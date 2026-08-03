@@ -1,0 +1,87 @@
+name: Generate canonical V1-V21 roadmap documentation
+
+on:
+  push:
+    branches:
+      - agent/roadmap-v1-v21-documentation
+    paths:
+      - '.github/workflows/generate-roadmap-v21.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate documentation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import base64
+          import gzip
+          import json
+
+          parts = []
+          for path in sorted(Path('.github/scripts').glob('roadmap_payload_*.txt')):
+              parts.append(path.read_text(encoding='utf-8').strip())
+          if len(parts) != 4:
+              raise SystemExit(f'Expected 4 payload parts, found {len(parts)}')
+
+          payload = ''.join(parts)
+          documents = json.loads(gzip.decompress(base64.b64decode(payload)).decode('utf-8'))
+          for relative_path, content in documents.items():
+              destination = Path(relative_path)
+              destination.parent.mkdir(parents=True, exist_ok=True)
+              destination.write_text(content, encoding='utf-8')
+          print(f'Generated {len(documents)} roadmap documentation files.')
+          PY
+
+      - name: Validate generated roadmap
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          import re
+
+          registry = Path('data/audit/product_scope_roadmap_lot21.jsonl')
+          rows = [json.loads(line) for line in registry.read_text(encoding='utf-8').splitlines() if line.strip()]
+          assert len(rows) == 178, len(rows)
+          assert [row['lot_number'] for row in rows] == list(range(178))
+          assert rows[25]['status'] == 'IMPLEMENTED_VALIDATED'
+          assert rows[26]['status'] == 'PLANNED_LOCKED'
+
+          master = Path('docs/ROADMAP_V1_TO_V21.md').read_text(encoding='utf-8')
+          for version in range(1, 22):
+              assert f'V{version}' in master
+
+          version_files = sorted(Path('docs/roadmap').glob('V*.md'))
+          assert len(version_files) == 21, len(version_files)
+          sections = []
+          for path in version_files:
+              text = path.read_text(encoding='utf-8')
+              sections.extend(int(value) for value in re.findall(r'^## Lot (\d+) —', text, flags=re.MULTILINE))
+          assert sections == list(range(178)), (sections[:5], sections[-5:], len(sections))
+          print('ROADMAP V1-V21 VALIDATION: PASS')
+          PY
+
+      - name: Commit generated documentation
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/scripts/roadmap_payload_*.txt
+          rm -f .github/workflows/generate-roadmap-v21.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Document canonical V1-V21 roadmap through Lot 177'
+          git push origin HEAD:agent/roadmap-v1-v21-documentation
