@@ -1,0 +1,614 @@
+{
+  "artifact_count": 21,
+  "artifacts": [
+    {
+      "artifact_id": "btc_eur_5m_market_state_lot7",
+      "artifact_type": "jsonl",
+      "checksum_sha256": "e6d5686dfacd6456bbd533b3b8a593ac6596f279242f3d829ab99c3d3e1ca246",
+      "consumes": [
+        "reports/lot_02_feature_report.md",
+        "reports/lot_03_pivot_report.md",
+        "reports/lot_04_volume_profile_report.md",
+        "reports/lot_05_volatility_report.md",
+        "reports/lot_06_regime_report.md"
+      ],
+      "created_at": "2026-07-06T09:05:35+00:00",
+      "line_count": 36,
+      "lot": "Lot 7",
+      "path": "data/gold/btc_eur_5m_market_state_lot7.jsonl",
+      "produced_by": "python scripts/build_lot7_market_state.py",
+      "required": true,
+      "size_bytes": 151393,
+      "validation_command": "python scripts/validate_lot7.py"
+    },
+    {
+      "artifact_id": "btc_eur_15m_market_state_lot7",
+      "artifact_type": "jsonl",
+      "checksum_sha256": "96f7fc73c83b96741933e1628a2f63d5435b628c6e7a15eae4c0f5d6f1d9b7d1",
+      "consumes": [
+        "reports/lot_02_multitimeframe_report.md",
+        "reports/lot_03_zone_report.md",
+        "reports/lot_04_vwap_report.md",
+        "reports/lot_05_range_state_report.md",
+        "reports/lot_06_regime_report.md"
+      ],
+      "created_at": "2026-07-06T09:05:35+00:00",
+      "line_count": 12,
+      "lot": "Lot 7",
+      "path": "data/gold/btc_eur_15m_market_state_lot7.jsonl",
+      "produced_by": "python scripts/build_lot7_market_state.py",
+      "required": true,
+      "size_bytes": 42632,
+      "validation_command": "python scripts/validate_lot7.py"
+    },
+    {
+      "artifact_id": "feature_registry_audit_lot8",
+      "artifact_type": "json",
+      "checksum_sha256": "997d70bbfed887457738b8b1e83428895018684358b6e99675563b5379f310d5",
+      "consumes": [
+        "data/gold/btc_eur_5m_market_state_lot7.jsonl",
+        "data/gold/btc_eur_15m_market_state_lot7.jsonl"
+      ],
+      "created_at": "2026-07-06T09:04:13+00:00",
+      "line_count": 73,
+      "lot": "Lot 8",
+      "path": "data/audit/feature_registry_audit_lot8.json",
+      "produced_by": "python scripts/audit_lot8_feature_registry.py",
+      "required": true,
+      "size_bytes": 3077,
+      "validation_command": "python scripts/validate_lot8.py"
+    },
+    {
+      "artifact_id": "no_lookahead_audit_lot8",
+      "artifact_type": "json",
+      "checksum_sha256": "44bb27c627d8ee21e3ac968ad5eff8a93590c01a5016d4f65fccb07b8fbffc47",
+      "consumes": [
+        "data/gold/btc_eur_5m_market_state_lot7.jsonl",
+        "data/gold/btc_eur_15m_market_state_lot7.jsonl"
+      ],
+      "created_at": "2026-07-06T09:04:14+00:00",
+      "line_count": 415,
+      "lot": "Lot 8",
+      "path": "data/audit/no_lookahead_audit_lot8.json",
+      "produced_by": "python scripts/audit_lot8_no_lookahead.py",
+      "required": true,
+      "size_bytes": 17800,
+      "validation_command": "python scripts/validate_lot8.py"
+    },
+    {
+      "artifact_id": "backtest_lot9_5m_steps",
+      "artifact_type": "jsonl",
+      "checksum_sha256": "a22852e914f30c6f4ba489c3518a4b42ce6261bbf4e28fc89f149ebb60731e2a",
+      "consumes": [
+        "data/gold/btc_eur_5m_market_state_lot7.jsonl",
+        "data/audit/feature_registry_audit_lot8.json",
+        "data/audit/no_lookahead_audit_lot8.json"
+      ],
+      "created_at": "2026-07-06T09:04:16+00:00",
+      "line_count": 36,
+      "lot": "Lot 9",
+      "path": "data/audit/backtest_lot9_5m_steps.jsonl",
+      "produced_by": "python scripts/run_lot9_backtest_replay.py",
+      "required": true,
+      "size_bytes": 30806,
+      "validation_command": "python scripts/validate_lot9.py"
+    },
+    {
+      "artifact_id": "backtest_lot9_15m_steps",
+      "artifact_type": "jsonl",
+      "checksum_sha256": "f8cdb634d3bea60729b5e6e3300c6749ee24bcae593d149793498a2457c3ab4f",
+      "consumes": [
+        "data/gold/btc_eur_15m_market_state_lot7.jsonl",
+        "data/audit/feature_registry_audit_lot8.json",
+        "data/audit/no_lookahead_audit_lot8.json"
+      ],
+      "created_at": "2026-07-06T09:04:16+00:00",
+      "line_count": 12,
+      "lot": "Lot 9",
+      "path": "data/audit/backtest_lot9_15m_steps.jsonl",
+      "produced_by": "python scripts/run_lot9_backtest_replay.py",
+      "required": true,
+      "size_bytes": 10286,
+      "validation_command": "python scripts/validate_lot9.py"
+    },
+    {
+      "artifact_id": "backtest_lot9_run_config",
+      "artifact_type": "json",
+      "checksum_sha256": "c51eb76e14dee280c9999239f3ca40cc6c2caacd55596d8db8a8a846f2dc07be",
+      "consumes": [
+        "data/audit/feature_registry_audit_lot8.json",
+        "data/audit/no_lookahead_audit_lot8.json"
+      ],
+      "created_at": "2026-07-06T09:04:16+00:00",
+      "line_count": 27,
+      "lot": "Lot 9",
+      "path": "data/audit/backtest_lot9_run_config.json",
+      "produced_by": "python scripts/run_lot9_backtest_replay.py",
+      "required": true,
+      "size_bytes": 847,
+      "validation_command": "python scripts/validate_lot9.py"
+    },
+    {
+      "artifact_id": "backtest_lot9_run_result",
+      "artifact_type": "json",
+      "checksum_sha256": "08e07a138be14dcb7ecc8728a7e236536d34ab8811a392cba7b69a476e396e62",
+      "consumes": [
+        "data/audit/backtest_lot9_5m_steps.jsonl",
+        "data/audit/backtest_lot9_15m_steps.jsonl",
+        "data/audit/backtest_lot9_run_config.json"
+      ],
+      "created_at": "2026-07-06T09:04:16+00:00",
+      "line_count": 33,
+      "lot": "Lot 9",
+      "path": "data/audit/backtest_lot9_run_result.json",
+      "produced_by": "python scripts/run_lot9_backtest_replay.py",
+      "required": true,
+      "size_bytes": 971,
+      "validation_command": "python scripts/validate_lot9.py"
+    },
+    {
+      "artifact_id": "transaction_cost_lot10_5m_estimates",
+      "artifact_type": "jsonl",
+      "checksum_sha256": "61bc64e89ab86a6387d9ed72023b48fa88a486125704837ee2cb23ce54577da2",
+      "consumes": [
+        "data/audit/backtest_lot9_5m_steps.jsonl",
+        "data/audit/backtest_lot9_run_result.json"
+      ],
+      "created_at": "2026-07-06T09:05:22+00:00",
+      "line_count": 36,
+      "lot": "Lot 10",
+      "path": "data/audit/transaction_cost_lot10_5m_estimates.jsonl",
+      "produced_by": "python scripts/run_lot10_transaction_costs.py",
+      "required": true,
+      "size_bytes": 50494,
+      "validation_command": "python scripts/validate_lot10.py"
+    },
+    {
+      "artifact_id": "transaction_cost_lot10_15m_estimates",
+      "artifact_type": "jsonl",
+      "checksum_sha256": "92d1976bfef60be3eae0391ce9bd0cc372a1436226a1ab914fd013de7559aac3",
+      "consumes": [
+        "data/audit/backtest_lot9_15m_steps.jsonl",
+        "data/audit/backtest_lot9_run_result.json"
+      ],
+      "created_at": "2026-07-06T09:05:22+00:00",
+      "line_count": 12,
+      "lot": "Lot 10",
+      "path": "data/audit/transaction_cost_lot10_15m_estimates.jsonl",
+      "produced_by": "python scripts/run_lot10_transaction_costs.py",
+      "required": true,
+      "size_bytes": 16859,
+      "validation_command": "python scripts/validate_lot10.py"
+    },
+    {
+      "artifact_id": "transaction_cost_lot10_run_result",
+      "artifact_type": "json",
+      "checksum_sha256": "1e876c03c098efbaa96d5433e2f3469bbc90fdb134399073814b2f18dc6f8309",
+      "consumes": [
+        "data/audit/transaction_cost_lot10_5m_estimates.jsonl",
+        "data/audit/transaction_cost_lot10_15m_estimates.jsonl"
+      ],
+      "created_at": "2026-07-06T09:05:22+00:00",
+      "line_count": 33,
+      "lot": "Lot 10",
+      "path": "data/audit/transaction_cost_lot10_run_result.json",
+      "produced_by": "python scripts/run_lot10_transaction_costs.py",
+      "required": true,
+      "size_bytes": 1073,
+      "validation_command": "python scripts/validate_lot10.py"
+    },
+    {
+      "artifact_id": "risk_engine_lot11_5m",
+      "artifact_type": "jsonl",
+      "checksum_sha256": "065aade623921985f906d585b4e8419e845dcae680017b71d279a2e6cf3e7a2c",
+      "consumes": [
+        "data/gold/btc_eur_5m_market_state_lot7.jsonl",
+        "data/audit/transaction_cost_lot10_5m_estimates.jsonl"
+      ],
+      "created_at": "2026-07-06T09:04:19+00:00",
+      "line_count": 36,
+      "lot": "Lot 11",
+      "path": "data/audit/risk_engine_lot11_5m.jsonl",
+      "produced_by": "python scripts/run_lot11_risk_engine.py",
+      "required": true,
+      "size_bytes": 93508,
+      "validation_command": "python scripts/validate_lot11.py"
+    },
+    {
+      "artifact_id": "risk_engine_lot11_15m",
+      "artifact_type": "jsonl",
+      "checksum_sha256": "dfebfb698d362a792148d40a86453ac10fb36fc881f64527a206efc2e8c07c56",
+      "consumes": [
+        "data/gold/btc_eur_15m_market_state_lot7.jsonl",
+        "data/audit/transaction_cost_lot10_15m_estimates.jsonl"
+      ],
+      "created_at": "2026-07-06T09:04:19+00:00",
+      "line_count": 12,
+      "lot": "Lot 11",
+      "path": "data/audit/risk_engine_lot11_15m.jsonl",
+      "produced_by": "python scripts/run_lot11_risk_engine.py",
+      "required": true,
+      "size_bytes": 31258,
+      "validation_command": "python scripts/validate_lot11.py"
+    },
+    {
+      "artifact_id": "exposure_guard_lot12_5m",
+      "artifact_type": "jsonl",
+      "checksum_sha256": "83fc8bef37e4601d38afa1614c83f9fa513c48426c261a121e6a45a27ec35ed4",
+      "consumes": [
+        "data/gold/btc_eur_5m_market_state_lot7.jsonl",
+        "data/audit/risk_engine_lot11_5m.jsonl"
+      ],
+      "created_at": "2026-07-06T09:04:20+00:00",
+      "line_count": 36,
+      "lot": "Lot 12",
+      "path": "data/audit/exposure_guard_lot12_5m.jsonl",
+      "produced_by": "python scripts/run_lot12_exposure_guard.py",
+      "required": true,
+      "size_bytes": 103259,
+      "validation_command": "python scripts/validate_lot12.py"
+    },
+    {
+      "artifact_id": "exposure_guard_lot12_15m",
+      "artifact_type": "jsonl",
+      "checksum_sha256": "3869cc0cebd8fdcdfc933f58b9a6a98becf38524be8ba891133ac604c5c7e8ab",
+      "consumes": [
+        "data/gold/btc_eur_15m_market_state_lot7.jsonl",
+        "data/audit/risk_engine_lot11_15m.jsonl"
+      ],
+      "created_at": "2026-07-06T09:04:20+00:00",
+      "line_count": 12,
+      "lot": "Lot 12",
+      "path": "data/audit/exposure_guard_lot12_15m.jsonl",
+      "produced_by": "python scripts/run_lot12_exposure_guard.py",
+      "required": true,
+      "size_bytes": 34461,
+      "validation_command": "python scripts/validate_lot12.py"
+    },
+    {
+      "artifact_id": "portfolio_freeze_lot13_5m",
+      "artifact_type": "jsonl",
+      "checksum_sha256": "064ca34200555e8410c30b269eaaa7d565eba9bab0b8685363d7c63eacc5e74f",
+      "consumes": [
+        "data/audit/risk_engine_lot11_5m.jsonl",
+        "data/audit/exposure_guard_lot12_5m.jsonl"
+      ],
+      "created_at": "2026-07-06T09:04:21+00:00",
+      "line_count": 36,
+      "lot": "Lot 13",
+      "path": "data/audit/portfolio_freeze_lot13_5m.jsonl",
+      "produced_by": "python scripts/run_lot13_portfolio_freeze.py",
+      "required": true,
+      "size_bytes": 142535,
+      "validation_command": "python scripts/validate_lot13.py"
+    },
+    {
+      "artifact_id": "portfolio_freeze_lot13_15m",
+      "artifact_type": "jsonl",
+      "checksum_sha256": "5f03d06249473f758f52224db85f57e7e8eb85d2293f7afc125ddbeafbaca1ba",
+      "consumes": [
+        "data/audit/risk_engine_lot11_15m.jsonl",
+        "data/audit/exposure_guard_lot12_15m.jsonl"
+      ],
+      "created_at": "2026-07-06T09:04:22+00:00",
+      "line_count": 12,
+      "lot": "Lot 13",
+      "path": "data/audit/portfolio_freeze_lot13_15m.jsonl",
+      "produced_by": "python scripts/run_lot13_portfolio_freeze.py",
+      "required": true,
+      "size_bytes": 47553,
+      "validation_command": "python scripts/validate_lot13.py"
+    },
+    {
+      "artifact_id": "final_decision_firewall_lot14_5m",
+      "artifact_type": "jsonl",
+      "checksum_sha256": "b5b087b198745595e7cbfffaea4bfa48dcdcac99506962b31d787ab19abfc46d",
+      "consumes": [
+        "data/gold/btc_eur_5m_market_state_lot7.jsonl",
+        "data/audit/transaction_cost_lot10_5m_estimates.jsonl",
+        "data/audit/risk_engine_lot11_5m.jsonl",
+        "data/audit/exposure_guard_lot12_5m.jsonl",
+        "data/audit/portfolio_freeze_lot13_5m.jsonl"
+      ],
+      "created_at": "2026-07-06T09:04:23+00:00",
+      "line_count": 36,
+      "lot": "Lot 14",
+      "path": "data/audit/final_decision_firewall_lot14_5m.jsonl",
+      "produced_by": "python scripts/run_lot14_decision_firewall.py",
+      "required": true,
+      "size_bytes": 158159,
+      "validation_command": "python scripts/validate_lot14.py"
+    },
+    {
+      "artifact_id": "final_decision_firewall_lot14_15m",
+      "artifact_type": "jsonl",
+      "checksum_sha256": "bad90476db37ca749e89f8869c588e40c3664c72eb956a8191cf0651aa1eedc4",
+      "consumes": [
+        "data/gold/btc_eur_15m_market_state_lot7.jsonl",
+        "data/audit/transaction_cost_lot10_15m_estimates.jsonl",
+        "data/audit/risk_engine_lot11_15m.jsonl",
+        "data/audit/exposure_guard_lot12_15m.jsonl",
+        "data/audit/portfolio_freeze_lot13_15m.jsonl"
+      ],
+      "created_at": "2026-07-06T09:04:23+00:00",
+      "line_count": 12,
+      "lot": "Lot 14",
+      "path": "data/audit/final_decision_firewall_lot14_15m.jsonl",
+      "produced_by": "python scripts/run_lot14_decision_firewall.py",
+      "required": true,
+      "size_bytes": 52785,
+      "validation_command": "python scripts/validate_lot14.py"
+    },
+    {
+      "artifact_id": "decision_ledger_lot15_5m",
+      "artifact_type": "jsonl",
+      "checksum_sha256": "42fd9f5255d5364633dc96e30dc65767ec2e191e50514262bfbdc6b3ce64a7a0",
+      "consumes": [
+        "data/gold/btc_eur_5m_market_state_lot7.jsonl",
+        "data/audit/transaction_cost_lot10_5m_estimates.jsonl",
+        "data/audit/risk_engine_lot11_5m.jsonl",
+        "data/audit/exposure_guard_lot12_5m.jsonl",
+        "data/audit/portfolio_freeze_lot13_5m.jsonl",
+        "data/audit/final_decision_firewall_lot14_5m.jsonl"
+      ],
+      "created_at": "2026-07-06T09:04:23+00:00",
+      "line_count": 36,
+      "lot": "Lot 15",
+      "path": "data/audit/decision_ledger_lot15_5m.jsonl",
+      "produced_by": "python scripts/run_lot15_decision_ledger.py",
+      "required": true,
+      "size_bytes": 174059,
+      "validation_command": "python scripts/validate_lot15.py"
+    },
+    {
+      "artifact_id": "decision_ledger_lot15_15m",
+      "artifact_type": "jsonl",
+      "checksum_sha256": "abb0d10f0b9121ee1ebab6163d410b161f510cf51ba7101429757006f3a5de86",
+      "consumes": [
+        "data/gold/btc_eur_15m_market_state_lot7.jsonl",
+        "data/audit/transaction_cost_lot10_15m_estimates.jsonl",
+        "data/audit/risk_engine_lot11_15m.jsonl",
+        "data/audit/exposure_guard_lot12_15m.jsonl",
+        "data/audit/portfolio_freeze_lot13_15m.jsonl",
+        "data/audit/final_decision_firewall_lot14_15m.jsonl"
+      ],
+      "created_at": "2026-07-06T09:04:23+00:00",
+      "line_count": 12,
+      "lot": "Lot 15",
+      "path": "data/audit/decision_ledger_lot15_15m.jsonl",
+      "produced_by": "python scripts/run_lot15_decision_ledger.py",
+      "required": true,
+      "size_bytes": 58151,
+      "validation_command": "python scripts/validate_lot15.py"
+    }
+  ],
+  "created_at": "2026-07-06T09:05:35.919239+00:00",
+  "critical_counts": {
+    "lot12": {
+      "15m": 12,
+      "5m": 36,
+      "total": 48
+    },
+    "lot13": {
+      "15m": 12,
+      "5m": 36,
+      "total": 48
+    },
+    "lot14": {
+      "15m": 12,
+      "5m": 36,
+      "total": 48
+    },
+    "lot15": {
+      "15m": 12,
+      "5m": 36,
+      "total": 48
+    }
+  },
+  "execution_allowed": false,
+  "external_connectivity_allowed": false,
+  "invariants": {
+    "Risk Engine blocks by default": true,
+    "SystemDecision": "BLOCK_TRADING",
+    "TradingDecision": "WAIT",
+    "allocation_allowed": false,
+    "capital_at_risk": 0,
+    "execution_allowed": false,
+    "exposure_allowed": false,
+    "external_connectivity_allowed": false,
+    "final_decision": "WAIT",
+    "final_system_decision": "BLOCK_TRADING",
+    "human_review_required": true,
+    "immutability_mode": "APPEND_ONLY_SIMULATED",
+    "leverage": "FORBIDDEN",
+    "live_execution": "DISABLED",
+    "portfolio_state": "FROZEN",
+    "rebalance_allowed": false,
+    "trade_allowed": false
+  },
+  "lineage_block_reasons": [
+    "REPRODUCIBILITY_MANIFEST_ONLY",
+    "LOCAL_ARTIFACTS_ONLY",
+    "NO_EXTERNAL_CONNECTIVITY",
+    "NO_EXECUTION_ALLOWED",
+    "NO_EXCHANGE_CONNECTOR",
+    "NO_ORDER_ROUTER",
+    "EDUCATIONAL_MODE_ONLY"
+  ],
+  "lineage_checks": [
+    {
+      "block_reason": "REPRODUCIBILITY_MANIFEST_ONLY",
+      "check_name": "manifest_scope",
+      "expected_value": "local_only",
+      "message": "Manifest remains a local reproducibility record only.",
+      "observed_value": "local_only",
+      "status": "BLOCK"
+    },
+    {
+      "block_reason": "LOCAL_ARTIFACTS_ONLY",
+      "check_name": "source_catalog",
+      "expected_value": "data/audit/dataset_catalog.json",
+      "message": "Source catalog path is local and explicit.",
+      "observed_value": "data/audit/dataset_catalog.json",
+      "status": "BLOCK"
+    },
+    {
+      "block_reason": "LOCAL_ARTIFACTS_ONLY",
+      "check_name": "artifact_count",
+      "expected_value": 21,
+      "message": "Explicit artifact list is recorded locally.",
+      "observed_value": 21,
+      "status": "BLOCK"
+    },
+    {
+      "block_reason": "NO_EXTERNAL_CONNECTIVITY",
+      "check_name": "external_connectivity_allowed",
+      "expected_value": false,
+      "message": "External connectivity remains disabled.",
+      "observed_value": false,
+      "status": "BLOCK"
+    },
+    {
+      "block_reason": "NO_EXECUTION_ALLOWED",
+      "check_name": "execution_allowed",
+      "expected_value": false,
+      "message": "Execution remains disabled.",
+      "observed_value": false,
+      "status": "BLOCK"
+    },
+    {
+      "block_reason": "NO_EXCHANGE_CONNECTOR",
+      "check_name": "exchange_connectivity",
+      "expected_value": "not_available",
+      "message": "No exchange connector is available.",
+      "observed_value": "not_available",
+      "status": "BLOCK"
+    },
+    {
+      "block_reason": "NO_ORDER_ROUTER",
+      "check_name": "routing_stack",
+      "expected_value": "not_available",
+      "message": "No routing stack is available.",
+      "observed_value": "not_available",
+      "status": "BLOCK"
+    },
+    {
+      "block_reason": "EDUCATIONAL_MODE_ONLY",
+      "check_name": "project_mode",
+      "expected_value": "EDUCATIONAL_AUDIT_ONLY",
+      "message": "Project remains educational audit only.",
+      "observed_value": "EDUCATIONAL_AUDIT_ONLY",
+      "status": "BLOCK"
+    },
+    {
+      "block_reason": "LOCAL_ARTIFACTS_ONLY",
+      "check_name": "lot12_total_rows",
+      "expected_value": 48,
+      "message": "Lot 12 critical row count remains stable.",
+      "observed_value": 48,
+      "status": "BLOCK"
+    },
+    {
+      "block_reason": "LOCAL_ARTIFACTS_ONLY",
+      "check_name": "lot13_total_rows",
+      "expected_value": 48,
+      "message": "Lot 13 critical row count remains stable.",
+      "observed_value": 48,
+      "status": "BLOCK"
+    },
+    {
+      "block_reason": "LOCAL_ARTIFACTS_ONLY",
+      "check_name": "lot14_total_rows",
+      "expected_value": 48,
+      "message": "Lot 14 critical row count remains stable.",
+      "observed_value": 48,
+      "status": "BLOCK"
+    },
+    {
+      "block_reason": "LOCAL_ARTIFACTS_ONLY",
+      "check_name": "lot15_total_rows",
+      "expected_value": 48,
+      "message": "Lot 15 critical row count remains stable.",
+      "observed_value": 48,
+      "status": "BLOCK"
+    }
+  ],
+  "lineage_state": "RECORDED",
+  "manifest_checksum": "556bbf85370640a417a645e2584f8733ef5a259edf340093cc549b3b3d9e51c3",
+  "manifest_version": "lot16_reproducibility_manifest_v0",
+  "policy_version": "lot16_reproducibility_manifest_v0",
+  "project_mode": "EDUCATIONAL_AUDIT_ONLY",
+  "project_name": "Crypto Quant Bot V3.1-Ops",
+  "replay_commands": [
+    "timeout 300s bash -lc '\npython scripts/validate_lot0.py &&\npython scripts/ingest_ohlcvt_fixture.py &&\npython scripts/validate_lot1.py &&\npython scripts/build_lot2_datasets.py &&\npython scripts/validate_lot2.py &&\npython scripts/build_lot3_pivots.py &&\npython scripts/validate_lot3.py &&\npython scripts/build_lot4_volume_vwap.py &&\npython scripts/validate_lot4.py &&\npython scripts/build_lot5_volatility.py &&\npython scripts/validate_lot5.py &&\npython scripts/build_lot6_regime.py &&\npython scripts/validate_lot6.py &&\npython scripts/build_lot7_market_state.py &&\npython scripts/validate_lot7.py &&\npython scripts/audit_lot8_feature_registry.py &&\npython scripts/audit_lot8_no_lookahead.py &&\npython scripts/validate_lot8.py &&\npython scripts/run_lot9_backtest_replay.py &&\npython scripts/validate_lot9.py &&\npython scripts/run_lot10_transaction_costs.py &&\npython scripts/validate_lot10.py &&\npython scripts/run_lot11_risk_engine.py &&\npython scripts/validate_lot11.py &&\npython scripts/run_lot12_exposure_guard.py &&\npython scripts/validate_lot12.py &&\npython scripts/run_lot13_portfolio_freeze.py &&\npython scripts/validate_lot13.py &&\npython scripts/run_lot14_decision_firewall.py &&\npython scripts/validate_lot14.py &&\npython scripts/run_lot15_decision_ledger.py &&\npython scripts/validate_lot15.py &&\npython scripts/run_lot16_reproducibility_manifest.py &&\npython scripts/validate_lot16.py &&\npython scripts/run_lot17_health_monitor.py &&\npython scripts/validate_lot17.py &&\npython -m pytest -q &&\necho EXACT_CHAIN_LOT16_DONE\n'"
+  ],
+  "reproducibility_scope_lot16": "LOT0_TO_LOT15_STABLE_SOURCE_CATALOG_ONLY",
+  "reproducibility_state": "REPRODUCIBLE_LOCALLY",
+  "source_artifacts": [
+    "data/audit/dataset_catalog.json",
+    "reports/lot_00_validation_report.md",
+    "reports/lot_01_data_quality_report.md",
+    "reports/lot_01_validation_report.md",
+    "reports/lot_02_feature_report.md",
+    "reports/lot_02_multitimeframe_report.md",
+    "reports/lot_03_pivot_report.md",
+    "reports/lot_03_zone_report.md",
+    "reports/lot_04_volume_profile_report.md",
+    "reports/lot_04_vwap_report.md",
+    "reports/lot_05_range_state_report.md",
+    "reports/lot_05_volatility_report.md",
+    "reports/lot_05_validation_report.md",
+    "reports/lot_06_regime_report.md",
+    "reports/lot_06_validation_report.md",
+    "reports/lot_07_market_state_report.md",
+    "reports/lot_07_validation_report.md",
+    "reports/lot_08_feature_registry_audit_report.md",
+    "reports/lot_08_no_lookahead_report.md",
+    "reports/lot_09_backtest_replay_report.md",
+    "reports/lot_10_transaction_costs_report.md",
+    "reports/lot_10_validation_report.md",
+    "reports/lot_11_risk_engine_report.md",
+    "reports/lot_11_validation_report.md",
+    "reports/lot_12_exposure_guard_report.md",
+    "reports/lot_12_validation_report.md",
+    "reports/lot_13_portfolio_freeze_report.md",
+    "reports/lot_13_validation_report.md",
+    "reports/lot_14_decision_firewall_report.md",
+    "reports/lot_14_validation_report.md",
+    "reports/lot_15_decision_ledger_report.md",
+    "reports/lot_15_validation_report.md",
+    "data/gold/btc_eur_5m_market_state_lot7.jsonl",
+    "data/gold/btc_eur_15m_market_state_lot7.jsonl",
+    "data/audit/feature_registry_audit_lot8.json",
+    "data/audit/no_lookahead_audit_lot8.json",
+    "data/audit/backtest_lot9_5m_steps.jsonl",
+    "data/audit/backtest_lot9_15m_steps.jsonl",
+    "data/audit/backtest_lot9_run_config.json",
+    "data/audit/backtest_lot9_run_result.json",
+    "data/audit/transaction_cost_lot10_5m_estimates.jsonl",
+    "data/audit/transaction_cost_lot10_15m_estimates.jsonl",
+    "data/audit/transaction_cost_lot10_run_result.json",
+    "data/audit/risk_engine_lot11_5m.jsonl",
+    "data/audit/risk_engine_lot11_15m.jsonl",
+    "data/audit/exposure_guard_lot12_5m.jsonl",
+    "data/audit/exposure_guard_lot12_15m.jsonl",
+    "data/audit/portfolio_freeze_lot13_5m.jsonl",
+    "data/audit/portfolio_freeze_lot13_15m.jsonl",
+    "data/audit/final_decision_firewall_lot14_5m.jsonl",
+    "data/audit/final_decision_firewall_lot14_15m.jsonl",
+    "data/audit/decision_ledger_lot15_5m.jsonl",
+    "data/audit/decision_ledger_lot15_15m.jsonl"
+  ],
+  "source_catalog_checksum": "8fa194ab16af5bbdc2e246c5f1232d32e61643e18b4772d4261a2fcedfde86c1",
+  "source_catalog_entry_count": 51,
+  "source_catalog_path": "data/audit/dataset_catalog.json",
+  "source_catalog_scope": "LOT0_TO_LOT15_STABLE_SOURCE_CATALOG_ONLY",
+  "trade_allowed": false,
+  "validation_commands": [
+    "python scripts/validate_lot16.py",
+    "python scripts/validate_all_until_lot16.py",
+    "bash scripts/run_required_chain_until_lot16.sh",
+    "python scripts/diagnose_lot16_required_chain_timing.py",
+    "python scripts/diagnose_exact_chain_until_lot16.py"
+  ]
+}

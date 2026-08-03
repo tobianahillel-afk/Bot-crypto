@@ -1,0 +1,178 @@
+{
+  "analysis_mode": "LOCAL_OFFLINE_ANALYSIS_ONLY",
+  "combined_context_score": 0.66782,
+  "combined_context_state": "TRM_CONTEXT_TRENDING",
+  "created_at": "2026-07-06T09:05:06.023225+00:00",
+  "dataset_timeframes": [
+    "5m",
+    "15m"
+  ],
+  "execution_allowed": false,
+  "external_connectivity_allowed": false,
+  "indicator_mode": "LOCAL_OFFLINE_INDICATORS_ONLY",
+  "input_rows_by_timeframe": {
+    "15m": 12,
+    "5m": 36
+  },
+  "leverage": "FORBIDDEN",
+  "live_execution": "DISABLED",
+  "momentum_context_score": 0.620213,
+  "momentum_state": "MOMENTUM_CONTEXT_ACCELERATING",
+  "policy_version": "lot24_trend_range_momentum_v0",
+  "project_mode": "EDUCATIONAL_AUDIT_ONLY",
+  "project_name": "Crypto Quant Bot V3.1-Ops",
+  "range_context_score": 0.677091,
+  "range_state": "RANGE_CONTEXT_BREAKING_STRUCTURE",
+  "source_artifacts": [
+    "data/audit/market_analysis_lot22.json",
+    "data/audit/market_analysis_timeframes_lot22.jsonl",
+    "data/audit/product_scope_lot21.json",
+    "data/audit/technical_indicators_lot23.json",
+    "data/audit/technical_indicators_timeframes_lot23.jsonl",
+    "data/audit/v1_closure_lot20.json",
+    "data/silver/btc_eur_15m_ohlcvt_lot5.jsonl",
+    "data/silver/btc_eur_5m_ohlcvt_lot5.jsonl",
+    "dist/crypto_quant_bot_v1_defensive_audit_lot_20.sha256",
+    "dist/crypto_quant_bot_v1_defensive_audit_lot_20.tar.gz",
+    "reports/lot_21_v1_archive_freeze_report.md",
+    "scripts/validate_v1_archive_frozen.py"
+  ],
+  "source_v1_archive_frozen": true,
+  "timeframe_summaries": [
+    {
+      "atr_5": 230.392,
+      "bollinger_width_5": 1.235654,
+      "close_change_percent": 0.938221,
+      "close_first": 50307.99,
+      "close_last": 50779.99,
+      "combined_context_score": 0.644653,
+      "combined_context_state": "TRM_CONTEXT_TRENDING",
+      "first_timestamp": "2026-05-25T00:00:00Z",
+      "last_timestamp": "2026-05-25T02:55:00Z",
+      "macd_histogram": 17.18202,
+      "momentum_3": 119.94,
+      "momentum_context_score": 0.645176,
+      "momentum_state": "MOMENTUM_CONTEXT_ACCELERATING",
+      "non_executable_summary": "5m trend/range/momentum remains descriptive only with state TRM_CONTEXT_TRENDING and score 0.644653; execution, routing and allocation stay blocked.",
+      "range_context_score": 0.578835,
+      "range_high_5": 50805.93,
+      "range_low_5": 49906.2,
+      "range_position_percent": 97.116913,
+      "range_state": "RANGE_CONTEXT_BREAKING_STRUCTURE",
+      "range_width_5": 899.73,
+      "range_width_percent": 1.77182,
+      "rate_of_change_3": 0.236755,
+      "row_count": 36,
+      "rsi_5": 96.352921,
+      "timeframe": "5m",
+      "trend_context_score": 0.709949,
+      "trend_direction_context": "UPWARD_SLOPE",
+      "trend_slope_5": 113.3275,
+      "trend_state": "TREND_CONTEXT_UPWARD"
+    },
+    {
+      "atr_5": 452.488,
+      "bollinger_width_5": 2.485574,
+      "close_change_percent": 0.764545,
+      "close_first": 50394.7,
+      "close_last": 50779.99,
+      "combined_context_score": 0.690987,
+      "combined_context_state": "TRM_CONTEXT_TRENDING",
+      "first_timestamp": "2026-05-25T00:00:00Z",
+      "last_timestamp": "2026-05-25T02:45:00Z",
+      "macd_histogram": 44.276413,
+      "momentum_3": 167.63,
+      "momentum_context_score": 0.595251,
+      "momentum_state": "MOMENTUM_CONTEXT_ACCELERATING",
+      "non_executable_summary": "15m trend/range/momentum remains descriptive only with state TRM_CONTEXT_TRENDING and score 0.690987; execution, routing and allocation stay blocked.",
+      "range_context_score": 0.775348,
+      "range_high_5": 50805.93,
+      "range_low_5": 49822.05,
+      "range_position_percent": 97.3635,
+      "range_state": "RANGE_CONTEXT_BREAKING_STRUCTURE",
+      "range_width_5": 983.88,
+      "range_width_percent": 1.937535,
+      "rate_of_change_3": 0.331204,
+      "row_count": 12,
+      "rsi_5": 51.805354,
+      "timeframe": "15m",
+      "trend_context_score": 0.702361,
+      "trend_direction_context": "UPWARD_SLOPE",
+      "trend_slope_5": 59.4975,
+      "trend_state": "TREND_CONTEXT_UPWARD"
+    }
+  ],
+  "trade_allowed": false,
+  "trend_block_reasons": [
+    "TREND_RANGE_MOMENTUM_ONLY",
+    "NO_EXECUTION_ALLOWED",
+    "NO_EXTERNAL_CONNECTIVITY",
+    "NO_EXCHANGE_CONNECTOR",
+    "NO_ORDER_ROUTER",
+    "NO_API_KEYS",
+    "NO_WEBSOCKET",
+    "NO_PAPER_TRADING_ACTIVE",
+    "NO_LIVE_TRADING_ACTIVE",
+    "NO_STRATEGY_ENGINE",
+    "EDUCATIONAL_MODE_ONLY",
+    "HUMAN_REVIEW_REQUIRED_BEFORE_DECISION_ENGINE"
+  ],
+  "trend_checks": [
+    {
+      "block_reason": "NO_EXECUTION_ALLOWED",
+      "check_name": "v1_archive_frozen",
+      "expected_value": true,
+      "message": "Frozen V1 archive remains validated with checksum ef5b5998cd5f75b6d97acc4afc10aeaf4833b565d2c11e9f3278bace06c78667 and size 366985.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "EDUCATIONAL_MODE_ONLY",
+      "check_name": "product_scope_alignment",
+      "expected_value": "OPENED_AS_PLANNING_ONLY",
+      "message": "Lot 21 product scope remains planning-only and blocks any executable layer.",
+      "observed_value": "OPENED_AS_PLANNING_ONLY",
+      "status": "PASS"
+    },
+    {
+      "block_reason": "NO_STRATEGY_ENGINE",
+      "check_name": "market_analysis_alignment",
+      "expected_value": "LOCAL_OFFLINE_ANALYSIS_ONLY",
+      "message": "Lot 22 market analysis remains a local descriptive dependency only.",
+      "observed_value": "LOCAL_OFFLINE_ANALYSIS_ONLY",
+      "status": "PASS"
+    },
+    {
+      "block_reason": "TREND_RANGE_MOMENTUM_ONLY",
+      "check_name": "technical_indicator_alignment",
+      "expected_value": "LOCAL_OFFLINE_INDICATORS_ONLY",
+      "message": "Lot 23 technical indicators remain local and descriptive only.",
+      "observed_value": "LOCAL_OFFLINE_INDICATORS_ONLY",
+      "status": "PASS"
+    },
+    {
+      "block_reason": "TREND_RANGE_MOMENTUM_ONLY",
+      "check_name": "trend_timeframes",
+      "expected_value": [
+        "5m",
+        "15m"
+      ],
+      "message": "Trend/Range/Momentum summaries cover only the validated 5m and 15m local timeframes.",
+      "observed_value": [
+        "5m",
+        "15m"
+      ],
+      "status": "PASS"
+    }
+  ],
+  "trend_checksum": "db05e4d5eee6c444c3289c88b2bf6883f41018794f5a6346d506520cc901cdc7",
+  "trend_context_score": 0.706155,
+  "trend_engine_mode": "LOCAL_OFFLINE_TREND_RANGE_MOMENTUM_ONLY",
+  "trend_engine_version": "lot24_trend_range_momentum_v0",
+  "trend_state": "TREND_CONTEXT_UPWARD",
+  "trend_timeframes": [
+    "5m",
+    "15m"
+  ],
+  "v2_scope_state": "OPENED_AS_PLANNING_ONLY"
+}

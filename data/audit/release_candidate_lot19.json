@@ -1,0 +1,411 @@
+{
+  "acceptance_criteria": [
+    "Lots 0 to 18 remain locally replayable.",
+    "The exact chain remains expected green.",
+    "pytest remains expected green.",
+    "Critical artifacts, reports and scripts remain present.",
+    "Lot 17 health monitor remains healthy for local audit.",
+    "Lot 18 no-trading compliance remains enforced.",
+    "Lot 16 reproducibility manifest remains readable and reproducible locally.",
+    "Lot 15 decision ledger remains coherent and append-only simulated.",
+    "No executable decision, no archive package and no network channel exist.",
+    "Human review is required before any next phase."
+  ],
+  "acceptance_state": "ACCEPTANCE_BUNDLE_GENERATED",
+  "api\u005fkey_present": false,
+  "archive_created": false,
+  "compliance_state": "COMPLIANT",
+  "created_at": "2026-07-06T09:04:31.798611+00:00",
+  "critical_counts_valid": true,
+  "dataset_catalog_valid": true,
+  "exact_chain_state": "EXPECTED_GREEN",
+  "exchange_connector_present": false,
+  "execution_allowed": false,
+  "external_connectivity_allowed": false,
+  "final_decision": "WAIT",
+  "final_system_decision": "BLOCK_TRADING",
+  "forbidden_semantics_present": false,
+  "health_monitor_valid": true,
+  "health_state": "HEALTHY_FOR_LOCAL_AUDIT",
+  "integrity_state": "VERIFIED",
+  "invariants": {
+    "Risk Engine blocks by default": true,
+    "SystemDecision": "BLOCK_TRADING",
+    "TradingDecision": "WAIT",
+    "allocation_allowed": false,
+    "capital_at_risk": 0,
+    "compliance_state": "COMPLIANT",
+    "execution_allowed": false,
+    "exposure_allowed": false,
+    "external_connectivity_allowed": false,
+    "final_decision": "WAIT",
+    "final_system_decision": "BLOCK_TRADING",
+    "human_review_required": true,
+    "immutability_mode": "APPEND_ONLY_SIMULATED",
+    "leverage": "FORBIDDEN",
+    "live_execution": "DISABLED",
+    "no_trading_state": "ENFORCED",
+    "portfolio_state": "FROZEN",
+    "project_mode": "EDUCATIONAL_AUDIT_ONLY",
+    "rebalance_allowed": false,
+    "trade_allowed": false
+  },
+  "leverage": "FORBIDDEN",
+  "live_execution": "DISABLED",
+  "no_trading_compliance_valid": true,
+  "no_trading_state": "ENFORCED",
+  "order_router_present": false,
+  "packaging_state": "NO_ARCHIVE_CREATED",
+  "paper_trading_present": false,
+  "policy_version": "lot19_release_candidate_v0",
+  "project_mode": "EDUCATIONAL_AUDIT_ONLY",
+  "project_name": "Crypto Quant Bot V3.1-Ops",
+  "pytest_state": "EXPECTED_GREEN",
+  "release_block_reasons": [
+    "DEFENSIVE_RELEASE_CANDIDATE_ONLY",
+    "NO_ARCHIVE_CREATED",
+    "NO_EXECUTION_ALLOWED",
+    "NO_EXTERNAL_CONNECTIVITY",
+    "NO_EXCHANGE_CONNECTOR",
+    "NO_ORDER_ROUTER",
+    "NO_API_KEYS",
+    "NO_WEBSOCKET",
+    "NO_PAPER_TRADING",
+    "NO_STRATEGY_ENGINE",
+    "EDUCATIONAL_MODE_ONLY",
+    "HUMAN_REVIEW_REQUIRED_BEFORE_NEXT_PHASE"
+  ],
+  "release_candidate_state": "READY_FOR_LOCAL_AUDIT_REVIEW",
+  "release_candidate_version": "lot19_release_candidate_v0",
+  "release_checks": [
+    {
+      "block_reason": "DEFENSIVE_RELEASE_CANDIDATE_ONLY",
+      "check_name": "required_artifacts_present",
+      "expected_value": true,
+      "message": "Critical Lot 12 to Lot 18 artifacts exist locally.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "DEFENSIVE_RELEASE_CANDIDATE_ONLY",
+      "check_name": "required_reports_present",
+      "expected_value": true,
+      "message": "Critical Lot 12 to Lot 18 reports exist locally.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "DEFENSIVE_RELEASE_CANDIDATE_ONLY",
+      "check_name": "required_scripts_present",
+      "expected_value": true,
+      "message": "Required run, validate and diagnose scripts exist locally.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "NO_ORDER_ROUTER",
+      "check_name": "critical_counts_valid",
+      "expected_value": {
+        "lot12": {
+          "15m": 12,
+          "5m": 36,
+          "total": 48
+        },
+        "lot13": {
+          "15m": 12,
+          "5m": 36,
+          "total": 48
+        },
+        "lot14": {
+          "15m": 12,
+          "5m": 36,
+          "total": 48
+        },
+        "lot15": {
+          "15m": 12,
+          "5m": 36,
+          "total": 48
+        }
+      },
+      "message": "Critical 36/12/48 counts remain stable for Lots 12 to 15.",
+      "observed_value": {
+        "lot12": {
+          "15m": 12,
+          "5m": 36,
+          "total": 48
+        },
+        "lot13": {
+          "15m": 12,
+          "5m": 36,
+          "total": 48
+        },
+        "lot14": {
+          "15m": 12,
+          "5m": 36,
+          "total": 48
+        },
+        "lot15": {
+          "15m": 12,
+          "5m": 36,
+          "total": 48
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "block_reason": "DEFENSIVE_RELEASE_CANDIDATE_ONLY",
+      "check_name": "reproducibility_manifest_valid",
+      "expected_value": "REPRODUCIBLE_LOCALLY",
+      "message": "Lot 16 manifest remains reproducible locally.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "DEFENSIVE_RELEASE_CANDIDATE_ONLY",
+      "check_name": "health_monitor_valid",
+      "expected_value": "HEALTHY_FOR_LOCAL_AUDIT",
+      "message": "Lot 17 health monitor remains healthy.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "DEFENSIVE_RELEASE_CANDIDATE_ONLY",
+      "check_name": "no_trading_compliance_valid",
+      "expected_value": "COMPLIANT_ENFORCED",
+      "message": "Lot 18 no-trading compliance remains enforced.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "DEFENSIVE_RELEASE_CANDIDATE_ONLY",
+      "check_name": "dataset_catalog_valid",
+      "expected_value": true,
+      "message": "dataset_catalog.json remains coherent and idempotent.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "NO_EXECUTION_ALLOWED",
+      "check_name": "lot12_guard_coherent",
+      "expected_value": false,
+      "message": "Lot 12 guard rows remain blocked and non executable.",
+      "observed_value": false,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "NO_EXECUTION_ALLOWED",
+      "check_name": "lot13_freeze_coherent",
+      "expected_value": false,
+      "message": "Lot 13 freeze rows remain blocked and non executable.",
+      "observed_value": false,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "NO_EXECUTION_ALLOWED",
+      "check_name": "lot14_firewall_coherent",
+      "expected_value": false,
+      "message": "Lot 14 firewall rows remain blocked and non executable.",
+      "observed_value": false,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "HUMAN_REVIEW_REQUIRED_BEFORE_NEXT_PHASE",
+      "check_name": "lot15_ledger_coherent",
+      "expected_value": false,
+      "message": "Lot 15 decision ledger remains coherent and append-only simulated.",
+      "observed_value": false,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "NO_ARCHIVE_CREATED",
+      "check_name": "archive_not_created",
+      "expected_value": false,
+      "message": "No archive packaging output exists for Lot 19.",
+      "observed_value": [],
+      "status": "PASS"
+    },
+    {
+      "block_reason": "NO_EXECUTION_ALLOWED",
+      "check_name": "execution_disabled",
+      "expected_value": false,
+      "message": "Execution remains disabled.",
+      "observed_value": false,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "NO_EXTERNAL_CONNECTIVITY",
+      "check_name": "external_connectivity_disabled",
+      "expected_value": false,
+      "message": "External connectivity remains disabled.",
+      "observed_value": false,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "NO_EXCHANGE_CONNECTOR",
+      "check_name": "exchange_connector_absent",
+      "expected_value": false,
+      "message": "No exchange connector is present.",
+      "observed_value": false,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "NO_ORDER_ROUTER",
+      "check_name": "order_router_absent",
+      "expected_value": false,
+      "message": "No order router is present.",
+      "observed_value": false,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "NO_API_KEYS",
+      "check_name": "api_credentials_absent",
+      "expected_value": false,
+      "message": "No API credentials are present.",
+      "observed_value": false,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "NO_WEBSOCKET",
+      "check_name": "ws_transport_absent",
+      "expected_value": false,
+      "message": "No WS transport is present.",
+      "observed_value": false,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "NO_PAPER_TRADING",
+      "check_name": "paper_mode_absent",
+      "expected_value": false,
+      "message": "No paper mode is present.",
+      "observed_value": false,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "NO_STRATEGY_ENGINE",
+      "check_name": "strategy_stack_absent",
+      "expected_value": false,
+      "message": "No strategy stack is present.",
+      "observed_value": false,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "DEFENSIVE_RELEASE_CANDIDATE_ONLY",
+      "check_name": "forbidden_semantics_absent",
+      "expected_value": false,
+      "message": "No executable trading semantics are present in the audited surfaces.",
+      "observed_value": {
+        "forbidden_semantics_present": false,
+        "network_hits": []
+      },
+      "status": "PASS"
+    },
+    {
+      "block_reason": "HUMAN_REVIEW_REQUIRED_BEFORE_NEXT_PHASE",
+      "check_name": "pytest_expected_green",
+      "expected_value": "EXPECTED_GREEN",
+      "message": "pytest remains part of the final local acceptance chain.",
+      "observed_value": "EXPECTED_GREEN",
+      "status": "PASS"
+    },
+    {
+      "block_reason": "HUMAN_REVIEW_REQUIRED_BEFORE_NEXT_PHASE",
+      "check_name": "exact_chain_expected_green",
+      "expected_value": "EXPECTED_GREEN",
+      "message": "The exact chain remains part of the final local acceptance chain.",
+      "observed_value": "EXPECTED_GREEN",
+      "status": "PASS"
+    },
+    {
+      "block_reason": "EDUCATIONAL_MODE_ONLY",
+      "check_name": "educational_mode_only",
+      "expected_value": "EDUCATIONAL_AUDIT_ONLY",
+      "message": "Project remains educational audit only.",
+      "observed_value": "EDUCATIONAL_AUDIT_ONLY",
+      "status": "PASS"
+    }
+  ],
+  "release_checksum": "533fac25e70299679b8e65ee8d933d8970397c0b67b02c58fd2d6e74e72bdbe0",
+  "reproducibility_manifest_valid": true,
+  "reproducibility_state": "REPRODUCIBLE_LOCALLY",
+  "required_artifacts_present": true,
+  "required_reports_present": true,
+  "required_scripts_present": true,
+  "source_artifacts": [
+    "data/audit/dataset_catalog.json",
+    "data/audit/decision_ledger_lot15_15m.jsonl",
+    "data/audit/decision_ledger_lot15_5m.jsonl",
+    "data/audit/exposure_guard_lot12_15m.jsonl",
+    "data/audit/exposure_guard_lot12_5m.jsonl",
+    "data/audit/final_decision_firewall_lot14_15m.jsonl",
+    "data/audit/final_decision_firewall_lot14_5m.jsonl",
+    "data/audit/health_checks_lot17.jsonl",
+    "data/audit/health_monitor_lot17.json",
+    "data/audit/no_trading_compliance_checks_lot18.jsonl",
+    "data/audit/no_trading_compliance_lot18.json",
+    "data/audit/portfolio_freeze_lot13_15m.jsonl",
+    "data/audit/portfolio_freeze_lot13_5m.jsonl",
+    "data/audit/reproducibility_artifacts_lot16.jsonl",
+    "data/audit/reproducibility_manifest_lot16.json",
+    "reports/lot_12_exposure_guard_report.md",
+    "reports/lot_12_validation_report.md",
+    "reports/lot_13_portfolio_freeze_report.md",
+    "reports/lot_13_validation_report.md",
+    "reports/lot_14_decision_firewall_report.md",
+    "reports/lot_14_validation_report.md",
+    "reports/lot_15_decision_ledger_report.md",
+    "reports/lot_15_validation_report.md",
+    "reports/lot_16_reproducibility_report.md",
+    "reports/lot_16_validation_report.md",
+    "reports/lot_17_health_monitor_report.md",
+    "reports/lot_17_validation_report.md",
+    "reports/lot_18_no_trading_compliance_report.md",
+    "reports/lot_18_validation_report.md",
+    "scripts/diagnose_exact_chain_until_lot12.py",
+    "scripts/diagnose_exact_chain_until_lot13.py",
+    "scripts/diagnose_exact_chain_until_lot14.py",
+    "scripts/diagnose_exact_chain_until_lot15.py",
+    "scripts/diagnose_exact_chain_until_lot16.py",
+    "scripts/diagnose_exact_chain_until_lot17.py",
+    "scripts/diagnose_exact_chain_until_lot18.py",
+    "scripts/diagnose_lot12_required_chain_timing.py",
+    "scripts/diagnose_lot13_required_chain_timing.py",
+    "scripts/diagnose_lot14_required_chain_timing.py",
+    "scripts/diagnose_lot15_required_chain_timing.py",
+    "scripts/diagnose_lot16_required_chain_timing.py",
+    "scripts/diagnose_lot17_required_chain_timing.py",
+    "scripts/diagnose_lot18_required_chain_timing.py",
+    "scripts/run_lot12_exposure_guard.py",
+    "scripts/run_lot13_portfolio_freeze.py",
+    "scripts/run_lot14_decision_firewall.py",
+    "scripts/run_lot15_decision_ledger.py",
+    "scripts/run_lot16_reproducibility_manifest.py",
+    "scripts/run_lot17_health_monitor.py",
+    "scripts/run_lot18_no_trading_compliance.py",
+    "scripts/run_required_chain_until_lot12.sh",
+    "scripts/run_required_chain_until_lot13.sh",
+    "scripts/run_required_chain_until_lot14.sh",
+    "scripts/run_required_chain_until_lot15.sh",
+    "scripts/run_required_chain_until_lot16.sh",
+    "scripts/run_required_chain_until_lot17.sh",
+    "scripts/run_required_chain_until_lot18.sh",
+    "scripts/validate_all_until_lot12.py",
+    "scripts/validate_all_until_lot13.py",
+    "scripts/validate_all_until_lot14.py",
+    "scripts/validate_all_until_lot15.py",
+    "scripts/validate_all_until_lot16.py",
+    "scripts/validate_all_until_lot17.py",
+    "scripts/validate_all_until_lot18.py",
+    "scripts/validate_lot12.py",
+    "scripts/validate_lot13.py",
+    "scripts/validate_lot14.py",
+    "scripts/validate_lot15.py",
+    "scripts/validate_lot16.py",
+    "scripts/validate_lot17.py",
+    "scripts/validate_lot18.py"
+  ],
+  "strategy_present": false,
+  "system_decision": "BLOCK_TRADING",
+  "trade_allowed": false,
+  "trading_decision": "WAIT",
+  "websock\u0065t_present": false
+}

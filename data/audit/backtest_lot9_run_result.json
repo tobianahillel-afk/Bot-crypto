@@ -1,0 +1,33 @@
+{
+  "available_at": "2026-07-06T09:04:16.089451+00:00",
+  "created_at": "2026-07-06T09:04:16.089444+00:00",
+  "decision_counts": {
+    "WAIT": 48
+  },
+  "end_timestamp": "2026-05-25T02:55:00Z",
+  "fills_created_count": 0,
+  "finished_at": "2026-07-06T09:04:16.089394+00:00",
+  "id": "7a7590b7-cda1-4b1e-a7c2-b811a62bafb3",
+  "lineage_id": "065bda1a-011d-4b02-9cca-7c08b7910888",
+  "lookahead_violations": [],
+  "orders_created_count": 0,
+  "pair": "BTC/EUR",
+  "pnl_total": 0,
+  "policy_name": "noop_wait_policy",
+  "quality_flag": "valid",
+  "reports": [
+    "reports/lot_09_backtest_replay_report.md"
+  ],
+  "run_id": "lot9_replay_65d52a09-03d0-4a05-a85b-cb2e9a9db89a",
+  "schema_version": "1.0.0",
+  "source": "lot9_backtest_replay_v0",
+  "start_timestamp": "2026-05-25T00:00:00Z",
+  "started_at": "2026-07-06T09:04:16.050613+00:00",
+  "step_count": 48,
+  "timeframes": [
+    "15m",
+    "5m"
+  ],
+  "used_for_decision": false,
+  "validation_status": "validated_lot9"
+}

@@ -1,0 +1,33 @@
+{
+  "available_at": "2026-07-06T09:04:17.662481+00:00",
+  "average_total_cost_bps": 80.27697712,
+  "created_at": "2026-07-06T09:04:17.662474+00:00",
+  "estimate_count": 48,
+  "fee_model_version": "lot10_fee_model_v0",
+  "fills_created_count": 0,
+  "finished_at": "2026-07-06T09:04:17.662422+00:00",
+  "id": "be5ce963-25c5-4f59-8a28-1c203101b7ce",
+  "lineage_id": "1fe9cdeb-f50f-43c8-bb5b-4a832f5224ca",
+  "max_total_cost_bps": 186.0010886,
+  "min_total_cost_bps": 41.0,
+  "orders_created_count": 0,
+  "pair": "BTC/EUR",
+  "pnl_total": 0,
+  "quality_flag": "valid",
+  "reports": [
+    "reports/lot_10_transaction_costs_report.md"
+  ],
+  "run_id": "lot10_costs_e0390846-a363-4db1-bade-7691ca1a485f",
+  "schema_version": "1.0.0",
+  "slippage_model_version": "lot10_slippage_model_v0",
+  "source": "lot10_transaction_cost_model_v0",
+  "spread_model_version": "lot10_spread_model_v0",
+  "started_at": "2026-07-06T09:04:17.656834+00:00",
+  "timeframes": [
+    "15m",
+    "5m"
+  ],
+  "trade_allowed": false,
+  "used_for_decision": false,
+  "validation_status": "validated_lot10"
+}

@@ -1,0 +1,404 @@
+{
+  "analysis_mode": "LOCAL_OFFLINE_ANALYSIS_ONLY",
+  "created_at": "2026-07-06T09:05:03.905261+00:00",
+  "dataset_timeframes": [
+    "5m",
+    "15m"
+  ],
+  "execution_allowed": false,
+  "external_connectivity_allowed": false,
+  "indicator_block_reasons": [
+    "TECHNICAL_INDICATORS_ONLY",
+    "NO_EXECUTION_ALLOWED",
+    "NO_EXTERNAL_CONNECTIVITY",
+    "NO_EXCHANGE_CONNECTOR",
+    "NO_ORDER_ROUTER",
+    "NO_API_KEYS",
+    "NO_WEBSOCKET",
+    "NO_PAPER_TRADING_ACTIVE",
+    "NO_LIVE_TRADING_ACTIVE",
+    "NO_STRATEGY_ENGINE",
+    "EDUCATIONAL_MODE_ONLY",
+    "HUMAN_REVIEW_REQUIRED_BEFORE_DECISION_ENGINE"
+  ],
+  "indicator_checks": [
+    {
+      "block_reason": "NO_EXECUTION_ALLOWED",
+      "check_name": "v1_archive_frozen",
+      "expected_value": true,
+      "message": "Frozen V1 archive remains validated with checksum ef5b5998cd5f75b6d97acc4afc10aeaf4833b565d2c11e9f3278bace06c78667 and size 366985.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "EDUCATIONAL_MODE_ONLY",
+      "check_name": "product_scope_alignment",
+      "expected_value": "OPENED_AS_PLANNING_ONLY",
+      "message": "Product scope remains planning-only and blocks any active trading implementation.",
+      "observed_value": "OPENED_AS_PLANNING_ONLY",
+      "status": "PASS"
+    },
+    {
+      "block_reason": "NO_STRATEGY_ENGINE",
+      "check_name": "market_analysis_alignment",
+      "expected_value": "LOCAL_OFFLINE_ANALYSIS_ONLY",
+      "message": "Lot 22 market analysis remains a local offline dependency only.",
+      "observed_value": "LOCAL_OFFLINE_ANALYSIS_ONLY",
+      "status": "PASS"
+    },
+    {
+      "block_reason": "TECHNICAL_INDICATORS_ONLY",
+      "check_name": "indicator_timeframes",
+      "expected_value": [
+        "5m",
+        "15m"
+      ],
+      "message": "Technical indicators are produced only for the validated local 5m and 15m timeframes.",
+      "observed_value": [
+        "5m",
+        "15m"
+      ],
+      "status": "PASS"
+    }
+  ],
+  "indicator_checksum": "adfae96bdc7f098c9c04bbb38971739376b8094eb1000d2771fc3bd9c37c46a7",
+  "indicator_context_score": 0.337561,
+  "indicator_mode": "LOCAL_OFFLINE_INDICATORS_ONLY",
+  "indicator_set": [
+    "sma_3",
+    "sma_5",
+    "ema_3",
+    "ema_5",
+    "rolling_high_5",
+    "rolling_low_5",
+    "rolling_range_5",
+    "close_vs_sma_5_percent",
+    "close_vs_ema_5_percent",
+    "rsi_5",
+    "macd_fast_3_slow_6",
+    "macd_signal_3",
+    "macd_histogram",
+    "bollinger_mid_5",
+    "bollinger_upper_5",
+    "bollinger_lower_5",
+    "bollinger_width_5",
+    "true_range",
+    "atr_5",
+    "momentum_3",
+    "rate_of_change_3"
+  ],
+  "indicator_state": "INDICATOR_MIXED",
+  "indicator_timeframes": [
+    "5m",
+    "15m"
+  ],
+  "indicator_version": "lot23_technical_indicators_v0",
+  "input_rows_by_timeframe": {
+    "15m": 12,
+    "5m": 36
+  },
+  "leverage": "FORBIDDEN",
+  "live_execution": "DISABLED",
+  "policy_version": "lot23_technical_indicators_v0",
+  "project_mode": "EDUCATIONAL_AUDIT_ONLY",
+  "project_name": "Crypto Quant Bot V3.1-Ops",
+  "source_artifacts": [
+    "data/audit/market_analysis_lot22.json",
+    "data/audit/market_analysis_timeframes_lot22.jsonl",
+    "data/audit/product_scope_lot21.json",
+    "data/audit/v1_closure_lot20.json",
+    "data/silver/btc_eur_15m_ohlcvt_lot5.jsonl",
+    "data/silver/btc_eur_5m_ohlcvt_lot5.jsonl",
+    "dist/crypto_quant_bot_v1_defensive_audit_lot_20.sha256",
+    "dist/crypto_quant_bot_v1_defensive_audit_lot_20.tar.gz",
+    "reports/lot_21_v1_archive_freeze_report.md",
+    "scripts/validate_v1_archive_frozen.py"
+  ],
+  "source_v1_archive_frozen": true,
+  "timeframe_summaries": [
+    {
+      "close_last": 50779.99,
+      "first_timestamp": "2026-05-25T00:00:00Z",
+      "indicator_context_score": 0.372405,
+      "indicator_count": 21,
+      "indicator_state": "INDICATOR_MIXED",
+      "indicator_values": [
+        {
+          "indicator_id": "sma_3",
+          "unit": "price",
+          "value": 50707.126667,
+          "window": 3
+        },
+        {
+          "indicator_id": "sma_5",
+          "unit": "price",
+          "value": 50621.622,
+          "window": 5
+        },
+        {
+          "indicator_id": "ema_3",
+          "unit": "price",
+          "value": 50698.162491,
+          "window": 3
+        },
+        {
+          "indicator_id": "ema_5",
+          "unit": "price",
+          "value": 50610.807754,
+          "window": 5
+        },
+        {
+          "indicator_id": "rolling_high_5",
+          "unit": "price",
+          "value": 50805.93,
+          "window": 5
+        },
+        {
+          "indicator_id": "rolling_low_5",
+          "unit": "price",
+          "value": 49906.2,
+          "window": 5
+        },
+        {
+          "indicator_id": "rolling_range_5",
+          "unit": "price",
+          "value": 899.73,
+          "window": 5
+        },
+        {
+          "indicator_id": "close_vs_sma_5_percent",
+          "unit": "percent",
+          "value": 0.312847,
+          "window": 5
+        },
+        {
+          "indicator_id": "close_vs_ema_5_percent",
+          "unit": "percent",
+          "value": 0.334281,
+          "window": 5
+        },
+        {
+          "indicator_id": "rsi_5",
+          "unit": "oscillator",
+          "value": 96.352921,
+          "window": 5
+        },
+        {
+          "indicator_id": "macd_fast_3_slow_6",
+          "unit": "price_delta",
+          "value": 119.303809,
+          "window": 6
+        },
+        {
+          "indicator_id": "macd_signal_3",
+          "unit": "price_delta",
+          "value": 102.121789,
+          "window": 3
+        },
+        {
+          "indicator_id": "macd_histogram",
+          "unit": "price_delta",
+          "value": 17.18202,
+          "window": 3
+        },
+        {
+          "indicator_id": "bollinger_mid_5",
+          "unit": "price",
+          "value": 50621.622,
+          "window": 5
+        },
+        {
+          "indicator_id": "bollinger_upper_5",
+          "unit": "price",
+          "value": 50934.376044,
+          "window": 5
+        },
+        {
+          "indicator_id": "bollinger_lower_5",
+          "unit": "price",
+          "value": 50308.867956,
+          "window": 5
+        },
+        {
+          "indicator_id": "bollinger_width_5",
+          "unit": "percent",
+          "value": 1.235654,
+          "window": 5
+        },
+        {
+          "indicator_id": "true_range",
+          "unit": "price_range",
+          "value": 115.79,
+          "window": 1
+        },
+        {
+          "indicator_id": "atr_5",
+          "unit": "price_range",
+          "value": 230.392,
+          "window": 5
+        },
+        {
+          "indicator_id": "momentum_3",
+          "unit": "price_delta",
+          "value": 119.94,
+          "window": 3
+        },
+        {
+          "indicator_id": "rate_of_change_3",
+          "unit": "percent",
+          "value": 0.236755,
+          "window": 3
+        }
+      ],
+      "last_timestamp": "2026-05-25T02:55:00Z",
+      "market_context_score": 0.350042,
+      "market_context_state": "CONTEXT_MIXED",
+      "non_executable_summary": "5m indicator pack stays descriptive only with state INDICATOR_MIXED, market context reference CONTEXT_MIXED and score 0.372405; execution, routing and allocation remain blocked.",
+      "row_count": 36,
+      "timeframe": "5m"
+    },
+    {
+      "close_last": 50779.99,
+      "first_timestamp": "2026-05-25T00:00:00Z",
+      "indicator_context_score": 0.302718,
+      "indicator_count": 21,
+      "indicator_state": "INDICATOR_MIXED",
+      "indicator_values": [
+        {
+          "indicator_id": "sma_3",
+          "unit": "price",
+          "value": 50442.84,
+          "window": 3
+        },
+        {
+          "indicator_id": "sma_5",
+          "unit": "price",
+          "value": 50496.576,
+          "window": 5
+        },
+        {
+          "indicator_id": "ema_3",
+          "unit": "price",
+          "value": 50614.16249,
+          "window": 3
+        },
+        {
+          "indicator_id": "ema_5",
+          "unit": "price",
+          "value": 50552.536993,
+          "window": 5
+        },
+        {
+          "indicator_id": "rolling_high_5",
+          "unit": "price",
+          "value": 50805.93,
+          "window": 5
+        },
+        {
+          "indicator_id": "rolling_low_5",
+          "unit": "price",
+          "value": 49822.05,
+          "window": 5
+        },
+        {
+          "indicator_id": "rolling_range_5",
+          "unit": "price",
+          "value": 983.88,
+          "window": 5
+        },
+        {
+          "indicator_id": "close_vs_sma_5_percent",
+          "unit": "percent",
+          "value": 0.561254,
+          "window": 5
+        },
+        {
+          "indicator_id": "close_vs_ema_5_percent",
+          "unit": "percent",
+          "value": 0.449934,
+          "window": 5
+        },
+        {
+          "indicator_id": "rsi_5",
+          "unit": "oscillator",
+          "value": 51.805354,
+          "window": 5
+        },
+        {
+          "indicator_id": "macd_fast_3_slow_6",
+          "unit": "price_delta",
+          "value": 78.802936,
+          "window": 6
+        },
+        {
+          "indicator_id": "macd_signal_3",
+          "unit": "price_delta",
+          "value": 34.526523,
+          "window": 3
+        },
+        {
+          "indicator_id": "macd_histogram",
+          "unit": "price_delta",
+          "value": 44.276413,
+          "window": 3
+        },
+        {
+          "indicator_id": "bollinger_mid_5",
+          "unit": "price",
+          "value": 50496.576,
+          "window": 5
+        },
+        {
+          "indicator_id": "bollinger_upper_5",
+          "unit": "price",
+          "value": 51124.140985,
+          "window": 5
+        },
+        {
+          "indicator_id": "bollinger_lower_5",
+          "unit": "price",
+          "value": 49869.011015,
+          "window": 5
+        },
+        {
+          "indicator_id": "bollinger_width_5",
+          "unit": "percent",
+          "value": 2.485574,
+          "window": 5
+        },
+        {
+          "indicator_id": "true_range",
+          "unit": "price_range",
+          "value": 200.95,
+          "window": 1
+        },
+        {
+          "indicator_id": "atr_5",
+          "unit": "price_range",
+          "value": 452.488,
+          "window": 5
+        },
+        {
+          "indicator_id": "momentum_3",
+          "unit": "price_delta",
+          "value": 167.63,
+          "window": 3
+        },
+        {
+          "indicator_id": "rate_of_change_3",
+          "unit": "percent",
+          "value": 0.331204,
+          "window": 3
+        }
+      ],
+      "last_timestamp": "2026-05-25T02:45:00Z",
+      "market_context_score": 0.527472,
+      "market_context_state": "CONTEXT_MIXED",
+      "non_executable_summary": "15m indicator pack stays descriptive only with state INDICATOR_MIXED, market context reference CONTEXT_MIXED and score 0.302718; execution, routing and allocation remain blocked.",
+      "row_count": 12,
+      "timeframe": "15m"
+    }
+  ],
+  "trade_allowed": false,
+  "v2_scope_state": "OPENED_AS_PLANNING_ONLY"
+}

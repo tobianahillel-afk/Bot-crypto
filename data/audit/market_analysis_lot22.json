@@ -1,0 +1,204 @@
+{
+  "analysis_block_reasons": [
+    "MARKET_ANALYSIS_ONLY",
+    "NO_EXECUTION_ALLOWED",
+    "NO_EXTERNAL_CONNECTIVITY",
+    "NO_EXCHANGE_CONNECTOR",
+    "NO_ORDER_ROUTER",
+    "NO_API_KEYS",
+    "NO_WEBSOCKET",
+    "NO_PAPER_TRADING_ACTIVE",
+    "NO_LIVE_TRADING_ACTIVE",
+    "NO_STRATEGY_ENGINE",
+    "EDUCATIONAL_MODE_ONLY",
+    "HUMAN_REVIEW_REQUIRED_BEFORE_DECISION_ENGINE"
+  ],
+  "analysis_checks": [
+    {
+      "block_reason": "",
+      "check_name": "source_v1_archive_frozen",
+      "expected_value": true,
+      "message": "La V2 reference uniquement l'archive V1 gelee validee au Lot 21-bis.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "",
+      "check_name": "v1_archive_checksum_locked",
+      "expected_value": "ef5b5998cd5f75b6d97acc4afc10aeaf4833b565d2c11e9f3278bace06c78667",
+      "message": "Le checksum archive observe reste identique a la preuve V1 gelee.",
+      "observed_value": "ef5b5998cd5f75b6d97acc4afc10aeaf4833b565d2c11e9f3278bace06c78667",
+      "status": "PASS"
+    },
+    {
+      "block_reason": "",
+      "check_name": "v1_archive_size_locked",
+      "expected_value": 366985,
+      "message": "La taille archivee observee reste coherente avec la preuve V1 gelee.",
+      "observed_value": 366985,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "",
+      "check_name": "v2_scope_state",
+      "expected_value": "OPENED_AS_PLANNING_ONLY",
+      "message": "Le scope V2 reste planning-only pendant l'analyse marche Lot 22.",
+      "observed_value": "OPENED_AS_PLANNING_ONLY",
+      "status": "PASS"
+    },
+    {
+      "block_reason": "",
+      "check_name": "trade_execution_blocked",
+      "expected_value": false,
+      "message": "Le Lot 22 ne declenche aucune execution, allocation ou connectivite externe.",
+      "observed_value": false,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "",
+      "check_name": "lot2_reference_rows_present",
+      "expected_value": true,
+      "message": "Les couches resamplees issues du lot2_resampler restent presentes via les datasets silver validates.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "",
+      "check_name": "timeframe_rows_present",
+      "expected_value": true,
+      "message": "Chaque timeframe dispose de lignes locales pour l'analyse.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "",
+      "check_name": "context_scores_bounded",
+      "expected_value": "0.0<=score<=1.0",
+      "message": "Les scores de contexte restent bornes et descriptifs.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "",
+      "check_name": "context_labels_allowed",
+      "expected_value": "NON_DIRECTIONAL_ALLOWED_SET",
+      "message": "Les libelles de contexte restent non directionnels et non executables.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "",
+      "check_name": "closure_state",
+      "expected_value": "V1_DEFENSIVE_AUDIT_CLOSED",
+      "message": "La cloture V1 defensive/audit reste la base verrouillee de l'analyse Lot 22.",
+      "observed_value": "V1_DEFENSIVE_AUDIT_CLOSED",
+      "status": "PASS"
+    }
+  ],
+  "analysis_checksum": "cb5eb5b0384b13ab909012698c133b7043844a7349a7c99df84b632909959ef9",
+  "analysis_mode": "LOCAL_OFFLINE_ANALYSIS_ONLY",
+  "analysis_timeframes": [
+    "5m",
+    "15m"
+  ],
+  "analysis_version": "lot22_market_analysis_v0",
+  "confidence_context": "5m=0.271437; 15m=0.397558",
+  "created_at": "2026-07-06T09:05:02.246256+00:00",
+  "dataset_timeframes": [
+    "5m",
+    "15m"
+  ],
+  "execution_allowed": false,
+  "external_connectivity_allowed": false,
+  "input_rows_by_timeframe": {
+    "15m": 12,
+    "5m": 36
+  },
+  "leverage": "FORBIDDEN",
+  "live_execution": "DISABLED",
+  "market_context_score": 0.438757,
+  "market_context_state": "CONTEXT_MIXED",
+  "policy_version": "lot22_market_analysis_v0",
+  "project_mode": "EDUCATIONAL_AUDIT_ONLY",
+  "project_name": "Crypto Quant Bot V3.1-Ops",
+  "range_context": "5m=NORMAL; 15m=COMPRESSED",
+  "regime_context": "5m=range; 15m=compressed",
+  "source_artifacts": [
+    "data/audit/product_scope_lot21.json",
+    "data/audit/v1_closure_lot20.json",
+    "data/gold/btc_eur_15m_features_lot2.jsonl",
+    "data/gold/btc_eur_15m_market_state_lot7.jsonl",
+    "data/gold/btc_eur_15m_pivots_lot3.jsonl",
+    "data/gold/btc_eur_15m_regime_lot6.jsonl",
+    "data/gold/btc_eur_15m_volatility_lot5.jsonl",
+    "data/gold/btc_eur_15m_vwap_lot4.jsonl",
+    "data/gold/btc_eur_5m_features_lot2.jsonl",
+    "data/gold/btc_eur_5m_market_state_lot7.jsonl",
+    "data/gold/btc_eur_5m_pivots_lot3.jsonl",
+    "data/gold/btc_eur_5m_regime_lot6.jsonl",
+    "data/gold/btc_eur_5m_volatility_lot5.jsonl",
+    "data/gold/btc_eur_5m_vwap_lot4.jsonl",
+    "data/silver/btc_eur_15m_ohlcvt_lot5.jsonl",
+    "data/silver/btc_eur_5m_ohlcvt_lot5.jsonl",
+    "dist/crypto_quant_bot_v1_defensive_audit_lot_20.sha256",
+    "dist/crypto_quant_bot_v1_defensive_audit_lot_20.tar.gz",
+    "reports/lot_21_v1_archive_freeze_report.md",
+    "scripts/validate_v1_archive_frozen.py"
+  ],
+  "source_v1_archive_frozen": true,
+  "timeframe_summaries": [
+    {
+      "close_change_absolute": 472.0,
+      "close_change_percent": 0.938221,
+      "close_first": 50307.99,
+      "close_last": 50779.99,
+      "context_label": "CONTEXT_MIXED",
+      "context_score": 0.350042,
+      "first_timestamp": "2026-05-25T00:00:00Z",
+      "last_timestamp": "2026-05-25T02:55:00Z",
+      "market_state": "DEGRADED",
+      "non_executable_summary": "5m context remains offline and descriptive only; lot2_reference_present=true, execution stays blocked and human review remains mandatory.",
+      "pivot_context": "NEAR_CONFIRMED_RESISTANCE",
+      "range_context": "NORMAL",
+      "range_high": 50925.02,
+      "range_low": 49717.11,
+      "range_percent": 2.40103,
+      "regime_state": "range",
+      "row_count": 36,
+      "timeframe": "5m",
+      "trend_context": "TRANSITIONAL_DRIFT",
+      "volatility_level": "LOW",
+      "volume_context": "BALANCED_VOLUME",
+      "vwap_relation": "ABOVE_VWAP"
+    },
+    {
+      "close_change_absolute": 385.29,
+      "close_change_percent": 0.764545,
+      "close_first": 50394.7,
+      "close_last": 50779.99,
+      "context_label": "CONTEXT_MIXED",
+      "context_score": 0.527472,
+      "first_timestamp": "2026-05-25T00:00:00Z",
+      "last_timestamp": "2026-05-25T02:45:00Z",
+      "market_state": "DEGRADED",
+      "non_executable_summary": "15m context remains offline and descriptive only; lot2_reference_present=true, execution stays blocked and human review remains mandatory.",
+      "pivot_context": "NEAR_CONFIRMED_RESISTANCE",
+      "range_context": "COMPRESSED",
+      "range_high": 50925.02,
+      "range_low": 49717.11,
+      "range_percent": 2.396899,
+      "regime_state": "compressed",
+      "row_count": 12,
+      "timeframe": "15m",
+      "trend_context": "TRANSITIONAL_DRIFT",
+      "volatility_level": "HIGH",
+      "volume_context": "BALANCED_VOLUME",
+      "vwap_relation": "ABOVE_VWAP"
+    }
+  ],
+  "trade_allowed": false,
+  "trend_context": "5m=TRANSITIONAL_DRIFT; 15m=TRANSITIONAL_DRIFT",
+  "v2_scope_state": "OPENED_AS_PLANNING_ONLY",
+  "volatility_context": "5m=LOW; 15m=HIGH",
+  "volume_context": "5m=BALANCED_VOLUME; 15m=BALANCED_VOLUME"
+}

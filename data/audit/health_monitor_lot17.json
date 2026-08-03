@@ -1,0 +1,231 @@
+{
+  "artifact_count": 21,
+  "checksum_references_valid": true,
+  "created_at": "2026-07-06T09:05:36.257994+00:00",
+  "critical_counts_valid": true,
+  "dataset_catalog_checksum": "d51729f620720ab560d7bde11ab3da2a65c8b8b74c29b7a933c829f00c33caf5",
+  "dataset_catalog_path": "data/audit/dataset_catalog.json",
+  "dataset_catalog_readable": true,
+  "exact_chain_expected": "EXACT_CHAIN_LOT17_DONE",
+  "execution_allowed": false,
+  "external_connectivity_allowed": false,
+  "health_block_reasons": [
+    "LOCAL_HEALTH_MONITOR_ONLY",
+    "NO_EXTERNAL_CONNECTIVITY",
+    "NO_EXECUTION_ALLOWED",
+    "NO_EXCHANGE_CONNECTOR",
+    "NO_ORDER_ROUTER",
+    "EDUCATIONAL_MODE_ONLY",
+    "REPRODUCIBILITY_MANIFEST_REQUIRED"
+  ],
+  "health_checks": [
+    {
+      "block_reason": "LOCAL_HEALTH_MONITOR_ONLY",
+      "check_name": "dataset_catalog_readable",
+      "expected_value": true,
+      "message": "dataset_catalog.json remains readable locally.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "REPRODUCIBILITY_MANIFEST_REQUIRED",
+      "check_name": "lot16_manifest_readable",
+      "expected_value": true,
+      "message": "Lot 16 manifest is readable locally.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "REPRODUCIBILITY_MANIFEST_REQUIRED",
+      "check_name": "lot16_artifacts_readable",
+      "expected_value": true,
+      "message": "Lot 16 artifact JSONL is readable locally.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "REPRODUCIBILITY_MANIFEST_REQUIRED",
+      "check_name": "required_artifacts_present",
+      "expected_value": true,
+      "message": "Critical Lot 12 to Lot 16 artifacts exist.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "EDUCATIONAL_MODE_ONLY",
+      "check_name": "required_reports_present",
+      "expected_value": true,
+      "message": "Critical audit reports exist locally.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "NO_EXECUTION_ALLOWED",
+      "check_name": "required_scripts_present",
+      "expected_value": true,
+      "message": "Required run and validation scripts exist locally.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "NO_EXTERNAL_CONNECTIVITY",
+      "check_name": "required_diagnostics_present",
+      "expected_value": true,
+      "message": "Required timing and exact-chain diagnostics exist locally.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "NO_ORDER_ROUTER",
+      "check_name": "critical_counts_valid",
+      "expected_value": {
+        "lot12": {
+          "15m": 12,
+          "5m": 36,
+          "total": 48
+        },
+        "lot13": {
+          "15m": 12,
+          "5m": 36,
+          "total": 48
+        },
+        "lot14": {
+          "15m": 12,
+          "5m": 36,
+          "total": 48
+        },
+        "lot15": {
+          "15m": 12,
+          "5m": 36,
+          "total": 48
+        }
+      },
+      "message": "Critical 36/12/48 counts remain consistent.",
+      "observed_value": {
+        "lot12": {
+          "15m": 12,
+          "5m": 36,
+          "total": 48
+        },
+        "lot13": {
+          "15m": 12,
+          "5m": 36,
+          "total": 48
+        },
+        "lot14": {
+          "15m": 12,
+          "5m": 36,
+          "total": 48
+        },
+        "lot15": {
+          "15m": 12,
+          "5m": 36,
+          "total": 48
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "block_reason": "REPRODUCIBILITY_MANIFEST_REQUIRED",
+      "check_name": "checksum_references_valid",
+      "expected_value": true,
+      "message": "Lot 16 checksum references remain locally verifiable.",
+      "observed_value": true,
+      "status": "PASS"
+    }
+  ],
+  "health_checksum": "08112cd6631cb47b6048fdc9548a0b5d6a6d9167b8fcea56168a0f4d603cb028",
+  "health_state": "HEALTHY_FOR_LOCAL_AUDIT",
+  "health_version": "lot17_health_monitor_v0",
+  "integrity_state": "VERIFIED",
+  "invariants": {
+    "Risk Engine blocks by default": true,
+    "SystemDecision": "BLOCK_TRADING",
+    "TradingDecision": "WAIT",
+    "allocation_allowed": false,
+    "capital_at_risk": 0,
+    "execution_allowed": false,
+    "exposure_allowed": false,
+    "external_connectivity_allowed": false,
+    "final_decision": "WAIT",
+    "final_system_decision": "BLOCK_TRADING",
+    "human_review_required": true,
+    "immutability_mode": "APPEND_ONLY_SIMULATED",
+    "leverage": "FORBIDDEN",
+    "live_execution": "DISABLED",
+    "portfolio_state": "FROZEN",
+    "rebalance_allowed": false,
+    "trade_allowed": false
+  },
+  "lot16_artifacts_path": "data/audit/reproducibility_artifacts_lot16.jsonl",
+  "lot16_artifacts_readable": true,
+  "lot16_manifest_checksum": "ddca94fceea77bcfd045f1185fe8dd7200960f5e1a58576c53af63b3fd05fde1",
+  "lot16_manifest_path": "data/audit/reproducibility_manifest_lot16.json",
+  "lot16_manifest_readable": true,
+  "monitoring_mode": "LOCAL_STATIC_ONLY",
+  "policy_version": "lot17_health_monitor_v0",
+  "project_mode": "EDUCATIONAL_AUDIT_ONLY",
+  "project_name": "Crypto Quant Bot V3.1-Ops",
+  "pytest_expected": "python -m pytest -q",
+  "reproducibility_state": "REPRODUCIBLE_LOCALLY",
+  "required_artifacts_present": true,
+  "required_diagnostics_present": true,
+  "required_reports_present": true,
+  "required_scripts_present": true,
+  "source_artifacts": [
+    "data/audit/dataset_catalog.json",
+    "data/audit/decision_ledger_lot15_15m.jsonl",
+    "data/audit/decision_ledger_lot15_5m.jsonl",
+    "data/audit/exposure_guard_lot12_15m.jsonl",
+    "data/audit/exposure_guard_lot12_5m.jsonl",
+    "data/audit/final_decision_firewall_lot14_15m.jsonl",
+    "data/audit/final_decision_firewall_lot14_5m.jsonl",
+    "data/audit/portfolio_freeze_lot13_15m.jsonl",
+    "data/audit/portfolio_freeze_lot13_5m.jsonl",
+    "data/audit/reproducibility_artifacts_lot16.jsonl",
+    "data/audit/reproducibility_manifest_lot16.json",
+    "reports/lot_12_exposure_guard_report.md",
+    "reports/lot_12_validation_report.md",
+    "reports/lot_13_portfolio_freeze_report.md",
+    "reports/lot_13_validation_report.md",
+    "reports/lot_14_decision_firewall_report.md",
+    "reports/lot_14_validation_report.md",
+    "reports/lot_15_decision_ledger_report.md",
+    "reports/lot_15_validation_report.md",
+    "reports/lot_16_reproducibility_report.md",
+    "reports/lot_16_validation_report.md",
+    "scripts/diagnose_exact_chain_return_shell.py",
+    "scripts/diagnose_exact_chain_until_lot12.py",
+    "scripts/diagnose_exact_chain_until_lot13.py",
+    "scripts/diagnose_exact_chain_until_lot14.py",
+    "scripts/diagnose_exact_chain_until_lot15.py",
+    "scripts/diagnose_exact_chain_until_lot16.py",
+    "scripts/diagnose_lot12_required_chain_timing.py",
+    "scripts/diagnose_lot13_required_chain_timing.py",
+    "scripts/diagnose_lot14_required_chain_timing.py",
+    "scripts/diagnose_lot15_required_chain_timing.py",
+    "scripts/diagnose_lot16_required_chain_timing.py",
+    "scripts/diagnose_pytest_resolution.py",
+    "scripts/run_lot12_exposure_guard.py",
+    "scripts/run_lot13_portfolio_freeze.py",
+    "scripts/run_lot14_decision_firewall.py",
+    "scripts/run_lot15_decision_ledger.py",
+    "scripts/run_lot16_reproducibility_manifest.py",
+    "scripts/run_required_chain_until_lot12.sh",
+    "scripts/run_required_chain_until_lot13.sh",
+    "scripts/run_required_chain_until_lot14.sh",
+    "scripts/run_required_chain_until_lot15.sh",
+    "scripts/run_required_chain_until_lot16.sh",
+    "scripts/validate_all_until_lot12.py",
+    "scripts/validate_all_until_lot13.py",
+    "scripts/validate_all_until_lot14.py",
+    "scripts/validate_all_until_lot15.py",
+    "scripts/validate_all_until_lot16.py",
+    "scripts/validate_lot12.py",
+    "scripts/validate_lot13.py",
+    "scripts/validate_lot14.py",
+    "scripts/validate_lot15.py",
+    "scripts/validate_lot16.py"
+  ],
+  "trade_allowed": false
+}

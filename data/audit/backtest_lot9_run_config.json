@@ -1,0 +1,27 @@
+{
+  "available_at": "2026-07-06T09:04:16.089361+00:00",
+  "config_version": "lot9_replay_v0",
+  "created_at": "2026-07-06T09:04:16.050613+00:00",
+  "data_sources": [
+    "data/gold/btc_eur_15m_market_state_lot7.jsonl",
+    "data/gold/btc_eur_5m_market_state_lot7.jsonl"
+  ],
+  "end_timestamp": "2026-05-25T02:55:00Z",
+  "id": "4de4d0c1-bf9a-4570-8d01-4dbf9caeeb41",
+  "lineage_id": "37bdf287-844e-4a7b-ba09-010968ee223f",
+  "mode": "replay_v0",
+  "pair": "BTC/EUR",
+  "policy_name": "noop_wait_policy",
+  "quality_flag": "valid",
+  "run_id": "lot9_replay_65d52a09-03d0-4a05-a85b-cb2e9a9db89a",
+  "schema_version": "1.0.0",
+  "source": "lot9_backtest_replay_v0",
+  "start_timestamp": "2026-05-25T00:00:00Z",
+  "timeframes": [
+    "15m",
+    "5m"
+  ],
+  "trade_allowed": false,
+  "used_for_decision": false,
+  "validation_status": "validated_lot9"
+}

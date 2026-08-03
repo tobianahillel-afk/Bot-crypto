@@ -1,0 +1,4233 @@
+{
+  "acceptance_criteria": [
+    "La V1 defensive/audit reste cloturee et verifiee depuis l'archive locale Lot 20.",
+    "Le gel de l'archive V1 est valide au Lot 21-bis et les chaines V2 ne la regenerent plus.",
+    "La V2 est ouverte uniquement comme planning-only scope lock, sans implementation active.",
+    "Le registre couvre explicitement Market Analysis, Research OS, AI / News / Event Engine, UI / Dashboard, Account Read-Only, Sandbox Demo Trading et Future Personal Live Trading.",
+    "Toutes les capabilities hors V1 sont notees not_yet_implemented avec execution_allowed=false.",
+    "Aucune connectivite externe, aucun connecteur exchange, aucune cle API et aucun WebSocket ne sont autorises.",
+    "La roadmap officielle Lot 22 a Lot 147 est documentee comme forecast-only.",
+    "Le DatasetCatalog contient les entrees Lot 21 sans doublon et reste upsertable idempotent.",
+    "Le scope_checksum est deterministe hors champs runtime-only.",
+    "Toute activation future exige un lot dedie, une validation propre et une revue humaine."
+  ],
+  "api_boundaries": [
+    "Aucun appel API n'est autorise au Lot 21.",
+    "Aucune cle API et aucun secret actif ne sont stockes ou utilises.",
+    "Aucun WebSocket ni flux externe n'est autorise."
+  ],
+  "capabilities": [
+    {
+      "acceptance_required_before_activation": [
+        "Already validated by the Lot 20 V1 closure and archive verification.",
+        "Any later change requires a separate lot and fresh audit."
+      ],
+      "capability_id": "v1_defensive_audit_closure",
+      "depends_on": [],
+      "description": "Confirme la fermeture defensive/audit/no-trading de la V1 et l'existence d'une archive locale verifiee.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": false,
+      "phase": "V1_DEFENSIVE_AUDIT_CLOSED",
+      "risk_level": "LOW",
+      "status": "DONE_V1_DEFENSIVE",
+      "title": "V1 Defensive Audit Closure"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation."
+      ],
+      "capability_id": "market_analysis_engine",
+      "depends_on": [
+        "v1_defensive_audit_closure"
+      ],
+      "description": "Cadre analytique de marche pour consolider contexte, tendance, range et structure descriptive.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V2_MARKET_ANALYSIS",
+      "risk_level": "MEDIUM",
+      "status": "PLANNED_V2",
+      "title": "Market Analysis Engine"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation."
+      ],
+      "capability_id": "multi_timeframe_engine",
+      "depends_on": [
+        "market_analysis_engine"
+      ],
+      "description": "Moteur de synchronisation des horizons de temps pour analyses descriptives sans decision executable.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V2_MARKET_ANALYSIS",
+      "risk_level": "MEDIUM",
+      "status": "PLANNED_V2",
+      "title": "Multi-Timeframe Engine"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation."
+      ],
+      "capability_id": "technical_indicators_pack",
+      "depends_on": [
+        "market_analysis_engine",
+        "multi_timeframe_engine"
+      ],
+      "description": "Pack d'indicateurs techniques formalise pour usage analytique et comparaison de scenarios.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V2_MARKET_ANALYSIS",
+      "risk_level": "MEDIUM",
+      "status": "PLANNED_V2",
+      "title": "Technical Indicators"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation."
+      ],
+      "capability_id": "volume_profile_engine",
+      "depends_on": [
+        "market_analysis_engine"
+      ],
+      "description": "Formalisation du volume profile candle-based et des zones descriptives de structure.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V2_MARKET_ANALYSIS",
+      "risk_level": "MEDIUM",
+      "status": "PLANNED_V2",
+      "title": "Volume Profile / Confluence Zones"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation."
+      ],
+      "capability_id": "confluence_zones_engine",
+      "depends_on": [
+        "market_analysis_engine",
+        "volume_profile_engine"
+      ],
+      "description": "Cadrage des zones de confluence et des syntheses de contexte multi-sources.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V2_MARKET_ANALYSIS",
+      "risk_level": "MEDIUM",
+      "status": "PLANNED_V2",
+      "title": "Confluence Zones Engine"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation."
+      ],
+      "capability_id": "order_book_l2_offline",
+      "depends_on": [
+        "market_analysis_engine"
+      ],
+      "description": "Bloc offline de reconstruction analytique L2, sans connectivite externe et sans execution.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V3_MICROSTRUCTURE_SCENARIOS",
+      "risk_level": "HIGH",
+      "status": "PLANNED_V3",
+      "title": "Order Book L2 Offline"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation."
+      ],
+      "capability_id": "order_flow_offline",
+      "depends_on": [
+        "order_book_l2_offline"
+      ],
+      "description": "Moteur de lecture offline du flux et de la pression de marche pour recherche uniquement.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V3_MICROSTRUCTURE_SCENARIOS",
+      "risk_level": "HIGH",
+      "status": "PLANNED_V3",
+      "title": "Order Flow Offline"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation."
+      ],
+      "capability_id": "strategic_microstructure",
+      "depends_on": [
+        "order_book_l2_offline",
+        "order_flow_offline"
+      ],
+      "description": "Brique de recherche microstructurelle pour hypotheses tactiques et lectures contextuelles.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V3_MICROSTRUCTURE_SCENARIOS",
+      "risk_level": "HIGH",
+      "status": "PLANNED_V3",
+      "title": "Strategic Microstructure"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation."
+      ],
+      "capability_id": "scenario_engine",
+      "depends_on": [
+        "market_analysis_engine",
+        "strategic_microstructure"
+      ],
+      "description": "Moteur de structuration des scenarios de marche, documente sans decision active.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V3_MICROSTRUCTURE_SCENARIOS",
+      "risk_level": "MEDIUM",
+      "status": "PLANNED_V3",
+      "title": "Scenario Engine"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation."
+      ],
+      "capability_id": "scenario_explanation_engine",
+      "depends_on": [
+        "scenario_engine"
+      ],
+      "description": "Couche d'explication de scenarios et de raisonnement, sans sortie executable.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V3_MICROSTRUCTURE_SCENARIOS",
+      "risk_level": "MEDIUM",
+      "status": "PLANNED_V3",
+      "title": "Decision Explanation Engine"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation."
+      ],
+      "capability_id": "expected_value_engine",
+      "depends_on": [
+        "scenario_engine"
+      ],
+      "description": "Bloc de calcul d'esperance pour recherche et comparaison de scenarios, sans activation.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V4_EXPECTED_VALUE_BACKTESTING",
+      "risk_level": "HIGH",
+      "status": "PLANNED_V4",
+      "title": "Expected Value Engine"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation."
+      ],
+      "capability_id": "advanced_backtesting",
+      "depends_on": [
+        "expected_value_engine"
+      ],
+      "description": "Roadmap d'un backtesting avance strictement separe du mode live et du mode demo actif.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V4_EXPECTED_VALUE_BACKTESTING",
+      "risk_level": "HIGH",
+      "status": "PLANNED_V4",
+      "title": "Backtesting Advanced"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation."
+      ],
+      "capability_id": "walk_forward_validation",
+      "depends_on": [
+        "advanced_backtesting"
+      ],
+      "description": "Validation walk-forward documentee pour les futurs audits de robustesse.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V4_EXPECTED_VALUE_BACKTESTING",
+      "risk_level": "HIGH",
+      "status": "PLANNED_V4",
+      "title": "Walk Forward Validation"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation."
+      ],
+      "capability_id": "anti_overfitting_audit",
+      "depends_on": [
+        "advanced_backtesting",
+        "walk_forward_validation"
+      ],
+      "description": "Audit anti-overfitting, placebo et hors echantillon reserve a des lots dedies.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V4_EXPECTED_VALUE_BACKTESTING",
+      "risk_level": "HIGH",
+      "status": "PLANNED_V4",
+      "title": "Anti Overfitting Audit"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated.",
+        "Demo-only guardrails must be validated without enabling active execution."
+      ],
+      "capability_id": "paper_trading_demo_portfolio",
+      "depends_on": [
+        "advanced_backtesting"
+      ],
+      "description": "Portefeuille demo futur strictement bloque au Lot 21 et reserve a un cadre non live.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V5_PAPER_TRADING_DEMO",
+      "risk_level": "HIGH",
+      "status": "FUTURE_DEMO_ONLY",
+      "title": "Paper Trading / Demo Portfolio"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated.",
+        "Demo-only guardrails must be validated without enabling active execution."
+      ],
+      "capability_id": "simulated_orders_and_fills",
+      "depends_on": [
+        "paper_trading_demo_portfolio"
+      ],
+      "description": "Cycle de simulation purement futur pour demo, sans activation ni usage exploitable au Lot 21.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V5_PAPER_TRADING_DEMO",
+      "risk_level": "HIGH",
+      "status": "FUTURE_DEMO_ONLY",
+      "title": "Simulated Order Lifecycle"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation."
+      ],
+      "capability_id": "research_os",
+      "depends_on": [
+        "v1_defensive_audit_closure"
+      ],
+      "description": "Socle de recherche pour hypotheses, experiences et gouvernance methodologique.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V6_RESEARCH_OS",
+      "risk_level": "MEDIUM",
+      "status": "RESEARCH_ONLY",
+      "title": "Research OS"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation."
+      ],
+      "capability_id": "experiment_registry",
+      "depends_on": [
+        "research_os"
+      ],
+      "description": "Registre d'experiences futur pour tracer hypotheses, variantes et evidences.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V6_RESEARCH_OS",
+      "risk_level": "LOW",
+      "status": "RESEARCH_ONLY",
+      "title": "Experiment Registry"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation."
+      ],
+      "capability_id": "hypothesis_tracking",
+      "depends_on": [
+        "research_os",
+        "experiment_registry"
+      ],
+      "description": "Suivi explicite des hypotheses de recherche et de leur statut de validation.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V6_RESEARCH_OS",
+      "risk_level": "LOW",
+      "status": "RESEARCH_ONLY",
+      "title": "Hypothesis Tracking"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation."
+      ],
+      "capability_id": "ablation_placebo_oos_testing",
+      "depends_on": [
+        "experiment_registry",
+        "anti_overfitting_audit"
+      ],
+      "description": "Briques de verification de robustesse reservees a la recherche et aux audits futurs.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V6_RESEARCH_OS",
+      "risk_level": "MEDIUM",
+      "status": "RESEARCH_ONLY",
+      "title": "Ablation / Placebo / OOS Testing"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated.",
+        "Connectivity and secrets review required before any external access is considered."
+      ],
+      "capability_id": "ai_news_event_engine",
+      "depends_on": [
+        "research_os"
+      ],
+      "description": "Bloc futur d'analyse AI/news/events, documente sans connectivite ni inference active.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V7_AI_NEWS_EVENT_ENGINE",
+      "risk_level": "HIGH",
+      "status": "PLANNED_LATER",
+      "title": "AI / News / Event Engine"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated.",
+        "Connectivity and secrets review required before any external access is considered."
+      ],
+      "capability_id": "economic_calendar",
+      "depends_on": [
+        "ai_news_event_engine"
+      ],
+      "description": "Couche de calendrier economique future, strictement inactive au Lot 21.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V7_AI_NEWS_EVENT_ENGINE",
+      "risk_level": "MEDIUM",
+      "status": "PLANNED_LATER",
+      "title": "Economic Calendar"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated.",
+        "Connectivity and secrets review required before any external access is considered."
+      ],
+      "capability_id": "news_ingestion_read_only",
+      "depends_on": [
+        "ai_news_event_engine"
+      ],
+      "description": "Ingestion news read-only future, sans appel externe actif au Lot 21.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V7_AI_NEWS_EVENT_ENGINE",
+      "risk_level": "HIGH",
+      "status": "PLANNED_LATER",
+      "title": "News Ingestion Read-Only"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Connectivity and secrets review required before any external access is considered."
+      ],
+      "capability_id": "sentiment_narrative_engine",
+      "depends_on": [
+        "ai_news_event_engine"
+      ],
+      "description": "Moteur futur de lecture narrative et de sentiment reserve a la recherche.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V7_AI_NEWS_EVENT_ENGINE",
+      "risk_level": "MEDIUM",
+      "status": "RESEARCH_ONLY",
+      "title": "Sentiment Narrative Engine"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Connectivity and secrets review required before any external access is considered."
+      ],
+      "capability_id": "llm_explanation_layer",
+      "depends_on": [
+        "scenario_explanation_engine",
+        "research_os"
+      ],
+      "description": "Couche d'explication LLM strictement research-only et non exec au Lot 21.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V7_AI_NEWS_EVENT_ENGINE",
+      "risk_level": "MEDIUM",
+      "status": "RESEARCH_ONLY",
+      "title": "LLM Explanation Layer"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Connectivity and secrets review required before any external access is considered."
+      ],
+      "capability_id": "ai_hallucination_source_audit",
+      "depends_on": [
+        "llm_explanation_layer"
+      ],
+      "description": "Audit futur des sources et des risques d'hallucination pour tout usage IA.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V7_AI_NEWS_EVENT_ENGINE",
+      "risk_level": "MEDIUM",
+      "status": "RESEARCH_ONLY",
+      "title": "AI Hallucination Source Audit"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated."
+      ],
+      "capability_id": "graphical_interface",
+      "depends_on": [
+        "market_analysis_engine"
+      ],
+      "description": "Interface graphique reservee a une phase documentaire ulterieure, sans activation serveur.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V8_UI_DASHBOARD",
+      "risk_level": "MEDIUM",
+      "status": "PLANNED_LATER",
+      "title": "Graphical Interface / Dashboard"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated."
+      ],
+      "capability_id": "market_dashboard",
+      "depends_on": [
+        "graphical_interface",
+        "market_analysis_engine"
+      ],
+      "description": "Dashboard marche futur, strictement passif tant qu'un lot UI dedie n'est pas valide.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V8_UI_DASHBOARD",
+      "risk_level": "MEDIUM",
+      "status": "PLANNED_LATER",
+      "title": "Market Dashboard"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated."
+      ],
+      "capability_id": "scenario_dashboard",
+      "depends_on": [
+        "graphical_interface",
+        "scenario_engine"
+      ],
+      "description": "Dashboard futur de scenarios et d'explications, sans interface active au Lot 21.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V8_UI_DASHBOARD",
+      "risk_level": "MEDIUM",
+      "status": "PLANNED_LATER",
+      "title": "Scenario Dashboard"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated."
+      ],
+      "capability_id": "decision_logs_dashboard",
+      "depends_on": [
+        "graphical_interface",
+        "scenario_explanation_engine"
+      ],
+      "description": "Vue future des logs et des justifications, sans action operative associee.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V8_UI_DASHBOARD",
+      "risk_level": "MEDIUM",
+      "status": "PLANNED_LATER",
+      "title": "Decision Logs Dashboard"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated."
+      ],
+      "capability_id": "paper_trading_dashboard",
+      "depends_on": [
+        "graphical_interface",
+        "paper_trading_demo_portfolio"
+      ],
+      "description": "Surface future de visualisation demo uniquement, bloquee au Lot 21.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V8_UI_DASHBOARD",
+      "risk_level": "HIGH",
+      "status": "PLANNED_LATER",
+      "title": "Paper Trading Dashboard"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated."
+      ],
+      "capability_id": "portfolio_dashboard",
+      "depends_on": [
+        "graphical_interface",
+        "account_analysis_read_only"
+      ],
+      "description": "Dashboard futur de portefeuille pour lecture et audit, sans operation active.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V8_UI_DASHBOARD",
+      "risk_level": "MEDIUM",
+      "status": "PLANNED_LATER",
+      "title": "Portfolio Dashboard"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated."
+      ],
+      "capability_id": "audit_replay_ui",
+      "depends_on": [
+        "graphical_interface",
+        "research_os"
+      ],
+      "description": "UI future de replay d'audit et de parcours des traces, non active au Lot 21.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V8_UI_DASHBOARD",
+      "risk_level": "LOW",
+      "status": "PLANNED_LATER",
+      "title": "Logs / Audit Replay UI"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated.",
+        "Connectivity and secrets review required before any external access is considered."
+      ],
+      "capability_id": "account_analysis_read_only",
+      "depends_on": [
+        "v1_defensive_audit_closure"
+      ],
+      "description": "Analyse de compte future en lecture seule, sans connectivite ni appel externe au Lot 21.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V9_ACCOUNT_READ_ONLY",
+      "risk_level": "HIGH",
+      "status": "PLANNED_LATER",
+      "title": "Account Analysis Read-Only"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated.",
+        "Connectivity and secrets review required before any external access is considered."
+      ],
+      "capability_id": "exchange_api_read_only",
+      "depends_on": [
+        "account_analysis_read_only"
+      ],
+      "description": "Integration exchange read-only future, documentee mais strictement inactive au Lot 21.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V9_ACCOUNT_READ_ONLY",
+      "risk_level": "VERY_HIGH",
+      "status": "PLANNED_LATER",
+      "title": "Exchange API Read-Only"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated.",
+        "Connectivity and secrets review required before any external access is considered."
+      ],
+      "capability_id": "balances_positions_read_only",
+      "depends_on": [
+        "exchange_api_read_only"
+      ],
+      "description": "Lecture future des soldes et de l'etat compte, reservee a une couche read-only.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V9_ACCOUNT_READ_ONLY",
+      "risk_level": "VERY_HIGH",
+      "status": "PLANNED_LATER",
+      "title": "Balances and Positions Read-Only"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated.",
+        "Connectivity and secrets review required before any external access is considered."
+      ],
+      "capability_id": "reconciliation_engine",
+      "depends_on": [
+        "balances_positions_read_only"
+      ],
+      "description": "Moteur de rapprochement futur entre etats analytiques et etats read-only.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V9_ACCOUNT_READ_ONLY",
+      "risk_level": "HIGH",
+      "status": "PLANNED_LATER",
+      "title": "Reconciliation Engine"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated.",
+        "Connectivity and secrets review required before any external access is considered.",
+        "Demo-only guardrails must be validated without enabling active execution."
+      ],
+      "capability_id": "sandbox_demo_trading",
+      "depends_on": [
+        "paper_trading_demo_portfolio",
+        "demo_risk_controls"
+      ],
+      "description": "Mode sandbox/demo futur, integralement bloque et reserve a des garde-fous dedies.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V10_SANDBOX_DEMO_TRADING",
+      "risk_level": "VERY_HIGH",
+      "status": "FUTURE_DEMO_ONLY",
+      "title": "Demo / Sandbox Trading"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated.",
+        "Connectivity and secrets review required before any external access is considered.",
+        "Demo-only guardrails must be validated without enabling active execution."
+      ],
+      "capability_id": "demo_order_lifecycle",
+      "depends_on": [
+        "sandbox_demo_trading"
+      ],
+      "description": "Cycle demo futur pour environnement sandbox uniquement, non active au Lot 21.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V10_SANDBOX_DEMO_TRADING",
+      "risk_level": "VERY_HIGH",
+      "status": "FUTURE_DEMO_ONLY",
+      "title": "Demo Order Lifecycle"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated.",
+        "Connectivity and secrets review required before any external access is considered.",
+        "Demo-only guardrails must be validated without enabling active execution."
+      ],
+      "capability_id": "demo_risk_controls",
+      "depends_on": [
+        "paper_trading_demo_portfolio"
+      ],
+      "description": "Controles de risque demo futurs avant toute ouverture d'un mode sandbox.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V10_SANDBOX_DEMO_TRADING",
+      "risk_level": "VERY_HIGH",
+      "status": "FUTURE_DEMO_ONLY",
+      "title": "Demo Risk Controls"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated.",
+        "Connectivity and secrets review required before any external access is considered.",
+        "Future live activation requires kill switch, reconciliation and governance readiness."
+      ],
+      "capability_id": "incident_response",
+      "depends_on": [
+        "reconciliation_engine"
+      ],
+      "description": "Gouvernance future de reponse incident avant tout live personnel.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V11_LIVE_PERSONAL_GOVERNANCE",
+      "risk_level": "VERY_HIGH",
+      "status": "FUTURE_LIVE_GATED",
+      "title": "Incident Response"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated.",
+        "Connectivity and secrets review required before any external access is considered.",
+        "Future live activation requires kill switch, reconciliation and governance readiness."
+      ],
+      "capability_id": "kill_switch_governance",
+      "depends_on": [
+        "incident_response"
+      ],
+      "description": "Bloc futur de kill switch et de gouvernance d'arret immediat, strictement gated.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V11_LIVE_PERSONAL_GOVERNANCE",
+      "risk_level": "VERY_HIGH",
+      "status": "FUTURE_LIVE_GATED",
+      "title": "Incident Response / Kill Switch"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated.",
+        "Connectivity and secrets review required before any external access is considered.",
+        "Future live activation requires kill switch, reconciliation and governance readiness."
+      ],
+      "capability_id": "secrets_policy",
+      "depends_on": [
+        "incident_response"
+      ],
+      "description": "Politique future de secrets et de securite prealable a toute connectivite externe.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V11_LIVE_PERSONAL_GOVERNANCE",
+      "risk_level": "VERY_HIGH",
+      "status": "FUTURE_LIVE_GATED",
+      "title": "Security / Secrets Policy"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated.",
+        "Connectivity and secrets review required before any external access is considered.",
+        "Future live activation requires kill switch, reconciliation and governance readiness."
+      ],
+      "capability_id": "future_personal_live_trading",
+      "depends_on": [
+        "kill_switch_governance",
+        "secrets_policy"
+      ],
+      "description": "Gouvernance future du live personnel, verrouillee et non ouverte au Lot 21.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V11_LIVE_PERSONAL_GOVERNANCE",
+      "risk_level": "VERY_HIGH",
+      "status": "FUTURE_LIVE_GATED",
+      "title": "Future Personal Live Trading Governance"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated.",
+        "Connectivity and secrets review required before any external access is considered.",
+        "Future live activation requires kill switch, reconciliation and governance readiness."
+      ],
+      "capability_id": "live_human_approval_mode",
+      "depends_on": [
+        "future_personal_live_trading"
+      ],
+      "description": "Mode futur d'approbation humaine obligatoire avant toute activation live.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V11_LIVE_PERSONAL_GOVERNANCE",
+      "risk_level": "VERY_HIGH",
+      "status": "FUTURE_LIVE_GATED",
+      "title": "Live Human Approval Mode"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated.",
+        "Connectivity and secrets review required before any external access is considered.",
+        "Future live activation requires kill switch, reconciliation and governance readiness."
+      ],
+      "capability_id": "live_small_capital_guard",
+      "depends_on": [
+        "future_personal_live_trading"
+      ],
+      "description": "Garde-fou futur de petit capital avant tout pilote live personnel.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V11_LIVE_PERSONAL_GOVERNANCE",
+      "risk_level": "VERY_HIGH",
+      "status": "FUTURE_LIVE_GATED",
+      "title": "Live Small Capital Guard"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated.",
+        "Connectivity and secrets review required before any external access is considered.",
+        "Future live activation requires kill switch, reconciliation and governance readiness."
+      ],
+      "capability_id": "live_reconciliation",
+      "depends_on": [
+        "reconciliation_engine",
+        "future_personal_live_trading"
+      ],
+      "description": "Rapprochement futur specifique au live personnel, soumis a gate de gouvernance.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V11_LIVE_PERSONAL_GOVERNANCE",
+      "risk_level": "VERY_HIGH",
+      "status": "FUTURE_LIVE_GATED",
+      "title": "Live Reconciliation"
+    },
+    {
+      "acceptance_required_before_activation": [
+        "Dedicated implementation lot approved by project governance.",
+        "No-trading invariants preserved through implementation and validation.",
+        "Validation script and acceptance report added before activation.",
+        "Human review sign-off recorded before activation.",
+        "Capability remains planning-only until its dedicated lot is validated."
+      ],
+      "capability_id": "final_product_reporting",
+      "depends_on": [
+        "graphical_interface",
+        "research_os"
+      ],
+      "description": "Reporting produit futur et restitution finale, sans diffusion active au Lot 21.",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "not_yet_implemented": true,
+      "phase": "V8_UI_DASHBOARD",
+      "risk_level": "MEDIUM",
+      "status": "PLANNED_LATER",
+      "title": "Reporting / Client Reports"
+    }
+  ],
+  "capability_count": 49,
+  "created_at": "2026-07-06T09:05:00.289457+00:00",
+  "execution_allowed": false,
+  "external_connectivity_allowed": false,
+  "future_lot_count": 126,
+  "leverage": "FORBIDDEN",
+  "live_execution": "DISABLED",
+  "live_trading_boundaries": [
+    "Le live personnel n'est pas ouvert au Lot 21.",
+    "Tout bloc live reste FUTURE_LIVE_GATED avec revue humaine obligatoire.",
+    "Aucun ordre reel, aucune execution et aucune connectivite exchange ne sont autorises."
+  ],
+  "phase_count": 10,
+  "policy_version": "lot21_product_scope_v0",
+  "project_identity": "SAME_PROJECT_NO_V4",
+  "project_mode": "EDUCATIONAL_AUDIT_ONLY",
+  "project_name": "Crypto Quant Bot V3.1-Ops",
+  "research_boundaries": [
+    "Le Research OS reste un registre de recherche sans activation operationnelle.",
+    "Les modules AI et explanation restent documentes ou research-only.",
+    "Aucun resultat de recherche ne peut declencher une action executable au Lot 21."
+  ],
+  "roadmap_lots": [
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "market_analysis_engine",
+        "multi_timeframe_engine",
+        "technical_indicators_pack",
+        "volume_profile_engine",
+        "confluence_zones_engine"
+      ],
+      "lot_id": "Lot 22",
+      "lot_number": 22,
+      "objective": "Planning-only slice for market analysis, multi-timeframe context, indicators and confluence coverage.",
+      "phase_id": "V2_MARKET_ANALYSIS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 22 - Market Analysis work package 01"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "market_analysis_engine",
+        "multi_timeframe_engine",
+        "technical_indicators_pack",
+        "volume_profile_engine",
+        "confluence_zones_engine"
+      ],
+      "lot_id": "Lot 23",
+      "lot_number": 23,
+      "objective": "Planning-only slice for market analysis, multi-timeframe context, indicators and confluence coverage.",
+      "phase_id": "V2_MARKET_ANALYSIS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 23 - Market Analysis work package 02"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "market_analysis_engine",
+        "multi_timeframe_engine",
+        "technical_indicators_pack",
+        "volume_profile_engine",
+        "confluence_zones_engine"
+      ],
+      "lot_id": "Lot 24",
+      "lot_number": 24,
+      "objective": "Planning-only slice for market analysis, multi-timeframe context, indicators and confluence coverage.",
+      "phase_id": "V2_MARKET_ANALYSIS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 24 - Market Analysis work package 03"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "market_analysis_engine",
+        "multi_timeframe_engine",
+        "technical_indicators_pack",
+        "volume_profile_engine",
+        "confluence_zones_engine"
+      ],
+      "lot_id": "Lot 25",
+      "lot_number": 25,
+      "objective": "Planning-only slice for market analysis, multi-timeframe context, indicators and confluence coverage.",
+      "phase_id": "V2_MARKET_ANALYSIS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 25 - Market Analysis work package 04"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "market_analysis_engine",
+        "multi_timeframe_engine",
+        "technical_indicators_pack",
+        "volume_profile_engine",
+        "confluence_zones_engine"
+      ],
+      "lot_id": "Lot 26",
+      "lot_number": 26,
+      "objective": "Planning-only slice for market analysis, multi-timeframe context, indicators and confluence coverage.",
+      "phase_id": "V2_MARKET_ANALYSIS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 26 - Market Analysis work package 05"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "market_analysis_engine",
+        "multi_timeframe_engine",
+        "technical_indicators_pack",
+        "volume_profile_engine",
+        "confluence_zones_engine"
+      ],
+      "lot_id": "Lot 27",
+      "lot_number": 27,
+      "objective": "Planning-only slice for market analysis, multi-timeframe context, indicators and confluence coverage.",
+      "phase_id": "V2_MARKET_ANALYSIS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 27 - Market Analysis work package 06"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "market_analysis_engine",
+        "multi_timeframe_engine",
+        "technical_indicators_pack",
+        "volume_profile_engine",
+        "confluence_zones_engine"
+      ],
+      "lot_id": "Lot 28",
+      "lot_number": 28,
+      "objective": "Planning-only slice for market analysis, multi-timeframe context, indicators and confluence coverage.",
+      "phase_id": "V2_MARKET_ANALYSIS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 28 - Market Analysis work package 07"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "market_analysis_engine",
+        "multi_timeframe_engine",
+        "technical_indicators_pack",
+        "volume_profile_engine",
+        "confluence_zones_engine"
+      ],
+      "lot_id": "Lot 29",
+      "lot_number": 29,
+      "objective": "Planning-only slice for market analysis, multi-timeframe context, indicators and confluence coverage.",
+      "phase_id": "V2_MARKET_ANALYSIS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 29 - Market Analysis work package 08"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "market_analysis_engine",
+        "multi_timeframe_engine",
+        "technical_indicators_pack",
+        "volume_profile_engine",
+        "confluence_zones_engine"
+      ],
+      "lot_id": "Lot 30",
+      "lot_number": 30,
+      "objective": "Planning-only slice for market analysis, multi-timeframe context, indicators and confluence coverage.",
+      "phase_id": "V2_MARKET_ANALYSIS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 30 - Market Analysis work package 09"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "order_book_l2_offline",
+        "order_flow_offline",
+        "strategic_microstructure"
+      ],
+      "lot_id": "Lot 31",
+      "lot_number": 31,
+      "objective": "Planning-only slice for offline order book, order flow and strategic microstructure research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 31 - Offline microstructure work package 01"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "order_book_l2_offline",
+        "order_flow_offline",
+        "strategic_microstructure"
+      ],
+      "lot_id": "Lot 32",
+      "lot_number": 32,
+      "objective": "Planning-only slice for offline order book, order flow and strategic microstructure research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 32 - Offline microstructure work package 02"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "order_book_l2_offline",
+        "order_flow_offline",
+        "strategic_microstructure"
+      ],
+      "lot_id": "Lot 33",
+      "lot_number": 33,
+      "objective": "Planning-only slice for offline order book, order flow and strategic microstructure research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 33 - Offline microstructure work package 03"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "order_book_l2_offline",
+        "order_flow_offline",
+        "strategic_microstructure"
+      ],
+      "lot_id": "Lot 34",
+      "lot_number": 34,
+      "objective": "Planning-only slice for offline order book, order flow and strategic microstructure research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 34 - Offline microstructure work package 04"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "order_book_l2_offline",
+        "order_flow_offline",
+        "strategic_microstructure"
+      ],
+      "lot_id": "Lot 35",
+      "lot_number": 35,
+      "objective": "Planning-only slice for offline order book, order flow and strategic microstructure research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 35 - Offline microstructure work package 05"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "order_book_l2_offline",
+        "order_flow_offline",
+        "strategic_microstructure"
+      ],
+      "lot_id": "Lot 36",
+      "lot_number": 36,
+      "objective": "Planning-only slice for offline order book, order flow and strategic microstructure research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 36 - Offline microstructure work package 06"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "order_book_l2_offline",
+        "order_flow_offline",
+        "strategic_microstructure"
+      ],
+      "lot_id": "Lot 37",
+      "lot_number": 37,
+      "objective": "Planning-only slice for offline order book, order flow and strategic microstructure research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 37 - Offline microstructure work package 07"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "order_book_l2_offline",
+        "order_flow_offline",
+        "strategic_microstructure"
+      ],
+      "lot_id": "Lot 38",
+      "lot_number": 38,
+      "objective": "Planning-only slice for offline order book, order flow and strategic microstructure research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 38 - Offline microstructure work package 08"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "order_book_l2_offline",
+        "order_flow_offline",
+        "strategic_microstructure"
+      ],
+      "lot_id": "Lot 39",
+      "lot_number": 39,
+      "objective": "Planning-only slice for offline order book, order flow and strategic microstructure research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 39 - Offline microstructure work package 09"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "order_book_l2_offline",
+        "order_flow_offline",
+        "strategic_microstructure"
+      ],
+      "lot_id": "Lot 40",
+      "lot_number": 40,
+      "objective": "Planning-only slice for offline order book, order flow and strategic microstructure research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 40 - Offline microstructure work package 10"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "order_book_l2_offline",
+        "order_flow_offline",
+        "strategic_microstructure"
+      ],
+      "lot_id": "Lot 41",
+      "lot_number": 41,
+      "objective": "Planning-only slice for offline order book, order flow and strategic microstructure research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 41 - Offline microstructure work package 11"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "order_book_l2_offline",
+        "order_flow_offline",
+        "strategic_microstructure"
+      ],
+      "lot_id": "Lot 42",
+      "lot_number": 42,
+      "objective": "Planning-only slice for offline order book, order flow and strategic microstructure research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 42 - Offline microstructure work package 12"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "scenario_engine",
+        "scenario_explanation_engine"
+      ],
+      "lot_id": "Lot 43",
+      "lot_number": 43,
+      "objective": "Planning-only slice for scenario modeling and decision explanation research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 43 - Scenario engine work package 01"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "scenario_engine",
+        "scenario_explanation_engine"
+      ],
+      "lot_id": "Lot 44",
+      "lot_number": 44,
+      "objective": "Planning-only slice for scenario modeling and decision explanation research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 44 - Scenario engine work package 02"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "scenario_engine",
+        "scenario_explanation_engine"
+      ],
+      "lot_id": "Lot 45",
+      "lot_number": 45,
+      "objective": "Planning-only slice for scenario modeling and decision explanation research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 45 - Scenario engine work package 03"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "scenario_engine",
+        "scenario_explanation_engine"
+      ],
+      "lot_id": "Lot 46",
+      "lot_number": 46,
+      "objective": "Planning-only slice for scenario modeling and decision explanation research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 46 - Scenario engine work package 04"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "scenario_engine",
+        "scenario_explanation_engine"
+      ],
+      "lot_id": "Lot 47",
+      "lot_number": 47,
+      "objective": "Planning-only slice for scenario modeling and decision explanation research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 47 - Scenario engine work package 05"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "scenario_engine",
+        "scenario_explanation_engine"
+      ],
+      "lot_id": "Lot 48",
+      "lot_number": 48,
+      "objective": "Planning-only slice for scenario modeling and decision explanation research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 48 - Scenario engine work package 06"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "scenario_engine",
+        "scenario_explanation_engine"
+      ],
+      "lot_id": "Lot 49",
+      "lot_number": 49,
+      "objective": "Planning-only slice for scenario modeling and decision explanation research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 49 - Scenario engine work package 07"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "scenario_engine",
+        "scenario_explanation_engine"
+      ],
+      "lot_id": "Lot 50",
+      "lot_number": 50,
+      "objective": "Planning-only slice for scenario modeling and decision explanation research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 50 - Scenario engine work package 08"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "scenario_engine",
+        "scenario_explanation_engine"
+      ],
+      "lot_id": "Lot 51",
+      "lot_number": 51,
+      "objective": "Planning-only slice for scenario modeling and decision explanation research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 51 - Scenario engine work package 09"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "scenario_engine",
+        "scenario_explanation_engine"
+      ],
+      "lot_id": "Lot 52",
+      "lot_number": 52,
+      "objective": "Planning-only slice for scenario modeling and decision explanation research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 52 - Scenario engine work package 10"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "scenario_engine",
+        "scenario_explanation_engine"
+      ],
+      "lot_id": "Lot 53",
+      "lot_number": 53,
+      "objective": "Planning-only slice for scenario modeling and decision explanation research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 53 - Scenario engine work package 11"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "scenario_engine",
+        "scenario_explanation_engine"
+      ],
+      "lot_id": "Lot 54",
+      "lot_number": 54,
+      "objective": "Planning-only slice for scenario modeling and decision explanation research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 54 - Scenario engine work package 12"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "scenario_engine",
+        "scenario_explanation_engine"
+      ],
+      "lot_id": "Lot 55",
+      "lot_number": 55,
+      "objective": "Planning-only slice for scenario modeling and decision explanation research.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 55 - Scenario engine work package 13"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "expected_value_engine",
+        "advanced_backtesting",
+        "walk_forward_validation",
+        "anti_overfitting_audit"
+      ],
+      "lot_id": "Lot 56",
+      "lot_number": 56,
+      "objective": "Planning-only slice for expected value research, backtesting, walk-forward validation and anti-overfitting audits.",
+      "phase_id": "V4_EXPECTED_VALUE_BACKTESTING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 56 - Expected value work package 01"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "expected_value_engine",
+        "advanced_backtesting",
+        "walk_forward_validation",
+        "anti_overfitting_audit"
+      ],
+      "lot_id": "Lot 57",
+      "lot_number": 57,
+      "objective": "Planning-only slice for expected value research, backtesting, walk-forward validation and anti-overfitting audits.",
+      "phase_id": "V4_EXPECTED_VALUE_BACKTESTING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 57 - Expected value work package 02"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "expected_value_engine",
+        "advanced_backtesting",
+        "walk_forward_validation",
+        "anti_overfitting_audit"
+      ],
+      "lot_id": "Lot 58",
+      "lot_number": 58,
+      "objective": "Planning-only slice for expected value research, backtesting, walk-forward validation and anti-overfitting audits.",
+      "phase_id": "V4_EXPECTED_VALUE_BACKTESTING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 58 - Expected value work package 03"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "expected_value_engine",
+        "advanced_backtesting",
+        "walk_forward_validation",
+        "anti_overfitting_audit"
+      ],
+      "lot_id": "Lot 59",
+      "lot_number": 59,
+      "objective": "Planning-only slice for expected value research, backtesting, walk-forward validation and anti-overfitting audits.",
+      "phase_id": "V4_EXPECTED_VALUE_BACKTESTING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 59 - Expected value work package 04"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "expected_value_engine",
+        "advanced_backtesting",
+        "walk_forward_validation",
+        "anti_overfitting_audit"
+      ],
+      "lot_id": "Lot 60",
+      "lot_number": 60,
+      "objective": "Planning-only slice for expected value research, backtesting, walk-forward validation and anti-overfitting audits.",
+      "phase_id": "V4_EXPECTED_VALUE_BACKTESTING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 60 - Expected value work package 05"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "expected_value_engine",
+        "advanced_backtesting",
+        "walk_forward_validation",
+        "anti_overfitting_audit"
+      ],
+      "lot_id": "Lot 61",
+      "lot_number": 61,
+      "objective": "Planning-only slice for expected value research, backtesting, walk-forward validation and anti-overfitting audits.",
+      "phase_id": "V4_EXPECTED_VALUE_BACKTESTING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 61 - Expected value work package 06"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "expected_value_engine",
+        "advanced_backtesting",
+        "walk_forward_validation",
+        "anti_overfitting_audit"
+      ],
+      "lot_id": "Lot 62",
+      "lot_number": 62,
+      "objective": "Planning-only slice for expected value research, backtesting, walk-forward validation and anti-overfitting audits.",
+      "phase_id": "V4_EXPECTED_VALUE_BACKTESTING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 62 - Expected value work package 07"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "expected_value_engine",
+        "advanced_backtesting",
+        "walk_forward_validation",
+        "anti_overfitting_audit"
+      ],
+      "lot_id": "Lot 63",
+      "lot_number": 63,
+      "objective": "Planning-only slice for expected value research, backtesting, walk-forward validation and anti-overfitting audits.",
+      "phase_id": "V4_EXPECTED_VALUE_BACKTESTING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 63 - Expected value work package 08"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "expected_value_engine",
+        "advanced_backtesting",
+        "walk_forward_validation",
+        "anti_overfitting_audit"
+      ],
+      "lot_id": "Lot 64",
+      "lot_number": 64,
+      "objective": "Planning-only slice for expected value research, backtesting, walk-forward validation and anti-overfitting audits.",
+      "phase_id": "V4_EXPECTED_VALUE_BACKTESTING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 64 - Expected value work package 09"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "expected_value_engine",
+        "advanced_backtesting",
+        "walk_forward_validation",
+        "anti_overfitting_audit"
+      ],
+      "lot_id": "Lot 65",
+      "lot_number": 65,
+      "objective": "Planning-only slice for expected value research, backtesting, walk-forward validation and anti-overfitting audits.",
+      "phase_id": "V4_EXPECTED_VALUE_BACKTESTING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 65 - Expected value work package 10"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "expected_value_engine",
+        "advanced_backtesting",
+        "walk_forward_validation",
+        "anti_overfitting_audit"
+      ],
+      "lot_id": "Lot 66",
+      "lot_number": 66,
+      "objective": "Planning-only slice for expected value research, backtesting, walk-forward validation and anti-overfitting audits.",
+      "phase_id": "V4_EXPECTED_VALUE_BACKTESTING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 66 - Expected value work package 11"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "paper_trading_demo_portfolio",
+        "simulated_orders_and_fills"
+      ],
+      "lot_id": "Lot 67",
+      "lot_number": 67,
+      "objective": "Planning-only slice for demo portfolio and simulated order lifecycle artifacts.",
+      "phase_id": "V5_PAPER_TRADING_DEMO",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 67 - Paper demo work package 01"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "paper_trading_demo_portfolio",
+        "simulated_orders_and_fills"
+      ],
+      "lot_id": "Lot 68",
+      "lot_number": 68,
+      "objective": "Planning-only slice for demo portfolio and simulated order lifecycle artifacts.",
+      "phase_id": "V5_PAPER_TRADING_DEMO",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 68 - Paper demo work package 02"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "paper_trading_demo_portfolio",
+        "simulated_orders_and_fills"
+      ],
+      "lot_id": "Lot 69",
+      "lot_number": 69,
+      "objective": "Planning-only slice for demo portfolio and simulated order lifecycle artifacts.",
+      "phase_id": "V5_PAPER_TRADING_DEMO",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 69 - Paper demo work package 03"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "paper_trading_demo_portfolio",
+        "simulated_orders_and_fills"
+      ],
+      "lot_id": "Lot 70",
+      "lot_number": 70,
+      "objective": "Planning-only slice for demo portfolio and simulated order lifecycle artifacts.",
+      "phase_id": "V5_PAPER_TRADING_DEMO",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 70 - Paper demo work package 04"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "paper_trading_demo_portfolio",
+        "simulated_orders_and_fills"
+      ],
+      "lot_id": "Lot 71",
+      "lot_number": 71,
+      "objective": "Planning-only slice for demo portfolio and simulated order lifecycle artifacts.",
+      "phase_id": "V5_PAPER_TRADING_DEMO",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 71 - Paper demo work package 05"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "paper_trading_demo_portfolio",
+        "simulated_orders_and_fills"
+      ],
+      "lot_id": "Lot 72",
+      "lot_number": 72,
+      "objective": "Planning-only slice for demo portfolio and simulated order lifecycle artifacts.",
+      "phase_id": "V5_PAPER_TRADING_DEMO",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 72 - Paper demo work package 06"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "paper_trading_demo_portfolio",
+        "simulated_orders_and_fills"
+      ],
+      "lot_id": "Lot 73",
+      "lot_number": 73,
+      "objective": "Planning-only slice for demo portfolio and simulated order lifecycle artifacts.",
+      "phase_id": "V5_PAPER_TRADING_DEMO",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 73 - Paper demo work package 07"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "paper_trading_demo_portfolio",
+        "simulated_orders_and_fills"
+      ],
+      "lot_id": "Lot 74",
+      "lot_number": 74,
+      "objective": "Planning-only slice for demo portfolio and simulated order lifecycle artifacts.",
+      "phase_id": "V5_PAPER_TRADING_DEMO",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 74 - Paper demo work package 08"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "paper_trading_demo_portfolio",
+        "simulated_orders_and_fills"
+      ],
+      "lot_id": "Lot 75",
+      "lot_number": 75,
+      "objective": "Planning-only slice for demo portfolio and simulated order lifecycle artifacts.",
+      "phase_id": "V5_PAPER_TRADING_DEMO",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 75 - Paper demo work package 09"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "paper_trading_demo_portfolio",
+        "simulated_orders_and_fills"
+      ],
+      "lot_id": "Lot 76",
+      "lot_number": 76,
+      "objective": "Planning-only slice for demo portfolio and simulated order lifecycle artifacts.",
+      "phase_id": "V5_PAPER_TRADING_DEMO",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 76 - Paper demo work package 10"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "research_os",
+        "experiment_registry",
+        "hypothesis_tracking",
+        "ablation_placebo_oos_testing"
+      ],
+      "lot_id": "Lot 77",
+      "lot_number": 77,
+      "objective": "Planning-only slice for research workflow, experiment registry and hypothesis governance.",
+      "phase_id": "V6_RESEARCH_OS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 77 - Research OS work package 01"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "research_os",
+        "experiment_registry",
+        "hypothesis_tracking",
+        "ablation_placebo_oos_testing"
+      ],
+      "lot_id": "Lot 78",
+      "lot_number": 78,
+      "objective": "Planning-only slice for research workflow, experiment registry and hypothesis governance.",
+      "phase_id": "V6_RESEARCH_OS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 78 - Research OS work package 02"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "research_os",
+        "experiment_registry",
+        "hypothesis_tracking",
+        "ablation_placebo_oos_testing"
+      ],
+      "lot_id": "Lot 79",
+      "lot_number": 79,
+      "objective": "Planning-only slice for research workflow, experiment registry and hypothesis governance.",
+      "phase_id": "V6_RESEARCH_OS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 79 - Research OS work package 03"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "research_os",
+        "experiment_registry",
+        "hypothesis_tracking",
+        "ablation_placebo_oos_testing"
+      ],
+      "lot_id": "Lot 80",
+      "lot_number": 80,
+      "objective": "Planning-only slice for research workflow, experiment registry and hypothesis governance.",
+      "phase_id": "V6_RESEARCH_OS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 80 - Research OS work package 04"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "research_os",
+        "experiment_registry",
+        "hypothesis_tracking",
+        "ablation_placebo_oos_testing"
+      ],
+      "lot_id": "Lot 81",
+      "lot_number": 81,
+      "objective": "Planning-only slice for research workflow, experiment registry and hypothesis governance.",
+      "phase_id": "V6_RESEARCH_OS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 81 - Research OS work package 05"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "research_os",
+        "experiment_registry",
+        "hypothesis_tracking",
+        "ablation_placebo_oos_testing"
+      ],
+      "lot_id": "Lot 82",
+      "lot_number": 82,
+      "objective": "Planning-only slice for research workflow, experiment registry and hypothesis governance.",
+      "phase_id": "V6_RESEARCH_OS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 82 - Research OS work package 06"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "research_os",
+        "experiment_registry",
+        "hypothesis_tracking",
+        "ablation_placebo_oos_testing"
+      ],
+      "lot_id": "Lot 83",
+      "lot_number": 83,
+      "objective": "Planning-only slice for research workflow, experiment registry and hypothesis governance.",
+      "phase_id": "V6_RESEARCH_OS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 83 - Research OS work package 07"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "research_os",
+        "experiment_registry",
+        "hypothesis_tracking",
+        "ablation_placebo_oos_testing"
+      ],
+      "lot_id": "Lot 84",
+      "lot_number": 84,
+      "objective": "Planning-only slice for research workflow, experiment registry and hypothesis governance.",
+      "phase_id": "V6_RESEARCH_OS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 84 - Research OS work package 08"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "research_os",
+        "experiment_registry",
+        "hypothesis_tracking",
+        "ablation_placebo_oos_testing"
+      ],
+      "lot_id": "Lot 85",
+      "lot_number": 85,
+      "objective": "Planning-only slice for research workflow, experiment registry and hypothesis governance.",
+      "phase_id": "V6_RESEARCH_OS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 85 - Research OS work package 09"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "research_os",
+        "experiment_registry",
+        "hypothesis_tracking",
+        "ablation_placebo_oos_testing"
+      ],
+      "lot_id": "Lot 86",
+      "lot_number": 86,
+      "objective": "Planning-only slice for research workflow, experiment registry and hypothesis governance.",
+      "phase_id": "V6_RESEARCH_OS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 86 - Research OS work package 10"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "research_os",
+        "experiment_registry",
+        "hypothesis_tracking",
+        "ablation_placebo_oos_testing"
+      ],
+      "lot_id": "Lot 87",
+      "lot_number": 87,
+      "objective": "Planning-only slice for research workflow, experiment registry and hypothesis governance.",
+      "phase_id": "V6_RESEARCH_OS",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 87 - Research OS work package 11"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "ai_news_event_engine",
+        "economic_calendar",
+        "news_ingestion_read_only",
+        "sentiment_narrative_engine",
+        "llm_explanation_layer",
+        "ai_hallucination_source_audit"
+      ],
+      "lot_id": "Lot 88",
+      "lot_number": 88,
+      "objective": "Planning-only slice for AI, news, event and explanation research modules.",
+      "phase_id": "V7_AI_NEWS_EVENT_ENGINE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 88 - AI news event work package 01"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "ai_news_event_engine",
+        "economic_calendar",
+        "news_ingestion_read_only",
+        "sentiment_narrative_engine",
+        "llm_explanation_layer",
+        "ai_hallucination_source_audit"
+      ],
+      "lot_id": "Lot 89",
+      "lot_number": 89,
+      "objective": "Planning-only slice for AI, news, event and explanation research modules.",
+      "phase_id": "V7_AI_NEWS_EVENT_ENGINE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 89 - AI news event work package 02"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "ai_news_event_engine",
+        "economic_calendar",
+        "news_ingestion_read_only",
+        "sentiment_narrative_engine",
+        "llm_explanation_layer",
+        "ai_hallucination_source_audit"
+      ],
+      "lot_id": "Lot 90",
+      "lot_number": 90,
+      "objective": "Planning-only slice for AI, news, event and explanation research modules.",
+      "phase_id": "V7_AI_NEWS_EVENT_ENGINE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 90 - AI news event work package 03"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "ai_news_event_engine",
+        "economic_calendar",
+        "news_ingestion_read_only",
+        "sentiment_narrative_engine",
+        "llm_explanation_layer",
+        "ai_hallucination_source_audit"
+      ],
+      "lot_id": "Lot 91",
+      "lot_number": 91,
+      "objective": "Planning-only slice for AI, news, event and explanation research modules.",
+      "phase_id": "V7_AI_NEWS_EVENT_ENGINE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 91 - AI news event work package 04"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "ai_news_event_engine",
+        "economic_calendar",
+        "news_ingestion_read_only",
+        "sentiment_narrative_engine",
+        "llm_explanation_layer",
+        "ai_hallucination_source_audit"
+      ],
+      "lot_id": "Lot 92",
+      "lot_number": 92,
+      "objective": "Planning-only slice for AI, news, event and explanation research modules.",
+      "phase_id": "V7_AI_NEWS_EVENT_ENGINE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 92 - AI news event work package 05"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "ai_news_event_engine",
+        "economic_calendar",
+        "news_ingestion_read_only",
+        "sentiment_narrative_engine",
+        "llm_explanation_layer",
+        "ai_hallucination_source_audit"
+      ],
+      "lot_id": "Lot 93",
+      "lot_number": 93,
+      "objective": "Planning-only slice for AI, news, event and explanation research modules.",
+      "phase_id": "V7_AI_NEWS_EVENT_ENGINE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 93 - AI news event work package 06"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "ai_news_event_engine",
+        "economic_calendar",
+        "news_ingestion_read_only",
+        "sentiment_narrative_engine",
+        "llm_explanation_layer",
+        "ai_hallucination_source_audit"
+      ],
+      "lot_id": "Lot 94",
+      "lot_number": 94,
+      "objective": "Planning-only slice for AI, news, event and explanation research modules.",
+      "phase_id": "V7_AI_NEWS_EVENT_ENGINE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 94 - AI news event work package 07"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "ai_news_event_engine",
+        "economic_calendar",
+        "news_ingestion_read_only",
+        "sentiment_narrative_engine",
+        "llm_explanation_layer",
+        "ai_hallucination_source_audit"
+      ],
+      "lot_id": "Lot 95",
+      "lot_number": 95,
+      "objective": "Planning-only slice for AI, news, event and explanation research modules.",
+      "phase_id": "V7_AI_NEWS_EVENT_ENGINE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 95 - AI news event work package 08"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "ai_news_event_engine",
+        "economic_calendar",
+        "news_ingestion_read_only",
+        "sentiment_narrative_engine",
+        "llm_explanation_layer",
+        "ai_hallucination_source_audit"
+      ],
+      "lot_id": "Lot 96",
+      "lot_number": 96,
+      "objective": "Planning-only slice for AI, news, event and explanation research modules.",
+      "phase_id": "V7_AI_NEWS_EVENT_ENGINE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 96 - AI news event work package 09"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "ai_news_event_engine",
+        "economic_calendar",
+        "news_ingestion_read_only",
+        "sentiment_narrative_engine",
+        "llm_explanation_layer",
+        "ai_hallucination_source_audit"
+      ],
+      "lot_id": "Lot 97",
+      "lot_number": 97,
+      "objective": "Planning-only slice for AI, news, event and explanation research modules.",
+      "phase_id": "V7_AI_NEWS_EVENT_ENGINE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 97 - AI news event work package 10"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "ai_news_event_engine",
+        "economic_calendar",
+        "news_ingestion_read_only",
+        "sentiment_narrative_engine",
+        "llm_explanation_layer",
+        "ai_hallucination_source_audit"
+      ],
+      "lot_id": "Lot 98",
+      "lot_number": 98,
+      "objective": "Planning-only slice for AI, news, event and explanation research modules.",
+      "phase_id": "V7_AI_NEWS_EVENT_ENGINE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 98 - AI news event work package 11"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "ai_news_event_engine",
+        "economic_calendar",
+        "news_ingestion_read_only",
+        "sentiment_narrative_engine",
+        "llm_explanation_layer",
+        "ai_hallucination_source_audit"
+      ],
+      "lot_id": "Lot 99",
+      "lot_number": 99,
+      "objective": "Planning-only slice for AI, news, event and explanation research modules.",
+      "phase_id": "V7_AI_NEWS_EVENT_ENGINE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 99 - AI news event work package 12"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "ai_news_event_engine",
+        "economic_calendar",
+        "news_ingestion_read_only",
+        "sentiment_narrative_engine",
+        "llm_explanation_layer",
+        "ai_hallucination_source_audit"
+      ],
+      "lot_id": "Lot 100",
+      "lot_number": 100,
+      "objective": "Planning-only slice for AI, news, event and explanation research modules.",
+      "phase_id": "V7_AI_NEWS_EVENT_ENGINE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 100 - AI news event work package 13"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "ai_news_event_engine",
+        "economic_calendar",
+        "news_ingestion_read_only",
+        "sentiment_narrative_engine",
+        "llm_explanation_layer",
+        "ai_hallucination_source_audit"
+      ],
+      "lot_id": "Lot 101",
+      "lot_number": 101,
+      "objective": "Planning-only slice for AI, news, event and explanation research modules.",
+      "phase_id": "V7_AI_NEWS_EVENT_ENGINE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 101 - AI news event work package 14"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "No server, no websocket and no active interface may be started before a dedicated UI lot."
+      ],
+      "capabilities": [
+        "graphical_interface",
+        "market_dashboard",
+        "scenario_dashboard",
+        "decision_logs_dashboard",
+        "paper_trading_dashboard",
+        "portfolio_dashboard",
+        "audit_replay_ui",
+        "final_product_reporting"
+      ],
+      "lot_id": "Lot 102",
+      "lot_number": 102,
+      "objective": "Planning-only slice for dashboards, audit replay UI and product reporting surfaces.",
+      "phase_id": "V8_UI_DASHBOARD",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 102 - UI dashboard work package 01"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "No server, no websocket and no active interface may be started before a dedicated UI lot."
+      ],
+      "capabilities": [
+        "graphical_interface",
+        "market_dashboard",
+        "scenario_dashboard",
+        "decision_logs_dashboard",
+        "paper_trading_dashboard",
+        "portfolio_dashboard",
+        "audit_replay_ui",
+        "final_product_reporting"
+      ],
+      "lot_id": "Lot 103",
+      "lot_number": 103,
+      "objective": "Planning-only slice for dashboards, audit replay UI and product reporting surfaces.",
+      "phase_id": "V8_UI_DASHBOARD",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 103 - UI dashboard work package 02"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "No server, no websocket and no active interface may be started before a dedicated UI lot."
+      ],
+      "capabilities": [
+        "graphical_interface",
+        "market_dashboard",
+        "scenario_dashboard",
+        "decision_logs_dashboard",
+        "paper_trading_dashboard",
+        "portfolio_dashboard",
+        "audit_replay_ui",
+        "final_product_reporting"
+      ],
+      "lot_id": "Lot 104",
+      "lot_number": 104,
+      "objective": "Planning-only slice for dashboards, audit replay UI and product reporting surfaces.",
+      "phase_id": "V8_UI_DASHBOARD",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 104 - UI dashboard work package 03"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "No server, no websocket and no active interface may be started before a dedicated UI lot."
+      ],
+      "capabilities": [
+        "graphical_interface",
+        "market_dashboard",
+        "scenario_dashboard",
+        "decision_logs_dashboard",
+        "paper_trading_dashboard",
+        "portfolio_dashboard",
+        "audit_replay_ui",
+        "final_product_reporting"
+      ],
+      "lot_id": "Lot 105",
+      "lot_number": 105,
+      "objective": "Planning-only slice for dashboards, audit replay UI and product reporting surfaces.",
+      "phase_id": "V8_UI_DASHBOARD",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 105 - UI dashboard work package 04"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "No server, no websocket and no active interface may be started before a dedicated UI lot."
+      ],
+      "capabilities": [
+        "graphical_interface",
+        "market_dashboard",
+        "scenario_dashboard",
+        "decision_logs_dashboard",
+        "paper_trading_dashboard",
+        "portfolio_dashboard",
+        "audit_replay_ui",
+        "final_product_reporting"
+      ],
+      "lot_id": "Lot 106",
+      "lot_number": 106,
+      "objective": "Planning-only slice for dashboards, audit replay UI and product reporting surfaces.",
+      "phase_id": "V8_UI_DASHBOARD",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 106 - UI dashboard work package 05"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "No server, no websocket and no active interface may be started before a dedicated UI lot."
+      ],
+      "capabilities": [
+        "graphical_interface",
+        "market_dashboard",
+        "scenario_dashboard",
+        "decision_logs_dashboard",
+        "paper_trading_dashboard",
+        "portfolio_dashboard",
+        "audit_replay_ui",
+        "final_product_reporting"
+      ],
+      "lot_id": "Lot 107",
+      "lot_number": 107,
+      "objective": "Planning-only slice for dashboards, audit replay UI and product reporting surfaces.",
+      "phase_id": "V8_UI_DASHBOARD",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 107 - UI dashboard work package 06"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "No server, no websocket and no active interface may be started before a dedicated UI lot."
+      ],
+      "capabilities": [
+        "graphical_interface",
+        "market_dashboard",
+        "scenario_dashboard",
+        "decision_logs_dashboard",
+        "paper_trading_dashboard",
+        "portfolio_dashboard",
+        "audit_replay_ui",
+        "final_product_reporting"
+      ],
+      "lot_id": "Lot 108",
+      "lot_number": 108,
+      "objective": "Planning-only slice for dashboards, audit replay UI and product reporting surfaces.",
+      "phase_id": "V8_UI_DASHBOARD",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 108 - UI dashboard work package 07"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "No server, no websocket and no active interface may be started before a dedicated UI lot."
+      ],
+      "capabilities": [
+        "graphical_interface",
+        "market_dashboard",
+        "scenario_dashboard",
+        "decision_logs_dashboard",
+        "paper_trading_dashboard",
+        "portfolio_dashboard",
+        "audit_replay_ui",
+        "final_product_reporting"
+      ],
+      "lot_id": "Lot 109",
+      "lot_number": 109,
+      "objective": "Planning-only slice for dashboards, audit replay UI and product reporting surfaces.",
+      "phase_id": "V8_UI_DASHBOARD",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 109 - UI dashboard work package 08"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "No server, no websocket and no active interface may be started before a dedicated UI lot."
+      ],
+      "capabilities": [
+        "graphical_interface",
+        "market_dashboard",
+        "scenario_dashboard",
+        "decision_logs_dashboard",
+        "paper_trading_dashboard",
+        "portfolio_dashboard",
+        "audit_replay_ui",
+        "final_product_reporting"
+      ],
+      "lot_id": "Lot 110",
+      "lot_number": 110,
+      "objective": "Planning-only slice for dashboards, audit replay UI and product reporting surfaces.",
+      "phase_id": "V8_UI_DASHBOARD",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 110 - UI dashboard work package 09"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "No server, no websocket and no active interface may be started before a dedicated UI lot."
+      ],
+      "capabilities": [
+        "graphical_interface",
+        "market_dashboard",
+        "scenario_dashboard",
+        "decision_logs_dashboard",
+        "paper_trading_dashboard",
+        "portfolio_dashboard",
+        "audit_replay_ui",
+        "final_product_reporting"
+      ],
+      "lot_id": "Lot 111",
+      "lot_number": 111,
+      "objective": "Planning-only slice for dashboards, audit replay UI and product reporting surfaces.",
+      "phase_id": "V8_UI_DASHBOARD",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 111 - UI dashboard work package 10"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "No server, no websocket and no active interface may be started before a dedicated UI lot."
+      ],
+      "capabilities": [
+        "graphical_interface",
+        "market_dashboard",
+        "scenario_dashboard",
+        "decision_logs_dashboard",
+        "paper_trading_dashboard",
+        "portfolio_dashboard",
+        "audit_replay_ui",
+        "final_product_reporting"
+      ],
+      "lot_id": "Lot 112",
+      "lot_number": 112,
+      "objective": "Planning-only slice for dashboards, audit replay UI and product reporting surfaces.",
+      "phase_id": "V8_UI_DASHBOARD",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 112 - UI dashboard work package 11"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "No server, no websocket and no active interface may be started before a dedicated UI lot."
+      ],
+      "capabilities": [
+        "graphical_interface",
+        "market_dashboard",
+        "scenario_dashboard",
+        "decision_logs_dashboard",
+        "paper_trading_dashboard",
+        "portfolio_dashboard",
+        "audit_replay_ui",
+        "final_product_reporting"
+      ],
+      "lot_id": "Lot 113",
+      "lot_number": 113,
+      "objective": "Planning-only slice for dashboards, audit replay UI and product reporting surfaces.",
+      "phase_id": "V8_UI_DASHBOARD",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 113 - UI dashboard work package 12"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "No server, no websocket and no active interface may be started before a dedicated UI lot."
+      ],
+      "capabilities": [
+        "graphical_interface",
+        "market_dashboard",
+        "scenario_dashboard",
+        "decision_logs_dashboard",
+        "paper_trading_dashboard",
+        "portfolio_dashboard",
+        "audit_replay_ui",
+        "final_product_reporting"
+      ],
+      "lot_id": "Lot 114",
+      "lot_number": 114,
+      "objective": "Planning-only slice for dashboards, audit replay UI and product reporting surfaces.",
+      "phase_id": "V8_UI_DASHBOARD",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 114 - UI dashboard work package 13"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "account_analysis_read_only",
+        "exchange_api_read_only",
+        "balances_positions_read_only",
+        "reconciliation_engine"
+      ],
+      "lot_id": "Lot 115",
+      "lot_number": 115,
+      "objective": "Planning-only slice for read-only account analytics, balances and reconciliation.",
+      "phase_id": "V9_ACCOUNT_READ_ONLY",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 115 - Account read-only work package 01"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "account_analysis_read_only",
+        "exchange_api_read_only",
+        "balances_positions_read_only",
+        "reconciliation_engine"
+      ],
+      "lot_id": "Lot 116",
+      "lot_number": 116,
+      "objective": "Planning-only slice for read-only account analytics, balances and reconciliation.",
+      "phase_id": "V9_ACCOUNT_READ_ONLY",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 116 - Account read-only work package 02"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "account_analysis_read_only",
+        "exchange_api_read_only",
+        "balances_positions_read_only",
+        "reconciliation_engine"
+      ],
+      "lot_id": "Lot 117",
+      "lot_number": 117,
+      "objective": "Planning-only slice for read-only account analytics, balances and reconciliation.",
+      "phase_id": "V9_ACCOUNT_READ_ONLY",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 117 - Account read-only work package 03"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "account_analysis_read_only",
+        "exchange_api_read_only",
+        "balances_positions_read_only",
+        "reconciliation_engine"
+      ],
+      "lot_id": "Lot 118",
+      "lot_number": 118,
+      "objective": "Planning-only slice for read-only account analytics, balances and reconciliation.",
+      "phase_id": "V9_ACCOUNT_READ_ONLY",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 118 - Account read-only work package 04"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "account_analysis_read_only",
+        "exchange_api_read_only",
+        "balances_positions_read_only",
+        "reconciliation_engine"
+      ],
+      "lot_id": "Lot 119",
+      "lot_number": 119,
+      "objective": "Planning-only slice for read-only account analytics, balances and reconciliation.",
+      "phase_id": "V9_ACCOUNT_READ_ONLY",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 119 - Account read-only work package 05"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "account_analysis_read_only",
+        "exchange_api_read_only",
+        "balances_positions_read_only",
+        "reconciliation_engine"
+      ],
+      "lot_id": "Lot 120",
+      "lot_number": 120,
+      "objective": "Planning-only slice for read-only account analytics, balances and reconciliation.",
+      "phase_id": "V9_ACCOUNT_READ_ONLY",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 120 - Account read-only work package 06"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "account_analysis_read_only",
+        "exchange_api_read_only",
+        "balances_positions_read_only",
+        "reconciliation_engine"
+      ],
+      "lot_id": "Lot 121",
+      "lot_number": 121,
+      "objective": "Planning-only slice for read-only account analytics, balances and reconciliation.",
+      "phase_id": "V9_ACCOUNT_READ_ONLY",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 121 - Account read-only work package 07"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "account_analysis_read_only",
+        "exchange_api_read_only",
+        "balances_positions_read_only",
+        "reconciliation_engine"
+      ],
+      "lot_id": "Lot 122",
+      "lot_number": 122,
+      "objective": "Planning-only slice for read-only account analytics, balances and reconciliation.",
+      "phase_id": "V9_ACCOUNT_READ_ONLY",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 122 - Account read-only work package 08"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "account_analysis_read_only",
+        "exchange_api_read_only",
+        "balances_positions_read_only",
+        "reconciliation_engine"
+      ],
+      "lot_id": "Lot 123",
+      "lot_number": 123,
+      "objective": "Planning-only slice for read-only account analytics, balances and reconciliation.",
+      "phase_id": "V9_ACCOUNT_READ_ONLY",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 123 - Account read-only work package 09"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "account_analysis_read_only",
+        "exchange_api_read_only",
+        "balances_positions_read_only",
+        "reconciliation_engine"
+      ],
+      "lot_id": "Lot 124",
+      "lot_number": 124,
+      "objective": "Planning-only slice for read-only account analytics, balances and reconciliation.",
+      "phase_id": "V9_ACCOUNT_READ_ONLY",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 124 - Account read-only work package 10"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "sandbox_demo_trading",
+        "demo_order_lifecycle",
+        "demo_risk_controls"
+      ],
+      "lot_id": "Lot 125",
+      "lot_number": 125,
+      "objective": "Planning-only slice for sandbox demo controls and guarded demo-only operations.",
+      "phase_id": "V10_SANDBOX_DEMO_TRADING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 125 - Sandbox demo work package 01"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "sandbox_demo_trading",
+        "demo_order_lifecycle",
+        "demo_risk_controls"
+      ],
+      "lot_id": "Lot 126",
+      "lot_number": 126,
+      "objective": "Planning-only slice for sandbox demo controls and guarded demo-only operations.",
+      "phase_id": "V10_SANDBOX_DEMO_TRADING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 126 - Sandbox demo work package 02"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "sandbox_demo_trading",
+        "demo_order_lifecycle",
+        "demo_risk_controls"
+      ],
+      "lot_id": "Lot 127",
+      "lot_number": 127,
+      "objective": "Planning-only slice for sandbox demo controls and guarded demo-only operations.",
+      "phase_id": "V10_SANDBOX_DEMO_TRADING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 127 - Sandbox demo work package 03"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "sandbox_demo_trading",
+        "demo_order_lifecycle",
+        "demo_risk_controls"
+      ],
+      "lot_id": "Lot 128",
+      "lot_number": 128,
+      "objective": "Planning-only slice for sandbox demo controls and guarded demo-only operations.",
+      "phase_id": "V10_SANDBOX_DEMO_TRADING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 128 - Sandbox demo work package 04"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "sandbox_demo_trading",
+        "demo_order_lifecycle",
+        "demo_risk_controls"
+      ],
+      "lot_id": "Lot 129",
+      "lot_number": 129,
+      "objective": "Planning-only slice for sandbox demo controls and guarded demo-only operations.",
+      "phase_id": "V10_SANDBOX_DEMO_TRADING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 129 - Sandbox demo work package 05"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "sandbox_demo_trading",
+        "demo_order_lifecycle",
+        "demo_risk_controls"
+      ],
+      "lot_id": "Lot 130",
+      "lot_number": 130,
+      "objective": "Planning-only slice for sandbox demo controls and guarded demo-only operations.",
+      "phase_id": "V10_SANDBOX_DEMO_TRADING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 130 - Sandbox demo work package 06"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "sandbox_demo_trading",
+        "demo_order_lifecycle",
+        "demo_risk_controls"
+      ],
+      "lot_id": "Lot 131",
+      "lot_number": 131,
+      "objective": "Planning-only slice for sandbox demo controls and guarded demo-only operations.",
+      "phase_id": "V10_SANDBOX_DEMO_TRADING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 131 - Sandbox demo work package 07"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "sandbox_demo_trading",
+        "demo_order_lifecycle",
+        "demo_risk_controls"
+      ],
+      "lot_id": "Lot 132",
+      "lot_number": 132,
+      "objective": "Planning-only slice for sandbox demo controls and guarded demo-only operations.",
+      "phase_id": "V10_SANDBOX_DEMO_TRADING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 132 - Sandbox demo work package 08"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "sandbox_demo_trading",
+        "demo_order_lifecycle",
+        "demo_risk_controls"
+      ],
+      "lot_id": "Lot 133",
+      "lot_number": 133,
+      "objective": "Planning-only slice for sandbox demo controls and guarded demo-only operations.",
+      "phase_id": "V10_SANDBOX_DEMO_TRADING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 133 - Sandbox demo work package 09"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "sandbox_demo_trading",
+        "demo_order_lifecycle",
+        "demo_risk_controls"
+      ],
+      "lot_id": "Lot 134",
+      "lot_number": 134,
+      "objective": "Planning-only slice for sandbox demo controls and guarded demo-only operations.",
+      "phase_id": "V10_SANDBOX_DEMO_TRADING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 134 - Sandbox demo work package 10"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "sandbox_demo_trading",
+        "demo_order_lifecycle",
+        "demo_risk_controls"
+      ],
+      "lot_id": "Lot 135",
+      "lot_number": 135,
+      "objective": "Planning-only slice for sandbox demo controls and guarded demo-only operations.",
+      "phase_id": "V10_SANDBOX_DEMO_TRADING",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 135 - Sandbox demo work package 11"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes.",
+        "Any live-oriented work remains FUTURE_LIVE_GATED until governance, reconciliation and kill switch controls are validated."
+      ],
+      "capabilities": [
+        "incident_response",
+        "kill_switch_governance",
+        "secrets_policy",
+        "future_personal_live_trading",
+        "live_human_approval_mode",
+        "live_small_capital_guard",
+        "live_reconciliation"
+      ],
+      "lot_id": "Lot 136",
+      "lot_number": 136,
+      "objective": "Planning-only slice for personal live governance, kill switch, secrets policy and live reconciliation gates.",
+      "phase_id": "V11_LIVE_PERSONAL_GOVERNANCE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 136 - Live governance work package 01"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes.",
+        "Any live-oriented work remains FUTURE_LIVE_GATED until governance, reconciliation and kill switch controls are validated."
+      ],
+      "capabilities": [
+        "incident_response",
+        "kill_switch_governance",
+        "secrets_policy",
+        "future_personal_live_trading",
+        "live_human_approval_mode",
+        "live_small_capital_guard",
+        "live_reconciliation"
+      ],
+      "lot_id": "Lot 137",
+      "lot_number": 137,
+      "objective": "Planning-only slice for personal live governance, kill switch, secrets policy and live reconciliation gates.",
+      "phase_id": "V11_LIVE_PERSONAL_GOVERNANCE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 137 - Live governance work package 02"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes.",
+        "Any live-oriented work remains FUTURE_LIVE_GATED until governance, reconciliation and kill switch controls are validated."
+      ],
+      "capabilities": [
+        "incident_response",
+        "kill_switch_governance",
+        "secrets_policy",
+        "future_personal_live_trading",
+        "live_human_approval_mode",
+        "live_small_capital_guard",
+        "live_reconciliation"
+      ],
+      "lot_id": "Lot 138",
+      "lot_number": 138,
+      "objective": "Planning-only slice for personal live governance, kill switch, secrets policy and live reconciliation gates.",
+      "phase_id": "V11_LIVE_PERSONAL_GOVERNANCE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 138 - Live governance work package 03"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes.",
+        "Any live-oriented work remains FUTURE_LIVE_GATED until governance, reconciliation and kill switch controls are validated."
+      ],
+      "capabilities": [
+        "incident_response",
+        "kill_switch_governance",
+        "secrets_policy",
+        "future_personal_live_trading",
+        "live_human_approval_mode",
+        "live_small_capital_guard",
+        "live_reconciliation"
+      ],
+      "lot_id": "Lot 139",
+      "lot_number": 139,
+      "objective": "Planning-only slice for personal live governance, kill switch, secrets policy and live reconciliation gates.",
+      "phase_id": "V11_LIVE_PERSONAL_GOVERNANCE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 139 - Live governance work package 04"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes.",
+        "Any live-oriented work remains FUTURE_LIVE_GATED until governance, reconciliation and kill switch controls are validated."
+      ],
+      "capabilities": [
+        "incident_response",
+        "kill_switch_governance",
+        "secrets_policy",
+        "future_personal_live_trading",
+        "live_human_approval_mode",
+        "live_small_capital_guard",
+        "live_reconciliation"
+      ],
+      "lot_id": "Lot 140",
+      "lot_number": 140,
+      "objective": "Planning-only slice for personal live governance, kill switch, secrets policy and live reconciliation gates.",
+      "phase_id": "V11_LIVE_PERSONAL_GOVERNANCE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 140 - Live governance work package 05"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes.",
+        "Any live-oriented work remains FUTURE_LIVE_GATED until governance, reconciliation and kill switch controls are validated."
+      ],
+      "capabilities": [
+        "incident_response",
+        "kill_switch_governance",
+        "secrets_policy",
+        "future_personal_live_trading",
+        "live_human_approval_mode",
+        "live_small_capital_guard",
+        "live_reconciliation"
+      ],
+      "lot_id": "Lot 141",
+      "lot_number": 141,
+      "objective": "Planning-only slice for personal live governance, kill switch, secrets policy and live reconciliation gates.",
+      "phase_id": "V11_LIVE_PERSONAL_GOVERNANCE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 141 - Live governance work package 06"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes.",
+        "Any live-oriented work remains FUTURE_LIVE_GATED until governance, reconciliation and kill switch controls are validated."
+      ],
+      "capabilities": [
+        "incident_response",
+        "kill_switch_governance",
+        "secrets_policy",
+        "future_personal_live_trading",
+        "live_human_approval_mode",
+        "live_small_capital_guard",
+        "live_reconciliation"
+      ],
+      "lot_id": "Lot 142",
+      "lot_number": 142,
+      "objective": "Planning-only slice for personal live governance, kill switch, secrets policy and live reconciliation gates.",
+      "phase_id": "V11_LIVE_PERSONAL_GOVERNANCE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 142 - Live governance work package 07"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes.",
+        "Any live-oriented work remains FUTURE_LIVE_GATED until governance, reconciliation and kill switch controls are validated."
+      ],
+      "capabilities": [
+        "incident_response",
+        "kill_switch_governance",
+        "secrets_policy",
+        "future_personal_live_trading",
+        "live_human_approval_mode",
+        "live_small_capital_guard",
+        "live_reconciliation"
+      ],
+      "lot_id": "Lot 143",
+      "lot_number": 143,
+      "objective": "Planning-only slice for personal live governance, kill switch, secrets policy and live reconciliation gates.",
+      "phase_id": "V11_LIVE_PERSONAL_GOVERNANCE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 143 - Live governance work package 08"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes.",
+        "Any live-oriented work remains FUTURE_LIVE_GATED until governance, reconciliation and kill switch controls are validated."
+      ],
+      "capabilities": [
+        "incident_response",
+        "kill_switch_governance",
+        "secrets_policy",
+        "future_personal_live_trading",
+        "live_human_approval_mode",
+        "live_small_capital_guard",
+        "live_reconciliation"
+      ],
+      "lot_id": "Lot 144",
+      "lot_number": 144,
+      "objective": "Planning-only slice for personal live governance, kill switch, secrets policy and live reconciliation gates.",
+      "phase_id": "V11_LIVE_PERSONAL_GOVERNANCE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 144 - Live governance work package 09"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes.",
+        "Any live-oriented work remains FUTURE_LIVE_GATED until governance, reconciliation and kill switch controls are validated."
+      ],
+      "capabilities": [
+        "incident_response",
+        "kill_switch_governance",
+        "secrets_policy",
+        "future_personal_live_trading",
+        "live_human_approval_mode",
+        "live_small_capital_guard",
+        "live_reconciliation"
+      ],
+      "lot_id": "Lot 145",
+      "lot_number": 145,
+      "objective": "Planning-only slice for personal live governance, kill switch, secrets policy and live reconciliation gates.",
+      "phase_id": "V11_LIVE_PERSONAL_GOVERNANCE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 145 - Live governance work package 10"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes.",
+        "Any live-oriented work remains FUTURE_LIVE_GATED until governance, reconciliation and kill switch controls are validated."
+      ],
+      "capabilities": [
+        "incident_response",
+        "kill_switch_governance",
+        "secrets_policy",
+        "future_personal_live_trading",
+        "live_human_approval_mode",
+        "live_small_capital_guard",
+        "live_reconciliation"
+      ],
+      "lot_id": "Lot 146",
+      "lot_number": 146,
+      "objective": "Planning-only slice for personal live governance, kill switch, secrets policy and live reconciliation gates.",
+      "phase_id": "V11_LIVE_PERSONAL_GOVERNANCE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 146 - Live governance work package 11"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes.",
+        "Any live-oriented work remains FUTURE_LIVE_GATED until governance, reconciliation and kill switch controls are validated."
+      ],
+      "capabilities": [
+        "incident_response",
+        "kill_switch_governance",
+        "secrets_policy",
+        "future_personal_live_trading",
+        "live_human_approval_mode",
+        "live_small_capital_guard",
+        "live_reconciliation"
+      ],
+      "lot_id": "Lot 147",
+      "lot_number": 147,
+      "objective": "Planning-only slice for personal live governance, kill switch, secrets policy and live reconciliation gates.",
+      "phase_id": "V11_LIVE_PERSONAL_GOVERNANCE",
+      "planning_only": true,
+      "status": "FORECAST_ONLY",
+      "title": "Lot 147 - Live governance work package 12"
+    }
+  ],
+  "roadmap_phases": [
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "market_analysis_engine",
+        "multi_timeframe_engine",
+        "technical_indicators_pack",
+        "volume_profile_engine",
+        "confluence_zones_engine"
+      ],
+      "end_lot_estimate": "Lot 30",
+      "objective": "Structurer l'analyse de marche multi-timeframe, les indicateurs et les zones de confluence.",
+      "phase_id": "V2_MARKET_ANALYSIS",
+      "start_lot_estimate": "Lot 22",
+      "status": "PLANNING_ONLY_LOCKED",
+      "title": "Market Analysis Foundation"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "order_book_l2_offline",
+        "order_flow_offline",
+        "strategic_microstructure",
+        "scenario_engine",
+        "scenario_explanation_engine"
+      ],
+      "end_lot_estimate": "Lot 55",
+      "objective": "Etendre le scope vers la microstructure offline et la recherche de scenarios explicables.",
+      "phase_id": "V3_MICROSTRUCTURE_SCENARIOS",
+      "start_lot_estimate": "Lot 31",
+      "status": "PLANNING_ONLY_LOCKED",
+      "title": "Offline Microstructure and Scenario Research"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "expected_value_engine",
+        "advanced_backtesting",
+        "walk_forward_validation",
+        "anti_overfitting_audit"
+      ],
+      "end_lot_estimate": "Lot 66",
+      "objective": "Documenter les briques d'Expected Value, walk-forward et anti-overfitting.",
+      "phase_id": "V4_EXPECTED_VALUE_BACKTESTING",
+      "start_lot_estimate": "Lot 56",
+      "status": "PLANNING_ONLY_LOCKED",
+      "title": "Expected Value and Advanced Backtesting"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "paper_trading_demo_portfolio",
+        "simulated_orders_and_fills"
+      ],
+      "end_lot_estimate": "Lot 76",
+      "objective": "Encadrer un futur mode demo uniquement, sans activation au Lot 21.",
+      "phase_id": "V5_PAPER_TRADING_DEMO",
+      "start_lot_estimate": "Lot 67",
+      "status": "PLANNING_ONLY_LOCKED",
+      "title": "Paper Trading and Demo Portfolio"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation."
+      ],
+      "capabilities": [
+        "research_os",
+        "experiment_registry",
+        "hypothesis_tracking",
+        "ablation_placebo_oos_testing"
+      ],
+      "end_lot_estimate": "Lot 87",
+      "objective": "Formaliser l'OS de recherche, l'experiment registry et le suivi d'hypotheses.",
+      "phase_id": "V6_RESEARCH_OS",
+      "start_lot_estimate": "Lot 77",
+      "status": "PLANNING_ONLY_LOCKED",
+      "title": "Research OS"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "ai_news_event_engine",
+        "economic_calendar",
+        "news_ingestion_read_only",
+        "sentiment_narrative_engine",
+        "llm_explanation_layer",
+        "ai_hallucination_source_audit"
+      ],
+      "end_lot_estimate": "Lot 101",
+      "objective": "Documenter les blocs IA, news, evenements et audit des sources.",
+      "phase_id": "V7_AI_NEWS_EVENT_ENGINE",
+      "start_lot_estimate": "Lot 88",
+      "status": "PLANNING_ONLY_LOCKED",
+      "title": "AI / News / Event Engine"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "No server, no websocket and no active interface may be started before a dedicated UI lot."
+      ],
+      "capabilities": [
+        "graphical_interface",
+        "market_dashboard",
+        "scenario_dashboard",
+        "decision_logs_dashboard",
+        "paper_trading_dashboard",
+        "portfolio_dashboard",
+        "audit_replay_ui",
+        "final_product_reporting"
+      ],
+      "end_lot_estimate": "Lot 114",
+      "objective": "Reserver l'interface graphique, les dashboards et la restitution produit a des lots dedies.",
+      "phase_id": "V8_UI_DASHBOARD",
+      "start_lot_estimate": "Lot 102",
+      "status": "PLANNING_ONLY_LOCKED",
+      "title": "Graphical Interface and Dashboards"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "account_analysis_read_only",
+        "exchange_api_read_only",
+        "balances_positions_read_only",
+        "reconciliation_engine"
+      ],
+      "end_lot_estimate": "Lot 124",
+      "objective": "Documenter l'analyse de compte et les futures integrations read-only sans activation.",
+      "phase_id": "V9_ACCOUNT_READ_ONLY",
+      "start_lot_estimate": "Lot 115",
+      "status": "PLANNING_ONLY_LOCKED",
+      "title": "Account Analysis and Read-Only APIs"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes."
+      ],
+      "capabilities": [
+        "sandbox_demo_trading",
+        "demo_order_lifecycle",
+        "demo_risk_controls"
+      ],
+      "end_lot_estimate": "Lot 135",
+      "objective": "Reserver les futures boucles demo/sandbox a un environnement entierement garde.",
+      "phase_id": "V10_SANDBOX_DEMO_TRADING",
+      "start_lot_estimate": "Lot 125",
+      "status": "PLANNING_ONLY_LOCKED",
+      "title": "Sandbox and Demo Trading"
+    },
+    {
+      "activation_constraints": [
+        "Lot 21 scope lock remains accepted.",
+        "No-trading invariants remain enforced before any implementation.",
+        "A dedicated implementation lot is required before activation.",
+        "Human review sign-off is mandatory before activation.",
+        "External connectivity remains disabled until a dedicated gate review passes.",
+        "Any live-oriented work remains FUTURE_LIVE_GATED until governance, reconciliation and kill switch controls are validated."
+      ],
+      "capabilities": [
+        "incident_response",
+        "kill_switch_governance",
+        "secrets_policy",
+        "future_personal_live_trading",
+        "live_human_approval_mode",
+        "live_small_capital_guard",
+        "live_reconciliation"
+      ],
+      "end_lot_estimate": "Lot 147",
+      "objective": "Verrouiller les controles de gouvernance, reconciliation et incident response avant tout live futur.",
+      "phase_id": "V11_LIVE_PERSONAL_GOVERNANCE",
+      "start_lot_estimate": "Lot 136",
+      "status": "PLANNING_ONLY_LOCKED",
+      "title": "Future Personal Live Trading Governance"
+    }
+  ],
+  "safety_boundaries": [
+    "TradingDecision reste WAIT pour toute la portee Lot 21.",
+    "SystemDecision reste BLOCK_TRADING pour toute la portee Lot 21.",
+    "Aucune execution, aucune allocation et aucun reequilibrage ne sont autorises.",
+    "Le capital_at_risk reste a 0 tant qu'aucun lot dedie n'est audite."
+  ],
+  "scope_block_reasons": [
+    "V2_SCOPE_LOCK_ONLY",
+    "NO_EXECUTION_ALLOWED",
+    "NO_EXTERNAL_CONNECTIVITY",
+    "NO_EXCHANGE_CONNECTOR",
+    "NO_ORDER_ROUTER",
+    "NO_API_KEYS",
+    "NO_WEBSOCKET",
+    "NO_PAPER_TRADING_ACTIVE",
+    "NO_LIVE_TRADING_ACTIVE",
+    "EDUCATIONAL_MODE_ONLY",
+    "HUMAN_REVIEW_REQUIRED_BEFORE_IMPLEMENTATION"
+  ],
+  "scope_checks": [
+    {
+      "block_reason": "",
+      "check_name": "v1_closure_state",
+      "expected_value": "V1_DEFENSIVE_AUDIT_CLOSED",
+      "message": "La V1 defensive/audit reste fermee avant ouverture du scope V2.",
+      "observed_value": "V1_DEFENSIVE_AUDIT_CLOSED",
+      "status": "PASS"
+    },
+    {
+      "block_reason": "",
+      "check_name": "release_candidate_state",
+      "expected_value": "READY_FOR_LOCAL_AUDIT_REVIEW",
+      "message": "Le release candidate Lot 19 reste la base defensive de reference.",
+      "observed_value": "READY_FOR_LOCAL_AUDIT_REVIEW",
+      "status": "PASS"
+    },
+    {
+      "block_reason": "",
+      "check_name": "no_trading_state",
+      "expected_value": "ENFORCED",
+      "message": "La conformite no-trading reste appliquee.",
+      "observed_value": "ENFORCED",
+      "status": "PASS"
+    },
+    {
+      "block_reason": "",
+      "check_name": "health_state",
+      "expected_value": "HEALTHY_FOR_LOCAL_AUDIT",
+      "message": "Le Health Monitor reste sain pour audit local.",
+      "observed_value": "HEALTHY_FOR_LOCAL_AUDIT",
+      "status": "PASS"
+    },
+    {
+      "block_reason": "",
+      "check_name": "reproducibility_state",
+      "expected_value": "REPRODUCIBLE_LOCALLY",
+      "message": "Le manifeste de reproductibilite reste utilisable comme source de depart.",
+      "observed_value": "REPRODUCIBLE_LOCALLY",
+      "status": "PASS"
+    },
+    {
+      "block_reason": "",
+      "check_name": "archive_checksum_verified",
+      "expected_value": "ef5b5998cd5f75b6d97acc4afc10aeaf4833b565d2c11e9f3278bace06c78667",
+      "message": "L'archive V1 et son SHA256 local sont verifies avant d'ouvrir le scope produit.",
+      "observed_value": "ef5b5998cd5f75b6d97acc4afc10aeaf4833b565d2c11e9f3278bace06c78667",
+      "status": "PASS"
+    },
+    {
+      "block_reason": "",
+      "check_name": "archive_size_verified",
+      "expected_value": 366985,
+      "message": "La taille archivee observee reste coherente avec le snapshot Lot 20.",
+      "observed_value": 366985,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "",
+      "check_name": "archive_frozen_guard",
+      "expected_value": true,
+      "message": "La V2 reference uniquement l'archive V1 gelee validee au Lot 21-bis.",
+      "observed_value": true,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "",
+      "check_name": "capability_registry_complete",
+      "expected_value": 49,
+      "message": "Toutes les capabilities minimales de la feuille de route produit sont enregistrees.",
+      "observed_value": 49,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "",
+      "check_name": "phase_registry_complete",
+      "expected_value": 10,
+      "message": "Toutes les phases roadmap minimales sont documentees.",
+      "observed_value": 10,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "",
+      "check_name": "future_lot_registry_complete",
+      "expected_value": 126,
+      "message": "Les lots 22 a 147 sont previsionnellement verrouilles dans le registre.",
+      "observed_value": 126,
+      "status": "PASS"
+    },
+    {
+      "block_reason": "",
+      "check_name": "scope_execution_blocked",
+      "expected_value": false,
+      "message": "Le scope reste documentaire, sans execution ni connectivite externe.",
+      "observed_value": false,
+      "status": "PASS"
+    }
+  ],
+  "scope_checksum": "d99645814fedc0f4cf5cc8e8ef7ec6bb45f3b34eb785b96bdcd4da25302ff949",
+  "scope_state": "FUNCTIONAL_SCOPE_LOCKED",
+  "scope_version": "lot21_product_scope_v0",
+  "source_artifacts": [
+    "data/audit/dataset_catalog.json",
+    "data/audit/health_monitor_lot17.json",
+    "data/audit/no_trading_compliance_lot18.json",
+    "data/audit/release_candidate_lot19.json",
+    "data/audit/reproducibility_manifest_lot16.json",
+    "data/audit/v1_closure_lot20.json",
+    "dist/crypto_quant_bot_v1_defensive_audit_lot_20.sha256",
+    "dist/crypto_quant_bot_v1_defensive_audit_lot_20.tar.gz",
+    "docs/MODULE_STATUS_MATRIX.md",
+    "docs/PROJECT_IDENTITY.md",
+    "reports/lot_21_v1_archive_freeze_report.md"
+  ],
+  "source_v1_archive_frozen": true,
+  "source_v1_archive_path": "dist/crypto_quant_bot_v1_defensive_audit_lot_20.tar.gz",
+  "source_v1_archive_sha256": "ef5b5998cd5f75b6d97acc4afc10aeaf4833b565d2c11e9f3278bace06c78667",
+  "source_v1_archive_size_bytes": 366985,
+  "trade_allowed": false,
+  "ui_boundaries": [
+    "L'UI est roadmap-only au Lot 21.",
+    "Aucun serveur web et aucune interface operative ne sont demarres.",
+    "Les dashboards restent des cibles documentaires jusqu'a un lot dedie."
+  ],
+  "v1_closure_state": "V1_DEFENSIVE_AUDIT_CLOSED",
+  "v2_scope_state": "OPENED_AS_PLANNING_ONLY"
+}

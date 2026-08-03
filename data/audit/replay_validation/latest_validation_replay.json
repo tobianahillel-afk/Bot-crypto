@@ -1,0 +1,27 @@
+{
+  "available_at": "2026-07-06T09:04:09.246758+00:00",
+  "config_version": "lot0_config_v1",
+  "created_at": "2026-07-06T09:04:09.246754+00:00",
+  "decision_id": "22227b4d-551d-41ed-a2b1-d99d1651a312",
+  "id": "7ba2cd54-4f8c-40c2-ab2c-c9800020b267",
+  "lineage_id": "66fc8bb8-e3fe-4670-9c85-f0b908dd126e",
+  "quality_flag": "valid",
+  "reasons": [
+    "no_market_data_in_lot0",
+    "default_block_until_validated",
+    "trade_allowed_false_by_default"
+  ],
+  "replay_id": "replay_34f5e117-e9d1-41d4-9f33-4f7c8d49c1ac",
+  "schema_version": "1.0.0",
+  "source": "lot0",
+  "system_decision": "BLOCK_TRADING",
+  "timestamp": "2026-07-06T09:04:09.246731+00:00",
+  "trade_allowed": false,
+  "trading_decision": "WAIT",
+  "used_for_decision": true,
+  "validation_status": "validated_lot0",
+  "vetoes": [
+    "risk_veto",
+    "data_quality_veto"
+  ]
+}
