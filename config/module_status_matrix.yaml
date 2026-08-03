@@ -1,0 +1,15 @@
+data_platform: MVP_REQUIRED
+contracts: MVP_REQUIRED
+feature_registry: MVP_REQUIRED
+decision_engine: MVP_REQUIRED
+risk_engine: MVP_REQUIRED
+audit_replay: MVP_REQUIRED
+paper_trading_v0: REQUIRED_BEFORE_LIVE
+paper_trading_v1_live_l2: REQUIRED_BEFORE_LIVE
+research_os: RESEARCH_ONLY
+ai_news_engine: RESEARCH_ONLY
+advanced_ml: RESEARCH_ONLY
+live_execution: DISABLED
+leverage: FORBIDDEN
+withdrawals: FORBIDDEN
+api_withdrawal_permission: FORBIDDEN

@@ -1,0 +1,19 @@
+### COMMAND diagnose_lot10_required_chain_timing
+### START 2026-06-01T01:53:11Z
+### CMD timeout -k 5s 120s python scripts/diagnose_lot10_required_chain_timing.py
+=== TIMING lot10_required_chain_fast_passive ===
+=== Crypto Quant Bot Lot 10 required chain, octies fast passive ===
+=== RUN run_lot10_transaction_costs ===
+LOT 10 TRANSACTION COSTS: PASS
+=== DONE run_lot10_transaction_costs ===
+=== RUN validate_lot10 ===
+LOT 10 VALIDATION: PASS
+=== DONE validate_lot10 ===
+=== RUN passive smoke subset ===
+LOT 10 PASSIVE SMOKE SUBSET: PASS
+=== DONE passive smoke subset ===
+LOT 10-octies REQUIRED CHAIN: PASS
+step=lot10_required_chain_fast_passive duration_seconds=10.720 rc=0 status=OK
+DIAGNOSE LOT10 REQUIRED CHAIN TIMING: PASS
+### END 2026-06-01T01:53:26Z
+### RC 0

@@ -1,0 +1,42 @@
+COMMAND: timeout 300s python scripts/diagnose_lot4_validate_after_chain.py
+START_TS: 1780523801
+BEFORE:validate_lot0
+COMMAND:validate_lot0:python scripts/validate_lot0.py
+LOT 0 VALIDATION: PASS
+AFTER:validate_lot0:rc=0:duration_seconds=1.381
+BEFORE:ingest_ohlcvt_fixture
+COMMAND:ingest_ohlcvt_fixture:python scripts/ingest_ohlcvt_fixture.py
+LOT 1 FIXTURE INGESTION: PASS
+AFTER:ingest_ohlcvt_fixture:rc=0:duration_seconds=1.399
+BEFORE:validate_lot1
+COMMAND:validate_lot1:python scripts/validate_lot1.py
+LOT 1 VALIDATION: PASS
+AFTER:validate_lot1:rc=0:duration_seconds=1.349
+BEFORE:build_lot2_datasets
+COMMAND:build_lot2_datasets:python scripts/build_lot2_datasets.py
+LOT 2 DATASET BUILD: PASS
+AFTER:build_lot2_datasets:rc=0:duration_seconds=1.347
+BEFORE:validate_lot2
+COMMAND:validate_lot2:python scripts/validate_lot2.py
+LOT 2 VALIDATION: PASS
+AFTER:validate_lot2:rc=0:duration_seconds=1.401
+BEFORE:build_lot3_pivots
+COMMAND:build_lot3_pivots:python scripts/build_lot3_pivots.py
+LOT 3 PIVOT BUILD: PASS
+AFTER:build_lot3_pivots:rc=0:duration_seconds=1.301
+BEFORE:validate_lot3
+COMMAND:validate_lot3:python scripts/validate_lot3.py
+LOT 3 VALIDATION: PASS
+AFTER:validate_lot3:rc=0:duration_seconds=1.299
+BEFORE:build_lot4_volume_vwap
+COMMAND:build_lot4_volume_vwap:python scripts/build_lot4_volume_vwap.py
+LOT 4 VOLUME/VWAP BUILD: PASS
+AFTER:build_lot4_volume_vwap:rc=0:duration_seconds=1.401
+BEFORE:validate_lot4
+COMMAND:validate_lot4:python scripts/validate_lot4.py
+LOT 4 VALIDATION: PASS
+AFTER:validate_lot4:rc=0:duration_seconds=1.349
+DIAGNOSE LOT4 VALIDATE AFTER CHAIN: PASS
+END_TS: 1780523815
+DURATION_SECONDS: 14
+RC: 0

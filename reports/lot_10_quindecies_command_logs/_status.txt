@@ -1,0 +1,23 @@
+START 01_diagnose_pytest_resolution 2026-06-03T21:26:31+00:00
+END 01_diagnose_pytest_resolution rc=0 duration=2 2026-06-03T21:26:33+00:00
+START 02_diagnose_lot4_validate_after_chain 2026-06-03T21:26:33+00:00
+END 02_diagnose_lot4_validate_after_chain rc=0 duration=13 2026-06-03T21:26:46+00:00
+START 03_diagnose_lot5_validate_after_chain 2026-06-03T21:26:46+00:00
+END 03_diagnose_lot5_validate_after_chain rc=0 duration=16 2026-06-03T21:27:02+00:00
+START 04_diagnose_lot7_build_after_chain 2026-06-03T21:27:02+00:00
+END 04_diagnose_lot7_build_after_chain rc=0 duration=22 2026-06-03T21:27:24+00:00
+START 05_diagnose_lot8_no_lookahead_after_chain 2026-06-03T21:27:24+00:00
+END 05_diagnose_lot8_no_lookahead_after_chain rc=0 duration=26 2026-06-03T21:27:50+00:00
+START 06_diagnose_exact_chain_until_lot10 2026-06-03T21:27:50+00:00
+END 06_diagnose_exact_chain_until_lot10 rc=0 duration=38 2026-06-03T21:28:28+00:00
+START 07_diagnose_after_pytest_lingering 2026-06-03T21:28:28+00:00
+END 07_diagnose_after_pytest_lingering rc=0 duration=11 2026-06-03T21:28:39+00:00
+START 08_diagnose_exact_chain_return_shell 2026-06-03T21:28:39+00:00
+END 08_diagnose_exact_chain_return_shell rc=0 duration=34 2026-06-03T21:29:13+00:00
+START 09_pytest 2026-06-03T21:29:13+00:00
+END 09_pytest rc=0 duration=3 2026-06-03T21:29:16+00:00
+START 10_validate_lot4_exact_mini_chain 2026-06-03T21:29:16+00:00
+END 10_validate_lot4_exact_mini_chain rc=0 duration=13 2026-06-03T21:29:29+00:00
+START 11_exact_chain 2026-06-03T21:29:29+00:00
+END 11_exact_chain rc=0 duration=32 2026-06-03T21:30:01+00:00
+ALL_DONE 2026-06-03T21:30:01+00:00

@@ -1,0 +1,26 @@
+COMMAND: timeout 300s bash -lc '
+python scripts/validate_lot0.py &&
+python scripts/ingest_ohlcvt_fixture.py &&
+python scripts/validate_lot1.py &&
+python scripts/build_lot2_datasets.py &&
+python scripts/validate_lot2.py &&
+python scripts/build_lot3_pivots.py &&
+python scripts/validate_lot3.py &&
+python scripts/build_lot4_volume_vwap.py &&
+python scripts/validate_lot4.py &&
+python scripts/build_lot5_volatility.py &&
+python scripts/validate_lot5.py &&
+echo VALIDATE_LOT5_CHAIN_DONE
+'
+LOT 0 VALIDATION: PASS
+LOT 1 FIXTURE INGESTION: PASS
+LOT 1 VALIDATION: PASS
+LOT 2 DATASET BUILD: PASS
+LOT 2 VALIDATION: PASS
+LOT 3 PIVOT BUILD: PASS
+LOT 3 VALIDATION: PASS
+LOT 4 VOLUME/VWAP BUILD: PASS
+LOT 4 VALIDATION: PASS
+LOT 5 VOLATILITY BUILD: PASS
+LOT 5 VALIDATION: PASS
+VALIDATE_LOT5_CHAIN_DONE

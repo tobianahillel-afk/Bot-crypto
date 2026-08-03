@@ -1,0 +1,9 @@
+### COMMAND validate_all_until_lot10_smoke
+### START 2026-06-01T01:58:20Z
+### CMD timeout -k 5s 120s bash -lc 'CQB_ORCHESTRATOR_MODE=smoke python scripts/validate_all_until_lot10.py'
+=== Crypto Quant Bot validation until Lot 10 ===
+mode=smoke
+=== CHECK passive artifacts ===
+LOT 10 ORCHESTRATOR SMOKE: PASS
+### END 2026-06-01T01:58:25Z
+### RC 0

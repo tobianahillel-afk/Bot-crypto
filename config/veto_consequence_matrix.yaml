@@ -1,0 +1,26 @@
+book_health_veto:
+  consequence: WAIT
+data_quality_veto:
+  consequence: BLOCK_TRADING
+spread_veto:
+  consequence: WAIT
+slippage_veto:
+  consequence: WAIT
+latency_veto:
+  consequence: WAIT
+risk_veto:
+  consequence: BLOCK_TRADING
+security_veto_low:
+  consequence: PAUSE
+security_veto_high:
+  consequence: KILL_SWITCH
+reconciliation_veto_minor:
+  consequence: PAUSE
+reconciliation_veto_critical:
+  consequence: KILL_SWITCH
+incident_veto_unresolved:
+  consequence: BLOCK_TRADING
+uncalibrated_model_veto:
+  consequence: WAIT
+negative_ev_veto:
+  consequence: WAIT

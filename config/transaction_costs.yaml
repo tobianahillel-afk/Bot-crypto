@@ -1,0 +1,17 @@
+version: "lot10_v0"
+pair: "BTC/EUR"
+currency: "EUR"
+fee_model:
+  maker_fee_bps: 16
+  taker_fee_bps: 26
+spread_model:
+  default_spread_bps: 10
+  min_spread_bps: 1
+  max_spread_bps: 100
+slippage_model:
+  base_slippage_bps: 5
+  volatility_multiplier: 1.0
+  max_slippage_bps: 150
+safety:
+  trade_allowed: false
+  used_for_decision: false

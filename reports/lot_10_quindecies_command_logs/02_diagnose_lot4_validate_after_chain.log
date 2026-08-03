@@ -1,0 +1,31 @@
+COMMAND: timeout 300s python scripts/diagnose_lot4_validate_after_chain.py
+BEFORE:validate_lot0
+LOT 0 VALIDATION: PASS
+AFTER:validate_lot0:rc=0:duration_seconds=1.320
+BEFORE:ingest_ohlcvt_fixture
+LOT 1 FIXTURE INGESTION: PASS
+AFTER:ingest_ohlcvt_fixture:rc=0:duration_seconds=1.401
+BEFORE:validate_lot1
+LOT 1 VALIDATION: PASS
+AFTER:validate_lot1:rc=0:duration_seconds=1.403
+BEFORE:build_lot2_datasets
+LOT 2 DATASET BUILD: PASS
+AFTER:build_lot2_datasets:rc=0:duration_seconds=1.296
+BEFORE:validate_lot2
+LOT 2 VALIDATION: PASS
+AFTER:validate_lot2:rc=0:duration_seconds=1.452
+BEFORE:build_lot3_pivots
+LOT 3 PIVOT BUILD: PASS
+AFTER:build_lot3_pivots:rc=0:duration_seconds=1.297
+BEFORE:validate_lot3
+LOT 3 VALIDATION: PASS
+AFTER:validate_lot3:rc=0:duration_seconds=1.350
+BEFORE:build_lot4_volume_vwap
+LOT 4 VOLUME/VWAP BUILD: PASS
+AFTER:build_lot4_volume_vwap:rc=0:duration_seconds=1.300
+BEFORE:validate_lot4
+LOT 4 VALIDATION: PASS
+AFTER:validate_lot4:rc=0:duration_seconds=1.350
+DIAGNOSE LOT4 VALIDATE AFTER CHAIN: PASS
+RC=0
+DURATION_SECONDS=13

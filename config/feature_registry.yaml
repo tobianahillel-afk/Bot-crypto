@@ -1,0 +1,379 @@
+close:
+  name: close
+  description: Prix de clôture de la candle clôturée
+  inputs: close
+  formula: close
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+simple_return_1:
+  name: simple_return_1
+  description: Rendement simple depuis la candle précédente
+  inputs: close, previous_close
+  formula: close_t / close_t_minus_1 - 1
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+log_return_1:
+  name: log_return_1
+  description: Rendement logarithmique depuis la candle précédente
+  inputs: close, previous_close
+  formula: ln(close_t / close_t_minus_1)
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+hl_range:
+  name: hl_range
+  description: Amplitude high low
+  inputs: high, low
+  formula: high - low
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+oc_change:
+  name: oc_change
+  description: Variation close open
+  inputs: open, close
+  formula: close - open
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+oc_range:
+  name: oc_range
+  description: Amplitude absolue open close
+  inputs: open, close
+  formula: abs(close - open)
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+typical_price:
+  name: typical_price
+  description: Prix typique OHLC
+  inputs: high, low, close
+  formula: (high + low + close) / 3
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+true_range:
+  name: true_range
+  description: True range OHLC sans futur
+  inputs: high, low, previous_close
+  formula: max(high-low, abs(high-previous_close), abs(low-previous_close))
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+rolling_mean_close_3:
+  name: rolling_mean_close_3
+  description: Moyenne mobile des 3 clôtures disponibles
+  inputs: close
+  formula: mean(close_t_minus_2_to_t)
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+rolling_volatility_return_3:
+  name: rolling_volatility_return_3
+  description: Écart-type des 3 derniers rendements disponibles
+  inputs: simple_return_1
+  formula: sample_std(return_t_minus_2_to_t)
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+volume_sum_3:
+  name: volume_sum_3
+  description: Somme des 3 volumes disponibles
+  inputs: volume
+  formula: sum(volume_t_minus_2_to_t)
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+close_to_close_abs_return:
+  name: close_to_close_abs_return
+  description: Retour absolu close-to-close
+  inputs: close, previous_close
+  formula: abs(close_t / close_t_minus_1 - 1)
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+realized_volatility_3:
+  name: realized_volatility_3
+  description: Volatilité réalisée sur 3 rendements
+  inputs: simple_return_1
+  formula: sample_std(last_3_returns)
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+realized_volatility_6:
+  name: realized_volatility_6
+  description: Volatilité réalisée sur 6 rendements
+  inputs: simple_return_1
+  formula: sample_std(last_6_returns)
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+atr_3:
+  name: atr_3
+  description: Average True Range sur 3 candles
+  inputs: true_range
+  formula: mean(last_3_true_ranges)
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+atr_6:
+  name: atr_6
+  description: Average True Range sur 6 candles
+  inputs: true_range
+  formula: mean(last_6_true_ranges)
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+volatility_percentile_lookback:
+  name: volatility_percentile_lookback
+  description: Rang de volatilité dans la fenêtre disponible
+  inputs: true_range, atr_3, atr_6
+  formula: percentile_rank_without_future_data
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+rolling_high_6:
+  name: rolling_high_6
+  description: Plus haut des 6 dernières candles disponibles
+  inputs: high
+  formula: max(high_t_minus_5_to_t)
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+rolling_low_6:
+  name: rolling_low_6
+  description: Plus bas des 6 dernières candles disponibles
+  inputs: low
+  formula: min(low_t_minus_5_to_t)
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+rolling_range_6:
+  name: rolling_range_6
+  description: Amplitude du range 6 candles
+  inputs: rolling_high_6, rolling_low_6
+  formula: rolling_high_6 - rolling_low_6
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+rolling_mid_6:
+  name: rolling_mid_6
+  description: Milieu du range 6 candles
+  inputs: rolling_high_6, rolling_low_6
+  formula: (rolling_high_6 + rolling_low_6) / 2
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+close_position_in_range_6:
+  name: close_position_in_range_6
+  description: Position de la clôture dans le range
+  inputs: close, rolling_low_6, rolling_range_6
+  formula: (close - rolling_low_6) / rolling_range_6
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+range_width_pct:
+  name: range_width_pct
+  description: Largeur du range rapportée au close
+  inputs: rolling_range_6, close
+  formula: rolling_range_6 / close
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+compression_score:
+  name: compression_score
+  description: Score déterministe de compression
+  inputs: range_width_pct
+  formula: 1 - percentile_rank(range_width_pct)
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+expansion_score:
+  name: expansion_score
+  description: Score déterministe d expansion
+  inputs: true_range
+  formula: percentile_rank(true_range)
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+range_state:
+  name: range_state
+  description: État de range non décisionnel
+  inputs: compression_score, expansion_score
+  formula: unknown_or_compressed_or_normal_or_expanding
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+direction_score:
+  name: direction_score
+  description: Score directionnel déterministe
+  inputs: close, close_t_minus_3
+  formula: clipped_normalized_return_over_trend_window
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+trend_score:
+  name: trend_score
+  description: Score de tendance déterministe
+  inputs: direction_score
+  formula: abs(direction_score)
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+range_score:
+  name: range_score
+  description: Score de range déterministe
+  inputs: direction_score, expansion_score, range_width_pct
+  formula: bounded_range_score
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+volatility_score:
+  name: volatility_score
+  description: Score de volatilité déterministe
+  inputs: volatility_percentile_lookback
+  formula: bounded_volatility_score
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+regime_state:
+  name: regime_state
+  description: État de régime non décisionnel
+  inputs: direction_score, range_score, volatility_score
+  formula: deterministic_regime_classifier
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+confidence_score:
+  name: confidence_score
+  description: Score de confiance du régime
+  inputs: available_sub_scores
+  formula: mean_of_available_bounded_scores
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+regime_confidence_score:
+  name: regime_confidence_score
+  description: Alias documentaire du score de confiance du régime
+  inputs: available_sub_scores
+  formula: mean_of_available_bounded_scores
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+vwap:
+  name: vwap
+  description: VWAP cumulatif sur candles clôturées
+  inputs: typical_price, volume
+  formula: sum(price_volume) / sum(volume)
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+anchored_vwap:
+  name: anchored_vwap
+  description: VWAP ancré sur anchor connue
+  inputs: anchor, typical_price, volume
+  formula: sum_from_anchor(price_volume) / sum_from_anchor(volume)
+  timeframe: 5m/15m
+  available_at_rule: available_at >= usable_from de l anchor
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+cumulative_price_volume:
+  name: cumulative_price_volume
+  description: Cumul prix volume disponible
+  inputs: typical_price, volume
+  formula: sum(typical_price * volume)
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+cumulative_volume:
+  name: cumulative_volume
+  description: Cumul volume disponible
+  inputs: volume
+  formula: sum(volume)
+  timeframe: 5m/15m
+  available_at_rule: available_at de la candle clôturée
+  lookahead_safe: true
+  status: MVP_REQUIRED
+
+strength_score:
+  name: strength_score
+  description: Score de force pivot ou zone
+  inputs: confirmed_object_components
+  formula: bounded_strength_score
+  timeframe: 5m/15m
+  available_at_rule: available_at >= usable_from de l objet
+  lookahead_safe: true
+  status: MVP_REQUIRED

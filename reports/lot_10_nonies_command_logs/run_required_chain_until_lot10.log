@@ -1,0 +1,17 @@
+### COMMAND run_required_chain_until_lot10
+### START 2026-06-01T01:53:00Z
+### CMD timeout -k 5s 120s bash -lc bash scripts/run_required_chain_until_lot10.sh; echo REQUIRED_CHAIN_LOT10_DONE
+=== Crypto Quant Bot Lot 10 required chain, octies fast passive ===
+=== RUN run_lot10_transaction_costs ===
+LOT 10 TRANSACTION COSTS: PASS
+=== DONE run_lot10_transaction_costs ===
+=== RUN validate_lot10 ===
+LOT 10 VALIDATION: PASS
+=== DONE validate_lot10 ===
+=== RUN passive smoke subset ===
+LOT 10 PASSIVE SMOKE SUBSET: PASS
+=== DONE passive smoke subset ===
+LOT 10-octies REQUIRED CHAIN: PASS
+REQUIRED_CHAIN_LOT10_DONE
+### END 2026-06-01T01:53:11Z
+### RC 0

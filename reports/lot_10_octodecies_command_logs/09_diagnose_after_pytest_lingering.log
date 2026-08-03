@@ -1,0 +1,22 @@
+COMMAND: timeout 300s python scripts/diagnose_after_pytest_lingering.py
+START_EPOCH: 1780597032
+BEFORE:pytest_only
+COMMAND:pytest_only:bash -lc python -m pytest -q && echo PYTEST_DONE
+EXPECTED_MARKER:pytest_only:PYTEST_DONE
+............................................................................................................................................................................
+172 passed in 0.96s
+PYTEST_DONE
+AFTER:pytest_only:rc=0:duration_seconds=3.774
+BEFORE:pytest_after_lot10
+COMMAND:pytest_after_lot10:bash -lc python scripts/run_lot10_transaction_costs.py && python scripts/validate_lot10.py && python -m pytest -q && echo PYTEST_AFTER_LOT10_DONE
+EXPECTED_MARKER:pytest_after_lot10:PYTEST_AFTER_LOT10_DONE
+LOT 10 TRANSACTION COSTS: PASS
+LOT 10 VALIDATION: PASS
+............................................................................................................................................................................
+172 passed in 1.01s
+PYTEST_AFTER_LOT10_DONE
+AFTER:pytest_after_lot10:rc=0:duration_seconds=7.049
+DIAGNOSE AFTER PYTEST LINGERING: PASS
+END_EPOCH: 1780597044
+DURATION_SECONDS: 12
+RC: 0

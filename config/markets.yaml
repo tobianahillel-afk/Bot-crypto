@@ -1,0 +1,5 @@
+default_pair: BTC/EUR
+base_asset: BTC
+quote_asset: EUR
+live_trading_enabled: false
+kraken_calls_enabled: false

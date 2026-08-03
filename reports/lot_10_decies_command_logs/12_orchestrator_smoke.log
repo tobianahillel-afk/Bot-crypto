@@ -1,0 +1,4 @@
+=== Crypto Quant Bot validation until Lot 10 ===
+mode=smoke
+=== CHECK passive artifacts ===
+LOT 10 ORCHESTRATOR SMOKE: PASS

@@ -1,0 +1,8 @@
+LOT 1 FIXTURE INGESTION: PASS
+dataset_id=btc_eur_1m_ohlcvt_sample_lot1bis
+parsed_candles=6
+quality_flag=valid
+bronze_path=/mnt/data/work_lot05/crypto_quant_bot/data/bronze/btc_eur_ohlcvt_sample_lot1bis.jsonl
+catalog_path=/mnt/data/work_lot05/crypto_quant_bot/data/audit/dataset_catalog.json
+quality_report=/mnt/data/work_lot05/crypto_quant_bot/reports/lot_01_data_quality_report.md
+bronze_checksum=93453f802f3dd1f829e1b51c55e01fa4063e487bc73d82f8ae2ed3d2f1bcd625

@@ -1,0 +1,26 @@
+COMMAND: timeout 300s bash -lc 
+python scripts/validate_lot0.py &&
+python scripts/ingest_ohlcvt_fixture.py &&
+python scripts/validate_lot1.py &&
+python scripts/build_lot2_datasets.py &&
+python scripts/validate_lot2.py &&
+python scripts/build_lot3_pivots.py &&
+python scripts/validate_lot3.py &&
+python scripts/build_lot4_volume_vwap.py &&
+python scripts/validate_lot4.py &&
+python scripts/build_lot5_volatility.py &&
+python scripts/validate_lot5.py &&
+python scripts/build_lot6_regime.py &&
+python scripts/validate_lot6.py &&
+python scripts/build_lot7_market_state.py &&
+python scripts/validate_lot7.py &&
+python scripts/audit_lot8_feature_registry.py &&
+python scripts/audit_lot8_no_lookahead.py &&
+python scripts/validate_lot8.py &&
+python scripts/run_lot9_backtest_replay.py &&
+python scripts/validate_lot9.py &&
+python scripts/run_lot10_transaction_costs.py &&
+python scripts/validate_lot10.py &&
+python -m pytest -q &&
+echo EXACT_CHAIN_DONE
+

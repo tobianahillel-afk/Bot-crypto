@@ -1,0 +1,7 @@
+COMMAND: timeout 60s python scripts/diagnose_pytest_resolution.py
+START_TS: 1780523800
+pytest_path=/opt/pyvenv/lib/python3.13/site-packages/pytest/__init__.py
+DIAGNOSE PYTEST RESOLUTION: PASS
+END_TS: 1780523801
+DURATION_SECONDS: 1
+RC: 0

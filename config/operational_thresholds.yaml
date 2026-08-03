@@ -1,0 +1,9 @@
+book_health_min_trade: 0.80
+book_health_min_system: 0.50
+max_unknown_volume_ratio: 0.30
+max_decision_latency_ms: 500
+max_reconnects_per_hour: 3
+max_api_errors_per_hour: 5
+max_order_rejections_per_day: 2
+max_reconciliation_fee_diff_pct: 0.05
+trade_allowed_default: false

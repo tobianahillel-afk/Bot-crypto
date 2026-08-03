@@ -1,0 +1,6 @@
+trade_allowed_default: false
+default_risk_reason: default_block_until_validated
+live_trading_enabled: false
+allow_leverage: false
+allow_futures: false
+allow_withdrawals: false

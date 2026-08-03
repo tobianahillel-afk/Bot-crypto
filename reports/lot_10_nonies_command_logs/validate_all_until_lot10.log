@@ -1,0 +1,13 @@
+### COMMAND validate_all_until_lot10
+### START 2026-06-01T01:52:46Z
+### CMD timeout -k 5s 120s bash -lc python scripts/validate_all_until_lot10.py; echo LOT10_WRAPPER_DONE
+=== Crypto Quant Bot validation until Lot 10 ===
+mode=fast
+=== CHECK passive artifacts ===
+=== FAST mode: passive historical checks and current lot validation ===
+LOT 10 TRANSACTION COSTS: PASS
+LOT 10 VALIDATION: PASS
+LOT 10 ORCHESTRATED VALIDATION: PASS
+LOT10_WRAPPER_DONE
+### END 2026-06-01T01:53:00Z
+### RC 0

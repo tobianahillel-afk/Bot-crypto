@@ -1,0 +1,60 @@
+### COMMAND: timeout 300s python scripts/diagnose_lot7_build_after_chain.py
+BEFORE:validate_lot0
+COMMAND:validate_lot0:python scripts/validate_lot0.py
+LOT 0 VALIDATION: PASS
+AFTER:validate_lot0:rc=0:duration_seconds=1.228
+BEFORE:ingest_ohlcvt_fixture
+COMMAND:ingest_ohlcvt_fixture:python scripts/ingest_ohlcvt_fixture.py
+LOT 1 FIXTURE INGESTION: PASS
+AFTER:ingest_ohlcvt_fixture:rc=0:duration_seconds=1.296
+BEFORE:validate_lot1
+COMMAND:validate_lot1:python scripts/validate_lot1.py
+LOT 1 VALIDATION: PASS
+AFTER:validate_lot1:rc=0:duration_seconds=1.250
+BEFORE:build_lot2_datasets
+COMMAND:build_lot2_datasets:python scripts/build_lot2_datasets.py
+LOT 2 DATASET BUILD: PASS
+AFTER:build_lot2_datasets:rc=0:duration_seconds=1.249
+BEFORE:validate_lot2
+COMMAND:validate_lot2:python scripts/validate_lot2.py
+LOT 2 VALIDATION: PASS
+AFTER:validate_lot2:rc=0:duration_seconds=1.302
+BEFORE:build_lot3_pivots
+COMMAND:build_lot3_pivots:python scripts/build_lot3_pivots.py
+LOT 3 PIVOT BUILD: PASS
+AFTER:build_lot3_pivots:rc=0:duration_seconds=1.299
+BEFORE:validate_lot3
+COMMAND:validate_lot3:python scripts/validate_lot3.py
+LOT 3 VALIDATION: PASS
+AFTER:validate_lot3:rc=0:duration_seconds=1.251
+BEFORE:build_lot4_volume_vwap
+COMMAND:build_lot4_volume_vwap:python scripts/build_lot4_volume_vwap.py
+LOT 4 VOLUME/VWAP BUILD: PASS
+AFTER:build_lot4_volume_vwap:rc=0:duration_seconds=1.350
+BEFORE:validate_lot4
+COMMAND:validate_lot4:python scripts/validate_lot4.py
+LOT 4 VALIDATION: PASS
+AFTER:validate_lot4:rc=0:duration_seconds=1.498
+BEFORE:build_lot5_volatility
+COMMAND:build_lot5_volatility:python scripts/build_lot5_volatility.py
+LOT 5 VOLATILITY BUILD: PASS
+AFTER:build_lot5_volatility:rc=0:duration_seconds=1.557
+BEFORE:validate_lot5
+COMMAND:validate_lot5:python scripts/validate_lot5.py
+LOT 5 VALIDATION: PASS
+AFTER:validate_lot5:rc=0:duration_seconds=1.494
+BEFORE:build_lot6_regime
+COMMAND:build_lot6_regime:python scripts/build_lot6_regime.py
+LOT 6 REGIME BUILD: PASS
+AFTER:build_lot6_regime:rc=0:duration_seconds=1.299
+BEFORE:validate_lot6
+COMMAND:validate_lot6:python scripts/validate_lot6.py
+LOT 6 VALIDATION: PASS
+AFTER:validate_lot6:rc=0:duration_seconds=1.300
+BEFORE:build_lot7_market_state
+COMMAND:build_lot7_market_state:python scripts/build_lot7_market_state.py
+LOT 7 MARKET STATE BUILD: PASS
+AFTER:build_lot7_market_state:rc=0:duration_seconds=1.503
+DIAGNOSE LOT7 BUILD AFTER CHAIN: PASS
+### RC: 0
+### DURATION_SECONDS: 20

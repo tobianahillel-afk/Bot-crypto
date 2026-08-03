@@ -1,0 +1,22 @@
+{
+  "available_at": "2026-07-06T09:04:09.639733+00:00",
+  "checked_at": "2026-07-06T09:04:09.639693+00:00",
+  "created_at": "2026-07-06T09:04:09.639728+00:00",
+  "dataset_id": "btc_eur_1m_ohlcvt_sample_lot1bis",
+  "duplicate_rows": 0,
+  "errors": [],
+  "has_negative_volume": false,
+  "has_ohlc_inconsistency": false,
+  "id": "b15c0793-bd8c-494a-819b-a51e751fce06",
+  "invalid_rows": 0,
+  "lineage_id": "a04f7a29-6bef-4f48-985b-8ab77292d70a",
+  "missing_rows": 0,
+  "monotonic_timestamp": true,
+  "quality_flag": "valid",
+  "row_count": 6,
+  "schema_version": "1.0.0",
+  "source": "lot0",
+  "used_for_decision": false,
+  "validation_status": "validated_lot1",
+  "warnings": []
+}

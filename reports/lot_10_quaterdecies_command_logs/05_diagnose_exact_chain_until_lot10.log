@@ -1,0 +1,96 @@
+COMMAND: timeout 300s python scripts/diagnose_exact_chain_until_lot10.py
+=== EXACT CHAIN BEFORE validate_lot0 ===
+command=python scripts/validate_lot0.py
+LOT 0 VALIDATION: PASS
+=== EXACT CHAIN AFTER validate_lot0 rc=0 duration_seconds=1.429 ===
+=== EXACT CHAIN BEFORE ingest_ohlcvt_fixture ===
+command=python scripts/ingest_ohlcvt_fixture.py
+LOT 1 FIXTURE INGESTION: PASS
+=== EXACT CHAIN AFTER ingest_ohlcvt_fixture rc=0 duration_seconds=1.743 ===
+=== EXACT CHAIN BEFORE validate_lot1 ===
+command=python scripts/validate_lot1.py
+LOT 1 VALIDATION: PASS
+=== EXACT CHAIN AFTER validate_lot1 rc=0 duration_seconds=1.641 ===
+=== EXACT CHAIN BEFORE build_lot2_datasets ===
+command=python scripts/build_lot2_datasets.py
+LOT 2 DATASET BUILD: PASS
+=== EXACT CHAIN AFTER build_lot2_datasets rc=0 duration_seconds=1.544 ===
+=== EXACT CHAIN BEFORE validate_lot2 ===
+command=python scripts/validate_lot2.py
+LOT 2 VALIDATION: PASS
+=== EXACT CHAIN AFTER validate_lot2 rc=0 duration_seconds=1.395 ===
+=== EXACT CHAIN BEFORE build_lot3_pivots ===
+command=python scripts/build_lot3_pivots.py
+LOT 3 PIVOT BUILD: PASS
+=== EXACT CHAIN AFTER build_lot3_pivots rc=0 duration_seconds=1.196 ===
+=== EXACT CHAIN BEFORE validate_lot3 ===
+command=python scripts/validate_lot3.py
+LOT 3 VALIDATION: PASS
+=== EXACT CHAIN AFTER validate_lot3 rc=0 duration_seconds=1.299 ===
+=== EXACT CHAIN BEFORE build_lot4_volume_vwap ===
+command=python scripts/build_lot4_volume_vwap.py
+LOT 4 VOLUME/VWAP BUILD: PASS
+=== EXACT CHAIN AFTER build_lot4_volume_vwap rc=0 duration_seconds=1.398 ===
+=== EXACT CHAIN BEFORE validate_lot4 ===
+command=python scripts/validate_lot4.py
+LOT 4 VALIDATION: PASS
+=== EXACT CHAIN AFTER validate_lot4 rc=0 duration_seconds=1.299 ===
+=== EXACT CHAIN BEFORE build_lot5_volatility ===
+command=python scripts/build_lot5_volatility.py
+LOT 5 VOLATILITY BUILD: PASS
+=== EXACT CHAIN AFTER build_lot5_volatility rc=0 duration_seconds=1.394 ===
+=== EXACT CHAIN BEFORE validate_lot5 ===
+command=python scripts/validate_lot5.py
+LOT 5 VALIDATION: PASS
+=== EXACT CHAIN AFTER validate_lot5 rc=0 duration_seconds=1.352 ===
+=== EXACT CHAIN BEFORE build_lot6_regime ===
+command=python scripts/build_lot6_regime.py
+LOT 6 REGIME BUILD: PASS
+=== EXACT CHAIN AFTER build_lot6_regime rc=0 duration_seconds=1.342 ===
+=== EXACT CHAIN BEFORE validate_lot6 ===
+command=python scripts/validate_lot6.py
+LOT 6 VALIDATION: PASS
+=== EXACT CHAIN AFTER validate_lot6 rc=0 duration_seconds=1.195 ===
+=== EXACT CHAIN BEFORE build_lot7_market_state ===
+command=python scripts/build_lot7_market_state.py
+LOT 7 MARKET STATE BUILD: PASS
+=== EXACT CHAIN AFTER build_lot7_market_state rc=0 duration_seconds=1.297 ===
+=== EXACT CHAIN BEFORE validate_lot7 ===
+command=python scripts/validate_lot7.py
+LOT 7 VALIDATION: PASS
+=== EXACT CHAIN AFTER validate_lot7 rc=0 duration_seconds=1.196 ===
+=== EXACT CHAIN BEFORE audit_lot8_feature_registry ===
+command=python scripts/audit_lot8_feature_registry.py
+LOT 8 FEATURE REGISTRY AUDIT: PASS
+=== EXACT CHAIN AFTER audit_lot8_feature_registry rc=0 duration_seconds=1.246 ===
+=== EXACT CHAIN BEFORE audit_lot8_no_lookahead ===
+command=python scripts/audit_lot8_no_lookahead.py
+LOT 8 NO-LOOKAHEAD AUDIT: PASS
+=== EXACT CHAIN AFTER audit_lot8_no_lookahead rc=0 duration_seconds=1.399 ===
+=== EXACT CHAIN BEFORE validate_lot8 ===
+command=python scripts/validate_lot8.py
+LOT 8 VALIDATION: START
+LOT 8 VALIDATION: PASS
+=== EXACT CHAIN AFTER validate_lot8 rc=0 duration_seconds=1.349 ===
+=== EXACT CHAIN BEFORE run_lot9_backtest_replay ===
+command=python scripts/run_lot9_backtest_replay.py
+LOT 9 BACKTEST REPLAY: PASS
+=== EXACT CHAIN AFTER run_lot9_backtest_replay rc=0 duration_seconds=1.296 ===
+=== EXACT CHAIN BEFORE validate_lot9 ===
+command=python scripts/validate_lot9.py
+LOT 9 VALIDATION: PASS
+=== EXACT CHAIN AFTER validate_lot9 rc=0 duration_seconds=1.395 ===
+=== EXACT CHAIN BEFORE run_lot10_transaction_costs ===
+command=python scripts/run_lot10_transaction_costs.py
+LOT 10 TRANSACTION COSTS: PASS
+=== EXACT CHAIN AFTER run_lot10_transaction_costs rc=0 duration_seconds=1.300 ===
+=== EXACT CHAIN BEFORE validate_lot10 ===
+command=python scripts/validate_lot10.py
+LOT 10 VALIDATION: PASS
+=== EXACT CHAIN AFTER validate_lot10 rc=0 duration_seconds=1.394 ===
+=== EXACT CHAIN BEFORE pytest ===
+command=python -m pytest -q
+...................................................................................................................................................................
+163 passed in 0.77s
+=== EXACT CHAIN AFTER pytest rc=0 duration_seconds=2.814 ===
+DIAGNOSE EXACT CHAIN LOT10: PASS

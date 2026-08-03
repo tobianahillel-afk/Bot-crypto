@@ -1,0 +1,7 @@
+trend_window: 3
+trend_up_threshold: 0.35
+trend_down_threshold: -0.35
+range_score_threshold: 0.60
+compression_threshold: 0.70
+expansion_threshold: 0.70
+volatility_high_threshold: 0.70

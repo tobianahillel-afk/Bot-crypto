@@ -1,0 +1,7 @@
+### COMMAND diagnose_pytest_resolution
+### START 2026-06-01T01:52:30Z
+### CMD timeout -k 5s 60s python scripts/diagnose_pytest_resolution.py
+pytest_path=/opt/pyvenv/lib/python3.13/site-packages/pytest/__init__.py
+DIAGNOSE PYTEST RESOLUTION: PASS
+### END 2026-06-01T01:52:36Z
+### RC 0

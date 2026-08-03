@@ -1,0 +1,1 @@
+COMMAND: timeout 120s bash -lc python -m pytest -q; echo PYTEST_DONE

@@ -1,0 +1,1 @@
+COMMAND: timeout 300s python scripts/diagnose_after_pytest_lingering.py

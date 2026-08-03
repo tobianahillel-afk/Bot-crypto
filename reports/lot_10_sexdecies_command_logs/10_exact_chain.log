@@ -1,0 +1,56 @@
+COMMAND: timeout 300s bash -lc '
+python scripts/validate_lot0.py &&
+python scripts/ingest_ohlcvt_fixture.py &&
+python scripts/validate_lot1.py &&
+python scripts/build_lot2_datasets.py &&
+python scripts/validate_lot2.py &&
+python scripts/build_lot3_pivots.py &&
+python scripts/validate_lot3.py &&
+python scripts/build_lot4_volume_vwap.py &&
+python scripts/validate_lot4.py &&
+python scripts/build_lot5_volatility.py &&
+python scripts/validate_lot5.py &&
+python scripts/build_lot6_regime.py &&
+python scripts/validate_lot6.py &&
+python scripts/build_lot7_market_state.py &&
+python scripts/validate_lot7.py &&
+python scripts/audit_lot8_feature_registry.py &&
+python scripts/audit_lot8_no_lookahead.py &&
+python scripts/validate_lot8.py &&
+python scripts/run_lot9_backtest_replay.py &&
+python scripts/validate_lot9.py &&
+python scripts/run_lot10_transaction_costs.py &&
+python scripts/validate_lot10.py &&
+python -m pytest -q &&
+echo EXACT_CHAIN_DONE
+'
+START_TS: 1780523959
+LOT 0 VALIDATION: PASS
+LOT 1 FIXTURE INGESTION: PASS
+LOT 1 VALIDATION: PASS
+LOT 2 DATASET BUILD: PASS
+LOT 2 VALIDATION: PASS
+LOT 3 PIVOT BUILD: PASS
+LOT 3 VALIDATION: PASS
+LOT 4 VOLUME/VWAP BUILD: PASS
+LOT 4 VALIDATION: PASS
+LOT 5 VOLATILITY BUILD: PASS
+LOT 5 VALIDATION: PASS
+LOT 6 REGIME BUILD: PASS
+LOT 6 VALIDATION: PASS
+LOT 7 MARKET STATE BUILD: PASS
+LOT 7 VALIDATION: PASS
+LOT 8 FEATURE REGISTRY AUDIT: PASS
+LOT 8 NO-LOOKAHEAD AUDIT: PASS
+LOT 8 VALIDATION: START
+LOT 8 VALIDATION: PASS
+LOT 9 BACKTEST REPLAY: PASS
+LOT 9 VALIDATION: PASS
+LOT 10 TRANSACTION COSTS: PASS
+LOT 10 VALIDATION: PASS
+......................................................................................................................................................................
+166 passed in 0.69s
+EXACT_CHAIN_DONE
+END_TS: 1780523991
+DURATION_SECONDS: 32
+RC: 0

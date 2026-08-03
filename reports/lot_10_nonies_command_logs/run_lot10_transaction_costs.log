@@ -1,0 +1,6 @@
+### COMMAND run_lot10_transaction_costs
+### START 2026-06-01T01:52:36Z
+### CMD timeout -k 5s 60s python scripts/run_lot10_transaction_costs.py
+LOT 10 TRANSACTION COSTS: PASS
+### END 2026-06-01T01:52:41Z
+### RC 0
