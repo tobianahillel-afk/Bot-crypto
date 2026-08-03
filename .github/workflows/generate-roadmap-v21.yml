@@ -37,16 +37,19 @@ jobs:
           import gzip
           import json
 
-          parts = []
-          for path in sorted(Path('.github/scripts').glob('roadmap_payload_*.txt')):
-              parts.append(path.read_text(encoding='utf-8').strip())
+          parts = [path.read_text(encoding='utf-8').strip() for path in sorted(Path('.github/scripts').glob('roadmap_payload_*.txt'))]
           if len(parts) != 4:
               raise SystemExit(f'Expected 4 payload parts, found {len(parts)}')
 
-          payload = ''.join(parts)
-          documents = json.loads(gzip.decompress(base64.b64decode(payload)).decode('utf-8'))
+          documents = json.loads(gzip.decompress(base64.b64decode(''.join(parts))).decode('utf-8'))
           for relative_path, content in documents.items():
-              destination = Path(relative_path)
+              source = Path(relative_path)
+              if relative_path == 'product_scope_roadmap_lot21.jsonl':
+                  destination = Path('data/audit') / source
+              elif source.parts[0] == 'roadmap':
+                  destination = Path('docs') / source
+              else:
+                  destination = Path('docs') / source
               destination.parent.mkdir(parents=True, exist_ok=True)
               destination.write_text(content, encoding='utf-8')
           print(f'Generated {len(documents)} roadmap documentation files.')
