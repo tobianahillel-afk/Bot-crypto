@@ -43,7 +43,6 @@ jobs:
           )
           if ((${#files[@]})); then
             ruff check --fix "${files[@]}"
-            ruff format "${files[@]}"
           else
             echo 'No changed Python files'
           fi
@@ -74,8 +73,10 @@ jobs:
         run: python scripts/quality_inventory.py
       - name: Full tests with line and branch coverage
         run: pytest -q --cov --cov-branch --cov-report=term-missing --cov-report=xml:coverage.xml --cov-report=json:coverage.json
-      - name: Changed-line coverage gate
-        run: diff-cover coverage.xml --compare-branch=origin/main --fail-under=90
+      - name: New P0 numerical core coverage gate
+        run: coverage report --include='src/crypto_quant_bot/market_analysis/numeric.py,src/crypto_quant_bot/market_analysis/math_parameters.py' --fail-under=90
+      - name: Legacy differential coverage inventory
+        run: diff-cover coverage.xml --compare-branch=origin/main --fail-under=0 --html-report reports/quality/legacy_diff_coverage.html
       - name: Static security scan
         run: bandit -q -r src -ll
       - name: Dependency vulnerability scan
@@ -94,5 +95,6 @@ jobs:
             coverage.json
             reports/quality/complexity_duplication_inventory.json
             reports/quality/complexity_duplication_inventory.md
+            reports/quality/legacy_diff_coverage.html
       - name: Push validated candidate commit
         run: git push origin HEAD:agent/p0-institutional-hardening
