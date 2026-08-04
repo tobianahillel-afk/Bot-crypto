@@ -1,0 +1,39 @@
+name: P0.6 patch VRC state logic
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: >-
+      github.actor != 'github-actions[bot]' &&
+      github.event.pull_request.head.ref == 'agent/p06-final-pre-lot26-assurance'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/p06-final-pre-lot26-assurance
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+      - name: Apply VRC state corrections
+        run: python scripts/patch_p06_vrc_state_logic.py
+      - name: Commit correction
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo 'VRC fixes already current.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py
+          git add scripts/validate_pre_lot26_readiness.py
+          git commit -m 'Fix VRC neutral and insufficient-data states'
+          git push origin HEAD:agent/p06-final-pre-lot26-assurance
