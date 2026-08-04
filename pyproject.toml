@@ -37,7 +37,8 @@ console_output_style = "classic"
 [tool.coverage.run]
 branch = true
 source = ["src/crypto_quant_bot"]
-parallel = false
+parallel = true
+patch = ["subprocess"]
 
 [tool.coverage.report]
 show_missing = true
