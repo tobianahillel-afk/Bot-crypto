@@ -116,3 +116,7 @@ HFT research, options context et on-chain context. Elles ne peuvent contourner l
 - Pas de secret dans Git, pas de permission withdrawal, pas de levier dans le périmètre initial.
 - Pas de HFT live dans V1→V21.
 - Pas de scale-up autonome.
+
+## 7. Précédence des preuves historiques
+
+Pour les Lots 0–25, critères d’acceptation, rapports PASS, artefacts et commit validé prévalent sur la roadmap. Aucun renommage rétroactif ni remplacement théorique de l’implémentation auditée n’est autorisé.

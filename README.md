@@ -1284,3 +1284,5 @@ The Lot 16 historical checksum is now derived from one canonical function: `comp
 ## Roadmap canonique V1–V21
 
 La source de vérité documentaire est [`docs/ROADMAP_V1_TO_V21.md`](docs/ROADMAP_V1_TO_V21.md). Le cahier des charges maître, la chaîne d’exécution, les contrats, les state machines et les Lots 0–177 sont liés depuis ce document.
+
+- `docs/HISTORICAL_IMPLEMENTATION_RECONCILIATION.md` — réconciliation des Lots 0–25 avec les preuves réelles.

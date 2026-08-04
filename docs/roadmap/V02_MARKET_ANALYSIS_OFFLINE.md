@@ -67,19 +67,47 @@ Figer le scope produit futur, les phases, les capabilities et les gates d’acti
 - Divergence entre état calculé et artefact réconcilié → veto et rapport de divergence.
 - Exception non classifiée → aucun output valide, incident auditable et arrêt fail-closed.
 
-### Fichiers et artefacts d’implémentation attendus
+### Preuves historiques et fichiers réels
 
-- src/crypto_quant_bot/market_analysis/product_scope_lock_and_future_capability_registry.py
-- src/crypto_quant_bot/market_analysis/product_scope_lock_and_future_capability_registry_models.py
-- scripts/run_lot21_product_scope_lock_and_future_capability_registry.py
-- scripts/validate_lot21.py
-- tests/test_lot21_product_scope_lock_and_future_capability_registry.py
-- data/audit/product_scope_lock_and_future_capability_registry_lot21.json
-- reports/lot_21_product_scope_lock_and_future_capability_registry_report.md
-- docs/LOT_21_PRODUCT_SCOPE_LOCK_AND_FUTURE_CAPABILITY_REGISTRY.md
-- docs/ACCEPTANCE_CRITERIA_LOT_21.md
-- reports/lot_21_validation_report.md
+Ce lot est déjà implémenté. La roadmap ne renomme, ne déplace et ne recrée aucun fichier historique.
+Les critères d’acceptation, rapports PASS, artefacts et commit validé sont normatifs ; en cas de divergence, ils prévalent sur cette synthèse.
 
+Fichiers de preuve détectés dans le dépôt :
+
+- `data/audit/product_scope_capabilities_lot21.jsonl`
+- `data/audit/product_scope_lot21.json`
+- `data/audit/product_scope_roadmap_lot21.jsonl`
+- `docs/ACCEPTANCE_CRITERIA_LOT_21.md`
+- `docs/LOT_21_PRODUCT_SCOPE.md`
+- `reports/lot_21_product_scope_report.md`
+- `reports/lot_21_v1_archive_freeze_report.md`
+- `reports/lot_21_validation_report.md`
+- `scripts/__pycache__/diagnose_exact_chain_until_lot21.cpython-313.pyc`
+- `scripts/__pycache__/run_lot21_product_scope.cpython-313.pyc`
+- `scripts/__pycache__/validate_all_until_lot21.cpython-313.pyc`
+- `scripts/__pycache__/validate_lot21.cpython-313.pyc`
+- `scripts/diagnose_exact_chain_until_lot21.py`
+- `scripts/diagnose_lot21_required_chain_timing.py`
+- `scripts/run_lot21_product_scope.py`
+- `scripts/run_required_chain_until_lot21.sh`
+- `scripts/validate_all_until_lot21.py`
+- `scripts/validate_lot21.py`
+- `tests/__pycache__/test_lot21_diagnostics_static.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot21_functional_capabilities.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot21_no_active_trading.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot21_product_scope_outputs.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot21_required_chain_static.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot21_roadmap_phases.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot21_v1_archive_freeze.cpython-313-pytest-9.0.2.pyc`
+- `tests/test_lot21_diagnostics_static.py`
+- `tests/test_lot21_functional_capabilities.py`
+- `tests/test_lot21_no_active_trading.py`
+- `tests/test_lot21_product_scope_outputs.py`
+- `tests/test_lot21_required_chain_static.py`
+- `tests/test_lot21_roadmap_phases.py`
+- `tests/test_lot21_v1_archive_freeze.py`
+
+Les chemins des modules source sont ceux des critères d’acceptation historiques et du dépôt réel. Aucun chemin synthétique futur n’est normatif pour ce lot.
 ### Observabilité minimale
 
 - lot_21_records_processed_total
@@ -173,19 +201,49 @@ Créer le socle d’analyse de marché V2 sur données 5m/15m.
 - Divergence entre état calculé et artefact réconcilié → veto et rapport de divergence.
 - Exception non classifiée → aucun output valide, incident auditable et arrêt fail-closed.
 
-### Fichiers et artefacts d’implémentation attendus
+### Preuves historiques et fichiers réels
 
-- src/crypto_quant_bot/market_analysis/market_analysis_foundation.py
-- src/crypto_quant_bot/market_analysis/market_analysis_foundation_models.py
-- scripts/run_lot22_market_analysis_foundation.py
-- scripts/validate_lot22.py
-- tests/test_lot22_market_analysis_foundation.py
-- data/audit/market_analysis_foundation_lot22.json
-- reports/lot_22_market_analysis_foundation_report.md
-- docs/LOT_22_MARKET_ANALYSIS_FOUNDATION.md
-- docs/ACCEPTANCE_CRITERIA_LOT_22.md
-- reports/lot_22_validation_report.md
+Ce lot est déjà implémenté. La roadmap ne renomme, ne déplace et ne recrée aucun fichier historique.
+Les critères d’acceptation, rapports PASS, artefacts et commit validé sont normatifs ; en cas de divergence, ils prévalent sur cette synthèse.
 
+Fichiers de preuve détectés dans le dépôt :
+
+- `data/audit/market_analysis_lot22.json`
+- `data/audit/market_analysis_timeframes_lot22.jsonl`
+- `docs/ACCEPTANCE_CRITERIA_LOT_22.md`
+- `docs/ACCEPTANCE_CRITERIA_LOT_22_BIS.md`
+- `docs/LOT_22_MARKET_ANALYSIS.md`
+- `reports/lot_22_bis_lot16_checksum_stability_report.md`
+- `reports/lot_22_market_analysis_report.md`
+- `reports/lot_22_validation_report.md`
+- `scripts/__pycache__/diagnose_exact_chain_until_lot22.cpython-313.pyc`
+- `scripts/__pycache__/diagnose_lot22_required_chain_timing.cpython-313.pyc`
+- `scripts/__pycache__/run_lot22_market_analysis.cpython-313.pyc`
+- `scripts/__pycache__/validate_all_until_lot22.cpython-313.pyc`
+- `scripts/__pycache__/validate_lot22.cpython-313.pyc`
+- `scripts/diagnose_exact_chain_until_lot22.py`
+- `scripts/diagnose_lot22_required_chain_timing.py`
+- `scripts/run_lot22_market_analysis.py`
+- `scripts/run_required_chain_until_lot22.sh`
+- `scripts/validate_all_until_lot22.py`
+- `scripts/validate_lot22.py`
+- `tests/__pycache__/test_lot22_archive_freeze_guard.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot22_bis_exact_chain_return_shell_static.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot22_bis_exact_chain_return_shell_static.cpython-313.pyc`
+- `tests/__pycache__/test_lot22_diagnostics_static.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot22_market_analysis_invariants.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot22_market_analysis_outputs.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot22_market_context_labels.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot22_required_chain_static.cpython-313-pytest-9.0.2.pyc`
+- `tests/test_lot22_archive_freeze_guard.py`
+- `tests/test_lot22_bis_exact_chain_return_shell_static.py`
+- `tests/test_lot22_diagnostics_static.py`
+- `tests/test_lot22_market_analysis_invariants.py`
+- `tests/test_lot22_market_analysis_outputs.py`
+- `tests/test_lot22_market_context_labels.py`
+- `tests/test_lot22_required_chain_static.py`
+
+Les chemins des modules source sont ceux des critères d’acceptation historiques et du dépôt réel. Aucun chemin synthétique futur n’est normatif pour ce lot.
 ### Observabilité minimale
 
 - lot_22_records_processed_total
@@ -278,19 +336,69 @@ Calculer un pack cohérent d’indicateurs numériques par timeframe.
 - Divergence entre état calculé et artefact réconcilié → veto et rapport de divergence.
 - Exception non classifiée → aucun output valide, incident auditable et arrêt fail-closed.
 
-### Fichiers et artefacts d’implémentation attendus
+### Preuves historiques et fichiers réels
 
-- src/crypto_quant_bot/market_analysis/technical_indicators_pack.py
-- src/crypto_quant_bot/market_analysis/technical_indicators_pack_models.py
-- scripts/run_lot23_technical_indicators_pack.py
-- scripts/validate_lot23.py
-- tests/test_lot23_technical_indicators_pack.py
-- data/audit/technical_indicators_pack_lot23.json
-- reports/lot_23_technical_indicators_pack_report.md
-- docs/LOT_23_TECHNICAL_INDICATORS_PACK.md
-- docs/ACCEPTANCE_CRITERIA_LOT_23.md
-- reports/lot_23_validation_report.md
+Ce lot est déjà implémenté. La roadmap ne renomme, ne déplace et ne recrée aucun fichier historique.
+Les critères d’acceptation, rapports PASS, artefacts et commit validé sont normatifs ; en cas de divergence, ils prévalent sur cette synthèse.
 
+Fichiers de preuve détectés dans le dépôt :
+
+- `data/audit/technical_indicators_lot23.json`
+- `data/audit/technical_indicators_timeframes_lot23.jsonl`
+- `docs/ACCEPTANCE_CRITERIA_LOT_23.md`
+- `docs/ACCEPTANCE_CRITERIA_LOT_23_BIS.md`
+- `docs/ACCEPTANCE_CRITERIA_LOT_23_QUATER.md`
+- `docs/ACCEPTANCE_CRITERIA_LOT_23_QUINQUIES.md`
+- `docs/ACCEPTANCE_CRITERIA_LOT_23_TER.md`
+- `docs/LOT_23_TECHNICAL_INDICATORS.md`
+- `reports/lot_23_bis_lot7_jsonl_robustness_report.md`
+- `reports/lot_23_quater_lot16_checksum_single_source_report.md`
+- `reports/lot_23_quinquies_lot16_after_lot10_diagnostic_report.md`
+- `reports/lot_23_technical_indicators_report.md`
+- `reports/lot_23_ter_lot10_writer_robustness_report.md`
+- `reports/lot_23_validation_report.md`
+- `scripts/__pycache__/diagnose_exact_chain_until_lot23.cpython-313.pyc`
+- `scripts/__pycache__/diagnose_lot23_required_chain_timing.cpython-313.pyc`
+- `scripts/__pycache__/run_lot23_technical_indicators.cpython-313.pyc`
+- `scripts/__pycache__/validate_all_until_lot23.cpython-313.pyc`
+- `scripts/__pycache__/validate_lot23.cpython-313.pyc`
+- `scripts/diagnose_exact_chain_until_lot23.py`
+- `scripts/diagnose_lot23_required_chain_timing.py`
+- `scripts/run_lot23_technical_indicators.py`
+- `scripts/run_required_chain_until_lot23.sh`
+- `scripts/validate_all_until_lot23.py`
+- `scripts/validate_lot23.py`
+- `tests/__pycache__/test_lot23_archive_freeze_guard.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot23_archive_freeze_guard.cpython-313.pyc`
+- `tests/__pycache__/test_lot23_bis_lot7_chain_stability.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot23_bis_lot7_chain_stability.cpython-313.pyc`
+- `tests/__pycache__/test_lot23_diagnostics_static.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot23_diagnostics_static.cpython-313.pyc`
+- `tests/__pycache__/test_lot23_indicator_states.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot23_indicator_states.cpython-313.pyc`
+- `tests/__pycache__/test_lot23_indicator_values.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot23_indicator_values.cpython-313.pyc`
+- `tests/__pycache__/test_lot23_quater_lot16_return_shell_stability.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot23_quater_lot16_return_shell_stability.cpython-313.pyc`
+- `tests/__pycache__/test_lot23_quinquies_lot16_after_lot10_diagnostic.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot23_required_chain_static.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot23_required_chain_static.cpython-313.pyc`
+- `tests/__pycache__/test_lot23_technical_indicators_outputs.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot23_technical_indicators_outputs.cpython-313.pyc`
+- `tests/__pycache__/test_lot23_ter_lot10_chain_stability.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot23_ter_lot10_chain_stability.cpython-313.pyc`
+- `tests/test_lot23_archive_freeze_guard.py`
+- `tests/test_lot23_bis_lot7_chain_stability.py`
+- `tests/test_lot23_diagnostics_static.py`
+- `tests/test_lot23_indicator_states.py`
+- `tests/test_lot23_indicator_values.py`
+- `tests/test_lot23_quater_lot16_return_shell_stability.py`
+- `tests/test_lot23_quinquies_lot16_after_lot10_diagnostic.py`
+- `tests/test_lot23_required_chain_static.py`
+- `tests/test_lot23_technical_indicators_outputs.py`
+- `tests/test_lot23_ter_lot10_chain_stability.py`
+
+Les chemins des modules source sont ceux des critères d’acceptation historiques et du dépôt réel. Aucun chemin synthétique futur n’est normatif pour ce lot.
 ### Observabilité minimale
 
 - lot_23_records_processed_total
@@ -380,19 +488,46 @@ Interpréter tendance, range et momentum de façon descriptive.
 - Divergence entre état calculé et artefact réconcilié → veto et rapport de divergence.
 - Exception non classifiée → aucun output valide, incident auditable et arrêt fail-closed.
 
-### Fichiers et artefacts d’implémentation attendus
+### Preuves historiques et fichiers réels
 
-- src/crypto_quant_bot/market_analysis/trend_range_momentum_engine.py
-- src/crypto_quant_bot/market_analysis/trend_range_momentum_engine_models.py
-- scripts/run_lot24_trend_range_momentum_engine.py
-- scripts/validate_lot24.py
-- tests/test_lot24_trend_range_momentum_engine.py
-- data/audit/trend_range_momentum_engine_lot24.json
-- reports/lot_24_trend_range_momentum_engine_report.md
-- docs/LOT_24_TREND_RANGE_MOMENTUM_ENGINE.md
-- docs/ACCEPTANCE_CRITERIA_LOT_24.md
-- reports/lot_24_validation_report.md
+Ce lot est déjà implémenté. La roadmap ne renomme, ne déplace et ne recrée aucun fichier historique.
+Les critères d’acceptation, rapports PASS, artefacts et commit validé sont normatifs ; en cas de divergence, ils prévalent sur cette synthèse.
 
+Fichiers de preuve détectés dans le dépôt :
+
+- `data/audit/trend_range_momentum_lot24.json`
+- `data/audit/trend_range_momentum_timeframes_lot24.jsonl`
+- `docs/ACCEPTANCE_CRITERIA_LOT_24.md`
+- `docs/LOT_24_TREND_RANGE_MOMENTUM.md`
+- `reports/lot_24_trend_range_momentum_report.md`
+- `reports/lot_24_validation_report.md`
+- `scripts/__pycache__/diagnose_exact_chain_until_lot24.cpython-313.pyc`
+- `scripts/__pycache__/diagnose_lot24_required_chain_timing.cpython-313.pyc`
+- `scripts/__pycache__/run_lot24_trend_range_momentum.cpython-313.pyc`
+- `scripts/__pycache__/validate_all_until_lot24.cpython-313.pyc`
+- `scripts/__pycache__/validate_lot24.cpython-313.pyc`
+- `scripts/diagnose_exact_chain_until_lot24.py`
+- `scripts/diagnose_lot24_required_chain_timing.py`
+- `scripts/run_lot24_trend_range_momentum.py`
+- `scripts/run_required_chain_until_lot24.sh`
+- `scripts/validate_all_until_lot24.py`
+- `scripts/validate_lot24.py`
+- `tests/__pycache__/test_lot24_archive_freeze_guard.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot24_context_states.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot24_diagnostics_static.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot24_no_forbidden_fields.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot24_required_chain_static.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot24_trend_range_momentum_outputs.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot24_trend_range_momentum_values.cpython-313-pytest-9.0.2.pyc`
+- `tests/test_lot24_archive_freeze_guard.py`
+- `tests/test_lot24_context_states.py`
+- `tests/test_lot24_diagnostics_static.py`
+- `tests/test_lot24_no_forbidden_fields.py`
+- `tests/test_lot24_required_chain_static.py`
+- `tests/test_lot24_trend_range_momentum_outputs.py`
+- `tests/test_lot24_trend_range_momentum_values.py`
+
+Les chemins des modules source sont ceux des critères d’acceptation historiques et du dépôt réel. Aucun chemin synthétique futur n’est normatif pour ce lot.
 ### Observabilité minimale
 
 - lot_24_records_processed_total
@@ -482,19 +617,53 @@ Fusionner volatilité, régime et confluence sans sortie exécutable.
 - Divergence entre état calculé et artefact réconcilié → veto et rapport de divergence.
 - Exception non classifiée → aucun output valide, incident auditable et arrêt fail-closed.
 
-### Fichiers et artefacts d’implémentation attendus
+### Preuves historiques et fichiers réels
 
-- src/crypto_quant_bot/market_analysis/volatility_regime_confluence_engine.py
-- src/crypto_quant_bot/market_analysis/volatility_regime_confluence_engine_models.py
-- scripts/run_lot25_volatility_regime_confluence_engine.py
-- scripts/validate_lot25.py
-- tests/test_lot25_volatility_regime_confluence_engine.py
-- data/audit/volatility_regime_confluence_engine_lot25.json
-- reports/lot_25_volatility_regime_confluence_engine_report.md
-- docs/LOT_25_VOLATILITY_REGIME_CONFLUENCE_ENGINE.md
-- docs/ACCEPTANCE_CRITERIA_LOT_25.md
-- reports/lot_25_validation_report.md
+Ce lot est déjà implémenté. La roadmap ne renomme, ne déplace et ne recrée aucun fichier historique.
+Les critères d’acceptation, rapports PASS, artefacts et commit validé sont normatifs ; en cas de divergence, ils prévalent sur cette synthèse.
 
+Fichiers de preuve détectés dans le dépôt :
+
+- `data/audit/volatility_regime_confluence_lot25.json`
+- `data/audit/volatility_regime_confluence_timeframes_lot25.jsonl`
+- `docs/ACCEPTANCE_CRITERIA_LOT_25.md`
+- `docs/LOT_25_VOLATILITY_REGIME_CONFLUENCE.md`
+- `reports/lot_25_validation_report.md`
+- `reports/lot_25_volatility_regime_confluence_report.md`
+- `scripts/__pycache__/diagnose_exact_chain_until_lot25.cpython-313.pyc`
+- `scripts/__pycache__/diagnose_lot25_required_chain_timing.cpython-313.pyc`
+- `scripts/__pycache__/run_lot25_volatility_regime_confluence.cpython-313.pyc`
+- `scripts/__pycache__/validate_all_until_lot25.cpython-313.pyc`
+- `scripts/__pycache__/validate_lot25.cpython-313.pyc`
+- `scripts/diagnose_exact_chain_until_lot25.py`
+- `scripts/diagnose_lot25_required_chain_timing.py`
+- `scripts/run_lot25_volatility_regime_confluence.py`
+- `scripts/run_required_chain_until_lot25.sh`
+- `scripts/validate_all_until_lot25.py`
+- `scripts/validate_lot25.py`
+- `tests/__pycache__/test_lot25_archive_freeze_guard.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot25_archive_freeze_guard.cpython-313.pyc`
+- `tests/__pycache__/test_lot25_context_states.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot25_context_states.cpython-313.pyc`
+- `tests/__pycache__/test_lot25_diagnostics_static.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot25_diagnostics_static.cpython-313.pyc`
+- `tests/__pycache__/test_lot25_no_forbidden_fields.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot25_no_forbidden_fields.cpython-313.pyc`
+- `tests/__pycache__/test_lot25_required_chain_static.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot25_required_chain_static.cpython-313.pyc`
+- `tests/__pycache__/test_lot25_volatility_regime_confluence_outputs.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot25_volatility_regime_confluence_outputs.cpython-313.pyc`
+- `tests/__pycache__/test_lot25_volatility_regime_confluence_values.cpython-313-pytest-9.0.2.pyc`
+- `tests/__pycache__/test_lot25_volatility_regime_confluence_values.cpython-313.pyc`
+- `tests/test_lot25_archive_freeze_guard.py`
+- `tests/test_lot25_context_states.py`
+- `tests/test_lot25_diagnostics_static.py`
+- `tests/test_lot25_no_forbidden_fields.py`
+- `tests/test_lot25_required_chain_static.py`
+- `tests/test_lot25_volatility_regime_confluence_outputs.py`
+- `tests/test_lot25_volatility_regime_confluence_values.py`
+
+Les chemins des modules source sont ceux des critères d’acceptation historiques et du dépôt réel. Aucun chemin synthétique futur n’est normatif pour ce lot.
 ### Observabilité minimale
 
 - lot_25_records_processed_total

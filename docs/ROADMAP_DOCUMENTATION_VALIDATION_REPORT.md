@@ -19,3 +19,9 @@
 ## Conclusion
 
 PASS si 178 lots continus, 21 versions, aucun objectif générique futur et 100 % des lots futurs satisfont les minima owner/contracts/steps/failures/files/tests.
+
+## Réconciliation historique complémentaire
+
+- Lots 0–25 liés aux preuves réelles : `PASS`.
+- Chemins synthétiques normatifs retirés : `PASS`.
+- Références des critères Lots 22–25 présentes : `PASS`.
