@@ -1,0 +1,56 @@
+name: P0.6 mutation directory fix
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: >-
+      github.actor != 'github-actions[bot]' &&
+      github.event.pull_request.head.ref == 'agent/p06-final-pre-lot26-assurance'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/p06-final-pre-lot26-assurance
+          fetch-depth: 0
+      - name: Patch final runner mutation directories
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('scripts/run_p06_final_assurance.py')
+          text = path.read_text(encoding='utf-8')
+          old = '''    shutil.rmtree(ROOT / "mutants", ignore_errors=True)
+    historical_mutation_result = _run("historical mutation", ["mutmut", "run"], timeout=1800, env=env)
+'''
+          new = '''    shutil.rmtree(ROOT / "mutants", ignore_errors=True)
+    (ROOT / "mutants" / "config" / "math").mkdir(parents=True, exist_ok=True)
+    historical_mutation_result = _run("historical mutation", ["mutmut", "run"], timeout=1800, env=env)
+'''
+          if old not in text:
+              raise SystemExit('historical mutation insertion point missing')
+          text = text.replace(old, new, 1)
+          old = '''        shutil.rmtree(ROOT / "mutants", ignore_errors=True)
+        extended_mutation_result = _run(
+'''
+          new = '''        shutil.rmtree(ROOT / "mutants", ignore_errors=True)
+        (ROOT / "mutants" / "config" / "math").mkdir(parents=True, exist_ok=True)
+        extended_mutation_result = _run(
+'''
+          if old not in text:
+              raise SystemExit('extended mutation insertion point missing')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+      - name: Commit correction
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add scripts/run_p06_final_assurance.py
+          git commit -m 'Create mutation copy directories in final assurance'
+          git push origin HEAD:agent/p06-final-pre-lot26-assurance
