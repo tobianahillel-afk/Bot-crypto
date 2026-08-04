@@ -4,15 +4,27 @@ on:
   pull_request:
     paths:
       - 'docs/**'
+      - 'config/governance/**'
       - 'data/audit/product_scope_roadmap_lot21.jsonl'
+      - 'scripts/audit_roadmap_semantics.py'
+      - 'scripts/quality_inventory.py'
+      - 'scripts/validate_domain_architecture.py'
+      - 'scripts/validate_engineering_deviations.py'
       - 'scripts/validate_roadmap_documentation.py'
+      - 'scripts/validate_traceability_contract.py'
       - '.github/workflows/roadmap-documentation-validation.yml'
   push:
     branches: [main]
     paths:
       - 'docs/**'
+      - 'config/governance/**'
       - 'data/audit/product_scope_roadmap_lot21.jsonl'
+      - 'scripts/audit_roadmap_semantics.py'
+      - 'scripts/quality_inventory.py'
+      - 'scripts/validate_domain_architecture.py'
+      - 'scripts/validate_engineering_deviations.py'
       - 'scripts/validate_roadmap_documentation.py'
+      - 'scripts/validate_traceability_contract.py'
       - '.github/workflows/roadmap-documentation-validation.yml'
   workflow_dispatch:
 
@@ -40,3 +52,7 @@ jobs:
         run: python scripts/validate_domain_architecture.py
       - name: Validate traceability contract
         run: python scripts/validate_traceability_contract.py
+      - name: Validate owned engineering deviations
+        run: |
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
