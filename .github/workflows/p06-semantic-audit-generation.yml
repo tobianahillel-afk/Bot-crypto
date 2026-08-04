@@ -1,0 +1,35 @@
+name: P0.6 semantic audit generation
+
+on:
+  push:
+    branches: [agent/p06-final-pre-lot26-assurance]
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/p06-final-pre-lot26-assurance
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+      - name: Generate semantic audit evidence
+        run: python scripts/audit_roadmap_semantics.py --report-only
+      - name: Commit generated evidence
+        shell: bash
+        run: |
+          if git diff --quiet -- reports/P0_6_ROADMAP_SEMANTIC_AUDIT.json && git ls-files --error-unmatch reports/P0_6_ROADMAP_SEMANTIC_AUDIT.json >/dev/null 2>&1; then
+            echo 'Semantic audit report already current.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add reports/P0_6_ROADMAP_SEMANTIC_AUDIT.json
+          git commit -m 'Generate P0.6 semantic roadmap audit'
+          git push origin HEAD:agent/p06-final-pre-lot26-assurance
