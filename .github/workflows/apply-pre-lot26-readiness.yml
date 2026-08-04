@@ -57,16 +57,7 @@ jobs:
           ruff check --fix scripts/validate_pre_lot26_readiness.py tests/test_pre_lot26_readiness.py
           ruff check scripts/validate_pre_lot26_readiness.py tests/test_pre_lot26_readiness.py
 
-      - name: Validate pre-Lot26 readiness
-        run: python scripts/validate_pre_lot26_readiness.py --write-report
-
-      - name: Validate roadmap
-        run: python scripts/validate_roadmap_documentation.py
-
-      - name: Run full regression suite
-        run: pytest -q
-
-      - name: Commit validated readiness package
+      - name: Materialize generated readiness package
         shell: bash
         run: |
           set -euo pipefail
@@ -75,5 +66,14 @@ jobs:
           git add -A
           git add -f data/audit/pre_lot26_readiness_manifest.json
           git status --short
-          git commit -m 'Prepare formal entry gate for Lot 26'
+          git commit -m 'Materialize pre-Lot26 readiness package'
           git push origin HEAD:agent/pre-lot26-readiness
+
+      - name: Validate pre-Lot26 readiness
+        run: python scripts/validate_pre_lot26_readiness.py --write-report
+
+      - name: Validate roadmap
+        run: python scripts/validate_roadmap_documentation.py
+
+      - name: Run full regression suite
+        run: pytest -q
