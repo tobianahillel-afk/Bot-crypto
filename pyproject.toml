@@ -82,7 +82,7 @@ pytest_add_cli_args_test_selection = [
   "tests/test_p0_math_properties.py",
   "tests/test_p0_math_parameter_contracts.py",
 ]
-also_copy = ["src/crypto_quant_bot/__init__.py", "src/crypto_quant_bot/core/", "src/crypto_quant_bot/data/", "config/math/market_analysis_thresholds_v1.json", "pyproject.toml"]
+also_copy = ["src/crypto_quant_bot/__init__.py", "src/crypto_quant_bot/core/", "src/crypto_quant_bot/data/", "config/", "pyproject.toml"]
 mutate_only_covered_lines = true
 max_stack_depth = 10
 timeout_multiplier = 8.0
