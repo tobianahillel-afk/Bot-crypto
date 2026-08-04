@@ -34,6 +34,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
+      - name: Validate owned engineering deviations
+        run: |
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
       - name: Run exact-commit assurance
         id: assurance
         continue-on-error: true
@@ -55,7 +59,7 @@ jobs:
           branch_coverage=$(python -c "import json; print(json.load(open('reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.json'))['branch_coverage_percent'])")
           tests=$(python -c "import json; print(json.load(open('reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.json'))['test_count'])")
           if [ "$status" = PASS ]; then
-            gh pr comment "$PR_URL" --body "P0.6 final assurance PASS on \`$evidence_commit\`: $tests tests, line coverage $line_coverage%, branch coverage $branch_coverage%, both mutation gates PASS, Bandit/pip-audit PASS, and 3/3 anti-flake repetitions PASS. The attached workflow artifact is the immutable exact-commit report. Lot 26 remains locked until human review and merge."
+            gh pr comment "$PR_URL" --body "P0.6 final assurance PASS on \`$evidence_commit\`: $tests tests, line coverage $line_coverage%, branch coverage $branch_coverage%, both mutation gates PASS, Bandit/pip-audit PASS, 3/3 anti-flake repetitions PASS, and all engineering deviations are owned and current. The attached workflow artifact is the immutable exact-commit report. Lot 26 remains locked until human review and merge."
             gh pr ready "$PR_URL"
           else
             gh pr comment "$PR_URL" --body "P0.6 final assurance remains FAIL on \`$evidence_commit\`. The workflow artifact contains the exact-commit JSON/Markdown report and all logs. The PR remains draft and Lot 26 remains locked."
