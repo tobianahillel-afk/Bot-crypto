@@ -52,6 +52,16 @@ def main() -> int:
     )
     text = replace_exact(
         text,
+        '    source_paths = ["src/crypto_quant_bot/market_analysis/"]',
+        '''    source_paths = ["src/crypto_quant_bot/market_analysis/"]
+    only_mutate = [
+      "src/crypto_quant_bot/market_analysis/technical_indicators.py",
+      "src/crypto_quant_bot/market_analysis/numeric.py",
+    ]''',
+        1,
+    )
+    text = replace_exact(
+        text,
         '    also_copy = ["config/math/market_analysis_thresholds_v1.json", "pyproject.toml"]',
         '    also_copy = ["src/crypto_quant_bot/__init__.py", "src/crypto_quant_bot/core/", "src/crypto_quant_bot/data/", "config/math/market_analysis_thresholds_v1.json", "pyproject.toml"]',
         1,
@@ -86,19 +96,70 @@ def main() -> int:
 ''',
         1,
     )
-    text = replace_exact(
-        text,
-        '''          - name: Targeted critical calculation mutation tests
+
+    original_mutation_block = '''          - name: Targeted critical calculation mutation tests
             run: |
               mutmut run 'crypto_quant_bot.market_analysis.technical_indicators._rsi*'
-''',
-        '''          - name: Targeted critical calculation mutation tests
+              mutmut run 'crypto_quant_bot.market_analysis.technical_indicators._bollinger*'
+              mutmut run 'crypto_quant_bot.market_analysis.numeric.require_finite_float*'
+          - name: Mutation result summary
+            run: mutmut results
+'''
+    scored_mutation_block = '''          - name: Targeted critical calculation mutation score gate
+            shell: bash
             run: |
-              mkdir -p mutants/config/math
-              mutmut run 'crypto_quant_bot.market_analysis.technical_indicators._rsi*'
-''',
-        1,
-    )
+              rm -rf mutants
+              mkdir -p reports/quality
+              set -o pipefail
+              mutmut run 2>&1 | tee reports/quality/mutation_run.txt
+              mutmut results 2>&1 | tee reports/quality/mutation_results.txt
+              python - <<'PY'
+              from pathlib import Path
+              import json
+              import re
+
+              text = Path('reports/quality/mutation_run.txt').read_text(encoding='utf-8', errors='replace')
+              matches = re.findall(
+                  r'🎉\\s*(\\d+).*?⏰\\s*(\\d+).*?🤔\\s*(\\d+).*?🙁\\s*(\\d+)',
+                  text,
+                  flags=re.DOTALL,
+              )
+              if not matches:
+                  raise SystemExit('MUTATION_SCORE_PARSE_ERROR: no mutmut summary found')
+              killed, timeout, suspicious, survived = map(int, matches[-1])
+              total = killed + timeout + suspicious + survived
+              if total <= 0:
+                  raise SystemExit('MUTATION_SCORE_INVALID: no evaluated mutants')
+              score = 100.0 * (killed + timeout) / total
+              payload = {
+                  'schema_version': 'mutation-score-v1',
+                  'killed': killed,
+                  'timeout': timeout,
+                  'suspicious': suspicious,
+                  'survived': survived,
+                  'evaluated': total,
+                  'score_percent': round(score, 2),
+                  'minimum_score_percent': 80.0,
+                  'status': 'PASS' if score >= 80.0 else 'FAIL',
+              }
+              Path('reports/quality/mutation_score.json').write_text(
+                  json.dumps(payload, indent=2, sort_keys=True) + '\\n',
+                  encoding='utf-8',
+              )
+              print(json.dumps(payload, sort_keys=True))
+              if score < 80.0:
+                  raise SystemExit('MUTATION_SCORE_BELOW_80_PERCENT')
+              PY
+          - uses: actions/upload-artifact@v4
+            with:
+              name: p0-mutation-evidence
+              path: |
+                reports/quality/mutation_run.txt
+                reports/quality/mutation_results.txt
+                reports/quality/mutation_score.json
+'''
+    text = replace_exact(text, original_mutation_block, scored_mutation_block, 1)
+
     text = replace_exact(
         text,
         '''                reports/quality/complexity_duplication_inventory.md
