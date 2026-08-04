@@ -58,8 +58,10 @@ jobs:
         run: python scripts/check_no_silent_numeric_coercion.py
       - name: Roadmap validation
         run: python scripts/validate_roadmap_documentation.py
-      - name: Complexity and duplication inventory
-        run: python scripts/quality_inventory.py
+      - name: Engineering inventory and owned deviation gate
+        run: |
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
       - name: Historical Lot 0-25 chain under coverage
         shell: bash
         run: |
@@ -78,6 +80,7 @@ jobs:
           mkdir -p reports/quality
           ruff check src scripts tests --output-format=json > reports/quality/ruff_legacy_inventory.json || true
           python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
       - name: Full tests with accumulated line and branch coverage
         run: pytest -q --cov --cov-branch --cov-append --cov-report=term-missing --cov-report=xml:coverage.xml --cov-report=json:coverage.json
       - name: P0 numerical core coverage gate
@@ -168,6 +171,7 @@ jobs:
             coverage.json
             reports/quality/complexity_duplication_inventory.json
             reports/quality/complexity_duplication_inventory.md
+            reports/quality/engineering_deviation_gate.json
             reports/quality/diff_coverage.html
             reports/quality/ruff_legacy_inventory.json
             reports/quality/mutation_run.txt
