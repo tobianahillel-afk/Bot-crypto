@@ -1,22 +1,22 @@
 [project]
 name = "crypto-quant-bot"
-version = "0.25.1-p0"
-description = "Crypto Quant Bot V3.1-Ops — Lot 25 validated offline foundation with institutional P0 quality hardening"
-requires-python = ">=3.11"
+version = "0.25.2.dev0"
+description = "Crypto Quant Bot V3.1-Ops — Lot 25 validated, P0 hardened, pre-Lot26 readiness"
+requires-python = "==3.11.*"
 dependencies = []
 
 [project.optional-dependencies]
 dev = [
-  "bandit>=1.8.0",
-  "diff-cover>=9.2.0",
-  "hypothesis>=6.161.0",
-  "mypy>=1.18.0",
-  "mutmut>=3.5.0",
-  "pip-audit>=2.9.0",
-  "pytest>=8.4.0",
-  "pytest-cov>=7.1.0",
-  "radon>=6.0.1",
-  "ruff>=0.12.0",
+  "bandit==1.8.0",
+  "diff-cover==9.2.0",
+  "hypothesis==6.161.0",
+  "mypy==1.18.1",
+  "mutmut==3.5.0",
+  "pip-audit==2.9.0",
+  "pytest==9.0.3",
+  "pytest-cov==7.1.0",
+  "radon==6.0.1",
+  "ruff==0.12.0",
 ]
 
 [tool.pytest.ini_options]

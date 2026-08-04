@@ -1,0 +1,183 @@
+{
+  "canonical_timeframes": {
+    "continuous_ingestion": true,
+    "evaluation_trigger": "ON_NEW_CLOSED_LOCAL_BAR",
+    "higher": "15m",
+    "higher_duration_seconds": 900,
+    "local": "5m",
+    "local_duration_seconds": 300,
+    "open_bars_allowed": false
+  },
+  "categorical_compatibility": {
+    "range": {
+      "RANGE_CONTEXT_BREAKING_STRUCTURE": {
+        "RANGE_CONTEXT_BREAKING_STRUCTURE": 1.0,
+        "RANGE_CONTEXT_COMPRESSED": 0.0,
+        "RANGE_CONTEXT_EXPANDED": 0.75,
+        "RANGE_CONTEXT_MIXED": 0.5,
+        "RANGE_CONTEXT_NEUTRAL": 0.25
+      },
+      "RANGE_CONTEXT_COMPRESSED": {
+        "RANGE_CONTEXT_BREAKING_STRUCTURE": 0.0,
+        "RANGE_CONTEXT_COMPRESSED": 1.0,
+        "RANGE_CONTEXT_EXPANDED": 0.25,
+        "RANGE_CONTEXT_MIXED": 0.5,
+        "RANGE_CONTEXT_NEUTRAL": 0.75
+      },
+      "RANGE_CONTEXT_EXPANDED": {
+        "RANGE_CONTEXT_BREAKING_STRUCTURE": 0.75,
+        "RANGE_CONTEXT_COMPRESSED": 0.25,
+        "RANGE_CONTEXT_EXPANDED": 1.0,
+        "RANGE_CONTEXT_MIXED": 0.75,
+        "RANGE_CONTEXT_NEUTRAL": 0.5
+      },
+      "RANGE_CONTEXT_MIXED": {
+        "RANGE_CONTEXT_BREAKING_STRUCTURE": 0.5,
+        "RANGE_CONTEXT_COMPRESSED": 0.5,
+        "RANGE_CONTEXT_EXPANDED": 0.75,
+        "RANGE_CONTEXT_MIXED": 1.0,
+        "RANGE_CONTEXT_NEUTRAL": 0.75
+      },
+      "RANGE_CONTEXT_NEUTRAL": {
+        "RANGE_CONTEXT_BREAKING_STRUCTURE": 0.25,
+        "RANGE_CONTEXT_COMPRESSED": 0.75,
+        "RANGE_CONTEXT_EXPANDED": 0.5,
+        "RANGE_CONTEXT_MIXED": 0.75,
+        "RANGE_CONTEXT_NEUTRAL": 1.0
+      }
+    },
+    "regime": {
+      "REGIME_CONTEXT_COMPRESSED": {
+        "REGIME_CONTEXT_COMPRESSED": 1.0,
+        "REGIME_CONTEXT_MIXED": 0.5,
+        "REGIME_CONTEXT_RANGE": 0.75,
+        "REGIME_CONTEXT_TRENDING": 0.25
+      },
+      "REGIME_CONTEXT_MIXED": {
+        "REGIME_CONTEXT_COMPRESSED": 0.5,
+        "REGIME_CONTEXT_MIXED": 1.0,
+        "REGIME_CONTEXT_RANGE": 0.5,
+        "REGIME_CONTEXT_TRENDING": 0.5
+      },
+      "REGIME_CONTEXT_RANGE": {
+        "REGIME_CONTEXT_COMPRESSED": 0.75,
+        "REGIME_CONTEXT_MIXED": 0.5,
+        "REGIME_CONTEXT_RANGE": 1.0,
+        "REGIME_CONTEXT_TRENDING": 0.0
+      },
+      "REGIME_CONTEXT_TRENDING": {
+        "REGIME_CONTEXT_COMPRESSED": 0.25,
+        "REGIME_CONTEXT_MIXED": 0.5,
+        "REGIME_CONTEXT_RANGE": 0.0,
+        "REGIME_CONTEXT_TRENDING": 1.0
+      }
+    }
+  },
+  "classification_thresholds": {
+    "aligned_minimum": 0.75,
+    "hard_mismatch_maximum": 0.25,
+    "multi_mismatch_count": 2,
+    "partial_minimum": 0.5
+  },
+  "component_weights": {
+    "confluence": 0.15,
+    "momentum": 0.18,
+    "range": 0.13,
+    "regime": 0.18,
+    "trend": 0.22,
+    "volatility": 0.14
+  },
+  "config_id": "lot26-mtf-alignment-v1",
+  "instrument_scope": [
+    "BTC/EUR"
+  ],
+  "minimum_available_component_count": 4,
+  "minimum_weighted_coverage_ratio": 0.7,
+  "numeric_policy": {
+    "absolute_tolerance": 1e-09,
+    "missing_component_value": null,
+    "relative_tolerance": 1e-09,
+    "round_decimal_places": 6,
+    "score_maximum": 1.0,
+    "score_minimum": 0.0,
+    "zero_denominator_behavior": "UNKNOWN"
+  },
+  "ordinal_encodings": {
+    "confluence": {
+      "CONFLUENCE_CONTEXT_ALIGNED": 1.0,
+      "CONFLUENCE_CONTEXT_DIVERGENT": 0.0,
+      "CONFLUENCE_CONTEXT_PARTIAL": 0.5
+    },
+    "momentum": {
+      "MOMENTUM_CONTEXT_ACCELERATING": 1.0,
+      "MOMENTUM_CONTEXT_DECELERATING": -1.0,
+      "MOMENTUM_CONTEXT_NEUTRAL": 0.0
+    },
+    "trend": {
+      "TREND_CONTEXT_DOWNWARD": -1.0,
+      "TREND_CONTEXT_FLAT": 0.0,
+      "TREND_CONTEXT_NEUTRAL": 0.0,
+      "TREND_CONTEXT_UPWARD": 1.0
+    },
+    "volatility": {
+      "VOLATILITY_CONTEXT_HIGH": 1.0,
+      "VOLATILITY_CONTEXT_LOW": 0.0,
+      "VOLATILITY_CONTEXT_MODERATE": 0.5
+    }
+  },
+  "promotion_restrictions": {
+    "alpha_claims_allowed": false,
+    "higher_timeframe_automatic_veto_allowed": false,
+    "live_use_allowed": false,
+    "order_intent_allowed": false,
+    "paper_promotion_allowed": false,
+    "probability_claims_allowed": false,
+    "signal_generation_allowed": false
+  },
+  "reason_codes": [
+    "MTF_ALIGNED",
+    "MTF_PARTIAL_ALIGNMENT",
+    "MTF_DIVERGENT",
+    "MTF_UNKNOWN",
+    "MTF_LOCAL_STATE_MISSING",
+    "MTF_HIGHER_STATE_MISSING",
+    "MTF_OPEN_BAR_REJECTED",
+    "MTF_FUTURE_STATE_REJECTED",
+    "MTF_STALE_LOCAL_STATE",
+    "MTF_STALE_HIGHER_STATE",
+    "MTF_TIMEZONE_INVALID",
+    "MTF_SCHEMA_INCOMPATIBLE",
+    "MTF_INSUFFICIENT_COMPONENT_COVERAGE",
+    "MTF_DIRECTIONAL_MISMATCH",
+    "MTF_VOLATILITY_MISMATCH",
+    "MTF_REGIME_MISMATCH",
+    "MTF_MULTI_COMPONENT_MISMATCH",
+    "MTF_REPLAY_DIVERGENCE"
+  ],
+  "runtime_scope": "LOCAL_OFFLINE_ANALYSIS_ONLY",
+  "schema_version": "multi-timeframe-alignment-config-v1",
+  "status": "PROVISIONAL_UNCALIBRATED_OFFLINE_ONLY",
+  "time_policy": {
+    "eligibility_rule": "available_at <= decision_time",
+    "future_tolerance_seconds": 0,
+    "higher_max_staleness_seconds": 990,
+    "interval_convention": "[bar_open_time, bar_close_time)",
+    "join_method": "ASOF_BACKWARD",
+    "local_max_staleness_seconds": 390,
+    "maximum_clock_skew_seconds": 2,
+    "tie_break_order": [
+      "bar_close_time DESC",
+      "available_at DESC",
+      "revision_id DESC",
+      "sequence_id DESC"
+    ],
+    "timezone": "UTC"
+  },
+  "unknown_state_tokens": [
+    "UNKNOWN",
+    "INSUFFICIENT_DATA",
+    "UNAVAILABLE",
+    "INVALID",
+    "BLOCKED"
+  ]
+}

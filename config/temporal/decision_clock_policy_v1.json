@@ -1,0 +1,76 @@
+{
+  "schema_version": "decision-clock-policy-v1",
+  "policy_id": "crypto-quant-bot-decision-clock-v1",
+  "status": "PRE_LOT26_NORMATIVE",
+  "principles": {
+    "event_driven_reassessment_supported": true,
+    "decision_trigger_separate_from_data_resolution": true,
+    "decision_trigger_separate_from_forecast_horizon": true,
+    "deduplicate_same_causal_event": true,
+    "future_information_forbidden": true,
+    "minimum_reassessment_interval_versioned": true
+  },
+  "triggers": [
+    {
+      "trigger_id": "CLOSED_LOCAL_BAR",
+      "enabled_in_lot26": true,
+      "required_evidence": ["ClosedBarAvailabilityV1", "TimeframeMarketContextStateV1"],
+      "description": "Evaluate after publication of a confirmed local bar state."
+    },
+    {
+      "trigger_id": "MARKET_EVENT",
+      "enabled_in_lot26": false,
+      "planned_owner": "V3_V4",
+      "description": "Canonical trade, book or derivatives event materially changes continuous state."
+    },
+    {
+      "trigger_id": "BOOK_IMBALANCE_CHANGE",
+      "enabled_in_lot26": false,
+      "planned_owner": "V4",
+      "description": "Versioned threshold or state transition in order-book imbalance."
+    },
+    {
+      "trigger_id": "LIQUIDITY_SWEEP",
+      "enabled_in_lot26": false,
+      "planned_owner": "V4",
+      "description": "Confirmed sweep, failed auction, trap or liquidity event."
+    },
+    {
+      "trigger_id": "VOLATILITY_BREAK",
+      "enabled_in_lot26": false,
+      "planned_owner": "V4_V5",
+      "description": "Material volatility-state transition."
+    },
+    {
+      "trigger_id": "REGIME_CHANGE",
+      "enabled_in_lot26": false,
+      "planned_owner": "V4_V5",
+      "description": "Confirmed or probabilistic regime transition."
+    },
+    {
+      "trigger_id": "FORECAST_UPDATE",
+      "enabled_in_lot26": false,
+      "planned_owner": "V5",
+      "description": "A calibrated forecast changes beyond a versioned materiality threshold."
+    },
+    {
+      "trigger_id": "RISK_EVENT",
+      "enabled_in_lot26": false,
+      "planned_owner": "V7",
+      "description": "Risk, drawdown, exposure, reconciliation or kill-switch event."
+    },
+    {
+      "trigger_id": "SCHEDULED_REEVALUATION",
+      "enabled_in_lot26": false,
+      "planned_owner": "V5_PLUS",
+      "description": "Versioned periodic reevaluation independent of bar closure."
+    }
+  ],
+  "lot26_policy": {
+    "enabled_triggers": ["CLOSED_LOCAL_BAR"],
+    "provisional_open_bar_observation": "NOT_CONSUMABLE_AS_CONFIRMED_STATE",
+    "duplicate_trigger_behavior": "IDEMPOTENT_NO_OP",
+    "out_of_order_trigger_behavior": "BLOCK_AND_AUDIT",
+    "trade_decision_allowed": false
+  }
+}

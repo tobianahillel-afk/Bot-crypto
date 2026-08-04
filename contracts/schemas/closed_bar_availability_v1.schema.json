@@ -1,0 +1,103 @@
+{
+  "$id": "https://crypto-quant-bot.local/schemas/closed-bar-availability-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "availability_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "available_at": {
+      "format": "date-time",
+      "pattern": "Z$",
+      "type": "string"
+    },
+    "bar_close_time": {
+      "format": "date-time",
+      "pattern": "Z$",
+      "type": "string"
+    },
+    "bar_open_time": {
+      "format": "date-time",
+      "pattern": "Z$",
+      "type": "string"
+    },
+    "decision_time": {
+      "format": "date-time",
+      "pattern": "Z$",
+      "type": "string"
+    },
+    "instrument_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "is_closed": {
+      "type": "boolean"
+    },
+    "is_complete": {
+      "type": "boolean"
+    },
+    "lineage_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "quality_state": {
+      "enum": [
+        "VALID",
+        "STALE",
+        "INCOMPLETE",
+        "INVALID",
+        "UNKNOWN"
+      ]
+    },
+    "reason_codes": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "revision_id": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "closed-bar-availability-v1"
+    },
+    "sequence_id": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "source_bar_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "timeframe": {
+      "enum": [
+        "5m",
+        "15m"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "availability_id",
+    "instrument_id",
+    "timeframe",
+    "source_bar_id",
+    "bar_open_time",
+    "bar_close_time",
+    "available_at",
+    "decision_time",
+    "is_closed",
+    "is_complete",
+    "quality_state",
+    "revision_id",
+    "sequence_id",
+    "lineage_id",
+    "reason_codes"
+  ],
+  "title": "closed-bar-availability-v1",
+  "type": "object"
+}

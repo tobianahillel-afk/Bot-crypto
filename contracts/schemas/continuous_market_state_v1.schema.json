@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/schemas/continuous_market_state_v1.schema.json",
+  "title": "ContinuousMarketStateV1",
+  "description": "Planned locked event-driven market state. Not implemented by Lot 26.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "state_id",
+    "instrument_id",
+    "as_of_event_time",
+    "available_at",
+    "source_event_range",
+    "market_quality_state",
+    "price_state",
+    "volatility_state",
+    "liquidity_state",
+    "order_flow_state",
+    "derivatives_state",
+    "latent_regime_state",
+    "state_uncertainty",
+    "model_ids",
+    "config_versions",
+    "lineage_id",
+    "validation_state",
+    "runtime_mode"
+  ],
+  "properties": {
+    "schema_version": {"const": "continuous-market-state-v1"},
+    "state_id": {"type": "string", "minLength": 1},
+    "instrument_id": {"type": "string", "minLength": 1},
+    "as_of_event_time": {"type": "string", "format": "date-time"},
+    "available_at": {"type": "string", "format": "date-time"},
+    "source_event_range": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["first_event_id", "last_event_id", "first_sequence_id", "last_sequence_id"],
+      "properties": {
+        "first_event_id": {"type": "string"},
+        "last_event_id": {"type": "string"},
+        "first_sequence_id": {"type": ["integer", "string"]},
+        "last_sequence_id": {"type": ["integer", "string"]}
+      }
+    },
+    "market_quality_state": {"type": "string"},
+    "price_state": {"type": ["object", "null"]},
+    "volatility_state": {"type": ["object", "null"]},
+    "liquidity_state": {"type": ["object", "null"]},
+    "order_flow_state": {"type": ["object", "null"]},
+    "derivatives_state": {"type": ["object", "null"]},
+    "latent_regime_state": {"type": ["object", "null"]},
+    "state_uncertainty": {"type": ["object", "null"]},
+    "model_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "config_versions": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "lineage_id": {"type": "string", "minLength": 1},
+    "validation_state": {"enum": ["VALID", "DEGRADED", "UNKNOWN", "BLOCKED"]},
+    "runtime_mode": {"type": "string"},
+    "reason_codes": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "trade_allowed": {"const": false},
+    "execution_allowed": {"const": false}
+  }
+}

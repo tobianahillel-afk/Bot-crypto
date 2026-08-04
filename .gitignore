@@ -5,6 +5,11 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.hypothesis/
+mutants/
+coverage.xml
+coverage.json
+.coverage
 build/
 dist/
 *.egg-info/
@@ -24,8 +29,10 @@ data/audit/*
 !data/raw/fixtures/*.csv
 !data/audit/dataset_catalog.json
 !data/audit/lot_01_data_quality_report.json
+!data/audit/pre_lot26_readiness_manifest.json
 
 reports/*.json
 !reports/lot_00_validation_report.md
 !reports/lot_01_validation_report.md
 !reports/lot_01_data_quality_report.md
+!reports/PRE_LOT26_ENTRY_GATE_REPORT.json
