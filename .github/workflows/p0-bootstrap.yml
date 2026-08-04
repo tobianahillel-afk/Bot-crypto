@@ -3,6 +3,8 @@ name: Bootstrap institutional P0 hardening
 on:
   push:
     branches: [agent/p0-institutional-hardening]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -10,7 +12,7 @@ permissions:
 
 jobs:
   apply-and-validate:
-    if: ${{ !contains(github.event.head_commit.message, '[p0-applied]') }}
+    if: ${{ !contains(github.event.head_commit.message || '', '[p0-applied]') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
