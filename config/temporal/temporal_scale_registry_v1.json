@@ -1,0 +1,91 @@
+{
+  "schema_version": "temporal-scale-registry-v1",
+  "registry_id": "crypto-quant-bot-temporal-scales-v1",
+  "status": "PRE_LOT26_NORMATIVE",
+  "project": "Crypto Quant Bot V3.1-Ops",
+  "canonical_timezone": "UTC",
+  "principles": {
+    "single_continuous_source_stream": true,
+    "data_resolution_is_not_forecast_horizon": true,
+    "forecast_horizon_is_not_decision_clock": true,
+    "decision_clock_is_not_holding_horizon": true,
+    "open_bar_may_be_observed_but_not_confirmed": true,
+    "future_information_forbidden": true,
+    "naive_timeframe_voting_forbidden": true
+  },
+  "lot26_initial_profile": {
+    "profile_id": "lot26-5m-15m-v1",
+    "local_scale_id": "timebar-5m",
+    "higher_scale_id": "timebar-15m",
+    "evaluation_trigger": "CLOSED_LOCAL_BAR",
+    "join_method": "ASOF_BACKWARD",
+    "eligibility_rule": "available_at <= decision_time",
+    "implementation_scope": "EXACTLY_ONE_ORDERED_SCALE_EDGE",
+    "extensible_interface_required": true
+  },
+  "scales": [
+    {
+      "scale_id": "event-stream",
+      "resolution_type": "EVENT",
+      "duration_seconds": null,
+      "aggregation_method": "NONE",
+      "publication_policy": "ON_EACH_CANONICAL_EVENT",
+      "state_kind": "PROVISIONAL_CONTINUOUS",
+      "enabled_in_lot26": false,
+      "planned_owner": "V3_V4_CONTINUOUS_MARKET_STATE"
+    },
+    {
+      "scale_id": "timebar-1m",
+      "resolution_type": "TIME_BAR",
+      "duration_seconds": 60,
+      "aggregation_method": "OHLCVT",
+      "publication_policy": "ON_BAR_CLOSE",
+      "state_kind": "CONFIRMED_BAR_DERIVED",
+      "enabled_in_lot26": false,
+      "planned_owner": "FUTURE_VERSIONED_PROFILE"
+    },
+    {
+      "scale_id": "timebar-5m",
+      "resolution_type": "TIME_BAR",
+      "duration_seconds": 300,
+      "aggregation_method": "OHLCVT",
+      "publication_policy": "ON_BAR_CLOSE",
+      "state_kind": "CONFIRMED_BAR_DERIVED",
+      "enabled_in_lot26": true,
+      "lot26_role": "LOCAL_CONTEXT"
+    },
+    {
+      "scale_id": "timebar-15m",
+      "resolution_type": "TIME_BAR",
+      "duration_seconds": 900,
+      "aggregation_method": "OHLCVT",
+      "publication_policy": "ON_BAR_CLOSE",
+      "state_kind": "CONFIRMED_BAR_DERIVED",
+      "enabled_in_lot26": true,
+      "lot26_role": "HIGHER_CONTEXT"
+    },
+    {
+      "scale_id": "timebar-1h",
+      "resolution_type": "TIME_BAR",
+      "duration_seconds": 3600,
+      "aggregation_method": "OHLCVT",
+      "publication_policy": "ON_BAR_CLOSE",
+      "state_kind": "CONFIRMED_BAR_DERIVED",
+      "enabled_in_lot26": false,
+      "planned_owner": "FUTURE_VERSIONED_PROFILE"
+    }
+  ],
+  "future_non_time_bars": [
+    "VOLUME_BAR",
+    "DOLLAR_BAR",
+    "TICK_BAR",
+    "IMBALANCE_BAR"
+  ],
+  "promotion_restrictions": {
+    "signal_generation_allowed": false,
+    "trade_decision_allowed": false,
+    "order_intent_allowed": false,
+    "paper_use_allowed": false,
+    "live_use_allowed": false
+  }
+}
