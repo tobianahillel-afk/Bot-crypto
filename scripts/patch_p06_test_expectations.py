@@ -20,8 +20,8 @@ def replace_once(path: Path, old: str, new: str) -> None:
 def main() -> int:
     replace_once(
         TRM,
-        '    ])[0] == "TRM_CONTEXT_RANGING"\n    assert trm._aggregate_combined_state([\n        summary(combined_state="TRM_CONTEXT_NEUTRAL"),',
-        '    ])[0] == "TRM_CONTEXT_COMPRESSED"\n    assert trm._aggregate_combined_state([\n        summary(combined_state="TRM_CONTEXT_NEUTRAL"),',
+        '        summary(combined_state="TRM_CONTEXT_VOLATILE"),\n    ])[0] == "TRM_CONTEXT_MIXED"\n',
+        '        summary(combined_state="TRM_CONTEXT_VOLATILE"),\n    ])[0] == "TRM_CONTEXT_VOLATILE"\n',
     )
     replace_once(VRC, "    assert divergence == 0.8\n", "    assert divergence == 0.6\n")
     print("P0.6 expectation corrections applied")
