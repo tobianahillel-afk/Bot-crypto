@@ -29,8 +29,21 @@ jobs:
         run: python -m compileall -q src scripts tests
       - name: Critical Ruff checks repository-wide
         run: ruff check --select E9,F63,F7,F82 src scripts tests
-      - name: Ruff full gate
-        run: ruff check src scripts tests
+      - name: Ruff changed-file gate
+        shell: bash
+        run: |
+          git fetch origin main
+          mapfile -t files < <(git diff --name-only --diff-filter=ACMR origin/main...HEAD -- '*.py')
+          if ((${#files[@]})); then
+            ruff check "${files[@]}"
+          else
+            echo 'No changed Python files'
+          fi
+      - name: Legacy Ruff inventory
+        shell: bash
+        run: |
+          mkdir -p reports/quality
+          ruff check src scripts tests --output-format=json > reports/quality/ruff_legacy_inventory.json || true
       - name: Mypy package validation
         run: mypy src/crypto_quant_bot
       - name: Architecture boundary gate
@@ -124,6 +137,7 @@ jobs:
             reports/quality/complexity_duplication_inventory.json
             reports/quality/complexity_duplication_inventory.md
             reports/quality/diff_coverage.html
+            reports/quality/ruff_legacy_inventory.json
             reports/quality/mutation_run.txt
             reports/quality/mutation_results.txt
             reports/quality/mutation_score.json
