@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import sys
 from pathlib import Path
 from types import ModuleType
 
@@ -10,10 +11,12 @@ SCRIPT = ROOT / "scripts/validate_pre_lot26_readiness.py"
 
 
 def _load_module() -> ModuleType:
-    spec = importlib.util.spec_from_file_location("validate_pre_lot26_readiness", SCRIPT)
+    module_name = "validate_pre_lot26_readiness_test_module"
+    spec = importlib.util.spec_from_file_location(module_name, SCRIPT)
     assert spec is not None
     assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
     spec.loader.exec_module(module)
     return module
 
