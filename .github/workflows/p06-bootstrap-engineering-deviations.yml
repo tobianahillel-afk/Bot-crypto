@@ -1,0 +1,36 @@
+name: P0.6 bootstrap engineering deviations
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    if: >-
+      github.actor != 'github-actions[bot]' &&
+      github.event.pull_request.head.ref == 'agent/p06-final-pre-lot26-assurance'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/p06-final-pre-lot26-assurance
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+      - name: Generate and validate exact deviation registry
+        run: |
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py --bootstrap
+      - name: Commit registry
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add config/governance/legacy_engineering_deviations_v1.json
+          git commit -m 'Register owned legacy engineering deviations'
+          git push origin HEAD:agent/p06-final-pre-lot26-assurance
