@@ -1,0 +1,65 @@
+name: Apply pre-Lot26 readiness package
+
+on:
+  push:
+    branches:
+      - agent/pre-lot26-readiness
+    paths:
+      - '.github/workflows/apply-pre-lot26-readiness.yml'
+      - 'scripts/apply_pre_lot26_readiness.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout readiness branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/pre-lot26-readiness
+          fetch-depth: 0
+
+      - name: Set up canonical Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+
+      - name: Generate readiness package
+        run: python scripts/apply_pre_lot26_readiness.py
+
+      - name: Resolve and lock development dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.in
+          python -m pip freeze --exclude-editable | LC_ALL=C sort > requirements-dev.lock
+
+      - name: Compile generated Python
+        run: python -m compileall -q src scripts tests
+
+      - name: Lint new Python files
+        run: ruff check scripts/validate_pre_lot26_readiness.py tests/test_pre_lot26_readiness.py
+
+      - name: Validate pre-Lot26 readiness
+        run: python scripts/validate_pre_lot26_readiness.py --write-report
+
+      - name: Validate roadmap
+        run: python scripts/validate_roadmap_documentation.py
+
+      - name: Run full regression suite
+        run: pytest -q
+
+      - name: Commit validated readiness package
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git add -f data/audit/pre_lot26_readiness_manifest.json
+          git status --short
+          git commit -m 'Prepare formal entry gate for Lot 26'
+          git push origin HEAD:agent/pre-lot26-readiness
