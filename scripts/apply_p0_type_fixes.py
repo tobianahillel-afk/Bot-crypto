@@ -38,6 +38,11 @@ def main() -> int:
         "ARTIFACT_SPECS = [\n",
         "ARTIFACT_SPECS: list[dict[str, Any]] = [\n",
     )
+    replace_exact(
+        lineage,
+        "    def build_artifact(self, spec: dict[str, object]) -> LineageArtifact:\n",
+        "    def build_artifact(self, spec: dict[str, Any]) -> LineageArtifact:\n",
+    )
 
     assembler = "src/crypto_quant_bot/market_state/assembler.py"
     replace_exact(
