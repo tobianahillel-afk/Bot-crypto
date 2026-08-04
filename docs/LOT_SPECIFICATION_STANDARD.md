@@ -60,8 +60,6 @@ Seuils généraux :
 ```text
 line coverage globale runtime >= 90 %
 branch coverage globale runtime >= 85 %
-line coverage globale runtime >= 90 %
-branch coverage globale runtime >= 85 %
 line coverage ajouté/modifié >= 90 %
 branch coverage ajouté/modifié >= 85 %
 modules critiques : line >= 95 %, branch >= 90 %
