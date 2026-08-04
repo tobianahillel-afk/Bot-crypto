@@ -35,7 +35,11 @@ jobs:
           cache: pip
 
       - name: Generate readiness package
-        run: python scripts/apply_pre_lot26_readiness.py
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/apply_pre_lot26_readiness.py
+          sed -i 's/mypy==1\.18\.0/mypy==1.18.1/g' requirements-dev.in pyproject.toml scripts/validate_pre_lot26_readiness.py
 
       - name: Resolve and lock development dependencies
         run: |
