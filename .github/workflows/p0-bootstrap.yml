@@ -178,5 +178,14 @@ jobs:
             reports/quality/mutation_run.txt
             reports/quality/mutation_results.txt
             reports/quality/mutation_score.json
-      - name: Push validated candidate commit
-        run: git push origin HEAD:agent/p0-institutional-hardening
+      - name: Publish validated candidate tree atomically
+        shell: bash
+        run: |
+          validated_tree=$(git rev-parse 'HEAD^{tree}')
+          git fetch origin agent/p0-institutional-hardening
+          remote_head=$(git rev-parse origin/agent/p0-institutional-hardening)
+          validated_commit=$(
+            printf '%s\n' 'Apply institutional P0 hardening [p0-applied]' |
+              git commit-tree "$validated_tree" -p "$remote_head"
+          )
+          git push origin "$validated_commit":agent/p0-institutional-hardening
