@@ -56,10 +56,22 @@ def main() -> int:
         '    ignore = ["E501", "B905", "RUF001", "RUF002", "RUF003", "RUF046"]',
         1,
     )
+    text = replace_exact(
+        text,
+        '    Project: **Crypto Quant Bot V3.1-Ops**  \n',
+        '    Project: **Crypto Quant Bot V3.1-Ops**\n',
+        1,
+    )
+    text = replace_exact(
+        text,
+        '    Scope: corrections P0 applied after the institutional audit dated 2026-08-04  \n',
+        '    Scope: corrections P0 applied after the institutional audit dated 2026-08-04\n',
+        1,
+    )
 
     MIGRATOR.write_text(text, encoding="utf-8")
     Path(__file__).unlink()
-    print("P0_MIGRATOR_BOUNDARIES_ESCAPES_TOML_AND_RUFF_REPAIRED")
+    print("P0_MIGRATOR_ALL_BOOTSTRAP_REPAIRS_APPLIED")
     return 0
 
 
