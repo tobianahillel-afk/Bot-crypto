@@ -1,5 +1,3 @@
-from datetime import datetime, timezone
+from crypto_quant_bot.contracts.primitives import utc_now_iso
 
-
-def utc_now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
+__all__ = ["utc_now_iso"]
