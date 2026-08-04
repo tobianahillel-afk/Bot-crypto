@@ -1,0 +1,121 @@
+name: P0.6 extended mutation assurance
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/crypto_quant_bot/contracts/**'
+      - 'src/crypto_quant_bot/market_analysis/trend_range_momentum.py'
+      - 'src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py'
+      - 'tests/test_p06_*.py'
+      - '.github/workflows/p06-extended-mutation.yml'
+      - 'requirements-dev.lock'
+      - 'pyproject.toml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/crypto_quant_bot/contracts/**'
+      - 'src/crypto_quant_bot/market_analysis/trend_range_momentum.py'
+      - 'src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py'
+      - 'tests/test_p06_*.py'
+      - '.github/workflows/p06-extended-mutation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mutation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Build isolated P0.6 mutation configuration
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('pyproject.toml')
+          text = path.read_text(encoding='utf-8')
+          start = text.index('only_mutate = [')
+          end = text.index(']\npytest_add_cli_args_test_selection', start) + 2
+          replacement = '''only_mutate = [
+            "src/crypto_quant_bot/contracts/decision_evidence.py",
+            "src/crypto_quant_bot/market_analysis/trend_range_momentum.py",
+            "src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py",
+          ]'''
+          text = text[:start] + replacement + text[end:]
+          start = text.index('pytest_add_cli_args_test_selection = [')
+          end = text.index(']\nalso_copy', start) + 2
+          replacement = '''pytest_add_cli_args_test_selection = [
+            "tests/test_p06_decision_evidence.py",
+            "tests/test_p06_decision_evidence_properties.py",
+            "tests/test_p06_trend_range_momentum_complete.py",
+            "tests/test_p06_vrc_complete.py",
+          ]'''
+          text = text[:start] + replacement + text[end:]
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Run extended mutation suite
+        shell: bash
+        run: |
+          rm -rf mutants reports/quality/p06_extended_mutation
+          mkdir -p reports/quality/p06_extended_mutation
+          set -o pipefail
+          mutmut run 2>&1 | tee reports/quality/p06_extended_mutation/run.txt
+          mutmut results 2>&1 | tee reports/quality/p06_extended_mutation/results.txt
+      - name: Enforce extended mutation score
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          import re
+
+          text = Path('reports/quality/p06_extended_mutation/run.txt').read_text(
+              encoding='utf-8', errors='replace'
+          )
+          matches = re.findall(
+              r'🎉\s*(\d+).*?⏰\s*(\d+).*?🤔\s*(\d+).*?🙁\s*(\d+)',
+              text,
+              flags=re.DOTALL,
+          )
+          if not matches:
+              raise SystemExit('P0_6_MUTATION_SCORE_PARSE_ERROR')
+          killed, timeout, suspicious, survived = map(int, matches[-1])
+          evaluated = killed + timeout + suspicious + survived
+          if evaluated <= 0:
+              raise SystemExit('P0_6_MUTATION_NO_EVALUATED_MUTANTS')
+          score = 100.0 * (killed + timeout) / evaluated
+          payload = {
+              'schema_version': 'p0-6-extended-mutation-score-v1',
+              'killed': killed,
+              'timeout': timeout,
+              'suspicious': suspicious,
+              'survived': survived,
+              'evaluated': evaluated,
+              'score_percent': round(score, 2),
+              'minimum_score_percent': 80.0,
+              'status': 'PASS' if score >= 80.0 else 'FAIL',
+          }
+          Path('reports/quality/p06_extended_mutation/score.json').write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + '\n',
+              encoding='utf-8',
+          )
+          print(json.dumps(payload, sort_keys=True))
+          if score < 80.0:
+              raise SystemExit('P0_6_EXTENDED_MUTATION_BELOW_80_PERCENT')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p06-extended-mutation-evidence
+          path: reports/quality/p06_extended_mutation/
