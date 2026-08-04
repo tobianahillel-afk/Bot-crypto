@@ -4,8 +4,8 @@ import hashlib
 import json
 from collections.abc import Iterable
 
-import pytest
 from hypothesis import given, strategies as st
+import pytest
 
 from crypto_quant_bot.contracts import UncertaintyEnvelopeV1
 from tests.test_p06_decision_evidence import HEX_A, make_envelope
