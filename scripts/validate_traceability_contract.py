@@ -2,10 +2,10 @@
 """Validate the mandatory decision traceability contract and its governance links."""
 from __future__ import annotations
 
-from dataclasses import fields
 import json
-from pathlib import Path
 import sys
+from dataclasses import fields
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
