@@ -88,6 +88,12 @@ def main() -> int:
     for path, name in invariant_files.items():
         replace_exact(path, f"{name} = {{\n", f"{name}: dict[str, str | bool | int] = {{\n")
 
+    replace_exact(
+        "src/crypto_quant_bot/release/candidate.py",
+        "no_trading_compliance_valid, compliance_errors, compliance_payload, _compliance_checks = _validate_compliance_snapshot(\n",
+        "no_trading_compliance_valid, compliance_errors, _compliance_payload, _compliance_checks = _validate_compliance_snapshot(\n",
+    )
+
     init_path = "src/crypto_quant_bot/market_analysis/__init__.py"
     replace_exact(
         init_path,
