@@ -79,7 +79,7 @@ def maximum_nesting(node: ast.AST) -> int:
         next_depth = depth + int(isinstance(current, NESTING_NODES))
         maximum = max(maximum, next_depth)
         for child in ast.iter_child_nodes(current):
-            if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and child is not node:
+            if isinstance(child, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef) and child is not node:
                 continue
             visit(child, next_depth)
 
@@ -106,7 +106,7 @@ def build_inventory() -> dict[str, object]:
         file_functions = 0
         maximum_complexity = 0
         for node in ast.walk(tree):
-            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef):
                 file_functions += 1
                 complexity = function_complexity(node)
                 maximum_complexity = max(maximum_complexity, complexity)
