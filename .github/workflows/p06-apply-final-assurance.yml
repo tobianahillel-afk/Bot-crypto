@@ -1,0 +1,37 @@
+name: P0.6 apply final assurance migration
+
+on:
+  push:
+    branches: [agent/p06-final-pre-lot26-assurance]
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/p06-final-pre-lot26-assurance
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+      - name: Apply deterministic P0.6 migration
+        run: python scripts/apply_p06_final_assurance.py
+      - name: Generate semantic audit evidence
+        run: python scripts/audit_roadmap_semantics.py --report-only
+      - name: Commit migration output
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo 'P0.6 migration already current.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Apply P0.6 final assurance migration'
+          git push origin HEAD:agent/p06-final-pre-lot26-assurance
