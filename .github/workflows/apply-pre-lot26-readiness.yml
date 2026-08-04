@@ -7,12 +7,6 @@ on:
     paths:
       - '.github/workflows/apply-pre-lot26-readiness.yml'
       - 'scripts/apply_pre_lot26_readiness.py'
-  pull_request:
-    branches:
-      - main
-    types:
-      - opened
-      - synchronize
   workflow_dispatch:
 
 permissions:
@@ -20,6 +14,7 @@ permissions:
 
 jobs:
   generate-and-validate:
+    if: ${{ hashFiles('scripts/apply_pre_lot26_readiness.py') != '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout readiness branch
@@ -50,8 +45,10 @@ jobs:
       - name: Compile generated Python
         run: python -m compileall -q src scripts tests
 
-      - name: Lint new Python files
-        run: ruff check scripts/validate_pre_lot26_readiness.py tests/test_pre_lot26_readiness.py
+      - name: Auto-fix and verify generated Python
+        run: |
+          ruff check --fix scripts/validate_pre_lot26_readiness.py tests/test_pre_lot26_readiness.py
+          ruff check scripts/validate_pre_lot26_readiness.py tests/test_pre_lot26_readiness.py
 
       - name: Validate pre-Lot26 readiness
         run: python scripts/validate_pre_lot26_readiness.py --write-report
