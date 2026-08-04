@@ -82,6 +82,19 @@ def main() -> int:
     )
     text = replace_exact(
         text,
+        '''          - name: Targeted critical calculation mutation tests
+            run: |
+              mutmut run 'crypto_quant_bot.market_analysis.technical_indicators._rsi*'
+''',
+        '''          - name: Targeted critical calculation mutation tests
+            run: |
+              mkdir -p mutants/config/math
+              mutmut run 'crypto_quant_bot.market_analysis.technical_indicators._rsi*'
+''',
+        1,
+    )
+    text = replace_exact(
+        text,
         '''                reports/quality/complexity_duplication_inventory.md
 ''',
         '''                reports/quality/complexity_duplication_inventory.md
