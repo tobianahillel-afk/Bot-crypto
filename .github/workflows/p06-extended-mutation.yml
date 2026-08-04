@@ -39,20 +39,27 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Build isolated P0.6 mutation configuration
+      - name: Build and validate isolated P0.6 mutation configuration
         run: |
           python - <<'PY'
           from pathlib import Path
+          import tomllib
 
           path = Path('pyproject.toml')
           text = path.read_text(encoding='utf-8')
+          text = text.replace(
+              'source_paths = ["src/crypto_quant_bot/market_analysis/"]',
+              'source_paths = ["src/crypto_quant_bot/"]',
+              1,
+          )
           start = text.index('only_mutate = [')
           end = text.index(']\npytest_add_cli_args_test_selection', start) + 2
           replacement = '''only_mutate = [
             "src/crypto_quant_bot/contracts/decision_evidence.py",
             "src/crypto_quant_bot/market_analysis/trend_range_momentum.py",
             "src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py",
-          ]'''
+          ]
+          '''
           text = text[:start] + replacement + text[end:]
           start = text.index('pytest_add_cli_args_test_selection = [')
           end = text.index(']\nalso_copy', start) + 2
@@ -61,9 +68,12 @@ jobs:
             "tests/test_p06_decision_evidence_properties.py",
             "tests/test_p06_trend_range_momentum_complete.py",
             "tests/test_p06_vrc_complete.py",
-          ]'''
+          ]
+          '''
           text = text[:start] + replacement + text[end:]
+          tomllib.loads(text)
           path.write_text(text, encoding='utf-8')
+          print('P0.6 mutation TOML: VALID')
           PY
       - name: Run extended mutation suite
         shell: bash
