@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/contracts/decision_evidence_envelope_v1.schema.json",
+  "title": "DecisionEvidenceEnvelopeV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "decision_id",
+    "parent_decision_ids",
+    "run_id",
+    "correlation_id",
+    "replay_id",
+    "event_time",
+    "decision_time",
+    "generated_at",
+    "runtime_mode",
+    "instrument_id",
+    "venue_id",
+    "data_snapshot_id",
+    "data_quality_state_id",
+    "feature_set_id",
+    "market_context_id",
+    "scenario_set_id",
+    "strategy_id",
+    "strategy_version",
+    "model_versions",
+    "calibration_version",
+    "risk_state_id",
+    "risk_decision_id",
+    "config_version",
+    "code_commit",
+    "input_checksums",
+    "output_checksum",
+    "decision_state",
+    "reason_codes",
+    "veto_codes",
+    "uncertainty",
+    "human_approval_id",
+    "facts_observed",
+    "features_computed",
+    "inferences",
+    "assumptions",
+    "supporting_evidence",
+    "contradicting_evidence",
+    "rules_triggered",
+    "final_consequence"
+  ],
+  "$defs": {
+    "nullableIdentifier": {
+      "anyOf": [
+        {"type": "string", "minLength": 1},
+        {"type": "null"}
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "codes": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "evidenceArray": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["evidence_id", "evidence_type", "checksum"],
+        "properties": {
+          "evidence_id": {"type": "string", "minLength": 1},
+          "evidence_type": {"type": "string", "minLength": 1},
+          "checksum": {"type": "string", "pattern": "^[A-Fa-f0-9]{64}$"},
+          "available_at": {"anyOf": [{"$ref": "#/$defs/timestamp"}, {"type": "null"}]}
+        }
+      }
+    }
+  },
+  "properties": {
+    "schema_version": {"const": "decision-evidence-envelope-v1"},
+    "decision_id": {"type": "string", "minLength": 1},
+    "parent_decision_ids": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "run_id": {"type": "string", "minLength": 1},
+    "correlation_id": {"type": "string", "minLength": 1},
+    "replay_id": {"$ref": "#/$defs/nullableIdentifier"},
+    "event_time": {"$ref": "#/$defs/timestamp"},
+    "decision_time": {"$ref": "#/$defs/timestamp"},
+    "generated_at": {"$ref": "#/$defs/timestamp"},
+    "runtime_mode": {"type": "string", "minLength": 1},
+    "instrument_id": {"$ref": "#/$defs/nullableIdentifier"},
+    "venue_id": {"$ref": "#/$defs/nullableIdentifier"},
+    "data_snapshot_id": {"$ref": "#/$defs/nullableIdentifier"},
+    "data_quality_state_id": {"$ref": "#/$defs/nullableIdentifier"},
+    "feature_set_id": {"$ref": "#/$defs/nullableIdentifier"},
+    "market_context_id": {"$ref": "#/$defs/nullableIdentifier"},
+    "scenario_set_id": {"$ref": "#/$defs/nullableIdentifier"},
+    "strategy_id": {"$ref": "#/$defs/nullableIdentifier"},
+    "strategy_version": {"$ref": "#/$defs/nullableIdentifier"},
+    "model_versions": {
+      "type": "object",
+      "additionalProperties": {"type": "string", "minLength": 1}
+    },
+    "calibration_version": {"$ref": "#/$defs/nullableIdentifier"},
+    "risk_state_id": {"$ref": "#/$defs/nullableIdentifier"},
+    "risk_decision_id": {"$ref": "#/$defs/nullableIdentifier"},
+    "config_version": {"type": "string", "minLength": 1},
+    "code_commit": {"type": "string", "pattern": "^[A-Fa-f0-9]{7,64}$"},
+    "input_checksums": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "string", "pattern": "^[A-Fa-f0-9]{64}$"}
+    },
+    "output_checksum": {"type": "string", "pattern": "^[A-Fa-f0-9]{64}$"},
+    "decision_state": {
+      "enum": ["APPROVE", "WAIT", "BLOCK_TRADING", "PAUSE", "KILL_SWITCH", "UNKNOWN", "NOT_APPLICABLE"]
+    },
+    "reason_codes": {"$ref": "#/$defs/codes"},
+    "veto_codes": {"$ref": "#/$defs/codes"},
+    "uncertainty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["data", "model", "calibration", "execution"],
+      "properties": {
+        "data": {"anyOf": [{"type": "number", "minimum": 0, "maximum": 1}, {"type": "null"}]},
+        "model": {"anyOf": [{"type": "number", "minimum": 0, "maximum": 1}, {"type": "null"}]},
+        "calibration": {"anyOf": [{"type": "number", "minimum": 0, "maximum": 1}, {"type": "null"}]},
+        "execution": {"anyOf": [{"type": "number", "minimum": 0, "maximum": 1}, {"type": "null"}]}
+      }
+    },
+    "human_approval_id": {"$ref": "#/$defs/nullableIdentifier"},
+    "facts_observed": {"type": "array", "items": {"type": "string"}},
+    "features_computed": {"type": "array", "items": {"type": "string"}},
+    "inferences": {"type": "array", "items": {"type": "string"}},
+    "assumptions": {"type": "array", "items": {"type": "string"}},
+    "supporting_evidence": {"$ref": "#/$defs/evidenceArray"},
+    "contradicting_evidence": {"$ref": "#/$defs/evidenceArray"},
+    "rules_triggered": {"$ref": "#/$defs/codes"},
+    "final_consequence": {"type": "string", "minLength": 1}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"decision_state": {"const": "APPROVE"}},
+        "required": ["decision_state"]
+      },
+      "then": {
+        "properties": {
+          "risk_decision_id": {"type": "string", "minLength": 1},
+          "reason_codes": {"minItems": 1}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {"decision_state": {"enum": ["BLOCK_TRADING", "PAUSE", "KILL_SWITCH"]}},
+        "required": ["decision_state"]
+      },
+      "then": {
+        "properties": {"veto_codes": {"minItems": 1}}
+      }
+    }
+  ]
+}
