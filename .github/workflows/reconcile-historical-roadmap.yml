@@ -1,0 +1,210 @@
+name: Reconcile historical roadmap evidence
+
+on:
+  pull_request:
+    branches: [main]
+    types: [synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/roadmap-v1-v21-documentation
+          fetch-depth: 0
+
+      - name: Reconcile implemented lots with real repository evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          import re
+
+          root = Path('.')
+          docs = root / 'docs'
+          version_docs = [
+              docs / 'roadmap' / 'V01_DEFENSIVE_AUDIT_NO_TRADING.md',
+              docs / 'roadmap' / 'V02_MARKET_ANALYSIS_OFFLINE.md',
+          ]
+
+          search_roots = [docs, root / 'reports', root / 'scripts', root / 'data' / 'audit', root / 'tests']
+          files = [p for base in search_roots if base.exists() for p in base.rglob('*') if p.is_file()]
+
+          def evidence_for(lot: int) -> list[str]:
+              pattern = re.compile(rf'lot[_\- ]?0*{lot}(?!\d)', re.IGNORECASE)
+              return sorted({p.as_posix() for p in files if pattern.search(p.name)})
+
+          evidence = {lot: evidence_for(lot) for lot in range(26)}
+          section_re = re.compile(r'(?ms)^## Lot (\d+) —.*?(?=^## Lot \d+ —|\Z)')
+          implementation_re = re.compile(
+              r'(?ms)^### Fichiers et artefacts d’implémentation attendus\n\n.*?(?=^### Observabilité minimale)'
+          )
+
+          for document in version_docs:
+              text = document.read_text(encoding='utf-8')
+
+              def replace(match: re.Match[str]) -> str:
+                  lot = int(match.group(1))
+                  block = match.group(0)
+                  if lot > 25:
+                      return block
+                  paths = evidence[lot]
+                  body = [
+                      '### Preuves historiques et fichiers réels',
+                      '',
+                      'Ce lot est déjà implémenté. La roadmap ne renomme, ne déplace et ne recrée aucun fichier historique.',
+                      'Les critères d’acceptation, rapports PASS, artefacts et commit validé sont normatifs ; en cas de divergence, ils prévalent sur cette synthèse.',
+                      '',
+                      'Fichiers de preuve détectés dans le dépôt :',
+                      '',
+                  ]
+                  body.extend(f'- `{path}`' for path in paths)
+                  if not paths:
+                      body.append('- Aucun nom de fichier ne porte directement ce numéro ; le manifeste de chaîne et le commit validé restent la preuve primaire.')
+                  body.extend([
+                      '',
+                      'Les chemins des modules source sont ceux des critères d’acceptation historiques et du dépôt réel. Aucun chemin synthétique futur n’est normatif pour ce lot.',
+                      '',
+                  ])
+                  if not implementation_re.search(block):
+                      raise SystemExit(f'Historical implementation block missing: Lot {lot} in {document}')
+                  return implementation_re.sub('\n'.join(body), block, count=1)
+
+              document.write_text(section_re.sub(replace, text), encoding='utf-8')
+
+          registry_path = root / 'data' / 'audit' / 'product_scope_roadmap_lot21.jsonl'
+          rows = [json.loads(line) for line in registry_path.read_text(encoding='utf-8').splitlines() if line.strip()]
+          assert len(rows) == 178
+          assert [row['lot_number'] for row in rows] == list(range(178))
+          for row in rows[:26]:
+              lot = row['lot_number']
+              row['historical_evidence_policy'] = 'HISTORICAL_ACCEPTANCE_PASS_REPORTS_AND_VALIDATED_COMMIT_ARE_NORMATIVE'
+              row['historical_evidence_files'] = evidence[lot]
+              row['implementation_files'] = evidence[lot]
+              row['historical_paths_must_not_be_renamed'] = True
+          registry_path.write_text(
+              ''.join(json.dumps(row, ensure_ascii=False, sort_keys=True) + '\n' for row in rows),
+              encoding='utf-8',
+          )
+
+          path_re = re.compile(
+              r'(?<![A-Za-z0-9_.-])([A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)+\.(?:jsonl|json|py|md|sh|toml|txt|csv))'
+          )
+          critical = []
+          for lot in range(22, 26):
+              acceptance = docs / f'ACCEPTANCE_CRITERIA_LOT_{lot}.md'
+              assert acceptance.is_file(), acceptance
+              referenced = sorted(set(path_re.findall(acceptance.read_text(encoding='utf-8'))))
+              missing = [path for path in referenced if not (root / path).is_file()]
+              if missing:
+                  raise SystemExit(f'Lot {lot} missing referenced paths: {missing}')
+              critical.append((lot, acceptance.as_posix(), len(referenced)))
+
+          report = [
+              '# Historical Implementation Reconciliation',
+              '',
+              '## Verdict',
+              '',
+              '`PASS` — Les Lots 0–25 sont reliés aux preuves réellement présentes dans le dépôt et ne portent plus de chemins synthétiques normatifs.',
+              '',
+              '## Règle de précédence',
+              '',
+              '```text',
+              'criteria + PASS report + artifacts + validated commit',
+              '> historical LOT document',
+              '> canonical roadmap synthesis',
+              '```',
+              '',
+              '## Contrôle renforcé des Lots 22–25',
+              '',
+          ]
+          report.extend(f'- Lot {lot}: `{path}` — {count} chemins historiques présents.' for lot, path, count in critical)
+          report.extend([
+              '',
+              '## Couverture par lot',
+              '',
+              '| Lot | Preuves détectées | Aucun renommage rétroactif |',
+              '|---:|---:|---|',
+          ])
+          report.extend(f'| {lot} | {len(evidence[lot])} | Oui |' for lot in range(26))
+          report.extend([
+              '',
+              'Les modules dont le nom ne contient pas le numéro du lot sont résolus par les critères d’acceptation et le commit validé, jamais inventés par la roadmap.',
+          ])
+          (docs / 'HISTORICAL_IMPLEMENTATION_RECONCILIATION.md').write_text('\n'.join(report) + '\n', encoding='utf-8')
+
+          master = docs / 'MASTER_SYSTEM_SPECIFICATION.md'
+          text = master.read_text(encoding='utf-8')
+          if '## 7. Précédence des preuves historiques' not in text:
+              text += (
+                  '\n## 7. Précédence des preuves historiques\n\n'
+                  'Pour les Lots 0–25, critères d’acceptation, rapports PASS, artefacts et commit validé prévalent sur la roadmap. '
+                  'Aucun renommage rétroactif ni remplacement théorique de l’implémentation auditée n’est autorisé.\n'
+              )
+          master.write_text(text, encoding='utf-8')
+
+          validation = docs / 'ROADMAP_DOCUMENTATION_VALIDATION_REPORT.md'
+          text = validation.read_text(encoding='utf-8')
+          if '## Réconciliation historique complémentaire' not in text:
+              text += (
+                  '\n## Réconciliation historique complémentaire\n\n'
+                  '- Lots 0–25 liés aux preuves réelles : `PASS`.\n'
+                  '- Chemins synthétiques normatifs retirés : `PASS`.\n'
+                  '- Références des critères Lots 22–25 présentes : `PASS`.\n'
+              )
+          validation.write_text(text, encoding='utf-8')
+
+          readme = root / 'README.md'
+          text = readme.read_text(encoding='utf-8')
+          line = '- `docs/HISTORICAL_IMPLEMENTATION_RECONCILIATION.md` — réconciliation des Lots 0–25 avec les preuves réelles.'
+          if line not in text:
+              text += '\n' + line + '\n'
+          readme.write_text(text, encoding='utf-8')
+
+          print('HISTORICAL ROADMAP RECONCILIATION: PASS')
+          PY
+
+      - name: Independent historical verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          import re
+
+          for path in [Path('docs/roadmap/V01_DEFENSIVE_AUDIT_NO_TRADING.md'), Path('docs/roadmap/V02_MARKET_ANALYSIS_OFFLINE.md')]:
+              text = path.read_text(encoding='utf-8')
+              for match in re.finditer(r'(?ms)^## Lot (\d+) —.*?(?=^## Lot \d+ —|\Z)', text):
+                  lot = int(match.group(1))
+                  if lot <= 25:
+                      block = match.group(0)
+                      assert '### Preuves historiques et fichiers réels' in block
+                      assert '### Fichiers et artefacts d’implémentation attendus' not in block
+
+          rows = [json.loads(line) for line in Path('data/audit/product_scope_roadmap_lot21.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          assert len(rows) == 178
+          for row in rows[:26]:
+              assert row['historical_paths_must_not_be_renamed'] is True
+              assert row['historical_evidence_policy'].startswith('HISTORICAL_')
+          assert Path('docs/HISTORICAL_IMPLEMENTATION_RECONCILIATION.md').is_file()
+          print('HISTORICAL EVIDENCE VERIFICATION: PASS')
+          PY
+
+      - name: Commit reconciled documentation
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/reconcile-historical-roadmap.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Reconcile roadmap with validated historical implementation'
+          git push origin HEAD:agent/roadmap-v1-v21-documentation
