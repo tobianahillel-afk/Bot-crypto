@@ -14,7 +14,6 @@ permissions:
 
 jobs:
   generate-and-validate:
-    if: ${{ hashFiles('scripts/apply_pre_lot26_readiness.py') != '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout readiness branch
@@ -33,6 +32,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          test -f scripts/apply_pre_lot26_readiness.py
           python scripts/apply_pre_lot26_readiness.py
           sed -i 's/mypy==1\.18\.0/mypy==1.18.1/g' requirements-dev.in pyproject.toml scripts/validate_pre_lot26_readiness.py
 
