@@ -24,6 +24,8 @@ jobs:
         with:
           python-version: '3.11'
           cache: pip
+      - name: Repair migrator replacement boundaries
+        run: python scripts/repair_p0_migrator.py
       - name: Apply idempotent P0 migration
         run: python scripts/apply_p0_hardening.py
       - name: Create local candidate commit
