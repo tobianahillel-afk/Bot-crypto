@@ -2,31 +2,22 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from crypto_quant_bot.contracts import (
-    ModuleStatus,
-    SystemDecision,
-    TradingDecision,
-    utc_now_iso,
-)
+import crypto_quant_bot.contracts as canonical
+import crypto_quant_bot.core.enums as legacy_enums
 from crypto_quant_bot.contracts.base import BaseContract
 from crypto_quant_bot.contracts.decision import DecisionContract
 from crypto_quant_bot.core.clock import utc_now_iso as legacy_utc_now_iso
-from crypto_quant_bot.core.enums import (
-    ModuleStatus as LegacyModuleStatus,
-    SystemDecision as LegacySystemDecision,
-    TradingDecision as LegacyTradingDecision,
-)
 
 
 def test_core_reexports_canonical_contract_primitives() -> None:
-    assert LegacyTradingDecision is TradingDecision
-    assert LegacySystemDecision is SystemDecision
-    assert LegacyModuleStatus is ModuleStatus
-    assert legacy_utc_now_iso is utc_now_iso
+    assert legacy_enums.TradingDecision is canonical.TradingDecision
+    assert legacy_enums.SystemDecision is canonical.SystemDecision
+    assert legacy_enums.ModuleStatus is canonical.ModuleStatus
+    assert legacy_utc_now_iso is canonical.utc_now_iso
 
 
 def test_utc_now_iso_is_timezone_aware_utc() -> None:
-    timestamp = utc_now_iso()
+    timestamp = canonical.utc_now_iso()
     parsed = datetime.fromisoformat(timestamp)
     assert parsed.tzinfo is not None
     assert parsed.utcoffset() is not None
@@ -47,8 +38,8 @@ def test_base_contract_defaults_are_complete_and_serializable() -> None:
 
 def test_decision_contract_preserves_fail_closed_defaults() -> None:
     contract = DecisionContract()
-    assert contract.trading_decision == TradingDecision.WAIT.value
-    assert contract.system_decision == SystemDecision.BLOCK_TRADING.value
+    assert contract.trading_decision == canonical.TradingDecision.WAIT.value
+    assert contract.system_decision == canonical.SystemDecision.BLOCK_TRADING.value
     assert contract.trade_allowed is False
     assert contract.reasons == []
     assert contract.vetoes == []
@@ -65,17 +56,17 @@ def test_contract_instances_do_not_share_mutable_lists() -> None:
 
 
 def test_enum_values_remain_backward_compatible() -> None:
-    assert [item.value for item in TradingDecision] == [
+    assert [item.value for item in canonical.TradingDecision] == [
         "WAIT",
         "LONG",
         "SHORT",
         "CLOSE",
         "REDUCE",
     ]
-    assert [item.value for item in SystemDecision] == [
+    assert [item.value for item in canonical.SystemDecision] == [
         "BLOCK_TRADING",
         "PAUSE",
         "RESUME",
         "KILL_SWITCH",
     ]
-    assert ModuleStatus.FORBIDDEN.value == "FORBIDDEN"
+    assert canonical.ModuleStatus.FORBIDDEN.value == "FORBIDDEN"
