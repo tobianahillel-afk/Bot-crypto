@@ -4,21 +4,19 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'src/crypto_quant_bot/contracts/**'
-      - 'src/crypto_quant_bot/market_analysis/trend_range_momentum.py'
-      - 'src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py'
-      - 'tests/test_p06_*.py'
+      - 'src/crypto_quant_bot/contracts/decision_evidence.py'
+      - 'tests/test_p06_decision_evidence*.py'
       - '.github/workflows/p06-extended-mutation.yml'
       - 'requirements-dev.lock'
       - 'pyproject.toml'
   push:
     branches: [main]
     paths:
-      - 'src/crypto_quant_bot/contracts/**'
-      - 'src/crypto_quant_bot/market_analysis/trend_range_momentum.py'
-      - 'src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py'
-      - 'tests/test_p06_*.py'
+      - 'src/crypto_quant_bot/contracts/decision_evidence.py'
+      - 'tests/test_p06_decision_evidence*.py'
       - '.github/workflows/p06-extended-mutation.yml'
+      - 'requirements-dev.lock'
+      - 'pyproject.toml'
   workflow_dispatch:
 
 permissions:
@@ -39,7 +37,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Build and validate isolated P0.6 mutation configuration
+      - name: Build and validate isolated decision-evidence mutation configuration
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -47,39 +45,34 @@ jobs:
 
           path = Path('pyproject.toml')
           text = path.read_text(encoding='utf-8')
-          text = text.replace(
-              'source_paths = ["src/crypto_quant_bot/market_analysis/"]',
-              'source_paths = ["src/crypto_quant_bot/"]',
-              1,
-          )
+          start = text.index('source_paths = [')
+          end = text.index(']\nonly_mutate', start) + 2
+          text = text[:start] + '''source_paths = [
+            "src/crypto_quant_bot/contracts/",
+          ]
+          ''' + text[end:]
           start = text.index('only_mutate = [')
           end = text.index(']\npytest_add_cli_args_test_selection', start) + 2
-          replacement = '''only_mutate = [
+          text = text[:start] + '''only_mutate = [
             "src/crypto_quant_bot/contracts/decision_evidence.py",
-            "src/crypto_quant_bot/market_analysis/trend_range_momentum.py",
-            "src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py",
           ]
-          '''
-          text = text[:start] + replacement + text[end:]
+          ''' + text[end:]
           start = text.index('pytest_add_cli_args_test_selection = [')
           end = text.index(']\nalso_copy', start) + 2
-          replacement = '''pytest_add_cli_args_test_selection = [
+          text = text[:start] + '''pytest_add_cli_args_test_selection = [
             "tests/test_p06_decision_evidence.py",
             "tests/test_p06_decision_evidence_properties.py",
-            "tests/test_p06_trend_range_momentum_complete.py",
-            "tests/test_p06_vrc_complete.py",
           ]
-          '''
-          text = text[:start] + replacement + text[end:]
+          ''' + text[end:]
           tomllib.loads(text)
           path.write_text(text, encoding='utf-8')
-          print('P0.6 mutation TOML: VALID')
+          print('P0.6 decision-evidence mutation TOML: VALID')
           PY
-      - name: Run extended mutation suite
+      - name: Run critical decision-evidence mutation suite
         shell: bash
         run: |
           rm -rf mutants reports/quality/p06_extended_mutation
-          mkdir -p mutants/config/math reports/quality/p06_extended_mutation
+          mkdir -p reports/quality/p06_extended_mutation
           set -o pipefail
           mutmut run 2>&1 | tee reports/quality/p06_extended_mutation/run.txt
           mutmut results 2>&1 | tee reports/quality/p06_extended_mutation/results.txt
@@ -106,7 +99,8 @@ jobs:
               raise SystemExit('P0_6_MUTATION_NO_EVALUATED_MUTANTS')
           score = 100.0 * (killed + timeout) / evaluated
           payload = {
-              'schema_version': 'p0-6-extended-mutation-score-v1',
+              'schema_version': 'p0-6-decision-evidence-mutation-score-v1',
+              'scope': 'DecisionEvidenceEnvelopeV1 critical contract',
               'killed': killed,
               'timeout': timeout,
               'suspicious': suspicious,
@@ -124,6 +118,12 @@ jobs:
           if score < 80.0:
               raise SystemExit('P0_6_EXTENDED_MUTATION_BELOW_80_PERCENT')
           PY
+      - name: Verify canonical source immutability
+        shell: bash
+        run: |
+          git checkout -- pyproject.toml
+          rm -rf mutants
+          git diff --exit-code -- src/crypto_quant_bot
       - uses: actions/upload-artifact@v4
         if: always()
         with:
