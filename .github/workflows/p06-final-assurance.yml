@@ -1,0 +1,100 @@
+name: P0.6 final exact-commit assurance
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'scripts/**'
+      - 'docs/**'
+      - 'config/**'
+      - 'contracts/**'
+      - 'requirements-dev.lock'
+      - 'pyproject.toml'
+      - '.github/workflows/p06-final-assurance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  assurance:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Run final assurance and persist evidence
+        id: assurance
+        continue-on-error: true
+        run: python scripts/run_p06_final_assurance.py
+      - name: Commit exact-commit report
+        if: always()
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.json
+          git add -f reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.md
+          git add -f reports/quality/p06_final_assurance/
+          if git diff --cached --quiet; then
+            echo 'Final assurance evidence already current.'
+          else
+            git commit -m 'Record P0.6 exact-commit assurance evidence'
+            git push origin HEAD:${{ github.event.pull_request.head.ref || github.ref_name }}
+          fi
+      - name: Update pull request when assurance passes
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        shell: bash
+        run: |
+          status=$(python -c "import json; print(json.load(open('reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.json'))['status'])")
+          evidence_commit=$(python -c "import json; print(json.load(open('reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.json'))['evidence_commit'])")
+          line_coverage=$(python -c "import json; print(json.load(open('reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.json'))['line_coverage_percent'])")
+          branch_coverage=$(python -c "import json; print(json.load(open('reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.json'))['branch_coverage_percent'])")
+          tests=$(python -c "import json; print(json.load(open('reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.json'))['test_count'])")
+          if [ "$status" = PASS ]; then
+            gh pr comment "$PR_URL" --body "P0.6 final assurance PASS on \`$evidence_commit\`: $tests tests, line coverage $line_coverage%, branch coverage $branch_coverage%, both mutation gates PASS, Bandit/pip-audit PASS, and 3/3 anti-flake repetitions PASS. Lot 26 remains locked until human review and merge."
+            gh pr ready "$PR_URL"
+          else
+            gh pr comment "$PR_URL" --body "P0.6 final assurance remains FAIL on \`$evidence_commit\`. See \`reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.md\` and the attached logs. The PR remains draft and Lot 26 remains locked."
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p06-final-exact-commit-assurance
+          path: |
+            coverage.xml
+            coverage.json
+            reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.json
+            reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.md
+            reports/quality/p06_final_assurance/
+      - name: Enforce final assurance verdict
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path('reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.json')
+          if not path.is_file():
+              raise SystemExit('P0_6_FINAL_REPORT_MISSING')
+          payload = json.loads(path.read_text(encoding='utf-8'))
+          if payload.get('status') != 'PASS':
+              raise SystemExit('P0_6_FINAL_ASSURANCE_NO_GO')
+          print('P0_6_FINAL_ASSURANCE: PASS')
+          PY
