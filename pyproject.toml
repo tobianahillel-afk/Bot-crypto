@@ -72,7 +72,10 @@ show_error_codes = true
 exclude = ["mutants/", "tests/"]
 
 [tool.mutmut]
-source_paths = ["src/crypto_quant_bot/market_analysis/"]
+source_paths = [
+  "src/crypto_quant_bot/contracts/",
+  "src/crypto_quant_bot/market_analysis/",
+]
 only_mutate = [
   "src/crypto_quant_bot/market_analysis/technical_indicators.py",
   "src/crypto_quant_bot/market_analysis/numeric.py",
@@ -82,7 +85,14 @@ pytest_add_cli_args_test_selection = [
   "tests/test_p0_math_properties.py",
   "tests/test_p0_math_parameter_contracts.py",
 ]
-also_copy = ["src/crypto_quant_bot/__init__.py", "src/crypto_quant_bot/core/", "src/crypto_quant_bot/data/", "config/", "pyproject.toml"]
+also_copy = [
+  "src/crypto_quant_bot/__init__.py",
+  "src/crypto_quant_bot/core/",
+  "src/crypto_quant_bot/data/",
+  "config/",
+  "contracts/",
+  "pyproject.toml",
+]
 mutate_only_covered_lines = true
 max_stack_depth = 10
 timeout_multiplier = 8.0
