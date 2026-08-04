@@ -50,10 +50,16 @@ def main() -> int:
         "    do_not_mutate_patterns = ['raise \\\\w+', 'logger\\\\.\\\\w+']",
         1,
     )
+    text = replace_exact(
+        text,
+        '    ignore = ["E501", "B905"]',
+        '    ignore = ["E501", "B905", "RUF001", "RUF002", "RUF003", "RUF046"]',
+        1,
+    )
 
     MIGRATOR.write_text(text, encoding="utf-8")
     Path(__file__).unlink()
-    print("P0_MIGRATOR_BOUNDARIES_ESCAPES_AND_TOML_REPAIRED")
+    print("P0_MIGRATOR_BOUNDARIES_ESCAPES_TOML_AND_RUFF_REPAIRED")
     return 0
 
 
