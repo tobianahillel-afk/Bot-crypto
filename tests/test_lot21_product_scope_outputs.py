@@ -67,7 +67,10 @@ def test_lot21_registry_counts_match_generated_jsonl_files():
     roadmap_rows = _load_jsonl(ROADMAP_PATH)
     assert registry["capability_count"] == len(capabilities)
     assert registry["phase_count"] == len(registry["roadmap_phases"])
-    assert registry["future_lot_count"] == len(roadmap_rows) == 126
+    assert len(roadmap_rows) == 178
+    assert registry["future_lot_count"] == sum(
+        1 for row in roadmap_rows if isinstance(row.get("lot_number"), int) and row["lot_number"] >= 26
+    )
 
 
 def test_lot21_freeze_report_mentions_the_frozen_archive():
