@@ -62,7 +62,7 @@ def test_analysis_checksum_and_source_artifacts_are_stable(
     )
     artifacts = foundation.default_source_artifacts()
     assert artifacts == sorted(set(artifacts))
-    assert {"a", "b", "m"}.issubset(artifacts)
+    assert {"a", "b", "m"}.issubset(set(artifacts))
 
 
 def test_require_object_expected_pairs_and_numeric_helpers(
