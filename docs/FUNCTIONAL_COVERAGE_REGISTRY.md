@@ -1,54 +1,50 @@
 # Functional Coverage Registry — V1 à V21
 
-Ce registre remplace le registre fonctionnel V2+ limité à V11 comme vue canonique des capabilities futures.
+## Périmètre initial
 
-## Statuts
-
-- `DONE_VALIDATED` : implémenté et validé.
-- `ACTIVE_PARTIAL` : version ouverte et partiellement implémentée.
-- `PLANNED_LOCKED` : planifié mais non activé.
-- `OPTIONAL_RESEARCH` : extension optionnelle de recherche.
+- BTC/EUR spot, venue de référence Kraken, offline/paper d’abord.
+- Leverage et withdrawals interdits ; live désactivé par défaut.
+- Futures/perpetuals/options/on-chain restent contextuels/research jusqu’aux gates dédiés.
 
 ## Couverture par version
 
-| Version | Capabilities principales | Lots | Statut |
-|---:|---|---:|---|
-| V1 | bootstrap, data foundation, pivots, volume/VWAP, volatility, regime, market state, anti-lookahead, replay, cost V0, risk firewalls, lineage, health, compliance, closure | 0–20 | DONE_VALIDATED |
-| V2 | market analysis, indicators, trend/range/momentum, volatility/regime/confluence, MTF alignment, aggregation, explanation, replay | 21–30 | ACTIVE_PARTIAL |
-| V3 | source registry, instrument normalization, clock policy, data quality, reconciliation, freshness/outages | 31–36 | PLANNED_LOCKED |
-| V4 | L2/L3 offline, book reconstruction, order flow/CVD, liquidity, absorption, stops, fakeouts, derivatives, game theory/scenarios | 37–52 | PLANNED_LOCKED |
-| V5 | alpha registry, strategy candidates, signal schema, trade/order intents, horizon, invalidation, retirement, promotion | 53–59 | PLANNED_LOCKED |
-| V6 | labels, replay, fees/funding/spread, slippage/impact, fills/capacity, EV, walk-forward, OOS, purged CV, placebo, Monte Carlo | 60–71 | PLANNED_LOCKED |
-| V7 | model cards, drift, limits, sizing, drawdown, tail risk, portfolio pre-checks, risk approval, kill switch | 72–80 | PLANNED_LOCKED |
-| V8 | paper runtime, simulated orders/fills, paper ledger, reconciliation, incident handling, promotion | 81–87 | PLANNED_LOCKED |
-| V9 | portfolio state, cash/collateral, positions, unified PnL, attribution, exposure, statements | 88–95 | PLANNED_LOCKED |
-| V10 | experiment registry, versioning, hypothesis lifecycle, ablations, knowledge base, governance | 96–102 | PLANNED_LOCKED |
-| V11 | news/events read-only, calendar, sentiment, event risk, source audit, LLM explanation | 103–110 | PLANNED_LOCKED |
-| V12 | market/microstructure/scenario dashboards, risk command center, operator console, UI security | 111–118 | PLANNED_LOCKED |
-| V13 | read-only connector, account snapshots, histories, reconciliation, permission scanner | 119–125 | PLANNED_LOCKED |
-| V14 | API/WS health, availability, staleness, rate limits, maintenance, counterparty risk | 126–132 | PLANNED_LOCKED |
-| V15 | OMS/EMS contracts, order state machine, idempotency, validation, rejects, partial fills, cancel/replace, recovery | 133–141 | PLANNED_LOCKED |
-| V16 | sandbox adapter, routing, fill/latency simulation, risk, failure injection, reconciliation | 142–149 | PLANNED_LOCKED |
-| V17 | runtime modes, secrets, human approval, small capital, live risk, override, compliance | 150–157 | PLANNED_LOCKED |
-| V18 | logs/metrics/traces, heartbeats, monitoring, alerting, incidents, DR, readiness | 158–165 | PLANNED_LOCKED |
-| V19 | tick/L2/L3, matching engine, queue model, latency, market making, adverse selection | 166–171 | OPTIONAL_RESEARCH |
-| V20 | options contracts, IV, skew, term structure, expiry, Greeks | 172–174 | OPTIONAL_RESEARCH |
-| V21 | on-chain sources, exchange/stablecoin/miner/whale flows, market fusion | 175–177 | OPTIONAL_RESEARCH |
+| Version | Lots | Owner | Package | Mode maximal | Statut |
+|---:|---:|---|---|---|---|
+| V1 | 0–20 | `SafetyKernel` | `core` | `EDUCATIONAL_AUDIT_ONLY` | DONE_VALIDATED |
+| V2 | 21–30 | `MarketAnalysisDomain` | `market_analysis` | `LOCAL_OFFLINE_ANALYSIS_ONLY` | ACTIVE_PARTIAL |
+| V3 | 31–36 | `MarketDataGovernanceDomain` | `data_governance` | `DATA_GOVERNANCE_ONLY` | PLANNED_LOCKED |
+| V4 | 37–52 | `MicrostructureDomain` | `microstructure` | `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY` | PLANNED_LOCKED |
+| V5 | 53–59 | `StrategyResearchDomain` | `strategy_research` | `OFFLINE_STRATEGY_RESEARCH_ONLY` | PLANNED_LOCKED |
+| V6 | 60–71 | `BacktestDomain` | `backtesting` | `BACKTEST_ONLY` | PLANNED_LOCKED |
+| V7 | 72–80 | `RiskDomain` | `risk` | `RISK_SIMULATION_ONLY` | PLANNED_LOCKED |
+| V8 | 81–87 | `PaperTradingDomain` | `paper_trading` | `PAPER` | PLANNED_LOCKED |
+| V9 | 88–95 | `PortfolioDomain` | `portfolio` | `PORTFOLIO_ACCOUNTING` | PLANNED_LOCKED |
+| V10 | 96–102 | `ResearchOSDomain` | `research_os` | `RESEARCH_GOVERNANCE_ONLY` | PLANNED_LOCKED |
+| V11 | 103–110 | `IntelligenceDomain` | `intelligence` | `READ_ONLY_CONTEXT_ONLY` | PLANNED_LOCKED |
+| V12 | 111–118 | `OperatorConsoleDomain` | `ui` | `OPERATOR_UI` | PLANNED_LOCKED |
+| V13 | 119–125 | `ReadOnlyConnectorDomain` | `connectors` | `READ_ONLY` | PLANNED_LOCKED |
+| V14 | 126–132 | `ExchangeRiskDomain` | `exchange_risk` | `EXCHANGE_HEALTH_ONLY` | PLANNED_LOCKED |
+| V15 | 133–141 | `OrderExecutionDomain` | `execution` | `ORDER_MANAGEMENT_CORE` | PLANNED_LOCKED |
+| V16 | 142–149 | `SandboxExecutionDomain` | `sandbox` | `SANDBOX` | PLANNED_LOCKED |
+| V17 | 150–157 | `LiveGovernanceDomain` | `live_governance` | `LIVE_DISABLED_BY_DEFAULT` | PLANNED_LOCKED |
+| V18 | 158–165 | `OperationsDomain` | `monitoring` | `OPERATIONS_GOVERNANCE` | PLANNED_LOCKED |
+| V19 | 166–171 | `HFTResearchDomain` | `hft_research` | `HFT_RESEARCH_ONLY` | OPTIONAL_RESEARCH |
+| V20 | 172–174 | `OptionsContextDomain` | `options` | `OPTIONS_CONTEXT_ONLY` | OPTIONAL_RESEARCH |
+| V21 | 175–177 | `OnChainContextDomain` | `onchain` | `ONCHAIN_CONTEXT_ONLY` | OPTIONAL_RESEARCH |
 
-## Gates transverses
+## Capabilities transverses
 
-- `data_quality_gate` avant toute analyse avancée.
-- `research_promotion_gate` avant backtest.
-- `backtest_promotion_gate` avant paper.
-- `risk_approval_gate` avant tout order intent.
-- `paper_promotion_gate` avant sandbox.
-- `sandbox_promotion_gate` avant live eligibility.
-- `human_approval_gate` avant toute soumission live.
-- `emergency_stop_gate` prioritaire sur tous les autres états.
+- Canonical contracts, lineage, available_at/usable_from, replay et checksums.
+- Veto consequence matrix et priorité KILL_SWITCH > PAUSE > BLOCK > WAIT > APPROVE.
+- Strategy lifecycle et promotion gates.
+- Configuration/environment governance, CI/CD, artifact registry, release et rollback.
+- Ledger, portfolio/PnL, reconciliation, observability, incident response et DR.
+- Domain ownership et architecture dependency tests.
 
 ## Interdictions
 
-- Aucun LLM ne crée ou approuve un signal, un sizing ou un ordre.
-- Aucune donnée inconnue ou non réconciliée n’autorise une action.
+- Aucun LLM ne crée/approuve signal, sizing ou ordre.
+- Aucune donnée inconnue/non réconciliée n’autorise une action.
 - Aucune permission withdrawal.
-- Aucun HFT live dans la roadmap V1–V21.
+- Aucun HFT live dans V1–V21.
+- Aucun scale-up autonome.

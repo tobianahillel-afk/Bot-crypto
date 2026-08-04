@@ -2,63 +2,62 @@
 
 Projet : **Crypto Quant Bot V3.1-Ops**
 
-Ce document remplace la roadmap prévisionnelle limitée à V11 / Lot 147 comme source de vérité pour les travaux futurs.
-Les documents historiques restent conservés pour audit, mais toute nouvelle implémentation doit suivre cette roadmap canonique.
+Cette roadmap est la source de vérité pour les travaux futurs. Elle est complétée par les contrats d’architecture ci-dessous et par les 21 documents de version.
 
 ## État actuel
 
-- Dernier lot implémenté et validé : **Lot 25 — Volatility / Regime / Confluence Engine**.
-- Prochain lot : **Lot 26 — Multi-Timeframe Alignment Engine**.
-- Lots `0–25` : implémentés/validés selon les rapports existants.
-- Lots `26–177` : planifiés et verrouillés jusqu’à activation explicite.
-- Les correctifs historiques `bis/ter/quater/...` restent des correctifs d’audit et ne sont pas comptés comme lots principaux.
+- Dernier lot implémenté et validé : **Lot 25**.
+- Prochain lot : **Lot 26**.
+- Lots 0–25 : historique implémenté/validé selon les preuves existantes.
+- Lots 26–177 : `PLANNED_LOCKED` jusqu’à activation explicite.
 
-## Principes non négociables
+## Documents normatifs
+
+- [Master System Specification](MASTER_SYSTEM_SPECIFICATION.md)
+- [System Execution Architecture](SYSTEM_EXECUTION_ARCHITECTURE.md)
+- [Domain Boundaries and Ownership](DOMAIN_BOUNDARIES_AND_OWNERSHIP.md)
+- [Canonical Data and Event Contracts](CANONICAL_DATA_AND_EVENT_CONTRACTS.md)
+- [Runtime Modes and State Machines](RUNTIME_MODES_AND_STATE_MACHINES.md)
+- [Strategy Lifecycle and Promotion Gates](STRATEGY_LIFECYCLE_AND_PROMOTION_GATES.md)
+- [Veto Consequence Matrix](VETO_CONSEQUENCE_MATRIX.md)
+- [Configuration / CI / Release Governance](CONFIGURATION_RELEASE_AND_ENVIRONMENT_GOVERNANCE.md)
+- [Failure and Recovery Policy](FAILURE_DEGRADED_AND_RECOVERY_POLICY.md)
+
+## Principe de séparation
 
 ```text
-Analyse ≠ signal
-Signal ≠ trade intent
-Trade intent ≠ order intent
-Order intent ≠ ordre soumis
-Ordre ≠ position
-Position ≠ stratégie validée
+Analyse ≠ scénario ≠ signal ≠ trade intent ≠ order intent
+Order intent ≠ ordre soumis ≠ fill ≠ position
 Stratégie validée ≠ autorisation live
 ```
 
-- Tout module est fail-closed.
-- Aucun score descriptif ne devient implicitement un signal.
-- Aucun signal ne devient ordre sans risk approval.
-- Aucun live sans promotion paper → sandbox → live et revue humaine.
-- HFT reste research/simulation dans cette roadmap.
-- Options et on-chain sont des extensions contextuelles, non bloquantes pour le cœur du produit.
+## Versions
 
-## Versions et plages de lots
-
-| Version | Phase | Lots | Statut global |
+| Version | Phase | Lots | Mode maximal |
 |---:|---|---:|---|
-| V1 | Defensive Audit / No Trading | 0–20 | CLOSED |
-| V2 | Market Analysis Offline | 21–30 | ACTIVE / PARTIAL |
-| V3 | Market Data Governance | 31–36 | PLANNED_LOCKED |
-| V4 | Microstructure / Liquidity / Game Theory | 37–52 | PLANNED_LOCKED |
-| V5 | Alpha / Strategy Research | 53–59 | PLANNED_LOCKED |
-| V6 | Backtesting / Expected Value / TCA | 60–71 | PLANNED_LOCKED |
-| V7 | Model Risk / Sizing / Risk | 72–80 | PLANNED_LOCKED |
-| V8 | Paper Trading | 81–87 | PLANNED_LOCKED |
-| V9 | Portfolio / PnL Core | 88–95 | PLANNED_LOCKED |
-| V10 | Research OS | 96–102 | PLANNED_LOCKED |
-| V11 | News / AI / Event Context | 103–110 | PLANNED_LOCKED |
-| V12 | UI / Operator Console | 111–118 | PLANNED_LOCKED |
-| V13 | API Read-Only / Account Read-Only | 119–125 | PLANNED_LOCKED |
-| V14 | Exchange Risk / API Health | 126–132 | PLANNED_LOCKED |
-| V15 | OMS / EMS Core | 133–141 | PLANNED_LOCKED |
-| V16 | Sandbox / Demo Execution | 142–149 | PLANNED_LOCKED |
-| V17 | Live Governance / Human Approval | 150–157 | PLANNED_LOCKED |
-| V18 | Observability / Incident Response | 158–165 | PLANNED_LOCKED |
-| V19 | HFT Research | 166–171 | PLANNED_LOCKED |
-| V20 | Options Context | 172–174 | PLANNED_LOCKED |
-| V21 | On-chain / Flow Intelligence | 175–177 | PLANNED_LOCKED |
+| V1 | Defensive Audit / No Trading | 0–20 | `EDUCATIONAL_AUDIT_ONLY` |
+| V2 | Market Analysis Offline | 21–30 | `LOCAL_OFFLINE_ANALYSIS_ONLY` |
+| V3 | Market Data Governance | 31–36 | `DATA_GOVERNANCE_ONLY` |
+| V4 | Microstructure / Liquidity / Game Theory | 37–52 | `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY` |
+| V5 | Alpha / Strategy Research | 53–59 | `OFFLINE_STRATEGY_RESEARCH_ONLY` |
+| V6 | Backtesting / Expected Value / TCA | 60–71 | `BACKTEST_ONLY` |
+| V7 | Model Risk / Sizing / Risk | 72–80 | `RISK_SIMULATION_ONLY` |
+| V8 | Paper Trading | 81–87 | `PAPER` |
+| V9 | Portfolio / PnL Core | 88–95 | `PORTFOLIO_ACCOUNTING` |
+| V10 | Research OS | 96–102 | `RESEARCH_GOVERNANCE_ONLY` |
+| V11 | News / AI / Event Context | 103–110 | `READ_ONLY_CONTEXT_ONLY` |
+| V12 | UI / Operator Console | 111–118 | `OPERATOR_UI` |
+| V13 | API Read-Only / Account Read-Only | 119–125 | `READ_ONLY` |
+| V14 | Exchange Risk / API Health | 126–132 | `EXCHANGE_HEALTH_ONLY` |
+| V15 | OMS / EMS Core | 133–141 | `ORDER_MANAGEMENT_CORE` |
+| V16 | Sandbox / Demo Execution | 142–149 | `SANDBOX` |
+| V17 | Live Governance / Human Approval | 150–157 | `LIVE_DISABLED_BY_DEFAULT` |
+| V18 | Observability / Incident Response | 158–165 | `OPERATIONS_GOVERNANCE` |
+| V19 | HFT Research | 166–171 | `HFT_RESEARCH_ONLY` |
+| V20 | Options Context | 172–174 | `OPTIONS_CONTEXT_ONLY` |
+| V21 | On-chain / Flow Intelligence | 175–177 | `ONCHAIN_CONTEXT_ONLY` |
 
-## Documents détaillés par version
+## Spécifications détaillées
 
 - [V1 — Defensive Audit / No Trading](roadmap/V01_DEFENSIVE_AUDIT_NO_TRADING.md) — Lots 0 à 20
 - [V2 — Market Analysis Offline](roadmap/V02_MARKET_ANALYSIS_OFFLINE.md) — Lots 21 à 30
@@ -82,16 +81,9 @@ Stratégie validée ≠ autorisation live
 - [V20 — Options Context](roadmap/V20_OPTIONS_CONTEXT.md) — Lots 172 à 174
 - [V21 — On-chain / Flow Intelligence](roadmap/V21_ON_CHAIN_FLOW_INTELLIGENCE.md) — Lots 175 à 177
 
-## Registres associés
-
-- `data/audit/product_scope_roadmap_lot21.jsonl` : registre machine-readable détaillé des Lots 0 à 177.
-- `docs/FUNCTIONAL_COVERAGE_REGISTRY.md` : couverture des capabilities et gates par version.
-- `docs/ROADMAP_MIGRATION_AND_GOVERNANCE.md` : règles de migration depuis l’ancienne roadmap.
-- `docs/LOT_SPECIFICATION_STANDARD.md` : structure obligatoire des futurs lots.
-
 ## Règles de modification
 
-1. Ne jamais renuméroter un lot déjà implémenté.
-2. Toute modification de scope doit mettre à jour simultanément le document de version, le registre JSONL et le registre fonctionnel.
-3. Tout lot activé doit obtenir un document d’acceptation dédié et un rapport PASS.
-4. Les versions optionnelles V19–V21 ne peuvent pas contourner les gates des versions V6–V18.
+1. Ne jamais renuméroter un lot implémenté.
+2. Toute modification met à jour roadmap, version, registry, contrats et validation report.
+3. Aucun lot suivant sans rapport PASS et gate humain.
+4. HFT/options/on-chain ne contournent jamais le core.

@@ -2,38 +2,34 @@
 
 ## But
 
-Normaliser l’ancienne roadmap V2+ limitée à V11 / Lot 147 en une roadmap canonique **V1 à V21 / Lots 0 à 177**, sans perdre l’historique d’audit.
+Normaliser l’ancienne projection V2→V11 / Lots 22→147 en V1→V21 / Lots 0→177 tout en préservant les contrats historiques du projet.
 
-## Règles de migration
+## Préservation
 
-- Les Lots 0 à 25 conservent leurs numéros, statuts et artefacts existants.
-- Le Lot 26 reste le prochain lot réel.
-- Les anciens work packages génériques Lots 26 à 147 sont remplacés par des spécifications fonctionnelles détaillées.
-- Les suffixes `bis`, `ter`, `quater`, etc. restent des correctifs historiques et ne sont pas convertis en lots principaux.
-- Les anciens documents ne sont pas supprimés s’ils constituent une preuve d’audit ; ils sont marqués comme historiques lorsque nécessaire.
-- La roadmap canonique est `docs/ROADMAP_V1_TO_V21.md`.
-- Les documents `docs/roadmap/Vxx_*.md` sont les spécifications détaillées.
-- Le registre JSONL est généré depuis la même structure logique.
+- Lots 0–25, correctifs bis/ter/quater, rapports et archives restent des preuves primaires.
+- Lot 25 reste dernier lot validé ; Lot 26 reste prochain lot.
+- Le périmètre initial BTC/EUR spot, Kraken de référence, no leverage, no withdrawal et live disabled est conservé.
+- Les anciens contrats décision, veto, ledger/reconciliation, exchange constraints, incident response et seuils historiques sont réintégrés dans les documents canoniques.
 
-## Corrections architecturales intégrées
+## Correspondance des anciennes phases
 
-1. **Data Governance** devient une version complète avant la microstructure.
-2. **Signal / Trade Intent / Order Intent** devient une frontière explicite.
-3. **TCA** est intégrée au backtesting avant l’EV finale.
-4. **Model Risk, Sizing et Risk Approval** précèdent le paper trading.
-5. **PnL Core** est unique et réutilisé par paper, sandbox et live.
-6. **OMS / EMS** précède le sandbox.
-7. **Exchange Risk** est séparé du simple connecteur read-only.
-8. **Observability / Incident Response / Disaster Recovery** devient une version dédiée.
-9. **HFT** reste research-only.
-10. **Options et On-chain** sont des extensions contextuelles optionnelles.
+| Ancienne projection | Nouvelle architecture |
+|---|---|
+| V2 Market Analysis 22–30 | V2 21–30 |
+| V3 Microstructure/Scenarios 31–55 | V3 Data Governance 31–36 + V4 37–52 + V5 53–59 |
+| V4 EV/Backtesting 56–66 | V6 60–71 avec TCA intégrée |
+| V5 Paper 67–76 | V8 81–87 + V9 Portfolio/PnL 88–95 |
+| V6 Research OS 77–87 | V10 96–102 |
+| V7 News/AI 88–101 | V11 103–110 |
+| V8 UI 102–114 | V12 111–118 |
+| V9 Account read-only 115–124 | V13 119–125 |
+| V10 Sandbox 125–135 | V15 OMS/EMS 133–141 puis V16 Sandbox 142–149 |
+| V11 Live Governance 136–147 | V17 150–157 + V18 158–165 |
 
-## Synchronisation obligatoire
+## Corrections architecturales
 
-Toute modification future doit mettre à jour :
+Data governance avant microstructure ; Signal/TradeIntent/OrderIntent séparés ; TCA au cœur du backtest ; OMS/EMS avant sandbox ; PnL Core unique ; risk/strategy promotion gates ; runtime/config/release/rollback/DR explicites ; HFT research-only ; options/on-chain optionnels.
 
-- le document de version ;
-- le registre machine-readable ;
-- le registre fonctionnel ;
-- le document d’acceptation du lot concerné ;
-- le rapport de validation lors de l’implémentation.
+## Synchronisation
+
+Toute évolution met à jour document de version, registre JSONL, functional registry, contrats transverses, acceptance criteria et rapport de validation.
