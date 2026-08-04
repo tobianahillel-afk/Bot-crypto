@@ -117,7 +117,7 @@ def test_release_checksum_paths_and_catalog_helpers(tmp_path: Path) -> None:
         )
     ]
     assert candidate._validate_catalog(catalog) == (True, [])
-    invalid = catalog + [dict(catalog[0])]
+    invalid = [*catalog, dict(catalog[0])]
     valid, errors = candidate._validate_catalog(invalid)
     assert not valid
     assert "dataset_catalog duplicate dataset_id" in errors
