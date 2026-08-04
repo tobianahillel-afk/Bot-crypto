@@ -1,0 +1,129 @@
+{
+  "project": "Crypto Quant Bot V3.1-Ops",
+  "audit_date": "2026-08-04",
+  "current_implemented_lot": 25,
+  "next_lot": 26,
+  "overall_verdict": {
+    "offline_research_continuation": "CONDITIONAL_GO",
+    "alpha_promotion": "NO_GO",
+    "paper_trading": "NO_GO",
+    "sandbox_execution": "NO_GO",
+    "real_capital": "NO_GO"
+  },
+  "evidence_boundary": "Assessment is limited to repository code, documents, reports and CI evidence available on main at audit time.",
+  "gaps": [
+    {
+      "id": "INST-P0-001",
+      "severity": "BLOCKER_BEFORE_INSTITUTIONAL_VALIDATION",
+      "domain": "software_quality",
+      "title": "No general code CI enforcing the documented quality gates",
+      "evidence": [
+        "The visible workflow validates roadmap documentation only.",
+        "pytest configuration disables the coverage plugin.",
+        "No demonstrated CI command for ruff, mypy, branch coverage or mutation testing."
+      ],
+      "required_action": "Create a code-quality CI pipeline covering compile, full pytest suites, line/branch coverage, lint, typing, architecture checks and security checks.",
+      "gate": "Required before claiming compliance with the 90 percent standard."
+    },
+    {
+      "id": "INST-P0-002",
+      "severity": "MAJOR",
+      "domain": "project_metadata",
+      "title": "Project metadata is stale",
+      "evidence": [
+        "pyproject version and description still identify Lot 10 although Lot 25 is validated."
+      ],
+      "required_action": "Update metadata through a governed compatibility change without changing project identity.",
+      "gate": "Required before the next release artifact."
+    },
+    {
+      "id": "INST-P0-003",
+      "severity": "MAJOR",
+      "domain": "data_validation",
+      "title": "Invalid numeric inputs can be converted silently to zero",
+      "evidence": [
+        "Market-analysis helpers use fallback conversion to 0.0 for non-numeric values."
+      ],
+      "required_action": "Replace permissive conversion at critical boundaries by explicit validation states and fail-closed reason codes.",
+      "gate": "Required before data-governance closure and before any strategy label generation."
+    },
+    {
+      "id": "INST-P0-004",
+      "severity": "MAJOR",
+      "domain": "mathematical_validation",
+      "title": "Thresholds and score normalizations are heuristic and uncalibrated",
+      "evidence": [
+        "Trend, range, momentum, volatility and confluence engines contain fixed thresholds and manually selected denominators.",
+        "No uncertainty interval, sensitivity report or out-of-sample calibration is currently demonstrated."
+      ],
+      "required_action": "Mark thresholds as provisional, move them to versioned configuration and require sensitivity, ablation, calibration and OOS evidence before alpha use.",
+      "gate": "Does not block descriptive Lot 26; blocks alpha promotion."
+    },
+    {
+      "id": "INST-P0-005",
+      "severity": "MAJOR",
+      "domain": "quant_research",
+      "title": "No demonstrated alpha or economic rationale",
+      "evidence": [
+        "Current outputs are descriptive context states and explicitly non-executable."
+      ],
+      "required_action": "Introduce falsifiable alpha hypotheses, payer-of-alpha rationale, labels, baselines and retirement conditions in the dedicated research phase.",
+      "gate": "Blocks paper trading."
+    },
+    {
+      "id": "INST-P1-001",
+      "severity": "MAJOR",
+      "domain": "statistical_validation",
+      "title": "No implemented institutional validation stack",
+      "evidence": [
+        "Walk-forward, purged CV, embargo, multiple-testing control, PBO and deflated performance metrics are planned but not implemented."
+      ],
+      "required_action": "Implement the full validation stack before strategy promotion.",
+      "gate": "Blocks validated-alpha status."
+    },
+    {
+      "id": "INST-P1-002",
+      "severity": "MAJOR",
+      "domain": "transaction_costs_capacity",
+      "title": "No calibrated venue-level capacity and execution-cost proof",
+      "evidence": [
+        "Lot 10 provides a defensive transaction-cost foundation, not a venue-calibrated fill/impact/queue model."
+      ],
+      "required_action": "Calibrate fees, spreads, slippage, market impact, queue/fill probability and capacity by venue and regime.",
+      "gate": "Blocks realistic backtest promotion."
+    },
+    {
+      "id": "INST-P1-003",
+      "severity": "MAJOR",
+      "domain": "portfolio_risk",
+      "title": "Portfolio and active risk stack are not implemented",
+      "evidence": [
+        "Sizing, risk budgets, factor exposure, stressed correlation, PnL accounting and portfolio reconciliation remain roadmap capabilities."
+      ],
+      "required_action": "Implement independently validated sizing, exposure, portfolio and accounting domains before sandbox/live.",
+      "gate": "Blocks sandbox and live."
+    },
+    {
+      "id": "INST-P1-004",
+      "severity": "BLOCKER_BEFORE_EXECUTION",
+      "domain": "execution_operations",
+      "title": "OMS, EMS, account reconciliation and production operations are not implemented",
+      "evidence": [
+        "The roadmap specifies these domains, but current implementation intentionally ends at descriptive market analysis."
+      ],
+      "required_action": "Implement and fault-test OMS/EMS, idempotency, partial fills, recovery, exchange health, reconciliation, incident response and kill-switch drills.",
+      "gate": "Blocks every real order path."
+    }
+  ],
+  "next_gate": {
+    "name": "PRE_LOT26_INSTITUTIONAL_REMEDIATION_GATE",
+    "verdict": "CONDITIONAL_GO",
+    "conditions": [
+      "Lot 26 remains offline and descriptive.",
+      "No score is labelled probability or alpha without calibration.",
+      "The code-CI and actual coverage baseline are created as a cross-cutting P0 action.",
+      "Heuristic thresholds are documented as provisional and versioned.",
+      "No paper, sandbox or live capability is unlocked."
+    ]
+  }
+}
