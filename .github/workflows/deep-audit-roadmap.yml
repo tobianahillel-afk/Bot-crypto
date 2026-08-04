@@ -78,7 +78,7 @@ jobs:
               'responsible_component', 'package_boundary', 'runtime_mode',
               'responsibility', 'input_contracts', 'output_contracts',
               'processing_sequence', 'domain_rules', 'failure_modes',
-              'observability', 'implementation_files', 'tests',
+              'observability', 'implementation_files', 'acceptance_tests',
               'non_goals', 'definition_of_done'
           }
           for row in rows[26:]:
@@ -88,7 +88,7 @@ jobs:
               assert len(row['processing_sequence']) >= 4, row['lot_number']
               assert len(row['failure_modes']) >= 3, row['lot_number']
               assert len(row['implementation_files']) >= 4, row['lot_number']
-              assert len(row['tests']) >= 4, row['lot_number']
+              assert len(row['acceptance_tests']) >= 6, row['lot_number']
               assert len(row['non_goals']) >= 2, row['lot_number']
 
           version_docs = sorted(Path('docs/roadmap').glob('V*.md'))
