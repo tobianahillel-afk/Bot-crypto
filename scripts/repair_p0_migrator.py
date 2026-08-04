@@ -44,10 +44,16 @@ def main() -> int:
         '            print("\\\\n".join(violations))',
         2,
     )
+    text = replace_exact(
+        text,
+        '    do_not_mutate_patterns = ["raise \\\\w+", "logger\\\\.\\\\w+"]',
+        "    do_not_mutate_patterns = ['raise \\\\w+', 'logger\\\\.\\\\w+']",
+        1,
+    )
 
     MIGRATOR.write_text(text, encoding="utf-8")
     Path(__file__).unlink()
-    print("P0_MIGRATOR_BOUNDARIES_AND_ESCAPES_REPAIRED")
+    print("P0_MIGRATOR_BOUNDARIES_ESCAPES_AND_TOML_REPAIRED")
     return 0
 
 
