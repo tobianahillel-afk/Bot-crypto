@@ -72,6 +72,12 @@ jobs:
           mv /tmp/p06-historical-coverage .coverage
       - name: Verify clean workspace after historical replay
         run: git diff --exit-code && test -z "$(git status --porcelain)"
+      - name: Rebuild non-mutating quality inventories
+        shell: bash
+        run: |
+          mkdir -p reports/quality
+          ruff check src scripts tests --output-format=json > reports/quality/ruff_legacy_inventory.json || true
+          python scripts/quality_inventory.py
       - name: Full tests with accumulated line and branch coverage
         run: pytest -q --cov --cov-branch --cov-append --cov-report=term-missing --cov-report=xml:coverage.xml --cov-report=json:coverage.json
       - name: P0 numerical core coverage gate
@@ -81,12 +87,7 @@ jobs:
         run: |
           mkdir -p reports/quality
           git fetch origin main
-          if git cat-file -e origin/main:reports/P0_INSTITUTIONAL_HARDENING_REPORT.md 2>/dev/null; then
-            diff-cover coverage.xml --compare-branch=origin/main --fail-under=90 --html-report reports/quality/diff_coverage.html
-          else
-            echo 'Initial P0 migration: recording historical differential coverage before the permanent 90% gate becomes active.'
-            diff-cover coverage.xml --compare-branch=origin/main --fail-under=0 --html-report reports/quality/diff_coverage.html
-          fi
+          diff-cover coverage.xml --compare-branch=origin/main --fail-under=90 --html-report reports/quality/diff_coverage.html
       - name: Static security scan
         run: bandit -q -r src -ll
       - name: Dependency vulnerability scan
@@ -121,13 +122,17 @@ jobs:
           )
           if not matches:
               raise SystemExit('MUTATION_SCORE_PARSE_ERROR: no mutmut summary found')
-          killed, timeout, suspicious, survived = map(int, matches[-1])
+          killed = sum(int(item[0]) for item in matches)
+          timeout = sum(int(item[1]) for item in matches)
+          suspicious = sum(int(item[2]) for item in matches)
+          survived = sum(int(item[3]) for item in matches)
           total = killed + timeout + suspicious + survived
           if total <= 0:
               raise SystemExit('MUTATION_SCORE_INVALID: no evaluated mutants')
           score = 100.0 * (killed + timeout) / total
           payload = {
               'schema_version': 'mutation-score-v1',
+              'summaries_aggregated': len(matches),
               'killed': killed,
               'timeout': timeout,
               'suspicious': suspicious,
