@@ -8,11 +8,13 @@ Un lot n'est pas validé parce que son scénario nominal passe. Il est validé s
 
 ## 2. Couverture minimale obligatoire
 
-Pour tout nouveau lot ou correctif :
+Pour tout nouveau lot ou correctif, la dette historique ne peut plus être masquée par une couverture différentielle seule :
 
 ```text
-line coverage global du code ajouté/modifié >= 90 %
-branch coverage global du code ajouté/modifié >= 85 %
+line coverage globale du package runtime >= 90 %
+branch coverage globale du package runtime >= 85 %
+line coverage du code ajouté/modifié >= 90 %
+branch coverage du code ajouté/modifié >= 85 %
 line coverage des modules critiques >= 95 %
 branch coverage des modules critiques >= 90 %
 mutation score des modules mathématiques/risque/exécution >= 80 %

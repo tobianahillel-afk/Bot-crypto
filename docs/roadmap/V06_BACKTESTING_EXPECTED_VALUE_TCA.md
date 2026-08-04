@@ -264,13 +264,13 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 
 - RunContextV1 (run_id, runtime_mode, config_version, code_commit, correlation_id)
 - LineageEnvelopeV1 des artefacts produits par les lots préalables
+- BookFeatureStateV1 produit par V4
+- DerivativesContextStateV1 produit par V4
 
 ### Contrats de sortie
 
 - FeesFundingSpreadCostModelStateV1
 - FeesFundingSpreadCostModelAuditV1
-- BookFeatureStateV1
-- DerivativesContextStateV1
 - TransactionCostStateV1
 
 ### Séquence de traitement obligatoire
@@ -279,17 +279,12 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 2. Exécuter la responsabilité « Fees, Funding & Spread Cost Model » dans le composant BacktestDomain sans effet de bord non déclaré.
 3. Associer à chaque résultat les identifiants de données, features, modèle, configuration, code et replay.
 4. Persister état, reason_codes, incertitude, veto éventuel, métriques et checksum par écriture atomique.
-5. Calculer spread absolu/bps, mid, microprice, depth par bande bps et cumulative depth.
-6. Calculer imbalance symétrique avec gestion du dénominateur nul.
-7. Publier valeurs par horizon/niveau et qualité du book.
-8. Ne pas extrapoler au-delà de la profondeur observée.
-9. Normaliser OI, funding, mark/index, basis et liquidations par venue/contrat.
-10. Aligner publication/effective_time et gérer révisions.
-11. Calculer crowding, leverage build-up, squeeze/liquidation risk comme contexte probabiliste.
-12. Interdire l’usage si spot/perp mapping ou notionals ne sont pas comparables.
-13. Modéliser maker/taker fee, fee tier, spread crossing, funding et settlement cashflows.
-14. Appliquer devise de frais et conversion FX versionnée.
-15. Refuser coût nul par défaut lorsque donnée absente ; utiliser conservative fallback explicite.
+5. Valider IDs, checksums, fraîcheur et compatibilité des états V4 consommés sans recalculer leur microstructure.
+6. Modéliser maker/taker fee, fee tier, spread crossing, funding et settlement cashflows.
+7. Aligner publication/effective_time du funding et gérer les révisions.
+8. Appliquer devise de frais et conversion FX versionnée.
+9. Refuser coût nul par défaut lorsque donnée absente ; utiliser un fallback conservateur explicite.
+10. Publier chaque composante de coût, sa provenance, son incertitude et le coût total réconcilié.
 
 ### Règles métier et algorithmiques
 
@@ -333,12 +328,12 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 - Test anti-lookahead ou anti-future-state adapté au domaine.
 - Test de sérialisation/désérialisation du contrat de sortie.
 - Test d’intégration avec le lot précédent et le gate suivant.
-- Book vide/unilatéral.
-- Invariance à l’unité de cotation et contrôle des bornes.
+- États V4 absents, stale ou incompatibles bloquent le coût.
+- Le Lot 62 ne produit aucun BookFeatureStateV1 ni DerivativesContextStateV1.
 - Funding publication vs effective time.
-- OI change sans prix/volume ne produit pas de scénario certain.
 - Maker/taker et devise de frais.
 - Funding multi-périodes et signe long/short.
+- Somme des composantes = coût total selon tolérance versionnée.
 
 ### Non-objectifs
 

@@ -48,17 +48,23 @@ python -m compileall -q src scripts tests
 ruff check <fichiers modifiés>
 mypy src/crypto_quant_bot
 python scripts/validate_architecture_boundaries.py
+python scripts/validate_domain_architecture.py
+python scripts/audit_roadmap_semantics.py
+python scripts/validate_traceability_contract.py
 python scripts/check_no_silent_numeric_coercion.py
 python scripts/validate_roadmap_documentation.py
 python scripts/validate_pre_lot26_readiness.py
-pytest -q --cov --cov-branch
+pytest -q --cov --cov-branch --cov-report=json:coverage.json
+python scripts/validate_global_coverage.py
 ```
 
-Nouveau code :
+Dépôt et nouveau code :
 
 ```text
-line coverage >= 90 %
-branch coverage >= 85 %
+line coverage globale runtime >= 90 %
+branch coverage globale runtime >= 85 %
+line coverage du code modifié >= 90 %
+branch coverage du code modifié >= 85 %
 module critique : line >= 95 %, branch >= 90 %
 mutation score critique >= 80 %
 ```

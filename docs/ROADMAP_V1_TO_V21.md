@@ -6,7 +6,7 @@ Projet : **Crypto Quant Bot V3.1-Ops**
 
 - Dernier lot implémenté et validé : **Lot 25**.
 - Baseline P0 institutionnelle : fusionnée.
-- Préparation Lot 26 : contrats, architecture temporelle et gate en revue.
+- Préparation Lot 26 : architecture fusionnée ; le gate transversal P0.6 est actif avant démarrage.
 - Lot 26 : `PLANNED_LOCKED`, aucune implémentation métier.
 - Lots 26–177 : planifiés et verrouillés.
 - Recherche offline : `CONDITIONAL_GO`.
@@ -29,6 +29,9 @@ Projet : **Crypto Quant Bot V3.1-Ops**
 - [Development Engineering Standard](DEVELOPMENT_ENGINEERING_STANDARD.md)
 - [Decision Auditability and Traceability](DECISION_AUDITABILITY_AND_TRACEABILITY_STANDARD.md)
 - [Lot Final Audit and GO / NO-GO Gate](LOT_FINAL_AUDIT_AND_GO_NO_GO_GATE.md)
+- [Capability and Contract Ownership Registry](CAPABILITY_AND_CONTRACT_OWNERSHIP_REGISTRY.md)
+- [Model Retraining and Promotion Policy](MODEL_RETRAINING_AND_PROMOTION_POLICY.md)
+- [Economic Objective and Risk Utility Policy](ECONOMIC_OBJECTIVE_AND_RISK_UTILITY_POLICY.md)
 
 ## Architecture quantitative multi-échelle
 
@@ -57,6 +60,8 @@ Ces documents sont normatifs pour les lots futurs. Ils n'indiquent pas que les c
 - Temporal scale registry: `config/temporal/temporal_scale_registry_v1.json`
 - Decision clock policy: `config/temporal/decision_clock_policy_v1.json`
 - Forecast horizon registry: `config/research/forecast_horizon_registry_v1.json`
+- Domain ownership registry: `config/governance/domain_ownership_registry_v1.json`
+- Decision evidence schema: `contracts/schemas/decision_evidence_envelope_v1.schema.json`
 
 ## Principe de séparation
 

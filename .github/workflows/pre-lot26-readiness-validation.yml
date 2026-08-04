@@ -69,6 +69,12 @@ jobs:
 
       - name: Validate canonical roadmap
         run: python scripts/validate_roadmap_documentation.py
+      - name: Validate semantic roadmap ownership
+        run: python scripts/audit_roadmap_semantics.py
+      - name: Validate all domain boundaries
+        run: python scripts/validate_domain_architecture.py
+      - name: Validate mandatory decision traceability
+        run: python scripts/validate_traceability_contract.py
 
       - name: Run readiness tests
         run: pytest -q tests/test_pre_lot26_readiness.py

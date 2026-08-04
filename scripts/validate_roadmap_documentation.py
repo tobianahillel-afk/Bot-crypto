@@ -64,6 +64,9 @@ REQUIRED_ARCHITECTURE_DOCS = [
     "MATHEMATICAL_MODELING_AND_NUMERICAL_VALIDATION_STANDARD.md",
     "DEVELOPMENT_ENGINEERING_STANDARD.md",
     "DECISION_AUDITABILITY_AND_TRACEABILITY_STANDARD.md",
+    "CAPABILITY_AND_CONTRACT_OWNERSHIP_REGISTRY.md",
+    "MODEL_RETRAINING_AND_PROMOTION_POLICY.md",
+    "ECONOMIC_OBJECTIVE_AND_RISK_UTILITY_POLICY.md",
     "LOT_FINAL_AUDIT_AND_GO_NO_GO_GATE.md",
     "TEMPORAL_MULTI_SCALE_AND_DECISION_CLOCK_ARCHITECTURE.md",
     "STOCHASTIC_CONTINUOUS_STATE_AND_MULTI_HORIZON_FORECASTING_STANDARD.md",
@@ -221,7 +224,8 @@ def validate_quality_standards() -> None:
     require_terms(
         "TEST_STRATEGY_COVERAGE_AND_QUALITY_GATES.md",
         [
-            "line coverage global du code ajouté/modifié >= 90 %",
+            "line coverage globale du package runtime >= 90 %",
+            "branch coverage globale du package runtime >= 85 %",
             "branch coverage",
             "mutation score",
             "Non-Regression Test Suite",

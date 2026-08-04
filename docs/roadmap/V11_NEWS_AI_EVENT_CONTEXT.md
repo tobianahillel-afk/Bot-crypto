@@ -263,8 +263,6 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 - NewsIngestionReadOnlyAuditV1
 - EventContextV1
 - SourceReliabilityStateV1
-- ReadOnlyAccountSnapshotV1
-- PermissionAuditV1
 
 ### Séquence de traitement obligatoire
 
@@ -276,10 +274,8 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 6. Séparer extraction factuelle, classification, scoring et explanation.
 7. Attribuer reliability/coverage et citer les source records.
 8. Le contexte peut réduire/bloquer le risque mais jamais augmenter seul size ou créer signal.
-9. Autoriser uniquement endpoints GET/read ; bloquer au code et à la permission toute écriture/trade/withdrawal.
-10. Paginer et dédupliquer histories via IDs venue.
-11. Conserver request_time, venue_time, cursor et completeness.
-12. Scanner permissions et faire échouer si trading/withdrawal présent.
+9. Utiliser uniquement des sources de news/événements enregistrées et des adapters contextuels read-only.
+10. Ne produire aucun snapshot de compte, permission audit ou historique exchange appartenant à V13.
 
 ### Règles métier et algorithmiques
 
@@ -325,9 +321,8 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 - Article publié après decision_time non visible.
 - LLM output sans source reference rejeté.
 - Prompt injection ne modifie aucun state exécutable.
-- Mock POST/DELETE interdit.
-- Clé avec withdrawal fait échouer startup.
-- Pagination duplicate/missing page.
+- Aucun ReadOnlyAccountSnapshotV1 ou PermissionAuditV1 produit.
+- Aucune dépendance vers les connecteurs compte/exchange de V13.
 
 ### Non-objectifs
 
