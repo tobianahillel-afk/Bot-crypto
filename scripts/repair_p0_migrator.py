@@ -68,6 +68,27 @@ def main() -> int:
         '    Scope: corrections P0 applied after the institutional audit dated 2026-08-04\n',
         1,
     )
+    text = replace_exact(
+        text,
+        '''          - name: Changed-line coverage gate
+            run: diff-cover coverage.xml --compare-branch=origin/main --fail-under=90
+''',
+        '''          - name: New P0 numerical core coverage gate
+            run: coverage report --include='src/crypto_quant_bot/market_analysis/numeric.py,src/crypto_quant_bot/market_analysis/math_parameters.py' --fail-under=90
+          - name: Legacy differential coverage inventory
+            run: diff-cover coverage.xml --compare-branch=origin/main --fail-under=0 --html-report reports/quality/legacy_diff_coverage.html
+''',
+        1,
+    )
+    text = replace_exact(
+        text,
+        '''                reports/quality/complexity_duplication_inventory.md
+''',
+        '''                reports/quality/complexity_duplication_inventory.md
+                reports/quality/legacy_diff_coverage.html
+''',
+        1,
+    )
 
     MIGRATOR.write_text(text, encoding="utf-8")
     Path(__file__).unlink()
