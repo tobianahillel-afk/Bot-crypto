@@ -134,7 +134,6 @@ def validate_architecture_documents() -> None:
         "runtime_mode = live_disabled",
         "btc/eur",
         "kraken",
-        "leverage",
         "withdrawals",
         "risk approval",
         "order intent",
@@ -142,6 +141,8 @@ def validate_architecture_documents() -> None:
         "pas de hft live",
     ]:
         require(term in master, f"Master specification missing: {term}")
+    require("levier" in master or "leverage" in master, "Master specification missing leverage prohibition")
+    require("forbidden" in master, "Master specification missing explicit forbidden state")
 
     execution = (DOCS / "SYSTEM_EXECUTION_ARCHITECTURE.md").read_text(encoding="utf-8").casefold()
     for term in [
