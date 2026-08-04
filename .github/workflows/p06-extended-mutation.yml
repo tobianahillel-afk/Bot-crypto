@@ -79,7 +79,7 @@ jobs:
         shell: bash
         run: |
           rm -rf mutants reports/quality/p06_extended_mutation
-          mkdir -p reports/quality/p06_extended_mutation
+          mkdir -p mutants/config/math reports/quality/p06_extended_mutation
           set -o pipefail
           mutmut run 2>&1 | tee reports/quality/p06_extended_mutation/run.txt
           mutmut results 2>&1 | tee reports/quality/p06_extended_mutation/results.txt
