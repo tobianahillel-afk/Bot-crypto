@@ -264,7 +264,7 @@ EXPECTED_LOT17_IDS = {
     "health_monitor_lot17",
     "health_checks_lot17",
 }
-COMPLIANCE_INVARIANTS = {
+COMPLIANCE_INVARIANTS: dict[str, str | bool | int] = {
     "TradingDecision": "WAIT",
     "SystemDecision": "BLOCK_TRADING",
     "final_decision": "WAIT",

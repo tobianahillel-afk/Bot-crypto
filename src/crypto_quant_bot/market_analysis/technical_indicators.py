@@ -12,7 +12,6 @@ from crypto_quant_bot.market_analysis.foundation import (
     ANALYSIS_INVARIANTS,
     ARCHIVE_OUTPUT_PATH,
     ARCHIVE_SHA256_OUTPUT_PATH,
-    DATASET_CATALOG_PATH,
     INPUT_SPECS,
     LOT20_OUTPUT_PATH,
     LOT21_FREEZE_REPORT_PATH,
@@ -21,7 +20,6 @@ from crypto_quant_bot.market_analysis.foundation import (
     LOT22_TIMEFRAMES_OUTPUT_PATH,
 )
 from crypto_quant_bot.market_analysis.indicator_models import (
-    ALLOWED_INDICATOR_STATES,
     DEFAULT_INDICATOR_BLOCK_REASONS,
     REQUIRED_INDICATOR_SET,
     IndicatorCheck,
@@ -31,6 +29,8 @@ from crypto_quant_bot.market_analysis.indicator_models import (
     TechnicalIndicatorTimeframeSummary,
 )
 from crypto_quant_bot.market_analysis.io import load_json, load_jsonl, read_text_limited
+from crypto_quant_bot.market_analysis.math_parameters import INDICATOR_PARAMETERS
+from crypto_quant_bot.market_analysis.numeric import require_finite_float
 
 LOT23_OUTPUT_PATH = "data/audit/technical_indicators_lot23.json"
 LOT23_TIMEFRAMES_OUTPUT_PATH = "data/audit/technical_indicators_timeframes_lot23.jsonl"
@@ -105,10 +105,9 @@ def _round6(value: float | None) -> float | None:
     return round(float(value), 6)
 
 
-def _as_float(value: Any) -> float:
-    if isinstance(value, (int, float)):
-        return float(value)
-    return 0.0
+
+def _as_float(value: Any, *, field_name: str = "numeric_value") -> float:
+    return require_finite_float(value, field_name=field_name)
 
 
 def _validate_frozen_archive(root: Path, *, product_scope: dict[str, Any], closure_snapshot: dict[str, Any]) -> tuple[str, int]:
@@ -206,8 +205,8 @@ def _bollinger(values: list[float], period: int) -> tuple[float | None, float | 
     sample = values[-period:]
     mid = mean(sample)
     deviation = pstdev(sample)
-    upper = mid + (2.0 * deviation)
-    lower = mid - (2.0 * deviation)
+    upper = mid + (float(INDICATOR_PARAMETERS["bollinger_stddev_multiplier"]) * deviation)
+    lower = mid - (float(INDICATOR_PARAMETERS["bollinger_stddev_multiplier"]) * deviation)
     width = ((upper - lower) / mid) * 100.0 if mid else 0.0
     return mid, upper, lower, width
 
@@ -257,10 +256,10 @@ def _rate_of_change(values: list[float], period: int) -> float | None:
 def _macd(values: list[float]) -> tuple[float | None, float | None, float | None]:
     if len(values) < 6:
         return None, None, None
-    fast_series = _ema_series(values, 3)
-    slow_series = _ema_series(values, 6)
+    fast_series = _ema_series(values, int(INDICATOR_PARAMETERS["short_period"]))
+    slow_series = _ema_series(values, int(INDICATOR_PARAMETERS["long_period"]))
     macd_series = [fast_value - slow_value for fast_value, slow_value in zip(fast_series, slow_series)]
-    signal_series = _ema_series(macd_series, 3)
+    signal_series = _ema_series(macd_series, int(INDICATOR_PARAMETERS["signal_period"]))
     if not macd_series or not signal_series:
         return None, None, None
     macd_value = macd_series[-1]
@@ -284,25 +283,25 @@ def _indicator_map(candles: list[dict[str, Any]]) -> dict[str, float | None]:
     lows = [_as_float(row.get("low")) for row in candles]
     close_last = closes[-1] if closes else 0.0
 
-    sma_3 = _sma(closes, 3)
-    sma_5 = _sma(closes, 5)
-    ema_3_series = _ema_series(closes, 3)
-    ema_5_series = _ema_series(closes, 5)
+    sma_3 = _sma(closes, int(INDICATOR_PARAMETERS["short_period"]))
+    sma_5 = _sma(closes, int(INDICATOR_PARAMETERS["medium_period"]))
+    ema_3_series = _ema_series(closes, int(INDICATOR_PARAMETERS["short_period"]))
+    ema_5_series = _ema_series(closes, int(INDICATOR_PARAMETERS["medium_period"]))
     ema_3 = ema_3_series[-1] if len(ema_3_series) >= 3 else None
     ema_5 = ema_5_series[-1] if len(ema_5_series) >= 5 else None
-    rolling_high_5 = _rolling_high(highs, 5)
-    rolling_low_5 = _rolling_low(lows, 5)
-    rolling_range_5 = _rolling_range(highs, lows, 5)
+    rolling_high_5 = _rolling_high(highs, int(INDICATOR_PARAMETERS["medium_period"]))
+    rolling_low_5 = _rolling_low(lows, int(INDICATOR_PARAMETERS["medium_period"]))
+    rolling_range_5 = _rolling_range(highs, lows, int(INDICATOR_PARAMETERS["medium_period"]))
     close_vs_sma_5_percent = _percent_distance(sma_5, close_last)
     close_vs_ema_5_percent = _percent_distance(ema_5, close_last)
-    rsi_5 = _rsi(closes, 5)
+    rsi_5 = _rsi(closes, int(INDICATOR_PARAMETERS["medium_period"]))
     macd_fast_3_slow_6, macd_signal_3, macd_histogram = _macd(closes)
-    bollinger_mid_5, bollinger_upper_5, bollinger_lower_5, bollinger_width_5 = _bollinger(closes, 5)
+    bollinger_mid_5, bollinger_upper_5, bollinger_lower_5, bollinger_width_5 = _bollinger(closes, int(INDICATOR_PARAMETERS["medium_period"]))
     true_range_series = _true_range_series(candles)
     true_range = true_range_series[-1] if true_range_series else None
-    atr_5 = _atr(candles, 5)
-    momentum_3 = _momentum(closes, 3)
-    rate_of_change_3 = _rate_of_change(closes, 3)
+    atr_5 = _atr(candles, int(INDICATOR_PARAMETERS["medium_period"]))
+    momentum_3 = _momentum(closes, int(INDICATOR_PARAMETERS["short_period"]))
+    rate_of_change_3 = _rate_of_change(closes, int(INDICATOR_PARAMETERS["short_period"]))
 
     return {
         "sma_3": sma_3,
@@ -514,7 +513,7 @@ def _build_timeframe_summary(
             market_context_state="CONTEXT_INSUFFICIENT_DATA",
             market_context_score=0.0,
             indicator_count=len(REQUIRED_INDICATOR_SET),
-            indicator_values=_indicator_values_from_map({indicator_id: None for indicator_id in REQUIRED_INDICATOR_SET}),
+            indicator_values=_indicator_values_from_map(dict.fromkeys(REQUIRED_INDICATOR_SET)),
             indicator_state="INDICATOR_INSUFFICIENT_DATA",
             indicator_context_score=0.0,
             non_executable_summary="Insufficient local data; execution remains blocked and no decision layer is active.",

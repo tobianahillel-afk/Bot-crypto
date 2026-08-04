@@ -8,7 +8,11 @@ from typing import Any
 
 from crypto_quant_bot.compliance import DEFAULT_COMPLIANCE_BLOCK_REASONS, build_compliance_checksum
 from crypto_quant_bot.core.clock import utc_now_iso
-from crypto_quant_bot.health import DEFAULT_HEALTH_BLOCK_REASONS, build_dataset_catalog_checksum, build_health_checksum
+from crypto_quant_bot.health import (
+    DEFAULT_HEALTH_BLOCK_REASONS,
+    build_dataset_catalog_checksum,
+    build_health_checksum,
+)
 from crypto_quant_bot.lineage import build_manifest_checksum, build_source_catalog_checksum
 from crypto_quant_bot.release.io import count_lines, load_json, load_jsonl, read_text_limited
 from crypto_quant_bot.release.models import (
@@ -282,7 +286,7 @@ EXPECTED_LOT18_IDS = {
     "no_trading_compliance_checks_lot18",
 }
 
-RELEASE_INVARIANTS = {
+RELEASE_INVARIANTS: dict[str, str | bool | int] = {
     "TradingDecision": "WAIT",
     "SystemDecision": "BLOCK_TRADING",
     "final_decision": "WAIT",
@@ -846,7 +850,7 @@ class DefensiveReleaseCandidate:
             self.root,
             catalog_rows=catalog_rows,
         )
-        no_trading_compliance_valid, compliance_errors, compliance_payload, _compliance_checks = _validate_compliance_snapshot(
+        no_trading_compliance_valid, compliance_errors, _compliance_payload, _compliance_checks = _validate_compliance_snapshot(
             self.root,
         )
 

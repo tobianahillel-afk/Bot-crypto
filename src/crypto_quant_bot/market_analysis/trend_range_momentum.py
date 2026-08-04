@@ -9,10 +9,8 @@ from typing import Any
 
 from crypto_quant_bot.data.checksum import sha256_file
 from crypto_quant_bot.market_analysis.foundation import (
-    ANALYSIS_INVARIANTS,
     ARCHIVE_OUTPUT_PATH,
     ARCHIVE_SHA256_OUTPUT_PATH,
-    DATASET_CATALOG_PATH,
     INPUT_SPECS,
     LOT20_OUTPUT_PATH,
     LOT21_FREEZE_REPORT_PATH,
@@ -22,16 +20,14 @@ from crypto_quant_bot.market_analysis.foundation import (
 )
 from crypto_quant_bot.market_analysis.indicator_models import REQUIRED_INDICATOR_SET
 from crypto_quant_bot.market_analysis.io import load_json, load_jsonl, read_text_limited
+from crypto_quant_bot.market_analysis.math_parameters import TREND_PARAMETERS
+from crypto_quant_bot.market_analysis.numeric import require_finite_float
 from crypto_quant_bot.market_analysis.technical_indicators import (
     INDICATOR_INVARIANTS,
     LOT23_OUTPUT_PATH,
     LOT23_TIMEFRAMES_OUTPUT_PATH,
 )
 from crypto_quant_bot.market_analysis.trend_models import (
-    ALLOWED_COMBINED_CONTEXT_STATES,
-    ALLOWED_MOMENTUM_STATES,
-    ALLOWED_RANGE_STATES,
-    ALLOWED_TREND_STATES,
     DEFAULT_TREND_BLOCK_REASONS,
     TrendRangeMomentumCheck,
     TrendRangeMomentumPolicy,
@@ -135,10 +131,9 @@ def _validate_frozen_archive(root: Path, *, product_scope: dict[str, Any], closu
     return archive_checksum, archive_size_bytes
 
 
-def _as_float(value: Any) -> float:
-    if isinstance(value, (int, float)):
-        return float(value)
-    return 0.0
+
+def _as_float(value: Any, *, field_name: str = "numeric_value") -> float:
+    return require_finite_float(value, field_name=field_name)
 
 
 def _round6(value: float) -> float:
@@ -183,11 +178,11 @@ def _trend_slope_5(closes: list[float]) -> float:
 
 
 def _trend_direction_context(slope_percent: float, close_vs_ema_percent: float) -> str:
-    if slope_percent >= 0.15 and close_vs_ema_percent >= 0.15:
+    if slope_percent >= float(TREND_PARAMETERS["direction_threshold_percent"]) and close_vs_ema_percent >= float(TREND_PARAMETERS["direction_threshold_percent"]):
         return "UPWARD_SLOPE"
-    if slope_percent <= -0.15 and close_vs_ema_percent <= -0.15:
+    if slope_percent <= -float(TREND_PARAMETERS["direction_threshold_percent"]) and close_vs_ema_percent <= -float(TREND_PARAMETERS["direction_threshold_percent"]):
         return "DOWNWARD_SLOPE"
-    if abs(slope_percent) <= 0.05 and abs(close_vs_ema_percent) <= 0.15:
+    if abs(slope_percent) <= float(TREND_PARAMETERS["flat_slope_threshold_percent"]) and abs(close_vs_ema_percent) <= float(TREND_PARAMETERS["direction_threshold_percent"]):
         return "FLAT_SLOPE"
     return "TRANSITIONAL_SLOPE"
 
@@ -199,9 +194,9 @@ def _trend_context_score(
     close_change_percent: float,
     market_context_score: float,
 ) -> float:
-    slope_strength = _clamp(abs(slope_percent) / 0.6)
-    extension_strength = _clamp(abs(close_vs_ema_percent) / 0.8)
-    drift_strength = _clamp(abs(close_change_percent) / 1.2)
+    slope_strength = _clamp(abs(slope_percent) / float(TREND_PARAMETERS["trend_slope_normalizer"]))
+    extension_strength = _clamp(abs(close_vs_ema_percent) / float(TREND_PARAMETERS["trend_extension_normalizer"]))
+    drift_strength = _clamp(abs(close_change_percent) / float(TREND_PARAMETERS["trend_drift_normalizer"]))
     alignment_strength = 1.0 if _sign(slope_percent) == _sign(close_vs_ema_percent) and _sign(slope_percent) != 0 else 0.35
     return _round6(mean([slope_strength, extension_strength, drift_strength, alignment_strength, _clamp(market_context_score)]))
 
@@ -213,9 +208,9 @@ def _range_context_score(
     bollinger_width_5: float,
     atr_percent: float,
 ) -> float:
-    width_strength = max(_clamp((1.4 - range_width_percent) / 1.4), _clamp((range_width_percent - 1.4) / 1.6))
-    edge_strength = _clamp(abs(range_position_percent - 50.0) / 40.0)
-    volatility_strength = max(_clamp(bollinger_width_5 / 2.6), _clamp(atr_percent / 0.9))
+    width_strength = max(_clamp((float(TREND_PARAMETERS["range_width_reference"]) - range_width_percent) / float(TREND_PARAMETERS["range_width_reference"])), _clamp((range_width_percent - float(TREND_PARAMETERS["range_width_reference"])) / float(TREND_PARAMETERS["range_width_expansion_span"])))
+    edge_strength = _clamp(abs(range_position_percent - 50.0) / float(TREND_PARAMETERS["range_edge_normalizer"]))
+    volatility_strength = max(_clamp(bollinger_width_5 / float(TREND_PARAMETERS["range_bollinger_normalizer"])), _clamp(atr_percent / float(TREND_PARAMETERS["range_atr_normalizer"])))
     return _round6(mean([width_strength, edge_strength, volatility_strength]))
 
 
@@ -226,9 +221,9 @@ def _momentum_context_score(
     rsi_5: float,
     macd_histogram: float,
 ) -> float:
-    momentum_strength = max(_clamp(abs(momentum_percent) / 0.4), _clamp(abs(rate_of_change_3) / 0.4))
-    oscillator_strength = _clamp(abs(rsi_5 - 50.0) / 25.0)
-    macd_strength = _clamp(abs(macd_histogram) / 50.0)
+    momentum_strength = max(_clamp(abs(momentum_percent) / float(TREND_PARAMETERS["momentum_normalizer"])), _clamp(abs(rate_of_change_3) / float(TREND_PARAMETERS["momentum_normalizer"])))
+    oscillator_strength = _clamp(abs(rsi_5 - 50.0) / float(TREND_PARAMETERS["rsi_normalizer"]))
+    macd_strength = _clamp(abs(macd_histogram) / float(TREND_PARAMETERS["macd_normalizer"]))
     return _round6(mean([momentum_strength, oscillator_strength, macd_strength]))
 
 
@@ -240,15 +235,15 @@ def _trend_state(
     close_change_percent: float,
     trend_context_score: float,
 ) -> str:
-    if row_count < 6:
+    if row_count < int(TREND_PARAMETERS["minimum_rows"]):
         return "TREND_CONTEXT_INSUFFICIENT_DATA"
-    if close_vs_ema_percent >= 0.15 and slope_percent >= 0.15 and close_change_percent >= 0.25 and trend_context_score >= 0.35:
+    if close_vs_ema_percent >= float(TREND_PARAMETERS["direction_threshold_percent"]) and slope_percent >= float(TREND_PARAMETERS["direction_threshold_percent"]) and close_change_percent >= float(TREND_PARAMETERS["close_change_threshold_percent"]) and trend_context_score >= float(TREND_PARAMETERS["minimum_context_score"]):
         return "TREND_CONTEXT_UPWARD"
-    if close_vs_ema_percent <= -0.15 and slope_percent <= -0.15 and close_change_percent <= -0.25 and trend_context_score >= 0.35:
+    if close_vs_ema_percent <= -float(TREND_PARAMETERS["direction_threshold_percent"]) and slope_percent <= -float(TREND_PARAMETERS["direction_threshold_percent"]) and close_change_percent <= -float(TREND_PARAMETERS["close_change_threshold_percent"]) and trend_context_score >= float(TREND_PARAMETERS["minimum_context_score"]):
         return "TREND_CONTEXT_DOWNWARD"
-    if abs(close_vs_ema_percent) <= 0.15 and abs(slope_percent) <= 0.05:
+    if abs(close_vs_ema_percent) <= float(TREND_PARAMETERS["direction_threshold_percent"]) and abs(slope_percent) <= float(TREND_PARAMETERS["flat_slope_threshold_percent"]):
         return "TREND_CONTEXT_FLAT"
-    if trend_context_score <= 0.2:
+    if trend_context_score <= float(TREND_PARAMETERS["neutral_context_score"]):
         return "TREND_CONTEXT_NEUTRAL"
     return "TREND_CONTEXT_MIXED"
 
@@ -262,15 +257,15 @@ def _range_state(
     atr_percent: float,
     trend_context_score: float,
 ) -> str:
-    if row_count < 6:
+    if row_count < int(TREND_PARAMETERS["minimum_rows"]):
         return "RANGE_CONTEXT_INSUFFICIENT_DATA"
-    if range_width_percent <= 1.4 and bollinger_width_5 <= 1.5:
+    if range_width_percent <= float(TREND_PARAMETERS["range_compressed_width_percent"]) and bollinger_width_5 <= float(TREND_PARAMETERS["range_compressed_bollinger_percent"]):
         return "RANGE_CONTEXT_COMPRESSED"
-    if (range_position_percent >= 85.0 or range_position_percent <= 15.0) and range_width_percent >= 1.2 and trend_context_score >= 0.35:
+    if (range_position_percent >= float(TREND_PARAMETERS["range_break_edge_high_percent"]) or range_position_percent <= float(TREND_PARAMETERS["range_break_edge_low_percent"])) and range_width_percent >= float(TREND_PARAMETERS["range_break_width_percent"]) and trend_context_score >= float(TREND_PARAMETERS["minimum_context_score"]):
         return "RANGE_CONTEXT_BREAKING_STRUCTURE"
-    if range_width_percent >= 1.8 or bollinger_width_5 >= 2.4 or atr_percent >= 0.8:
+    if range_width_percent >= float(TREND_PARAMETERS["range_expanded_width_percent"]) or bollinger_width_5 >= float(TREND_PARAMETERS["range_expanded_bollinger_percent"]) or atr_percent >= float(TREND_PARAMETERS["range_expanded_atr_percent"]):
         return "RANGE_CONTEXT_EXPANDED"
-    if 30.0 <= range_position_percent <= 70.0 and range_width_percent <= 2.0:
+    if float(TREND_PARAMETERS["range_neutral_low_percent"]) <= range_position_percent <= float(TREND_PARAMETERS["range_neutral_high_percent"]) and range_width_percent <= float(TREND_PARAMETERS["range_neutral_width_percent"]):
         return "RANGE_CONTEXT_NEUTRAL"
     return "RANGE_CONTEXT_MIXED"
 
@@ -284,15 +279,15 @@ def _momentum_state(
     macd_histogram: float,
     momentum_context_score: float,
 ) -> str:
-    if row_count < 6:
+    if row_count < int(TREND_PARAMETERS["minimum_rows"]):
         return "MOMENTUM_CONTEXT_INSUFFICIENT_DATA"
     if momentum_context_score <= 0.2:
         return "MOMENTUM_CONTEXT_NEUTRAL"
-    if (_sign(macd_histogram) != _sign(rate_of_change_3) and _sign(rate_of_change_3) != 0) or (rsi_5 >= 70.0 and rate_of_change_3 <= 0.15):
+    if (_sign(macd_histogram) != _sign(rate_of_change_3) and _sign(rate_of_change_3) != 0) or (rsi_5 >= float(TREND_PARAMETERS["momentum_rsi_divergence_level"]) and rate_of_change_3 <= float(TREND_PARAMETERS["direction_threshold_percent"])):
         return "MOMENTUM_CONTEXT_DIVERGENT"
-    if momentum_3 > 0 and rate_of_change_3 >= 0.18 and macd_histogram > 0:
+    if momentum_3 > 0 and rate_of_change_3 >= float(TREND_PARAMETERS["momentum_rate_threshold_percent"]) and macd_histogram > 0:
         return "MOMENTUM_CONTEXT_ACCELERATING"
-    if momentum_3 < 0 and rate_of_change_3 <= -0.18 and macd_histogram < 0:
+    if momentum_3 < 0 and rate_of_change_3 <= -float(TREND_PARAMETERS["momentum_rate_threshold_percent"]) and macd_histogram < 0:
         return "MOMENTUM_CONTEXT_DECELERATING"
     return "MOMENTUM_CONTEXT_MIXED"
 
@@ -308,13 +303,13 @@ def _combined_context_state(
         return "TRM_CONTEXT_INSUFFICIENT_DATA"
     if range_state == "RANGE_CONTEXT_COMPRESSED" and trend_state in {"TREND_CONTEXT_FLAT", "TREND_CONTEXT_NEUTRAL"}:
         return "TRM_CONTEXT_COMPRESSED"
-    if range_state == "RANGE_CONTEXT_EXPANDED" and momentum_state in {"MOMENTUM_CONTEXT_ACCELERATING", "MOMENTUM_CONTEXT_DECELERATING"} and combined_context_score >= 0.5:
+    if range_state == "RANGE_CONTEXT_EXPANDED" and momentum_state in {"MOMENTUM_CONTEXT_ACCELERATING", "MOMENTUM_CONTEXT_DECELERATING"} and combined_context_score >= float(TREND_PARAMETERS["volatile_combined_score"]):
         return "TRM_CONTEXT_VOLATILE"
-    if trend_state in {"TREND_CONTEXT_UPWARD", "TREND_CONTEXT_DOWNWARD"} and combined_context_score >= 0.4:
+    if trend_state in {"TREND_CONTEXT_UPWARD", "TREND_CONTEXT_DOWNWARD"} and combined_context_score >= float(TREND_PARAMETERS["trend_combined_score"]):
         return "TRM_CONTEXT_TRENDING"
     if range_state in {"RANGE_CONTEXT_NEUTRAL", "RANGE_CONTEXT_COMPRESSED"} and trend_state in {"TREND_CONTEXT_FLAT", "TREND_CONTEXT_NEUTRAL"}:
         return "TRM_CONTEXT_RANGING"
-    if combined_context_score <= 0.2:
+    if combined_context_score <= float(TREND_PARAMETERS["neutral_context_score"]):
         return "TRM_CONTEXT_NEUTRAL"
     return "TRM_CONTEXT_MIXED"
 
@@ -326,9 +321,9 @@ def _aggregate_trend_state(summaries: list[TrendRangeMomentumTimeframeSummary]) 
     states = [summary.trend_state for summary in summaries]
     if len(set(states)) == 1:
         return states[0], average_score
-    if "TREND_CONTEXT_UPWARD" in states and "TREND_CONTEXT_DOWNWARD" not in states and average_score >= 0.4:
+    if "TREND_CONTEXT_UPWARD" in states and "TREND_CONTEXT_DOWNWARD" not in states and average_score >= float(TREND_PARAMETERS["trend_combined_score"]):
         return "TREND_CONTEXT_UPWARD", average_score
-    if "TREND_CONTEXT_DOWNWARD" in states and "TREND_CONTEXT_UPWARD" not in states and average_score >= 0.4:
+    if "TREND_CONTEXT_DOWNWARD" in states and "TREND_CONTEXT_UPWARD" not in states and average_score >= float(TREND_PARAMETERS["trend_combined_score"]):
         return "TREND_CONTEXT_DOWNWARD", average_score
     if all(state in {"TREND_CONTEXT_FLAT", "TREND_CONTEXT_NEUTRAL"} for state in states):
         return "TREND_CONTEXT_FLAT", average_score
@@ -362,9 +357,9 @@ def _aggregate_momentum_state(summaries: list[TrendRangeMomentumTimeframeSummary
         return states[0], average_score
     if "MOMENTUM_CONTEXT_DIVERGENT" in states:
         return "MOMENTUM_CONTEXT_DIVERGENT", average_score
-    if "MOMENTUM_CONTEXT_ACCELERATING" in states and "MOMENTUM_CONTEXT_DECELERATING" not in states and average_score >= 0.4:
+    if "MOMENTUM_CONTEXT_ACCELERATING" in states and "MOMENTUM_CONTEXT_DECELERATING" not in states and average_score >= float(TREND_PARAMETERS["trend_combined_score"]):
         return "MOMENTUM_CONTEXT_ACCELERATING", average_score
-    if "MOMENTUM_CONTEXT_DECELERATING" in states and "MOMENTUM_CONTEXT_ACCELERATING" not in states and average_score >= 0.4:
+    if "MOMENTUM_CONTEXT_DECELERATING" in states and "MOMENTUM_CONTEXT_ACCELERATING" not in states and average_score >= float(TREND_PARAMETERS["trend_combined_score"]):
         return "MOMENTUM_CONTEXT_DECELERATING", average_score
     if all(state in {"MOMENTUM_CONTEXT_NEUTRAL", "MOMENTUM_CONTEXT_MIXED"} for state in states):
         return "MOMENTUM_CONTEXT_NEUTRAL", average_score
@@ -380,7 +375,7 @@ def _aggregate_combined_state(summaries: list[TrendRangeMomentumTimeframeSummary
         return states[0], average_score
     if "TRM_CONTEXT_VOLATILE" in states and average_score >= 0.5:
         return "TRM_CONTEXT_VOLATILE", average_score
-    if "TRM_CONTEXT_TRENDING" in states and average_score >= 0.4:
+    if "TRM_CONTEXT_TRENDING" in states and average_score >= float(TREND_PARAMETERS["trend_combined_score"]):
         return "TRM_CONTEXT_TRENDING", average_score
     if "TRM_CONTEXT_COMPRESSED" in states and all(state not in {"TRM_CONTEXT_VOLATILE", "TRM_CONTEXT_TRENDING"} for state in states):
         return "TRM_CONTEXT_COMPRESSED", average_score

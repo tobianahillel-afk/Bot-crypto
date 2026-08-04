@@ -60,7 +60,11 @@ def assemble_market_states(
         _availability("range_state", range_row, component_available_at)
         _availability("regime_state", regime_row, component_available_at)
         if anchored_rows:
-            anchored_available = [row.get("available_at") for row in anchored_rows if isinstance(row.get("available_at"), str)]
+            anchored_available: list[str] = [
+                str(row["available_at"])
+                for row in anchored_rows
+                if isinstance(row.get("available_at"), str)
+            ]
             if anchored_available:
                 component_available_at["anchored_vwap_state"] = max(anchored_available)
 
@@ -68,13 +72,19 @@ def assemble_market_states(
         selected_pivots = nearest_pivots(pivots, close, current_available_at, limit=3)
         selected_zones = nearest_zones(zones, close, current_available_at, limit=3)
         if selected_pivots:
-            pivot_available = [row.get("available_at") or row.get("usable_from") for row in selected_pivots]
-            pivot_available = [value for value in pivot_available if isinstance(value, str)]
+            pivot_available: list[str] = [
+                str(value)
+                for row in selected_pivots
+                if isinstance((value := row.get("available_at") or row.get("usable_from")), str)
+            ]
             if pivot_available:
                 component_available_at["nearest_pivots"] = max(pivot_available)
         if selected_zones:
-            zone_available = [row.get("available_at") or row.get("usable_from") for row in selected_zones]
-            zone_available = [value for value in zone_available if isinstance(value, str)]
+            zone_available: list[str] = [
+                str(value)
+                for row in selected_zones
+                if isinstance((value := row.get("available_at") or row.get("usable_from")), str)
+            ]
             if zone_available:
                 component_available_at["nearest_zones"] = max(zone_available)
 

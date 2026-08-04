@@ -45,7 +45,8 @@ def compute_range_state_points(
                 range_width_history.append(range_width_pct)
             true_range_history.append(true_range_values[index])
             if len(range_width_history) >= window and len(true_range_history) >= window:
-                compression_score = 1 - percentile_rank(range_width_pct, range_width_history)
+                range_percentile = percentile_rank(range_width_pct, range_width_history)
+                compression_score = None if range_percentile is None else 1.0 - range_percentile
                 expansion_score = percentile_rank(true_range_values[index], true_range_history)
         points.append(
             RangeStatePoint(

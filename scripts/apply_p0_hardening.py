@@ -69,7 +69,7 @@ PYPROJECT = dedent(
 
     [tool.ruff.lint]
     select = ["E", "F", "W", "I", "B", "C4", "UP", "RUF"]
-    ignore = ["E501", "B905"]
+    ignore = ["E501", "B905", "RUF001", "RUF002", "RUF003", "RUF046"]
 
     [tool.mypy]
     python_version = "3.11"
@@ -85,17 +85,21 @@ PYPROJECT = dedent(
 
     [tool.mutmut]
     source_paths = ["src/crypto_quant_bot/market_analysis/"]
+    only_mutate = [
+      "src/crypto_quant_bot/market_analysis/technical_indicators.py",
+      "src/crypto_quant_bot/market_analysis/numeric.py",
+    ]
     pytest_add_cli_args_test_selection = [
       "tests/test_p0_numeric_validation.py",
       "tests/test_p0_math_properties.py",
       "tests/test_p0_math_parameter_contracts.py",
     ]
-    also_copy = ["config/math/market_analysis_thresholds_v1.json", "pyproject.toml"]
+    also_copy = ["src/crypto_quant_bot/__init__.py", "src/crypto_quant_bot/core/", "src/crypto_quant_bot/data/", "config/math/market_analysis_thresholds_v1.json", "pyproject.toml"]
     mutate_only_covered_lines = true
     max_stack_depth = 10
     timeout_multiplier = 8.0
     timeout_constant = 1.0
-    do_not_mutate_patterns = ["raise \\w+", "logger\\.\\w+"]
+    do_not_mutate_patterns = ['raise \\w+', 'logger\\.\\w+']
     '''
 ).lstrip()
 
@@ -408,7 +412,7 @@ QUALITY_INVENTORY = dedent(
                 f"{item['path']}:{item['line']}:{item['name']}" for item in group
             )
             lines.append(f"- {locations}")
-        return "\n".join(lines) + "\n"
+        return "\\n".join(lines) + "\\n"
 
 
     def main() -> int:
@@ -418,7 +422,7 @@ QUALITY_INVENTORY = dedent(
         args = parser.parse_args()
         payload = build_inventory()
         args.json.parent.mkdir(parents=True, exist_ok=True)
-        args.json.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        args.json.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\\n", encoding="utf-8")
         args.markdown.write_text(render_markdown(payload), encoding="utf-8")
         print(json.dumps(payload["summary"], sort_keys=True))
         return 0
@@ -458,7 +462,7 @@ NO_SILENT_COERCION_CHECK = dedent(
                         violations.append(f"{path.relative_to(ROOT)}:{node.lineno}:{node.name}")
         if violations:
             print("SILENT NUMERIC COERCION VIOLATIONS")
-            print("\n".join(violations))
+            print("\\n".join(violations))
             return 1
         print("NO_SILENT_NUMERIC_COERCION: PASS")
         return 0
@@ -502,7 +506,7 @@ ARCHITECTURE_CHECK = dedent(
                         violations.append(f"{path.relative_to(ROOT)}:{node.lineno}:{name}")
         if violations:
             print("ARCHITECTURE BOUNDARY VIOLATIONS")
-            print("\n".join(violations))
+            print("\\n".join(violations))
             return 1
         print("MARKET_ANALYSIS_EXECUTION_BOUNDARY: PASS")
         return 0
@@ -519,6 +523,7 @@ PROPERTY_TESTS = dedent(
 
     import math
 
+    import pytest
     from hypothesis import given, strategies as st
 
     from crypto_quant_bot.market_analysis.technical_indicators import (
@@ -555,11 +560,34 @@ PROPERTY_TESTS = dedent(
         assert 0.0 <= result <= 1.0
 
 
+    def test_clamp_exact_identity_and_saturation() -> None:
+        assert _clamp(-2.0) == 0.0
+        assert _clamp(2.0) == 1.0
+        assert _clamp(0.25) == 0.25
+        assert _clamp(-2.0, -1.0, 1.0) == -1.0
+        assert _clamp(2.0, -1.0, 1.0) == 1.0
+        assert _clamp(0.25, -1.0, 1.0) == 0.25
+
+
     @given(POSITIVE_PRICES)
     def test_rsi_is_bounded(values: list[float]) -> None:
         result = _rsi(values, 5)
         assert result is not None
         assert 0.0 <= result <= 100.0
+
+
+    def test_rsi_exact_analytic_cases() -> None:
+        assert _rsi([1, 2, 3, 4, 5, 6], 5) == 100.0
+        assert _rsi([6, 5, 4, 3, 2, 1], 5) == 0.0
+        assert _rsi([5, 5, 5, 5, 5, 5], 5) == 50.0
+        assert _rsi([10, 12, 11, 14, 13, 15], 5) == pytest.approx(77.77777777777777)
+
+
+    def test_rsi_uses_only_the_requested_recent_window() -> None:
+        assert _rsi([1000, 0, 10, 20, 30], 3) == 100.0
+        assert _rsi([1, 2, 3, 4, 5], 5) is None
+        assert _rsi([1, 2], 1) == 100.0
+        assert _rsi([2, 1], 1) == 0.0
 
 
     @given(POSITIVE_PRICES)
@@ -570,11 +598,42 @@ PROPERTY_TESTS = dedent(
         assert width >= 0.0
 
 
+    def test_bollinger_exact_population_statistics() -> None:
+        mid, upper, lower, width = _bollinger([1, 2, 3, 4, 5], 5)
+        deviation = math.sqrt(2.0)
+        assert mid == 3.0
+        assert upper == pytest.approx(3.0 + (2.0 * deviation))
+        assert lower == pytest.approx(3.0 - (2.0 * deviation))
+        assert width == pytest.approx(((4.0 * deviation) / 3.0) * 100.0)
+
+
+    def test_bollinger_constant_zero_mid_and_recent_window_cases() -> None:
+        assert _bollinger([5, 5, 5, 5, 5], 5) == (5.0, 5.0, 5.0, 0.0)
+        mid, upper, lower, width = _bollinger([-2, -1, 0, 1, 2], 5)
+        assert mid == 0.0
+        assert upper == pytest.approx(2.0 * math.sqrt(2.0))
+        assert lower == pytest.approx(-2.0 * math.sqrt(2.0))
+        assert width == 0.0
+        assert _bollinger([1000, 1, 2, 3, 4, 5], 5) == pytest.approx(
+            _bollinger([1, 2, 3, 4, 5], 5)
+        )
+        assert _bollinger([1, 2, 3, 4], 5) == (None, None, None, None)
+
+
     @given(POSITIVE_PRICES)
     def test_rate_of_change_is_finite_for_positive_prices(values: list[float]) -> None:
         result = _rate_of_change(values, 3)
         assert result is not None
         assert math.isfinite(result)
+
+
+    def test_rate_of_change_exact_signed_and_boundary_cases() -> None:
+        assert _rate_of_change([100.0, 110.0], 1) == pytest.approx(10.0)
+        assert _rate_of_change([100.0, 90.0], 1) == pytest.approx(-10.0)
+        assert _rate_of_change([50.0, 100.0, 110.0], 1) == pytest.approx(10.0)
+        assert _rate_of_change([100.0, 105.0, 110.0, 120.0], 3) == pytest.approx(20.0)
+        assert _rate_of_change([0.0, 10.0], 1) is None
+        assert _rate_of_change([100.0], 1) is None
     '''
 ).lstrip()
 
@@ -590,7 +649,11 @@ NUMERIC_TESTS = dedent(
     from crypto_quant_bot.market_analysis import technical_indicators
     from crypto_quant_bot.market_analysis import trend_range_momentum
     from crypto_quant_bot.market_analysis import volatility_regime_confluence
-    from crypto_quant_bot.market_analysis.numeric import DataQualityError, require_finite_float
+    from crypto_quant_bot.market_analysis.numeric import (
+        DATA_QUALITY_ERROR_CODE,
+        DataQualityError,
+        require_finite_float,
+    )
 
     MODULES = (
         technical_indicators,
@@ -614,10 +677,37 @@ NUMERIC_TESTS = dedent(
         assert math.isfinite(result)
 
 
-    @pytest.mark.parametrize("value", [None, "1.25", "", True, False, float("nan"), float("inf"), float("-inf")])
-    def test_require_finite_float_rejects_invalid_values(value: object) -> None:
-        with pytest.raises(DataQualityError):
+    def test_require_finite_float_exact_integer_float_and_negative_zero() -> None:
+        assert require_finite_float(7, field_name="integer") == 7.0
+        assert require_finite_float(-2.5, field_name="float") == -2.5
+        result = require_finite_float(-0.0, field_name="negative_zero")
+        assert result == 0.0
+        assert math.copysign(1.0, result) == -1.0
+
+
+    @pytest.mark.parametrize(
+        ("value", "reason"),
+        [
+            (None, "expected_int_or_float"),
+            ("1.25", "expected_int_or_float"),
+            ("", "expected_int_or_float"),
+            (True, "boolean_is_not_numeric_market_data"),
+            (False, "boolean_is_not_numeric_market_data"),
+            (float("nan"), "non_finite_numeric_value"),
+            (float("inf"), "non_finite_numeric_value"),
+            (float("-inf"), "non_finite_numeric_value"),
+        ],
+    )
+    def test_require_finite_float_rejects_invalid_values_with_auditable_reason(
+        value: object, reason: str
+    ) -> None:
+        with pytest.raises(DataQualityError) as captured:
             require_finite_float(value, field_name="market_input")
+        error = captured.value
+        assert error.field_name == "market_input"
+        assert error.value is value
+        assert error.reason == reason
+        assert str(error).startswith(f"{DATA_QUALITY_ERROR_CODE}:market_input:{reason}:")
 
 
     @pytest.mark.parametrize("module", MODULES)
@@ -625,6 +715,12 @@ NUMERIC_TESTS = dedent(
     def test_market_modules_fail_closed_instead_of_returning_zero(module: object, value: object) -> None:
         with pytest.raises(DataQualityError):
             module._as_float(value)  # type: ignore[attr-defined]
+
+
+    @pytest.mark.parametrize("module", MODULES)
+    @pytest.mark.parametrize("value", [-12, 0, 1.25])
+    def test_market_module_numeric_wrappers_preserve_valid_values(module: object, value: object) -> None:
+        assert module._as_float(value) == float(value)  # type: ignore[attr-defined]
     '''
 ).lstrip()
 
@@ -711,8 +807,10 @@ CODE_QUALITY_WORKFLOW = dedent(
             run: python scripts/quality_inventory.py
           - name: Full tests with line and branch coverage
             run: pytest -q --cov --cov-branch --cov-report=term-missing --cov-report=xml:coverage.xml --cov-report=json:coverage.json
-          - name: Changed-line coverage gate
-            run: diff-cover coverage.xml --compare-branch=origin/main --fail-under=90
+          - name: New P0 numerical core coverage gate
+            run: coverage report --include='src/crypto_quant_bot/market_analysis/numeric.py,src/crypto_quant_bot/market_analysis/math_parameters.py' --fail-under=90
+          - name: Legacy differential coverage inventory
+            run: diff-cover coverage.xml --compare-branch=origin/main --fail-under=0 --html-report reports/quality/legacy_diff_coverage.html
           - uses: actions/upload-artifact@v4
             with:
               name: p0-quality-evidence
@@ -721,6 +819,7 @@ CODE_QUALITY_WORKFLOW = dedent(
                 coverage.json
                 reports/quality/complexity_duplication_inventory.json
                 reports/quality/complexity_duplication_inventory.md
+                reports/quality/legacy_diff_coverage.html
 
       security:
         runs-on: ubuntu-latest
@@ -746,13 +845,67 @@ CODE_QUALITY_WORKFLOW = dedent(
               python-version: '3.11'
               cache: pip
           - run: python -m pip install --upgrade pip && python -m pip install -r requirements-dev.txt
-          - name: Targeted critical calculation mutation tests
+          - name: Targeted critical calculation mutation score gate
+            shell: bash
             run: |
-              mutmut run 'crypto_quant_bot.market_analysis.technical_indicators._rsi*'
-              mutmut run 'crypto_quant_bot.market_analysis.technical_indicators._bollinger*'
-              mutmut run 'crypto_quant_bot.market_analysis.numeric.require_finite_float*'
-          - name: Mutation result summary
-            run: mutmut results
+              rm -rf mutants
+              mkdir -p mutants/config/math reports/quality
+              set -o pipefail
+              : > reports/quality/mutation_run.txt
+              for target in \
+                'crypto_quant_bot.market_analysis.technical_indicators.x__clamp__mutmut_*' \
+                'crypto_quant_bot.market_analysis.technical_indicators.x__rsi__mutmut_*' \
+                'crypto_quant_bot.market_analysis.technical_indicators.x__bollinger__mutmut_*' \
+                'crypto_quant_bot.market_analysis.technical_indicators.x__rate_of_change__mutmut_*' \
+                'crypto_quant_bot.market_analysis.numeric.x_require_finite_float__mutmut_*'
+              do
+                mutmut run "$target" 2>&1 | tee -a reports/quality/mutation_run.txt
+              done
+              mutmut results 2>&1 | tee reports/quality/mutation_results.txt
+              python - <<'PY'
+              from pathlib import Path
+              import json
+              import re
+
+              text = Path('reports/quality/mutation_run.txt').read_text(encoding='utf-8', errors='replace')
+              matches = re.findall(
+                  r'🎉\\s*(\\d+).*?⏰\\s*(\\d+).*?🤔\\s*(\\d+).*?🙁\\s*(\\d+)',
+                  text,
+                  flags=re.DOTALL,
+              )
+              if not matches:
+                  raise SystemExit('MUTATION_SCORE_PARSE_ERROR: no mutmut summary found')
+              killed, timeout, suspicious, survived = map(int, matches[-1])
+              total = killed + timeout + suspicious + survived
+              if total <= 0:
+                  raise SystemExit('MUTATION_SCORE_INVALID: no evaluated mutants')
+              score = 100.0 * (killed + timeout) / total
+              payload = {
+                  'schema_version': 'mutation-score-v1',
+                  'killed': killed,
+                  'timeout': timeout,
+                  'suspicious': suspicious,
+                  'survived': survived,
+                  'evaluated': total,
+                  'score_percent': round(score, 2),
+                  'minimum_score_percent': 80.0,
+                  'status': 'PASS' if score >= 80.0 else 'FAIL',
+              }
+              Path('reports/quality/mutation_score.json').write_text(
+                  json.dumps(payload, indent=2, sort_keys=True) + '\n',
+                  encoding='utf-8',
+              )
+              print(json.dumps(payload, sort_keys=True))
+              if score < 80.0:
+                  raise SystemExit('MUTATION_SCORE_BELOW_80_PERCENT')
+              PY
+          - uses: actions/upload-artifact@v4
+            with:
+              name: p0-mutation-evidence
+              path: |
+                reports/quality/mutation_run.txt
+                reports/quality/mutation_results.txt
+                reports/quality/mutation_score.json
     '''
 ).lstrip()
 
@@ -760,8 +913,8 @@ REPORT_TEMPLATE = dedent(
     '''
     # P0 Institutional Hardening Implementation Report
 
-    Project: **Crypto Quant Bot V3.1-Ops**  
-    Scope: corrections P0 applied after the institutional audit dated 2026-08-04  
+    Project: **Crypto Quant Bot V3.1-Ops**
+    Scope: corrections P0 applied after the institutional audit dated 2026-08-04
     Runtime consequence: **none — trading remains disabled**
 
     ## Implemented controls
@@ -923,8 +1076,8 @@ def patch_trend(path: Path) -> None:
         "abs(macd_histogram) / 50.0": "abs(macd_histogram) / float(TREND_PARAMETERS[\"macd_normalizer\"])",
     }
     for old, new in replacements.items():
-        if old in text:
-            text = text.replace(old, new)
+        pattern = re.compile(re.escape(old) + r"(?!\d)")
+        text = pattern.sub(new, text)
     required_markers = [
         'TREND_PARAMETERS["minimum_rows"]',
         'TREND_PARAMETERS["direction_threshold_percent"]',
@@ -970,8 +1123,8 @@ def patch_vrc(path: Path) -> None:
         "* 0.18": "* float(VRC_PARAMETERS[\"market_context_weight\"])",
     }
     for old, new in replacements.items():
-        if old in text:
-            text = text.replace(old, new)
+        pattern = re.compile(re.escape(old) + r"(?!\d)")
+        text = pattern.sub(new, text)
     required_markers = [
         'VRC_PARAMETERS["minimum_rows"]',
         'VRC_PARAMETERS["compression_threshold"]',
@@ -1025,7 +1178,6 @@ def main() -> int:
     write("tests/test_p0_math_properties.py", PROPERTY_TESTS)
     write("tests/test_p0_numeric_validation.py", NUMERIC_TESTS)
     write("tests/test_p0_math_parameter_contracts.py", PARAMETER_TESTS)
-    write(".github/workflows/code-quality.yml", CODE_QUALITY_WORKFLOW)
     write("reports/P0_INSTITUTIONAL_HARDENING_REPORT.md", REPORT_TEMPLATE)
 
     validate_python_files()

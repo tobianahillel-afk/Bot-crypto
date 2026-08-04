@@ -266,7 +266,7 @@ EXPECTED_LOT19_IDS = {
     "release_candidate_checks_lot19",
 }
 
-CLOSURE_INVARIANTS = {
+CLOSURE_INVARIANTS: dict[str, str | bool | int] = {
     "TradingDecision": "WAIT",
     "SystemDecision": "BLOCK_TRADING",
     "final_decision": "WAIT",
