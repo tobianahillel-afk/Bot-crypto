@@ -60,17 +60,14 @@ jobs:
         run: python scripts/validate_roadmap_documentation.py
       - name: Complexity and duplication inventory
         run: python scripts/quality_inventory.py
-      - name: Full tests with line and branch coverage
-        run: pytest -q --cov --cov-branch --cov-report=term-missing --cov-report=xml:coverage.xml --cov-report=json:coverage.json
-      - name: Repository-wide coverage gate
-        run: python scripts/validate_global_coverage.py --line-minimum 90 --branch-minimum 85
-      - name: Flake detection — repeat full suite three times
+      - name: Historical Lot 0-25 chain under coverage
         shell: bash
         run: |
-          for attempt in 1 2 3; do
-            echo "Full regression repetition ${attempt}/3"
-            pytest -q
-          done
+          coverage erase
+          coverage run --parallel-mode scripts/run_historical_chain_under_coverage.py
+          coverage combine
+      - name: Full tests with accumulated line and branch coverage
+        run: pytest -q --cov --cov-branch --cov-append --cov-report=term-missing --cov-report=xml:coverage.xml --cov-report=json:coverage.json
       - name: P0 numerical core coverage gate
         run: coverage report --include='src/crypto_quant_bot/market_analysis/numeric.py,src/crypto_quant_bot/market_analysis/math_parameters.py' --fail-under=90
       - name: Differential coverage gate
@@ -142,6 +139,15 @@ jobs:
           if score < 80.0:
               raise SystemExit('MUTATION_SCORE_BELOW_80_PERCENT')
           PY
+      - name: Flake detection — repeat full suite three times
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            echo "Full regression repetition ${attempt}/3"
+            pytest -q
+          done
+      - name: Repository-wide coverage gate
+        run: python scripts/validate_global_coverage.py --line-minimum 90 --branch-minimum 85
       - uses: actions/upload-artifact@v4
         if: always()
         with:
