@@ -1,0 +1,58 @@
+{
+  "schema_version": "forecast-horizon-registry-v1",
+  "registry_id": "crypto-quant-bot-forecast-horizons-v1",
+  "status": "PLANNED_LOCKED_NOT_IMPLEMENTED",
+  "principles": {
+    "forecast_horizon_separate_from_feature_resolution": true,
+    "forecast_horizon_separate_from_signal_ttl": true,
+    "forecast_horizon_separate_from_holding_horizon": true,
+    "each_horizon_requires_independent_calibration": true,
+    "cross_horizon_error_dependence_must_be_measured": true,
+    "naive_majority_vote_forbidden": true,
+    "probability_requires_calibration": true
+  },
+  "horizons": [
+    {
+      "horizon_id": "30s",
+      "duration_seconds": 30,
+      "status": "PLANNED_V4_V5",
+      "candidate_targets": ["RETURN_DISTRIBUTION", "TARGET_HIT", "STOP_HIT", "LIQUIDITY_STATE"]
+    },
+    {
+      "horizon_id": "5m",
+      "duration_seconds": 300,
+      "status": "PLANNED_V5",
+      "candidate_targets": ["RETURN_DISTRIBUTION", "VOLATILITY", "TARGET_HIT", "STOP_HIT"]
+    },
+    {
+      "horizon_id": "15m",
+      "duration_seconds": 900,
+      "status": "PLANNED_V5",
+      "candidate_targets": ["RETURN_DISTRIBUTION", "VOLATILITY", "REGIME_TRANSITION", "TARGET_HIT", "STOP_HIT"]
+    },
+    {
+      "horizon_id": "1h",
+      "duration_seconds": 3600,
+      "status": "PLANNED_V5_V6",
+      "candidate_targets": ["RETURN_DISTRIBUTION", "VOLATILITY", "REGIME_TRANSITION", "DRAWDOWN_RISK"]
+    }
+  ],
+  "required_output_families": [
+    "EXPECTED_RETURN",
+    "RETURN_QUANTILES",
+    "VOLATILITY_FORECAST",
+    "DIRECTION_PROBABILITY_IF_CALIBRATED",
+    "TARGET_HIT_PROBABILITY_IF_CALIBRATED",
+    "STOP_HIT_PROBABILITY_IF_CALIBRATED",
+    "TIME_TO_EVENT_DISTRIBUTION",
+    "MAXIMUM_ADVERSE_EXCURSION",
+    "MAXIMUM_FAVORABLE_EXCURSION",
+    "REGIME_TRANSITION_PROBABILITY_IF_CALIBRATED",
+    "UNCERTAINTY"
+  ],
+  "lot26_restriction": {
+    "forecast_generation_allowed": false,
+    "prediction_claims_allowed": false,
+    "probability_claims_allowed": false
+  }
+}
