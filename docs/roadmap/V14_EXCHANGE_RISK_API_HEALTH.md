@@ -249,13 +249,13 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 - RunContextV1 (run_id, runtime_mode, config_version, code_commit, correlation_id)
 - LineageEnvelopeV1 des artefacts produits par les lots préalables
 - ExchangeInstrumentMetadataV1
+- InstrumentRegistryV1 produit par V3
+- InstrumentSpecificationV1 produit par V3
 
 ### Contrats de sortie
 
 - MarketSymbolInstrumentAvailabilityStateV1
 - MarketSymbolInstrumentAvailabilityAuditV1
-- InstrumentRegistryV1
-- InstrumentSpecificationV1
 - ExchangeHealthStateV1
 - ExchangeRiskVetoV1
 
@@ -364,13 +364,13 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 - RunContextV1 (run_id, runtime_mode, config_version, code_commit, correlation_id)
 - LineageEnvelopeV1 des artefacts produits par les lots préalables
 - RawTimestampEnvelopeV1
+- CanonicalTimeEnvelopeV1 produit par V3
+- ClockHealthStateV1 produit par V3
 
 ### Contrats de sortie
 
 - DataStalenessClockDriftSequenceHealthStateV1
 - DataStalenessClockDriftSequenceHealthAuditV1
-- CanonicalTimeEnvelopeV1
-- ClockHealthStateV1
 - StrategyHealthStateV1
 - RetirementDecisionV1
 
@@ -588,10 +588,9 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 
 - CounterpartyOperationalRiskDashboardStateV1
 - CounterpartyOperationalRiskDashboardAuditV1
-- UIReadModelV1
-- OperatorActionAuditV1
 - ExchangeHealthStateV1
 - ExchangeRiskVetoV1
+- ExchangeRiskDashboardProjectionV1
 
 ### Séquence de traitement obligatoire
 

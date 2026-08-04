@@ -38,6 +38,7 @@ Faire évoluer le système de **Source registry approuvé** vers **Contexte év�
 
 - RunContextV1 (run_id, runtime_mode, config_version, code_commit, correlation_id)
 - LineageEnvelopeV1 des artefacts produits par les lots préalables
+- SourceRegistryV1 produit par V3
 
 ### Contrats de sortie
 
@@ -45,7 +46,7 @@ Faire évoluer le système de **Source registry approuvé** vers **Contexte év�
 - NewsAIScopeGateSourceRegistryAuditV1
 - NewsAIScopeGateSourceRegistryContractRegistryV1
 - NewsAIScopeGateSourceRegistryCapabilityMatrixV1
-- SourceRegistryV1
+- IntelligenceSourcePolicyV1
 
 ### Séquence de traitement obligatoire
 

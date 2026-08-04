@@ -269,13 +269,15 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 
 - RunContextV1 (run_id, runtime_mode, config_version, code_commit, correlation_id)
 - LineageEnvelopeV1 des artefacts produits par les lots préalables
+- SignalV1 produit par V5
+- TradeIntentV1 produit par V5
+- RiskDecisionV1 produit par V7
 
 ### Contrats de sortie
 
 - SignalToPaperDecisionMappingStateV1
 - SignalToPaperDecisionMappingAuditV1
-- TradeIntentV1
-- OrderIntentV1
+- PaperOrderIntentV1
 
 ### Séquence de traitement obligatoire
 
@@ -510,9 +512,8 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 - PaperOrderV1
 - PaperFillV1
 - PaperPositionV1
-- TelemetryEnvelopeV1
-- IncidentRecordV1
-- RecoveryEvidenceV1
+- PaperIncidentEventV1
+- PaperRiskActionV1
 
 ### Séquence de traitement obligatoire
 
@@ -633,8 +634,7 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 - PaperOrderV1
 - PaperFillV1
 - PaperPositionV1
-- SandboxExecutionStateV1
-- FailureInjectionEvidenceV1
+- SandboxPromotionDecisionV1
 
 ### Séquence de traitement obligatoire
 

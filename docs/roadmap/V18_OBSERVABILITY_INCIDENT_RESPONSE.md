@@ -259,17 +259,18 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 
 - RunContextV1 (run_id, runtime_mode, config_version, code_commit, correlation_id)
 - LineageEnvelopeV1 des artefacts produits par les lots préalables
+- DataQualityStateV1 produit par V3
+- DataAnomalyV1 produit par V3
+- DataQualityVetoV1 produit par V3
 
 ### Contrats de sortie
 
 - HeartbeatsDataFreshnessLatencyMonitoringStateV1
 - HeartbeatsDataFreshnessLatencyMonitoringAuditV1
-- DataQualityStateV1
-- DataAnomalyV1
-- DataQualityVetoV1
 - TelemetryEnvelopeV1
 - IncidentRecordV1
 - RecoveryEvidenceV1
+- RuntimeFreshnessMonitoringStateV1
 
 ### Séquence de traitement obligatoire
 

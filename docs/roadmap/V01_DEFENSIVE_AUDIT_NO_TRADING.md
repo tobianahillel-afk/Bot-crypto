@@ -2408,8 +2408,6 @@ Surveiller intégrité, santé locale et cohérence des artefacts.
 
 - LocalHealthMonitorIntegrityChecksStateV1
 - LocalHealthMonitorIntegrityChecksAuditV1
-- ExchangeHealthStateV1
-- ExchangeRiskVetoV1
 
 ### Séquence de traitement obligatoire
 

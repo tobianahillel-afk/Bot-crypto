@@ -120,14 +120,10 @@ KNOWN_CONTAMINATION = {
         "Publier risk-of-ruin",
     ],
     ("V06", 62): [
-        "- BookFeatureStateV1",
-        "- DerivativesContextStateV1",
         "Calculer imbalance symétrique",
         "Calculer crowding, leverage build-up",
     ],
     ("V09", 90): [
-        "- InstrumentRegistryV1",
-        "- InstrumentSpecificationV1",
         "Normaliser venue, base, quote",
         "Valider tick_size, lot_size",
     ],
