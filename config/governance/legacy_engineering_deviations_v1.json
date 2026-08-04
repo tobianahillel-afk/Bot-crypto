@@ -1,0 +1,2303 @@
+{
+  "deviations": [
+    {
+      "category": "CLASS_LINES",
+      "finding_id": "CLASS_LINES:68503815e5b403da",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/closure/archive.py:635:V1DefensiveAuditClosure",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CLASS_LINES",
+      "finding_id": "CLASS_LINES:6c4ed19ca7226723",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/compliance/no_trading_audit.py:483:FinalNoTradingComplianceAudit",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CLASS_LINES",
+      "finding_id": "CLASS_LINES:f2dfb023ad71f102",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/release/candidate.py:583:DefensiveReleaseCandidate",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:0239b559c8cfae5c",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/audit/available_at.py:20:_walk_nested_temporal",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:0308e72f32dccfee",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/audit/feature_registry_audit.py:149:_collect_from_object",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:0a3cf823b087ea11",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/core/config_loader.py:26:load_simple_yaml",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:2214d2d62f77508a",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py:390:_combined_context_state",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:2832a326a93ccb91",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py:519:_build_timeframe_summary",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:2887cef22296412f",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/foundation.py:293:_validate_frozen_archive",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:29da0c1919f0756a",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/compliance/no_trading_audit.py:508:build_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:306385bb47c86772",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/release/candidate.py:417:_validate_health_snapshot",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:31ccbf75297800bf",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/trend_range_momentum.py:273:_momentum_state",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:35c20ddf2307adfc",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/trend_range_momentum.py:354:_aggregate_momentum_state",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:3f952d246d8a83da",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/compliance/no_trading_audit.py:667:build_snapshot",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:432083f959437a94",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py:108:_validate_frozen_archive",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:4d9e012f2c073d30",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/closure/archive.py:660:build_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:56a808268b19b102",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/trend_range_momentum.py:320:_aggregate_trend_state",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:57b896777d86f8ff",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/foundation.py:240:_aggregate_market_context",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:5c32760ac24fff1f",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/audit/lookahead.py:91:audit_no_lookahead",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:63a6aed9372f4097",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/data/quality.py:8:validate_ohlcvt",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:6933a82276fd8b35",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/volatility/range_state.py:16:compute_range_state_points",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:6cefc321a9de138f",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_state/assembler.py:28:assemble_market_states",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:6df471b516f47bd4",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/trend_range_momentum.py:104:_validate_frozen_archive",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:73008646f3071830",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/pivots/fractal.py:14:detect_fractal_pivots",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:7639f5c68f39ab24",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/trend_range_momentum.py:251:_range_state",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:768c088d15796e42",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/volume/profile.py:20:build_volume_profile",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:81948c91a9069a15",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/trend_range_momentum.py:450:_build_timeframe_summary",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:8345607502c4911c",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/foundation.py:323:_build_timeframe_summary",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:8acc5a632f57ca10",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/health/monitor.py:295:build_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:946fc2bbbfe7b2c0",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/timeframes/resampler.py:21:resample_ohlcvt",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:94ec5fb78d74e9fb",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/trend_range_momentum.py:336:_aggregate_range_state",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:998647a3fe4872a0",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/audit/available_at.py:74:audit_available_at",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:a17d1227b9a3b97c",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/trend_range_momentum.py:295:_combined_context_state",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:a3ed5bd7cda3e969",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/closure/archive.py:917:build_manifest",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:abad121ce5646946",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/foundation.py:215:_context_label",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:afcfad4b0da559df",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/backtest/replay.py:39:run_replay",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:b7901ca61aaec5e7",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/product_scope/registry.py:1170:build_product_scope_registry",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:ba095df0bfd3639e",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/compliance/no_trading_audit.py:378:_validate_health_snapshot",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:c90b246d028f65c8",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/features/basic.py:29:compute_basic_features",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:cc10f2e86e7a0889",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/release/candidate.py:608:build_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:d023bb708d601478",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/trend_range_momentum.py:372:_aggregate_combined_state",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:d02a0cd9c75db9ad",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/audit/feature_registry_audit.py:201:audit_feature_registry",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:d6b7f03684e704fa",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py:266:_regime_context_score",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:d6c51114b03c47c1",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/regime/classifier.py:36:classify_state",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:de49dd775b0598bb",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/health/monitor.py:246:_validate_checksum_references",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:dfc2c1089b2630ac",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py:223:_volatility_state",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:e414acd29e56204f",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/release/candidate.py:838:build_snapshot",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:f235e657e80dcb69",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/technical_indicators.py:113:_validate_frozen_archive",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "CYCLOMATIC_COMPLEXITY",
+      "finding_id": "CYCLOMATIC_COMPLEXITY:fc8b7b841d3918dd",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/technical_indicators.py:395:_indicator_state",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "DUPLICATE_FUNCTION",
+      "finding_id": "DUPLICATE_FUNCTION:002509d4d48fcdfc",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/closure/io.py:56:read_text_limited | src/crypto_quant_bot/compliance/io.py:56:read_text_limited | src/crypto_quant_bot/health/io.py:52:read_text_limited | src/crypto_quant_bot/ledger/io.py:32:read_text_limited | src/crypto_quant_bot/lineage/io.py:52:read_text_limited | src/crypto_quant_bot/market_analysis/io.py:56:read_text_limited | src/crypto_quant_bot/product_scope/io.py:40:read_text_limited | src/crypto_quant_bot/release/io.py:56:read_text_limited",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "DUPLICATE_FUNCTION",
+      "finding_id": "DUPLICATE_FUNCTION:13788c5bac14ae93",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/features/basic.py:22:sample_std | src/crypto_quant_bot/volatility/realized.py:7:sample_std",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "DUPLICATE_FUNCTION",
+      "finding_id": "DUPLICATE_FUNCTION:3b658c1d31720549",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/closure/archive.py:544:_validate_jsonl_rows | src/crypto_quant_bot/compliance/no_trading_audit.py:426:_validate_jsonl_rows | src/crypto_quant_bot/release/candidate.py:521:_validate_jsonl_rows",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "DUPLICATE_FUNCTION",
+      "finding_id": "DUPLICATE_FUNCTION:3d77348cf71c5351",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/foundation.py:293:_validate_frozen_archive | src/crypto_quant_bot/market_analysis/technical_indicators.py:113:_validate_frozen_archive | src/crypto_quant_bot/market_analysis/trend_range_momentum.py:104:_validate_frozen_archive | src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py:108:_validate_frozen_archive",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "DUPLICATE_FUNCTION",
+      "finding_id": "DUPLICATE_FUNCTION:4a4d3a27f124db8d",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/compliance/no_trading_audit.py:454:_network_surface_hits | src/crypto_quant_bot/release/candidate.py:549:_network_surface_hits",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "DUPLICATE_FUNCTION",
+      "finding_id": "DUPLICATE_FUNCTION:5112971cc002185e",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/closure/io.py:70:_atomic_replace_text | src/crypto_quant_bot/compliance/io.py:70:_atomic_replace_text | src/crypto_quant_bot/data/data_writer.py:18:_atomic_replace_text | src/crypto_quant_bot/health/io.py:59:_atomic_replace_text | src/crypto_quant_bot/market_analysis/io.py:63:_atomic_replace_text | src/crypto_quant_bot/product_scope/io.py:47:_atomic_replace_text | src/crypto_quant_bot/release/io.py:70:_atomic_replace_text",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "DUPLICATE_FUNCTION",
+      "finding_id": "DUPLICATE_FUNCTION:6714ee0d78f11cd4",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/closure/archive.py:643:_compute_critical_counts | src/crypto_quant_bot/compliance/no_trading_audit.py:491:_compute_critical_counts | src/crypto_quant_bot/release/candidate.py:591:_compute_critical_counts",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "DUPLICATE_FUNCTION",
+      "finding_id": "DUPLICATE_FUNCTION:696ed789a9a2e85f",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/decision/io.py:23:load_jsonl | src/crypto_quant_bot/portfolio/io.py:23:load_jsonl",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "DUPLICATE_FUNCTION",
+      "finding_id": "DUPLICATE_FUNCTION:72f64021bd416aa0",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/closure/archive.py:325:_expand_patterns | src/crypto_quant_bot/compliance/no_trading_audit.py:320:_expand_patterns | src/crypto_quant_bot/release/candidate.py:357:_expand_patterns",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "DUPLICATE_FUNCTION",
+      "finding_id": "DUPLICATE_FUNCTION:89a6d2e8a0c59134",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/foundation.py:121:_require_object | src/crypto_quant_bot/market_analysis/technical_indicators.py:85:_require_object | src/crypto_quant_bot/market_analysis/trend_range_momentum.py:91:_require_object | src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py:95:_require_object",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "DUPLICATE_FUNCTION",
+      "finding_id": "DUPLICATE_FUNCTION:8ad35d2045016028",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/closure/io.py:63:_sanitize_json_output | src/crypto_quant_bot/compliance/io.py:63:_sanitize_json_output | src/crypto_quant_bot/release/io.py:63:_sanitize_json_output",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "DUPLICATE_FUNCTION",
+      "finding_id": "DUPLICATE_FUNCTION:a7f1c33324fa94e2",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/exposure/io.py:17:load_jsonl | src/crypto_quant_bot/risk/io.py:15:load_jsonl",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "DUPLICATE_FUNCTION",
+      "finding_id": "DUPLICATE_FUNCTION:b85bbde95e50dc88",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/closure/io.py:22:load_json | src/crypto_quant_bot/compliance/io.py:22:load_json | src/crypto_quant_bot/decision/io.py:16:load_json | src/crypto_quant_bot/health/io.py:18:load_json | src/crypto_quant_bot/lineage/io.py:18:load_json | src/crypto_quant_bot/market_analysis/io.py:33:load_json | src/crypto_quant_bot/portfolio/io.py:16:load_json | src/crypto_quant_bot/product_scope/io.py:17:load_json | src/crypto_quant_bot/release/io.py:22:load_json",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "DUPLICATE_FUNCTION",
+      "finding_id": "DUPLICATE_FUNCTION:ba9259e194021ac7",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/closure/archive.py:359:_validate_manifest | src/crypto_quant_bot/compliance/no_trading_audit.py:345:_validate_manifest | src/crypto_quant_bot/release/candidate.py:384:_validate_manifest",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "DUPLICATE_FUNCTION",
+      "finding_id": "DUPLICATE_FUNCTION:c18ab829681a4653",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/compliance/no_trading_audit.py:378:_validate_health_snapshot | src/crypto_quant_bot/release/candidate.py:417:_validate_health_snapshot",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "DUPLICATE_FUNCTION",
+      "finding_id": "DUPLICATE_FUNCTION:d232acc8f13a8fde",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/decision/io.py:39:_atomic_replace_text | src/crypto_quant_bot/exposure/io.py:29:_atomic_replace_text | src/crypto_quant_bot/ledger/io.py:39:_atomic_replace_text | src/crypto_quant_bot/lineage/io.py:59:_atomic_replace_text | src/crypto_quant_bot/portfolio/io.py:39:_atomic_replace_text",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "DUPLICATE_FUNCTION",
+      "finding_id": "DUPLICATE_FUNCTION:dfbbf89ab15f7cb0",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/closure/io.py:29:load_jsonl | src/crypto_quant_bot/compliance/io.py:29:load_jsonl | src/crypto_quant_bot/health/io.py:25:load_jsonl | src/crypto_quant_bot/ledger/io.py:16:load_jsonl | src/crypto_quant_bot/lineage/io.py:25:load_jsonl | src/crypto_quant_bot/market_analysis/io.py:40:load_jsonl | src/crypto_quant_bot/product_scope/io.py:24:load_jsonl | src/crypto_quant_bot/release/io.py:29:load_jsonl",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "DUPLICATE_FUNCTION",
+      "finding_id": "DUPLICATE_FUNCTION:e9a96ba6d3388c9a",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/closure/io.py:45:count_lines | src/crypto_quant_bot/compliance/io.py:45:count_lines | src/crypto_quant_bot/health/io.py:41:count_lines | src/crypto_quant_bot/lineage/io.py:41:count_lines | src/crypto_quant_bot/release/io.py:45:count_lines",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:02a4333d00187327",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/release/candidate.py:465:_validate_compliance_snapshot",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:05a96d40ca2c4ad4",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/backtest/replay.py:39:run_replay",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:0b1fe3e50a0829e6",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/decision/firewall.py:156:snapshot_from_documentary_rows",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:15c4ef63588e6963",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/closure/archive.py:660:build_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:16cbe2624751b9ba",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/data/quality.py:8:validate_ohlcvt",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:1f270cf908ff6dd9",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py:694:build_volatility_regime_confluence_result",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:24d4cc465b8af1dc",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/product_scope/io.py:190:write_acceptance_doc",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:2dfd120e96d8406d",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/technical_indicators.py:552:build_technical_indicator_result",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:383b795395ab88f9",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/io.py:317:write_indicator_acceptance_doc",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:391e0fbfe766c393",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/ledger/audit_trail.py:51:build_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:3d7f6be26f28451f",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/compliance/no_trading_audit.py:667:build_snapshot",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:4713a90d0b93c025",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/compliance/no_trading_audit.py:508:build_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:49332c804d08e998",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/health/monitor.py:388:build_snapshot",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:49887a332cd8a228",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/release/candidate.py:838:build_snapshot",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:5ba606cf0fbc668a",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/trend_range_momentum.py:606:build_trend_range_momentum_result",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:5c21e0daa5c14956",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/pivots/fractal.py:14:detect_fractal_pivots",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:5ca2bb691451916e",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/foundation.py:455:_build_analysis_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:6ebc928f52fc3643",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/portfolio/freeze.py:25:build_portfolio_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:74538ade9281d347",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/foundation.py:551:build_market_context_snapshot",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:7cb4f7ee7031446b",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/exposure/guard.py:25:build_exposure_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:8245da01059acd13",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py:519:_build_timeframe_summary",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:88f1ef061a52d0b8",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/technical_indicators.py:499:_build_timeframe_summary",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:9b3f3cf49bcea229",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/lineage/manifest.py:629:build_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:9d3bc9cf9501beaa",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/volatility/range_state.py:16:compute_range_state_points",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:9f7dfc53ab480944",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/health/monitor.py:295:build_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:a5eb71abbd42562f",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/features/basic.py:29:compute_basic_features",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:ac5b983fb5099dff",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/foundation.py:323:_build_timeframe_summary",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:b3c06b4bfbba7292",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/audit/feature_registry_audit.py:201:audit_feature_registry",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:c008c1fcf8d7f079",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/closure/archive.py:488:_validate_release_snapshot",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:c25f90e3b27a4335",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/closure/archive.py:917:build_manifest",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:d5bc2dfcf4486af9",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/release/candidate.py:608:build_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:d82654c788cbe250",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/decision/firewall.py:25:build_decision_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:df378ae25d8139f8",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/product_scope/registry.py:1057:_build_scope_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:e00e88c1d84a23a8",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/trend_range_momentum.py:397:_build_trend_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:e45c1992c961cc38",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/ledger/audit_trail.py:139:entry_from_source",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:e4edde3834b0b2f5",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py:457:_build_vrc_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:f71819557a8580ff",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/regime/classifier.py:68:classify_regime_points",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:f86f366538f44e14",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/volume/profile.py:20:build_volume_profile",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:f9a1d7d5bda52c7e",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_state/assembler.py:28:assemble_market_states",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:fa45f4acd136d2d6",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/trend_range_momentum.py:450:_build_timeframe_summary",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "FUNCTION_LINES",
+      "finding_id": "FUNCTION_LINES:ff134d23f97dadba",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/product_scope/registry.py:1170:build_product_scope_registry",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "MODULE_LINES",
+      "finding_id": "MODULE_LINES:108c11dccab1cf17",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py:1:volatility_regime_confluence.py",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "MODULE_LINES",
+      "finding_id": "MODULE_LINES:3ee05c2e3ccdb9d3",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/closure/archive.py:1:archive.py",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "MODULE_LINES",
+      "finding_id": "MODULE_LINES:71f46aaa2602c921",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/product_scope/registry.py:1:registry.py",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "MODULE_LINES",
+      "finding_id": "MODULE_LINES:bb796c2965dceec1",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/release/candidate.py:1:candidate.py",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "MODULE_LINES",
+      "finding_id": "MODULE_LINES:bc70aa7426b3a0a4",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/compliance/no_trading_audit.py:1:no_trading_audit.py",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "NESTING",
+      "finding_id": "NESTING:1e29cb95235bf377",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/audit/available_at.py:20:_walk_nested_temporal",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "NESTING",
+      "finding_id": "NESTING:5d483cffc736e0d4",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/audit/available_at.py:74:audit_available_at",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "NESTING",
+      "finding_id": "NESTING:814bc027771bb228",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/audit/lookahead.py:91:audit_no_lookahead",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "NESTING",
+      "finding_id": "NESTING:9d5cfbf99174062e",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/closure/archive.py:582:create_archive",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "NESTING",
+      "finding_id": "NESTING:ec88c1b253147637",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/audit/forbidden_names.py:24:find_forbidden_keys",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "PARAMETERS",
+      "finding_id": "PARAMETERS:07a95f7964e64719",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py:519:_build_timeframe_summary",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "PARAMETERS",
+      "finding_id": "PARAMETERS:07d3654cd6379c79",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/regime/classifier.py:68:classify_regime_points",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "PARAMETERS",
+      "finding_id": "PARAMETERS:156c386d2fbc044f",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/foundation.py:323:_build_timeframe_summary",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "PARAMETERS",
+      "finding_id": "PARAMETERS:16f1b114d5ca4013",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/product_scope/registry.py:1057:_build_scope_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "PARAMETERS",
+      "finding_id": "PARAMETERS:24f9e063efe07ea8",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/decision/firewall.py:156:snapshot_from_documentary_rows",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "PARAMETERS",
+      "finding_id": "PARAMETERS:2652764e66d0b477",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/lineage/manifest.py:736:build_manifest",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "PARAMETERS",
+      "finding_id": "PARAMETERS:2ae7ffde037c495e",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/closure/archive.py:660:build_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "PARAMETERS",
+      "finding_id": "PARAMETERS:3a3447ee8a378866",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py:294:_confluence_components",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "PARAMETERS",
+      "finding_id": "PARAMETERS:3d4ab2235929ccc4",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/release/candidate.py:608:build_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "PARAMETERS",
+      "finding_id": "PARAMETERS:626b4abb427fd188",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/compliance/no_trading_audit.py:508:build_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "PARAMETERS",
+      "finding_id": "PARAMETERS:986b600b45542c27",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/market_state/assembler.py:28:assemble_market_states",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "PARAMETERS",
+      "finding_id": "PARAMETERS:9f0021589da4d83f",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/health/monitor.py:295:build_checks",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "PARAMETERS",
+      "finding_id": "PARAMETERS:b33fc2c4a4d67010",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/decision/firewall.py:211:build_snapshots",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "PARAMETERS",
+      "finding_id": "PARAMETERS:c41f037cc2480fd8",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/pivots/strength.py:20:compute_pivot_strength",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "PARAMETERS",
+      "finding_id": "PARAMETERS:d62ccc0868399065",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/regime/classifier.py:36:classify_state",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "PARAMETERS",
+      "finding_id": "PARAMETERS:decdb7e2db5b6dad",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/closure/archive.py:917:build_manifest",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    },
+    {
+      "category": "PARAMETERS",
+      "finding_id": "PARAMETERS:f40e25cc9629b6b2",
+      "justification": "Validated historical Lots 0-25 code is preserved to avoid an opportunistic pre-Lot26 refactor; the finding remains visible and fail-closed controls are strengthened.",
+      "location": "src/crypto_quant_bot/data/metadata.py:8:build_dataset_metadata",
+      "owner": "Hillel Tobiana \u2014 Project Owner",
+      "remediation_trigger": "Decompose before modifying the affected symbol, or before opening Lot 27, whichever occurs first.",
+      "review_by": "2026-09-30",
+      "status": "ACCEPTED_TEMPORARY",
+      "strengthened_controls": [
+        "full Lots 0-25 deterministic replay",
+        "repository-wide 90% line and 85% branch coverage gates",
+        "changed-file Ruff and 90% differential coverage gates",
+        "targeted and P0.6 extended mutation score gates >= 80%",
+        "three complete anti-flake pytest repetitions"
+      ]
+    }
+  ],
+  "policy": "No listed deviation authorizes weaker safety, traceability, coverage, mutation, or no-trading controls. New or changed findings are blocked by CI.",
+  "project": "Crypto Quant Bot V3.1-Ops",
+  "schema_version": "legacy-engineering-deviations-v1",
+  "scope": "P0.6 pre-Lot26 inventory of validated historical runtime code"
+}
