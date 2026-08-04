@@ -2,7 +2,7 @@
 
 Ce fichier est conservé pour compatibilité avec les artefacts du Lot 21.
 
-La roadmap canonique du projet est désormais :
+La roadmap canonique est :
 
 - [`ROADMAP_V1_TO_V21.md`](ROADMAP_V1_TO_V21.md)
 - [`roadmap/`](roadmap/)
@@ -14,7 +14,17 @@ La roadmap canonique du projet est désormais :
 - V1 / Lots 0–20 : fermée et archivée.
 - Lot 21 : scope lock validé.
 - Lots 22–25 : Market Analysis implémentée.
-- Lot 26 : prochain lot.
+- P0 institutionnel : fusionné.
+- Lot 26 : prochain lot, encore verrouillé.
 - Lots 26–177 : planifiés et verrouillés.
 
-L’ancienne projection V2→V11 / Lots 22→147 ne doit plus être utilisée comme plan d’exécution. Elle a été normalisée en V1→V21 / Lots 0→177 afin d’intégrer Data Governance, Alpha, Signal/Intent, TCA, Model Risk, Sizing, Portfolio/PnL, Exchange Risk, OMS/EMS, Observability, HFT Research, Options et On-chain.
+## Addendum normatif Lot 26
+
+La préparation exacte du Lot 26 est définie par :
+
+- [`PRE_LOT26_ENTRY_GATE.md`](PRE_LOT26_ENTRY_GATE.md)
+- [`LOT_26_MULTI_TIMEFRAME_ALIGNMENT_ENGINE.md`](LOT_26_MULTI_TIMEFRAME_ALIGNMENT_ENGINE.md)
+- [`ACCEPTANCE_CRITERIA_LOT_26.md`](ACCEPTANCE_CRITERIA_LOT_26.md)
+- [`roadmap/V02_LOT26_NORMATIVE_ADDENDUM.md`](roadmap/V02_LOT26_NORMATIVE_ADDENDUM.md)
+
+L’ancienne projection V2→V11 / Lots 22→147 ne doit plus être utilisée comme plan d’exécution.

@@ -1,6 +1,21 @@
 # Canonical Data and Event Contracts
 
-Tous les contrats sont versionnés, sérialisables en JSON et incluent `schema_version`, `run_id`, `correlation_id`, `generated_at`, `validation_state` et `lineage_id`.
+Tous les contrats sont versionnés, sérialisables en JSON et incluent les identifiants nécessaires
+au replay et à l’audit.
+
+## Envelope commun
+
+```text
+schema_version
+run_id
+correlation_id
+generated_at
+validation_state
+lineage_id
+config_version
+code_commit
+reason_codes
+```
 
 ## MarketDataEnvelopeV1
 
@@ -11,14 +26,77 @@ sequence_id, revision_id, payload_type, payload
 quality_state_id, raw_content_hash
 ```
 
-## MarketContextStateV1
+## MarketContextStateV1 — historique
+
+Contrat historique utilisé par les Lots 22–25. Il reste normatif pour leurs preuves et n’est pas
+renommé rétroactivement.
 
 ```text
 instrument_id, timeframe, as_of, available_at
 trend_state, range_state, momentum_state, volatility_state, regime_state
 component_scores, confidence, uncertainty, conflicts, reason_codes
-used_for_decision=false jusqu’aux lots dédiés
+used_for_decision=false
 ```
+
+## TimeframeMarketContextStateV1 — Lot 26+
+
+Adaptateur temporel explicite autour des états historiques :
+
+```text
+state_id, instrument_id, timeframe
+bar_open_time, bar_close_time, event_time
+available_at, decision_time, generated_at
+source_bar_id, revision_id, sequence_id
+trend_state, range_state, momentum_state
+volatility_state, regime_state, confluence_state
+component_scores, validation_state
+analysis_only=true
+used_for_decision=false
+execution_allowed=false
+```
+
+Schema :
+`contracts/schemas/timeframe_market_context_state_v1.schema.json`.
+
+## ClosedBarAvailabilityV1
+
+Preuve qu’une barre était fermée, complète, validée et disponible à l’instant évalué.
+
+```text
+availability_id, instrument_id, timeframe, source_bar_id
+bar_open_time, bar_close_time, available_at, decision_time
+is_closed, is_complete, quality_state
+revision_id, sequence_id, lineage_id, reason_codes
+```
+
+Schema :
+`contracts/schemas/closed_bar_availability_v1.schema.json`.
+
+## MultiTimeframeAlignmentStateV1
+
+```text
+alignment_id, instrument_id
+local_timeframe=5m, higher_timeframe=15m
+decision_time, local_state_id, higher_state_id
+local_bar_close_time, higher_bar_close_time
+join_method=ASOF_BACKWARD
+component_alignment_scores
+available_component_count
+weighted_coverage_ratio
+overall_agreement_score(nullable)
+alignment_state, divergence_state, coherence_state
+combined_context_state, hard_mismatch_components
+uncertainty_state, reason_codes
+config_version, config_checksum, lineage_id
+analysis_only=true
+used_for_decision=false
+signal_generation_allowed=false
+order_routing_allowed=false
+execution_allowed=false
+```
+
+Schema :
+`contracts/schemas/multi_timeframe_alignment_state_v1.schema.json`.
 
 ## ScenarioV1
 
@@ -45,40 +123,16 @@ created_at, expires_at, direction_hypothesis, strength
 confidence, calibration_id(optional), invalidation_reason
 ```
 
-Signal ne contient pas de venue, quantity finale ni ordre.
+Signal ne contient pas de venue, quantité finale ni ordre.
 
-## TradeIntentV1
+## TradeIntentV1 / RiskDecisionV1 / OrderIntentV1
 
-```text
-trade_intent_id, signal_id, strategy_id/version
-instrument_id, side_hypothesis, max_risk_budget, horizon
-requested_at, expires_at, context/risk references
-```
+Ces contrats restent inactifs jusqu’aux versions propriétaires. Aucun état Market Analysis ne peut
+les créer.
 
-## RiskDecisionV1
+## OMSOrderStateV1 / ExecutionEventV1 / FillV1 / PositionStateV1 / PnLStateV1
 
-```text
-risk_decision_id, trade_intent_hash, decision
-approved_size, binding_limits, vetoes, reason_codes
-risk_state_id, limit_set_version, created_at, expires_at
-```
-
-## OrderIntentV1
-
-```text
-order_intent_id, trade_intent_id, risk_decision_id
-venue, instrument_id, side, order_type, quantity, limit/stop prices
-TIF, post_only/reduce_only, idempotency_key
-created_at, expires_at, config/instrument versions
-```
-
-## OMSOrderStateV1 / ExecutionEventV1
-
-Contient `client_order_id`, venue IDs, current_state, cumulative_qty, leaves_qty, average_price, fees, attempts et causal events. Tout event est idempotent par `event_id`.
-
-## FillV1 / PositionStateV1 / PnLStateV1
-
-Les fills portent venue_fill_id, order IDs, price, qty, fee, liquidity role et event_time. Position et PnL sont reconstruisibles depuis le ledger, avec séparation realized/unrealized/fees/funding/slippage/FX.
+Contrats futurs versionnés et reconstructibles depuis le ledger.
 
 ## IncidentRecordV1
 
