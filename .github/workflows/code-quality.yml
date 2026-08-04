@@ -64,10 +64,10 @@ jobs:
           mkdir -p reports/quality
           git fetch origin main
           if git cat-file -e origin/main:reports/P0_INSTITUTIONAL_HARDENING_REPORT.md 2>/dev/null; then
-            diff-cover coverage.xml --compare-branch=origin/main --fail-under=90 --format html:reports/quality/diff_coverage.html
+            diff-cover coverage.xml --compare-branch=origin/main --fail-under=90 --html-report reports/quality/diff_coverage.html
           else
             echo 'Initial P0 migration: recording historical differential coverage before the permanent 90% gate becomes active.'
-            diff-cover coverage.xml --compare-branch=origin/main --fail-under=0 --format html:reports/quality/diff_coverage.html
+            diff-cover coverage.xml --compare-branch=origin/main --fail-under=0 --html-report reports/quality/diff_coverage.html
           fi
       - name: Static security scan
         run: bandit -q -r src -ll
