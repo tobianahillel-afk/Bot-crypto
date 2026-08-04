@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import tomllib
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
-import tomllib
 
 PROJECT_NAME = "Crypto Quant Bot V3.1-Ops"
 
