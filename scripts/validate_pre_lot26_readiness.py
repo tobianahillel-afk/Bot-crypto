@@ -406,6 +406,7 @@ def _validate_historical_immutability(root: Path) -> list[str]:
         "src/crypto_quant_bot/core/clock.py",
         "src/crypto_quant_bot/core/enums.py",
         "src/crypto_quant_bot/market_analysis/trend_range_momentum.py",
+        "src/crypto_quant_bot/market_analysis/trend_range_momentum.py",
     }
     errors: list[str] = []
     for changed in _git_changed_files(root):
