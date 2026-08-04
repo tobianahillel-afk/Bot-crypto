@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/schemas/decision_clock_policy_v1.schema.json",
+  "title": "DecisionClockPolicyV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "policy_id", "status", "principles", "triggers", "lot26_policy"],
+  "properties": {
+    "schema_version": {"const": "decision-clock-policy-v1"},
+    "policy_id": {"type": "string", "minLength": 1},
+    "status": {"type": "string", "minLength": 1},
+    "principles": {
+      "type": "object",
+      "additionalProperties": {"type": "boolean"},
+      "minProperties": 5
+    },
+    "triggers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["trigger_id", "enabled_in_lot26", "description"],
+        "properties": {
+          "trigger_id": {
+            "enum": [
+              "CLOSED_LOCAL_BAR",
+              "MARKET_EVENT",
+              "BOOK_IMBALANCE_CHANGE",
+              "LIQUIDITY_SWEEP",
+              "VOLATILITY_BREAK",
+              "REGIME_CHANGE",
+              "FORECAST_UPDATE",
+              "RISK_EVENT",
+              "SCHEDULED_REEVALUATION"
+            ]
+          },
+          "enabled_in_lot26": {"type": "boolean"},
+          "required_evidence": {"type": "array", "items": {"type": "string"}},
+          "planned_owner": {"type": "string"},
+          "description": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "lot26_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled_triggers",
+        "provisional_open_bar_observation",
+        "duplicate_trigger_behavior",
+        "out_of_order_trigger_behavior",
+        "trade_decision_allowed"
+      ],
+      "properties": {
+        "enabled_triggers": {"const": ["CLOSED_LOCAL_BAR"]},
+        "provisional_open_bar_observation": {"const": "NOT_CONSUMABLE_AS_CONFIRMED_STATE"},
+        "duplicate_trigger_behavior": {"const": "IDEMPOTENT_NO_OP"},
+        "out_of_order_trigger_behavior": {"const": "BLOCK_AND_AUDIT"},
+        "trade_decision_allowed": {"const": false}
+      }
+    }
+  }
+}
