@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,11 +24,11 @@ def main() -> int:
     )
     print(completed.stdout, end="")
     if completed.stderr:
-        print(completed.stderr, end="", file=__import__("sys").stderr)
+        print(completed.stderr, end="", file=sys.stderr)
     if completed.returncode != 0:
         return completed.returncode
     if "LOT 25 REQUIRED CHAIN: PASS" not in completed.stdout:
-        print("HISTORICAL_CHAIN_PASS_MARKER_MISSING", file=__import__("sys").stderr)
+        print("HISTORICAL_CHAIN_PASS_MARKER_MISSING", file=sys.stderr)
         return 1
     print("P0_6_HISTORICAL_CHAIN: PASS")
     return 0
