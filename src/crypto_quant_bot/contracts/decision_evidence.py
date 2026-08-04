@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from datetime import datetime, timezone
-from hashlib import sha256
 import json
-from types import MappingProxyType
-from typing import Mapping, Sequence
 import re
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
+from datetime import UTC, datetime
+from hashlib import sha256
+from types import MappingProxyType
 
 _HEX64 = re.compile(r"^[A-Fa-f0-9]{64}$")
 _COMMIT = re.compile(r"^[A-Fa-f0-9]{7,64}$")
@@ -35,7 +35,7 @@ def _require_optional_text(value: str | None, field: str) -> None:
 def _require_utc_timestamp(value: str, field: str) -> None:
     _require_text(value, field)
     parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
-    if parsed.tzinfo is None or parsed.utcoffset() != timezone.utc.utcoffset(parsed):
+    if parsed.tzinfo is None or parsed.utcoffset() != UTC.utcoffset(parsed):
         raise ValueError(f"{field} must be timezone-aware UTC")
 
 
@@ -191,16 +191,32 @@ class DecisionEvidenceEnvelopeV1:
             raise ValueError("input_checksums must not be empty")
 
     def _freeze_collections(self) -> None:
-        object.__setattr__(self, "parent_decision_ids", _freeze_codes(self.parent_decision_ids, "parent_decision_ids"))
+        object.__setattr__(
+            self,
+            "parent_decision_ids",
+            _freeze_codes(self.parent_decision_ids, "parent_decision_ids"),
+        )
         object.__setattr__(self, "reason_codes", _freeze_codes(self.reason_codes, "reason_codes"))
         object.__setattr__(self, "veto_codes", _freeze_codes(self.veto_codes, "veto_codes"))
-        object.__setattr__(self, "rules_triggered", _freeze_codes(self.rules_triggered, "rules_triggered"))
+        object.__setattr__(
+            self,
+            "rules_triggered",
+            _freeze_codes(self.rules_triggered, "rules_triggered"),
+        )
         for field in ("facts_observed", "features_computed", "inferences", "assumptions"):
             object.__setattr__(self, field, _freeze_codes(getattr(self, field), field))
         object.__setattr__(self, "supporting_evidence", tuple(self.supporting_evidence))
         object.__setattr__(self, "contradicting_evidence", tuple(self.contradicting_evidence))
-        object.__setattr__(self, "model_versions", _freeze_mapping(self.model_versions, "model_versions"))
-        object.__setattr__(self, "input_checksums", _freeze_mapping(self.input_checksums, "input_checksums"))
+        object.__setattr__(
+            self,
+            "model_versions",
+            _freeze_mapping(self.model_versions, "model_versions"),
+        )
+        object.__setattr__(
+            self,
+            "input_checksums",
+            _freeze_mapping(self.input_checksums, "input_checksums"),
+        )
 
     def _validate_decision_semantics(self) -> None:
         if self.decision_state not in _DECISION_STATES:
@@ -258,7 +274,12 @@ class DecisionEvidenceEnvelopeV1:
         }
 
     def canonical_json(self) -> str:
-        return json.dumps(self.to_dict(), sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+        return json.dumps(
+            self.to_dict(),
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        )
 
     def envelope_checksum(self) -> str:
         return sha256(self.canonical_json().encode("utf-8")).hexdigest()
