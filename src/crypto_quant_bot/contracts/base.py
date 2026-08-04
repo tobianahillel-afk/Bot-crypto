@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from dataclasses import asdict, dataclass, field
 from typing import Any
 from uuid import uuid4
 
-from crypto_quant_bot.core.clock import utc_now_iso
+from crypto_quant_bot.contracts.primitives import utc_now_iso
 
 
 @dataclass(frozen=True)
