@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/schemas/temporal_scale_registry_v1.schema.json",
+  "title": "TemporalScaleRegistryV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "registry_id",
+    "status",
+    "canonical_timezone",
+    "principles",
+    "lot26_initial_profile",
+    "scales",
+    "promotion_restrictions"
+  ],
+  "properties": {
+    "schema_version": {"const": "temporal-scale-registry-v1"},
+    "registry_id": {"type": "string", "minLength": 1},
+    "status": {"type": "string", "minLength": 1},
+    "project": {"type": "string"},
+    "canonical_timezone": {"const": "UTC"},
+    "principles": {
+      "type": "object",
+      "additionalProperties": {"type": "boolean"},
+      "minProperties": 5
+    },
+    "lot26_initial_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile_id",
+        "local_scale_id",
+        "higher_scale_id",
+        "evaluation_trigger",
+        "join_method",
+        "eligibility_rule",
+        "implementation_scope",
+        "extensible_interface_required"
+      ],
+      "properties": {
+        "profile_id": {"type": "string"},
+        "local_scale_id": {"const": "timebar-5m"},
+        "higher_scale_id": {"const": "timebar-15m"},
+        "evaluation_trigger": {"const": "CLOSED_LOCAL_BAR"},
+        "join_method": {"const": "ASOF_BACKWARD"},
+        "eligibility_rule": {"const": "available_at <= decision_time"},
+        "implementation_scope": {"const": "EXACTLY_ONE_ORDERED_SCALE_EDGE"},
+        "extensible_interface_required": {"const": true}
+      }
+    },
+    "scales": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "scale_id",
+          "resolution_type",
+          "duration_seconds",
+          "aggregation_method",
+          "publication_policy",
+          "state_kind",
+          "enabled_in_lot26"
+        ],
+        "properties": {
+          "scale_id": {"type": "string", "minLength": 1},
+          "resolution_type": {"enum": ["EVENT", "TIME_BAR", "VOLUME_BAR", "DOLLAR_BAR", "TICK_BAR", "IMBALANCE_BAR"]},
+          "duration_seconds": {"type": ["integer", "null"], "minimum": 1},
+          "aggregation_method": {"type": "string"},
+          "publication_policy": {"type": "string"},
+          "state_kind": {"type": "string"},
+          "enabled_in_lot26": {"type": "boolean"},
+          "lot26_role": {"enum": ["LOCAL_CONTEXT", "HIGHER_CONTEXT"]},
+          "planned_owner": {"type": "string"}
+        }
+      }
+    },
+    "future_non_time_bars": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string"}
+    },
+    "promotion_restrictions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "signal_generation_allowed",
+        "trade_decision_allowed",
+        "order_intent_allowed",
+        "paper_use_allowed",
+        "live_use_allowed"
+      ],
+      "properties": {
+        "signal_generation_allowed": {"const": false},
+        "trade_decision_allowed": {"const": false},
+        "order_intent_allowed": {"const": false},
+        "paper_use_allowed": {"const": false},
+        "live_use_allowed": {"const": false}
+      }
+    }
+  }
+}
