@@ -1,15 +1,18 @@
 name: P0.6 apply final assurance migration
 
 on:
-  push:
-    branches: [agent/p06-final-pre-lot26-assurance]
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
 
 jobs:
   apply:
-    if: github.actor != 'github-actions[bot]'
+    if: >-
+      github.actor != 'github-actions[bot]' &&
+      github.event.pull_request.head.ref == 'agent/p06-final-pre-lot26-assurance'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
