@@ -36,7 +36,11 @@ Projet : **Crypto Quant Bot V3.1-Ops**
 - [Stochastic Continuous State and Multi-Horizon Forecasting Standard](STOCHASTIC_CONTINUOUS_STATE_AND_MULTI_HORIZON_FORECASTING_STANDARD.md)
 - [Participant Behavior and Liquidity Exit-Zone Inference Standard](PARTICIPANT_BEHAVIOR_AND_LIQUIDITY_EXIT_ZONE_INFERENCE_STANDARD.md)
 - [Protective Orders and Exit Lifecycle Standard](PROTECTIVE_ORDERS_AND_EXIT_LIFECYCLE_STANDARD.md)
-- [Multi-Scale / Stochastic / Participant Roadmap Addendum](roadmap/MULTI_SCALE_STOCHASTIC_PREDICTION_AND_PARTICIPANT_INFERENCE_ADDENDUM.md)
+- [Cross-version roadmap addendum](roadmap/MULTI_SCALE_STOCHASTIC_PREDICTION_AND_PARTICIPANT_INFERENCE_ADDENDUM.md)
+- [V3 continuous market-data addendum](roadmap/V03_CONTINUOUS_MARKET_DATA_NORMATIVE_ADDENDUM.md)
+- [V4 participant/Game Theory addendum](roadmap/V04_PARTICIPANT_GAME_THEORY_NORMATIVE_ADDENDUM.md)
+- [V5 multi-horizon forecasting addendum](roadmap/V05_MULTI_HORIZON_FORECASTING_NORMATIVE_ADDENDUM.md)
+- [V15 protective-order addendum](roadmap/V15_PROTECTIVE_ORDER_LIFECYCLE_NORMATIVE_ADDENDUM.md)
 
 Ces documents sont normatifs pour les lots futurs. Ils n'indiquent pas que les capabilities sont déjà implémentées.
 
@@ -45,6 +49,7 @@ Ces documents sont normatifs pour les lots futurs. Ils n'indiquent pas que les c
 - [PRE_LOT26_ENTRY_GATE](PRE_LOT26_ENTRY_GATE.md)
 - [Lot 26 specification](LOT_26_MULTI_TIMEFRAME_ALIGNMENT_ENGINE.md)
 - [Lot 26 acceptance criteria](ACCEPTANCE_CRITERIA_LOT_26.md)
+- [Lot 26 requirement-test matrix](LOT26_REQUIREMENT_TEST_MATRIX.md)
 - [Time semantics ADR](adr/ADR_0001_TIME_SEMANTICS_AND_ASOF_JOIN.md)
 - [Lot 26 temporal contracts](contracts/LOT26_TEMPORAL_CONTRACTS.md)
 - [Lot 26 mathematical specification](math/LOT_26_MULTI_TIMEFRAME_ALIGNMENT_SPEC.md)
