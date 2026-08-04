@@ -1,0 +1,143 @@
+name: Institutional code quality gates
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install quality dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+      - name: Compile source
+        run: python -m compileall -q src scripts tests
+      - name: Critical Ruff checks repository-wide
+        run: ruff check --select E9,F63,F7,F82 src scripts tests
+      - name: Ruff changed-file gate
+        shell: bash
+        run: |
+          git fetch origin main
+          mapfile -t files < <(git diff --name-only --diff-filter=ACMR origin/main...HEAD -- '*.py')
+          if ((${#files[@]})); then
+            ruff check "${files[@]}"
+          else
+            echo 'No changed Python files'
+          fi
+      - name: Legacy Ruff inventory
+        shell: bash
+        run: |
+          mkdir -p reports/quality
+          ruff check src scripts tests --output-format=json > reports/quality/ruff_legacy_inventory.json || true
+      - name: Mypy package validation
+        run: mypy src/crypto_quant_bot
+      - name: Architecture boundary gate
+        run: python scripts/validate_architecture_boundaries.py
+      - name: Silent numeric coercion gate
+        run: python scripts/check_no_silent_numeric_coercion.py
+      - name: Roadmap validation
+        run: python scripts/validate_roadmap_documentation.py
+      - name: Complexity and duplication inventory
+        run: python scripts/quality_inventory.py
+      - name: Full tests with line and branch coverage
+        run: pytest -q --cov --cov-branch --cov-report=term-missing --cov-report=xml:coverage.xml --cov-report=json:coverage.json
+      - name: P0 numerical core coverage gate
+        run: coverage report --include='src/crypto_quant_bot/market_analysis/numeric.py,src/crypto_quant_bot/market_analysis/math_parameters.py' --fail-under=90
+      - name: Differential coverage gate
+        shell: bash
+        run: |
+          mkdir -p reports/quality
+          git fetch origin main
+          if git cat-file -e origin/main:reports/P0_INSTITUTIONAL_HARDENING_REPORT.md 2>/dev/null; then
+            diff-cover coverage.xml --compare-branch=origin/main --fail-under=90 --format html:reports/quality/diff_coverage.html
+          else
+            echo 'Initial P0 migration: recording historical differential coverage before the permanent 90% gate becomes active.'
+            diff-cover coverage.xml --compare-branch=origin/main --fail-under=0 --format html:reports/quality/diff_coverage.html
+          fi
+      - name: Static security scan
+        run: bandit -q -r src -ll
+      - name: Dependency vulnerability scan
+        run: pip-audit -r requirements-dev.txt
+      - name: Targeted mutation score gate
+        shell: bash
+        run: |
+          rm -rf mutants
+          mkdir -p mutants/config/math reports/quality
+          set -o pipefail
+          : > reports/quality/mutation_run.txt
+          for target in \
+            'crypto_quant_bot.market_analysis.technical_indicators.x__clamp__mutmut_*' \
+            'crypto_quant_bot.market_analysis.technical_indicators.x__rsi__mutmut_*' \
+            'crypto_quant_bot.market_analysis.technical_indicators.x__bollinger__mutmut_*' \
+            'crypto_quant_bot.market_analysis.technical_indicators.x__rate_of_change__mutmut_*' \
+            'crypto_quant_bot.market_analysis.numeric.x_require_finite_float__mutmut_*'
+          do
+            mutmut run "$target" 2>&1 | tee -a reports/quality/mutation_run.txt
+          done
+          mutmut results 2>&1 | tee reports/quality/mutation_results.txt
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          import re
+
+          text = Path('reports/quality/mutation_run.txt').read_text(encoding='utf-8', errors='replace')
+          matches = re.findall(
+              r'🎉\s*(\d+).*?⏰\s*(\d+).*?🤔\s*(\d+).*?🙁\s*(\d+)',
+              text,
+              flags=re.DOTALL,
+          )
+          if not matches:
+              raise SystemExit('MUTATION_SCORE_PARSE_ERROR: no mutmut summary found')
+          killed, timeout, suspicious, survived = map(int, matches[-1])
+          total = killed + timeout + suspicious + survived
+          if total <= 0:
+              raise SystemExit('MUTATION_SCORE_INVALID: no evaluated mutants')
+          score = 100.0 * (killed + timeout) / total
+          payload = {
+              'schema_version': 'mutation-score-v1',
+              'killed': killed,
+              'timeout': timeout,
+              'suspicious': suspicious,
+              'survived': survived,
+              'evaluated': total,
+              'score_percent': round(score, 2),
+              'minimum_score_percent': 80.0,
+              'status': 'PASS' if score >= 80.0 else 'FAIL',
+          }
+          Path('reports/quality/mutation_score.json').write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + '\n',
+              encoding='utf-8',
+          )
+          print(json.dumps(payload, sort_keys=True))
+          if score < 80.0:
+              raise SystemExit('MUTATION_SCORE_BELOW_80_PERCENT')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: institutional-quality-evidence
+          path: |
+            coverage.xml
+            coverage.json
+            reports/quality/complexity_duplication_inventory.json
+            reports/quality/complexity_duplication_inventory.md
+            reports/quality/diff_coverage.html
+            reports/quality/ruff_legacy_inventory.json
+            reports/quality/mutation_run.txt
+            reports/quality/mutation_results.txt
+            reports/quality/mutation_score.json

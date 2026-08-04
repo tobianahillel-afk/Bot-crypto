@@ -61,13 +61,16 @@ def test_lot21_registry_core_fields_are_locked():
     assert len(registry["scope_checksum"]) == 64
 
 
-def test_lot21_registry_counts_match_generated_jsonl_files():
+def test_lot21_historical_registry_and_canonical_roadmap_are_reconciled():
     registry = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     capabilities = _load_jsonl(CAPABILITIES_PATH)
     roadmap_rows = _load_jsonl(ROADMAP_PATH)
     assert registry["capability_count"] == len(capabilities)
     assert registry["phase_count"] == len(registry["roadmap_phases"])
-    assert registry["future_lot_count"] == len(roadmap_rows) == 126
+    # The frozen Lot 21 snapshot keeps its original 22–147 forecast count.
+    assert registry["future_lot_count"] == 126
+    # The canonical roadmap was later expanded and now covers Lots 0–177.
+    assert len(roadmap_rows) == 178
 
 
 def test_lot21_freeze_report_mentions_the_frozen_archive():

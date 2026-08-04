@@ -8,6 +8,13 @@ from statistics import mean
 from typing import Any
 
 from crypto_quant_bot.data.checksum import sha256_file
+from crypto_quant_bot.market_analysis.confluence_models import (
+    DEFAULT_VRC_BLOCK_REASONS,
+    VolatilityRegimeConfluenceCheck,
+    VolatilityRegimeConfluencePolicy,
+    VolatilityRegimeConfluenceResult,
+    VolatilityRegimeConfluenceTimeframeSummary,
+)
 from crypto_quant_bot.market_analysis.foundation import (
     ARCHIVE_OUTPUT_PATH,
     ARCHIVE_SHA256_OUTPUT_PATH,
@@ -19,8 +26,9 @@ from crypto_quant_bot.market_analysis.foundation import (
     LOT22_TIMEFRAMES_OUTPUT_PATH,
 )
 from crypto_quant_bot.market_analysis.io import load_json, load_jsonl, read_text_limited
+from crypto_quant_bot.market_analysis.math_parameters import VRC_PARAMETERS
+from crypto_quant_bot.market_analysis.numeric import require_finite_float
 from crypto_quant_bot.market_analysis.technical_indicators import (
-    INDICATOR_INVARIANTS,
     LOT23_OUTPUT_PATH,
     LOT23_TIMEFRAMES_OUTPUT_PATH,
 )
@@ -28,13 +36,6 @@ from crypto_quant_bot.market_analysis.trend_range_momentum import (
     LOT24_OUTPUT_PATH,
     LOT24_TIMEFRAMES_OUTPUT_PATH,
     TREND_INVARIANTS,
-)
-from crypto_quant_bot.market_analysis.confluence_models import (
-    DEFAULT_VRC_BLOCK_REASONS,
-    VolatilityRegimeConfluenceCheck,
-    VolatilityRegimeConfluencePolicy,
-    VolatilityRegimeConfluenceResult,
-    VolatilityRegimeConfluenceTimeframeSummary,
 )
 
 LOT25_OUTPUT_PATH = "data/audit/volatility_regime_confluence_lot25.json"
@@ -134,10 +135,9 @@ def _validate_frozen_archive(root: Path, *, product_scope: dict[str, Any], closu
     return archive_checksum, archive_size_bytes
 
 
-def _as_float(value: Any) -> float:
-    if isinstance(value, (int, float)):
-        return float(value)
-    return 0.0
+
+def _as_float(value: Any, *, field_name: str = "numeric_value") -> float:
+    return require_finite_float(value, field_name=field_name)
 
 
 def _round6(value: float) -> float:
@@ -187,12 +187,12 @@ def _volatility_expansion_score(
     return _round6(
         mean(
             [
-                _clamp(atr_percent / 0.9),
-                _clamp(true_range_percent / 0.55),
-                _clamp(bollinger_width_5 / 2.5),
-                _clamp(range_width_percent / 2.1),
-                _clamp(volatility_percentile * 1.35),
-                _clamp(realized_volatility_6 / 0.01),
+                _clamp(atr_percent / float(VRC_PARAMETERS["atr_expansion_normalizer"])),
+                _clamp(true_range_percent / float(VRC_PARAMETERS["true_range_normalizer"])),
+                _clamp(bollinger_width_5 / float(VRC_PARAMETERS["bollinger_expansion_normalizer"])),
+                _clamp(range_width_percent / float(VRC_PARAMETERS["range_expansion_normalizer"])),
+                _clamp(volatility_percentile * float(VRC_PARAMETERS["volatility_percentile_multiplier"])),
+                _clamp(realized_volatility_6 / float(VRC_PARAMETERS["realized_volatility_normalizer"])),
                 _clamp(expansion_score_source),
             ]
         )
@@ -210,9 +210,9 @@ def _volatility_compression_score(
     return _round6(
         mean(
             [
-                _clamp((0.9 - atr_percent) / 0.9),
-                _clamp((1.9 - bollinger_width_5) / 1.9),
-                _clamp((1.9 - range_width_percent) / 1.9),
+                _clamp((float(VRC_PARAMETERS["atr_expansion_normalizer"]) - atr_percent) / float(VRC_PARAMETERS["atr_expansion_normalizer"])),
+                _clamp((float(VRC_PARAMETERS["compression_bollinger_reference"]) - bollinger_width_5) / float(VRC_PARAMETERS["compression_bollinger_reference"])),
+                _clamp((float(VRC_PARAMETERS["compression_range_reference"]) - range_width_percent) / float(VRC_PARAMETERS["compression_range_reference"])),
                 _clamp(1.0 - volatility_percentile),
                 _clamp(compression_score_source),
             ]
@@ -221,19 +221,19 @@ def _volatility_compression_score(
 
 
 def _volatility_state(*, row_count: int, expansion_score: float, compression_score: float, volatility_level: str) -> str:
-    if row_count < 6:
+    if row_count < int(VRC_PARAMETERS["minimum_rows"]):
         return "VOLATILITY_CONTEXT_INSUFFICIENT_DATA"
-    if compression_score >= 0.68 and expansion_score < 0.5:
+    if compression_score >= float(VRC_PARAMETERS["compression_threshold"]) and expansion_score < 0.5:
         return "VOLATILITY_CONTEXT_COMPRESSING"
-    if expansion_score >= 0.7 and compression_score < 0.5:
+    if expansion_score >= float(VRC_PARAMETERS["expansion_threshold"]) and compression_score < 0.5:
         return "VOLATILITY_CONTEXT_EXPANDING"
-    if expansion_score >= 0.58 or volatility_level == "HIGH":
+    if expansion_score >= float(VRC_PARAMETERS["high_or_low_threshold"]) or volatility_level == "HIGH":
         return "VOLATILITY_CONTEXT_HIGH"
-    if compression_score >= 0.58 or volatility_level == "LOW":
+    if compression_score >= float(VRC_PARAMETERS["high_or_low_threshold"]) or volatility_level == "LOW":
         return "VOLATILITY_CONTEXT_LOW"
-    if expansion_score >= 0.38 or compression_score >= 0.38 or volatility_level == "MODERATE":
+    if expansion_score >= float(VRC_PARAMETERS["moderate_threshold"]) or compression_score >= float(VRC_PARAMETERS["moderate_threshold"]) or volatility_level == "MODERATE":
         return "VOLATILITY_CONTEXT_MODERATE"
-    if abs(expansion_score - compression_score) <= 0.08 and max(expansion_score, compression_score) >= 0.35:
+    if abs(expansion_score - compression_score) <= float(VRC_PARAMETERS["mixed_delta"]) and max(expansion_score, compression_score) >= float(VRC_PARAMETERS["mixed_minimum"]):
         return "VOLATILITY_CONTEXT_MIXED"
     return "VOLATILITY_CONTEXT_NEUTRAL"
 
@@ -247,7 +247,7 @@ def _regime_state(
     range_state: str,
     volatility_state: str,
 ) -> str:
-    if row_count < 6:
+    if row_count < int(VRC_PARAMETERS["minimum_rows"]):
         return "REGIME_CONTEXT_INSUFFICIENT_DATA"
     source = market_regime_source_state.lower()
     if source == "compressed" or volatility_state == "VOLATILITY_CONTEXT_COMPRESSING":
@@ -275,19 +275,19 @@ def _regime_context_score(
     score = 0.0
     source = market_regime_source_state.lower()
     if source in {"range", "ranging"} and range_state.startswith("RANGE_CONTEXT"):
-        score += 0.22
+        score += float(VRC_PARAMETERS["regime_source_range_weight"])
     if source == "compressed" and volatility_state == "VOLATILITY_CONTEXT_COMPRESSING":
-        score += 0.24
+        score += float(VRC_PARAMETERS["regime_source_compressed_weight"])
     if trm_combined_state == "TRM_CONTEXT_TRENDING" and trend_state in {"TREND_CONTEXT_UPWARD", "TREND_CONTEXT_DOWNWARD"}:
-        score += 0.26
+        score += float(VRC_PARAMETERS["regime_trend_weight"])
     if trm_combined_state in {"TRM_CONTEXT_RANGING", "TRM_CONTEXT_COMPRESSED"} and range_state in {
         "RANGE_CONTEXT_NEUTRAL",
         "RANGE_CONTEXT_COMPRESSED",
     }:
-        score += 0.2
+        score += float(VRC_PARAMETERS["regime_range_weight"])
     if volatility_state in {"VOLATILITY_CONTEXT_HIGH", "VOLATILITY_CONTEXT_EXPANDING"} and source != "compressed":
-        score += 0.14
-    score += _clamp(market_context_score) * 0.18
+        score += float(VRC_PARAMETERS["regime_volatility_weight"])
+    score += _clamp(market_context_score) * float(VRC_PARAMETERS["market_context_weight"])
     return _round6(_clamp(score))
 
 
@@ -368,7 +368,7 @@ def _confluence_scores(components: dict[str, Any]) -> tuple[float, float]:
 
 
 def _confluence_state(*, row_count: int, agreement_score: float, divergence_score: float) -> str:
-    if row_count < 6:
+    if row_count < int(VRC_PARAMETERS["minimum_rows"]):
         return "CONFLUENCE_CONTEXT_INSUFFICIENT_DATA"
     if divergence_score >= 0.6:
         return "CONFLUENCE_CONTEXT_DIVERGENT"

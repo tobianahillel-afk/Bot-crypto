@@ -23,13 +23,11 @@ def test_lot21_mandatory_phases_are_present():
     assert phase_ids == MANDATORY_PHASE_IDS
 
 
-def test_lot21_roadmap_covers_required_future_ranges():
+def test_canonical_roadmap_covers_lots_zero_through_177_without_gaps():
     roadmap_rows = _load_jsonl(ROADMAP_PATH)
     lot_numbers = [row["lot_number"] for row in roadmap_rows]
-    assert lot_numbers[0] == 22
-    assert lot_numbers[-1] == 147
-    assert len(roadmap_rows) == 126
-    assert len(set(lot_numbers)) == 126
+    assert lot_numbers == list(range(178))
+    assert len(set(lot_numbers)) == 178
 
 
 def test_lot21_phase_docs_cover_research_ai_ui_and_read_only_blocks():

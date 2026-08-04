@@ -171,7 +171,7 @@ API_BOUNDARIES = [
     "Aucun WebSocket ni flux externe n'est autorise.",
 ]
 
-PHASE_SPECS = [
+PHASE_SPECS: list[dict[str, Any]] = [
     {
         "phase_id": "V2_MARKET_ANALYSIS",
         "title": "Market Analysis Foundation",
@@ -322,7 +322,7 @@ PHASE_SPECS = [
     },
 ]
 
-ROADMAP_BLOCKS = [
+ROADMAP_BLOCKS: list[dict[str, Any]] = [
     {
         "start": 22,
         "end": 30,
@@ -431,7 +431,7 @@ ROADMAP_BLOCKS = [
     },
 ]
 
-CAPABILITY_SPECS = [
+CAPABILITY_SPECS: list[dict[str, Any]] = [
     {
         "capability_id": "v1_defensive_audit_closure",
         "title": "V1 Defensive Audit Closure",

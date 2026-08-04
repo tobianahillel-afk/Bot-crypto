@@ -12,7 +12,6 @@ from crypto_quant_bot.data.checksum import sha256_file
 from crypto_quant_bot.market_analysis.io import load_json, load_jsonl, read_text_limited
 from crypto_quant_bot.market_analysis.models import (
     ALLOWED_CONTEXT_LABELS,
-    DEFAULT_ANALYSIS_BLOCK_REASONS,
     MarketAnalysisCheck,
     MarketAnalysisInput,
     MarketAnalysisPolicy,
@@ -20,6 +19,7 @@ from crypto_quant_bot.market_analysis.models import (
     MarketContextSnapshot,
     MarketTimeframeSummary,
 )
+from crypto_quant_bot.market_analysis.numeric import require_finite_float
 
 DATASET_CATALOG_PATH = "data/audit/dataset_catalog.json"
 LOT20_OUTPUT_PATH = "data/audit/v1_closure_lot20.json"
@@ -135,10 +135,9 @@ def _clamp(value: float, minimum: float = 0.0, maximum: float = 1.0) -> float:
     return max(minimum, min(maximum, value))
 
 
-def _as_float(value: Any) -> float:
-    if isinstance(value, (int, float)):
-        return float(value)
-    return 0.0
+
+def _as_float(value: Any, *, field_name: str = "numeric_value") -> float:
+    return require_finite_float(value, field_name=field_name)
 
 
 def _round6(value: float) -> float:

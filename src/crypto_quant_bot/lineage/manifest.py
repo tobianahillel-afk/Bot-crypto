@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import json
-from dataclasses import replace
 import re
-from datetime import datetime, timezone
+from dataclasses import replace
+from datetime import UTC, datetime
 from hashlib import sha256
 from pathlib import Path
+from typing import Any
 
 from crypto_quant_bot.core.clock import utc_now_iso
 from crypto_quant_bot.data.checksum import sha256_file
@@ -110,7 +111,7 @@ LOT16_SOURCE_CATALOG_STABLE_FIELDS = (
     "source_lot",
 )
 
-INVARIANTS = {
+INVARIANTS: dict[str, str | bool | int] = {
     "TradingDecision": "WAIT",
     "SystemDecision": "BLOCK_TRADING",
     "final_decision": "WAIT",
@@ -164,7 +165,7 @@ SOURCE_REPORT_PATHS = [
     "reports/lot_15_validation_report.md",
 ]
 
-ARTIFACT_SPECS = [
+ARTIFACT_SPECS: list[dict[str, Any]] = [
     {
         "artifact_id": "btc_eur_5m_market_state_lot7",
         "lot": "Lot 7",
@@ -594,7 +595,7 @@ def build_source_catalog_checksum(records: list[dict[str, object]] | dict[str, o
 
 
 def file_created_at_iso(path: Path) -> str:
-    return datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc).isoformat()
+    return datetime.fromtimestamp(path.stat().st_mtime, tz=UTC).isoformat()
 
 
 class LineageManifestBuilder:
@@ -602,7 +603,7 @@ class LineageManifestBuilder:
         self.root = root
         self.policy = LineagePolicy()
 
-    def build_artifact(self, spec: dict[str, object]) -> LineageArtifact:
+    def build_artifact(self, spec: dict[str, Any]) -> LineageArtifact:
         path = self.root / str(spec["path"])
         return LineageArtifact(
             artifact_id=str(spec["artifact_id"]),

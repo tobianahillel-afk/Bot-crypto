@@ -1,15 +1,16 @@
 import json
 import os
+from collections.abc import Iterable
 from dataclasses import asdict, is_dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 from uuid import uuid4
 
 
 def _to_jsonable(record: Any) -> Any:
     if hasattr(record, "to_dict"):
         return record.to_dict()
-    if is_dataclass(record):
+    if is_dataclass(record) and not isinstance(record, type):
         return asdict(record)
     return record
 
