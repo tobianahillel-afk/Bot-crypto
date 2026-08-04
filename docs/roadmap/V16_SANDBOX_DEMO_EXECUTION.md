@@ -470,12 +470,12 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 
 - RunContextV1 (run_id, runtime_mode, config_version, code_commit, correlation_id)
 - LineageEnvelopeV1 des artefacts produits par les lots préalables
+- RiskDecisionV1 produit par V7
 
 ### Contrats de sortie
 
 - SandboxRiskLimitsKillSwitchStateV1
 - SandboxRiskLimitsKillSwitchAuditV1
-- RiskDecisionV1
 - KillSwitchStateV1
 - SandboxExecutionStateV1
 - FailureInjectionEvidenceV1
@@ -593,9 +593,7 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 - FailureInjectionIncidentDrillsAuditV1
 - SandboxExecutionStateV1
 - FailureInjectionEvidenceV1
-- TelemetryEnvelopeV1
-- IncidentRecordV1
-- RecoveryEvidenceV1
+- SandboxIncidentEventV1
 
 ### Séquence de traitement obligatoire
 

@@ -376,10 +376,10 @@ def _confluence_state(*, row_count: int, agreement_score: float, divergence_scor
         return "CONFLUENCE_CONTEXT_ALIGNED"
     if agreement_score >= 0.5 and divergence_score <= 0.4:
         return "CONFLUENCE_CONTEXT_PARTIAL"
-    if agreement_score <= 0.25:
-        return "CONFLUENCE_CONTEXT_WEAK"
     if agreement_score <= 0.2 and divergence_score <= 0.2:
         return "CONFLUENCE_CONTEXT_NEUTRAL"
+    if agreement_score <= 0.25:
+        return "CONFLUENCE_CONTEXT_WEAK"
     return "CONFLUENCE_CONTEXT_MIXED"
 
 
@@ -395,7 +395,10 @@ def _combined_context_state(
     trm_combined_state: str,
     combined_context_score: float,
 ) -> str:
-    if "INSUFFICIENT_DATA" in {volatility_state, regime_state, confluence_state}:
+    if any(
+        "INSUFFICIENT_DATA" in state
+        for state in (volatility_state, regime_state, confluence_state)
+    ):
         return "VRC_CONTEXT_INSUFFICIENT_DATA"
     if confluence_state == "CONFLUENCE_CONTEXT_DIVERGENT":
         return "VRC_CONTEXT_DIVERGENT"

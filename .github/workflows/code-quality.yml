@@ -19,12 +19,12 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.11.9'
           cache: pip
       - name: Install quality dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements-dev.txt
+          python -m pip install -r requirements-dev.lock
       - name: Compile source
         run: python -m compileall -q src scripts tests
       - name: Critical Ruff checks repository-wide
@@ -46,16 +46,43 @@ jobs:
           ruff check src scripts tests --output-format=json > reports/quality/ruff_legacy_inventory.json || true
       - name: Mypy package validation
         run: mypy src/crypto_quant_bot
-      - name: Architecture boundary gate
+      - name: Legacy market-analysis execution boundary
         run: python scripts/validate_architecture_boundaries.py
+      - name: All-domain architecture and ownership gate
+        run: python scripts/validate_domain_architecture.py
+      - name: Semantic roadmap ownership gate
+        run: python scripts/audit_roadmap_semantics.py
+      - name: Mandatory decision traceability gate
+        run: python scripts/validate_traceability_contract.py
       - name: Silent numeric coercion gate
         run: python scripts/check_no_silent_numeric_coercion.py
       - name: Roadmap validation
         run: python scripts/validate_roadmap_documentation.py
-      - name: Complexity and duplication inventory
-        run: python scripts/quality_inventory.py
-      - name: Full tests with line and branch coverage
-        run: pytest -q --cov --cov-branch --cov-report=term-missing --cov-report=xml:coverage.xml --cov-report=json:coverage.json
+      - name: Engineering inventory and owned deviation gate
+        run: |
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+      - name: Historical Lot 0-25 chain under coverage
+        shell: bash
+        run: |
+          coverage erase
+          coverage run --parallel-mode scripts/run_historical_chain_under_coverage.py
+          coverage combine
+          cp .coverage /tmp/p06-historical-coverage
+          git reset --hard HEAD
+          git clean -fd
+          mv /tmp/p06-historical-coverage .coverage
+      - name: Verify clean workspace after historical replay
+        run: git diff --exit-code && test -z "$(git status --porcelain)"
+      - name: Rebuild non-mutating quality inventories
+        shell: bash
+        run: |
+          mkdir -p reports/quality
+          ruff check src scripts tests --output-format=json > reports/quality/ruff_legacy_inventory.json || true
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+      - name: Full tests with accumulated line and branch coverage
+        run: pytest -q --cov --cov-branch --cov-append --cov-report=term-missing --cov-report=xml:coverage.xml --cov-report=json:coverage.json
       - name: P0 numerical core coverage gate
         run: coverage report --include='src/crypto_quant_bot/market_analysis/numeric.py,src/crypto_quant_bot/market_analysis/math_parameters.py' --fail-under=90
       - name: Differential coverage gate
@@ -63,16 +90,11 @@ jobs:
         run: |
           mkdir -p reports/quality
           git fetch origin main
-          if git cat-file -e origin/main:reports/P0_INSTITUTIONAL_HARDENING_REPORT.md 2>/dev/null; then
-            diff-cover coverage.xml --compare-branch=origin/main --fail-under=90 --html-report reports/quality/diff_coverage.html
-          else
-            echo 'Initial P0 migration: recording historical differential coverage before the permanent 90% gate becomes active.'
-            diff-cover coverage.xml --compare-branch=origin/main --fail-under=0 --html-report reports/quality/diff_coverage.html
-          fi
+          diff-cover coverage.xml --compare-branch=origin/main --fail-under=90 --html-report reports/quality/diff_coverage.html
       - name: Static security scan
         run: bandit -q -r src -ll
       - name: Dependency vulnerability scan
-        run: pip-audit -r requirements-dev.txt
+        run: pip-audit -r requirements-dev.lock
       - name: Targeted mutation score gate
         shell: bash
         run: |
@@ -103,13 +125,17 @@ jobs:
           )
           if not matches:
               raise SystemExit('MUTATION_SCORE_PARSE_ERROR: no mutmut summary found')
-          killed, timeout, suspicious, survived = map(int, matches[-1])
+          killed = sum(int(item[0]) for item in matches)
+          timeout = sum(int(item[1]) for item in matches)
+          suspicious = sum(int(item[2]) for item in matches)
+          survived = sum(int(item[3]) for item in matches)
           total = killed + timeout + suspicious + survived
           if total <= 0:
               raise SystemExit('MUTATION_SCORE_INVALID: no evaluated mutants')
           score = 100.0 * (killed + timeout) / total
           payload = {
               'schema_version': 'mutation-score-v1',
+              'summaries_aggregated': len(matches),
               'killed': killed,
               'timeout': timeout,
               'suspicious': suspicious,
@@ -127,6 +153,15 @@ jobs:
           if score < 80.0:
               raise SystemExit('MUTATION_SCORE_BELOW_80_PERCENT')
           PY
+      - name: Flake detection — repeat full suite three times
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            echo "Full regression repetition ${attempt}/3"
+            pytest -q
+          done
+      - name: Repository-wide coverage gate
+        run: python scripts/validate_global_coverage.py --line-minimum 90 --branch-minimum 85
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -136,8 +171,11 @@ jobs:
             coverage.json
             reports/quality/complexity_duplication_inventory.json
             reports/quality/complexity_duplication_inventory.md
+            reports/quality/engineering_deviation_gate.json
             reports/quality/diff_coverage.html
             reports/quality/ruff_legacy_inventory.json
             reports/quality/mutation_run.txt
             reports/quality/mutation_results.txt
             reports/quality/mutation_score.json
+            reports/quality/global_coverage_gate.json
+            reports/P0_6_ROADMAP_SEMANTIC_AUDIT.json

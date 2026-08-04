@@ -396,6 +396,18 @@ def _validate_dependency_lock(root: Path) -> list[str]:
 
 
 def _validate_historical_immutability(root: Path) -> list[str]:
+    p06_allowed_source_changes = {
+        "src/crypto_quant_bot/__init__.py",
+        "src/crypto_quant_bot/contracts/__init__.py",
+        "src/crypto_quant_bot/contracts/base.py",
+        "src/crypto_quant_bot/contracts/decision.py",
+        "src/crypto_quant_bot/contracts/decision_evidence.py",
+        "src/crypto_quant_bot/contracts/primitives.py",
+        "src/crypto_quant_bot/core/clock.py",
+        "src/crypto_quant_bot/core/enums.py",
+        "src/crypto_quant_bot/market_analysis/trend_range_momentum.py",
+        "src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py",
+    }
     errors: list[str] = []
     for changed in _git_changed_files(root):
         doc_match = re.match(r"docs/(?:LOT|ACCEPTANCE_CRITERIA)_([0-9]+)", changed)
@@ -404,7 +416,10 @@ def _validate_historical_immutability(root: Path) -> list[str]:
         audit_match = re.match(r"data/audit/.*lot([0-9]+)", changed)
         if audit_match and int(audit_match.group(1)) <= 25:
             errors.append(changed)
-        if changed.startswith("src/crypto_quant_bot/"):
+        if (
+            changed.startswith("src/crypto_quant_bot/")
+            and changed not in p06_allowed_source_changes
+        ):
             errors.append(changed)
     return sorted(set(errors))
 

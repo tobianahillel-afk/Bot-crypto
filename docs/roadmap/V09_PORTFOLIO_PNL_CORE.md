@@ -244,14 +244,12 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 
 - RunContextV1 (run_id, runtime_mode, config_version, code_commit, correlation_id)
 - LineageEnvelopeV1 des artefacts produits par les lots préalables
-- ExchangeInstrumentMetadataV1
+- InstrumentSpecificationV1 produit par V3
 
 ### Contrats de sortie
 
 - PositionLifecycleCorporateInstrumentEventsStateV1
 - PositionLifecycleCorporateInstrumentEventsAuditV1
-- InstrumentRegistryV1
-- InstrumentSpecificationV1
 - PositionStateV1
 - PositionEventV1
 
@@ -261,12 +259,11 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 2. Exécuter la responsabilité « Position Lifecycle & Corporate/Instrument Events » dans le composant PortfolioDomain sans effet de bord non déclaré.
 3. Associer à chaque résultat les identifiants de données, features, modèle, configuration, code et replay.
 4. Persister état, reason_codes, incertitude, veto éventuel, métriques et checksum par écriture atomique.
-5. Normaliser venue, base, quote, market_type, canonical_symbol et exchange_symbol.
-6. Modéliser spot, perpetual, dated future et option avec champs non applicables explicitement null/forbidden.
-7. Valider tick_size, lot_size, min_qty, min_notional, price/qty precision, fee tier, settlement, margin et leverage policy.
-8. Appliquer fills, fees, funding, transfers et instrument events dans ordre déterministe.
-9. Gérer increase/reduce/close/reopen et average cost selon méthode documentée.
-10. Distinguer position économique, venue position et strategy attribution.
+5. Consommer l'InstrumentSpecificationV1 de V3 et rejeter toute version inconnue ou stale sans la renormaliser.
+6. Appliquer fills, fees, funding, transfers et instrument events dans ordre déterministe.
+7. Gérer increase/reduce/close/reopen et average cost selon méthode documentée.
+8. Distinguer position économique, venue position et strategy attribution.
+9. Produire chaque transition de position comme événement idempotent et réconciliable.
 
 ### Règles métier et algorithmiques
 
@@ -278,8 +275,8 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 - Entrée absente, obsolète, hors séquence ou de version incompatible → état BLOCKED/UNKNOWN.
 - Divergence entre état calculé et artefact réconcilié → veto et rapport de divergence.
 - Exception non classifiée → aucun output valide, incident auditable et arrêt fail-closed.
-- Métadonnée instrument ambiguë ou révisée → INSTRUMENT_FROZEN.
-- Arrondi qui viole min_notional → order intent rejeté.
+- InstrumentSpecificationV1 ambiguë, stale ou révisée → POSITION_PROCESSING_FROZEN.
+- Fill ou instrument event invalide → événement rejeté et réconciliation requise.
 
 ### Fichiers et artefacts d’implémentation attendus
 
@@ -311,8 +308,8 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 - Test anti-lookahead ou anti-future-state adapté au domaine.
 - Test de sérialisation/désérialisation du contrat de sortie.
 - Test d’intégration avec le lot précédent et le gate suivant.
-- Round-trip symbol canonical ↔ venue.
-- Tests de quantization aux frontières tick/lot/min_notional.
+- Le Lot 90 ne produit ni InstrumentRegistryV1 ni InstrumentSpecificationV1.
+- InstrumentSpecificationV1 stale ou incompatible gèle le traitement.
 - Long→flat→long ne mélange pas lots.
 - Out-of-order fill event réconcilié.
 
@@ -464,12 +461,12 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 
 - RunContextV1 (run_id, runtime_mode, config_version, code_commit, correlation_id)
 - LineageEnvelopeV1 des artefacts produits par les lots préalables
+- DerivativesContextStateV1 produit par V4
 
 ### Contrats de sortie
 
 - FeeFundingSlippageAttributionStateV1
 - FeeFundingSlippageAttributionAuditV1
-- DerivativesContextStateV1
 - SlippageImpactEstimateV1
 
 ### Séquence de traitement obligatoire

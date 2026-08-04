@@ -375,12 +375,12 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 
 - RunContextV1 (run_id, runtime_mode, config_version, code_commit, correlation_id)
 - LineageEnvelopeV1 des artefacts produits par les lots préalables
+- DerivativesContextStateV1 produit par V4
 
 ### Contrats de sortie
 
 - OrderTradeFundingHistoryStateV1
 - OrderTradeFundingHistoryAuditV1
-- DerivativesContextStateV1
 - ReadOnlyAccountSnapshotV1
 - PermissionAuditV1
 

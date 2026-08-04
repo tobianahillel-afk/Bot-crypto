@@ -17,22 +17,36 @@ on:
       - '.github/pull_request_template.md'
       - '.github/workflows/pre-lot26-readiness-validation.yml'
       - 'config/math/multi_timeframe_alignment_v1.json'
+      - 'config/governance/**'
       - 'config/temporal/**'
       - 'config/research/forecast_horizon_registry_v1.json'
       - 'contracts/schemas/**'
       - 'docs/**'
+      - 'scripts/audit_roadmap_semantics.py'
+      - 'scripts/quality_inventory.py'
+      - 'scripts/validate_domain_architecture.py'
+      - 'scripts/validate_engineering_deviations.py'
       - 'scripts/validate_pre_lot26_readiness.py'
+      - 'scripts/validate_traceability_contract.py'
       - 'tests/test_pre_lot26_readiness.py'
+      - 'tests/test_p06_*.py'
   push:
     branches:
       - main
     paths:
+      - 'config/governance/**'
       - 'config/temporal/**'
       - 'config/research/forecast_horizon_registry_v1.json'
       - 'contracts/schemas/**'
       - 'docs/**'
+      - 'scripts/audit_roadmap_semantics.py'
+      - 'scripts/quality_inventory.py'
+      - 'scripts/validate_domain_architecture.py'
+      - 'scripts/validate_engineering_deviations.py'
       - 'scripts/validate_pre_lot26_readiness.py'
+      - 'scripts/validate_traceability_contract.py'
       - 'tests/test_pre_lot26_readiness.py'
+      - 'tests/test_p06_*.py'
   workflow_dispatch:
 
 permissions:
@@ -59,10 +73,20 @@ jobs:
           python -m pip install -r requirements-dev.lock
 
       - name: Compile readiness code
-        run: python -m compileall -q scripts/validate_pre_lot26_readiness.py tests/test_pre_lot26_readiness.py
+        run: python -m compileall -q scripts tests
 
-      - name: Ruff readiness code
-        run: ruff check scripts/validate_pre_lot26_readiness.py tests/test_pre_lot26_readiness.py
+      - name: Ruff readiness and P0.6 code
+        run: >-
+          ruff check
+          scripts/validate_pre_lot26_readiness.py
+          scripts/audit_roadmap_semantics.py
+          scripts/quality_inventory.py
+          scripts/validate_domain_architecture.py
+          scripts/validate_engineering_deviations.py
+          scripts/validate_traceability_contract.py
+          tests/test_pre_lot26_readiness.py
+          tests/test_p06_decision_evidence.py
+          tests/test_p06_global_coverage_gate.py
 
       - name: Run readiness validator
         run: python scripts/validate_pre_lot26_readiness.py --write-report
@@ -70,8 +94,22 @@ jobs:
       - name: Validate canonical roadmap
         run: python scripts/validate_roadmap_documentation.py
 
+      - name: Validate semantic roadmap ownership
+        run: python scripts/audit_roadmap_semantics.py
+
+      - name: Validate all domain boundaries
+        run: python scripts/validate_domain_architecture.py
+
+      - name: Validate mandatory decision traceability
+        run: python scripts/validate_traceability_contract.py
+
+      - name: Validate owned engineering deviations
+        run: |
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+
       - name: Run readiness tests
-        run: pytest -q tests/test_pre_lot26_readiness.py
+        run: pytest -q tests/test_pre_lot26_readiness.py tests/test_p06_decision_evidence.py tests/test_p06_global_coverage_gate.py
 
       - name: Run full regression suite
         run: pytest -q

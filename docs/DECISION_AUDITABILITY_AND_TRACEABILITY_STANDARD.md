@@ -19,7 +19,7 @@ Toute décision, absence de décision, veto, transition, ordre simulé ou ordre 
 - l'action finale ;
 - les événements ultérieurs et la réconciliation.
 
-## 2. Decision Evidence Envelope
+## 2. `DecisionEvidenceEnvelopeV1`
 
 Chaque décision persistée contient au minimum :
 

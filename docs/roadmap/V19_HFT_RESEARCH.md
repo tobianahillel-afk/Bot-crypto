@@ -154,13 +154,14 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 - RunContextV1 (run_id, runtime_mode, config_version, code_commit, correlation_id)
 - LineageEnvelopeV1 des artefacts produits par les lots préalables
 - RawTimestampEnvelopeV1
+- CanonicalTimeEnvelopeV1 produit par V3
+- ClockHealthStateV1 produit par V3
 
 ### Contrats de sortie
 
 - TickL2L3DataHighResolutionTimePolicyStateV1
 - TickL2L3DataHighResolutionTimePolicyAuditV1
-- CanonicalTimeEnvelopeV1
-- ClockHealthStateV1
+- HighResolutionTimePolicyV1
 
 ### Séquence de traitement obligatoire
 

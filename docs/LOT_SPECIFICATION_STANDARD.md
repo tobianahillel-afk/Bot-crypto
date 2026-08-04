@@ -16,7 +16,7 @@ Ce standard est complété par :
 2. Objectif falsifiable, responsabilité exacte et composant propriétaire.
 3. Périmètre, non-objectifs et capabilities interdites.
 4. Contrats d'entrée : types, versions, unités, fraîcheur, provenance et disponibilité temporelle.
-5. Contrats de sortie : schémas, états, reason codes, incertitude et lineage.
+5. Contrats de sortie : schémas, états, reason codes, incertitude, lineage et `DecisionEvidenceEnvelopeV1`.
 6. Préconditions et gates d'entrée.
 7. Séquence de traitement ordonnée, avec décisions intermédiaires.
 8. Spécification mathématique : domaines, formules, hypothèses, unités, bornes et tolérances.
@@ -58,6 +58,8 @@ anti_lookahead_data
 Seuils généraux :
 
 ```text
+line coverage globale runtime >= 90 %
+branch coverage globale runtime >= 85 %
 line coverage ajouté/modifié >= 90 %
 branch coverage ajouté/modifié >= 85 %
 modules critiques : line >= 95 %, branch >= 90 %

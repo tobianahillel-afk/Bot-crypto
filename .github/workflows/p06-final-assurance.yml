@@ -1,0 +1,90 @@
+name: P0.6 final exact-commit assurance
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'scripts/**'
+      - 'docs/**'
+      - 'config/**'
+      - 'contracts/**'
+      - 'requirements-dev.lock'
+      - 'pyproject.toml'
+      - '.github/workflows/p06-final-assurance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  assurance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Validate owned engineering deviations
+        run: |
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+      - name: Run exact-commit assurance
+        id: assurance
+        continue-on-error: true
+        run: python scripts/run_p06_final_assurance.py
+      - name: Publish pull-request verdict
+        if: github.event_name == 'pull_request' && always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        shell: bash
+        run: |
+          if [ ! -f reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.json ]; then
+            gh pr comment "$PR_URL" --body "P0.6 final assurance runner failed before producing its exact-commit report. The PR remains draft and Lot 26 remains locked."
+            exit 0
+          fi
+          status=$(python -c "import json; print(json.load(open('reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.json'))['status'])")
+          evidence_commit=$(python -c "import json; print(json.load(open('reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.json'))['evidence_commit'])")
+          line_coverage=$(python -c "import json; print(json.load(open('reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.json'))['line_coverage_percent'])")
+          branch_coverage=$(python -c "import json; print(json.load(open('reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.json'))['branch_coverage_percent'])")
+          tests=$(python -c "import json; print(json.load(open('reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.json'))['test_count'])")
+          if [ "$status" = PASS ]; then
+            gh pr comment "$PR_URL" --body "P0.6 final assurance PASS on \`$evidence_commit\`: $tests tests, line coverage $line_coverage%, branch coverage $branch_coverage%, both mutation gates PASS, Bandit/pip-audit PASS, 3/3 anti-flake repetitions PASS, and all engineering deviations are owned and current. The attached workflow artifact is the immutable exact-commit report. An authorized reviewer may now mark the PR ready and merge it. Lot 26 remains locked until merge."
+          else
+            gh pr comment "$PR_URL" --body "P0.6 final assurance remains FAIL on \`$evidence_commit\`. The workflow artifact contains the exact-commit JSON/Markdown report and all logs. The PR remains draft and Lot 26 remains locked."
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p06-final-exact-commit-assurance-${{ github.sha }}
+          path: |
+            coverage.xml
+            coverage.json
+            reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.json
+            reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.md
+            reports/quality/p06_final_assurance/
+      - name: Enforce final assurance verdict
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path('reports/P0_6_FINAL_PRE_LOT26_ASSURANCE_REPORT.json')
+          if not path.is_file():
+              raise SystemExit('P0_6_FINAL_REPORT_MISSING')
+          payload = json.loads(path.read_text(encoding='utf-8'))
+          if payload.get('status') != 'PASS':
+              raise SystemExit('P0_6_FINAL_ASSURANCE_NO_GO')
+          print('P0_6_FINAL_ASSURANCE: PASS')
+          PY

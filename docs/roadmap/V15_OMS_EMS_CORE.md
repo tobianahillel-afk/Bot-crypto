@@ -356,13 +356,13 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 - RunContextV1 (run_id, runtime_mode, config_version, code_commit, correlation_id)
 - LineageEnvelopeV1 des artefacts produits par les lots préalables
 - ExchangeInstrumentMetadataV1
+- InstrumentRegistryV1 produit par V3
+- InstrumentSpecificationV1 produit par V3
 
 ### Contrats de sortie
 
 - OrderValidationContractSpecificationRulesStateV1
 - OrderValidationContractSpecificationRulesAuditV1
-- InstrumentRegistryV1
-- InstrumentSpecificationV1
 - OrderValidationResultV1
 
 ### Séquence de traitement obligatoire

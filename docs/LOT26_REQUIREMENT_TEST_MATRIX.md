@@ -23,7 +23,7 @@
 | AC-26-19 protective-order boundary | architecture, static | no stop/TP/trailing/bracket/OCO implementation |
 | AC-26-20 quality gates | CI | line/branch coverage and mutation artifacts |
 | AC-26-21 forbidden capabilities | security/static | no BUY/SELL/order/size/paper/live fields |
-| AC-26-22 audit evidence | audit/replay | manifest, lineage, config/registry checksums |
+| AC-26-22 audit evidence | audit/replay | `DecisionEvidenceEnvelopeV1`, manifest, lineage, config/registry checksums |
 | AC-26-23 historical immutability | git/static | no Lots 0–25 or src changes |
 
 ## Required test metadata

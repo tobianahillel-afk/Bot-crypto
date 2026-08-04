@@ -43,8 +43,6 @@ Faire évoluer le système de **Projet initial** vers **Archive V1 figée et inv
 
 - ProjectBootstrapSafetyBaselineStateV1
 - ProjectBootstrapSafetyBaselineAuditV1
-- LiquidityBehaviorEventV1
-- RobustnessSimulationResultV1
 
 ### Séquence de traitement obligatoire
 
@@ -53,14 +51,9 @@ Faire évoluer le système de **Projet initial** vers **Archive V1 figée et inv
 3. Associer à chaque résultat les identifiants de données, features, modèle, configuration, code et replay.
 4. Persister état, reason_codes, incertitude, veto éventuel, métriques et checksum par écriture atomique.
 5. Conserver l’implémentation historique et utiliser les documents LOT_x / ACCEPTANCE_CRITERIA_LOT_x existants comme preuve primaire.
-6. Détecter breach de zone, excursion, volume/flow associé puis reclaim/acceptance dans fenêtre définie.
-7. Classer SWEEP, BREAKOUT_ACCEPTED, FAKEOUT, LONG_TRAP, SHORT_TRAP ou FAILED_AUCTION.
-8. Exiger séquence temporelle complète et publier evidence/invalidating_evidence.
-9. Ne pas utiliser de barre future au-delà du temps de décision.
-10. Bootstrap par blocs pour préserver dépendance temporelle.
-11. Randomiser ordre des trades/cost shocks selon scénario.
-12. Balayer paramètres autour du point choisi et détecter cliffs.
-13. Publier risk-of-ruin et drawdown distribution.
+6. Enregistrer identité projet, runtime autorisé, version Python, toolchain et invariants de sécurité.
+7. Vérifier qu'aucun connecteur, moteur de prédiction, signal, sizing ou exécution n'est activé.
+8. Produire un manifest de bootstrap et un audit déterministes avec checksums.
 
 ### Règles métier et algorithmiques
 
@@ -104,10 +97,9 @@ Les chemins des modules source sont ceux des critères d’acceptation historiqu
 - Test anti-lookahead ou anti-future-state adapté au domaine.
 - Test de sérialisation/désérialisation du contrat de sortie.
 - Test d’intégration avec le lot précédent et le gate suivant.
-- Breach sans reclaim ≠ fakeout.
-- Late reclaim après expiration ≠ trap actif.
-- Seed reproductible.
-- Paramètre fragile marqué non promotable.
+- Manifest de bootstrap reconstructible.
+- Runtime hors `EDUCATIONAL_AUDIT_ONLY` rejeté.
+- Aucun contrat ou algorithme appartenant aux versions futures.
 
 ### Non-objectifs
 
@@ -2416,8 +2408,6 @@ Surveiller intégrité, santé locale et cohérence des artefacts.
 
 - LocalHealthMonitorIntegrityChecksStateV1
 - LocalHealthMonitorIntegrityChecksAuditV1
-- ExchangeHealthStateV1
-- ExchangeRiskVetoV1
 
 ### Séquence de traitement obligatoire
 
