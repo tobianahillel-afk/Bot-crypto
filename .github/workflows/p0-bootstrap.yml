@@ -46,6 +46,17 @@ jobs:
           PY
       - name: Strengthen exact mathematical mutation oracles
         run: python scripts/strengthen_p0_mutation_tests.py
+      - name: Defer permanent workflow publication to connector
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/apply_p0_hardening.py')
+          text = path.read_text(encoding='utf-8')
+          line = '    write(".github/workflows/code-quality.yml", CODE_QUALITY_WORKFLOW)\n'
+          if text.count(line) != 1:
+              raise SystemExit('code-quality workflow write marker mismatch')
+          path.write_text(text.replace(line, '', 1), encoding='utf-8')
+          PY
       - name: Apply idempotent P0 migration
         run: python scripts/apply_p0_hardening.py
       - name: Apply historical mypy fixes
