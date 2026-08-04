@@ -119,8 +119,6 @@ code_commit
 
 Chaque état est accompagné d'un `DecisionEvidenceEnvelopeV1` fermé reliant inputs, checksums, règles, reason codes, incertitude et conséquence finale.
 
-Chaque état est accompagné d'un `DecisionEvidenceEnvelopeV1` fermé reliant inputs, checksums, règles, reason codes, incertitude et conséquence finale.
-
 Le score peut être `null`. Une valeur absente n'est jamais transformée en zéro.
 
 La sortie est conçue pour être consommable ultérieurement par V4/V5, mais elle n'est pas une prévision et ne porte aucun champ exécutable.
