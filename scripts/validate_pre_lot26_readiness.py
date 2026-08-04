@@ -10,12 +10,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-EXPECTED_CONFIG_SHA256 = "cb6ac1d3c392df67b5eb15d4c07a8fc818772025ec05e142190b0b667308bd76"
 DIRECT_LOCKED_TOOLS = {
     "bandit": "1.8.0",
     "diff-cover": "9.2.0",
     "hypothesis": "6.161.0",
-    "mypy": "1.18.0",
+    "mypy": "1.18.1",
     "mutmut": "3.5.0",
     "pip-audit": "2.9.0",
     "pytest": "8.4.0",
@@ -33,17 +32,33 @@ REQUIRED_FILES = [
     "CHANGELOG.md",
     ".github/CODEOWNERS",
     ".github/pull_request_template.md",
+    ".github/workflows/pre-lot26-readiness-validation.yml",
     "docs/PRE_LOT26_ENTRY_GATE.md",
     "docs/LOT_26_MULTI_TIMEFRAME_ALIGNMENT_ENGINE.md",
     "docs/ACCEPTANCE_CRITERIA_LOT_26.md",
+    "docs/LOT26_REQUIREMENT_TEST_MATRIX.md",
     "docs/adr/ADR_0001_TIME_SEMANTICS_AND_ASOF_JOIN.md",
     "docs/contracts/LOT26_TEMPORAL_CONTRACTS.md",
     "docs/math/LOT_26_MULTI_TIMEFRAME_ALIGNMENT_SPEC.md",
     "docs/roadmap/V02_LOT26_NORMATIVE_ADDENDUM.md",
+    "docs/TEMPORAL_MULTI_SCALE_AND_DECISION_CLOCK_ARCHITECTURE.md",
+    "docs/STOCHASTIC_CONTINUOUS_STATE_AND_MULTI_HORIZON_FORECASTING_STANDARD.md",
+    "docs/PARTICIPANT_BEHAVIOR_AND_LIQUIDITY_EXIT_ZONE_INFERENCE_STANDARD.md",
+    "docs/PROTECTIVE_ORDERS_AND_EXIT_LIFECYCLE_STANDARD.md",
+    "docs/roadmap/MULTI_SCALE_STOCHASTIC_PREDICTION_AND_PARTICIPANT_INFERENCE_ADDENDUM.md",
+    "config/math/multi_timeframe_alignment_v1.json",
+    "config/temporal/temporal_scale_registry_v1.json",
+    "config/temporal/decision_clock_policy_v1.json",
+    "config/research/forecast_horizon_registry_v1.json",
     "contracts/schemas/timeframe_market_context_state_v1.schema.json",
     "contracts/schemas/closed_bar_availability_v1.schema.json",
     "contracts/schemas/multi_timeframe_alignment_state_v1.schema.json",
-    "config/math/multi_timeframe_alignment_v1.json",
+    "contracts/schemas/temporal_scale_registry_v1.schema.json",
+    "contracts/schemas/decision_clock_policy_v1.schema.json",
+    "contracts/schemas/continuous_market_state_v1.schema.json",
+    "contracts/schemas/multi_horizon_forecast_v1.schema.json",
+    "contracts/schemas/participant_behavior_scenario_v1.schema.json",
+    "contracts/schemas/liquidity_exit_zone_v1.schema.json",
     "reports/P0_INSTITUTIONAL_HARDENING_REPORT.md",
     "data/audit/volatility_regime_confluence_timeframes_lot25.jsonl",
 ]
@@ -51,9 +66,24 @@ REQUIRED_FILES = [
 FORBIDDEN_IMPLEMENTATION_FILES = [
     "src/crypto_quant_bot/market_analysis/multi_timeframe_alignment_engine.py",
     "src/crypto_quant_bot/market_analysis/multi_timeframe_alignment_engine_models.py",
+    "src/crypto_quant_bot/market_analysis/continuous_market_state.py",
+    "src/crypto_quant_bot/strategy_research/multi_horizon_forecast.py",
+    "src/crypto_quant_bot/microstructure/participant_behavior.py",
     "scripts/run_lot26_multi_timeframe_alignment_engine.py",
     "data/audit/multi_timeframe_alignment_engine_lot26.json",
 ]
+
+FORBIDDEN_TEMPORARY_FILES = [
+    ".github/workflows/apply-pre-lot26-readiness.yml",
+    "scripts/apply_pre_lot26_readiness.py",
+    "scripts/pre_lot26_payload_00.txt",
+    "scripts/pre_lot26_payload_00_fixed.txt",
+    "scripts/pre_lot26_payload_01.txt",
+    "scripts/pre_lot26_payload_02.txt",
+    "scripts/pre_lot26_payload_03.txt",
+]
+
+SCHEMA_FILES = [path for path in REQUIRED_FILES if path.startswith("contracts/schemas/")]
 
 REQUIRED_DOC_TOKENS = {
     "docs/adr/ADR_0001_TIME_SEMANTICS_AND_ASOF_JOIN.md": [
@@ -61,32 +91,63 @@ REQUIRED_DOC_TOKENS = {
         "ASOF_BACKWARD",
         "bar_close_time",
         "open_bars",
+        "decision_clock",
     ],
     "docs/math/LOT_26_MULTI_TIMEFRAME_ALIGNMENT_SPEC.md": [
         "overall_agreement_score",
         "weighted_coverage_ratio",
         "agreement score",
         "probability",
-        "0.70",
-        "0.75",
+        "G = (S, E)",
+        "vote majoritaire",
     ],
     "docs/LOT_26_MULTI_TIMEFRAME_ALIGNMENT_ENGINE.md": [
         "PLANNED_LOCKED",
+        "timebar-5m",
+        "timebar-15m",
         "used_for_decision=false",
-        "execution_allowed=false",
+        "forecast_generation_allowed=false",
         "Game Theory",
     ],
-    "docs/roadmap/V04_MICROSTRUCTURE_LIQUIDITY_GAME_THEORY.md": [
-        "Lots 37 à 52",
-        "participant_behavior = inference_explicitly_labeled",
-        "execution_allowed=false",
+    "docs/TEMPORAL_MULTI_SCALE_AND_DECISION_CLOCK_ARCHITECTURE.md": [
+        "data_resolution",
+        "forecast_horizon",
+        "decision_clock",
+        "signal_ttl",
+        "holding_horizon",
+        "vote majoritaire",
+    ],
+    "docs/STOCHASTIC_CONTINUOUS_STATE_AND_MULTI_HORIZON_FORECASTING_STANDARD.md": [
+        "ContinuousMarketStateV1",
+        "MultiHorizonForecastV1",
+        "Kalman",
+        "Hawkes",
+        "calibration",
+        "Lot26 forecast generation = FORBIDDEN",
+    ],
+    "docs/PARTICIPANT_BEHAVIOR_AND_LIQUIDITY_EXIT_ZONE_INFERENCE_STANDARD.md": [
+        "ParticipantBehaviorScenarioV1",
+        "TAKE_PROFIT_CLUSTER",
+        "BREAK_EVEN_CLUSTER",
+        "LIQUIDATION_CLUSTER",
+        "payoff_proxy",
+        "inference_explicitly_labeled",
+    ],
+    "docs/PROTECTIVE_ORDERS_AND_EXIT_LIFECYCLE_STANDARD.md": [
+        "ExitPolicyV1",
+        "ProtectiveOrderPlanV1",
+        "OCO",
+        "break-even",
+        "partial fill",
+        "reconciliation",
     ],
     "README.md": [
         "Lot 25",
         "Lot 26",
-        "flux continu",
+        "flux de marché canonique unique et continu",
         "ASOF_BACKWARD",
         "Game Theory",
+        "TAKE_PROFIT_CLUSTER",
     ],
 }
 
@@ -106,40 +167,45 @@ def _load_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def validate_config(payload: dict[str, Any]) -> list[str]:
+def _pass_or_fail(check_id: str, errors: list[str], success: str) -> Check:
+    return Check(check_id, "PASS" if not errors else "FAIL", "; ".join(errors) or success)
+
+
+def _validate_alignment_config(payload: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     weights = payload.get("component_weights")
-    if not isinstance(weights, dict) or set(weights) != {
-        "trend", "range", "momentum", "volatility", "regime", "confluence"
-    }:
+    expected = {"trend", "range", "momentum", "volatility", "regime", "confluence"}
+    if not isinstance(weights, dict) or set(weights) != expected:
         errors.append("component_weights keys invalid")
     else:
         numeric = [float(value) for value in weights.values()]
-        if any(value <= 0.0 for value in numeric):
+        if any(value <= 0 for value in numeric):
             errors.append("component weights must be positive")
         if abs(sum(numeric) - 1.0) > 1e-9:
             errors.append("component weights must sum to 1")
 
-    tf = payload.get("canonical_timeframes", {})
-    if tf.get("local") != "5m" or tf.get("higher") != "15m":
-        errors.append("canonical timeframe pair must be 5m/15m")
-    if tf.get("continuous_ingestion") is not True or tf.get("open_bars_allowed") is not False:
-        errors.append("continuous/closed-bar policy invalid")
+    timeframes = payload.get("canonical_timeframes", {})
+    if timeframes.get("local") != "5m" or timeframes.get("higher") != "15m":
+        errors.append("Lot26 initial pair must be 5m/15m")
+    if timeframes.get("continuous_ingestion") is not True:
+        errors.append("continuous_ingestion must be true")
+    if timeframes.get("open_bars_allowed") is not False:
+        errors.append("open bars must be forbidden as confirmed inputs")
 
-    time_policy = payload.get("time_policy", {})
-    if time_policy.get("join_method") != "ASOF_BACKWARD":
+    policy = payload.get("time_policy", {})
+    if policy.get("join_method") != "ASOF_BACKWARD":
         errors.append("join_method must be ASOF_BACKWARD")
-    if time_policy.get("eligibility_rule") != "available_at <= decision_time":
+    if policy.get("eligibility_rule") != "available_at <= decision_time":
         errors.append("eligibility rule invalid")
 
     restrictions = payload.get("promotion_restrictions", {})
-    if any(value is not False for value in restrictions.values()):
+    if not restrictions or any(value is not False for value in restrictions.values()):
         errors.append("all promotion permissions must be false")
 
     thresholds = payload.get("classification_thresholds", {})
     aligned = float(thresholds.get("aligned_minimum", -1))
     partial = float(thresholds.get("partial_minimum", -1))
-    if not 0.0 <= partial < aligned <= 1.0:
+    if not 0 <= partial < aligned <= 1:
         errors.append("classification thresholds invalid")
 
     matrices = payload.get("categorical_compatibility", {})
@@ -155,11 +221,117 @@ def validate_config(payload: dict[str, Any]) -> list[str]:
                 continue
             for target, value in row.items():
                 number = float(value)
-                if not 0.0 <= number <= 1.0:
-                    errors.append(f"{name} matrix out of bounds {source}/{target}")
                 reverse = matrix.get(target, {}).get(source)
+                if not 0 <= number <= 1:
+                    errors.append(f"{name} matrix out of bounds {source}/{target}")
                 if reverse is None or abs(number - float(reverse)) > 1e-9:
                     errors.append(f"{name} matrix not symmetric {source}/{target}")
+    return errors
+
+
+def _validate_temporal_registry(payload: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    profile = payload.get("lot26_initial_profile", {})
+    expected_profile = {
+        "local_scale_id": "timebar-5m",
+        "higher_scale_id": "timebar-15m",
+        "evaluation_trigger": "CLOSED_LOCAL_BAR",
+        "join_method": "ASOF_BACKWARD",
+        "eligibility_rule": "available_at <= decision_time",
+        "implementation_scope": "EXACTLY_ONE_ORDERED_SCALE_EDGE",
+        "extensible_interface_required": True,
+    }
+    for key, expected in expected_profile.items():
+        if profile.get(key) != expected:
+            errors.append(f"temporal profile {key} invalid")
+
+    principles = payload.get("principles", {})
+    required_true = [
+        "single_continuous_source_stream",
+        "data_resolution_is_not_forecast_horizon",
+        "forecast_horizon_is_not_decision_clock",
+        "decision_clock_is_not_holding_horizon",
+        "future_information_forbidden",
+        "naive_timeframe_voting_forbidden",
+    ]
+    for key in required_true:
+        if principles.get(key) is not True:
+            errors.append(f"temporal principle {key} must be true")
+
+    scales = payload.get("scales")
+    if not isinstance(scales, list):
+        return errors + ["scales must be a list"]
+    active = {item.get("scale_id"): item for item in scales if item.get("enabled_in_lot26") is True}
+    if set(active) != {"timebar-5m", "timebar-15m"}:
+        errors.append("exact active Lot26 scales must be 5m and 15m")
+    if active.get("timebar-5m", {}).get("lot26_role") != "LOCAL_CONTEXT":
+        errors.append("5m role must be LOCAL_CONTEXT")
+    if active.get("timebar-15m", {}).get("lot26_role") != "HIGHER_CONTEXT":
+        errors.append("15m role must be HIGHER_CONTEXT")
+    return errors
+
+
+def _validate_decision_clock(payload: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    policy = payload.get("lot26_policy", {})
+    if policy.get("enabled_triggers") != ["CLOSED_LOCAL_BAR"]:
+        errors.append("Lot26 must enable only CLOSED_LOCAL_BAR")
+    if policy.get("trade_decision_allowed") is not False:
+        errors.append("decision clock cannot allow trade decision")
+    triggers = payload.get("triggers")
+    if not isinstance(triggers, list):
+        return errors + ["triggers must be a list"]
+    enabled = [item.get("trigger_id") for item in triggers if item.get("enabled_in_lot26") is True]
+    if enabled != ["CLOSED_LOCAL_BAR"]:
+        errors.append("trigger list enables non-Lot26 clock")
+    required_future = {"MARKET_EVENT", "BOOK_IMBALANCE_CHANGE", "LIQUIDITY_SWEEP", "FORECAST_UPDATE", "RISK_EVENT"}
+    available = {str(item.get("trigger_id")) for item in triggers}
+    missing = sorted(required_future - available)
+    if missing:
+        errors.append("future triggers missing=" + ",".join(missing))
+    return errors
+
+
+def _validate_forecast_registry(payload: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    if payload.get("status") != "PLANNED_LOCKED_NOT_IMPLEMENTED":
+        errors.append("forecast registry must remain planned/locked")
+    principles = payload.get("principles", {})
+    for key in (
+        "forecast_horizon_separate_from_feature_resolution",
+        "forecast_horizon_separate_from_signal_ttl",
+        "forecast_horizon_separate_from_holding_horizon",
+        "cross_horizon_error_dependence_must_be_measured",
+        "naive_majority_vote_forbidden",
+        "probability_requires_calibration",
+    ):
+        if principles.get(key) is not True:
+            errors.append(f"forecast principle {key} must be true")
+    horizons = payload.get("horizons")
+    ids = {item.get("horizon_id") for item in horizons} if isinstance(horizons, list) else set()
+    if not {"30s", "5m", "15m", "1h"}.issubset(ids):
+        errors.append("initial forecast horizons incomplete")
+    restrictions = payload.get("lot26_restriction", {})
+    if not restrictions or any(value is not False for value in restrictions.values()):
+        errors.append("Lot26 forecast permissions must all be false")
+    return errors
+
+
+def _validate_schemas(root: Path) -> list[str]:
+    errors: list[str] = []
+    for relative in SCHEMA_FILES:
+        try:
+            schema = _load_json(root / relative)
+        except Exception as exc:
+            errors.append(f"{relative}: {exc}")
+            continue
+        if schema.get("type") != "object":
+            errors.append(f"{relative} must be object schema")
+        if schema.get("additionalProperties") is not False:
+            errors.append(f"{relative} must reject additional properties")
+        required = schema.get("required")
+        if not isinstance(required, list) or not required:
+            errors.append(f"{relative} required list missing")
     return errors
 
 
@@ -177,88 +349,11 @@ def _git_changed_files(root: Path) -> list[str]:
     return [line.strip() for line in completed.stdout.splitlines() if line.strip()]
 
 
-def run_checks(root: Path) -> list[Check]:
-    checks: list[Check] = []
-
-    missing = [path for path in REQUIRED_FILES if not (root / path).exists()]
-    checks.append(Check("PRE26_FILES", "PASS" if not missing else "FAIL", "missing=" + ",".join(missing)))
-
-    forbidden = [path for path in FORBIDDEN_IMPLEMENTATION_FILES if (root / path).exists()]
-    checks.append(
-        Check(
-            "PRE26_NO_LOT26_IMPLEMENTATION",
-            "PASS" if not forbidden else "FAIL",
-            "present=" + ",".join(forbidden),
-        )
-    )
-
-    config_path = root / "config/math/multi_timeframe_alignment_v1.json"
-    try:
-        config = _load_json(config_path)
-        config_errors = validate_config(config)
-        actual_sha = _sha256(config_path)
-    except Exception as exc:
-        config_errors = [f"config read error: {exc}"]
-        actual_sha = ""
-    if actual_sha != EXPECTED_CONFIG_SHA256:
-        config_errors.append(f"config checksum {actual_sha} != {EXPECTED_CONFIG_SHA256}")
-    checks.append(
-        Check(
-            "PRE26_CONFIG",
-            "PASS" if not config_errors else "FAIL",
-            "; ".join(config_errors) or f"sha256={actual_sha}",
-        )
-    )
-
-    schema_errors: list[str] = []
-    for relative in (
-        "contracts/schemas/timeframe_market_context_state_v1.schema.json",
-        "contracts/schemas/closed_bar_availability_v1.schema.json",
-        "contracts/schemas/multi_timeframe_alignment_state_v1.schema.json",
-    ):
-        try:
-            schema = _load_json(root / relative)
-            if schema.get("type") != "object" or schema.get("additionalProperties") is not False:
-                schema_errors.append(f"{relative} must be closed object schema")
-            if not schema.get("required"):
-                schema_errors.append(f"{relative} required list missing")
-        except Exception as exc:
-            schema_errors.append(f"{relative}: {exc}")
-    checks.append(Check("PRE26_SCHEMAS", "PASS" if not schema_errors else "FAIL", "; ".join(schema_errors)))
-
-    doc_errors: list[str] = []
-    for relative, tokens in REQUIRED_DOC_TOKENS.items():
-        path = root / relative
-        text = path.read_text(encoding="utf-8") if path.exists() else ""
-        for token in tokens:
-            if token not in text:
-                doc_errors.append(f"{relative} missing {token}")
-    checks.append(Check("PRE26_DOCUMENTATION", "PASS" if not doc_errors else "FAIL", "; ".join(doc_errors)))
-
-    lot25_errors: list[str] = []
-    lot25_path = root / "data/audit/volatility_regime_confluence_timeframes_lot25.jsonl"
-    if lot25_path.exists():
-        rows = [json.loads(line) for line in lot25_path.read_text(encoding="utf-8").splitlines() if line.strip()]
-        if {row.get("timeframe") for row in rows} != {"5m", "15m"}:
-            lot25_errors.append("Lot25 artifacts must contain exact 5m/15m states")
-        if any(row.get("execution_allowed", False) or row.get("trade_allowed", False) for row in rows):
-            lot25_errors.append("Lot25 artifact unexpectedly executable")
-    else:
-        lot25_errors.append("Lot25 timeframe artifact missing")
-    checks.append(Check("PRE26_LOT25_BASELINE", "PASS" if not lot25_errors else "FAIL", "; ".join(lot25_errors)))
-
-    python_value = (
-        (root / ".python-version").read_text(encoding="utf-8").strip()
-        if (root / ".python-version").exists()
-        else ""
-    )
-    checks.append(Check("PRE26_PYTHON", "PASS" if python_value == "3.11.9" else "FAIL", python_value))
-
-    lock_errors: list[str] = []
-    lock_path = root / "requirements-dev.lock"
-    lock_text = lock_path.read_text(encoding="utf-8") if lock_path.exists() else ""
+def _validate_dependency_lock(root: Path) -> list[str]:
+    errors: list[str] = []
+    lock_text = (root / "requirements-dev.lock").read_text(encoding="utf-8")
     if any(operator in lock_text for operator in (">=", "<=", "~=", "!=")):
-        lock_errors.append("lock contains non-exact operator")
+        errors.append("lock contains non-exact operator")
     normalized: dict[str, str] = {}
     for line in lock_text.splitlines():
         if "==" in line and not line.startswith("#"):
@@ -266,62 +361,134 @@ def run_checks(root: Path) -> list[Check]:
             normalized[name.lower().replace("_", "-")] = version.split(";", 1)[0].strip()
     for name, version in DIRECT_LOCKED_TOOLS.items():
         if normalized.get(name) != version:
-            lock_errors.append(f"{name}={normalized.get(name)} expected {version}")
-    checks.append(Check("PRE26_DEPENDENCY_LOCK", "PASS" if not lock_errors else "FAIL", "; ".join(lock_errors)))
+            errors.append(f"{name}={normalized.get(name)} expected {version}")
+    return errors
 
-    historical_errors: list[str] = []
+
+def _validate_historical_immutability(root: Path) -> list[str]:
+    errors: list[str] = []
     for changed in _git_changed_files(root):
-        match = re.match(
-            r"(docs/(LOT|ACCEPTANCE_CRITERIA)_([0-9]+)|data/audit/.*lot([0-9]+))",
-            changed,
-        )
-        if match:
-            lot_text = match.group(3) or match.group(4)
-            if lot_text and int(lot_text) <= 25:
-                historical_errors.append(changed)
+        match = re.match(r"docs/(?:LOT|ACCEPTANCE_CRITERIA)_([0-9]+)", changed)
+        if match and int(match.group(1)) <= 25:
+            errors.append(changed)
+        audit_match = re.match(r"data/audit/.*lot([0-9]+)", changed)
+        if audit_match and int(audit_match.group(1)) <= 25:
+            errors.append(changed)
         if changed.startswith("src/crypto_quant_bot/"):
-            historical_errors.append(changed)
-    checks.append(
-        Check(
-            "PRE26_HISTORICAL_IMMUTABILITY",
-            "PASS" if not historical_errors else "FAIL",
-            "changed=" + ",".join(historical_errors),
-        )
-    )
+            errors.append(changed)
+    return sorted(set(errors))
 
+
+def run_checks(root: Path) -> list[Check]:
+    checks: list[Check] = []
+
+    missing = [path for path in REQUIRED_FILES if not (root / path).exists()]
+    checks.append(_pass_or_fail("PRE26_FILES", missing, f"required_files={len(REQUIRED_FILES)}"))
+
+    forbidden = [path for path in FORBIDDEN_IMPLEMENTATION_FILES if (root / path).exists()]
+    checks.append(_pass_or_fail("PRE26_NO_IMPLEMENTATION", forbidden, "Lot26 and future engines absent"))
+
+    temporary = [path for path in FORBIDDEN_TEMPORARY_FILES if (root / path).exists()]
+    checks.append(_pass_or_fail("PRE26_NO_TEMPORARY_FILES", temporary, "one-shot files absent"))
+
+    alignment_path = root / "config/math/multi_timeframe_alignment_v1.json"
+    try:
+        alignment = _load_json(alignment_path)
+        errors = _validate_alignment_config(alignment)
+        evidence = f"sha256={_sha256(alignment_path)}"
+    except Exception as exc:
+        errors = [str(exc)]
+        evidence = ""
+    checks.append(_pass_or_fail("PRE26_ALIGNMENT_CONFIG", errors, evidence))
+
+    try:
+        temporal = _load_json(root / "config/temporal/temporal_scale_registry_v1.json")
+        temporal_errors = _validate_temporal_registry(temporal)
+    except Exception as exc:
+        temporal_errors = [str(exc)]
+    checks.append(_pass_or_fail("PRE26_TEMPORAL_REGISTRY", temporal_errors, "5m->15m active, extensible"))
+
+    try:
+        clock = _load_json(root / "config/temporal/decision_clock_policy_v1.json")
+        clock_errors = _validate_decision_clock(clock)
+    except Exception as exc:
+        clock_errors = [str(exc)]
+    checks.append(_pass_or_fail("PRE26_DECISION_CLOCK", clock_errors, "CLOSED_LOCAL_BAR only"))
+
+    try:
+        forecast = _load_json(root / "config/research/forecast_horizon_registry_v1.json")
+        forecast_errors = _validate_forecast_registry(forecast)
+    except Exception as exc:
+        forecast_errors = [str(exc)]
+    checks.append(_pass_or_fail("PRE26_FORECAST_SCOPE", forecast_errors, "future horizons locked"))
+
+    checks.append(_pass_or_fail("PRE26_SCHEMAS", _validate_schemas(root), f"schemas={len(SCHEMA_FILES)}"))
+
+    doc_errors: list[str] = []
+    for relative, tokens in REQUIRED_DOC_TOKENS.items():
+        text = (root / relative).read_text(encoding="utf-8") if (root / relative).exists() else ""
+        for token in tokens:
+            if token not in text:
+                doc_errors.append(f"{relative} missing {token}")
+    checks.append(_pass_or_fail("PRE26_DOCUMENTATION", doc_errors, f"documents={len(REQUIRED_DOC_TOKENS)}"))
+
+    lot25_errors: list[str] = []
+    lot25_path = root / "data/audit/volatility_regime_confluence_timeframes_lot25.jsonl"
+    if lot25_path.exists():
+        rows = [json.loads(line) for line in lot25_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+        if {row.get("timeframe") for row in rows} != {"5m", "15m"}:
+            lot25_errors.append("Lot25 artifact must contain exact 5m/15m states")
+        if any(row.get("execution_allowed", False) or row.get("trade_allowed", False) for row in rows):
+            lot25_errors.append("Lot25 artifact unexpectedly executable")
+    else:
+        lot25_errors.append("Lot25 timeframe artifact missing")
+    checks.append(_pass_or_fail("PRE26_LOT25_BASELINE", lot25_errors, "Lot25 5m/15m baseline preserved"))
+
+    python_value = (root / ".python-version").read_text(encoding="utf-8").strip()
+    python_errors = [] if python_value == "3.11.9" else [f"python={python_value}"]
+    checks.append(_pass_or_fail("PRE26_PYTHON", python_errors, python_value))
+
+    checks.append(_pass_or_fail("PRE26_DEPENDENCY_LOCK", _validate_dependency_lock(root), "direct tools pinned"))
+
+    historical = _validate_historical_immutability(root)
+    checks.append(_pass_or_fail("PRE26_HISTORICAL_IMMUTABILITY", historical, "Lots0-25 and src unchanged"))
+
+    readme = (root / "README.md").read_text(encoding="utf-8")
     invariants = [
         "trade_allowed = false",
         "execution_allowed = false",
+        "approved_size = 0",
         "live_execution = DISABLED",
         "leverage = FORBIDDEN",
+        "withdrawals = FORBIDDEN",
     ]
-    readme = (root / "README.md").read_text(encoding="utf-8")
     missing_invariants = [value for value in invariants if value not in readme]
-    checks.append(
-        Check(
-            "PRE26_NO_TRADING_INVARIANTS",
-            "PASS" if not missing_invariants else "FAIL",
-            "missing=" + ",".join(missing_invariants),
-        )
-    )
+    checks.append(_pass_or_fail("PRE26_NO_TRADING_INVARIANTS", missing_invariants, "all permissions disabled"))
 
     return checks
 
 
 def write_outputs(root: Path, checks: list[Check]) -> None:
-    status = "GO" if all(check.status == "PASS" for check in checks) else "NO_GO"
+    verdict = "GO" if all(check.status == "PASS" for check in checks) else "NO_GO"
     generated_at = datetime.now(UTC).isoformat().replace("+00:00", "Z")
     manifest = {
-        "schema_version": "pre-lot26-readiness-manifest-v1",
+        "schema_version": "pre-lot26-readiness-manifest-v2",
         "generated_at": generated_at,
         "project": "Crypto Quant Bot V3.1-Ops",
         "baseline": "Lot25+P0",
         "next_lot": 26,
         "lot26_status": "PLANNED_LOCKED",
-        "config_sha256": EXPECTED_CONFIG_SHA256,
         "checks": [asdict(check) for check in checks],
-        "verdict": status,
+        "verdict": verdict,
         "trading_state": "DISABLED",
+        "implemented_by_this_gate": [],
+        "documented_future_capabilities": [
+            "continuous market state",
+            "multi-horizon forecasting",
+            "participant behavior inference",
+            "liquidity exit zones",
+            "protective order lifecycle",
+        ],
     }
     audit_path = root / "data/audit/pre_lot26_readiness_manifest.json"
     audit_path.parent.mkdir(parents=True, exist_ok=True)
@@ -341,37 +508,41 @@ def write_outputs(root: Path, checks: list[Check]) -> None:
         "|---|---|---|",
     ]
     for check in checks:
-        evidence = check.evidence.replace("|", "\\|")
-        lines.append(f"| `{check.check_id}` | **{check.status}** | {evidence} |")
+        lines.append(f"| `{check.check_id}` | **{check.status}** | {check.evidence.replace('|', ' / ')} |")
     lines.extend(
         [
             "",
-            "## Continuous flow decision",
+            "## Architecture fixed by this readiness package",
             "",
-            "Ingestion remains continuous. Closed 5m states trigger evaluation and use the last eligible",
-            "closed 15m state through an as-of backward join. Open/future bars are forbidden.",
+            "- continuous canonical stream as the target architecture;",
+            "- Lot26 initial profile `timebar-5m -> timebar-15m`;",
+            "- distinct data resolution, forecast horizon, decision clock, signal TTL and holding horizon;",
+            "- future event-driven clocks registered but disabled;",
+            "- stochastic multi-horizon forecasts registered but not implemented;",
+            "- participant/game-theory and stop/TP/break-even/liquidation zones owned by V4;",
+            "- protective orders owned by V5/V7/V15;",
+            "- naive timeframe voting forbidden.",
             "",
-            "## Game Theory boundary",
+            "## Explicitly not implemented",
             "",
-            "Stops, take-profit behavior, liquidity sweeps and participant inference remain owned by",
-            "V4 / Lots 37–52 and are not part of Lot 26.",
+            "No Lot26 engine, continuous market-state engine, forecast model, order-book engine,",
+            "participant inference, strategy, risk approval, order or execution path is implemented.",
             "",
             "## Verdict",
             "",
-            f"**{status}** to start Lot 26 only after this exact commit is green in CI and a human review",
-            "explicitly unlocks the lot. All trading permissions remain disabled.",
-            "",
+            f"**{verdict}** to start Lot 26 only after this exact commit is green in all CI workflows",
+            "and a human review explicitly unlocks the lot. All trading permissions remain disabled.",
         ]
     )
-    report = root / "reports/PRE_LOT26_ENTRY_GATE_REPORT.md"
-    report.parent.mkdir(parents=True, exist_ok=True)
-    report.write_text("\n".join(lines), encoding="utf-8")
+    report_path = root / "reports/PRE_LOT26_ENTRY_GATE_REPORT.md"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--write-report", action="store_true")
     parser.add_argument("--root", default=".")
+    parser.add_argument("--write-report", action="store_true")
     args = parser.parse_args()
     root = Path(args.root).resolve()
     checks = run_checks(root)
@@ -379,9 +550,11 @@ def main() -> int:
         write_outputs(root, checks)
     for check in checks:
         print(f"{check.check_id}: {check.status} — {check.evidence}")
-    passed = all(check.status == "PASS" for check in checks)
-    print("PRE_LOT26_READINESS: " + ("GO" if passed else "NO_GO"))
-    return 0 if passed else 1
+    if all(check.status == "PASS" for check in checks):
+        print("PRE_LOT26_READINESS: GO")
+        return 0
+    print("PRE_LOT26_READINESS: NO_GO")
+    return 1
 
 
 if __name__ == "__main__":
