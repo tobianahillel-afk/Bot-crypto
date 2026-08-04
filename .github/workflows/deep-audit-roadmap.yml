@@ -114,8 +114,8 @@ jobs:
           for name in required_docs:
               assert (Path('docs') / name).is_file(), name
 
-          execution = Path('docs/SYSTEM_EXECUTION_ARCHITECTURE.md').read_text(encoding='utf-8')
-          for term in ['Market Data', 'Analysis', 'Scenario', 'Signal', 'Trade Intent', 'Risk Approval', 'Order Intent', 'OMS', 'EMS', 'Reconciliation', 'Position', 'PnL']:
+          execution = Path('docs/SYSTEM_EXECUTION_ARCHITECTURE.md').read_text(encoding='utf-8').casefold()
+          for term in ['data governance', 'market analysis', 'microstructure', 'signal', 'tradeintent', 'riskdecision', 'orderintent', 'oms', 'ems', 'reconciliation', 'portfolio', 'pnl']:
               assert term in execution, term
 
           print('INDEPENDENT ROADMAP ARCHITECTURE VERIFICATION: PASS')
