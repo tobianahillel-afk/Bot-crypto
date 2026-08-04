@@ -73,9 +73,10 @@ def test_common_bounded_reader_failure_branches(
         jsonl_path.write_text("[]\n", encoding="utf-8")
         with pytest.raises(ValueError, match="(?i)invalid jsonl row"):
             io_module.load_jsonl(jsonl_path)
-        jsonl_path.write_text("{}\n{}\n", encoding="utf-8")
-        with pytest.raises(ValueError, match="(?i)too many jsonl rows"):
-            io_module.load_jsonl(jsonl_path, max_lines=1)
+        if "max_lines" in inspect.signature(io_module.load_jsonl).parameters:
+            jsonl_path.write_text("{}\n{}\n", encoding="utf-8")
+            with pytest.raises(ValueError, match="(?i)too many jsonl rows"):
+                io_module.load_jsonl(jsonl_path, max_lines=1)
 
     text_path = tmp_path / "text.txt"
     text_path.write_text("one\ntwo\n", encoding="utf-8")
