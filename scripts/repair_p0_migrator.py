@@ -6,22 +6,48 @@ ROOT = Path(__file__).resolve().parents[1]
 MIGRATOR = ROOT / "scripts" / "apply_p0_hardening.py"
 
 
+def replace_exact(text: str, old: str, new: str, expected: int) -> str:
+    count = text.count(old)
+    if count != expected:
+        raise RuntimeError(f"expected {expected} occurrences of {old!r}, found {count}")
+    return text.replace(old, new)
+
+
 def main() -> int:
     text = MIGRATOR.read_text(encoding="utf-8")
-    old = '''    for old, new in replacements.items():
+
+    unsafe_loop = '''    for old, new in replacements.items():
         if old in text:
             text = text.replace(old, new)
 '''
-    new = '''    for old, new in replacements.items():
+    bounded_loop = '''    for old, new in replacements.items():
         pattern = re.compile(re.escape(old) + r"(?!\\d)")
         text = pattern.sub(new, text)
 '''
-    count = text.count(old)
-    if count != 2:
-        raise RuntimeError(f"expected two unsafe replacement loops, found {count}")
-    MIGRATOR.write_text(text.replace(old, new), encoding="utf-8")
+    text = replace_exact(text, unsafe_loop, bounded_loop, 2)
+
+    text = replace_exact(
+        text,
+        '        return "\\n".join(lines) + "\\n"',
+        '        return "\\\\n".join(lines) + "\\\\n"',
+        1,
+    )
+    text = replace_exact(
+        text,
+        '        args.json.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\\n", encoding="utf-8")',
+        '        args.json.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\\\\n", encoding="utf-8")',
+        1,
+    )
+    text = replace_exact(
+        text,
+        '            print("\\n".join(violations))',
+        '            print("\\\\n".join(violations))',
+        2,
+    )
+
+    MIGRATOR.write_text(text, encoding="utf-8")
     Path(__file__).unlink()
-    print("P0_MIGRATOR_NUMERIC_BOUNDARIES_REPAIRED")
+    print("P0_MIGRATOR_BOUNDARIES_AND_ESCAPES_REPAIRED")
     return 0
 
 
