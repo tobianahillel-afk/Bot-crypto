@@ -6,6 +6,12 @@ on:
       - agent/roadmap-v1-v21-documentation
     paths:
       - '.github/workflows/deep-audit-roadmap.yml'
+  pull_request:
+    branches:
+      - main
+    types:
+      - synchronize
+      - reopened
   workflow_dispatch:
 
 permissions:
