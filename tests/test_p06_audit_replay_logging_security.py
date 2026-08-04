@@ -114,7 +114,7 @@ def test_used_for_decision_audit_accepts_only_explicit_false() -> None:
         ],
         "decision.jsonl",
     )
-    assert [item["row_index"] for item in violations] == [2, 3]
+    assert [item["row_index"] for item in violations] == [2, 3, 4]
     assert all(item["reference"] is False for item in violations)
 
 
