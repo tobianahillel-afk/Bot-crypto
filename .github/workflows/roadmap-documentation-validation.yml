@@ -1,0 +1,28 @@
+name: Roadmap documentation validation
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'data/audit/product_scope_roadmap_lot21.jsonl'
+      - 'scripts/validate_roadmap_documentation.py'
+      - '.github/workflows/roadmap-documentation-validation.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'data/audit/product_scope_roadmap_lot21.jsonl'
+      - 'scripts/validate_roadmap_documentation.py'
+      - '.github/workflows/roadmap-documentation-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate canonical roadmap
+        run: python scripts/validate_roadmap_documentation.py

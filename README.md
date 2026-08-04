@@ -1280,3 +1280,9 @@ Lot 23-quater exists because the Lot 24 preparation could still fail intermitten
 The Lot 16 historical checksum is now derived from one canonical function: `compute_lot16_source_catalog_checksum(...)` in [src/crypto_quant_bot/lineage/manifest.py](/mnt/hgfs/Forensic/Bot-crypto/crypto_quant_bot/src/crypto_quant_bot/lineage/manifest.py). That function normalizes the dataset catalog deterministically, deduplicates by `dataset_id` with the same last-write-wins rule as the catalog writer, filters the source scope to Lots 0 through 15, excludes Lot 16 self-produced records plus all later lots, keeps only stable fields, and hashes the canonical JSON.
 
 `scripts/run_lot16_reproducibility_manifest.py`, `scripts/validate_lot16.py`, `scripts/diagnose_lot16_source_catalog_checksum.py`, and the Lot 16 checksum tests now all use this same source of truth. The Lot 16 manifest records `reproducibility_scope_lot16`, `source_catalog_scope`, and `source_catalog_entry_count` for auditability. The frozen V1 archive remains unchanged, and Lot 24 has not been started by this corrective lot.
+
+## Roadmap canonique V1–V21
+
+La source de vérité documentaire est [`docs/ROADMAP_V1_TO_V21.md`](docs/ROADMAP_V1_TO_V21.md). Le cahier des charges maître, la chaîne d’exécution, les contrats, les state machines et les Lots 0–177 sont liés depuis ce document.
+
+- `docs/HISTORICAL_IMPLEMENTATION_RECONCILIATION.md` — réconciliation des Lots 0–25 avec les preuves réelles.
