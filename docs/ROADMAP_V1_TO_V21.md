@@ -10,6 +10,7 @@ Cette roadmap est la source de vérité pour les travaux futurs. Elle est compl�
 - Prochain lot : **Lot 26**.
 - Lots 0–25 : historique implémenté/validé selon les preuves existantes.
 - Lots 26–177 : `PLANNED_LOCKED` jusqu'à activation explicite.
+- Audit institutionnel courant : `CONDITIONAL_GO` pour poursuivre la recherche offline ; `NO_GO` pour alpha promotion, paper trading, sandbox et capital réel.
 
 ## Documents normatifs
 
@@ -28,6 +29,8 @@ Cette roadmap est la source de vérité pour les travaux futurs. Elle est compl�
 - [Development Engineering Standard](DEVELOPMENT_ENGINEERING_STANDARD.md)
 - [Decision Auditability and Traceability](DECISION_AUDITABILITY_AND_TRACEABILITY_STANDARD.md)
 - [Lot Final Audit and GO / NO-GO Gate](LOT_FINAL_AUDIT_AND_GO_NO_GO_GATE.md)
+- [Institutional Hedge Fund Audit — August 2026](INSTITUTIONAL_HEDGE_FUND_AUDIT_2026_08.md)
+- Machine-readable institutional gap register: `data/audit/institutional_gap_register_2026_08.json`
 
 ## Principe de séparation
 
@@ -37,6 +40,7 @@ Order intent ≠ ordre soumis ≠ fill ≠ position
 Stratégie validée ≠ autorisation live
 CI verte ≠ validation mathématique ≠ GO de promotion
 Coverage élevé ≠ tests suffisants ≠ correction prouvée
+software correctness ≠ statistical evidence ≠ economic alpha
 ```
 
 ## Versions
@@ -99,3 +103,5 @@ Coverage élevé ≠ tests suffisants ≠ correction prouvée
 6. Toute formule, probabilité, estimation ou décision quantitative suit le standard mathématique et numérique.
 7. Toute décision et tout veto sont intégralement rejouables, traçables et auditables.
 8. Zéro BLOCKER et zéro MAJOR avant promotion.
+9. Un standard documenté n'est réputé implémenté que lorsqu'une CI et des rapports en fournissent la preuve.
+10. Le gate institutionnel du registre d'écarts prévaut sur toute promotion fonctionnelle plus permissive.
