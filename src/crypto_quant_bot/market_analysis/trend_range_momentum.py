@@ -299,7 +299,10 @@ def _combined_context_state(
     momentum_state: str,
     combined_context_score: float,
 ) -> str:
-    if "INSUFFICIENT_DATA" in {trend_state, range_state, momentum_state}:
+    if any(
+        "INSUFFICIENT_DATA" in state
+        for state in (trend_state, range_state, momentum_state)
+    ):
         return "TRM_CONTEXT_INSUFFICIENT_DATA"
     if range_state == "RANGE_CONTEXT_COMPRESSED" and trend_state in {"TREND_CONTEXT_FLAT", "TREND_CONTEXT_NEUTRAL"}:
         return "TRM_CONTEXT_COMPRESSED"
