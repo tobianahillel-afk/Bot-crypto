@@ -158,5 +158,3 @@ jobs:
             reports/quality/mutation_score.json
             reports/quality/global_coverage_gate.json
             reports/P0_6_ROADMAP_SEMANTIC_AUDIT.json
-            reports/quality/global_coverage_gate.json
-            reports/P0_6_ROADMAP_SEMANTIC_AUDIT.json
