@@ -6,6 +6,12 @@ import hashlib
 import json
 from pathlib import Path
 
+PART_FILENAMES = [
+    "pre_lot26_payload_00_fixed.txt",
+    "pre_lot26_payload_01.txt",
+    "pre_lot26_payload_02.txt",
+    "pre_lot26_payload_03.txt",
+]
 EXPECTED_PART_SHA256 = [
     "05d719673f1dd131e2a18b35ccd1f959d5ea7f3227e54c950f99a83d9d4e46c8",
     "3dfddda3f8f94ae338c3450bef233097192a5cb048664f34b5716a0ab949e07b",
@@ -17,12 +23,11 @@ EXPECTED_PAYLOAD_SHA256 = "e3141f733928351c6de77289278088b19a32ea9ac4c6069b583b2
 
 def main() -> None:
     root = Path(__file__).resolve().parents[1]
-    part_paths = sorted((root / "scripts").glob("pre_lot26_payload_*.txt"))
-    if len(part_paths) != len(EXPECTED_PART_SHA256):
-        raise SystemExit(
-            "PRE_LOT26_PAYLOAD_PART_COUNT_INVALID: "
-            f"expected={len(EXPECTED_PART_SHA256)} observed={len(part_paths)}"
-        )
+    scripts_dir = root / "scripts"
+    part_paths = [scripts_dir / filename for filename in PART_FILENAMES]
+    missing = [path.name for path in part_paths if not path.exists()]
+    if missing:
+        raise SystemExit(f"PRE_LOT26_PAYLOAD_PARTS_MISSING: {','.join(missing)}")
 
     parts: list[str] = []
     invalid_parts: list[str] = []
@@ -57,6 +62,9 @@ def main() -> None:
 
     for path in part_paths:
         path.unlink()
+    corrupt_legacy_part = scripts_dir / "pre_lot26_payload_00.txt"
+    if corrupt_legacy_part.exists():
+        corrupt_legacy_part.unlink()
     Path(__file__).unlink()
     print(f"PRE_LOT26_GENERATED={len(documents)}")
     print(f"PRE_LOT26_PAYLOAD_SHA256={observed_payload_checksum}")
