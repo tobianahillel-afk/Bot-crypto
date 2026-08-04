@@ -109,7 +109,7 @@ def main() -> int:
             shell: bash
             run: |
               rm -rf mutants
-              mkdir -p reports/quality
+              mkdir -p mutants/config/math reports/quality
               set -o pipefail
               mutmut run 2>&1 | tee reports/quality/mutation_run.txt
               mutmut results 2>&1 | tee reports/quality/mutation_results.txt
