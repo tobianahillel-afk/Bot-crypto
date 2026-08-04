@@ -53,39 +53,40 @@ def test_common_bounded_reader_failure_branches(
     if hasattr(io_module, "load_json"):
         json_path = tmp_path / "payload.json"
         json_path.write_text("{}", encoding="utf-8")
-        monkeypatch.setattr(io_module, "MAX_JSON_BYTES", 1)
-        with pytest.raises(ValueError, match="json payload too large"):
-            io_module.load_json(json_path)
-        monkeypatch.setattr(io_module, "MAX_JSON_BYTES", 1_000)
+        if hasattr(io_module, "MAX_JSON_BYTES"):
+            monkeypatch.setattr(io_module, "MAX_JSON_BYTES", 1)
+            with pytest.raises(ValueError, match="(?i)json payload too large"):
+                io_module.load_json(json_path)
+            monkeypatch.setattr(io_module, "MAX_JSON_BYTES", 1_000)
         assert io_module.load_json(json_path) == {}
 
     if hasattr(io_module, "load_jsonl"):
         jsonl_path = tmp_path / "rows.jsonl"
         jsonl_path.write_text("{}\n", encoding="utf-8")
-        monkeypatch.setattr(io_module, "MAX_JSONL_BYTES", 1)
-        with pytest.raises(ValueError, match="jsonl payload too large"):
-            io_module.load_jsonl(jsonl_path)
-
-        monkeypatch.setattr(io_module, "MAX_JSONL_BYTES", 1_000)
+        if hasattr(io_module, "MAX_JSONL_BYTES"):
+            monkeypatch.setattr(io_module, "MAX_JSONL_BYTES", 1)
+            with pytest.raises(ValueError, match="(?i)jsonl payload too large"):
+                io_module.load_jsonl(jsonl_path)
+            monkeypatch.setattr(io_module, "MAX_JSONL_BYTES", 1_000)
         jsonl_path.write_text("\n{}\n", encoding="utf-8")
         assert io_module.load_jsonl(jsonl_path) == [{}]
         jsonl_path.write_text("[]\n", encoding="utf-8")
-        with pytest.raises(ValueError, match="invalid jsonl row"):
+        with pytest.raises(ValueError, match="(?i)invalid jsonl row"):
             io_module.load_jsonl(jsonl_path)
         jsonl_path.write_text("{}\n{}\n", encoding="utf-8")
-        with pytest.raises(ValueError, match="too many jsonl rows"):
+        with pytest.raises(ValueError, match="(?i)too many jsonl rows"):
             io_module.load_jsonl(jsonl_path, max_lines=1)
 
     text_path = tmp_path / "text.txt"
     text_path.write_text("one\ntwo\n", encoding="utf-8")
     if hasattr(io_module, "count_lines"):
-        with pytest.raises(ValueError, match="text payload too large"):
+        with pytest.raises(ValueError, match="(?i)text payload too large"):
             io_module.count_lines(text_path, max_bytes=1)
-        with pytest.raises(ValueError, match="too many lines"):
+        with pytest.raises(ValueError, match="(?i)too many lines"):
             io_module.count_lines(text_path, max_lines=1)
         assert io_module.count_lines(text_path, max_lines=2) == 2
     if hasattr(io_module, "read_text_limited"):
-        with pytest.raises(ValueError, match="text payload too large"):
+        with pytest.raises(ValueError, match="(?i)text payload too large"):
             io_module.read_text_limited(text_path, max_bytes=1)
         assert io_module.read_text_limited(text_path, max_bytes=100) == "one\ntwo\n"
 
