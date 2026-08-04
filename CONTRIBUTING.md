@@ -39,7 +39,12 @@ imbrication <= 4
 paramètres <= 7
 ```
 
-Toute dérogation exige justification, owner, tests renforcés et échéance.
+Toute dérogation exige justification, owner, tests renforcés et échéance. Les dérogations
+historiques temporaires sont listées individuellement dans
+`config/governance/legacy_engineering_deviations_v1.json`. Elles sont contrôlées par
+`scripts/validate_engineering_deviations.py` : tout finding nouveau, non enregistré,
+expiré ou devenu obsolète bloque la CI. Une dérogation doit être corrigée avant toute
+modification du symbole concerné ou avant l’ouverture du Lot 27, selon la première échéance.
 
 ## Gates minimales
 
@@ -53,6 +58,8 @@ python scripts/audit_roadmap_semantics.py
 python scripts/validate_traceability_contract.py
 python scripts/check_no_silent_numeric_coercion.py
 python scripts/validate_roadmap_documentation.py
+python scripts/quality_inventory.py
+python scripts/validate_engineering_deviations.py
 python scripts/validate_pre_lot26_readiness.py
 pytest -q --cov --cov-branch --cov-report=json:coverage.json
 python scripts/validate_global_coverage.py
