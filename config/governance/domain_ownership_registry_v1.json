@@ -1,0 +1,38 @@
+{
+  "schema_version": "domain-ownership-registry-v1",
+  "status": "P0_6_NORMATIVE",
+  "root_namespace": "crypto_quant_bot",
+  "shared_packages": ["contracts"],
+  "domains": [
+    {"version":"V1","owner":"SafetyKernel","package":"core","mode":"EDUCATIONAL_AUDIT_ONLY","allowed_dependencies":["contracts"],"owned_capabilities":["safety_baseline","immutable_audit","defensive_runtime"]},
+    {"version":"V2","owner":"MarketAnalysisDomain","package":"market_analysis","mode":"LOCAL_OFFLINE_ANALYSIS_ONLY","allowed_dependencies":["contracts","core"],"owned_capabilities":["bar_context","technical_indicators","multi_timeframe_alignment"]},
+    {"version":"V3","owner":"MarketDataGovernanceDomain","package":"data_governance","mode":"DATA_GOVERNANCE_ONLY","allowed_dependencies":["contracts","core"],"owned_capabilities":["source_registry","instrument_registry","canonical_time","data_quality","continuous_market_data"]},
+    {"version":"V4","owner":"MicrostructureDomain","package":"microstructure","mode":"OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY","allowed_dependencies":["contracts","core","data_governance","market_analysis"],"owned_capabilities":["order_book","order_flow","liquidity","participant_inference","game_theory"]},
+    {"version":"V5","owner":"StrategyResearchDomain","package":"strategy_research","mode":"OFFLINE_STRATEGY_RESEARCH_ONLY","allowed_dependencies":["contracts","core","data_governance","market_analysis","microstructure"],"owned_capabilities":["alpha_hypothesis","forecast","scenario","signal","trade_intent"]},
+    {"version":"V6","owner":"BacktestDomain","package":"backtesting","mode":"BACKTEST_ONLY","allowed_dependencies":["contracts","core","data_governance","market_analysis","microstructure","strategy_research"],"owned_capabilities":["outcome_labels","backtest","transaction_cost_model","fill_simulation","expected_value","oos_validation"]},
+    {"version":"V7","owner":"RiskDomain","package":"risk","mode":"RISK_SIMULATION_ONLY","allowed_dependencies":["contracts","core","data_governance","market_analysis","microstructure","strategy_research","backtesting","exchange_risk"],"owned_capabilities":["model_risk","risk_limits","sizing","risk_decision","kill_switch_policy"]},
+    {"version":"V8","owner":"PaperTradingDomain","package":"paper_trading","mode":"PAPER","allowed_dependencies":["contracts","core","strategy_research","risk","portfolio"],"owned_capabilities":["paper_runtime","paper_order","paper_fill","paper_reconciliation"]},
+    {"version":"V9","owner":"PortfolioDomain","package":"portfolio","mode":"PORTFOLIO_ACCOUNTING","allowed_dependencies":["contracts","core","data_governance"],"owned_capabilities":["portfolio_state","cash","positions","pnl","accounting","portfolio_reconciliation"]},
+    {"version":"V10","owner":"ResearchOSDomain","package":"research_os","mode":"RESEARCH_GOVERNANCE_ONLY","allowed_dependencies":["contracts","core","data_governance","strategy_research","backtesting"],"owned_capabilities":["experiment_registry","artifact_registry","research_release"]},
+    {"version":"V11","owner":"IntelligenceDomain","package":"intelligence","mode":"READ_ONLY_CONTEXT_ONLY","allowed_dependencies":["contracts","core","data_governance"],"owned_capabilities":["economic_events","news","sentiment","event_context","llm_explanation"]},
+    {"version":"V12","owner":"OperatorConsoleDomain","package":"ui","mode":"OPERATOR_UI","allowed_dependencies":["contracts","core"],"owned_capabilities":["operator_read_models","operator_actions","audit_console"]},
+    {"version":"V13","owner":"ReadOnlyConnectorDomain","package":"connectors","mode":"READ_ONLY","allowed_dependencies":["contracts","core","data_governance"],"owned_capabilities":["read_only_exchange_connector","account_snapshot","permission_scan"]},
+    {"version":"V14","owner":"ExchangeRiskDomain","package":"exchange_risk","mode":"EXCHANGE_HEALTH_ONLY","allowed_dependencies":["contracts","core","data_governance","connectors"],"owned_capabilities":["exchange_health","exchange_veto","rate_limit_health","counterparty_risk"]},
+    {"version":"V15","owner":"OrderExecutionDomain","package":"execution","mode":"ORDER_MANAGEMENT_CORE","allowed_dependencies":["contracts","core","data_governance","risk","exchange_risk"],"owned_capabilities":["order_intent_validation","oms","ems","protective_orders","execution_reconciliation"]},
+    {"version":"V16","owner":"SandboxExecutionDomain","package":"sandbox","mode":"SANDBOX","allowed_dependencies":["contracts","core","risk","execution","portfolio","exchange_risk"],"owned_capabilities":["sandbox_adapter","sandbox_routing","failure_injection"]},
+    {"version":"V17","owner":"LiveGovernanceDomain","package":"live_governance","mode":"LIVE_DISABLED_BY_DEFAULT","allowed_dependencies":["contracts","core","risk","execution","portfolio","exchange_risk"],"owned_capabilities":["human_approval","live_eligibility","capital_tiers","manual_pause","emergency_stop"]},
+    {"version":"V18","owner":"OperationsDomain","package":"monitoring","mode":"OPERATIONS_GOVERNANCE","allowed_dependencies":["contracts","core"],"owned_capabilities":["telemetry","alerts","incidents","disaster_recovery","release_readiness"]},
+    {"version":"V19","owner":"HFTResearchDomain","package":"hft_research","mode":"HFT_RESEARCH_ONLY","allowed_dependencies":["contracts","core","data_governance","microstructure","backtesting"],"owned_capabilities":["queue_simulation","matching_simulation","hft_feasibility"]},
+    {"version":"V20","owner":"OptionsContextDomain","package":"options","mode":"OPTIONS_CONTEXT_ONLY","allowed_dependencies":["contracts","core","data_governance"],"owned_capabilities":["options_registry","implied_volatility","skew","greeks","options_context"]},
+    {"version":"V21","owner":"OnChainContextDomain","package":"onchain","mode":"ONCHAIN_CONTEXT_ONLY","allowed_dependencies":["contracts","core","data_governance"],"owned_capabilities":["onchain_sources","flow_context","onchain_market_context"]}
+  ],
+  "global_rules": {
+    "contracts_have_no_business_dependencies": true,
+    "private_cross_domain_imports_forbidden": true,
+    "only_risk_owns_risk_decision": true,
+    "only_execution_owns_order_submission": true,
+    "portfolio_submission_forbidden": true,
+    "ui_authorization_logic_forbidden": true,
+    "context_domains_cannot_authorize_trading": true
+  }
+}
