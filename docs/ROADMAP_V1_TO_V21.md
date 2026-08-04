@@ -2,14 +2,14 @@
 
 Projet : **Crypto Quant Bot V3.1-Ops**
 
-Cette roadmap est la source de vérité pour les travaux futurs. Elle est complétée par les contrats d’architecture ci-dessous et par les 21 documents de version.
+Cette roadmap est la source de vérité pour les travaux futurs. Elle est complétée par les contrats d'architecture ci-dessous et par les 21 documents de version.
 
 ## État actuel
 
 - Dernier lot implémenté et validé : **Lot 25**.
 - Prochain lot : **Lot 26**.
 - Lots 0–25 : historique implémenté/validé selon les preuves existantes.
-- Lots 26–177 : `PLANNED_LOCKED` jusqu’à activation explicite.
+- Lots 26–177 : `PLANNED_LOCKED` jusqu'à activation explicite.
 
 ## Documents normatifs
 
@@ -22,6 +22,12 @@ Cette roadmap est la source de vérité pour les travaux futurs. Elle est compl�
 - [Veto Consequence Matrix](VETO_CONSEQUENCE_MATRIX.md)
 - [Configuration / CI / Release Governance](CONFIGURATION_RELEASE_AND_ENVIRONMENT_GOVERNANCE.md)
 - [Failure and Recovery Policy](FAILURE_DEGRADED_AND_RECOVERY_POLICY.md)
+- [Lot Specification Standard](LOT_SPECIFICATION_STANDARD.md)
+- [Test Strategy, Coverage and Quality Gates](TEST_STRATEGY_COVERAGE_AND_QUALITY_GATES.md)
+- [Mathematical Modeling and Numerical Validation](MATHEMATICAL_MODELING_AND_NUMERICAL_VALIDATION_STANDARD.md)
+- [Development Engineering Standard](DEVELOPMENT_ENGINEERING_STANDARD.md)
+- [Decision Auditability and Traceability](DECISION_AUDITABILITY_AND_TRACEABILITY_STANDARD.md)
+- [Lot Final Audit and GO / NO-GO Gate](LOT_FINAL_AUDIT_AND_GO_NO_GO_GATE.md)
 
 ## Principe de séparation
 
@@ -29,6 +35,8 @@ Cette roadmap est la source de vérité pour les travaux futurs. Elle est compl�
 Analyse ≠ scénario ≠ signal ≠ trade intent ≠ order intent
 Order intent ≠ ordre soumis ≠ fill ≠ position
 Stratégie validée ≠ autorisation live
+CI verte ≠ validation mathématique ≠ GO de promotion
+Coverage élevé ≠ tests suffisants ≠ correction prouvée
 ```
 
 ## Versions
@@ -81,9 +89,13 @@ Stratégie validée ≠ autorisation live
 - [V20 — Options Context](roadmap/V20_OPTIONS_CONTEXT.md) — Lots 172 à 174
 - [V21 — On-chain / Flow Intelligence](roadmap/V21_ON_CHAIN_FLOW_INTELLIGENCE.md) — Lots 175 à 177
 
-## Règles de modification
+## Règles de modification et validation
 
 1. Ne jamais renuméroter un lot implémenté.
 2. Toute modification met à jour roadmap, version, registry, contrats et validation report.
-3. Aucun lot suivant sans rapport PASS et gate humain.
+3. Aucun lot suivant sans rapport final `GO`, CI verte sur le commit exact et gate humain.
 4. HFT/options/on-chain ne contournent jamais le core.
+5. Chaque lot atteint au moins 90 % de line coverage sur le code ajouté/modifié et satisfait toutes les suites obligatoires.
+6. Toute formule, probabilité, estimation ou décision quantitative suit le standard mathématique et numérique.
+7. Toute décision et tout veto sont intégralement rejouables, traçables et auditables.
+8. Zéro BLOCKER et zéro MAJOR avant promotion.
