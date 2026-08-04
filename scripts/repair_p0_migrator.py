@@ -52,6 +52,12 @@ def main() -> int:
     )
     text = replace_exact(
         text,
+        '    also_copy = ["config/math/market_analysis_thresholds_v1.json", "pyproject.toml"]',
+        '    also_copy = ["src/crypto_quant_bot/__init__.py", "src/crypto_quant_bot/core/", "src/crypto_quant_bot/data/", "config/math/market_analysis_thresholds_v1.json", "pyproject.toml"]',
+        1,
+    )
+    text = replace_exact(
+        text,
         '    ignore = ["E501", "B905"]',
         '    ignore = ["E501", "B905", "RUF001", "RUF002", "RUF003", "RUF046"]',
         1,
