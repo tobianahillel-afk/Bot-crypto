@@ -1,5 +1,6 @@
 name: P0.6 mutation directory fix
 
+# One-shot repair; delete immediately after its successful commit.
 on:
   pull_request:
     branches: [main]
