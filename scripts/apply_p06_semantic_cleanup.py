@@ -65,7 +65,38 @@ def _edit_lot(
     path.write_text(content[: target.start()] + block + content[target.end() :], encoding="utf-8")
 
 
+def _patch_audit_rules() -> None:
+    path = ROOT / "scripts" / "audit_roadmap_semantics.py"
+    content = path.read_text(encoding="utf-8")
+    content = content.replace(
+        '    ("V06", 62): [\n'
+        '        "- BookFeatureStateV1",\n'
+        '        "- DerivativesContextStateV1",\n'
+        '        "Calculer imbalance symétrique",\n'
+        '        "Calculer crowding, leverage build-up",\n'
+        "    ],",
+        '    ("V06", 62): [\n'
+        '        "Calculer imbalance symétrique",\n'
+        '        "Calculer crowding, leverage build-up",\n'
+        "    ],",
+    )
+    content = content.replace(
+        '    ("V09", 90): [\n'
+        '        "- InstrumentRegistryV1",\n'
+        '        "- InstrumentSpecificationV1",\n'
+        '        "Normaliser venue, base, quote",\n'
+        '        "Valider tick_size, lot_size",\n'
+        "    ],",
+        '    ("V09", 90): [\n'
+        '        "Normaliser venue, base, quote",\n'
+        '        "Valider tick_size, lot_size",\n'
+        "    ],",
+    )
+    path.write_text(content, encoding="utf-8")
+
+
 def main() -> int:
+    _patch_audit_rules()
     _edit_lot(
         "V01_DEFENSIVE_AUDIT_NO_TRADING.md",
         17,
@@ -75,7 +106,11 @@ def main() -> int:
         "V08_PAPER_TRADING.md",
         83,
         remove_outputs=("TradeIntentV1", "OrderIntentV1"),
-        add_inputs=("SignalV1 produit par V5", "TradeIntentV1 produit par V5", "RiskDecisionV1 produit par V7"),
+        add_inputs=(
+            "SignalV1 produit par V5",
+            "TradeIntentV1 produit par V5",
+            "RiskDecisionV1 produit par V7",
+        ),
         add_outputs=("PaperOrderIntentV1",),
     )
     _edit_lot(
@@ -113,13 +148,19 @@ def main() -> int:
         "V14_EXCHANGE_RISK_API_HEALTH.md",
         128,
         remove_outputs=("InstrumentRegistryV1", "InstrumentSpecificationV1"),
-        add_inputs=("InstrumentRegistryV1 produit par V3", "InstrumentSpecificationV1 produit par V3"),
+        add_inputs=(
+            "InstrumentRegistryV1 produit par V3",
+            "InstrumentSpecificationV1 produit par V3",
+        ),
     )
     _edit_lot(
         "V14_EXCHANGE_RISK_API_HEALTH.md",
         129,
         remove_outputs=("CanonicalTimeEnvelopeV1", "ClockHealthStateV1"),
-        add_inputs=("CanonicalTimeEnvelopeV1 produit par V3", "ClockHealthStateV1 produit par V3"),
+        add_inputs=(
+            "CanonicalTimeEnvelopeV1 produit par V3",
+            "ClockHealthStateV1 produit par V3",
+        ),
     )
     _edit_lot(
         "V14_EXCHANGE_RISK_API_HEALTH.md",
@@ -131,7 +172,10 @@ def main() -> int:
         "V15_OMS_EMS_CORE.md",
         136,
         remove_outputs=("InstrumentRegistryV1", "InstrumentSpecificationV1"),
-        add_inputs=("InstrumentRegistryV1 produit par V3", "InstrumentSpecificationV1 produit par V3"),
+        add_inputs=(
+            "InstrumentRegistryV1 produit par V3",
+            "InstrumentSpecificationV1 produit par V3",
+        ),
     )
     _edit_lot(
         "V16_SANDBOX_DEMO_EXECUTION.md",
@@ -149,14 +193,21 @@ def main() -> int:
         "V18_OBSERVABILITY_INCIDENT_RESPONSE.md",
         160,
         remove_outputs=("DataQualityStateV1", "DataAnomalyV1", "DataQualityVetoV1"),
-        add_inputs=("DataQualityStateV1 produit par V3", "DataAnomalyV1 produit par V3", "DataQualityVetoV1 produit par V3"),
+        add_inputs=(
+            "DataQualityStateV1 produit par V3",
+            "DataAnomalyV1 produit par V3",
+            "DataQualityVetoV1 produit par V3",
+        ),
         add_outputs=("RuntimeFreshnessMonitoringStateV1",),
     )
     _edit_lot(
         "V19_HFT_RESEARCH.md",
         167,
         remove_outputs=("CanonicalTimeEnvelopeV1", "ClockHealthStateV1"),
-        add_inputs=("CanonicalTimeEnvelopeV1 produit par V3", "ClockHealthStateV1 produit par V3"),
+        add_inputs=(
+            "CanonicalTimeEnvelopeV1 produit par V3",
+            "ClockHealthStateV1 produit par V3",
+        ),
         add_outputs=("HighResolutionTimePolicyV1",),
     )
     _edit_lot(
