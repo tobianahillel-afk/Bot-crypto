@@ -66,6 +66,12 @@ jobs:
           coverage erase
           coverage run --parallel-mode scripts/run_historical_chain_under_coverage.py
           coverage combine
+          cp .coverage /tmp/p06-historical-coverage
+          git reset --hard HEAD
+          git clean -fd
+          mv /tmp/p06-historical-coverage .coverage
+      - name: Verify clean workspace after historical replay
+        run: git diff --exit-code && test -z "$(git status --porcelain)"
       - name: Full tests with accumulated line and branch coverage
         run: pytest -q --cov --cov-branch --cov-append --cov-report=term-missing --cov-report=xml:coverage.xml --cov-report=json:coverage.json
       - name: P0 numerical core coverage gate
