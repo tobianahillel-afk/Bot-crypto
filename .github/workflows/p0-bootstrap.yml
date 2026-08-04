@@ -83,6 +83,7 @@ jobs:
         run: pip-audit -r requirements-dev.txt
       - name: Targeted mutation tests
         run: |
+          mkdir -p mutants/config/math
           mutmut run 'crypto_quant_bot.market_analysis.technical_indicators._rsi*'
           mutmut run 'crypto_quant_bot.market_analysis.technical_indicators._bollinger*'
           mutmut run 'crypto_quant_bot.market_analysis.numeric.require_finite_float*'
