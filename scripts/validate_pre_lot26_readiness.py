@@ -260,7 +260,7 @@ def _validate_temporal_registry(payload: dict[str, Any]) -> list[str]:
 
     scales = payload.get("scales")
     if not isinstance(scales, list):
-        return errors + ["scales must be a list"]
+        return [*errors, "scales must be a list"]
     active = {item.get("scale_id"): item for item in scales if item.get("enabled_in_lot26") is True}
     if set(active) != {"timebar-5m", "timebar-15m"}:
         errors.append("exact active Lot26 scales must be 5m and 15m")
@@ -280,7 +280,7 @@ def _validate_decision_clock(payload: dict[str, Any]) -> list[str]:
         errors.append("decision clock cannot allow trade decision")
     triggers = payload.get("triggers")
     if not isinstance(triggers, list):
-        return errors + ["triggers must be a list"]
+        return [*errors, "triggers must be a list"]
     enabled = [item.get("trigger_id") for item in triggers if item.get("enabled_in_lot26") is True]
     if enabled != ["CLOSED_LOCAL_BAR"]:
         errors.append("trigger list enables non-Lot26 clock")
