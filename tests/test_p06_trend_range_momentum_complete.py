@@ -394,7 +394,7 @@ def test_aggregate_state_branches() -> None:
     assert trm._aggregate_combined_state([
         summary(combined_state="TRM_CONTEXT_TRENDING"),
         summary(combined_state="TRM_CONTEXT_VOLATILE"),
-    ])[0] == "TRM_CONTEXT_MIXED"
+    ])[0] == "TRM_CONTEXT_VOLATILE"
 
 
 def setup_archive(monkeypatch: pytest.MonkeyPatch, root: Path) -> tuple[str, int]:

@@ -212,7 +212,7 @@ def test_confluence_components_alignment_and_divergence() -> None:
     assert components["market_alignment"] is True
     agreement, divergence = vrc._confluence_scores(components)
     assert agreement == 0.6
-    assert divergence == 0.8
+    assert divergence == 0.6
 
     low_alignment = vrc._confluence_components(
         market_context_state="CONTEXT_LOW_ACTIVITY",

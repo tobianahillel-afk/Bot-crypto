@@ -11,7 +11,7 @@ import sys
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Sequence
+from collections.abc import Sequence
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORT_DIR = ROOT / "reports" / "quality" / "p06_final_assurance"
@@ -93,6 +93,13 @@ def _parse_mutation(path: Path, schema_version: str) -> dict[str, object]:
     if not matches:
         return {
             "schema_version": schema_version,
+            "killed": 0,
+            "timeout": 0,
+            "suspicious": 0,
+            "survived": 0,
+            "evaluated": 0,
+            "score_percent": 0.0,
+            "minimum_score_percent": 80.0,
             "status": "FAIL",
             "reason": "mutation summary not found",
         }
@@ -113,13 +120,19 @@ def _parse_mutation(path: Path, schema_version: str) -> dict[str, object]:
 
 
 def _patch_extended_mutation_config(text: str) -> str:
+    text = text.replace(
+        'source_paths = ["src/crypto_quant_bot/market_analysis/"]',
+        'source_paths = ["src/crypto_quant_bot/"]',
+        1,
+    )
     start = text.index("only_mutate = [")
     end = text.index("]\npytest_add_cli_args_test_selection", start) + 2
     replacement = '''only_mutate = [
   "src/crypto_quant_bot/contracts/decision_evidence.py",
   "src/crypto_quant_bot/market_analysis/trend_range_momentum.py",
   "src/crypto_quant_bot/market_analysis/volatility_regime_confluence.py",
-]'''
+]
+'''
     text = text[:start] + replacement + text[end:]
     start = text.index("pytest_add_cli_args_test_selection = [")
     end = text.index("]\nalso_copy", start) + 2
@@ -128,7 +141,8 @@ def _patch_extended_mutation_config(text: str) -> str:
   "tests/test_p06_decision_evidence_properties.py",
   "tests/test_p06_trend_range_momentum_complete.py",
   "tests/test_p06_vrc_complete.py",
-]'''
+]
+'''
     return text[:start] + replacement + text[end:]
 
 
@@ -146,7 +160,17 @@ def _historical_coverage(env: dict[str, str]) -> list[CommandResult]:
     coverage_path = ROOT / ".coverage"
     saved = coverage_path.read_bytes() if coverage_path.is_file() else b""
     subprocess.run(["git", "reset", "--hard", "HEAD"], cwd=ROOT, check=True)
-    subprocess.run(["git", "clean", "-fd"], cwd=ROOT, check=True)
+    subprocess.run(
+        [
+            "git",
+            "clean",
+            "-fd",
+            "-e",
+            "reports/quality/p06_final_assurance/",
+        ],
+        cwd=ROOT,
+        check=True,
+    )
     if saved:
         coverage_path.write_bytes(saved)
     clean = subprocess.run(
