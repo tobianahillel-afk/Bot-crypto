@@ -32,9 +32,6 @@ Projet : **Crypto Quant Bot V3.1-Ops**
 - [Capability and Contract Ownership Registry](CAPABILITY_AND_CONTRACT_OWNERSHIP_REGISTRY.md)
 - [Model Retraining and Promotion Policy](MODEL_RETRAINING_AND_PROMOTION_POLICY.md)
 - [Economic Objective and Risk Utility Policy](ECONOMIC_OBJECTIVE_AND_RISK_UTILITY_POLICY.md)
-- [Capability and Contract Ownership Registry](CAPABILITY_AND_CONTRACT_OWNERSHIP_REGISTRY.md)
-- [Model Retraining and Promotion Policy](MODEL_RETRAINING_AND_PROMOTION_POLICY.md)
-- [Economic Objective and Risk Utility Policy](ECONOMIC_OBJECTIVE_AND_RISK_UTILITY_POLICY.md)
 
 ## Architecture quantitative multi-échelle
 
@@ -63,8 +60,6 @@ Ces documents sont normatifs pour les lots futurs. Ils n'indiquent pas que les c
 - Temporal scale registry: `config/temporal/temporal_scale_registry_v1.json`
 - Decision clock policy: `config/temporal/decision_clock_policy_v1.json`
 - Forecast horizon registry: `config/research/forecast_horizon_registry_v1.json`
-- Domain ownership registry: `config/governance/domain_ownership_registry_v1.json`
-- Decision evidence schema: `contracts/schemas/decision_evidence_envelope_v1.schema.json`
 - Domain ownership registry: `config/governance/domain_ownership_registry_v1.json`
 - Decision evidence schema: `contracts/schemas/decision_evidence_envelope_v1.schema.json`
 
