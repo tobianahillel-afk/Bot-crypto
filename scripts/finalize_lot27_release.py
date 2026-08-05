@@ -29,8 +29,7 @@ def replace(path: str, old: str, new: str) -> None:
 def update_v2_roadmap() -> None:
     path = ROOT / "docs/roadmap/V02_MARKET_ANALYSIS_OFFLINE.md"
     text = path.read_text(encoding="utf-8")
-    marker = "## Lot 27 — Global Market Context Aggregator"
-    start = text.index(marker)
+    start = text.index("## Lot 27 — Global Market Context Aggregator")
     end = text.index("## Lot 28 —", start)
     section = text[start:end]
     old = "**Statut canonique :** `PLANNED_LOCKED`"
@@ -73,10 +72,7 @@ def write_overlay(implementation_commit: str) -> None:
                 "trade_allowed": False,
                 "execution_allowed": False,
             },
-            "28": {
-                "implementation_started": False,
-                "status": "PLANNED_LOCKED",
-            },
+            "28": {"implementation_started": False, "status": "PLANNED_LOCKED"},
         },
     }
     path = ROOT / "data/audit/roadmap_lifecycle_overlay_lot27.json"
@@ -197,23 +193,7 @@ def update_historical_lot26_test() -> None:
     )
 
 
-def reconcile(implementation_commit: str) -> None:
-    run(ROOT, implementation_commit)
-    replace(
-        "pyproject.toml",
-        'version = "0.26.0"\ndescription = "Crypto Quant Bot V3.1-Ops — Lot 26 validated offline descriptive alignment"',
-        'version = "0.27.0"\ndescription = "Crypto Quant Bot V3.1-Ops — Lot 27 validated offline global market context"',
-    )
-    replace(
-        "README.md",
-        "| Dernier lot implémenté et validé | **Lot 26 — Multi-Timeframe Alignment** |",
-        "| Dernier lot implémenté et validé | **Lot 27 — Global Market Context Aggregator** |",
-    )
-    replace(
-        "README.md",
-        "| Prochain lot planifié | **Lot 27 — Global Market Context Aggregator**, verrouillé jusqu’au merge et à l’audit post-merge du Lot 26 |",
-        "| Prochain lot planifié | **Lot 28 — Explanation Core & Why-Not-Trade Layer**, verrouillé jusqu’au merge et à l’audit post-merge du Lot 27 |",
-    )
+def update_changelog() -> None:
     changelog = ROOT / "CHANGELOG.md"
     current = changelog.read_text(encoding="utf-8")
     entry = """## 0.27.0 — Lot 27 Global Market Context Aggregator
@@ -234,12 +214,10 @@ def reconcile(implementation_commit: str) -> None:
         if not current.startswith(marker):
             raise RuntimeError("changelog header missing")
         changelog.write_text(marker + entry + current[len(marker):], encoding="utf-8")
-    replace(
-        "docs/LOT_27_GLOBAL_MARKET_CONTEXT_AGGREGATOR.md",
-        "Status: `IMPLEMENTATION_IN_PROGRESS`",
-        f"Status: `{FINAL_STATUS}`",
-    )
-    old_state = """- Dernier lot dont l'implémentation est terminée : **Lot 26**.
+
+
+def update_master_roadmap() -> None:
+    old = """- Dernier lot dont l'implémentation est terminée : **Lot 26**.
 - Baseline P0 institutionnelle : fusionnée.
 - Gate transversal P0.6 : fusionné et conservé comme preuve historique.
 - Lot 26 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
@@ -251,7 +229,7 @@ def reconcile(implementation_commit: str) -> None:
 
 L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot26.json`. Le registre
 """
-    new_state = """- Dernier lot dont l'implémentation est terminée : **Lot 27**.
+    new = """- Dernier lot dont l'implémentation est terminée : **Lot 27**.
 - Baseline P0 institutionnelle : fusionnée.
 - Gate transversal P0.6 : fusionné et conservé comme preuve historique.
 - Lot 26 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
@@ -263,7 +241,34 @@ L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot26.json`
 
 L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot27.json`. Le registre
 """
-    replace("docs/ROADMAP_V1_TO_V21.md", old_state, new_state)
+    replace("docs/ROADMAP_V1_TO_V21.md", old, new)
+
+
+def reconcile(implementation_commit: str) -> None:
+    run(ROOT, implementation_commit)
+    replace("pyproject.toml", 'version = "0.26.0"', 'version = "0.27.0"')
+    replace(
+        "pyproject.toml",
+        'description = "Crypto Quant Bot V3.1-Ops — Lot 26 validated offline descriptive alignment"',
+        'description = "Crypto Quant Bot V3.1-Ops — Lot 27 validated offline global market context"',
+    )
+    replace(
+        "README.md",
+        "| Dernier lot implémenté et validé | **Lot 26 — Multi-Timeframe Alignment** |",
+        "| Dernier lot implémenté et validé | **Lot 27 — Global Market Context Aggregator** |",
+    )
+    replace(
+        "README.md",
+        "| Prochain lot planifié | **Lot 27 — Global Market Context Aggregator**, verrouillé jusqu’au merge et à l’audit post-merge du Lot 26 |",
+        "| Prochain lot planifié | **Lot 28 — Explanation Core & Why-Not-Trade Layer**, verrouillé jusqu’au merge et à l’audit post-merge du Lot 27 |",
+    )
+    update_changelog()
+    replace(
+        "docs/LOT_27_GLOBAL_MARKET_CONTEXT_AGGREGATOR.md",
+        "Status: `IMPLEMENTATION_IN_PROGRESS`",
+        f"Status: `{FINAL_STATUS}`",
+    )
+    update_master_roadmap()
     update_v2_roadmap()
     write_overlay(implementation_commit)
     write_worklog(implementation_commit)
