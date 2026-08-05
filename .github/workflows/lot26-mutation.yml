@@ -99,21 +99,27 @@ jobs:
         run: |
           python - <<'PY'
           import json
+          import re
           from pathlib import Path
 
-          path = Path('.tmp-lot26-mutants/mutants/mutmut-stats.json')
+          path = Path('reports/lot26/mutation/run.txt')
           if not path.is_file():
-              raise SystemExit('LOT26_MUTATION_STATS_MISSING')
-          stats = json.loads(path.read_text(encoding='utf-8'))['mutation_scores']
-          killed = int(stats.get('killed', 0))
-          timeout = int(stats.get('timeout', 0))
-          survived = int(stats.get('survived', 0))
-          suspicious = int(stats.get('suspicious', 0))
-          untested = int(stats.get('untested', 0))
-          denominator = killed + timeout + survived + suspicious + untested
-          if denominator <= 0:
-              raise SystemExit('LOT26_MUTATION_NO_EVALUATED_MUTANTS')
-          score = 100.0 * (killed + timeout) / denominator
+              raise SystemExit('LOT26_MUTATION_RUN_LOG_MISSING')
+          text = path.read_text(encoding='utf-8', errors='replace')
+          text = re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', text).replace('\r', '\n')
+          pattern = re.compile(
+              r'(\d+)/(\d+).*?🎉\s*(\d+).*?⏰\s*(\d+).*?🤔\s*(\d+).*?🙁\s*(\d+)'
+          )
+          matches = pattern.findall(text)
+          if not matches:
+              raise SystemExit('LOT26_MUTATION_SCORE_PARSE_ERROR')
+          completed, total, killed, timeout, suspicious, survived = map(int, matches[-1])
+          evaluated = killed + timeout + suspicious + survived
+          if completed != total or evaluated != total or total <= 0:
+              raise SystemExit(
+                  f'LOT26_MUTATION_INCOMPLETE completed={completed} total={total} evaluated={evaluated}'
+              )
+          score = 100.0 * (killed + timeout) / evaluated
           payload = {
               'schema_version': 'lot26-critical-mutation-score-v1',
               'scope': 'alignment_math and alignment_temporal',
@@ -121,8 +127,7 @@ jobs:
               'timeout': timeout,
               'survived': survived,
               'suspicious': suspicious,
-              'untested': untested,
-              'evaluated': denominator,
+              'evaluated': evaluated,
               'score_percent': round(score, 2),
               'minimum_score_percent': 80.0,
               'status': 'PASS' if score >= 80.0 else 'FAIL',
