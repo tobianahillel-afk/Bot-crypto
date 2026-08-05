@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/schemas/explanation-core-why-not-trade-layer-state-v1.schema.json",
+  "title": "explanation-core-why-not-trade-layer-state-v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "explanation_id",
+    "instrument_id",
+    "decision_time",
+    "global_context_id",
+    "alignment_id",
+    "bundle",
+    "lineage_id",
+    "config_version",
+    "config_checksum",
+    "code_commit",
+    "input_checksums",
+    "output_checksum",
+    "reason_codes",
+    "validation_state",
+    "analysis_only",
+    "used_for_decision",
+    "forecast_generation_allowed",
+    "probability_claims_allowed",
+    "signal_generation_allowed",
+    "risk_approval_allowed",
+    "order_routing_allowed",
+    "execution_allowed",
+    "trade_allowed",
+    "approved_size"
+  ],
+  "$defs": {
+    "evidence_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "artifact_path", "artifact_checksum", "json_pointer", "observed_value"],
+      "properties": {
+        "schema_version": {"const": "explanation-evidence-reference-v1"},
+        "artifact_path": {"type": "string", "minLength": 1},
+        "artifact_checksum": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "json_pointer": {"type": "string", "minLength": 1},
+        "observed_value": {"type": ["string", "number", "integer", "boolean", "null"]}
+      }
+    },
+    "statement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "statement_id", "section", "reason_code", "template_id", "text", "parameters", "evidence_refs"],
+      "properties": {
+        "schema_version": {"const": "explanation-statement-v1"},
+        "statement_id": {"type": "string", "minLength": 1},
+        "section": {"enum": ["facts_observed", "features_computed", "inferences", "assumptions", "supporting_evidence", "contradicting_evidence", "uncertainty", "rules_triggered", "vetos_triggered", "non_applicable", "final_consequence"]},
+        "reason_code": {"type": "string", "minLength": 1},
+        "template_id": {"type": "string", "minLength": 1},
+        "text": {"type": "string", "minLength": 1},
+        "parameters": {"type": "object", "additionalProperties": {"type": "string"}},
+        "evidence_refs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidence_reference"}}
+      }
+    },
+    "why_reason": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "reason_id", "reason_code", "owner", "condition_not_satisfied", "observed_value", "required_value", "expiry", "reconsideration_condition", "evidence_refs", "order_intent_created"],
+      "properties": {
+        "schema_version": {"const": "why-not-trade-reason-v1"},
+        "reason_id": {"type": "string", "minLength": 1},
+        "reason_code": {"type": "string", "minLength": 1},
+        "owner": {"type": "string", "minLength": 1},
+        "condition_not_satisfied": {"type": "string", "minLength": 1},
+        "observed_value": {"type": "string", "minLength": 1},
+        "required_value": {"type": "string", "minLength": 1},
+        "expiry": {"type": ["string", "null"]},
+        "reconsideration_condition": {"type": "string", "minLength": 1},
+        "evidence_refs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidence_reference"}},
+        "order_intent_created": {"const": false}
+      }
+    }
+  },
+  "properties": {
+    "schema_version": {"const": "explanation-core-why-not-trade-layer-state-v1"},
+    "explanation_id": {"type": "string", "minLength": 1},
+    "instrument_id": {"const": "BTC/EUR"},
+    "decision_time": {"type": "string", "format": "date-time", "pattern": "Z$"},
+    "global_context_id": {"type": "string", "minLength": 1},
+    "alignment_id": {"type": "string", "minLength": 1},
+    "bundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "facts_observed", "features_computed", "inferences", "assumptions", "supporting_evidence", "contradicting_evidence", "uncertainty", "rules_triggered", "vetos_triggered", "non_applicable", "final_consequence", "why_not_trade"],
+      "properties": {
+        "schema_version": {"const": "explanation-bundle-v1"},
+        "facts_observed": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/statement"}},
+        "features_computed": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/statement"}},
+        "inferences": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/statement"}},
+        "assumptions": {"type": "array", "maxItems": 0, "items": {"$ref": "#/$defs/statement"}},
+        "supporting_evidence": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/statement"}},
+        "contradicting_evidence": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/statement"}},
+        "uncertainty": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/statement"}},
+        "rules_triggered": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/statement"}},
+        "vetos_triggered": {"type": "array", "minItems": 3, "items": {"$ref": "#/$defs/statement"}},
+        "non_applicable": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/statement"}},
+        "final_consequence": {"type": "array", "minItems": 1, "maxItems": 1, "items": {"$ref": "#/$defs/statement"}},
+        "why_not_trade": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["schema_version", "reason_set_id", "reasons", "dominant_reason_code", "final_consequence", "no_order_intent_created"],
+          "properties": {
+            "schema_version": {"const": "why-not-trade-reason-set-v1"},
+            "reason_set_id": {"type": "string", "minLength": 1},
+            "reasons": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"$ref": "#/$defs/why_reason"}},
+            "dominant_reason_code": {"const": "WNT_PERMISSIONS_DISABLED"},
+            "final_consequence": {"type": "string", "minLength": 1},
+            "no_order_intent_created": {"const": true}
+          }
+        }
+      }
+    },
+    "lineage_id": {"type": "string", "minLength": 1},
+    "config_version": {"const": "lot28-explanation-core-v1"},
+    "config_checksum": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "code_commit": {"type": "string", "pattern": "^[a-f0-9]{7,64}$"},
+    "input_checksums": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["global_context", "multi_timeframe_alignment"],
+      "properties": {
+        "global_context": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "multi_timeframe_alignment": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "output_checksum": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "validation_state": {"const": "VALID"},
+    "analysis_only": {"const": true},
+    "used_for_decision": {"const": false},
+    "forecast_generation_allowed": {"const": false},
+    "probability_claims_allowed": {"const": false},
+    "signal_generation_allowed": {"const": false},
+    "risk_approval_allowed": {"const": false},
+    "order_routing_allowed": {"const": false},
+    "execution_allowed": {"const": false},
+    "trade_allowed": {"const": false},
+    "approved_size": {"const": 0}
+  }
+}
