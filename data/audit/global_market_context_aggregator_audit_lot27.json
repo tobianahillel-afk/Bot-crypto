@@ -1,0 +1,26 @@
+{
+  "analysis_only": true,
+  "code_commit": "bae0633d1fb28a77eb91111796d35549a5a365c8",
+  "config_checksum": "bad9f16478dfb6b800a99f8afae47a9635039301f5c9532cb4674d9f87fc3e70",
+  "decision_time": "2026-05-25T03:00:00Z",
+  "execution_allowed": false,
+  "input_checksums": {
+    "lot22_market_analysis": "df6e87bc193d9b432022af1b12fa29521a811506971c171b09d0edad335b124e",
+    "lot23_technical_indicators": "79f139104b5a106716a850ca49346944d3c36e6fbaee9e36c9099066038ad76b",
+    "lot24_trend_range_momentum": "9748a98ef34f4b78fa4600c2f316a3a219f46817f8138136dae6d46ce901d992",
+    "lot25_volatility_regime_confluence": "bfbc43f291ffe377303f971671b6167e8a9aebee1bf32cad9f1128ebb347ceae",
+    "lot26_multi_timeframe_alignment": "278cecf24b714738a69ec87c21745a3aaf0c40b4e5462c929ea3478b9d266eba"
+  },
+  "output_checksum": "1bd3f23134d337cf58205f39147b32892ced1624c2428eb4d58085d48951a98d",
+  "reason_codes": [
+    "GMC_ALL_SOURCES_VALID",
+    "GMC_EXPLICIT_CONFLICT",
+    "GMC_CONTEXT_MIXED",
+    "GMC_CONFIDENCE_INTERVAL_UNAVAILABLE_UNCALIBRATED"
+  ],
+  "replay_status": "MATCH",
+  "run_id": "baab8b85-871a-5711-b921-e73314b7df38",
+  "schema_version": "global-market-context-aggregator-audit-v1",
+  "trade_allowed": false,
+  "used_for_decision": false
+}
