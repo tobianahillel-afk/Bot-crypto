@@ -1,0 +1,102 @@
+{
+  "schema_version": "global-market-context-aggregator-config-v1",
+  "config_id": "lot27-global-market-context-v1",
+  "status": "PROVISIONAL_UNCALIBRATED_OFFLINE_ONLY",
+  "runtime_scope": "LOCAL_OFFLINE_ANALYSIS_ONLY",
+  "instrument_id": "BTC/EUR",
+  "source_weights": {
+    "lot22_market_analysis": 0.15,
+    "lot23_technical_indicators": 0.15,
+    "lot24_trend_range_momentum": 0.25,
+    "lot25_volatility_regime_confluence": 0.25,
+    "lot26_multi_timeframe_alignment": 0.2
+  },
+  "source_specs": {
+    "lot22_market_analysis": {
+      "artifact": "data/audit/market_analysis_lot22.json",
+      "state_field": "market_context_state",
+      "score_field": "market_context_score",
+      "version_field": "analysis_version",
+      "checks_field": "analysis_checks",
+      "semantic_mapping": {"CONTEXT_MIXED": "MIXED"}
+    },
+    "lot23_technical_indicators": {
+      "artifact": "data/audit/technical_indicators_lot23.json",
+      "state_field": "indicator_state",
+      "score_field": "indicator_context_score",
+      "version_field": "indicator_version",
+      "checks_field": "indicator_checks",
+      "semantic_mapping": {"INDICATOR_MIXED": "MIXED"}
+    },
+    "lot24_trend_range_momentum": {
+      "artifact": "data/audit/trend_range_momentum_lot24.json",
+      "state_field": "combined_context_state",
+      "score_field": "combined_context_score",
+      "version_field": "trend_engine_version",
+      "checks_field": "trend_checks",
+      "semantic_mapping": {"TRM_CONTEXT_TRENDING": "TRENDING"}
+    },
+    "lot25_volatility_regime_confluence": {
+      "artifact": "data/audit/volatility_regime_confluence_lot25.json",
+      "state_field": "combined_context_state",
+      "score_field": "combined_context_score",
+      "version_field": "vrc_engine_version",
+      "checks_field": "vrc_checks",
+      "semantic_mapping": {
+        "VRC_CONTEXT_ALIGNED_RANGE": "RANGE",
+        "VRC_CONTEXT_ALIGNED_TREND": "TRENDING"
+      }
+    },
+    "lot26_multi_timeframe_alignment": {
+      "artifact": "data/audit/multi_timeframe_alignment_engine_lot26.json",
+      "state_field": "alignment_state",
+      "score_field": "overall_agreement_score",
+      "version_field": "schema_version",
+      "checks_field": null,
+      "semantic_mapping": {
+        "MTF_ALIGNED": "TRENDING",
+        "MTF_PARTIAL": "MIXED",
+        "MTF_DIVERGENT": "CONFLICT",
+        "MTF_UNKNOWN": "MIXED"
+      }
+    }
+  },
+  "thresholds": {
+    "minimum_available_source_count": 4,
+    "minimum_weighted_coverage_ratio": 0.75,
+    "dominance_margin_minimum": 0.05,
+    "explicit_conflict_mixed_minimum": 0.1,
+    "maximum_staleness_seconds": 900
+  },
+  "numeric_policy": {
+    "round_decimal_places": 6,
+    "score_minimum": 0.0,
+    "score_maximum": 1.0,
+    "missing_source_contribution": 0.0,
+    "renormalize_missing_sources": false
+  },
+  "promotion_restrictions": {
+    "forecast_generation_allowed": false,
+    "probability_claims_allowed": false,
+    "signal_generation_allowed": false,
+    "trade_decision_allowed": false,
+    "order_intent_allowed": false,
+    "paper_use_allowed": false,
+    "live_use_allowed": false
+  },
+  "reason_codes": [
+    "GMC_ALL_SOURCES_VALID",
+    "GMC_SOURCE_MISSING",
+    "GMC_SOURCE_INVALID",
+    "GMC_SOURCE_STALE",
+    "GMC_INSUFFICIENT_WEIGHTED_COVERAGE",
+    "GMC_EXPLICIT_CONFLICT",
+    "GMC_DOMINANCE_MARGIN_INSUFFICIENT",
+    "GMC_CONTEXT_TRENDING",
+    "GMC_CONTEXT_RANGE",
+    "GMC_CONTEXT_MIXED",
+    "GMC_CONTEXT_UNKNOWN",
+    "GMC_CONFIDENCE_INTERVAL_UNAVAILABLE_UNCALIBRATED",
+    "GMC_REPLAY_DIVERGENCE"
+  ]
+}
