@@ -12,14 +12,14 @@ SOURCE_ROOT = REPOSITORY_ROOT / "src"
 if str(SOURCE_ROOT) not in sys.path:
     sys.path.insert(0, str(SOURCE_ROOT))
 
+from crypto_quant_bot.market_analysis.alignment_io import (  # noqa: E402
+    load_json,
+    write_json_atomic,
+)
 from crypto_quant_bot.market_analysis.global_market_context_aggregator import (  # noqa: E402
     build_global_market_context,
     checksum,
     replay_matches,
-)
-from crypto_quant_bot.market_analysis.alignment_io import (  # noqa: E402
-    load_json,
-    write_json_atomic,
 )
 
 CONFIG_PATH = "config/math/global_market_context_aggregator_v1.json"
