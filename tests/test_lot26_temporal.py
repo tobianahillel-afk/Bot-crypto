@@ -3,10 +3,10 @@ from __future__ import annotations
 from dataclasses import replace
 
 import pytest
-from lot26_fixtures import load_config, make_availability, make_state
 
 from crypto_quant_bot.market_analysis.alignment_common import Lot26ValidationError
 from crypto_quant_bot.market_analysis.alignment_temporal import select_asof_backward
+from tests.lot26_fixtures import load_config, make_availability, make_state
 
 
 def _base_inputs():

@@ -5,7 +5,6 @@ from copy import deepcopy
 import pytest
 from hypothesis import given
 from hypothesis import strategies as st
-from lot26_fixtures import load_clock, load_config, load_registry
 
 from crypto_quant_bot.market_analysis.alignment_common import Lot26ValidationError
 from crypto_quant_bot.market_analysis.alignment_config import (
@@ -20,6 +19,7 @@ from crypto_quant_bot.market_analysis.alignment_math import (
     compute_weighted_agreement,
     uncertainty_from_coverage,
 )
+from tests.lot26_fixtures import load_clock, load_config, load_registry
 
 
 def test_component_oracles_for_lot25_contexts() -> None:

@@ -5,7 +5,6 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
-from lot26_fixtures import load_config, load_registry, make_alignment
 
 from crypto_quant_bot.contracts.timeframe_alignment import require_unique_codes, validate_score
 from crypto_quant_bot.market_analysis import alignment_io
@@ -19,6 +18,7 @@ from crypto_quant_bot.market_analysis.alignment_config import (
     validate_scale_registry,
 )
 from crypto_quant_bot.market_analysis.alignment_math import component_compatibility
+from tests.lot26_fixtures import load_config, load_registry, make_alignment
 
 
 def test_common_helpers_fail_closed(tmp_path: Path) -> None:

@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import FrozenInstanceError, replace
 
 import pytest
-from lot26_fixtures import make_alignment, make_availability, make_state
 
 from crypto_quant_bot.contracts.timeframe_alignment import (
     ClosedBarAvailabilityV1,
@@ -11,6 +10,7 @@ from crypto_quant_bot.contracts.timeframe_alignment import (
     TimeframeMarketContextStateV1,
     parse_utc,
 )
+from tests.lot26_fixtures import make_alignment, make_availability, make_state
 
 
 def test_context_contract_round_trip_and_dimensions() -> None:
