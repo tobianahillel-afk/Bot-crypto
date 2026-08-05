@@ -19,7 +19,8 @@ def test_lot26_post_merge_release_state_is_consistent() -> None:
     )
     worklog = (ROOT / "docs/LOT_26_IMPLEMENTATION_WORKLOG.md").read_text(encoding="utf-8")
 
-    assert project["version"] == "0.26.0"
+    version = tuple(int(part) for part in project["version"].split("."))
+    assert version >= (0, 26, 0)
     assert overlay["latest_implemented_lot"] == 26
     assert overlay["lots"]["26"]["status"] == "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY"
     assert overlay["lots"]["26"]["trade_allowed"] is False

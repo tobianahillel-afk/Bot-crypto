@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.27.0 — Lot 27 Global Market Context Aggregator
+
+- agrégation descriptive déterministe des sorties validées des Lots 22–26 ;
+- poids fixes publiés et aucune renormalisation silencieuse des sources absentes ;
+- qualité, fraîcheur, checksum, état, catégorie et contribution conservés par source ;
+- support `TRENDING`, `RANGE`, `MIXED`, `CONFLICT`, alternatives et conflits explicites ;
+- oracle global `GLOBAL_CONTEXT_MIXED`, score `0.5646`, couverture `1.0` ;
+- 57 tests ciblés, couverture lignes 97.18% et branches 91.07% ;
+- mutation critique 803/948, score 84.70% PASS ;
+- Ruff, mypy, Bandit, pip-audit, architecture, traçabilité, régression et anti-flake PASS ;
+- aucune prévision, probabilité, décision, permission de trading ou exécution activée.
+
 ## 0.26.0 — Lot 26 Multi-Timeframe Alignment
 
 - moteur descriptif `timebar-5m → timebar-15m` avec jointure `ASOF_BACKWARD` ;

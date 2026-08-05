@@ -1,0 +1,99 @@
+name: Lot 27 global market context validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'config/math/global_market_context_aggregator_v1.json'
+      - 'contracts/schemas/global_market_context_aggregator_state_v1.schema.json'
+      - 'src/crypto_quant_bot/market_analysis/global_market_context_aggregator*.py'
+      - 'scripts/run_lot27_global_market_context_aggregator.py'
+      - 'scripts/validate_lot27.py'
+      - 'tests/lot27_fixtures.py'
+      - 'tests/test_lot27_*.py'
+      - 'docs/*LOT_27*'
+      - 'reports/*lot_27*'
+      - 'data/audit/global_market_context_aggregator*lot27.json'
+      - '.github/workflows/lot27-global-context.yml'
+      - 'requirements-dev.lock'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lot27:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Compile lint and type-check
+        run: |
+          python -m compileall -q src scripts tests
+          ruff check src/crypto_quant_bot/market_analysis/global_market_context_aggregator*.py scripts/run_lot27_global_market_context_aggregator.py scripts/validate_lot27.py tests/lot27_fixtures.py tests/test_lot27_*.py
+          mypy src/crypto_quant_bot/market_analysis/global_market_context_aggregator*.py
+      - name: Targeted line and branch coverage
+        run: |
+          coverage erase
+          pytest -q tests/test_lot27_*.py \
+            --cov=crypto_quant_bot.market_analysis.global_market_context_aggregator \
+            --cov=crypto_quant_bot.market_analysis.global_market_context_aggregator_models \
+            --cov-branch \
+            --cov-report=json:reports/lot27/coverage.json \
+            --cov-report=term-missing
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          payload = json.loads(Path('reports/lot27/coverage.json').read_text())
+          totals = payload['totals']
+          lines = float(totals['percent_statements_covered'])
+          branches = float(totals['percent_branches_covered'])
+          print(f'Lot27 coverage: lines={lines:.2f}% branches={branches:.2f}%')
+          if lines < 95.0 or branches < 90.0:
+              raise SystemExit('LOT27_CRITICAL_COVERAGE_BELOW_THRESHOLD')
+          PY
+      - name: Deterministic runner and evidence validation
+        env:
+          CODE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          python scripts/run_lot27_global_market_context_aggregator.py --code-commit "$CODE_COMMIT"
+          cp data/audit/global_market_context_aggregator_lot27.json /tmp/lot27-run1.json
+          cp data/audit/global_market_context_aggregator_audit_lot27.json /tmp/lot27-audit1.json
+          python scripts/validate_lot27.py
+          python scripts/run_lot27_global_market_context_aggregator.py --code-commit "$CODE_COMMIT"
+          cmp /tmp/lot27-run1.json data/audit/global_market_context_aggregator_lot27.json
+          cmp /tmp/lot27-audit1.json data/audit/global_market_context_aggregator_audit_lot27.json
+          python scripts/validate_lot27.py
+      - name: Architecture traceability and security
+        run: |
+          python scripts/validate_domain_architecture.py
+          python scripts/validate_traceability_contract.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          bandit -q -r src/crypto_quant_bot/market_analysis/global_market_context_aggregator*.py
+          pip-audit -r requirements-dev.lock
+      - name: Full regression and anti-flake
+        run: |
+          pytest -q
+          pytest -q tests/test_lot27_*.py
+          pytest -q tests/test_lot27_*.py
+          pytest -q tests/test_lot27_*.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot27-global-context-evidence
+          path: |
+            data/audit/global_market_context_aggregator*lot27.json
+            reports/lot_27_global_market_context_aggregator_report.md
+            reports/lot27/
