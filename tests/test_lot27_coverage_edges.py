@@ -123,6 +123,7 @@ def test_range_can_dominate_when_conflict_and_trend_support_are_removed() -> Non
     config = copy.deepcopy(load_config())
     config["thresholds"]["minimum_available_source_count"] = 3
     config["thresholds"]["minimum_weighted_coverage_ratio"] = 0.5
+    config["thresholds"]["dominance_margin_minimum"] = 0.03
     state = build_global_market_context(sources, config, COMMIT)
     assert state.dominant_state == "GLOBAL_CONTEXT_RANGE"
     assert "GMC_CONTEXT_RANGE" in state.reason_codes
