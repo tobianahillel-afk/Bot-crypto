@@ -3,252 +3,69 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
-    "alignment_id": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "alignment_state": {
-      "enum": [
-        "MTF_ALIGNED",
-        "MTF_PARTIAL",
-        "MTF_DIVERGENT",
-        "MTF_UNKNOWN"
-      ]
-    },
-    "analysis_only": {
-      "const": true
-    },
-    "available_component_count": {
-      "maximum": 6,
-      "minimum": 0,
-      "type": "integer"
-    },
-    "coherence_state": {
-      "enum": [
-        "MTF_COHERENT",
-        "MTF_MIXED",
-        "MTF_INCOHERENT",
-        "MTF_UNKNOWN"
-      ]
-    },
-    "combined_context_state": {
-      "enum": [
-        "MTF_CONTEXT_ALIGNED",
-        "MTF_CONTEXT_PARTIAL",
-        "MTF_CONTEXT_DIVERGENT",
-        "MTF_CONTEXT_UNKNOWN"
-      ]
-    },
+    "alignment_id": {"minLength": 1, "type": "string"},
+    "alignment_state": {"enum": ["MTF_ALIGNED", "MTF_PARTIAL", "MTF_DIVERGENT", "MTF_UNKNOWN"]},
+    "analysis_only": {"const": true},
+    "approved_size": {"const": 0},
+    "available_component_count": {"maximum": 6, "minimum": 0, "type": "integer"},
+    "code_commit": {"pattern": "^[a-f0-9]{7,64}$", "type": "string"},
+    "coherence_state": {"enum": ["MTF_COHERENT", "MTF_MIXED", "MTF_INCOHERENT", "MTF_UNKNOWN"]},
+    "combined_context_state": {"enum": ["MTF_CONTEXT_ALIGNED", "MTF_CONTEXT_PARTIAL", "MTF_CONTEXT_DIVERGENT", "MTF_CONTEXT_UNKNOWN"]},
     "component_alignment_scores": {
       "additionalProperties": false,
       "properties": {
-        "confluence": {
-          "maximum": 1.0,
-          "minimum": 0.0,
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "momentum": {
-          "maximum": 1.0,
-          "minimum": 0.0,
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "range": {
-          "maximum": 1.0,
-          "minimum": 0.0,
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "regime": {
-          "maximum": 1.0,
-          "minimum": 0.0,
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "trend": {
-          "maximum": 1.0,
-          "minimum": 0.0,
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "volatility": {
-          "maximum": 1.0,
-          "minimum": 0.0,
-          "type": [
-            "number",
-            "null"
-          ]
-        }
+        "confluence": {"maximum": 1, "minimum": 0, "type": ["number", "null"]},
+        "momentum": {"maximum": 1, "minimum": 0, "type": ["number", "null"]},
+        "range": {"maximum": 1, "minimum": 0, "type": ["number", "null"]},
+        "regime": {"maximum": 1, "minimum": 0, "type": ["number", "null"]},
+        "trend": {"maximum": 1, "minimum": 0, "type": ["number", "null"]},
+        "volatility": {"maximum": 1, "minimum": 0, "type": ["number", "null"]}
       },
-      "required": [
-        "trend",
-        "range",
-        "momentum",
-        "volatility",
-        "regime",
-        "confluence"
-      ],
+      "required": ["trend", "range", "momentum", "volatility", "regime", "confluence"],
       "type": "object"
     },
-    "config_checksum": {
-      "pattern": "^[a-f0-9]{64}$",
-      "type": "string"
-    },
-    "config_version": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "decision_time": {
-      "format": "date-time",
-      "pattern": "Z$",
-      "type": "string"
-    },
-    "divergence_state": {
-      "enum": [
-        "MTF_MULTI_COMPONENT_MISMATCH",
-        "MTF_DIRECTIONAL_MISMATCH",
-        "MTF_REGIME_MISMATCH",
-        "MTF_VOLATILITY_MISMATCH",
-        "MTF_NO_HARD_DIVERGENCE",
-        "MTF_UNKNOWN"
-      ]
-    },
-    "execution_allowed": {
-      "const": false
-    },
-    "hard_mismatch_components": {
-      "items": {
-        "enum": [
-          "trend",
-          "range",
-          "momentum",
-          "volatility",
-          "regime",
-          "confluence"
-        ]
-      },
-      "type": "array",
-      "uniqueItems": true
-    },
-    "higher_bar_close_time": {
-      "format": "date-time",
-      "pattern": "Z$",
-      "type": "string"
-    },
-    "higher_state_id": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "higher_timeframe": {
-      "const": "15m"
-    },
-    "instrument_id": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "join_method": {
-      "const": "ASOF_BACKWARD"
-    },
-    "lineage_id": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "local_bar_close_time": {
-      "format": "date-time",
-      "pattern": "Z$",
-      "type": "string"
-    },
-    "local_state_id": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "local_timeframe": {
-      "const": "5m"
-    },
-    "order_routing_allowed": {
-      "const": false
-    },
-    "overall_agreement_score": {
-      "maximum": 1.0,
-      "minimum": 0.0,
-      "type": [
-        "number",
-        "null"
-      ]
-    },
-    "reason_codes": {
-      "items": {
-        "minLength": 1,
-        "type": "string"
-      },
-      "type": "array",
-      "uniqueItems": true
-    },
-    "schema_version": {
-      "const": "multi-timeframe-alignment-state-v1"
-    },
-    "signal_generation_allowed": {
-      "const": false
-    },
-    "uncertainty_state": {
-      "enum": [
-        "LOW",
-        "MODERATE",
-        "HIGH",
-        "UNKNOWN"
-      ]
-    },
-    "used_for_decision": {
-      "const": false
-    },
-    "weighted_coverage_ratio": {
-      "maximum": 1.0,
-      "minimum": 0.0,
-      "type": "number"
-    }
+    "config_checksum": {"pattern": "^[a-f0-9]{64}$", "type": "string"},
+    "config_version": {"minLength": 1, "type": "string"},
+    "decision_clock_policy_version": {"minLength": 1, "type": "string"},
+    "decision_time": {"format": "date-time", "pattern": "Z$", "type": "string"},
+    "decision_trigger": {"const": "CLOSED_LOCAL_BAR"},
+    "divergence_state": {"enum": ["MTF_MULTI_COMPONENT_MISMATCH", "MTF_DIRECTIONAL_MISMATCH", "MTF_REGIME_MISMATCH", "MTF_VOLATILITY_MISMATCH", "MTF_NO_HARD_DIVERGENCE", "MTF_UNKNOWN"]},
+    "execution_allowed": {"const": false},
+    "forecast_generation_allowed": {"const": false},
+    "hard_mismatch_components": {"items": {"enum": ["trend", "range", "momentum", "volatility", "regime", "confluence"]}, "type": "array", "uniqueItems": true},
+    "higher_bar_close_time": {"format": "date-time", "pattern": "Z$", "type": "string"},
+    "higher_scale_id": {"const": "timebar-15m"},
+    "higher_state_id": {"minLength": 1, "type": "string"},
+    "higher_timeframe": {"const": "15m"},
+    "instrument_id": {"minLength": 1, "type": "string"},
+    "join_method": {"const": "ASOF_BACKWARD"},
+    "lineage_id": {"minLength": 1, "type": "string"},
+    "local_bar_close_time": {"format": "date-time", "pattern": "Z$", "type": "string"},
+    "local_scale_id": {"const": "timebar-5m"},
+    "local_state_id": {"minLength": 1, "type": "string"},
+    "local_timeframe": {"const": "5m"},
+    "order_routing_allowed": {"const": false},
+    "output_checksum": {"pattern": "^[a-f0-9]{64}$", "type": "string"},
+    "overall_agreement_score": {"maximum": 1, "minimum": 0, "type": ["number", "null"]},
+    "probability_claims_allowed": {"const": false},
+    "reason_codes": {"items": {"minLength": 1, "type": "string"}, "type": "array", "uniqueItems": true},
+    "scale_registry_version": {"minLength": 1, "type": "string"},
+    "schema_version": {"const": "multi-timeframe-alignment-state-v1"},
+    "signal_generation_allowed": {"const": false},
+    "trade_allowed": {"const": false},
+    "uncertainty_state": {"enum": ["LOW", "MODERATE", "HIGH", "UNKNOWN"]},
+    "used_for_decision": {"const": false},
+    "weighted_coverage_ratio": {"maximum": 1, "minimum": 0, "type": "number"}
   },
   "required": [
-    "schema_version",
-    "alignment_id",
-    "instrument_id",
-    "local_timeframe",
-    "higher_timeframe",
-    "decision_time",
-    "local_state_id",
-    "higher_state_id",
-    "local_bar_close_time",
-    "higher_bar_close_time",
-    "join_method",
-    "component_alignment_scores",
-    "available_component_count",
-    "weighted_coverage_ratio",
-    "overall_agreement_score",
-    "alignment_state",
-    "divergence_state",
-    "coherence_state",
-    "combined_context_state",
-    "hard_mismatch_components",
-    "reason_codes",
-    "uncertainty_state",
-    "lineage_id",
-    "config_version",
-    "config_checksum",
-    "analysis_only",
-    "used_for_decision",
-    "signal_generation_allowed",
-    "order_routing_allowed",
-    "execution_allowed"
+    "schema_version", "alignment_id", "instrument_id", "local_scale_id", "higher_scale_id", "local_timeframe",
+    "higher_timeframe", "decision_trigger", "decision_time", "local_state_id", "higher_state_id", "local_bar_close_time",
+    "higher_bar_close_time", "join_method", "component_alignment_scores", "available_component_count", "weighted_coverage_ratio",
+    "overall_agreement_score", "alignment_state", "divergence_state", "coherence_state", "combined_context_state",
+    "hard_mismatch_components", "reason_codes", "uncertainty_state", "lineage_id", "scale_registry_version",
+    "decision_clock_policy_version", "config_version", "config_checksum", "code_commit", "output_checksum", "analysis_only",
+    "used_for_decision", "forecast_generation_allowed", "probability_claims_allowed", "signal_generation_allowed",
+    "order_routing_allowed", "execution_allowed", "trade_allowed", "approved_size"
   ],
   "title": "multi-timeframe-alignment-state-v1",
   "type": "object"
