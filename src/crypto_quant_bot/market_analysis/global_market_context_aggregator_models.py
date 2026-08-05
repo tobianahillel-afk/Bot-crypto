@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-import math
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from typing import Any
+
+from crypto_quant_bot.contracts.timeframe_alignment import validate_score
 
 SOURCE_IDS = (
     "lot22_market_analysis",
@@ -29,15 +30,6 @@ def parse_utc(value: str, field_name: str) -> datetime:
     if parsed.tzinfo is None or parsed.utcoffset() != UTC.utcoffset(parsed):
         raise ValueError(f"{field_name} must be timezone-aware UTC")
     return parsed
-
-
-def validate_score(value: float | None, field_name: str) -> None:
-    if value is None:
-        return
-    if isinstance(value, bool) or not isinstance(value, int | float):
-        raise ValueError(f"{field_name} must be numeric or null")
-    if not math.isfinite(float(value)) or not 0.0 <= float(value) <= 1.0:
-        raise ValueError(f"{field_name} must be finite within [0, 1]")
 
 
 def require_text(value: str, field_name: str) -> None:
