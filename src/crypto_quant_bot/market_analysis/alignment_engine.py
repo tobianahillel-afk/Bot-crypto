@@ -23,10 +23,7 @@ from crypto_quant_bot.market_analysis.alignment_math import (
     compute_weighted_agreement,
     uncertainty_from_coverage,
 )
-from crypto_quant_bot.market_analysis.alignment_temporal import (
-    TemporalSelectionV1,
-    select_asof_backward,
-)
+from crypto_quant_bot.market_analysis.alignment_temporal import TemporalSelectionV1, select_asof_backward
 
 
 def _stable_id(kind: str, payload: object) -> str:
@@ -55,6 +52,18 @@ def _component_scores(
     }
 
 
+def _alignment_identity(
+    selection: TemporalSelectionV1,
+    config_hash: str,
+) -> dict[str, str]:
+    return {
+        "local_state_id": selection.local.state_id,
+        "higher_state_id": selection.higher.state_id,
+        "decision_time": selection.local.decision_time,
+        "config_checksum": config_hash,
+    }
+
+
 def _state_payload(
     *,
     selection: TemporalSelectionV1,
@@ -65,16 +74,10 @@ def _state_payload(
     classification: tuple[str, str, str, str, tuple[str, ...], tuple[str, ...]],
     versions: tuple[str, str, str, str],
 ) -> dict[str, Any]:
-    local = selection.local
-    higher = selection.higher
+    local, higher = selection.local, selection.higher
     alignment, divergence, coherence, context, hard, reasons = classification
     registry_version, clock_version, config_version, config_hash = versions
-    identity = {
-        "local_state_id": local.state_id,
-        "higher_state_id": higher.state_id,
-        "decision_time": local.decision_time,
-        "config_checksum": config_hash,
-    }
+    identity = _alignment_identity(selection, config_hash)
     return {
         "alignment_id": _stable_id("alignment", identity),
         "instrument_id": local.instrument_id,
@@ -144,5 +147,7 @@ def build_alignment_state(
         code_commit=code_commit,
         output_checksum="0" * 64,
     )
-    output_hash = checksum({key: value for key, value in state.to_dict().items() if key != "output_checksum"})
+    output_hash = checksum(
+        {key: value for key, value in state.to_dict().items() if key != "output_checksum"}
+    )
     return replace(state, output_checksum=output_hash)

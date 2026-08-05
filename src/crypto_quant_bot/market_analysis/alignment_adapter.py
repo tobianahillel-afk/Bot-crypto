@@ -65,26 +65,29 @@ def _times(row: Mapping[str, Any], timeframe: str) -> tuple[str, str]:
     return opened_text, closed.isoformat().replace("+00:00", "Z")
 
 
-def adapt_lot25_summary(
+def _identity(
+    row: Mapping[str, Any],
+    decision_time: str,
+    code_commit: str,
+) -> dict[str, object]:
+    return {"row": dict(row), "decision_time": decision_time, "code_commit": code_commit}
+
+
+def _build_context_state(
     row: Mapping[str, Any],
     *,
+    timeframe: str,
+    opened: str,
+    closed: str,
     decision_time: str,
     code_commit: str,
     sequence_id: int,
-) -> tuple[TimeframeMarketContextStateV1, ClosedBarAvailabilityV1]:
-    timeframe = _required_text(row, "timeframe")
-    if timeframe not in _DURATION_SECONDS:
-        raise Lot26ValidationError("MTF_SCALE_RELATION_NOT_ALLOWED")
-    opened, closed = _times(row, timeframe)
-    decision = parse_utc(decision_time, "decision_time")
-    if parse_utc(closed, "bar_close_time") > decision:
-        raise Lot26ValidationError("MTF_FUTURE_STATE_REJECTED")
-    identity = {"row": dict(row), "decision_time": decision_time, "code_commit": code_commit}
+) -> TimeframeMarketContextStateV1:
+    identity = _identity(row, decision_time, code_commit)
     state_id = _stable_id("context", identity)
     lineage_id = _stable_id("lineage", identity)
     source_bar_id = _stable_id("bar", {"timeframe": timeframe, "open": opened, "close": closed})
-    values = _state_values(row)
-    state = TimeframeMarketContextStateV1(
+    return TimeframeMarketContextStateV1(
         state_id=state_id,
         instrument_id="BTC/EUR",
         timeframe=timeframe,
@@ -110,28 +113,59 @@ def adapt_lot25_summary(
         validation_state="VALID",
         component_scores=_context_scores(row),
         reason_codes=("LOT25_ADAPTER_CONFIRMED_CLOSED_BAR",),
-        **{f"{key}_state": value for key, value in values.items()},
+        **{f"{key}_state": value for key, value in _state_values(row).items()},
     )
-    availability = ClosedBarAvailabilityV1(
+
+
+def _build_availability(
+    state: TimeframeMarketContextStateV1,
+    identity: dict[str, object],
+) -> ClosedBarAvailabilityV1:
+    return ClosedBarAvailabilityV1(
         availability_id=_stable_id("availability", identity),
-        state_id=state_id,
+        state_id=state.state_id,
         instrument_id=state.instrument_id,
-        timeframe=timeframe,
+        timeframe=state.timeframe,
         scale_id=state.scale_id,
-        source_bar_id=source_bar_id,
-        bar_open_time=opened,
-        bar_close_time=closed,
-        available_at=closed,
-        decision_time=decision_time,
+        source_bar_id=state.source_bar_id,
+        bar_open_time=state.bar_open_time,
+        bar_close_time=state.bar_close_time,
+        available_at=state.available_at,
+        decision_time=state.decision_time,
         is_closed=True,
         is_complete=True,
         quality_state="VALID",
-        revision_id=0,
-        sequence_id=sequence_id,
-        lineage_id=lineage_id,
+        revision_id=state.revision_id,
+        sequence_id=state.sequence_id,
+        lineage_id=state.lineage_id,
         reason_codes=("CLOSED_BAR_CONFIRMED",),
     )
-    return state, availability
+
+
+def adapt_lot25_summary(
+    row: Mapping[str, Any],
+    *,
+    decision_time: str,
+    code_commit: str,
+    sequence_id: int,
+) -> tuple[TimeframeMarketContextStateV1, ClosedBarAvailabilityV1]:
+    timeframe = _required_text(row, "timeframe")
+    if timeframe not in _DURATION_SECONDS:
+        raise Lot26ValidationError("MTF_SCALE_RELATION_NOT_ALLOWED")
+    opened, closed = _times(row, timeframe)
+    if parse_utc(closed, "bar_close_time") > parse_utc(decision_time, "decision_time"):
+        raise Lot26ValidationError("MTF_FUTURE_STATE_REJECTED")
+    identity = _identity(row, decision_time, code_commit)
+    state = _build_context_state(
+        row,
+        timeframe=timeframe,
+        opened=opened,
+        closed=closed,
+        decision_time=decision_time,
+        code_commit=code_commit,
+        sequence_id=sequence_id,
+    )
+    return state, _build_availability(state, identity)
 
 
 def adapt_lot25_rows(

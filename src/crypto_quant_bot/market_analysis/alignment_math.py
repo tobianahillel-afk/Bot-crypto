@@ -70,19 +70,29 @@ def component_compatibility(
     return max(0.0, min(1.0, score))
 
 
+def _available_scores(
+    scores: Mapping[str, float | None],
+) -> dict[str, float]:
+    if set(scores) != set(COMPONENTS):
+        raise Lot26ValidationError("scores must contain exactly six components")
+    available: dict[str, float] = {}
+    for key, value in scores.items():
+        if value is None:
+            continue
+        numeric = float(value)
+        if not math.isfinite(numeric) or not 0.0 <= numeric <= 1.0:
+            raise Lot26ValidationError(f"invalid component score: {key}")
+        available[key] = numeric
+    return available
+
+
 def compute_weighted_agreement(
     scores: Mapping[str, float | None],
     config: Mapping[str, Any],
 ) -> tuple[int, float, float | None]:
     validate_alignment_config(config)
-    if set(scores) != set(COMPONENTS):
-        raise Lot26ValidationError("scores must contain exactly six components")
     weights = {key: float(value) for key, value in config["component_weights"].items()}
-    available = {key: value for key, value in scores.items() if value is not None}
-    for key, value in available.items():
-        numeric = float(value)
-        if not math.isfinite(numeric) or not 0.0 <= numeric <= 1.0:
-            raise Lot26ValidationError(f"invalid component score: {key}")
+    available = _available_scores(scores)
     count = len(available)
     coverage = sum(weights[key] for key in available)
     minimum_count = int(config["minimum_available_component_count"])
@@ -90,7 +100,7 @@ def compute_weighted_agreement(
     rounded_coverage = round(coverage, 6)
     if count < minimum_count or coverage < minimum_coverage or coverage == 0.0:
         return count, rounded_coverage, None
-    numerator = sum(weights[key] * float(value) for key, value in available.items())
+    numerator = sum(weights[key] * value for key, value in available.items())
     decimals = int(config["numeric_policy"]["round_decimal_places"])
     return count, rounded_coverage, round(numerator / coverage, decimals)
 
