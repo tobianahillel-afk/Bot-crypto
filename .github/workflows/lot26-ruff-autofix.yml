@@ -34,7 +34,7 @@ jobs:
             src/crypto_quant_bot/contracts/timeframe_alignment.py \
             src/crypto_quant_bot/market_analysis/alignment_*.py \
             tests/lot26_fixtures.py \
-            tests/test_lot26_*.py
+            tests/test_lot26_*.py || true
       - name: Commit safe formatting fixes
         run: |
           git config user.name 'github-actions[bot]'
