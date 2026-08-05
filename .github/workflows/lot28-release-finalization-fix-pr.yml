@@ -1,0 +1,57 @@
+name: Apply Lot 28 release finalization fix
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/lot28-release-finalization-fix-pr.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/lot28-explanation-core-why-not-trade
+          fetch-depth: 0
+      - name: Correct release-test contract paths
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('.github/workflows/lot28-release-finalization.yml')
+          text = path.read_text(encoding='utf-8')
+          old = '''    assert state["why_not_trade"]["reason_codes"] == [
+        "WNT_CONTEXT_MIXED",
+        "WNT_MTF_DIVERGENCE",
+        "WNT_PERMISSIONS_DISABLED",
+    ]'''
+          new = '''    assert [
+        reason["reason_code"] for reason in state["bundle"]["why_not_trade"]["reasons"]
+    ] == [
+        "WNT_CONTEXT_MIXED",
+        "WNT_MTF_DIVERGENCE",
+        "WNT_PERMISSIONS_DISABLED",
+    ]'''
+          if old not in text:
+              raise SystemExit('why-not assertion marker missing')
+          text = text.replace(old, new, 1)
+          old = '    assert state["no_order_intent_created"] is True'
+          new = '    assert state["bundle"]["why_not_trade"]["no_order_intent_created"] is True'
+          if old not in text:
+              raise SystemExit('no-order assertion marker missing')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+      - name: Commit correction and remove fix workflows
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/lot28-release-finalization-fix.yml
+          git rm .github/workflows/lot28-release-finalization-fix-pr.yml
+          git add .github/workflows/lot28-release-finalization.yml
+          git commit -m "Correct Lot 28 release contract assertions"
+          git push origin HEAD:agent/lot28-explanation-core-why-not-trade
