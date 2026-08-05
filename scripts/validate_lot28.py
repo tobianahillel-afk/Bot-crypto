@@ -100,6 +100,17 @@ def _validate_checksums(state: Mapping[str, Any], audit: Mapping[str, Any]) -> s
     return stored
 
 
+def _canonical_statement_codes(config: Mapping[str, Any]) -> tuple[str, ...]:
+    templates = mapping(config["templates"], "templates")
+    statement_order = config.get("statement_order")
+    if not isinstance(statement_order, list):
+        raise ValueError("invalid canonical statement order")
+    return tuple(
+        str(mapping(templates[str(template_id)], f"templates.{template_id}")["reason_code"])
+        for template_id in statement_order
+    )
+
+
 def validate(root: Path) -> dict[str, Any]:
     required = (CONFIG_PATH, OUTPUT_PATH, AUDIT_PATH, REPORT_PATH, SCHEMA_PATH)
     missing = [path for path in required if not (root / path).is_file()]
@@ -113,7 +124,8 @@ def validate(root: Path) -> dict[str, Any]:
     _validate_closed_fields(state, schema)
     bundle = mapping(state["bundle"], "bundle")
     sources = _load_sources(root, config)
-    statement_codes = validate_statements(bundle, config, sources)
+    validate_statements(bundle, config, sources)
+    statement_codes = _canonical_statement_codes(config)
     reason_codes = validate_reason_set(bundle, config, sources)
     expected_codes = tuple(dict.fromkeys(statement_codes + reason_codes))
     if tuple(state["reason_codes"]) != expected_codes:
