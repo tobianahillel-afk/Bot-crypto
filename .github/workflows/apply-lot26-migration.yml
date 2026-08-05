@@ -1,0 +1,31 @@
+name: Apply Lot 26 implementation migration
+
+on:
+  push:
+    branches: [agent/lot26-multi-timeframe-alignment]
+    paths:
+      - 'scripts/apply_lot26_migration.py'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/lot26-multi-timeframe-alignment
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+      - name: Apply migration
+        run: python scripts/apply_lot26_migration.py
+      - name: Commit implementation
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --quiet || git commit -m 'Lot26 implement multi-timeframe alignment engine'
+          git push origin HEAD:agent/lot26-multi-timeframe-alignment
