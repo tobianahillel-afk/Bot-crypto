@@ -51,6 +51,12 @@ jobs:
               )
           PY
           cat > .tmp-lot26-mutants/pyproject.toml <<'TOML'
+          [project]
+          name = "crypto-quant-bot"
+          version = "0.25.2.dev0"
+          requires-python = "==3.11.*"
+          dependencies = []
+
           [tool.pytest.ini_options]
           pythonpath = ["src", "tests"]
           addopts = ["--tb=short", "-p", "no:cacheprovider"]
