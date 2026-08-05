@@ -7,7 +7,7 @@ Projet : **Crypto Quant Bot V3.1-Ops**
 - Dernier lot dont l'implémentation est terminée : **Lot 26**.
 - Baseline P0 institutionnelle : fusionnée.
 - Gate transversal P0.6 : fusionné et conservé comme preuve historique.
-- Lot 26 : `IMPLEMENTATION_COMPLETE_AWAITING_EXACT_COMMIT_CI`.
+- Lot 26 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
 - PR Lot 26 : brouillon tant que les workflows permanents n'ont pas exécuté leurs commandes sur un même SHA.
 - Lot 27 : `PLANNED_LOCKED`, aucun développement démarré.
 - Lots 27–177 : planifiés et verrouillés.

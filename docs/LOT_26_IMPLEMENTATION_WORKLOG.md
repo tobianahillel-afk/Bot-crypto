@@ -1,8 +1,8 @@
 # Lot 26 implementation worklog
 
-Status: `IMPLEMENTATION_COMPLETE_AWAITING_EXACT_COMMIT_CI`
+Status: `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`
 
-## Completed
+## Delivered
 
 - immutable `TimeframeMarketContextStateV1`, `ClosedBarAvailabilityV1` and `MultiTimeframeAlignmentStateV1` contracts;
 - Lot 25 adapter without rewriting historical artifacts;
@@ -11,19 +11,24 @@ Status: `IMPLEMENTATION_COMPLETE_AWAITING_EXACT_COMMIT_CI`
 - deterministic IDs, lineage, checksums and `DecisionEvidenceEnvelopeV1`;
 - atomic bounded I/O, replay and tamper detection;
 - closed JSON schemas and lifecycle-aware roadmap overlay;
-- targeted functional, mathematical, temporal, property, integration, I/O and runner tests;
-- dedicated coverage, regression, security and mutation workflows.
+- functional, mathematical, temporal, property, integration, I/O and runner tests;
+- permanent coverage, regression, security, anti-flake and mutation gates.
 
-## Local non-authoritative validation
+## Exact-head GitHub Actions evidence
 
-The available execution environment completed 106 Lot 26 tests with 2 Hypothesis properties skipped by a local stub, statement coverage 98.60% and branch coverage 96.76%. The new source inventory contains no function above 50 logical lines, no cyclomatic complexity above 10, no parameter count above 7 and no duplicate function body.
+- targeted Lot 26 suite: **108 tests PASS**;
+- targeted line coverage: **98.73%**;
+- targeted branch coverage: **97.12%**;
+- repository assurance: **832 tests PASS**;
+- repository line coverage: **94.63%**;
+- repository branch coverage: **86.77%**;
+- critical Lot 26 mutation: **455/552 evaluated, 82.43% PASS**;
+- Ruff, mypy, architecture, ownership, traceability, Bandit and dependency audit: **PASS**;
+- full-suite anti-flake repetition: **3/3 PASS**;
+- roadmap, lifecycle, P0.6 exact-commit assurance and institutional quality: **PASS**.
 
-This validation is useful engineering evidence but is not the canonical release gate because it did not run under the repository's locked Python 3.11.9 GitHub Actions environment.
-
-## External CI state
-
-GitHub Actions jobs currently terminate before checkout with no allocated steps or logs (`steps=null`). Therefore the PR remains draft and Lot 27 remains locked until all permanent workflows execute successfully on one exact head SHA.
+The authoritative certification SHA is the pull-request head recorded by the successful workflow runs and their immutable artifacts.
 
 ## Safety
 
-This status grants no trading capability. Forecasting, probability claims, signals, `TradeIntent`, `OrderIntent`, paper execution and live execution remain disabled.
+This status grants no trading capability. Forecasting, probability claims, signals, `TradeIntent`, `OrderIntent`, paper execution and live execution remain disabled. Lot 27 remains `PLANNED_LOCKED` until the Lot 26 merge and post-merge audit pass.

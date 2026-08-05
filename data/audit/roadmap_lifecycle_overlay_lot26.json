@@ -1,30 +1,30 @@
 {
-  "schema_version": "roadmap-lifecycle-overlay-v1",
-  "historical_registry": "data/audit/product_scope_roadmap_lot21.jsonl",
-  "latest_implemented_lot": 26,
-  "lots": {
-    "26": {
-      "status": "IMPLEMENTATION_COMPLETE_AWAITING_EXACT_COMMIT_CI",
-      "runtime_mode": "LOCAL_OFFLINE_ANALYSIS_ONLY",
-      "implementation_contract": "docs/LOT_26_MULTI_TIMEFRAME_ALIGNMENT_ENGINE.md",
-      "implementation_status": "docs/LOT_26_IMPLEMENTATION_WORKLOG.md",
-      "acceptance_contract": "docs/ACCEPTANCE_CRITERIA_LOT_26.md",
-      "runner": "scripts/run_lot26_multi_timeframe_alignment_engine.py",
-      "validator": "scripts/validate_lot26.py",
-      "pull_request": 6,
-      "trade_allowed": false,
-      "execution_allowed": false
-    },
-    "27": {
-      "status": "PLANNED_LOCKED",
-      "implementation_started": false
-    }
-  },
   "future_capabilities_locked": [
     "ContinuousMarketStateV1",
     "MultiHorizonForecastV1",
     "ParticipantBehaviorScenarioV1",
     "TradeIntent",
     "OrderIntent"
-  ]
+  ],
+  "historical_registry": "data/audit/product_scope_roadmap_lot21.jsonl",
+  "latest_implemented_lot": 26,
+  "lots": {
+    "26": {
+      "acceptance_contract": "docs/ACCEPTANCE_CRITERIA_LOT_26.md",
+      "execution_allowed": false,
+      "implementation_contract": "docs/LOT_26_MULTI_TIMEFRAME_ALIGNMENT_ENGINE.md",
+      "implementation_status": "docs/LOT_26_IMPLEMENTATION_WORKLOG.md",
+      "pull_request": 6,
+      "runner": "scripts/run_lot26_multi_timeframe_alignment_engine.py",
+      "runtime_mode": "LOCAL_OFFLINE_ANALYSIS_ONLY",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY",
+      "trade_allowed": false,
+      "validator": "scripts/validate_lot26.py"
+    },
+    "27": {
+      "implementation_started": false,
+      "status": "PLANNED_LOCKED"
+    }
+  },
+  "schema_version": "roadmap-lifecycle-overlay-v1"
 }

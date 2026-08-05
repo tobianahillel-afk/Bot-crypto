@@ -1,7 +1,7 @@
 # Lot 26 — Mathematical specification of multi-timeframe alignment
 
 Definition ID: `MTF_ALIGNMENT_V1`  
-Status: `PROVISIONAL_UNCALIBRATED_OFFLINE_ONLY`
+Status: `IMPLEMENTED_UNCALIBRATED_OFFLINE_ONLY`
 
 ## 1. Purpose
 

@@ -136,8 +136,8 @@ def validate_lifecycle() -> None:
     require(isinstance(lot26, dict), "Lot 26 lifecycle entry missing")
     require(isinstance(lot27, dict), "Lot 27 lifecycle entry missing")
     require(
-        lot26.get("status") == "IMPLEMENTATION_COMPLETE_AWAITING_EXACT_COMMIT_CI",
-        "Lot 26 must remain pending until exact-commit CI passes",
+        lot26.get("status") == "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY",
+        "Lot 26 must remain validated after exact-commit CI passes",
     )
     require(lot26.get("trade_allowed") is False, "Lot 26 trading must remain disabled")
     require(lot26.get("execution_allowed") is False, "Lot 26 execution must remain disabled")
@@ -171,7 +171,7 @@ def validate_lot26_files_and_boundaries() -> None:
     ):
         require(token in text, f"Lot 26 contract missing boundary: {token}")
     status = (ROOT / "docs/LOT_26_IMPLEMENTATION_WORKLOG.md").read_text(encoding="utf-8")
-    require("IMPLEMENTATION_COMPLETE_AWAITING_EXACT_COMMIT_CI" in status, "Lot 26 status is not current")
+    require("IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY" in status, "Lot 26 status is not current")
 
 
 def validate_no_temporary_files() -> None:

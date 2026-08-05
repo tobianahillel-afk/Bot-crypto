@@ -1,17 +1,16 @@
 # Changelog
 
-## Unreleased — Pre-Lot26 readiness
+## 0.26.0 — Lot 26 Multi-Timeframe Alignment
 
-- fusion de la baseline P0 institutionnelle ;
-- environnement Python canonique et dépendances verrouillées ;
-- contrat temporel 5m/15m ;
-- jointure as-of backward et rejet des barres ouvertes/futures ;
-- spécification mathématique complète du Lot 26 ;
-- configuration versionnée et reason codes ;
-- gate automatique de readiness ;
-- README, contribution, sécurité et template de PR actualisés ;
-- clarification : Game Theory reste en V4 Lots 37–52 ;
-- aucune implémentation du moteur Lot 26 et aucune activation de trading.
+- moteur descriptif `timebar-5m → timebar-15m` avec jointure `ASOF_BACKWARD` ;
+- contrats immuables et schémas JSON fermés ;
+- couverture pondérée, agreement, divergence, cohérence et incertitude descriptive ;
+- lineage, checksums, `DecisionEvidenceEnvelopeV1`, replay et détection de falsification ;
+- 108 tests Lot 26, couverture lignes 98.73% et branches 97.12% ;
+- mutation critique 82.43% sur 552 mutants ;
+- audit dépôt 832 tests, couverture lignes 94.63% et branches 86.77% ;
+- Ruff, mypy, Bandit, pip-audit, architecture, traçabilité et anti-flake PASS ;
+- aucune prévision, probabilité, décision, permission de trading ou exécution activée.
 
 ## 0.25.1-p0
 
