@@ -39,6 +39,8 @@ jobs:
           cp -R src .tmp-lot26-mutants/src
           cp -R config .tmp-lot26-mutants/config
           cp -R contracts .tmp-lot26-mutants/contracts
+          mkdir -p .tmp-lot26-mutants/data/audit
+          cp data/audit/volatility_regime_confluence_timeframes_lot25.jsonl .tmp-lot26-mutants/data/audit/
           printf '%s\n' '"""Minimal package aggregator for isolated Lot 26 mutation tests."""' > .tmp-lot26-mutants/src/crypto_quant_bot/market_analysis/__init__.py
           mkdir -p .tmp-lot26-mutants/tests
           cp tests/lot26_fixtures.py tests/test_lot26_math.py tests/test_lot26_temporal.py tests/test_lot26_integration.py tests/test_lot26_coverage_edges.py .tmp-lot26-mutants/tests/
@@ -81,6 +83,7 @@ jobs:
             "src/crypto_quant_bot/market_analysis/alignment_io.py",
             "config/",
             "contracts/",
+            "data/",
           ]
           mutate_only_covered_lines = true
           timeout_factor = 8.0
