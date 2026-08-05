@@ -2,19 +2,25 @@ from __future__ import annotations
 
 import argparse
 import subprocess
+import sys
 from datetime import timedelta
 from pathlib import Path
 from typing import Any
 from uuid import NAMESPACE_URL, uuid5
 
-from crypto_quant_bot.market_analysis.alignment_adapter import adapt_lot25_rows
-from crypto_quant_bot.market_analysis.alignment_audit import (
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+SOURCE_ROOT = REPOSITORY_ROOT / "src"
+if str(SOURCE_ROOT) not in sys.path:
+    sys.path.insert(0, str(SOURCE_ROOT))
+
+from crypto_quant_bot.market_analysis.alignment_adapter import adapt_lot25_rows  # noqa: E402
+from crypto_quant_bot.market_analysis.alignment_audit import (  # noqa: E402
     build_alignment_evidence,
     replay_matches,
 )
-from crypto_quant_bot.market_analysis.alignment_common import checksum, parse_utc
-from crypto_quant_bot.market_analysis.alignment_engine import build_alignment_state
-from crypto_quant_bot.market_analysis.alignment_io import (
+from crypto_quant_bot.market_analysis.alignment_common import checksum, parse_utc  # noqa: E402
+from crypto_quant_bot.market_analysis.alignment_engine import build_alignment_state  # noqa: E402
+from crypto_quant_bot.market_analysis.alignment_io import (  # noqa: E402
     load_json,
     load_jsonl,
     write_json_atomic,
@@ -161,7 +167,7 @@ def run(root: Path, code_commit: str) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run the Lot 26 offline alignment engine")
-    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
+    parser.add_argument("--root", type=Path, default=REPOSITORY_ROOT)
     parser.add_argument("--code-commit")
     args = parser.parse_args()
     root = args.root.resolve()
