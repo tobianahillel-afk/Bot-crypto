@@ -48,27 +48,36 @@ def _mapping(value: object, field_name: str) -> Mapping[str, Any]:
     return value
 
 
-def _validate_templates(config: Mapping[str, Any]) -> None:
-    templates = _mapping(config.get("templates"), "templates")
+def _statement_order(
+    config: Mapping[str, Any],
+    templates: Mapping[str, Any],
+) -> tuple[str, ...]:
     order = config.get("statement_order")
     if not isinstance(order, list) or not order or len(order) != len(set(order)):
         raise ExplanationValidationError("statement_order must be a unique non-empty list")
     if set(order) != set(templates):
         raise ExplanationValidationError("statement_order must reference every template exactly once")
-    reason_codes: list[str] = []
-    for template_id in order:
-        template = _mapping(templates[template_id], f"templates.{template_id}")
-        if template.get("section") not in SECTIONS:
-            raise ExplanationValidationError(f"invalid section for template {template_id}")
-        if not isinstance(template.get("text"), str) or not template["text"]:
-            raise ExplanationValidationError(f"template text missing for {template_id}")
-        reason_code = template.get("reason_code")
-        if not isinstance(reason_code, str) or not reason_code:
-            raise ExplanationValidationError(f"reason code missing for {template_id}")
-        reason_codes.append(reason_code)
+    return tuple(str(template_id) for template_id in order)
+
+
+def _validate_template(template_id: str, value: object) -> str:
+    template = _mapping(value, f"templates.{template_id}")
+    if template.get("section") not in SECTIONS:
+        raise ExplanationValidationError(f"invalid section for template {template_id}")
+    if not isinstance(template.get("text"), str) or not template["text"]:
+        raise ExplanationValidationError(f"template text missing for {template_id}")
+    reason_code = template.get("reason_code")
+    if not isinstance(reason_code, str) or not reason_code:
+        raise ExplanationValidationError(f"reason code missing for {template_id}")
+    return reason_code
+
+
+def _validate_templates(config: Mapping[str, Any]) -> None:
+    templates = _mapping(config.get("templates"), "templates")
+    order = _statement_order(config, templates)
+    reason_codes = tuple(_validate_template(template_id, templates[template_id]) for template_id in order)
     if len(reason_codes) != len(set(reason_codes)):
         raise ExplanationValidationError("template reason codes must be unique")
-
 
 def _validate_reason_registry(config: Mapping[str, Any]) -> None:
     registry = _mapping(config.get("why_not_trade_reasons"), "why_not_trade_reasons")
@@ -107,21 +116,36 @@ def _safety_false(payload: Mapping[str, Any], fields: tuple[str, ...]) -> bool:
     return all(payload.get(field) is False for field in fields)
 
 
-def validate_inputs(global_context: Mapping[str, Any], alignment: Mapping[str, Any], config: Mapping[str, Any]) -> None:
-    schemas = _mapping(config["required_input_schemas"], "required_input_schemas")
+def _validate_input_identity(
+    global_context: Mapping[str, Any],
+    alignment: Mapping[str, Any],
+    schemas: Mapping[str, Any],
+) -> None:
     if global_context.get("schema_version") != schemas["global_context"]:
         raise ExplanationValidationError("global context schema mismatch")
     if alignment.get("schema_version") != schemas["multi_timeframe_alignment"]:
         raise ExplanationValidationError("alignment schema mismatch")
     if global_context.get("instrument_id") != alignment.get("instrument_id"):
         raise ExplanationValidationError("input instruments diverge")
+
+
+def _validate_input_times(
+    global_context: Mapping[str, Any],
+    alignment: Mapping[str, Any],
+) -> None:
     global_time = str(global_context.get("decision_time", ""))
     alignment_time = str(alignment.get("decision_time", ""))
     parse_utc(global_time, "global_context.decision_time")
     parse_utc(alignment_time, "alignment.decision_time")
     if global_time != alignment_time:
         raise ExplanationValidationError("input decision times diverge")
-    global_false = (
+
+
+def _validate_input_safety(
+    global_context: Mapping[str, Any],
+    alignment: Mapping[str, Any],
+) -> None:
+    false_fields = (
         "used_for_decision",
         "forecast_generation_allowed",
         "probability_claims_allowed",
@@ -130,23 +154,40 @@ def validate_inputs(global_context: Mapping[str, Any], alignment: Mapping[str, A
         "execution_allowed",
         "trade_allowed",
     )
-    alignment_false = global_false
-    if global_context.get("analysis_only") is not True or not _safety_false(global_context, global_false):
+    if global_context.get("analysis_only") is not True or not _safety_false(global_context, false_fields):
         raise ExplanationValidationError("global context safety invariants failed")
-    if alignment.get("analysis_only") is not True or not _safety_false(alignment, alignment_false):
+    if alignment.get("analysis_only") is not True or not _safety_false(alignment, false_fields):
         raise ExplanationValidationError("alignment safety invariants failed")
     if global_context.get("approved_size") != 0 or alignment.get("approved_size") != 0:
         raise ExplanationValidationError("approved_size must remain zero")
+
+
+def _validate_expected_context(
+    global_context: Mapping[str, Any],
+    alignment: Mapping[str, Any],
+) -> None:
     if global_context.get("validation_state") != "VALID":
         raise ExplanationValidationError("global context is not validated")
     if global_context.get("dominant_state") != "GLOBAL_CONTEXT_MIXED":
         raise ExplanationValidationError("template version expects a mixed global context")
-    conflicts = global_context.get("conflict_states")
-    if conflicts != ["MTF_DIVERGENT"] or alignment.get("alignment_state") != "MTF_DIVERGENT":
+    if global_context.get("conflict_states") != ["MTF_DIVERGENT"]:
+        raise ExplanationValidationError("template version expects explicit multi-timeframe divergence")
+    if alignment.get("alignment_state") != "MTF_DIVERGENT":
         raise ExplanationValidationError("template version expects explicit multi-timeframe divergence")
     if alignment.get("coherence_state") != "MTF_INCOHERENT":
         raise ExplanationValidationError("template version expects incoherent multi-timeframe state")
 
+
+def validate_inputs(
+    global_context: Mapping[str, Any],
+    alignment: Mapping[str, Any],
+    config: Mapping[str, Any],
+) -> None:
+    schemas = _mapping(config["required_input_schemas"], "required_input_schemas")
+    _validate_input_identity(global_context, alignment, schemas)
+    _validate_input_times(global_context, alignment)
+    _validate_input_safety(global_context, alignment)
+    _validate_expected_context(global_context, alignment)
 
 def _source_checksum(payload: Mapping[str, Any]) -> str:
     return checksum(payload)
@@ -232,6 +273,52 @@ def _shared_values(global_context: Mapping[str, Any], alignment: Mapping[str, An
     }
 
 
+def _global_context_evidence(
+    global_context: Mapping[str, Any],
+    path: str,
+    digest: str,
+) -> dict[str, EvidenceReferenceV1]:
+    support = global_context["category_support"]
+    return {
+        "global_state": _evidence(path, digest, "/dominant_state", str(global_context["dominant_state"])),
+        "global_coverage": _evidence(path, digest, "/weighted_coverage_ratio", float(global_context["weighted_coverage_ratio"])),
+        "support_trending": _evidence(path, digest, "/category_support/TRENDING", float(support["TRENDING"])),
+        "support_range": _evidence(path, digest, "/category_support/RANGE", float(support["RANGE"])),
+        "support_mixed": _evidence(path, digest, "/category_support/MIXED", float(support["MIXED"])),
+        "support_conflict": _evidence(path, digest, "/category_support/CONFLICT", float(support["CONFLICT"])),
+        "aggregate_score": _evidence(path, digest, "/aggregate_evidence_score", float(global_context["aggregate_evidence_score"])),
+        "available_sources": _evidence(path, digest, "/available_source_count", int(global_context["available_source_count"])),
+        "confidence_interval": _evidence(path, digest, "/confidence_interval", None),
+        "global_conflict": _evidence(path, digest, "/conflict_states/0", str(global_context["conflict_states"][0])),
+    }
+
+
+def _global_permission_evidence(
+    global_context: Mapping[str, Any],
+    path: str,
+    digest: str,
+) -> dict[str, EvidenceReferenceV1]:
+    return {
+        "global_analysis_only": _evidence(path, digest, "/analysis_only", True),
+        "global_used_for_decision": _evidence(path, digest, "/used_for_decision", False),
+        "global_signal_permission": _evidence(path, digest, "/signal_generation_allowed", False),
+        "global_order_permission": _evidence(path, digest, "/order_routing_allowed", False),
+        "global_execution_permission": _evidence(path, digest, "/execution_allowed", False),
+    }
+
+
+def _alignment_evidence(
+    alignment: Mapping[str, Any],
+    path: str,
+    digest: str,
+) -> dict[str, EvidenceReferenceV1]:
+    return {
+        "alignment_state": _evidence(path, digest, "/alignment_state", str(alignment["alignment_state"])),
+        "alignment_coherence": _evidence(path, digest, "/coherence_state", str(alignment["coherence_state"])),
+        "alignment_divergence": _evidence(path, digest, "/divergence_state", str(alignment["divergence_state"])),
+    }
+
+
 def _evidence_registry(
     global_context: Mapping[str, Any],
     alignment: Mapping[str, Any],
@@ -240,116 +327,18 @@ def _evidence_registry(
     artifacts = _mapping(config["input_artifacts"], "input_artifacts")
     global_path = str(artifacts["global_context"])
     alignment_path = str(artifacts["multi_timeframe_alignment"])
-    global_checksum = _source_checksum(global_context)
-    alignment_checksum = _source_checksum(alignment)
+    global_digest = _source_checksum(global_context)
+    alignment_digest = _source_checksum(alignment)
     return {
-        "global_state": _evidence(global_path, global_checksum, "/dominant_state", str(global_context["dominant_state"])),
-        "global_coverage": _evidence(
-            global_path,
-            global_checksum,
-            "/weighted_coverage_ratio",
-            float(global_context["weighted_coverage_ratio"]),
-        ),
-        "support_trending": _evidence(
-            global_path,
-            global_checksum,
-            "/category_support/TRENDING",
-            float(global_context["category_support"]["TRENDING"]),
-        ),
-        "support_range": _evidence(
-            global_path,
-            global_checksum,
-            "/category_support/RANGE",
-            float(global_context["category_support"]["RANGE"]),
-        ),
-        "support_mixed": _evidence(
-            global_path,
-            global_checksum,
-            "/category_support/MIXED",
-            float(global_context["category_support"]["MIXED"]),
-        ),
-        "support_conflict": _evidence(
-            global_path,
-            global_checksum,
-            "/category_support/CONFLICT",
-            float(global_context["category_support"]["CONFLICT"]),
-        ),
-        "aggregate_score": _evidence(
-            global_path,
-            global_checksum,
-            "/aggregate_evidence_score",
-            float(global_context["aggregate_evidence_score"]),
-        ),
-        "available_sources": _evidence(
-            global_path,
-            global_checksum,
-            "/available_source_count",
-            int(global_context["available_source_count"]),
-        ),
-        "confidence_interval": _evidence(
-            global_path,
-            global_checksum,
-            "/confidence_interval",
-            None,
-        ),
-        "global_conflict": _evidence(
-            global_path,
-            global_checksum,
-            "/conflict_states/0",
-            str(global_context["conflict_states"][0]),
-        ),
-        "global_analysis_only": _evidence(
-            global_path,
-            global_checksum,
-            "/analysis_only",
-            True,
-        ),
-        "global_used_for_decision": _evidence(
-            global_path,
-            global_checksum,
-            "/used_for_decision",
-            False,
-        ),
-        "global_signal_permission": _evidence(
-            global_path,
-            global_checksum,
-            "/signal_generation_allowed",
-            False,
-        ),
-        "global_order_permission": _evidence(
-            global_path,
-            global_checksum,
-            "/order_routing_allowed",
-            False,
-        ),
-        "global_execution_permission": _evidence(
-            global_path,
-            global_checksum,
-            "/execution_allowed",
-            False,
-        ),
-        "alignment_state": _evidence(
-            alignment_path,
-            alignment_checksum,
-            "/alignment_state",
-            str(alignment["alignment_state"]),
-        ),
-        "alignment_coherence": _evidence(
-            alignment_path,
-            alignment_checksum,
-            "/coherence_state",
-            str(alignment["coherence_state"]),
-        ),
-        "alignment_divergence": _evidence(
-            alignment_path,
-            alignment_checksum,
-            "/divergence_state",
-            str(alignment["divergence_state"]),
-        ),
+        **_global_context_evidence(global_context, global_path, global_digest),
+        **_global_permission_evidence(global_context, global_path, global_digest),
+        **_alignment_evidence(alignment, alignment_path, alignment_digest),
     }
 
-
-def _plans(values: Mapping[str, str], refs: Mapping[str, EvidenceReferenceV1]) -> tuple[StatementPlan, ...]:
+def _context_plans(
+    values: Mapping[str, str],
+    refs: Mapping[str, EvidenceReferenceV1],
+) -> tuple[StatementPlan, ...]:
     return (
         StatementPlan(
             "fact_global_context",
@@ -364,12 +353,7 @@ def _plans(values: Mapping[str, str], refs: Mapping[str, EvidenceReferenceV1]) -
                 "mixed_support": values["mixed_support"],
                 "conflict_support": values["conflict_support"],
             },
-            (
-                refs["support_trending"],
-                refs["support_range"],
-                refs["support_mixed"],
-                refs["support_conflict"],
-            ),
+            (refs["support_trending"], refs["support_range"], refs["support_mixed"], refs["support_conflict"]),
         ),
         StatementPlan(
             "fact_alignment",
@@ -386,6 +370,14 @@ def _plans(values: Mapping[str, str], refs: Mapping[str, EvidenceReferenceV1]) -
             {"conflict_state": values["conflict_state"]},
             (refs["global_conflict"], refs["alignment_divergence"]),
         ),
+    )
+
+
+def _evidence_plans(
+    values: Mapping[str, str],
+    refs: Mapping[str, EvidenceReferenceV1],
+) -> tuple[StatementPlan, ...]:
+    return (
         StatementPlan(
             "support_validated_sources",
             {"available_source_count": values["available_source_count"]},
@@ -401,6 +393,11 @@ def _plans(values: Mapping[str, str], refs: Mapping[str, EvidenceReferenceV1]) -
             (refs["support_trending"], refs["support_range"], refs["support_conflict"]),
         ),
         StatementPlan("uncertainty_uncalibrated", {}, (refs["confidence_interval"],)),
+    )
+
+
+def _governance_plans(refs: Mapping[str, EvidenceReferenceV1]) -> tuple[StatementPlan, ...]:
+    return (
         StatementPlan("rule_offline_only", {}, (refs["global_analysis_only"],)),
         StatementPlan("veto_context_mixed", {}, (refs["global_state"],)),
         StatementPlan(
@@ -411,21 +408,12 @@ def _plans(values: Mapping[str, str], refs: Mapping[str, EvidenceReferenceV1]) -
         StatementPlan(
             "veto_permissions_disabled",
             {},
-            (
-                refs["global_used_for_decision"],
-                refs["global_signal_permission"],
-                refs["global_order_permission"],
-                refs["global_execution_permission"],
-            ),
+            (refs["global_used_for_decision"], refs["global_signal_permission"], refs["global_order_permission"], refs["global_execution_permission"]),
         ),
         StatementPlan(
             "non_applicable_future_capabilities",
             {},
-            (
-                refs["global_used_for_decision"],
-                refs["global_signal_permission"],
-                refs["global_order_permission"],
-            ),
+            (refs["global_used_for_decision"], refs["global_signal_permission"], refs["global_order_permission"]),
         ),
         StatementPlan(
             "final_no_executable_action",
@@ -434,6 +422,9 @@ def _plans(values: Mapping[str, str], refs: Mapping[str, EvidenceReferenceV1]) -
         ),
     )
 
+
+def _plans(values: Mapping[str, str], refs: Mapping[str, EvidenceReferenceV1]) -> tuple[StatementPlan, ...]:
+    return _context_plans(values, refs) + _evidence_plans(values, refs) + _governance_plans(refs)
 
 def _why_reason(
     config: Mapping[str, Any],

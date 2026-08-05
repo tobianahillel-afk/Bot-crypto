@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from datetime import UTC, datetime
 from typing import Any
+
+from crypto_quant_bot.market_analysis.global_market_context_aggregator_models import (
+    parse_utc,
+    require_unique,
+)
 
 SECTIONS = {
     "facts_observed",
@@ -23,22 +27,6 @@ VALIDATION_STATES = {"VALID", "UNKNOWN", "BLOCKED"}
 def require_text(value: str, field_name: str) -> None:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"{field_name} must be a non-empty string")
-
-
-def require_unique(values: tuple[str, ...], field_name: str) -> None:
-    if len(values) != len(set(values)):
-        raise ValueError(f"{field_name} must not contain duplicates")
-    if any(not isinstance(value, str) or not value for value in values):
-        raise ValueError(f"{field_name} must contain non-empty strings")
-
-
-def parse_utc(value: str, field_name: str) -> datetime:
-    if not isinstance(value, str) or not value.endswith("Z"):
-        raise ValueError(f"{field_name} must be an ISO-8601 UTC timestamp ending in Z")
-    parsed = datetime.fromisoformat(value[:-1] + "+00:00")
-    if parsed.tzinfo is None or parsed.utcoffset() != UTC.utcoffset(parsed):
-        raise ValueError(f"{field_name} must be timezone-aware UTC")
-    return parsed
 
 
 def _validate_scalar(value: object, field_name: str) -> None:
