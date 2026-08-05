@@ -50,3 +50,4 @@ jobs:
           git add pyproject.toml README.md CHANGELOG.md docs data/audit reports tests
           git diff --cached --quiet || git commit -m 'Lot27 finalize CI-backed release evidence'
           git push origin HEAD:agent/lot27-global-market-context-aggregator
+      # Second revision intentionally triggers the one-shot workflow.
