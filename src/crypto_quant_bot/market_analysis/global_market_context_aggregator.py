@@ -52,26 +52,36 @@ def _require_mapping(value: object, field_name: str) -> Mapping[str, Any]:
     return value
 
 
-def validate_config(config: Mapping[str, Any]) -> None:
-    if config.get("schema_version") != "global-market-context-aggregator-config-v1":
-        raise GlobalContextValidationError("unsupported Lot 27 config schema")
+def _validate_weights(config: Mapping[str, Any]) -> None:
     weights = _require_mapping(config.get("source_weights"), "source_weights")
     if set(weights) != set(SOURCE_IDS):
         raise GlobalContextValidationError("source_weights must contain exactly five sources")
     numeric_weights = [float(weights[source_id]) for source_id in SOURCE_IDS]
-    if any(weight <= 0 for weight in numeric_weights) or abs(sum(numeric_weights) - 1.0) > 1e-9:
+    positive = all(weight > 0 for weight in numeric_weights)
+    normalized = abs(sum(numeric_weights) - 1.0) <= 1e-9
+    if not positive or not normalized:
         raise GlobalContextValidationError("source weights must be positive and sum to one")
+
+
+def _validate_specs(config: Mapping[str, Any]) -> None:
     specs = _require_mapping(config.get("source_specs"), "source_specs")
     if set(specs) != set(SOURCE_IDS):
         raise GlobalContextValidationError("source_specs must contain exactly five sources")
     for source_id in SOURCE_IDS:
         spec = _require_mapping(specs[source_id], f"source_specs.{source_id}")
         mapping = _require_mapping(spec.get("semantic_mapping"), "semantic_mapping")
-        if not mapping or any(value not in SEMANTIC_CATEGORIES for value in mapping.values()):
+        valid_categories = mapping and all(value in SEMANTIC_CATEGORIES for value in mapping.values())
+        if not valid_categories:
             raise GlobalContextValidationError(f"invalid semantic mapping for {source_id}")
+
+
+def _validate_restrictions(config: Mapping[str, Any]) -> None:
     restrictions = _require_mapping(config.get("promotion_restrictions"), "promotion_restrictions")
     if not restrictions or any(value is not False for value in restrictions.values()):
         raise GlobalContextValidationError("all Lot 27 promotion permissions must be false")
+
+
+def _validate_thresholds(config: Mapping[str, Any]) -> None:
     thresholds = _require_mapping(config.get("thresholds"), "thresholds")
     minimum_count = int(thresholds.get("minimum_available_source_count", 0))
     if not 1 <= minimum_count <= len(SOURCE_IDS):
@@ -82,6 +92,15 @@ def validate_config(config: Mapping[str, Any]) -> None:
         "explicit_conflict_mixed_minimum",
     ):
         validate_score(float(thresholds.get(key, -1)), f"thresholds.{key}")
+
+
+def validate_config(config: Mapping[str, Any]) -> None:
+    if config.get("schema_version") != "global-market-context-aggregator-config-v1":
+        raise GlobalContextValidationError("unsupported Lot 27 config schema")
+    _validate_weights(config)
+    _validate_specs(config)
+    _validate_restrictions(config)
+    _validate_thresholds(config)
 
 
 def _source_event_time(payload: Mapping[str, Any], source_id: str) -> str:
@@ -258,7 +277,8 @@ def _classify(
     ranked = sorted(category_support, key=lambda item: (-category_support[item], item))
     alternatives = tuple(category for category in ranked if category_support[category] > 0)
     if category_support["CONFLICT"] >= float(thresholds["explicit_conflict_mixed_minimum"]):
-        return "GLOBAL_CONTEXT_MIXED", alternatives, ("GMC_EXPLICIT_CONFLICT", "GMC_CONTEXT_MIXED")
+        reasons = ("GMC_EXPLICIT_CONFLICT", "GMC_CONTEXT_MIXED")
+        return "GLOBAL_CONTEXT_MIXED", alternatives, reasons
     margin = category_support[ranked[0]] - category_support[ranked[1]]
     if margin < float(thresholds["dominance_margin_minimum"]):
         reasons = ("GMC_DOMINANCE_MARGIN_INSUFFICIENT", "GMC_CONTEXT_MIXED")
