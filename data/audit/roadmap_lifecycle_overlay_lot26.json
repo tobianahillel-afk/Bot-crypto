@@ -1,0 +1,28 @@
+{
+  "schema_version": "roadmap-lifecycle-overlay-v1",
+  "historical_registry": "data/audit/product_scope_roadmap_lot21.jsonl",
+  "latest_implemented_lot": 26,
+  "lots": {
+    "26": {
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY",
+      "runtime_mode": "LOCAL_OFFLINE_ANALYSIS_ONLY",
+      "implementation_contract": "docs/LOT_26_MULTI_TIMEFRAME_ALIGNMENT_ENGINE.md",
+      "acceptance_contract": "docs/ACCEPTANCE_CRITERIA_LOT_26.md",
+      "runner": "scripts/run_lot26_multi_timeframe_alignment_engine.py",
+      "validator": "scripts/validate_lot26.py",
+      "trade_allowed": false,
+      "execution_allowed": false
+    },
+    "27": {
+      "status": "PLANNED_LOCKED",
+      "implementation_started": false
+    }
+  },
+  "future_capabilities_locked": [
+    "ContinuousMarketStateV1",
+    "MultiHorizonForecastV1",
+    "ParticipantBehaviorScenarioV1",
+    "TradeIntent",
+    "OrderIntent"
+  ]
+}
