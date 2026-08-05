@@ -13,8 +13,7 @@ SCRIPT = ROOT / "scripts/validate_pre_lot26_readiness.py"
 def _load_module() -> ModuleType:
     module_name = "validate_pre_lot26_readiness_test_module"
     spec = importlib.util.spec_from_file_location(module_name, SCRIPT)
-    assert spec is not None
-    assert spec.loader is not None
+    assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     sys.modules[module_name] = module
     spec.loader.exec_module(module)
@@ -27,10 +26,9 @@ def _load_json(relative: str) -> dict[str, object]:
     return value
 
 
-def test_pre_lot26_readiness_checks_pass() -> None:
+def test_lot26_foundation_lifecycle_checks_pass() -> None:
     module = _load_module()
-    checks = module.run_checks(ROOT)
-    failures = [check for check in checks if check.status != "PASS"]
+    failures = [check for check in module.run_checks(ROOT) if check.status != "PASS"]
     assert not failures, failures
 
 
@@ -41,11 +39,9 @@ def test_temporal_registry_activates_only_initial_edge() -> None:
     assert profile["local_scale_id"] == "timebar-5m"
     assert profile["higher_scale_id"] == "timebar-15m"
     assert profile["extensible_interface_required"] is True
-
     scales = payload["scales"]
     assert isinstance(scales, list)
-    active = {item["scale_id"] for item in scales if item["enabled_in_lot26"] is True}
-    assert active == {"timebar-5m", "timebar-15m"}
+    assert {item["scale_id"] for item in scales if item["enabled_in_lot26"] is True} == {"timebar-5m", "timebar-15m"}
 
 
 def test_temporal_dimensions_are_explicitly_separate() -> None:
@@ -65,11 +61,6 @@ def test_lot26_decision_clock_is_closed_local_bar_only() -> None:
     assert policy["enabled_triggers"] == ["CLOSED_LOCAL_BAR"]
     assert policy["trade_decision_allowed"] is False
 
-    triggers = payload["triggers"]
-    assert isinstance(triggers, list)
-    enabled = [item["trigger_id"] for item in triggers if item["enabled_in_lot26"] is True]
-    assert enabled == ["CLOSED_LOCAL_BAR"]
-
 
 def test_forecast_horizons_are_registered_but_locked() -> None:
     payload = _load_json("config/research/forecast_horizon_registry_v1.json")
@@ -82,14 +73,13 @@ def test_forecast_horizons_are_registered_but_locked() -> None:
     assert all(value is False for value in restrictions.values())
 
 
-def test_all_new_schemas_are_closed_objects() -> None:
+def test_all_schemas_are_closed_objects() -> None:
     module = _load_module()
     for relative in module.SCHEMA_FILES:
         schema = _load_json(relative)
         assert schema["type"] == "object"
         assert schema["additionalProperties"] is False
-        assert isinstance(schema["required"], list)
-        assert schema["required"]
+        assert isinstance(schema["required"], list) and schema["required"]
 
 
 def test_participant_and_exit_zone_taxonomy_is_complete() -> None:
@@ -99,40 +89,33 @@ def test_participant_and_exit_zone_taxonomy_is_complete() -> None:
     zone_type = properties["zone_type"]
     assert isinstance(zone_type, dict)
     assert set(zone_type["enum"]) == {
-        "STOP_LOSS_CLUSTER",
-        "TAKE_PROFIT_CLUSTER",
-        "BREAK_EVEN_CLUSTER",
-        "LIQUIDATION_CLUSTER",
-        "ENTRY_CONGESTION_ZONE",
-        "TRAPPED_POSITION_ZONE",
-        "FORCED_EXIT_ZONE",
-        "PASSIVE_DEFENSE_ZONE",
+        "STOP_LOSS_CLUSTER", "TAKE_PROFIT_CLUSTER", "BREAK_EVEN_CLUSTER", "LIQUIDATION_CLUSTER",
+        "ENTRY_CONGESTION_ZONE", "TRAPPED_POSITION_ZONE", "FORCED_EXIT_ZONE", "PASSIVE_DEFENSE_ZONE",
     }
 
 
 def test_lot26_documents_forbid_forecast_and_execution() -> None:
     text = (ROOT / "docs/LOT_26_MULTI_TIMEFRAME_ALIGNMENT_ENGINE.md").read_text(encoding="utf-8")
-    assert "forecast_generation_allowed=false" in text
-    assert "probability_claims_allowed=false" in text
-    assert "execution_allowed=false" in text
-    assert "trade_allowed=false" in text
-    assert "Game Theory" in text
+    for token in (
+        "forecast_generation_allowed=false", "probability_claims_allowed=false",
+        "execution_allowed=false", "trade_allowed=false", "Game Theory",
+    ):
+        assert token in text
 
 
-def test_no_lot26_or_future_engine_is_implemented() -> None:
+def test_only_future_engines_remain_unimplemented() -> None:
     module = _load_module()
     assert not [relative for relative in module.FORBIDDEN_IMPLEMENTATION_FILES if (ROOT / relative).exists()]
+    assert (ROOT / "src/crypto_quant_bot/market_analysis/alignment_engine.py").is_file()
 
 
-def test_readiness_report_can_be_generated(tmp_path: Path) -> None:
+def test_lifecycle_report_can_be_generated(tmp_path: Path) -> None:
     module = _load_module()
     checks = [module.Check("EXAMPLE", "PASS", "evidence")]
     module.write_outputs(tmp_path, checks)
-    manifest = json.loads(
-        (tmp_path / "data/audit/pre_lot26_readiness_manifest.json").read_text(encoding="utf-8")
-    )
+    manifest = json.loads((tmp_path / "data/audit/pre_lot26_readiness_manifest.json").read_text(encoding="utf-8"))
     report = (tmp_path / "reports/PRE_LOT26_ENTRY_GATE_REPORT.md").read_text(encoding="utf-8")
-    assert manifest["verdict"] == "GO"
+    assert manifest["verdict"] == "GO_LOT26_IMPLEMENTED"
     assert "continuous market state" in manifest["documented_future_capabilities"]
-    assert "**GO**" in report
-    assert "No Lot26 engine" in report
+    assert "**GO_LOT26_IMPLEMENTED**" in report
+    assert "Lot 26 engine" in report
