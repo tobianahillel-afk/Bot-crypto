@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, ClassVar
 
 COMPONENTS = ("trend", "range", "momentum", "volatility", "regime", "confluence")
 _ALIGNMENT_STATES = {"MTF_ALIGNED", "MTF_PARTIAL", "MTF_DIVERGENT", "MTF_UNKNOWN"}
@@ -62,6 +62,16 @@ def validate_score(value: float | None, field_name: str) -> None:
         raise ValueError(f"{field_name} must be finite within [0, 1]")
 
 
+class TupleListSerializable:
+    _tuple_fields: ClassVar[tuple[str, ...]] = ()
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        for field_name in self._tuple_fields:
+            payload[field_name] = list(getattr(self, field_name))
+        return payload
+
+
 def _validate_context_dimensions(state: TimeframeMarketContextStateV1) -> None:
     if state.timeframe not in {"5m", "15m"}:
         raise ValueError("Lot 26 v1 accepts only 5m and 15m context states")
@@ -106,7 +116,8 @@ def _validate_context_payload(state: TimeframeMarketContextStateV1) -> None:
 
 
 @dataclass(frozen=True, slots=True)
-class TimeframeMarketContextStateV1:
+class TimeframeMarketContextStateV1(TupleListSerializable):
+    _tuple_fields: ClassVar[tuple[str, ...]] = ("reason_codes",)
     state_id: str
     instrument_id: str
     timeframe: str
@@ -157,11 +168,6 @@ class TimeframeMarketContextStateV1:
         _validate_context_time(self)
         _validate_context_payload(self)
 
-    def to_dict(self) -> dict[str, Any]:
-        payload = asdict(self)
-        payload["reason_codes"] = list(self.reason_codes)
-        return payload
-
 
 def _validate_availability_time(item: ClosedBarAvailabilityV1) -> None:
     opened = parse_utc(item.bar_open_time, "bar_open_time")
@@ -173,7 +179,8 @@ def _validate_availability_time(item: ClosedBarAvailabilityV1) -> None:
 
 
 @dataclass(frozen=True, slots=True)
-class ClosedBarAvailabilityV1:
+class ClosedBarAvailabilityV1(TupleListSerializable):
+    _tuple_fields: ClassVar[tuple[str, ...]] = ("reason_codes",)
     availability_id: str
     state_id: str
     instrument_id: str
@@ -213,11 +220,6 @@ class ClosedBarAvailabilityV1:
     @property
     def consumable(self) -> bool:
         return self.is_closed and self.is_complete and self.quality_state == "VALID"
-
-    def to_dict(self) -> dict[str, Any]:
-        payload = asdict(self)
-        payload["reason_codes"] = list(self.reason_codes)
-        return payload
 
 
 def _validate_alignment_states(state: MultiTimeframeAlignmentStateV1) -> None:
@@ -265,7 +267,8 @@ def _validate_alignment_safety(state: MultiTimeframeAlignmentStateV1) -> None:
 
 
 @dataclass(frozen=True, slots=True)
-class MultiTimeframeAlignmentStateV1:
+class MultiTimeframeAlignmentStateV1(TupleListSerializable):
+    _tuple_fields: ClassVar[tuple[str, ...]] = ("hard_mismatch_components", "reason_codes")
     alignment_id: str
     instrument_id: str
     local_scale_id: str
@@ -329,9 +332,3 @@ class MultiTimeframeAlignmentStateV1:
         _validate_alignment_scores(self)
         _validate_alignment_states(self)
         _validate_alignment_safety(self)
-
-    def to_dict(self) -> dict[str, Any]:
-        payload = asdict(self)
-        payload["hard_mismatch_components"] = list(self.hard_mismatch_components)
-        payload["reason_codes"] = list(self.reason_codes)
-        return payload
