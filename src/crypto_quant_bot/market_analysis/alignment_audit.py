@@ -36,7 +36,7 @@ def assert_no_forbidden_capabilities(payload: object) -> None:
             if str(key).lower() in _FORBIDDEN_KEYS:
                 raise Lot26ValidationError(f"MTF_FORECAST_FIELD_FORBIDDEN:{key}")
             assert_no_forbidden_capabilities(value)
-    elif isinstance(payload, Sequence) and not isinstance(payload, (str, bytes, bytearray)):
+    elif isinstance(payload, Sequence) and not isinstance(payload, str | bytes | bytearray):
         for value in payload:
             assert_no_forbidden_capabilities(value)
 
