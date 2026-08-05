@@ -1,9 +1,8 @@
 name: Lot 26 one-shot Ruff autofix
 
 on:
-  push:
-    branches:
-      - agent/lot26-multi-timeframe-alignment
+  pull_request:
+    branches: [main]
     paths:
       - '.github/workflows/lot26-ruff-autofix.yml'
 
@@ -12,6 +11,7 @@ permissions:
 
 jobs:
   autofix:
+    if: github.head_ref == 'agent/lot26-multi-timeframe-alignment'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
