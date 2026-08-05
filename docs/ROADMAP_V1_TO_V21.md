@@ -4,13 +4,14 @@ Projet : **Crypto Quant Bot V3.1-Ops**
 
 ## État actuel
 
-- Dernier lot implémenté et validé : **Lot 25**.
+- Dernier lot implémenté et validé : **Lot 26**.
 - Baseline P0 institutionnelle : fusionnée.
-- Préparation Lot 26 : architecture fusionnée ; le gate transversal P0.6 est actif avant démarrage.
-- Lot 26 : `PLANNED_LOCKED`, aucune implémentation métier.
-- Lots 26–177 : planifiés et verrouillés.
-- Recherche offline : `CONDITIONAL_GO`.
-- Alpha, paper, sandbox et capital réel : `NO_GO`.
+- Gate transversal P0.6 : fusionné et conservé comme preuve historique.
+- Lot 26 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
+- Lot 27 : `PLANNED_LOCKED`, aucun développement démarré.
+- Lots 27–177 : planifiés et verrouillés.
+- Recherche offline descriptive : `GO` pour le périmètre Lot 26 uniquement.
+- Forecast, alpha, paper, sandbox et capital réel : `NO_GO`.
 
 ## Documents normatifs transverses
 
@@ -47,9 +48,8 @@ Projet : **Crypto Quant Bot V3.1-Ops**
 
 Ces documents sont normatifs pour les lots futurs. Ils n'indiquent pas que les capabilities sont déjà implémentées.
 
-## Pré-Lot26 normatif
+## Lot 26 normatif et implémenté
 
-- [PRE_LOT26_ENTRY_GATE](PRE_LOT26_ENTRY_GATE.md)
 - [Lot 26 specification](LOT_26_MULTI_TIMEFRAME_ALIGNMENT_ENGINE.md)
 - [Lot 26 acceptance criteria](ACCEPTANCE_CRITERIA_LOT_26.md)
 - [Lot 26 requirement-test matrix](LOT26_REQUIREMENT_TEST_MATRIX.md)
