@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import replace
+from dataclasses import FrozenInstanceError, replace
 
 import pytest
 from lot26_fixtures import make_alignment, make_availability, make_state
@@ -160,7 +160,7 @@ def test_alignment_contract_rejects_incomplete_scores_and_duplicate_codes() -> N
 
 def test_closed_contract_types_are_immutable() -> None:
     state = make_state("5m")
-    with pytest.raises(Exception):
+    with pytest.raises(FrozenInstanceError):
         state.timeframe = "15m"  # type: ignore[misc]
     assert isinstance(make_availability(state), ClosedBarAvailabilityV1)
     assert isinstance(make_alignment(), MultiTimeframeAlignmentStateV1)
