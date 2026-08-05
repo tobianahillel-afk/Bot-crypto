@@ -1,6 +1,6 @@
 # Lot 26 — Post-Merge Audit
 
-Status: `AUDIT_IN_PROGRESS`
+Status: `PASS`
 
 ## Audited baseline
 
@@ -20,6 +20,24 @@ Status: `AUDIT_IN_PROGRESS`
 - final report and implementation worklog agree;
 - no one-shot reconciliation or auto-fix workflow remains in the merged tree.
 
-## Required verdict
+## Finding and remediation
 
-This audit becomes `PASS` only when all pull-request workflows triggered by this file and the permanent post-merge test succeed against the merged `main` baseline. Until then, Lot 27 remains locked.
+The first post-merge run found that the deterministic runner regenerated the final report with the historical verdict `GO_LOT26_IMPLEMENTED_VALIDATED`, while the canonical lifecycle status was `GO_LOT26_IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
+
+The runner is now the same source of truth as the roadmap and final report. Replaying the engine no longer downgrades or changes the release verdict.
+
+## Verified gates after remediation
+
+- roadmap, semantic ownership, architecture and traceability: `PASS`;
+- lifecycle and full regression: `PASS`;
+- Lot 26 compile, Ruff, mypy, coverage, deterministic runner and replay: `PASS`;
+- critical Lot 26 mutation: `PASS`;
+- institutional quality, security, dependency audit and repository coverage: `PASS`;
+- full-suite anti-flake repetition: `3/3 PASS`;
+- post-merge release-state tests: `PASS`.
+
+## Verdict
+
+`GO_LOT26_POST_MERGE_AUDIT`.
+
+Lot 26 is stable after merge. Lot 27 may be unlocked only after this audit PR is certified on its final head and merged into `main`.
