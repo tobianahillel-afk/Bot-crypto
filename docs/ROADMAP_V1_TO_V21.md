@@ -4,17 +4,17 @@ Projet : **Crypto Quant Bot V3.1-Ops**
 
 ## État actuel
 
-- Dernier lot dont l'implémentation est terminée : **Lot 26**.
+- Dernier lot dont l'implémentation est terminée : **Lot 27**.
 - Baseline P0 institutionnelle : fusionnée.
 - Gate transversal P0.6 : fusionné et conservé comme preuve historique.
 - Lot 26 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
-- PR Lot 26 : brouillon tant que les workflows permanents n'ont pas exécuté leurs commandes sur un même SHA.
-- Lot 27 : `PLANNED_LOCKED`, aucun développement démarré.
-- Lots 27–177 : planifiés et verrouillés.
-- Recherche offline descriptive : implémentée pour le périmètre Lot 26, promotion encore `NO_GO`.
+- Lot 27 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
+- Lot 28 : `PLANNED_LOCKED`, aucun développement démarré.
+- Lots 28–177 : planifiés et verrouillés.
+- Recherche offline descriptive : implémentée pour le périmètre Lots 21–27, sans permission de décision ou d'exécution.
 - Forecast, alpha, paper, sandbox et capital réel : `NO_GO`.
 
-L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot26.json`. Le registre
+L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot27.json`. Le registre
 `data/audit/product_scope_roadmap_lot21.jsonl` reste une preuve historique immuable.
 
 ## Documents normatifs transverses

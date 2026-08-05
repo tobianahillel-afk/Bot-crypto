@@ -6,9 +6,9 @@ Plateforme quantitative crypto défensive, déterministe, extensible et auditabl
 
 | Élément | État |
 |---|---|
-| Dernier lot implémenté et validé | **Lot 26 — Multi-Timeframe Alignment** |
+| Dernier lot implémenté et validé | **Lot 27 — Global Market Context Aggregator** |
 | Baseline qualité | **P0 institutionnel fusionné** |
-| Prochain lot planifié | **Lot 27 — Global Market Context Aggregator**, verrouillé jusqu’au merge et à l’audit post-merge du Lot 26 |
+| Prochain lot planifié | **Lot 28 — Explanation Core & Why-Not-Trade Layer**, verrouillé jusqu’au merge et à l’audit post-merge du Lot 27 |
 | Runtime maximal | `LOCAL_OFFLINE_ANALYSIS_ONLY` |
 | Trading | **désactivé** |
 | Connectivité exchange | **désactivée** |
