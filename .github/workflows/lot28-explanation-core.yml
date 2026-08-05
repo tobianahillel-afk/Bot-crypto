@@ -113,7 +113,7 @@ jobs:
           pytest -q tests/test_lot28_*.py tests/test_lot27_release_state.py tests/test_lot27_post_merge_state.py
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git show HEAD^:.github/workflows/lot28-explanation-core.yml > .github/workflows/lot28-explanation-core.yml
+          git show d7bec66daaef46fc6888f2f83dbfd54c09cc3ce1:.github/workflows/lot28-explanation-core.yml > .github/workflows/lot28-explanation-core.yml
           git add -A
           git commit -m "Release Lot 28 explanation core 0.28.0"
           git push origin HEAD:${{ github.head_ref }}
