@@ -70,7 +70,7 @@ def _report(alignment: dict[str, Any], evidence_checksum: str, code_commit: str)
         [
             "# Lot 26 — Multi-Timeframe Alignment Final Report",
             "",
-            "Verdict: **GO_LOT26_IMPLEMENTED_VALIDATED**",
+            "Verdict: **GO_LOT26_IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY**",
             "",
             f"- Code commit: `{code_commit}`",
             f"- Alignment ID: `{alignment['alignment_id']}`",
