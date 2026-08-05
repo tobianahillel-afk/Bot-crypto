@@ -113,8 +113,22 @@ jobs:
           pytest -q tests/test_lot28_*.py tests/test_lot27_release_state.py tests/test_lot27_post_merge_state.py
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git show d7bec66daaef46fc6888f2f83dbfd54c09cc3ce1:.github/workflows/lot28-explanation-core.yml > .github/workflows/lot28-explanation-core.yml
-          git add -A
+          git checkout HEAD -- \
+            .github/workflows/lot28-explanation-core.yml \
+            .github/workflows/lot28-release-finalization.yml \
+            .github/workflows/lot28-release-finalization-fix.yml \
+            .github/workflows/lot28-release-finalization-fix-pr.yml
+          git add \
+            pyproject.toml README.md CHANGELOG.md \
+            docs/ROADMAP_V1_TO_V21.md docs/roadmap/V02_MARKET_ANALYSIS_OFFLINE.md \
+            docs/LOT_28_IMPLEMENTATION_WORKLOG.md \
+            data/audit/explanation_core_and_why_not_trade_layer_lot28.json \
+            data/audit/explanation_core_and_why_not_trade_layer_audit_lot28.json \
+            data/audit/roadmap_lifecycle_overlay_lot28.json \
+            reports/lot_28_explanation_core_and_why_not_trade_layer_report.md \
+            tests/test_lot27_release_state.py tests/test_lot27_post_merge_state.py \
+            tests/test_lot28_release_state.py
+          git add -u scripts/finalize_lot28_release.py
           git commit -m "Release Lot 28 explanation core 0.28.0"
           git push origin HEAD:${{ github.head_ref }}
       - uses: actions/upload-artifact@v4
