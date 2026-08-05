@@ -3,162 +3,61 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
-    "analysis_only": {
-      "const": true
-    },
-    "available_at": {
-      "format": "date-time",
-      "pattern": "Z$",
-      "type": "string"
-    },
-    "bar_close_time": {
-      "format": "date-time",
-      "pattern": "Z$",
-      "type": "string"
-    },
-    "bar_open_time": {
-      "format": "date-time",
-      "pattern": "Z$",
-      "type": "string"
-    },
-    "code_commit": {
-      "minLength": 1,
-      "type": "string"
-    },
+    "analysis_only": {"const": true},
+    "available_at": {"format": "date-time", "pattern": "Z$", "type": "string"},
+    "bar_close_time": {"format": "date-time", "pattern": "Z$", "type": "string"},
+    "bar_open_time": {"format": "date-time", "pattern": "Z$", "type": "string"},
+    "code_commit": {"minLength": 1, "type": "string"},
     "component_scores": {
-      "additionalProperties": {
-        "type": "number"
+      "additionalProperties": false,
+      "properties": {
+        "confluence": {"maximum": 1, "minimum": 0, "type": ["number", "null"]},
+        "momentum": {"maximum": 1, "minimum": 0, "type": ["number", "null"]},
+        "range": {"maximum": 1, "minimum": 0, "type": ["number", "null"]},
+        "regime": {"maximum": 1, "minimum": 0, "type": ["number", "null"]},
+        "trend": {"maximum": 1, "minimum": 0, "type": ["number", "null"]},
+        "volatility": {"maximum": 1, "minimum": 0, "type": ["number", "null"]}
       },
+      "required": ["trend", "range", "momentum", "volatility", "regime", "confluence"],
       "type": "object"
     },
-    "config_version": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "confluence_state": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "decision_time": {
-      "format": "date-time",
-      "pattern": "Z$",
-      "type": "string"
-    },
-    "event_time": {
-      "format": "date-time",
-      "pattern": "Z$",
-      "type": "string"
-    },
-    "execution_allowed": {
-      "const": false
-    },
-    "generated_at": {
-      "format": "date-time",
-      "pattern": "Z$",
-      "type": "string"
-    },
-    "instrument_id": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "lineage_id": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "momentum_state": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "range_state": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "reason_codes": {
-      "items": {
-        "minLength": 1,
-        "type": "string"
-      },
-      "type": "array",
-      "uniqueItems": true
-    },
-    "regime_state": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "revision_id": {
-      "minimum": 0,
-      "type": "integer"
-    },
-    "schema_version": {
-      "const": "timeframe-market-context-state-v1"
-    },
-    "sequence_id": {
-      "minimum": 0,
-      "type": "integer"
-    },
-    "source_bar_id": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "state_id": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "timeframe": {
-      "enum": [
-        "5m",
-        "15m"
-      ]
-    },
-    "trend_state": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "used_for_decision": {
-      "const": false
-    },
-    "validation_state": {
-      "enum": [
-        "VALID",
-        "UNKNOWN",
-        "BLOCKED",
-        "INVALID"
-      ]
-    },
-    "volatility_state": {
-      "minLength": 1,
-      "type": "string"
-    }
+    "config_version": {"minLength": 1, "type": "string"},
+    "confluence_state": {"minLength": 1, "type": "string"},
+    "data_resolution": {"enum": ["5m", "15m"]},
+    "decision_clock": {"const": "CLOSED_LOCAL_BAR"},
+    "decision_time": {"format": "date-time", "pattern": "Z$", "type": "string"},
+    "event_time": {"format": "date-time", "pattern": "Z$", "type": "string"},
+    "execution_allowed": {"const": false},
+    "feature_lookback": {"type": ["string", "null"]},
+    "forecast_horizon": {"type": "null"},
+    "generated_at": {"format": "date-time", "pattern": "Z$", "type": "string"},
+    "holding_horizon": {"type": "null"},
+    "instrument_id": {"minLength": 1, "type": "string"},
+    "lineage_id": {"minLength": 1, "type": "string"},
+    "momentum_state": {"minLength": 1, "type": "string"},
+    "range_state": {"minLength": 1, "type": "string"},
+    "reason_codes": {"items": {"minLength": 1, "type": "string"}, "type": "array", "uniqueItems": true},
+    "regime_state": {"minLength": 1, "type": "string"},
+    "revision_id": {"minimum": 0, "type": "integer"},
+    "scale_id": {"enum": ["timebar-5m", "timebar-15m"]},
+    "schema_version": {"const": "timeframe-market-context-state-v1"},
+    "sequence_id": {"minimum": 0, "type": "integer"},
+    "signal_ttl": {"type": "null"},
+    "source_bar_id": {"minLength": 1, "type": "string"},
+    "state_id": {"minLength": 1, "type": "string"},
+    "timeframe": {"enum": ["5m", "15m"]},
+    "trend_state": {"minLength": 1, "type": "string"},
+    "used_for_decision": {"const": false},
+    "validation_state": {"enum": ["VALID", "UNKNOWN", "BLOCKED", "INVALID"]},
+    "volatility_state": {"minLength": 1, "type": "string"}
   },
   "required": [
-    "schema_version",
-    "state_id",
-    "instrument_id",
-    "timeframe",
-    "bar_open_time",
-    "bar_close_time",
-    "event_time",
-    "available_at",
-    "decision_time",
-    "generated_at",
-    "source_bar_id",
-    "revision_id",
-    "sequence_id",
-    "lineage_id",
-    "config_version",
-    "code_commit",
-    "validation_state",
-    "trend_state",
-    "range_state",
-    "momentum_state",
-    "volatility_state",
-    "regime_state",
-    "confluence_state",
-    "component_scores",
-    "reason_codes",
-    "analysis_only",
-    "used_for_decision",
-    "execution_allowed"
+    "schema_version", "state_id", "instrument_id", "timeframe", "scale_id", "data_resolution",
+    "feature_lookback", "forecast_horizon", "decision_clock", "signal_ttl", "holding_horizon",
+    "bar_open_time", "bar_close_time", "event_time", "available_at", "decision_time", "generated_at",
+    "source_bar_id", "lineage_id", "config_version", "code_commit", "trend_state", "range_state",
+    "momentum_state", "volatility_state", "regime_state", "confluence_state", "revision_id", "sequence_id",
+    "validation_state", "component_scores", "reason_codes", "analysis_only", "used_for_decision", "execution_allowed"
   ],
   "title": "timeframe-market-context-state-v1",
   "type": "object"
