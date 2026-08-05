@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from datetime import datetime
+from itertools import pairwise
 from typing import Any
 
 from crypto_quant_bot.contracts.timeframe_alignment import (
@@ -113,7 +114,7 @@ def _require_canonical_order(states: list[TimeframeMarketContextStateV1]) -> Non
     keys = [_temporal_key(state) for state in states]
     if keys != sorted(keys):
         raise Lot26ValidationError("MTF_TIME_ALIGNMENT_INVALID:out-of-order higher states")
-    for previous, current in zip(states, states[1:], strict=False):
+    for previous, current in pairwise(states):
         if _temporal_key(previous) == _temporal_key(current):
             raise Lot26ValidationError("MTF_TIME_ALIGNMENT_INVALID:ambiguous duplicate")
 
