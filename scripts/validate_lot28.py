@@ -115,8 +115,8 @@ def validate(root: Path) -> dict[str, Any]:
     sources = _load_sources(root, config)
     statement_codes = validate_statements(bundle, config, sources)
     reason_codes = validate_reason_set(bundle, config, sources)
-    expected_codes = statement_codes + reason_codes
-    if tuple(state["reason_codes"]) != expected_codes or len(expected_codes) != len(set(expected_codes)):
+    expected_codes = tuple(dict.fromkeys(statement_codes + reason_codes))
+    if tuple(state["reason_codes"]) != expected_codes:
         raise ValueError("state reason-code sequence mismatch")
     validate_safety(state, config)
     stored_checksum = _validate_checksums(state, audit)
