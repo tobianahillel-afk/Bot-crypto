@@ -69,6 +69,7 @@ jobs:
           runner = "python -m pytest -q tests/test_lot27_global_market_context_aggregator.py tests/test_lot27_coverage_edges.py"
           also_copy = [
             "src/crypto_quant_bot/__init__.py",
+            "src/crypto_quant_bot/contracts/",
             "src/crypto_quant_bot/market_analysis/__init__.py",
             "src/crypto_quant_bot/market_analysis/global_market_context_aggregator_models.py",
             "config/",
