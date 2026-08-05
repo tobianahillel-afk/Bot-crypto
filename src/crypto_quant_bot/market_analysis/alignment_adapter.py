@@ -46,7 +46,7 @@ def _context_scores(row: Mapping[str, Any]) -> dict[str, float | None]:
         value = row.get(field_name)
         if value is None:
             result[component] = None
-        elif isinstance(value, bool) or not isinstance(value, (int, float)):
+        elif isinstance(value, bool) or not isinstance(value, int | float):
             raise Lot26ValidationError(f"MTF_SCHEMA_INCOMPATIBLE:{field_name}")
         else:
             result[component] = float(value)
