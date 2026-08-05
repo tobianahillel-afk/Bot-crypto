@@ -1,0 +1,77 @@
+name: Lot 26 one-shot mypy remediation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/lot26-mypy-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.head_ref == 'agent/lot26-multi-timeframe-alignment'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/lot26-multi-timeframe-alignment
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Apply exact typing fixes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace(path: str, old: str, new: str) -> None:
+              target = Path(path)
+              text = target.read_text(encoding='utf-8')
+              if old not in text:
+                  raise SystemExit(f'expected text missing in {path}')
+              target.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          replace(
+              'src/crypto_quant_bot/contracts/timeframe_alignment.py',
+              'from typing import Any, ClassVar\n',
+              'from typing import Any, ClassVar, cast\n',
+          )
+          replace(
+              'src/crypto_quant_bot/contracts/timeframe_alignment.py',
+              '        payload = asdict(self)\n',
+              '        payload = asdict(cast(Any, self))\n',
+          )
+          replace(
+              'src/crypto_quant_bot/market_analysis/alignment_adapter.py',
+              '    source_bar_id = stable_id("bar", {"timeframe": timeframe, "open": opened, "close": closed})\n    return TimeframeMarketContextStateV1(\n',
+              '    source_bar_id = stable_id("bar", {"timeframe": timeframe, "open": opened, "close": closed})\n    states = _state_values(row)\n    return TimeframeMarketContextStateV1(\n',
+          )
+          replace(
+              'src/crypto_quant_bot/market_analysis/alignment_adapter.py',
+              '        **{f"{key}_state": value for key, value in _state_values(row).items()},\n',
+              '        trend_state=states["trend"],\n        range_state=states["range"],\n        momentum_state=states["momentum"],\n        volatility_state=states["volatility"],\n        regime_state=states["regime"],\n        confluence_state=states["confluence"],\n',
+          )
+          replace(
+              'src/crypto_quant_bot/market_analysis/alignment_math.py',
+              '        reasons = ("MTF_UNKNOWN", "MTF_INSUFFICIENT_COMPONENT_COVERAGE")\n',
+              '        reasons: tuple[str, ...] = ("MTF_UNKNOWN", "MTF_INSUFFICIENT_COMPONENT_COVERAGE")\n',
+          )
+          PY
+      - name: Verify lint and typing
+        run: |
+          ruff check src/crypto_quant_bot/contracts/timeframe_alignment.py src/crypto_quant_bot/market_analysis/alignment_*.py
+          mypy src/crypto_quant_bot/contracts/timeframe_alignment.py src/crypto_quant_bot/market_analysis/alignment_*.py
+      - name: Commit verified typing fixes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/crypto_quant_bot/contracts/timeframe_alignment.py src/crypto_quant_bot/market_analysis/alignment_adapter.py src/crypto_quant_bot/market_analysis/alignment_math.py
+          git diff --cached --quiet || git commit -m 'Lot26 fix strict typing gates'
+          git push origin HEAD:agent/lot26-multi-timeframe-alignment
