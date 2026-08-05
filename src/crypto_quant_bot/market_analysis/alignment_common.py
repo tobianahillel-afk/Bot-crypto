@@ -5,6 +5,7 @@ from datetime import UTC, datetime
 from hashlib import sha256
 from pathlib import Path
 from typing import Any, Mapping
+from uuid import NAMESPACE_URL, uuid5
 
 
 class Lot26ValidationError(ValueError):
@@ -44,3 +45,7 @@ def require_mapping(payload: Mapping[str, Any], key: str) -> Mapping[str, Any]:
     if not isinstance(value, Mapping):
         raise Lot26ValidationError(f"{key} must be a mapping")
     return value
+
+
+def stable_id(kind: str, payload: object) -> str:
+    return str(uuid5(NAMESPACE_URL, f"lot26:{kind}:{checksum(payload)}"))

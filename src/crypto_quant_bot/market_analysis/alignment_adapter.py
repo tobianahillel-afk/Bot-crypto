@@ -3,13 +3,12 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from datetime import timedelta
 from typing import Any
-from uuid import NAMESPACE_URL, uuid5
 
 from crypto_quant_bot.contracts.timeframe_alignment import (
     ClosedBarAvailabilityV1,
     TimeframeMarketContextStateV1,
 )
-from crypto_quant_bot.market_analysis.alignment_common import Lot26ValidationError, checksum, parse_utc
+from crypto_quant_bot.market_analysis.alignment_common import Lot26ValidationError, parse_utc, stable_id
 
 _DURATION_SECONDS = {"5m": 300, "15m": 900}
 _STATE_FIELDS = {
@@ -28,10 +27,6 @@ _SCORE_FIELDS = {
     "regime": "regime_context_score",
     "confluence": "confluence_context_score",
 }
-
-
-def _stable_id(kind: str, payload: object) -> str:
-    return str(uuid5(NAMESPACE_URL, f"lot26:{kind}:{checksum(payload)}"))
 
 
 def _required_text(row: Mapping[str, Any], key: str) -> str:
@@ -84,9 +79,9 @@ def _build_context_state(
     sequence_id: int,
 ) -> TimeframeMarketContextStateV1:
     identity = _identity(row, decision_time, code_commit)
-    state_id = _stable_id("context", identity)
-    lineage_id = _stable_id("lineage", identity)
-    source_bar_id = _stable_id("bar", {"timeframe": timeframe, "open": opened, "close": closed})
+    state_id = stable_id("context", identity)
+    lineage_id = stable_id("lineage", identity)
+    source_bar_id = stable_id("bar", {"timeframe": timeframe, "open": opened, "close": closed})
     return TimeframeMarketContextStateV1(
         state_id=state_id,
         instrument_id="BTC/EUR",
@@ -122,7 +117,7 @@ def _build_availability(
     identity: dict[str, object],
 ) -> ClosedBarAvailabilityV1:
     return ClosedBarAvailabilityV1(
-        availability_id=_stable_id("availability", identity),
+        availability_id=stable_id("availability", identity),
         state_id=state.state_id,
         instrument_id=state.instrument_id,
         timeframe=state.timeframe,

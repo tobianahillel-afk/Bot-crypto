@@ -3,7 +3,6 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from dataclasses import replace
 from typing import Any
-from uuid import NAMESPACE_URL, uuid5
 
 from crypto_quant_bot.contracts.timeframe_alignment import (
     COMPONENTS,
@@ -11,7 +10,7 @@ from crypto_quant_bot.contracts.timeframe_alignment import (
     MultiTimeframeAlignmentStateV1,
     TimeframeMarketContextStateV1,
 )
-from crypto_quant_bot.market_analysis.alignment_common import checksum
+from crypto_quant_bot.market_analysis.alignment_common import checksum, stable_id
 from crypto_quant_bot.market_analysis.alignment_config import (
     config_checksum,
     validate_decision_clock,
@@ -24,10 +23,6 @@ from crypto_quant_bot.market_analysis.alignment_math import (
     uncertainty_from_coverage,
 )
 from crypto_quant_bot.market_analysis.alignment_temporal import TemporalSelectionV1, select_asof_backward
-
-
-def _stable_id(kind: str, payload: object) -> str:
-    return str(uuid5(NAMESPACE_URL, f"lot26:{kind}:{checksum(payload)}"))
 
 
 def _component_states(state: TimeframeMarketContextStateV1) -> dict[str, str]:
@@ -79,7 +74,7 @@ def _state_payload(
     registry_version, clock_version, config_version, config_hash = versions
     identity = _alignment_identity(selection, config_hash)
     return {
-        "alignment_id": _stable_id("alignment", identity),
+        "alignment_id": stable_id("alignment", identity),
         "instrument_id": local.instrument_id,
         "local_scale_id": local.scale_id,
         "higher_scale_id": higher.scale_id,
@@ -103,7 +98,7 @@ def _state_payload(
         "hard_mismatch_components": hard,
         "reason_codes": reasons,
         "uncertainty_state": uncertainty_from_coverage(coverage, count),
-        "lineage_id": _stable_id("alignment-lineage", identity),
+        "lineage_id": stable_id("alignment-lineage", identity),
         "scale_registry_version": registry_version,
         "decision_clock_policy_version": clock_version,
         "config_version": config_version,
