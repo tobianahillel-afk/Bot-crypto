@@ -56,7 +56,7 @@ def require_unique_codes(values: tuple[str, ...], field_name: str) -> None:
 def validate_score(value: float | None, field_name: str) -> None:
     if value is None:
         return
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
+    if isinstance(value, bool) or not isinstance(value, int | float):
         raise ValueError(f"{field_name} must be numeric or null")
     if not math.isfinite(float(value)) or not 0.0 <= float(value) <= 1.0:
         raise ValueError(f"{field_name} must be finite within [0, 1]")
@@ -156,10 +156,22 @@ class TimeframeMarketContextStateV1(TupleListSerializable):
 
     def __post_init__(self) -> None:
         fields = (
-            "state_id", "instrument_id", "timeframe", "scale_id", "data_resolution",
-            "decision_clock", "source_bar_id", "lineage_id", "config_version", "code_commit",
-            "trend_state", "range_state", "momentum_state", "volatility_state",
-            "regime_state", "confluence_state",
+            "state_id",
+            "instrument_id",
+            "timeframe",
+            "scale_id",
+            "data_resolution",
+            "decision_clock",
+            "source_bar_id",
+            "lineage_id",
+            "config_version",
+            "code_commit",
+            "trend_state",
+            "range_state",
+            "momentum_state",
+            "volatility_state",
+            "regime_state",
+            "confluence_state",
         )
         require_text_fields(self, fields)
         if self.schema_version != "timeframe-market-context-state-v1":
@@ -202,8 +214,13 @@ class ClosedBarAvailabilityV1(TupleListSerializable):
 
     def __post_init__(self) -> None:
         fields = (
-            "availability_id", "state_id", "instrument_id", "timeframe",
-            "scale_id", "source_bar_id", "lineage_id",
+            "availability_id",
+            "state_id",
+            "instrument_id",
+            "timeframe",
+            "scale_id",
+            "source_bar_id",
+            "lineage_id",
         )
         require_text_fields(self, fields)
         if self.schema_version != "closed-bar-availability-v1":
@@ -313,15 +330,30 @@ class MultiTimeframeAlignmentStateV1(TupleListSerializable):
 
     def __post_init__(self) -> None:
         fields = (
-            "alignment_id", "instrument_id", "local_scale_id", "higher_scale_id",
-            "decision_trigger", "local_state_id", "higher_state_id", "lineage_id",
-            "scale_registry_version", "decision_clock_policy_version", "config_version",
-            "config_checksum", "code_commit", "output_checksum",
+            "alignment_id",
+            "instrument_id",
+            "local_scale_id",
+            "higher_scale_id",
+            "decision_trigger",
+            "local_state_id",
+            "higher_state_id",
+            "lineage_id",
+            "scale_registry_version",
+            "decision_clock_policy_version",
+            "config_version",
+            "config_checksum",
+            "code_commit",
+            "output_checksum",
         )
         require_text_fields(self, fields)
         if self.schema_version != "multi-timeframe-alignment-state-v1":
             raise ValueError("unsupported alignment schema_version")
-        edge = (self.local_scale_id, self.higher_scale_id, self.local_timeframe, self.higher_timeframe)
+        edge = (
+            self.local_scale_id,
+            self.higher_scale_id,
+            self.local_timeframe,
+            self.higher_timeframe,
+        )
         if edge != ("timebar-5m", "timebar-15m", "5m", "15m"):
             raise ValueError("Lot 26 v1 accepts only the 5m to 15m edge")
         if self.decision_trigger != "CLOSED_LOCAL_BAR" or self.join_method != "ASOF_BACKWARD":
