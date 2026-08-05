@@ -8,13 +8,13 @@ from hashlib import sha256
 from typing import Any
 from uuid import NAMESPACE_URL, uuid5
 
+from crypto_quant_bot.contracts.timeframe_alignment import validate_score
 from crypto_quant_bot.market_analysis.global_market_context_aggregator_models import (
     SEMANTIC_CATEGORIES,
     SOURCE_IDS,
     GlobalMarketContextAggregatorStateV1,
     SourceContributionV1,
     parse_utc,
-    validate_score,
 )
 
 
@@ -321,7 +321,7 @@ def _aggregate_support(
 ) -> tuple[float, dict[str, float], float]:
     included = tuple(item for item in contributions if item.included)
     coverage = round(sum(item.configured_weight for item in included), 6)
-    support = {category: 0.0 for category in SEMANTIC_CATEGORIES}
+    support = dict.fromkeys(SEMANTIC_CATEGORIES, 0.0)
     for item in included:
         assert item.semantic_category is not None
         support[item.semantic_category] += item.effective_contribution
