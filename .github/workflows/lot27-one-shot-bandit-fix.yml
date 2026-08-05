@@ -31,18 +31,10 @@ jobs:
 
           path = Path('src/crypto_quant_bot/market_analysis/global_market_context_aggregator.py')
           text = path.read_text(encoding='utf-8')
-          old = '''    for item in included:
-              assert item.semantic_category is not None
-              support[item.semantic_category] += item.effective_contribution
-          '''
-          new = '''    for item in included:
-              category = item.semantic_category
-              if category is None:
-                  raise GlobalContextValidationError("included source lacks semantic category")
-              support[category] += item.effective_contribution
-          '''
+          old = '        assert item.semantic_category is not None\n        support[item.semantic_category] += item.effective_contribution'
+          new = '        category = item.semantic_category\n        if category is None:\n            raise GlobalContextValidationError("included source lacks semantic category")\n        support[category] += item.effective_contribution'
           if old not in text:
-              raise SystemExit('LOT27_ASSERT_BLOCK_NOT_FOUND')
+              raise SystemExit('LOT27_ASSERT_LINES_NOT_FOUND')
           path.write_text(text.replace(old, new, 1), encoding='utf-8')
           PY
       - name: Validate corrected source
