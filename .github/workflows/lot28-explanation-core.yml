@@ -1,0 +1,142 @@
+name: Lot 28 explanation core validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'config/explanations/explanation_core_why_not_trade_v1.json'
+      - 'contracts/schemas/explanation_core_why_not_trade_layer_state_v1.schema.json'
+      - 'src/crypto_quant_bot/market_analysis/explanation_core*.py'
+      - 'scripts/run_lot28_explanation_core_and_why_not_trade_layer.py'
+      - 'scripts/validate_lot28.py'
+      - 'scripts/finalize_lot28_release.py'
+      - 'tests/lot28_fixtures.py'
+      - 'tests/test_lot28_*.py'
+      - 'docs/*LOT_28*'
+      - 'reports/*lot_28*'
+      - 'data/audit/explanation_core_and_why_not_trade_layer*lot28.json'
+      - '.github/workflows/lot28-explanation-core.yml'
+      - 'requirements-dev.lock'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  lot28:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Compile lint and type-check
+        run: |
+          python -m compileall -q src scripts tests
+          ruff check src/crypto_quant_bot/market_analysis/explanation_core*.py scripts/run_lot28_explanation_core_and_why_not_trade_layer.py scripts/validate_lot28.py scripts/finalize_lot28_release.py tests/lot28_fixtures.py tests/test_lot28_*.py
+          mypy src/crypto_quant_bot/market_analysis/explanation_core*.py
+      - name: Targeted line and branch coverage
+        run: |
+          coverage erase
+          pytest -q tests/test_lot28_*.py \
+            --cov=crypto_quant_bot.market_analysis.explanation_core_and_why_not_trade_layer \
+            --cov=crypto_quant_bot.market_analysis.explanation_core_and_why_not_trade_layer_models \
+            --cov=crypto_quant_bot.market_analysis.explanation_core_validation \
+            --cov-branch \
+            --cov-report=json:reports/lot28/coverage.json \
+            --cov-report=term-missing
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          payload = json.loads(Path('reports/lot28/coverage.json').read_text())
+          totals = payload['totals']
+          lines = float(totals['percent_statements_covered'])
+          branches = float(totals['percent_branches_covered'])
+          print(f'Lot28 coverage: lines={lines:.2f}% branches={branches:.2f}%')
+          if lines < 95.0 or branches < 90.0:
+              raise SystemExit('LOT28_CRITICAL_COVERAGE_BELOW_THRESHOLD')
+          PY
+      - name: Deterministic runner and evidence validation
+        env:
+          CODE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          python scripts/run_lot28_explanation_core_and_why_not_trade_layer.py --code-commit "$CODE_COMMIT"
+          cp data/audit/explanation_core_and_why_not_trade_layer_lot28.json /tmp/lot28-run1.json
+          cp data/audit/explanation_core_and_why_not_trade_layer_audit_lot28.json /tmp/lot28-audit1.json
+          python scripts/validate_lot28.py
+          python scripts/run_lot28_explanation_core_and_why_not_trade_layer.py --code-commit "$CODE_COMMIT"
+          cmp /tmp/lot28-run1.json data/audit/explanation_core_and_why_not_trade_layer_lot28.json
+          cmp /tmp/lot28-audit1.json data/audit/explanation_core_and_why_not_trade_layer_audit_lot28.json
+          python scripts/validate_lot28.py
+      - name: Architecture traceability and security
+        run: |
+          python scripts/validate_domain_architecture.py
+          python scripts/validate_traceability_contract.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          bandit -q -r src/crypto_quant_bot/market_analysis/explanation_core*.py
+          pip-audit -r requirements-dev.lock
+      - name: Full regression and anti-flake
+        run: |
+          pytest -q
+          pytest -q tests/test_lot28_*.py
+          pytest -q tests/test_lot28_*.py
+          pytest -q tests/test_lot28_*.py
+      - name: Finalize clean release tree
+        if: github.event_name == 'pull_request' && github.head_ref == 'agent/lot28-explanation-core-why-not-trade'
+        env:
+          CODE_COMMIT: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          python scripts/run_lot28_explanation_core_and_why_not_trade_layer.py --code-commit "$CODE_COMMIT"
+          python scripts/finalize_lot28_release.py --implementation-sha "$CODE_COMMIT"
+          rm -f \
+            .github/workflows/lot28-release-finalization.yml \
+            .github/workflows/lot28-release-finalization-fix.yml \
+            .github/workflows/lot28-release-finalization-fix-pr.yml \
+            scripts/finalize_lot28_release.py
+          python scripts/validate_lot28.py
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_domain_architecture.py
+          python scripts/validate_traceability_contract.py
+          python scripts/validate_engineering_deviations.py
+          ruff check tests/test_lot27_release_state.py tests/test_lot27_post_merge_state.py tests/test_lot28_release_state.py
+          pytest -q tests/test_lot28_*.py tests/test_lot27_release_state.py tests/test_lot27_post_merge_state.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout HEAD -- \
+            .github/workflows/lot28-explanation-core.yml \
+            .github/workflows/lot28-release-finalization.yml \
+            .github/workflows/lot28-release-finalization-fix.yml \
+            .github/workflows/lot28-release-finalization-fix-pr.yml
+          git add \
+            pyproject.toml README.md CHANGELOG.md \
+            docs/ROADMAP_V1_TO_V21.md docs/roadmap/V02_MARKET_ANALYSIS_OFFLINE.md \
+            docs/LOT_28_IMPLEMENTATION_WORKLOG.md \
+            reports/lot_28_explanation_core_and_why_not_trade_layer_report.md \
+            tests/test_lot27_release_state.py tests/test_lot27_post_merge_state.py \
+            tests/test_lot28_release_state.py
+          git add -f \
+            data/audit/explanation_core_and_why_not_trade_layer_lot28.json \
+            data/audit/explanation_core_and_why_not_trade_layer_audit_lot28.json \
+            data/audit/roadmap_lifecycle_overlay_lot28.json
+          git add -u scripts/finalize_lot28_release.py
+          git commit -m "Release Lot 28 explanation core 0.28.0"
+          git push origin HEAD:${{ github.head_ref }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot28-explanation-core-evidence
+          path: |
+            data/audit/explanation_core_and_why_not_trade_layer*lot28.json
+            reports/lot_28_explanation_core_and_why_not_trade_layer_report.md
+            reports/lot28/
