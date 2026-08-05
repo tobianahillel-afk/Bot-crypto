@@ -39,6 +39,7 @@ jobs:
           cp -R src .tmp-lot26-mutants/src
           cp -R config .tmp-lot26-mutants/config
           cp -R contracts .tmp-lot26-mutants/contracts
+          printf '%s\n' '"""Minimal package aggregator for isolated Lot 26 mutation tests."""' > .tmp-lot26-mutants/src/crypto_quant_bot/market_analysis/__init__.py
           mkdir -p .tmp-lot26-mutants/tests
           cp tests/lot26_fixtures.py tests/test_lot26_math.py tests/test_lot26_temporal.py tests/test_lot26_integration.py tests/test_lot26_coverage_edges.py .tmp-lot26-mutants/tests/
           python - <<'PY'
