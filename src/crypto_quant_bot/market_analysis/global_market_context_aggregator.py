@@ -323,8 +323,10 @@ def _aggregate_support(
     coverage = round(sum(item.configured_weight for item in included), 6)
     support = dict.fromkeys(SEMANTIC_CATEGORIES, 0.0)
     for item in included:
-        assert item.semantic_category is not None
-        support[item.semantic_category] += item.effective_contribution
+        category = item.semantic_category
+        if category is None:
+            raise GlobalContextValidationError("included source lacks semantic category")
+        support[category] += item.effective_contribution
     rounded = {key: round(value, 6) for key, value in support.items()}
     score = round(sum(item.effective_contribution for item in included), 6)
     return coverage, rounded, score
