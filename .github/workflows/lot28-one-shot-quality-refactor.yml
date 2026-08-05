@@ -43,4 +43,4 @@ jobs:
           git add src/crypto_quant_bot/market_analysis/explanation_core*.py scripts/validate_lot28.py tests/test_lot28_*.py
           git diff --cached --quiet || git commit -m 'Lot28 remove new engineering deviations'
           git push origin HEAD:agent/lot28-explanation-core-why-not-trade
-      # Initial revision; a follow-up revision triggers execution.
+      # Second revision intentionally triggers execution.
