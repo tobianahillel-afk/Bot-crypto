@@ -73,7 +73,7 @@ def make_state(
         config_version="fixture-v1",
         code_commit="abcdef1",
         validation_state=validation_state,
-        component_scores={key: 0.5 for key in ("trend", "range", "momentum", "volatility", "regime", "confluence")},
+        component_scores=dict.fromkeys(("trend", "range", "momentum", "volatility", "regime", "confluence"), 0.5),
         reason_codes=("FIXTURE",),
         **values,
     )
@@ -122,7 +122,7 @@ def make_alignment(**changes: Any) -> MultiTimeframeAlignmentStateV1:
         "local_bar_close_time": "2026-05-25T03:00:00Z",
         "higher_bar_close_time": "2026-05-25T03:00:00Z",
         "join_method": "ASOF_BACKWARD",
-        "component_alignment_scores": {key: 1.0 for key in ("trend", "range", "momentum", "volatility", "regime", "confluence")},
+        "component_alignment_scores": dict.fromkeys(("trend", "range", "momentum", "volatility", "regime", "confluence"), 1.0),
         "available_component_count": 6,
         "weighted_coverage_ratio": 1.0,
         "overall_agreement_score": 1.0,

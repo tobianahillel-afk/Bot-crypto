@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import math
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 from crypto_quant_bot.contracts.timeframe_alignment import COMPONENTS
 from crypto_quant_bot.market_analysis.alignment_common import Lot26ValidationError

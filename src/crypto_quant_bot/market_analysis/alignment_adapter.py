@@ -8,7 +8,11 @@ from crypto_quant_bot.contracts.timeframe_alignment import (
     ClosedBarAvailabilityV1,
     TimeframeMarketContextStateV1,
 )
-from crypto_quant_bot.market_analysis.alignment_common import Lot26ValidationError, parse_utc, stable_id
+from crypto_quant_bot.market_analysis.alignment_common import (
+    Lot26ValidationError,
+    parse_utc,
+    stable_id,
+)
 
 _DURATION_SECONDS = {"5m": 300, "15m": 900}
 _STATE_FIELDS = {

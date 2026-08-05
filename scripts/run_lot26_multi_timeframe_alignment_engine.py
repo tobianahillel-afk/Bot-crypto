@@ -8,7 +8,10 @@ from typing import Any
 from uuid import NAMESPACE_URL, uuid5
 
 from crypto_quant_bot.market_analysis.alignment_adapter import adapt_lot25_rows
-from crypto_quant_bot.market_analysis.alignment_audit import build_alignment_evidence, replay_matches
+from crypto_quant_bot.market_analysis.alignment_audit import (
+    build_alignment_evidence,
+    replay_matches,
+)
 from crypto_quant_bot.market_analysis.alignment_common import checksum, parse_utc
 from crypto_quant_bot.market_analysis.alignment_engine import build_alignment_state
 from crypto_quant_bot.market_analysis.alignment_io import (

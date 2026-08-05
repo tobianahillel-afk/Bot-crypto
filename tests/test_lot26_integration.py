@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 
 import pytest
+from lot26_fixtures import ROOT, load_clock, load_config, load_registry
 
 from crypto_quant_bot.market_analysis.alignment_adapter import adapt_lot25_rows, adapt_lot25_summary
 from crypto_quant_bot.market_analysis.alignment_audit import (
@@ -13,7 +14,6 @@ from crypto_quant_bot.market_analysis.alignment_audit import (
 from crypto_quant_bot.market_analysis.alignment_common import Lot26ValidationError, checksum
 from crypto_quant_bot.market_analysis.alignment_engine import build_alignment_state
 from crypto_quant_bot.market_analysis.alignment_io import load_jsonl
-from lot26_fixtures import ROOT, load_clock, load_config, load_registry
 
 LOT25 = ROOT / "data/audit/volatility_regime_confluence_timeframes_lot25.jsonl"
 

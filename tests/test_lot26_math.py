@@ -3,7 +3,9 @@ from __future__ import annotations
 from copy import deepcopy
 
 import pytest
-from hypothesis import given, strategies as st
+from hypothesis import given
+from hypothesis import strategies as st
+from lot26_fixtures import load_clock, load_config, load_registry
 
 from crypto_quant_bot.market_analysis.alignment_common import Lot26ValidationError
 from crypto_quant_bot.market_analysis.alignment_config import (
@@ -18,7 +20,6 @@ from crypto_quant_bot.market_analysis.alignment_math import (
     compute_weighted_agreement,
     uncertainty_from_coverage,
 )
-from lot26_fixtures import load_clock, load_config, load_registry
 
 
 def test_component_oracles_for_lot25_contexts() -> None:
@@ -59,7 +60,7 @@ def test_weighted_agreement_rejects_bad_shape_and_scores() -> None:
     config = load_config()
     with pytest.raises(Lot26ValidationError, match="six components"):
         compute_weighted_agreement({"trend": 1.0}, config)
-    scores = {key: 1.0 for key in config["component_weights"]}
+    scores = dict.fromkeys(config["component_weights"], 1.0)
     scores["trend"] = float("nan")
     with pytest.raises(Lot26ValidationError, match="invalid component score"):
         compute_weighted_agreement(scores, config)
@@ -67,7 +68,7 @@ def test_weighted_agreement_rejects_bad_shape_and_scores() -> None:
 
 def test_classification_priority_and_coherence() -> None:
     config = load_config()
-    full = {key: 1.0 for key in config["component_weights"]}
+    full = dict.fromkeys(config["component_weights"], 1.0)
     assert classify_alignment(0.9, full, config)[:4] == ("MTF_ALIGNED", "MTF_NO_HARD_DIVERGENCE", "MTF_COHERENT", "MTF_CONTEXT_ALIGNED")
     partial = {**full, "trend": 0.25}
     assert classify_alignment(0.7, partial, config)[:3] == ("MTF_PARTIAL", "MTF_DIRECTIONAL_MISMATCH", "MTF_MIXED")
@@ -81,10 +82,10 @@ def test_classification_priority_and_coherence() -> None:
 
 def test_classification_single_regime_volatility_and_unknown() -> None:
     config = load_config()
-    full = {key: 1.0 for key in config["component_weights"]}
+    full = dict.fromkeys(config["component_weights"], 1.0)
     assert classify_alignment(0.8, {**full, "regime": 0.25}, config)[1] == "MTF_REGIME_MISMATCH"
     assert classify_alignment(0.8, {**full, "volatility": 0.25}, config)[1] == "MTF_VOLATILITY_MISMATCH"
-    unknown = classify_alignment(None, {key: None for key in full}, config)
+    unknown = classify_alignment(None, dict.fromkeys(full), config)
     assert unknown[:4] == ("MTF_UNKNOWN", "MTF_UNKNOWN", "MTF_UNKNOWN", "MTF_CONTEXT_UNKNOWN")
 
 

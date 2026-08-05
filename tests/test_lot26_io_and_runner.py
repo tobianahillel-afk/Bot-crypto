@@ -5,6 +5,7 @@ import shutil
 from pathlib import Path
 
 import pytest
+from lot26_fixtures import ROOT
 
 from crypto_quant_bot.market_analysis import alignment_io
 from crypto_quant_bot.market_analysis.alignment_common import Lot26ValidationError
@@ -16,7 +17,6 @@ from crypto_quant_bot.market_analysis.alignment_io import (
 )
 from scripts.run_lot26_multi_timeframe_alignment_engine import run
 from scripts.validate_lot26 import validate
-from lot26_fixtures import ROOT
 
 
 def test_json_and_jsonl_atomic_round_trip(tmp_path: Path) -> None:

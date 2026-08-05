@@ -22,7 +22,10 @@ from crypto_quant_bot.market_analysis.alignment_math import (
     compute_weighted_agreement,
     uncertainty_from_coverage,
 )
-from crypto_quant_bot.market_analysis.alignment_temporal import TemporalSelectionV1, select_asof_backward
+from crypto_quant_bot.market_analysis.alignment_temporal import (
+    TemporalSelectionV1,
+    select_asof_backward,
+)
 
 
 def _component_states(state: TimeframeMarketContextStateV1) -> dict[str, str]:
