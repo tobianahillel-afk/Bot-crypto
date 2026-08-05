@@ -158,5 +158,5 @@ def test_builder_rejects_non_numeric_or_out_of_range_scores() -> None:
 
     invalid = copy.deepcopy(global_context)
     invalid["conflict_states"] = ["A", "B"]
-    with pytest.raises(ExplanationValidationError, match="exactly one"):
+    with pytest.raises(ExplanationValidationError, match="divergence"):
         build_explanation_state(invalid, alignment, config, COMMIT)
