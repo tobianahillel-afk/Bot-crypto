@@ -6,9 +6,9 @@ Plateforme quantitative crypto défensive, déterministe, extensible et auditabl
 
 | Élément | État |
 |---|---|
-| Dernier lot implémenté et validé | **Lot 27 — Global Market Context Aggregator** |
+| Dernier lot implémenté et validé | **Lot 28 — Explanation Core & Why-Not-Trade Layer** |
 | Baseline qualité | **P0 institutionnel fusionné** |
-| Prochain lot planifié | **Lot 28 — Explanation Core & Why-Not-Trade Layer**, verrouillé jusqu’au merge et à l’audit post-merge du Lot 27 |
+| Prochain lot planifié | **Lot 29 — V2 Deterministic Replay & Audit**, verrouillé jusqu’au merge et à l’audit post-merge du Lot 28 |
 | Runtime maximal | `LOCAL_OFFLINE_ANALYSIS_ONLY` |
 | Trading | **désactivé** |
 | Connectivité exchange | **désactivée** |
@@ -144,6 +144,15 @@ La CI ajoute Ruff, mypy, coverage lignes/branches, diff coverage, Bandit, `pip-a
 - [Mathématiques](docs/math/LOT_26_MULTI_TIMEFRAME_ALIGNMENT_SPEC.md)
 - [ADR temporel](docs/adr/ADR_0001_TIME_SEMANTICS_AND_ASOF_JOIN.md)
 - [Contrats temporels](docs/contracts/LOT26_TEMPORAL_CONTRACTS.md)
+
+### Lot 28
+
+- [Spécification](docs/LOT_28_EXPLANATION_CORE_AND_WHY_NOT_TRADE_LAYER.md)
+- [Critères d’acceptation](docs/ACCEPTANCE_CRITERIA_LOT_28.md)
+- [Worklog de validation](docs/LOT_28_IMPLEMENTATION_WORKLOG.md)
+- [Rapport final](reports/lot_28_explanation_core_and_why_not_trade_layer_report.md)
+- État certifié : `data/audit/explanation_core_and_why_not_trade_layer_lot28.json`
+- Audit certifié : `data/audit/explanation_core_and_why_not_trade_layer_audit_lot28.json`
 
 ### Architecture future verrouillée
 

@@ -1,0 +1,574 @@
+{
+  "alignment_id": "0d87a551-16fb-56e4-aaa9-4ff3245b4839",
+  "analysis_only": true,
+  "approved_size": 0,
+  "bundle": {
+    "assumptions": [],
+    "contradicting_evidence": [
+      {
+        "evidence_refs": [
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/category_support/TRENDING",
+            "observed_value": 0.166955,
+            "schema_version": "explanation-evidence-reference-v1"
+          },
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/category_support/RANGE",
+            "observed_value": 0.151198,
+            "schema_version": "explanation-evidence-reference-v1"
+          },
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/category_support/CONFLICT",
+            "observed_value": 0.13,
+            "schema_version": "explanation-evidence-reference-v1"
+          }
+        ],
+        "parameters": {
+          "conflict_support": "0.130000",
+          "range_support": "0.151198",
+          "trending_support": "0.166955"
+        },
+        "reason_code": "EXPL_CONTRADICTION_TREND_RANGE",
+        "schema_version": "explanation-statement-v1",
+        "section": "contradicting_evidence",
+        "statement_id": "f8057456-dbd2-5380-8274-e0d7d7351600",
+        "template_id": "contradiction_trend_range",
+        "text": "Trending support 0.166955 and range support 0.151198 coexist with conflict support 0.130000."
+      }
+    ],
+    "facts_observed": [
+      {
+        "evidence_refs": [
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/dominant_state",
+            "observed_value": "GLOBAL_CONTEXT_MIXED",
+            "schema_version": "explanation-evidence-reference-v1"
+          },
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/weighted_coverage_ratio",
+            "observed_value": 1.0,
+            "schema_version": "explanation-evidence-reference-v1"
+          }
+        ],
+        "parameters": {
+          "dominant_state": "GLOBAL_CONTEXT_MIXED",
+          "weighted_coverage_ratio": "1.000000"
+        },
+        "reason_code": "EXPL_FACT_GLOBAL_CONTEXT",
+        "schema_version": "explanation-statement-v1",
+        "section": "facts_observed",
+        "statement_id": "a267ef00-2050-5dc7-a028-4e10ce494368",
+        "template_id": "fact_global_context",
+        "text": "Global context is GLOBAL_CONTEXT_MIXED with weighted coverage 1.000000."
+      },
+      {
+        "evidence_refs": [
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/category_support/TRENDING",
+            "observed_value": 0.166955,
+            "schema_version": "explanation-evidence-reference-v1"
+          },
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/category_support/RANGE",
+            "observed_value": 0.151198,
+            "schema_version": "explanation-evidence-reference-v1"
+          },
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/category_support/MIXED",
+            "observed_value": 0.116448,
+            "schema_version": "explanation-evidence-reference-v1"
+          },
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/category_support/CONFLICT",
+            "observed_value": 0.13,
+            "schema_version": "explanation-evidence-reference-v1"
+          }
+        ],
+        "parameters": {
+          "conflict_support": "0.130000",
+          "mixed_support": "0.116448",
+          "range_support": "0.151198",
+          "trending_support": "0.166955"
+        },
+        "reason_code": "EXPL_FACT_CATEGORY_SUPPORT",
+        "schema_version": "explanation-statement-v1",
+        "section": "facts_observed",
+        "statement_id": "4ee2dfd1-8b5e-502b-8dd3-6768e70d6dfd",
+        "template_id": "fact_category_support",
+        "text": "Observed category support is trending=0.166955, range=0.151198, mixed=0.116448, conflict=0.130000."
+      },
+      {
+        "evidence_refs": [
+          {
+            "artifact_checksum": "278cecf24b714738a69ec87c21745a3aaf0c40b4e5462c929ea3478b9d266eba",
+            "artifact_path": "data/audit/multi_timeframe_alignment_engine_lot26.json",
+            "json_pointer": "/alignment_state",
+            "observed_value": "MTF_DIVERGENT",
+            "schema_version": "explanation-evidence-reference-v1"
+          },
+          {
+            "artifact_checksum": "278cecf24b714738a69ec87c21745a3aaf0c40b4e5462c929ea3478b9d266eba",
+            "artifact_path": "data/audit/multi_timeframe_alignment_engine_lot26.json",
+            "json_pointer": "/coherence_state",
+            "observed_value": "MTF_INCOHERENT",
+            "schema_version": "explanation-evidence-reference-v1"
+          }
+        ],
+        "parameters": {
+          "alignment_state": "MTF_DIVERGENT",
+          "coherence_state": "MTF_INCOHERENT"
+        },
+        "reason_code": "EXPL_FACT_ALIGNMENT",
+        "schema_version": "explanation-statement-v1",
+        "section": "facts_observed",
+        "statement_id": "d5e0e643-b47f-5244-a0a4-7c8fd8b4d078",
+        "template_id": "fact_alignment",
+        "text": "Multi-timeframe alignment is MTF_DIVERGENT; coherence is MTF_INCOHERENT."
+      }
+    ],
+    "features_computed": [
+      {
+        "evidence_refs": [
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/aggregate_evidence_score",
+            "observed_value": 0.5646,
+            "schema_version": "explanation-evidence-reference-v1"
+          },
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/confidence_interval",
+            "observed_value": null,
+            "schema_version": "explanation-evidence-reference-v1"
+          }
+        ],
+        "parameters": {
+          "aggregate_evidence_score": "0.564600"
+        },
+        "reason_code": "EXPL_FEATURE_AGGREGATE_SCORE",
+        "schema_version": "explanation-statement-v1",
+        "section": "features_computed",
+        "statement_id": "527eb9d4-cd6a-5c0e-a4cd-6f4b3bcc946d",
+        "template_id": "feature_aggregate_score",
+        "text": "Aggregate descriptive evidence score is 0.564600; it is not calibrated as a probability."
+      }
+    ],
+    "final_consequence": [
+      {
+        "evidence_refs": [
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/used_for_decision",
+            "observed_value": false,
+            "schema_version": "explanation-evidence-reference-v1"
+          },
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/execution_allowed",
+            "observed_value": false,
+            "schema_version": "explanation-evidence-reference-v1"
+          }
+        ],
+        "parameters": {},
+        "reason_code": "EXPL_FINAL_NO_EXECUTABLE_ACTION",
+        "schema_version": "explanation-statement-v1",
+        "section": "final_consequence",
+        "statement_id": "62d98dd4-0679-5531-9751-291551deaf66",
+        "template_id": "final_no_executable_action",
+        "text": "No executable action is produced; a future validated promotion gate would be required before reconsideration."
+      }
+    ],
+    "inferences": [
+      {
+        "evidence_refs": [
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/conflict_states/0",
+            "observed_value": "MTF_DIVERGENT",
+            "schema_version": "explanation-evidence-reference-v1"
+          },
+          {
+            "artifact_checksum": "278cecf24b714738a69ec87c21745a3aaf0c40b4e5462c929ea3478b9d266eba",
+            "artifact_path": "data/audit/multi_timeframe_alignment_engine_lot26.json",
+            "json_pointer": "/divergence_state",
+            "observed_value": "MTF_MULTI_COMPONENT_MISMATCH",
+            "schema_version": "explanation-evidence-reference-v1"
+          }
+        ],
+        "parameters": {
+          "conflict_state": "MTF_DIVERGENT"
+        },
+        "reason_code": "EXPL_INFERENCE_EXPLICIT_CONFLICT",
+        "schema_version": "explanation-statement-v1",
+        "section": "inferences",
+        "statement_id": "327cb926-2be7-503a-b387-bd71f79b96c2",
+        "template_id": "inference_explicit_conflict",
+        "text": "The descriptive sources do not support one coherent context because MTF_DIVERGENT remains explicit."
+      }
+    ],
+    "non_applicable": [
+      {
+        "evidence_refs": [
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/used_for_decision",
+            "observed_value": false,
+            "schema_version": "explanation-evidence-reference-v1"
+          },
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/signal_generation_allowed",
+            "observed_value": false,
+            "schema_version": "explanation-evidence-reference-v1"
+          },
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/order_routing_allowed",
+            "observed_value": false,
+            "schema_version": "explanation-evidence-reference-v1"
+          }
+        ],
+        "parameters": {},
+        "reason_code": "EXPL_NA_FUTURE_CAPABILITIES",
+        "schema_version": "explanation-statement-v1",
+        "section": "non_applicable",
+        "statement_id": "eedbbde0-7a42-5abe-bf50-516eb056cce1",
+        "template_id": "non_applicable_future_capabilities",
+        "text": "Forecast, signal, risk approval and order details are not applicable in this offline descriptive layer."
+      }
+    ],
+    "rules_triggered": [
+      {
+        "evidence_refs": [
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/analysis_only",
+            "observed_value": true,
+            "schema_version": "explanation-evidence-reference-v1"
+          }
+        ],
+        "parameters": {},
+        "reason_code": "EXPL_RULE_OFFLINE_ONLY",
+        "schema_version": "explanation-statement-v1",
+        "section": "rules_triggered",
+        "statement_id": "95c68d40-1888-59fe-a725-4080af0ece33",
+        "template_id": "rule_offline_only",
+        "text": "Runtime policy is local offline analysis only."
+      }
+    ],
+    "schema_version": "explanation-bundle-v1",
+    "supporting_evidence": [
+      {
+        "evidence_refs": [
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/available_source_count",
+            "observed_value": 5,
+            "schema_version": "explanation-evidence-reference-v1"
+          },
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/weighted_coverage_ratio",
+            "observed_value": 1.0,
+            "schema_version": "explanation-evidence-reference-v1"
+          }
+        ],
+        "parameters": {
+          "available_source_count": "5"
+        },
+        "reason_code": "EXPL_SUPPORT_VALIDATED_SOURCES",
+        "schema_version": "explanation-statement-v1",
+        "section": "supporting_evidence",
+        "statement_id": "0584d7e7-a50e-51a9-9436-3803f3ebd49a",
+        "template_id": "support_validated_sources",
+        "text": "All 5 configured descriptive sources are present and validated."
+      }
+    ],
+    "uncertainty": [
+      {
+        "evidence_refs": [
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/confidence_interval",
+            "observed_value": null,
+            "schema_version": "explanation-evidence-reference-v1"
+          }
+        ],
+        "parameters": {},
+        "reason_code": "EXPL_UNCERTAINTY_UNCALIBRATED",
+        "schema_version": "explanation-statement-v1",
+        "section": "uncertainty",
+        "statement_id": "651b9d57-ec92-52ae-bee7-5f84d7cb2b0e",
+        "template_id": "uncertainty_uncalibrated",
+        "text": "No calibrated confidence interval is available for the heterogeneous descriptive sources."
+      }
+    ],
+    "vetos_triggered": [
+      {
+        "evidence_refs": [
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/dominant_state",
+            "observed_value": "GLOBAL_CONTEXT_MIXED",
+            "schema_version": "explanation-evidence-reference-v1"
+          }
+        ],
+        "parameters": {},
+        "reason_code": "WNT_CONTEXT_MIXED",
+        "schema_version": "explanation-statement-v1",
+        "section": "vetos_triggered",
+        "statement_id": "ea13c872-3156-5881-ad15-6033ec454113",
+        "template_id": "veto_context_mixed",
+        "text": "Executable promotion is blocked because the global context is mixed."
+      },
+      {
+        "evidence_refs": [
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/conflict_states/0",
+            "observed_value": "MTF_DIVERGENT",
+            "schema_version": "explanation-evidence-reference-v1"
+          },
+          {
+            "artifact_checksum": "278cecf24b714738a69ec87c21745a3aaf0c40b4e5462c929ea3478b9d266eba",
+            "artifact_path": "data/audit/multi_timeframe_alignment_engine_lot26.json",
+            "json_pointer": "/alignment_state",
+            "observed_value": "MTF_DIVERGENT",
+            "schema_version": "explanation-evidence-reference-v1"
+          },
+          {
+            "artifact_checksum": "278cecf24b714738a69ec87c21745a3aaf0c40b4e5462c929ea3478b9d266eba",
+            "artifact_path": "data/audit/multi_timeframe_alignment_engine_lot26.json",
+            "json_pointer": "/divergence_state",
+            "observed_value": "MTF_MULTI_COMPONENT_MISMATCH",
+            "schema_version": "explanation-evidence-reference-v1"
+          }
+        ],
+        "parameters": {},
+        "reason_code": "WNT_MTF_DIVERGENCE",
+        "schema_version": "explanation-statement-v1",
+        "section": "vetos_triggered",
+        "statement_id": "082c74ee-a0c7-589c-baea-8527c83204d5",
+        "template_id": "veto_mtf_divergence",
+        "text": "Executable promotion is blocked because multi-timeframe divergence remains unresolved."
+      },
+      {
+        "evidence_refs": [
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/used_for_decision",
+            "observed_value": false,
+            "schema_version": "explanation-evidence-reference-v1"
+          },
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/signal_generation_allowed",
+            "observed_value": false,
+            "schema_version": "explanation-evidence-reference-v1"
+          },
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/order_routing_allowed",
+            "observed_value": false,
+            "schema_version": "explanation-evidence-reference-v1"
+          },
+          {
+            "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+            "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+            "json_pointer": "/execution_allowed",
+            "observed_value": false,
+            "schema_version": "explanation-evidence-reference-v1"
+          }
+        ],
+        "parameters": {},
+        "reason_code": "WNT_PERMISSIONS_DISABLED",
+        "schema_version": "explanation-statement-v1",
+        "section": "vetos_triggered",
+        "statement_id": "0731af41-01eb-5cdf-a062-98edfa4bd233",
+        "template_id": "veto_permissions_disabled",
+        "text": "Executable promotion is blocked because decision, signal, routing and execution permissions are disabled."
+      }
+    ],
+    "why_not_trade": {
+      "dominant_reason_code": "WNT_PERMISSIONS_DISABLED",
+      "final_consequence": "No executable action is produced; a future validated promotion gate would be required before reconsideration.",
+      "no_order_intent_created": true,
+      "reason_set_id": "108339f3-d498-5f3a-9603-dcd9c1a5fcfd",
+      "reasons": [
+        {
+          "condition_not_satisfied": "global_context_is_unambiguous",
+          "evidence_refs": [
+            {
+              "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+              "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+              "json_pointer": "/dominant_state",
+              "observed_value": "GLOBAL_CONTEXT_MIXED",
+              "schema_version": "explanation-evidence-reference-v1"
+            }
+          ],
+          "expiry": null,
+          "observed_value": "GLOBAL_CONTEXT_MIXED",
+          "order_intent_created": false,
+          "owner": "MarketAnalysisDomain",
+          "reason_code": "WNT_CONTEXT_MIXED",
+          "reason_id": "665067bc-b771-5511-b506-941cc410602a",
+          "reconsideration_condition": "A future validated context must no longer be mixed and must pass its promotion gate.",
+          "required_value": "UNAMBIGUOUS_VALIDATED_CONTEXT",
+          "schema_version": "why-not-trade-reason-v1"
+        },
+        {
+          "condition_not_satisfied": "multi_timeframe_context_is_coherent",
+          "evidence_refs": [
+            {
+              "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+              "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+              "json_pointer": "/conflict_states/0",
+              "observed_value": "MTF_DIVERGENT",
+              "schema_version": "explanation-evidence-reference-v1"
+            },
+            {
+              "artifact_checksum": "278cecf24b714738a69ec87c21745a3aaf0c40b4e5462c929ea3478b9d266eba",
+              "artifact_path": "data/audit/multi_timeframe_alignment_engine_lot26.json",
+              "json_pointer": "/alignment_state",
+              "observed_value": "MTF_DIVERGENT",
+              "schema_version": "explanation-evidence-reference-v1"
+            },
+            {
+              "artifact_checksum": "278cecf24b714738a69ec87c21745a3aaf0c40b4e5462c929ea3478b9d266eba",
+              "artifact_path": "data/audit/multi_timeframe_alignment_engine_lot26.json",
+              "json_pointer": "/divergence_state",
+              "observed_value": "MTF_MULTI_COMPONENT_MISMATCH",
+              "schema_version": "explanation-evidence-reference-v1"
+            }
+          ],
+          "expiry": null,
+          "observed_value": "MTF_DIVERGENT",
+          "order_intent_created": false,
+          "owner": "MarketAnalysisDomain",
+          "reason_code": "WNT_MTF_DIVERGENCE",
+          "reason_id": "01450bd6-627a-5bdc-bdbc-bbd0bc8a5cbb",
+          "reconsideration_condition": "A future validated alignment must remove the explicit unresolved divergence.",
+          "required_value": "MTF_COHERENT",
+          "schema_version": "why-not-trade-reason-v1"
+        },
+        {
+          "condition_not_satisfied": "decision_and_execution_capabilities_are_enabled",
+          "evidence_refs": [
+            {
+              "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+              "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+              "json_pointer": "/used_for_decision",
+              "observed_value": false,
+              "schema_version": "explanation-evidence-reference-v1"
+            },
+            {
+              "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+              "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+              "json_pointer": "/signal_generation_allowed",
+              "observed_value": false,
+              "schema_version": "explanation-evidence-reference-v1"
+            },
+            {
+              "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+              "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+              "json_pointer": "/order_routing_allowed",
+              "observed_value": false,
+              "schema_version": "explanation-evidence-reference-v1"
+            },
+            {
+              "artifact_checksum": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+              "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+              "json_pointer": "/execution_allowed",
+              "observed_value": false,
+              "schema_version": "explanation-evidence-reference-v1"
+            }
+          ],
+          "expiry": null,
+          "observed_value": "decision=false;signal=false;routing=false;execution=false",
+          "order_intent_created": false,
+          "owner": "SystemSafetyPolicy",
+          "reason_code": "WNT_PERMISSIONS_DISABLED",
+          "reason_id": "cee287d5-3749-5848-9f25-0724dec99a5e",
+          "reconsideration_condition": "A future lot must pass its own validation, human promotion and safety gates.",
+          "required_value": "EXPLICITLY_APPROVED_FUTURE_CAPABILITIES",
+          "schema_version": "why-not-trade-reason-v1"
+        }
+      ],
+      "schema_version": "why-not-trade-reason-set-v1"
+    }
+  },
+  "code_commit": "7c0ad0b2feb1640e98d9ca8e5f35c3657de6ffe8",
+  "config_checksum": "d77ba1b49058b77ea6b7b6554204f9bbf9a33d3b72bd29087962551d0babef97",
+  "config_version": "lot28-explanation-core-v1",
+  "decision_time": "2026-05-25T03:00:00Z",
+  "execution_allowed": false,
+  "explanation_id": "42fbf9f2-f483-5922-8cdb-99cde4cad5df",
+  "forecast_generation_allowed": false,
+  "global_context_id": "57e315cf-f63f-54f4-8bf3-a4159adbccb1",
+  "input_checksums": {
+    "global_context": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+    "multi_timeframe_alignment": "278cecf24b714738a69ec87c21745a3aaf0c40b4e5462c929ea3478b9d266eba"
+  },
+  "instrument_id": "BTC/EUR",
+  "lineage_id": "26733221-7629-5fe8-ae73-fa1b6cbadc0a",
+  "order_routing_allowed": false,
+  "output_checksum": "e5e23e67e5d033d449b4ca46b6cdae2f6a7aad9649266ce3ad21f42de1d16e02",
+  "probability_claims_allowed": false,
+  "reason_codes": [
+    "EXPL_FACT_GLOBAL_CONTEXT",
+    "EXPL_FACT_CATEGORY_SUPPORT",
+    "EXPL_FACT_ALIGNMENT",
+    "EXPL_FEATURE_AGGREGATE_SCORE",
+    "EXPL_INFERENCE_EXPLICIT_CONFLICT",
+    "EXPL_SUPPORT_VALIDATED_SOURCES",
+    "EXPL_CONTRADICTION_TREND_RANGE",
+    "EXPL_UNCERTAINTY_UNCALIBRATED",
+    "EXPL_RULE_OFFLINE_ONLY",
+    "WNT_CONTEXT_MIXED",
+    "WNT_MTF_DIVERGENCE",
+    "WNT_PERMISSIONS_DISABLED",
+    "EXPL_NA_FUTURE_CAPABILITIES",
+    "EXPL_FINAL_NO_EXECUTABLE_ACTION"
+  ],
+  "risk_approval_allowed": false,
+  "schema_version": "explanation-core-why-not-trade-layer-state-v1",
+  "signal_generation_allowed": false,
+  "trade_allowed": false,
+  "used_for_decision": false,
+  "validation_state": "VALID"
+}

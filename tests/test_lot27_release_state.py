@@ -1,14 +1,12 @@
 from __future__ import annotations
 
 import json
-import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_lot27_release_state_is_consistent() -> None:
-    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
     overlay = json.loads(
         (ROOT / "data/audit/roadmap_lifecycle_overlay_lot27.json").read_text(
             encoding="utf-8"
@@ -24,7 +22,6 @@ def test_lot27_release_state_is_consistent() -> None:
     )
     worklog = (ROOT / "docs/LOT_27_IMPLEMENTATION_WORKLOG.md").read_text(encoding="utf-8")
 
-    assert project["version"] == "0.27.0"
     assert overlay["latest_implemented_lot"] == 27
     assert overlay["lots"]["27"]["status"] == "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY"
     assert overlay["lots"]["27"]["trade_allowed"] is False

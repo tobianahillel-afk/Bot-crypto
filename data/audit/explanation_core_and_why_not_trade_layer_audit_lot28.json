@@ -1,0 +1,37 @@
+{
+  "analysis_only": true,
+  "code_commit": "7c0ad0b2feb1640e98d9ca8e5f35c3657de6ffe8",
+  "config_checksum": "d77ba1b49058b77ea6b7b6554204f9bbf9a33d3b72bd29087962551d0babef97",
+  "decision_time": "2026-05-25T03:00:00Z",
+  "dominant_reason_code": "WNT_PERMISSIONS_DISABLED",
+  "execution_allowed": false,
+  "input_checksums": {
+    "global_context": "a8b9b7ff38041bfafc00759cc472dbb93b13c36fcd16bc0a52e3ed9db231b46a",
+    "multi_timeframe_alignment": "278cecf24b714738a69ec87c21745a3aaf0c40b4e5462c929ea3478b9d266eba"
+  },
+  "no_order_intent_created": true,
+  "output_checksum": "e5e23e67e5d033d449b4ca46b6cdae2f6a7aad9649266ce3ad21f42de1d16e02",
+  "reason_codes": [
+    "EXPL_FACT_GLOBAL_CONTEXT",
+    "EXPL_FACT_CATEGORY_SUPPORT",
+    "EXPL_FACT_ALIGNMENT",
+    "EXPL_FEATURE_AGGREGATE_SCORE",
+    "EXPL_INFERENCE_EXPLICIT_CONFLICT",
+    "EXPL_SUPPORT_VALIDATED_SOURCES",
+    "EXPL_CONTRADICTION_TREND_RANGE",
+    "EXPL_UNCERTAINTY_UNCALIBRATED",
+    "EXPL_RULE_OFFLINE_ONLY",
+    "WNT_CONTEXT_MIXED",
+    "WNT_MTF_DIVERGENCE",
+    "WNT_PERMISSIONS_DISABLED",
+    "EXPL_NA_FUTURE_CAPABILITIES",
+    "EXPL_FINAL_NO_EXECUTABLE_ACTION"
+  ],
+  "replay_status": "MATCH",
+  "run_id": "eb8ed8fc-0e7c-5e08-a24e-b3a7f21b80f8",
+  "schema_version": "explanation-core-why-not-trade-layer-audit-v1",
+  "statement_count": 14,
+  "trade_allowed": false,
+  "used_for_decision": false,
+  "why_not_reason_count": 3
+}

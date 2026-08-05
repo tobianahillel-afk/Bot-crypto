@@ -934,7 +934,7 @@ Validation humaine et rapport PASS requis avant le lot suivant.
 
 ## Lot 28 — Explanation Core & Why-Not-Trade Layer
 
-**Statut canonique :** `PLANNED_LOCKED`  
+**Statut canonique :** `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`  
 **Runtime/mode autorisé :** `LOCAL_OFFLINE_ANALYSIS_ONLY`  
 **Composant propriétaire :** `MarketAnalysisDomain`  
 **Frontière de code :** `src/crypto_quant_bot/market_analysis`

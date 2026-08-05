@@ -4,17 +4,17 @@ Projet : **Crypto Quant Bot V3.1-Ops**
 
 ## État actuel
 
-- Dernier lot dont l'implémentation est terminée : **Lot 27**.
+- Dernier lot dont l'implémentation est terminée : **Lot 28**.
 - Baseline P0 institutionnelle : fusionnée.
 - Gate transversal P0.6 : fusionné et conservé comme preuve historique.
 - Lot 26 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
 - Lot 27 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
-- Lot 28 : `PLANNED_LOCKED`, aucun développement démarré.
-- Lots 28–177 : planifiés et verrouillés.
-- Recherche offline descriptive : implémentée pour le périmètre Lots 21–27, sans permission de décision ou d'exécution.
+- Lot 28 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
+- Lots 29–177 : planifiés et verrouillés.
+- Recherche offline descriptive : implémentée pour le périmètre Lots 21–28, sans permission de décision ou d'exécution.
 - Forecast, alpha, paper, sandbox et capital réel : `NO_GO`.
 
-L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot27.json`. Le registre
+L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot28.json`. Le registre
 `data/audit/product_scope_roadmap_lot21.jsonl` reste une preuve historique immuable.
 
 ## Documents normatifs transverses
@@ -68,6 +68,17 @@ prédictives ou d'exécution sont déjà implémentées.
 - Decision clock policy : `config/temporal/decision_clock_policy_v1.json`
 - Runner : `scripts/run_lot26_multi_timeframe_alignment_engine.py`
 - Validator : `scripts/validate_lot26.py`
+
+## Lot 28
+
+- [Specification](LOT_28_EXPLANATION_CORE_AND_WHY_NOT_TRADE_LAYER.md)
+- [Acceptance criteria](ACCEPTANCE_CRITERIA_LOT_28.md)
+- [Implementation status](LOT_28_IMPLEMENTATION_WORKLOG.md)
+- Configuration : `config/explanations/explanation_core_why_not_trade_v1.json`
+- Schema : `contracts/schemas/explanation_core_why_not_trade_layer_state_v1.schema.json`
+- Runner : `scripts/run_lot28_explanation_core_and_why_not_trade_layer.py`
+- Validator : `scripts/validate_lot28.py`
+- Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot28.json`
 
 ## Séparations obligatoires
 
