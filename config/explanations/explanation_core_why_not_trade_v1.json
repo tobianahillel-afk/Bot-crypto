@@ -1,0 +1,137 @@
+{
+  "schema_version": "explanation-core-why-not-trade-config-v1",
+  "config_id": "lot28-explanation-core-v1",
+  "status": "PROVISIONAL_OFFLINE_DESCRIPTIVE_ONLY",
+  "runtime_scope": "LOCAL_OFFLINE_ANALYSIS_ONLY",
+  "input_artifacts": {
+    "global_context": "data/audit/global_market_context_aggregator_lot27.json",
+    "multi_timeframe_alignment": "data/audit/multi_timeframe_alignment_engine_lot26.json"
+  },
+  "required_input_schemas": {
+    "global_context": "global-market-context-aggregator-state-v1",
+    "multi_timeframe_alignment": "multi-timeframe-alignment-state-v1"
+  },
+  "templates": {
+    "fact_global_context": {
+      "section": "facts_observed",
+      "reason_code": "EXPL_FACT_GLOBAL_CONTEXT",
+      "text": "Global context is {dominant_state} with weighted coverage {weighted_coverage_ratio}."
+    },
+    "fact_category_support": {
+      "section": "facts_observed",
+      "reason_code": "EXPL_FACT_CATEGORY_SUPPORT",
+      "text": "Observed category support is trending={trending_support}, range={range_support}, mixed={mixed_support}, conflict={conflict_support}."
+    },
+    "fact_alignment": {
+      "section": "facts_observed",
+      "reason_code": "EXPL_FACT_ALIGNMENT",
+      "text": "Multi-timeframe alignment is {alignment_state}; coherence is {coherence_state}."
+    },
+    "feature_aggregate_score": {
+      "section": "features_computed",
+      "reason_code": "EXPL_FEATURE_AGGREGATE_SCORE",
+      "text": "Aggregate descriptive evidence score is {aggregate_evidence_score}; it is not calibrated as a probability."
+    },
+    "inference_explicit_conflict": {
+      "section": "inferences",
+      "reason_code": "EXPL_INFERENCE_EXPLICIT_CONFLICT",
+      "text": "The descriptive sources do not support one coherent context because {conflict_state} remains explicit."
+    },
+    "support_validated_sources": {
+      "section": "supporting_evidence",
+      "reason_code": "EXPL_SUPPORT_VALIDATED_SOURCES",
+      "text": "All {available_source_count} configured descriptive sources are present and validated."
+    },
+    "contradiction_trend_range": {
+      "section": "contradicting_evidence",
+      "reason_code": "EXPL_CONTRADICTION_TREND_RANGE",
+      "text": "Trending support {trending_support} and range support {range_support} coexist with conflict support {conflict_support}."
+    },
+    "uncertainty_uncalibrated": {
+      "section": "uncertainty",
+      "reason_code": "EXPL_UNCERTAINTY_UNCALIBRATED",
+      "text": "No calibrated confidence interval is available for the heterogeneous descriptive sources."
+    },
+    "rule_offline_only": {
+      "section": "rules_triggered",
+      "reason_code": "EXPL_RULE_OFFLINE_ONLY",
+      "text": "Runtime policy is local offline analysis only."
+    },
+    "veto_context_mixed": {
+      "section": "vetos_triggered",
+      "reason_code": "WNT_CONTEXT_MIXED",
+      "text": "Executable promotion is blocked because the global context is mixed."
+    },
+    "veto_mtf_divergence": {
+      "section": "vetos_triggered",
+      "reason_code": "WNT_MTF_DIVERGENCE",
+      "text": "Executable promotion is blocked because multi-timeframe divergence remains unresolved."
+    },
+    "veto_permissions_disabled": {
+      "section": "vetos_triggered",
+      "reason_code": "WNT_PERMISSIONS_DISABLED",
+      "text": "Executable promotion is blocked because decision, signal, routing and execution permissions are disabled."
+    },
+    "non_applicable_future_capabilities": {
+      "section": "non_applicable",
+      "reason_code": "EXPL_NA_FUTURE_CAPABILITIES",
+      "text": "Forecast, signal, risk approval and order details are not applicable in this offline descriptive layer."
+    },
+    "final_no_executable_action": {
+      "section": "final_consequence",
+      "reason_code": "EXPL_FINAL_NO_EXECUTABLE_ACTION",
+      "text": "No executable action is produced; a future validated promotion gate would be required before reconsideration."
+    }
+  },
+  "statement_order": [
+    "fact_global_context",
+    "fact_category_support",
+    "fact_alignment",
+    "feature_aggregate_score",
+    "inference_explicit_conflict",
+    "support_validated_sources",
+    "contradiction_trend_range",
+    "uncertainty_uncalibrated",
+    "rule_offline_only",
+    "veto_context_mixed",
+    "veto_mtf_divergence",
+    "veto_permissions_disabled",
+    "non_applicable_future_capabilities",
+    "final_no_executable_action"
+  ],
+  "why_not_trade_reasons": {
+    "WNT_CONTEXT_MIXED": {
+      "owner": "MarketAnalysisDomain",
+      "condition_not_satisfied": "global_context_is_unambiguous",
+      "required_value": "UNAMBIGUOUS_VALIDATED_CONTEXT",
+      "reconsideration_condition": "A future validated context must no longer be mixed and must pass its promotion gate."
+    },
+    "WNT_MTF_DIVERGENCE": {
+      "owner": "MarketAnalysisDomain",
+      "condition_not_satisfied": "multi_timeframe_context_is_coherent",
+      "required_value": "MTF_COHERENT",
+      "reconsideration_condition": "A future validated alignment must remove the explicit unresolved divergence."
+    },
+    "WNT_PERMISSIONS_DISABLED": {
+      "owner": "SystemSafetyPolicy",
+      "condition_not_satisfied": "decision_and_execution_capabilities_are_enabled",
+      "required_value": "EXPLICITLY_APPROVED_FUTURE_CAPABILITIES",
+      "reconsideration_condition": "A future lot must pass its own validation, human promotion and safety gates."
+    }
+  },
+  "forbidden_output_tokens": [
+    "BUY",
+    "SELL",
+    "position_size"
+  ],
+  "promotion_restrictions": {
+    "used_for_decision": false,
+    "forecast_generation_allowed": false,
+    "probability_claims_allowed": false,
+    "signal_generation_allowed": false,
+    "risk_approval_allowed": false,
+    "order_routing_allowed": false,
+    "execution_allowed": false,
+    "trade_allowed": false
+  }
+}
