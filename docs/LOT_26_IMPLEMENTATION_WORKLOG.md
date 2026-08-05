@@ -16,7 +16,7 @@ Status: `IMPLEMENTATION_COMPLETE_AWAITING_EXACT_COMMIT_CI`
 
 ## Local non-authoritative validation
 
-The available execution environment completed 106 Lot 26 tests with 2 Hypothesis properties skipped by a local stub, line coverage 98.60% and branch coverage 96.74%. The new source inventory contains no function above 50 logical lines, no cyclomatic complexity above 10, no parameter count above 7 and no duplicate function body.
+The available execution environment completed 106 Lot 26 tests with 2 Hypothesis properties skipped by a local stub, statement coverage 98.60% and branch coverage 96.76%. The new source inventory contains no function above 50 logical lines, no cyclomatic complexity above 10, no parameter count above 7 and no duplicate function body.
 
 This validation is useful engineering evidence but is not the canonical release gate because it did not run under the repository's locked Python 3.11.9 GitHub Actions environment.
 
