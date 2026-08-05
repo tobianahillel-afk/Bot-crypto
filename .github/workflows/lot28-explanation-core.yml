@@ -9,7 +9,6 @@ on:
       - 'src/crypto_quant_bot/market_analysis/explanation_core*.py'
       - 'scripts/run_lot28_explanation_core_and_why_not_trade_layer.py'
       - 'scripts/validate_lot28.py'
-      - 'scripts/finalize_lot28_release.py'
       - 'tests/lot28_fixtures.py'
       - 'tests/test_lot28_*.py'
       - 'docs/*LOT_28*'
@@ -22,7 +21,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   lot28:
@@ -42,7 +41,7 @@ jobs:
       - name: Compile lint and type-check
         run: |
           python -m compileall -q src scripts tests
-          ruff check src/crypto_quant_bot/market_analysis/explanation_core*.py scripts/run_lot28_explanation_core_and_why_not_trade_layer.py scripts/validate_lot28.py scripts/finalize_lot28_release.py tests/lot28_fixtures.py tests/test_lot28_*.py
+          ruff check src/crypto_quant_bot/market_analysis/explanation_core*.py scripts/run_lot28_explanation_core_and_why_not_trade_layer.py scripts/validate_lot28.py tests/lot28_fixtures.py tests/test_lot28_*.py
           mypy src/crypto_quant_bot/market_analysis/explanation_core*.py
       - name: Targeted line and branch coverage
         run: |
@@ -91,47 +90,6 @@ jobs:
           pytest -q tests/test_lot28_*.py
           pytest -q tests/test_lot28_*.py
           pytest -q tests/test_lot28_*.py
-      - name: Finalize clean release tree
-        if: github.event_name == 'pull_request' && github.head_ref == 'agent/lot28-explanation-core-why-not-trade'
-        env:
-          CODE_COMMIT: ${{ github.event.pull_request.head.sha }}
-        run: |
-          set -euo pipefail
-          python scripts/run_lot28_explanation_core_and_why_not_trade_layer.py --code-commit "$CODE_COMMIT"
-          python scripts/finalize_lot28_release.py --implementation-sha "$CODE_COMMIT"
-          rm -f \
-            .github/workflows/lot28-release-finalization.yml \
-            .github/workflows/lot28-release-finalization-fix.yml \
-            .github/workflows/lot28-release-finalization-fix-pr.yml \
-            scripts/finalize_lot28_release.py
-          python scripts/validate_lot28.py
-          python scripts/validate_roadmap_documentation.py
-          python scripts/validate_domain_architecture.py
-          python scripts/validate_traceability_contract.py
-          python scripts/validate_engineering_deviations.py
-          ruff check tests/test_lot27_release_state.py tests/test_lot27_post_merge_state.py tests/test_lot28_release_state.py
-          pytest -q tests/test_lot28_*.py tests/test_lot27_release_state.py tests/test_lot27_post_merge_state.py
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout HEAD -- \
-            .github/workflows/lot28-explanation-core.yml \
-            .github/workflows/lot28-release-finalization.yml \
-            .github/workflows/lot28-release-finalization-fix.yml \
-            .github/workflows/lot28-release-finalization-fix-pr.yml
-          git add \
-            pyproject.toml README.md CHANGELOG.md \
-            docs/ROADMAP_V1_TO_V21.md docs/roadmap/V02_MARKET_ANALYSIS_OFFLINE.md \
-            docs/LOT_28_IMPLEMENTATION_WORKLOG.md \
-            reports/lot_28_explanation_core_and_why_not_trade_layer_report.md \
-            tests/test_lot27_release_state.py tests/test_lot27_post_merge_state.py \
-            tests/test_lot28_release_state.py
-          git add -f \
-            data/audit/explanation_core_and_why_not_trade_layer_lot28.json \
-            data/audit/explanation_core_and_why_not_trade_layer_audit_lot28.json \
-            data/audit/roadmap_lifecycle_overlay_lot28.json
-          git add -u scripts/finalize_lot28_release.py
-          git commit -m "Release Lot 28 explanation core 0.28.0"
-          git push origin HEAD:${{ github.head_ref }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
