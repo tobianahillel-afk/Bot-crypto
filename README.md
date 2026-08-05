@@ -6,9 +6,9 @@ Plateforme quantitative crypto défensive, déterministe, extensible et auditabl
 
 | Élément | État |
 |---|---|
-| Dernier lot implémenté et validé | **Lot 25 — Volatility / Regime / Confluence** |
+| Dernier lot implémenté et validé | **Lot 26 — Multi-Timeframe Alignment** |
 | Baseline qualité | **P0 institutionnel fusionné** |
-| Prochaine implémentation autorisée | **Lot 26 — Multi-Timeframe Alignment**, encore verrouillé |
+| Prochain lot planifié | **Lot 27 — Global Market Context Aggregator**, verrouillé jusqu’au merge et à l’audit post-merge du Lot 26 |
 | Runtime maximal | `LOCAL_OFFLINE_ANALYSIS_ONLY` |
 | Trading | **désactivé** |
 | Connectivité exchange | **désactivée** |

@@ -1,0 +1,10 @@
+{
+  "execution_allowed": false,
+  "run_1_checksum": "c5238d4e3782ab0ae75b6dae84724f061c11917f07ee899d2341ece2e031d556",
+  "run_2_checksum": "c5238d4e3782ab0ae75b6dae84724f061c11917f07ee899d2341ece2e031d556",
+  "run_id": "e7fa3c36-ebff-5824-94cb-1b8095b2ad5e",
+  "schema_version": "lot26-replay-evidence-v1",
+  "source_commit": "8ad774038b6dcc974b37291f5fc3239a095b4252",
+  "status": "MATCH",
+  "used_for_decision": false
+}

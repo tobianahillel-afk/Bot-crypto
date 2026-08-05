@@ -1,0 +1,149 @@
+name: Lot 26 critical mutation assurance
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/crypto_quant_bot/contracts/timeframe_alignment.py'
+      - 'src/crypto_quant_bot/market_analysis/alignment_*.py'
+      - 'tests/lot26_fixtures.py'
+      - 'tests/test_lot26_*.py'
+      - '.github/workflows/lot26-mutation.yml'
+      - 'requirements-dev.lock'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mutation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Build isolated Lot 26 mutation workspace
+        run: |
+          rm -rf .tmp-lot26-mutants reports/lot26/mutation
+          mkdir -p .tmp-lot26-mutants reports/lot26/mutation
+          cp -R src .tmp-lot26-mutants/src
+          cp -R config .tmp-lot26-mutants/config
+          cp -R contracts .tmp-lot26-mutants/contracts
+          mkdir -p .tmp-lot26-mutants/data/audit
+          cp data/audit/volatility_regime_confluence_timeframes_lot25.jsonl .tmp-lot26-mutants/data/audit/
+          printf '%s\n' '"""Minimal package aggregator for isolated Lot 26 mutation tests."""' > .tmp-lot26-mutants/src/crypto_quant_bot/market_analysis/__init__.py
+          mkdir -p .tmp-lot26-mutants/tests
+          cp tests/lot26_fixtures.py tests/test_lot26_math.py tests/test_lot26_temporal.py tests/test_lot26_integration.py tests/test_lot26_coverage_edges.py .tmp-lot26-mutants/tests/
+          python - <<'PY'
+          from pathlib import Path
+          for path in Path('.tmp-lot26-mutants/tests').glob('test_lot26_*.py'):
+              text = path.read_text(encoding='utf-8')
+              path.write_text(
+                  text.replace('from tests.lot26_fixtures import', 'from lot26_fixtures import'),
+                  encoding='utf-8',
+              )
+          PY
+          cat > .tmp-lot26-mutants/pyproject.toml <<'TOML'
+          [project]
+          name = "crypto-quant-bot"
+          version = "0.26.0"
+          requires-python = "==3.11.*"
+          dependencies = []
+
+          [tool.pytest.ini_options]
+          pythonpath = ["src", "tests"]
+          addopts = ["--tb=short", "-p", "no:cacheprovider"]
+
+          [tool.mutmut]
+          paths_to_mutate = [
+            "src/crypto_quant_bot/market_analysis/alignment_math.py",
+            "src/crypto_quant_bot/market_analysis/alignment_temporal.py",
+          ]
+          tests_dir = ["tests/"]
+          runner = "python -m pytest -q tests/test_lot26_math.py tests/test_lot26_temporal.py tests/test_lot26_integration.py tests/test_lot26_coverage_edges.py"
+          also_copy = [
+            "src/crypto_quant_bot/__init__.py",
+            "src/crypto_quant_bot/contracts/",
+            "src/crypto_quant_bot/market_analysis/__init__.py",
+            "src/crypto_quant_bot/market_analysis/alignment_adapter.py",
+            "src/crypto_quant_bot/market_analysis/alignment_audit.py",
+            "src/crypto_quant_bot/market_analysis/alignment_common.py",
+            "src/crypto_quant_bot/market_analysis/alignment_config.py",
+            "src/crypto_quant_bot/market_analysis/alignment_engine.py",
+            "src/crypto_quant_bot/market_analysis/alignment_io.py",
+            "config/",
+            "contracts/",
+            "data/",
+          ]
+          mutate_only_covered_lines = true
+          timeout_factor = 8.0
+          TOML
+      - name: Run mutation suite
+        shell: bash
+        run: |
+          set -o pipefail
+          cd .tmp-lot26-mutants
+          mutmut run 2>&1 | tee ../reports/lot26/mutation/run.txt
+          mutmut results 2>&1 | tee ../reports/lot26/mutation/results.txt || true
+      - name: Enforce mutation score
+        run: |
+          python - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          path = Path('reports/lot26/mutation/run.txt')
+          if not path.is_file():
+              raise SystemExit('LOT26_MUTATION_RUN_LOG_MISSING')
+          text = path.read_text(encoding='utf-8', errors='replace')
+          text = re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', text).replace('\r', '\n')
+          pattern = re.compile(
+              r'(\d+)/(\d+).*?🎉\s*(\d+).*?⏰\s*(\d+).*?🤔\s*(\d+).*?🙁\s*(\d+)'
+          )
+          matches = pattern.findall(text)
+          if not matches:
+              raise SystemExit('LOT26_MUTATION_SCORE_PARSE_ERROR')
+          completed, total, killed, timeout, suspicious, survived = map(int, matches[-1])
+          evaluated = killed + timeout + suspicious + survived
+          if completed != total or evaluated != total or total <= 0:
+              raise SystemExit(
+                  f'LOT26_MUTATION_INCOMPLETE completed={completed} total={total} evaluated={evaluated}'
+              )
+          score = 100.0 * (killed + timeout) / evaluated
+          payload = {
+              'schema_version': 'lot26-critical-mutation-score-v1',
+              'scope': 'alignment_math and alignment_temporal',
+              'killed': killed,
+              'timeout': timeout,
+              'survived': survived,
+              'suspicious': suspicious,
+              'evaluated': evaluated,
+              'score_percent': round(score, 2),
+              'minimum_score_percent': 80.0,
+              'status': 'PASS' if score >= 80.0 else 'FAIL',
+          }
+          output = Path('reports/lot26/mutation/score.json')
+          output.write_text(json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+          print(json.dumps(payload, sort_keys=True))
+          if score < 80.0:
+              raise SystemExit('LOT26_MUTATION_BELOW_80_PERCENT')
+          PY
+      - name: Verify canonical source immutability
+        run: |
+          rm -rf .tmp-lot26-mutants
+          git diff --exit-code -- src/crypto_quant_bot
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot26-critical-mutation-evidence
+          path: reports/lot26/mutation/

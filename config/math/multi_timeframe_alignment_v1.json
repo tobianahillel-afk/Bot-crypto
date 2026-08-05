@@ -152,11 +152,14 @@
     "MTF_VOLATILITY_MISMATCH",
     "MTF_REGIME_MISMATCH",
     "MTF_MULTI_COMPONENT_MISMATCH",
-    "MTF_REPLAY_DIVERGENCE"
+    "MTF_REPLAY_DIVERGENCE",
+    "MTF_SCALE_RELATION_NOT_ALLOWED",
+    "MTF_NAIVE_VOTING_FORBIDDEN",
+    "MTF_FORECAST_FIELD_FORBIDDEN"
   ],
   "runtime_scope": "LOCAL_OFFLINE_ANALYSIS_ONLY",
   "schema_version": "multi-timeframe-alignment-config-v1",
-  "status": "PROVISIONAL_UNCALIBRATED_OFFLINE_ONLY",
+  "status": "IMPLEMENTED_UNCALIBRATED_OFFLINE_ONLY",
   "time_policy": {
     "eligibility_rule": "available_at <= decision_time",
     "future_tolerance_seconds": 0,

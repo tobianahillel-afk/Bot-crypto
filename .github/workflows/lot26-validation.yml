@@ -1,0 +1,94 @@
+name: Lot 26 multi-timeframe alignment validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'config/math/multi_timeframe_alignment_v1.json'
+      - 'config/temporal/**'
+      - 'contracts/schemas/*timeframe*'
+      - 'contracts/schemas/closed_bar_availability_v1.schema.json'
+      - 'data/audit/*lot26*'
+      - 'docs/*LOT_26*'
+      - 'reports/LOT_26*'
+      - 'scripts/run_lot26_multi_timeframe_alignment_engine.py'
+      - 'scripts/validate_lot26.py'
+      - 'src/crypto_quant_bot/contracts/timeframe_alignment.py'
+      - 'src/crypto_quant_bot/market_analysis/alignment_*.py'
+      - 'tests/lot26_fixtures.py'
+      - 'tests/test_lot26_*.py'
+      - '.github/workflows/lot26-validation.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lot26:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Compile and lint
+        run: |
+          python -m compileall -q src scripts tests
+          ruff check src/crypto_quant_bot/contracts/timeframe_alignment.py src/crypto_quant_bot/market_analysis/alignment_*.py scripts/run_lot26_multi_timeframe_alignment_engine.py scripts/validate_lot26.py tests/lot26_fixtures.py tests/test_lot26_*.py
+          mypy src/crypto_quant_bot/contracts/timeframe_alignment.py src/crypto_quant_bot/market_analysis/alignment_*.py
+      - name: Targeted line and branch coverage
+        run: |
+          coverage erase
+          pytest -q tests/test_lot26_*.py --cov=crypto_quant_bot.contracts.timeframe_alignment --cov=crypto_quant_bot.market_analysis.alignment_adapter --cov=crypto_quant_bot.market_analysis.alignment_audit --cov=crypto_quant_bot.market_analysis.alignment_common --cov=crypto_quant_bot.market_analysis.alignment_config --cov=crypto_quant_bot.market_analysis.alignment_engine --cov=crypto_quant_bot.market_analysis.alignment_io --cov=crypto_quant_bot.market_analysis.alignment_math --cov=crypto_quant_bot.market_analysis.alignment_temporal --cov-branch --cov-report=json:reports/lot26/coverage.json --cov-report=term-missing
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          payload = json.loads(Path('reports/lot26/coverage.json').read_text())
+          totals = payload['totals']
+          lines = float(totals['percent_statements_covered'])
+          branches = float(totals['percent_branches_covered'])
+          print(f'Lot26 coverage: lines={lines:.2f}% branches={branches:.2f}%')
+          if lines < 95.0 or branches < 90.0:
+              raise SystemExit('LOT26_CRITICAL_COVERAGE_BELOW_THRESHOLD')
+          PY
+      - name: Deterministic runner and evidence validation
+        env:
+          CODE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          python scripts/run_lot26_multi_timeframe_alignment_engine.py --code-commit "$CODE_COMMIT"
+          cp data/audit/multi_timeframe_alignment_engine_lot26.json /tmp/lot26-run1.json
+          python scripts/validate_lot26.py
+          python scripts/run_lot26_multi_timeframe_alignment_engine.py --code-commit "$CODE_COMMIT"
+          cmp /tmp/lot26-run1.json data/audit/multi_timeframe_alignment_engine_lot26.json
+          python scripts/validate_lot26.py
+      - name: Architecture traceability and security
+        run: |
+          python scripts/validate_domain_architecture.py
+          python scripts/validate_traceability_contract.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          bandit -q -r src/crypto_quant_bot/contracts/timeframe_alignment.py src/crypto_quant_bot/market_analysis/alignment_*.py
+          pip-audit -r requirements-dev.lock
+      - name: Full regression and anti-flake
+        run: |
+          pytest -q
+          pytest -q tests/test_lot26_*.py
+          pytest -q tests/test_lot26_*.py
+          pytest -q tests/test_lot26_*.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot26-alignment-evidence
+          path: |
+            data/audit/*lot26*
+            reports/LOT_26_MULTI_TIMEFRAME_ALIGNMENT_FINAL_REPORT.md
+            reports/lot26/

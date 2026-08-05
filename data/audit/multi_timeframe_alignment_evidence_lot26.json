@@ -1,0 +1,88 @@
+{
+  "assumptions": [
+    "agreement_score_is_descriptive_not_predictive"
+  ],
+  "calibration_version": null,
+  "code_commit": "8ad774038b6dcc974b37291f5fc3239a095b4252",
+  "config_version": "lot26-mtf-alignment-v1",
+  "contradicting_evidence": [],
+  "correlation_id": "0d87a551-16fb-56e4-aaa9-4ff3245b4839",
+  "data_quality_state_id": "VALID",
+  "data_snapshot_id": "88ff0bd5-5575-5d3d-947b-9e83da96d04d",
+  "decision_id": "73f69bf2-23cb-5aa6-bf0e-a079c4b71467",
+  "decision_state": "NOT_APPLICABLE",
+  "decision_time": "2026-05-25T03:00:00Z",
+  "event_time": "2026-05-25T03:00:00Z",
+  "facts_observed": [
+    "local_state=c4b00976-8b0e-5f5e-8de2-1f485e9e6102",
+    "higher_state=4cb9db61-88b3-5425-bf0b-330199c7ead4",
+    "join_method=ASOF_BACKWARD",
+    "weighted_coverage_ratio=1.0"
+  ],
+  "feature_set_id": null,
+  "features_computed": [
+    "confluence=0.5",
+    "momentum=1.0",
+    "range=1.0",
+    "regime=0.25",
+    "trend=1.0",
+    "volatility=0.0"
+  ],
+  "final_consequence": "DESCRIPTIVE_ALIGNMENT_ONLY_NO_TRADING",
+  "generated_at": "2026-05-25T03:00:00Z",
+  "human_approval_id": null,
+  "inferences": [
+    "alignment_state=MTF_DIVERGENT",
+    "divergence_state=MTF_MULTI_COMPONENT_MISMATCH",
+    "coherence_state=MTF_INCOHERENT"
+  ],
+  "input_checksums": {
+    "alignment_config": "54ef2ef113422b3093b5294482a5e1c581d73b34085b015cb96095002e0b9174",
+    "higher_state": "d5bb1588e03637d5b868e23fa3dd208870e2035f450e6c79fb4eb7c9a805d8af",
+    "local_state": "64eca2651ea2da3d13a34e85ddd2e9cb6e4bb2ad47ea4b77adfbb701e73aa1ff"
+  },
+  "instrument_id": "BTC/EUR",
+  "market_context_id": "0d87a551-16fb-56e4-aaa9-4ff3245b4839",
+  "model_versions": {},
+  "output_checksum": "c5238d4e3782ab0ae75b6dae84724f061c11917f07ee899d2341ece2e031d556",
+  "parent_decision_ids": [],
+  "reason_codes": [
+    "MTF_DIVERGENT",
+    "MTF_MULTI_COMPONENT_MISMATCH"
+  ],
+  "replay_id": null,
+  "risk_decision_id": null,
+  "risk_state_id": null,
+  "rules_triggered": [
+    "LOT26_CLOSED_BAR_ASOF_BACKWARD",
+    "LOT26_WEIGHTED_ALIGNMENT_V1"
+  ],
+  "run_id": "e7fa3c36-ebff-5824-94cb-1b8095b2ad5e",
+  "runtime_mode": "LOCAL_OFFLINE_ANALYSIS_ONLY",
+  "scenario_set_id": null,
+  "schema_version": "decision-evidence-envelope-v1",
+  "strategy_id": null,
+  "strategy_version": null,
+  "supporting_evidence": [
+    {
+      "available_at": "2026-05-25T03:00:00Z",
+      "checksum": "64eca2651ea2da3d13a34e85ddd2e9cb6e4bb2ad47ea4b77adfbb701e73aa1ff",
+      "evidence_id": "c4b00976-8b0e-5f5e-8de2-1f485e9e6102",
+      "evidence_type": "timeframe-market-context-state-v1"
+    },
+    {
+      "available_at": "2026-05-25T03:00:00Z",
+      "checksum": "d5bb1588e03637d5b868e23fa3dd208870e2035f450e6c79fb4eb7c9a805d8af",
+      "evidence_id": "4cb9db61-88b3-5425-bf0b-330199c7ead4",
+      "evidence_type": "timeframe-market-context-state-v1"
+    }
+  ],
+  "uncertainty": {
+    "calibration": null,
+    "data": 0.0,
+    "execution": null,
+    "model": null
+  },
+  "venue_id": null,
+  "veto_codes": []
+}

@@ -14,12 +14,20 @@ from crypto_quant_bot.contracts.primitives import (
     TradingDecision,
     utc_now_iso,
 )
+from crypto_quant_bot.contracts.timeframe_alignment import (
+    ClosedBarAvailabilityV1,
+    MultiTimeframeAlignmentStateV1,
+    TimeframeMarketContextStateV1,
+)
 
 __all__ = [
+    "ClosedBarAvailabilityV1",
     "DecisionEvidenceEnvelopeV1",
     "EvidenceReferenceV1",
     "ModuleStatus",
+    "MultiTimeframeAlignmentStateV1",
     "SystemDecision",
+    "TimeframeMarketContextStateV1",
     "TradingDecision",
     "UncertaintyEnvelopeV1",
     "utc_now_iso",
