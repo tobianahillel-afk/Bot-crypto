@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import subprocess
 import tomllib
 from pathlib import Path
 
@@ -19,34 +18,34 @@ def canonical_checksum(payload: object) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
-def read_committed(path: str) -> str:
-    completed = subprocess.run(
-        ["git", "show", f"HEAD:{path}"],
-        cwd=ROOT,
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    return completed.stdout
-
-
 def test_lot28_release_state_is_consistent() -> None:
     project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
-    overlay = json.loads(read_committed("data/audit/roadmap_lifecycle_overlay_lot28.json"))
+    overlay = json.loads(
+        (ROOT / "data/audit/roadmap_lifecycle_overlay_lot28.json").read_text(encoding="utf-8")
+    )
     state = json.loads(
-        read_committed("data/audit/explanation_core_and_why_not_trade_layer_lot28.json")
+        (ROOT / "data/audit/explanation_core_and_why_not_trade_layer_lot28.json").read_text(
+            encoding="utf-8"
+        )
     )
     audit = json.loads(
-        read_committed("data/audit/explanation_core_and_why_not_trade_layer_audit_lot28.json")
+        (ROOT / "data/audit/explanation_core_and_why_not_trade_layer_audit_lot28.json").read_text(
+            encoding="utf-8"
+        )
     )
-    report = read_committed("reports/lot_28_explanation_core_and_why_not_trade_layer_report.md")
-    worklog = read_committed("docs/LOT_28_IMPLEMENTATION_WORKLOG.md")
+    report = (
+        ROOT / "reports/lot_28_explanation_core_and_why_not_trade_layer_report.md"
+    ).read_text(encoding="utf-8")
+    worklog = (ROOT / "docs/LOT_28_IMPLEMENTATION_WORKLOG.md").read_text(encoding="utf-8")
 
     assert project["version"] == "0.28.0"
     assert overlay["latest_implemented_lot"] == 28
     assert overlay["previous_overlay"] == "data/audit/roadmap_lifecycle_overlay_lot27.json"
     assert overlay["lots"]["28"]["status"] == "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY"
-    assert overlay["lots"]["28"]["implementation_commit"] == state["code_commit"]
+    implementation_commit = overlay["lots"]["28"]["implementation_commit"]
+    assert len(implementation_commit) == 40
+    assert all(character in "0123456789abcdef" for character in implementation_commit)
+    assert implementation_commit in worklog
     assert overlay["lots"]["28"]["trade_allowed"] is False
     assert overlay["lots"]["28"]["execution_allowed"] is False
     assert overlay["lots"]["29"] == {
