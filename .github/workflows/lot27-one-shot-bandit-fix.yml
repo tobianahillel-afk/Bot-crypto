@@ -1,0 +1,59 @@
+name: Lot 27 one-shot Bandit fix
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/lot27-one-shot-bandit-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.head_ref == 'agent/lot27-global-market-context-aggregator'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/lot27-global-market-context-aggregator
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: python -m pip install -r requirements-dev.lock
+      - name: Replace optimization-sensitive assertion
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('src/crypto_quant_bot/market_analysis/global_market_context_aggregator.py')
+          text = path.read_text(encoding='utf-8')
+          old = '''    for item in included:
+              assert item.semantic_category is not None
+              support[item.semantic_category] += item.effective_contribution
+          '''
+          new = '''    for item in included:
+              category = item.semantic_category
+              if category is None:
+                  raise GlobalContextValidationError("included source lacks semantic category")
+              support[category] += item.effective_contribution
+          '''
+          if old not in text:
+              raise SystemExit('LOT27_ASSERT_BLOCK_NOT_FOUND')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+      - name: Validate corrected source
+        run: |
+          ruff check src/crypto_quant_bot/market_analysis/global_market_context_aggregator.py
+          bandit -q -r src/crypto_quant_bot/market_analysis/global_market_context_aggregator.py
+          pytest -q tests/test_lot27_global_market_context_aggregator.py tests/test_lot27_coverage_edges.py
+      - name: Commit corrected source
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/crypto_quant_bot/market_analysis/global_market_context_aggregator.py
+          git diff --cached --quiet || git commit -m 'Lot27 replace assert with fail-closed validation'
+          git push origin HEAD:agent/lot27-global-market-context-aggregator
