@@ -30,31 +30,18 @@ jobs:
 
           engine = Path('src/crypto_quant_bot/market_analysis/explanation_core_and_why_not_trade_layer.py')
           text = engine.read_text(encoding='utf-8')
-          old = '''    reason_codes = tuple(item.reason_code for item in statements) + tuple(
-              item.reason_code for item in reason_set.reasons
-          )
-          '''
-          new = '''    combined_codes = tuple(item.reason_code for item in statements) + tuple(
-              item.reason_code for item in reason_set.reasons
-          )
-              reason_codes = tuple(dict.fromkeys(combined_codes))
-          '''
+          old = '    reason_codes = tuple(item.reason_code for item in statements) + tuple(\n        item.reason_code for item in reason_set.reasons\n    )'
+          new = '    combined_codes = tuple(item.reason_code for item in statements) + tuple(\n        item.reason_code for item in reason_set.reasons\n    )\n    reason_codes = tuple(dict.fromkeys(combined_codes))'
           if old not in text:
-              raise SystemExit('LOT28_ENGINE_REASON_BLOCK_NOT_FOUND')
+              raise SystemExit('LOT28_ENGINE_REASON_LINES_NOT_FOUND')
           engine.write_text(text.replace(old, new, 1), encoding='utf-8')
 
           validator = Path('scripts/validate_lot28.py')
           text = validator.read_text(encoding='utf-8')
-          old = '''    expected_codes = statement_codes + reason_codes
-              if tuple(state["reason_codes"]) != expected_codes or len(expected_codes) != len(set(expected_codes)):
-                  raise ValueError("state reason-code sequence mismatch")
-          '''
-          new = '''    expected_codes = tuple(dict.fromkeys(statement_codes + reason_codes))
-              if tuple(state["reason_codes"]) != expected_codes:
-                  raise ValueError("state reason-code sequence mismatch")
-          '''
+          old = '    expected_codes = statement_codes + reason_codes\n    if tuple(state["reason_codes"]) != expected_codes or len(expected_codes) != len(set(expected_codes)):\n        raise ValueError("state reason-code sequence mismatch")'
+          new = '    expected_codes = tuple(dict.fromkeys(statement_codes + reason_codes))\n    if tuple(state["reason_codes"]) != expected_codes:\n        raise ValueError("state reason-code sequence mismatch")'
           if old not in text:
-              raise SystemExit('LOT28_VALIDATOR_REASON_BLOCK_NOT_FOUND')
+              raise SystemExit('LOT28_VALIDATOR_REASON_LINES_NOT_FOUND')
           validator.write_text(text.replace(old, new, 1), encoding='utf-8')
           PY
           ruff check --fix src/crypto_quant_bot/market_analysis/explanation_core*.py scripts/run_lot28_explanation_core_and_why_not_trade_layer.py scripts/validate_lot28.py tests/lot28_fixtures.py tests/test_lot28_*.py
@@ -70,3 +57,4 @@ jobs:
           git add src/crypto_quant_bot/market_analysis/explanation_core*.py scripts/run_lot28_explanation_core_and_why_not_trade_layer.py scripts/validate_lot28.py tests/lot28_fixtures.py tests/test_lot28_*.py
           git diff --cached --quiet || git commit -m 'Lot28 normalize reason registry and static quality'
           git push origin HEAD:agent/lot28-explanation-core-why-not-trade
+      # Second revision intentionally triggers this workflow.
