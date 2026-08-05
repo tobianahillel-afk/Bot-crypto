@@ -2,12 +2,20 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 from typing import Any
 
-from crypto_quant_bot.market_analysis.alignment_audit import assert_no_forbidden_capabilities
-from crypto_quant_bot.market_analysis.alignment_common import checksum
-from crypto_quant_bot.market_analysis.alignment_io import load_json, load_jsonl
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+SOURCE_ROOT = REPOSITORY_ROOT / "src"
+if str(SOURCE_ROOT) not in sys.path:
+    sys.path.insert(0, str(SOURCE_ROOT))
+
+from crypto_quant_bot.market_analysis.alignment_audit import (  # noqa: E402
+    assert_no_forbidden_capabilities,
+)
+from crypto_quant_bot.market_analysis.alignment_common import checksum  # noqa: E402
+from crypto_quant_bot.market_analysis.alignment_io import load_json, load_jsonl  # noqa: E402
 
 REQUIRED = {
     "contexts": "data/audit/timeframe_market_context_states_lot26.jsonl",
@@ -62,7 +70,9 @@ def validate(root: Path) -> dict[str, Any]:
     replay = load_json(root / REQUIRED["replay"])
     if len(contexts) != 2 or {row["timeframe"] for row in contexts} != {"5m", "15m"}:
         raise ValueError("Lot26 contexts must contain exactly 5m and 15m")
-    if len(availability) != 2 or not all(row["is_closed"] and row["is_complete"] for row in availability):
+    if len(availability) != 2 or not all(
+        row["is_closed"] and row["is_complete"] for row in availability
+    ):
         raise ValueError("Lot26 availability evidence is incomplete")
     for name, payloads in (("contexts", contexts), ("availability", availability)):
         schema = load_json(root / SCHEMAS[name])
@@ -71,12 +81,17 @@ def validate(root: Path) -> dict[str, Any]:
     _validate_closed_schema(alignment, load_json(root / SCHEMAS["alignment"]), "alignment")
     assert_no_forbidden_capabilities(alignment)
     _validate_safety(alignment)
-    expected_hash = checksum({key: value for key, value in alignment.items() if key != "output_checksum"})
+    expected_hash = checksum(
+        {key: value for key, value in alignment.items() if key != "output_checksum"}
+    )
     if alignment.get("output_checksum") != expected_hash:
         raise ValueError("Lot26 output checksum mismatch")
     if evidence.get("output_checksum") != alignment["output_checksum"]:
         raise ValueError("decision evidence does not reference alignment output")
-    if replay.get("status") != "MATCH" or replay.get("run_1_checksum") != alignment["output_checksum"]:
+    if (
+        replay.get("status") != "MATCH"
+        or replay.get("run_1_checksum") != alignment["output_checksum"]
+    ):
         raise ValueError("Lot26 replay evidence is invalid")
     if alignment.get("overall_agreement_score") != 0.65:
         raise ValueError("Lot25→Lot26 integration oracle mismatch")
@@ -96,7 +111,7 @@ def validate(root: Path) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate Lot 26 evidence")
-    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
+    parser.add_argument("--root", type=Path, default=REPOSITORY_ROOT)
     args = parser.parse_args()
     validate(args.root.resolve())
     return 0
