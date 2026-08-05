@@ -122,12 +122,13 @@ jobs:
             pyproject.toml README.md CHANGELOG.md \
             docs/ROADMAP_V1_TO_V21.md docs/roadmap/V02_MARKET_ANALYSIS_OFFLINE.md \
             docs/LOT_28_IMPLEMENTATION_WORKLOG.md \
-            data/audit/explanation_core_and_why_not_trade_layer_lot28.json \
-            data/audit/explanation_core_and_why_not_trade_layer_audit_lot28.json \
-            data/audit/roadmap_lifecycle_overlay_lot28.json \
             reports/lot_28_explanation_core_and_why_not_trade_layer_report.md \
             tests/test_lot27_release_state.py tests/test_lot27_post_merge_state.py \
             tests/test_lot28_release_state.py
+          git add -f \
+            data/audit/explanation_core_and_why_not_trade_layer_lot28.json \
+            data/audit/explanation_core_and_why_not_trade_layer_audit_lot28.json \
+            data/audit/roadmap_lifecycle_overlay_lot28.json
           git add -u scripts/finalize_lot28_release.py
           git commit -m "Release Lot 28 explanation core 0.28.0"
           git push origin HEAD:${{ github.head_ref }}
