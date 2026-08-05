@@ -148,7 +148,7 @@ def classify_alignment(
     hard_maximum = float(config["classification_thresholds"]["hard_mismatch_maximum"])
     hard = tuple(sorted(key for key, value in scores.items() if value is not None and value <= hard_maximum))
     if score is None:
-        reasons = ("MTF_UNKNOWN", "MTF_INSUFFICIENT_COMPONENT_COVERAGE")
+        reasons: tuple[str, ...] = ("MTF_UNKNOWN", "MTF_INSUFFICIENT_COMPONENT_COVERAGE")
         return "MTF_UNKNOWN", "MTF_UNKNOWN", "MTF_UNKNOWN", "MTF_CONTEXT_UNKNOWN", hard, reasons
     alignment = _alignment_class(score, len(hard), config)
     divergence = _divergence_class(hard, config)

@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
-from typing import Any, ClassVar
+from typing import Any, ClassVar, cast
 
 COMPONENTS = ("trend", "range", "momentum", "volatility", "regime", "confluence")
 _ALIGNMENT_STATES = {"MTF_ALIGNED", "MTF_PARTIAL", "MTF_DIVERGENT", "MTF_UNKNOWN"}
@@ -66,7 +66,7 @@ class TupleListSerializable:
     _tuple_fields: ClassVar[tuple[str, ...]] = ()
 
     def to_dict(self) -> dict[str, Any]:
-        payload = asdict(self)
+        payload = asdict(cast(Any, self))
         for field_name in self._tuple_fields:
             payload[field_name] = list(getattr(self, field_name))
         return payload

@@ -86,6 +86,7 @@ def _build_context_state(
     state_id = stable_id("context", identity)
     lineage_id = stable_id("lineage", identity)
     source_bar_id = stable_id("bar", {"timeframe": timeframe, "open": opened, "close": closed})
+    states = _state_values(row)
     return TimeframeMarketContextStateV1(
         state_id=state_id,
         instrument_id="BTC/EUR",
@@ -112,7 +113,12 @@ def _build_context_state(
         validation_state="VALID",
         component_scores=_context_scores(row),
         reason_codes=("LOT25_ADAPTER_CONFIRMED_CLOSED_BAR",),
-        **{f"{key}_state": value for key, value in _state_values(row).items()},
+        trend_state=states["trend"],
+        range_state=states["range"],
+        momentum_state=states["momentum"],
+        volatility_state=states["volatility"],
+        regime_state=states["regime"],
+        confluence_state=states["confluence"],
     )
 
 
