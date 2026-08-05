@@ -273,6 +273,7 @@ class ExplanationCoreWhyNotTradeLayerStateV1:
         ):
             require_text(getattr(self, field_name), field_name)
         parse_utc(self.decision_time, "decision_time")
+        object.__setattr__(self, "reason_codes", tuple(dict.fromkeys(self.reason_codes)))
         if self.validation_state not in VALIDATION_STATES:
             raise ValueError("unknown validation_state")
         require_unique(self.reason_codes, "reason_codes")
