@@ -54,8 +54,8 @@ jobs:
           from pathlib import Path
           payload = json.loads(Path('reports/lot26/coverage.json').read_text())
           totals = payload['totals']
-          lines = float(totals['percent_covered'])
-          branches = 100.0 * (totals['num_branches'] - totals['missing_branches']) / totals['num_branches']
+          lines = float(totals['percent_statements_covered'])
+          branches = float(totals['percent_branches_covered'])
           print(f'Lot26 coverage: lines={lines:.2f}% branches={branches:.2f}%')
           if lines < 95.0 or branches < 90.0:
               raise SystemExit('LOT26_CRITICAL_COVERAGE_BELOW_THRESHOLD')
@@ -74,7 +74,16 @@ jobs:
         run: |
           python scripts/validate_domain_architecture.py
           python scripts/validate_traceability_contract.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
           bandit -q -r src/crypto_quant_bot/contracts/timeframe_alignment.py src/crypto_quant_bot/market_analysis/alignment_*.py
+          pip-audit -r requirements-dev.lock
+      - name: Full regression and anti-flake
+        run: |
+          pytest -q
+          pytest -q tests/test_lot26_*.py
+          pytest -q tests/test_lot26_*.py
+          pytest -q tests/test_lot26_*.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
