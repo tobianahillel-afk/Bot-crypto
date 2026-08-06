@@ -1,0 +1,53 @@
+{
+  "artifacts": [
+    {
+      "lot": 21,
+      "path": "data/audit/product_scope_lot21.json",
+      "validator": "scripts/validate_lot21.py"
+    },
+    {
+      "lot": 22,
+      "path": "data/audit/market_analysis_lot22.json",
+      "validator": "scripts/validate_lot22.py"
+    },
+    {
+      "lot": 23,
+      "path": "data/audit/technical_indicators_lot23.json",
+      "validator": "scripts/validate_lot23.py"
+    },
+    {
+      "lot": 24,
+      "path": "data/audit/trend_range_momentum_lot24.json",
+      "validator": "scripts/validate_lot24.py"
+    },
+    {
+      "lot": 25,
+      "path": "data/audit/volatility_regime_confluence_lot25.json",
+      "validator": "scripts/validate_lot25.py"
+    },
+    {
+      "lot": 26,
+      "path": "data/audit/multi_timeframe_alignment_engine_lot26.json",
+      "validator": "scripts/validate_lot26.py"
+    },
+    {
+      "lot": 27,
+      "path": "data/audit/global_market_context_aggregator_lot27.json",
+      "validator": "scripts/validate_lot27.py"
+    },
+    {
+      "lot": 28,
+      "path": "data/audit/explanation_core_and_why_not_trade_layer_lot28.json",
+      "validator": "scripts/validate_lot28.py"
+    }
+  ],
+  "runtime_mode": "LOCAL_OFFLINE_ANALYSIS_ONLY",
+  "safety": {
+    "analysis_only": true,
+    "approved_size": 0,
+    "execution_allowed": false,
+    "trade_allowed": false,
+    "used_for_decision": false
+  },
+  "schema_version": "v2-deterministic-replay-audit-config-v1"
+}
