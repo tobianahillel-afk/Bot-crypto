@@ -11,13 +11,13 @@ SOURCE_ROOT = ROOT / "src"
 if str(SOURCE_ROOT) not in sys.path:
     sys.path.insert(0, str(SOURCE_ROOT))
 
-from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry import (
+from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry import (  # noqa: E402
     canonical_checksum,
     load_json_object,
 )
-from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry_models import (
-    SourceRegistryValidationError,
+from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry_models import (  # noqa: E402
     fail_closed_safety,
+    SourceRegistryValidationError,
 )
 
 STATE_PATH = ROOT / "data/audit/market_data_governance_scope_and_source_registry_lot31.json"
