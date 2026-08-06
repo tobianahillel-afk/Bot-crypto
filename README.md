@@ -6,11 +6,11 @@ Plateforme quantitative crypto défensive, déterministe, extensible et auditabl
 
 | Élément | État |
 |---|---|
-| Dernier lot implémenté et validé | **Lot 30 — V2 Market Analysis Closure** |
-| Version | **0.30.0** |
+| Dernier lot implémenté et validé | **Lot 31 — Market Data Governance Scope & Source Registry** |
+| Version | **0.31.0** |
 | Baseline qualité | **P0 institutionnel fusionné** |
-| Prochain lot planifié | **Lot 31 — Market Data Source Registry**, `PLANNED_LOCKED` |
-| Runtime maximal | `LOCAL_OFFLINE_ANALYSIS_ONLY` |
+| Prochain lot planifié | **Lot 32 — Instrument, Symbol & Contract Normalization**, `PLANNED_LOCKED` |
+| Runtime maximal | `DATA_GOVERNANCE_ONLY` |
 | Trading | **désactivé** |
 | Connectivité exchange | **désactivée** |
 
@@ -26,10 +26,14 @@ withdrawals = FORBIDDEN
 ```
 
 Le Lot 29 prouve que les artefacts certifiés des Lots 21 à 28 forment une chaîne ordonnée,
-déterministe et non exécutable. Le Lot 30 clôture ensuite V2 en revérifiant les huit
-artefacts, les preuves Lot 29, deux replays identiques du validateur et cinq contrôles
-négatifs fail-closed. La clôture couvre exactement les Lots 21 à 30 et ne crée aucun état
-de marché V3, forecast, signal, risque approuvé ou ordre.
+déterministe et non exécutable. Le Lot 30 clôture V2 en revérifiant les huit artefacts,
+les preuves Lot 29, deux replays identiques du validateur et cinq contrôles négatifs
+fail-closed.
+
+Le Lot 31 ouvre V3 avec un registre de sources strictement **metadata-only**. Il déclare une
+source de vérité et deux sources de secours, versionne les responsabilités, licences,
+cadences, révisions et capacités, mais n'effectue aucune requête réseau. Toutes les sources
+restent `auth_mode=NONE`, `enabled=false` et `connection_status=DISABLED`.
 
 ## Vision temporelle
 
@@ -70,8 +74,10 @@ est interdit.
 ## Flux continu et données confirmées
 
 Une barre ouverte peut être observée comme état provisoire, mais elle ne peut pas être
-consommée comme état confirmé. Les futurs états événementiels de carnet, trades,
-liquidations et order flow appartiennent à V3/V4 ; ils ne sont pas simulés dans V2.
+consommée comme état confirmé. Le Lot 31 ne publie encore aucun événement de marché : il
+possède uniquement le registre et les règles de gouvernance des sources. Les instruments,
+le temps canonique, la qualité, la réconciliation et le flux continu appartiennent aux Lots
+32 à 36 ; les features de carnet, trades, liquidations et order flow appartiennent à V4.
 
 ## Prévision et modèles stochastiques
 
@@ -79,7 +85,7 @@ La roadmap prévoit des prévisions par horizons distincts — initialement 30s,
 1h — avec distributions, quantiles, volatilité, target/stop hit, MAE/MFE, temps avant
 événement et incertitude.
 
-Ces contrats sont `PLANNED_LOCKED_NOT_IMPLEMENTED`. Les Lots 26 à 30 ne produisent aucune
+Ces contrats sont `PLANNED_LOCKED_NOT_IMPLEMENTED`. Les Lots 26 à 31 ne produisent aucune
 prediction, probability, expected return ou direction BUY/SELL.
 
 Les futurs modèles stochastiques devront être sélectionnés par preuve, comparés à des
@@ -160,7 +166,9 @@ python -m pip install -r requirements-dev.lock
 
 ```bash
 python scripts/validate_lot30.py
-python scripts/diagnose_exact_chain_until_lot30.py
+python scripts/validate_lot31_entry_gate.py
+python scripts/validate_lot31.py
+python scripts/validate_lot31_no_connectivity.py
 python scripts/validate_roadmap_documentation.py
 python scripts/validate_architecture_boundaries.py
 python scripts/check_no_silent_numeric_coercion.py
@@ -211,7 +219,20 @@ complexité, mutation testing et répétitions anti-flake.
 - État certifié : `data/audit/v2_market_analysis_closure_lot30.json`
 - Audit certifié : `data/audit/v2_market_analysis_closure_audit_lot30.json`
 - Manifest final V2 : `data/audit/closure_manifest_lot30.json`
-- Lifecycle courant : `data/audit/roadmap_lifecycle_overlay_lot30.json`
+- Lifecycle historique : `data/audit/roadmap_lifecycle_overlay_lot30.json`
+
+### Lot 31
+
+- [Gate d’entrée V3](docs/LOT_31_V3_ENTRY_GATE.md)
+- [Spécification](docs/LOT_31_MARKET_DATA_GOVERNANCE_SCOPE_AND_SOURCE_REGISTRY.md)
+- [Critères d’acceptation](docs/ACCEPTANCE_CRITERIA_LOT_31.md)
+- [Worklog certifié](docs/LOT_31_IMPLEMENTATION_WORKLOG.md)
+- [Audit post-merge](docs/LOT_31_POST_MERGE_AUDIT.md)
+- [Rapport final](reports/lot_31_market_data_governance_scope_and_source_registry_report.md)
+- État certifié : `data/audit/market_data_governance_scope_and_source_registry_lot31.json`
+- Audit certifié : `data/audit/market_data_governance_scope_and_source_registry_audit_lot31.json`
+- Registre de sources : `data/audit/source_registry_lot31.json`
+- Lifecycle courant : `data/audit/roadmap_lifecycle_overlay_lot31.json`
 
 ### Architecture future verrouillée
 
