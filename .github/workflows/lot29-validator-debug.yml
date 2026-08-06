@@ -24,4 +24,6 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
       - name: Run Lot 21 validator with native output
+        env:
+          LOT29_DIAGNOSTIC: validator-21
         run: python scripts/validate_lot21.py
