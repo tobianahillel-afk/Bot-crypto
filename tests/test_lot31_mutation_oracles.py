@@ -5,10 +5,12 @@ from pathlib import Path
 
 import pytest
 
-from crypto_quant_bot.data_governance import market_data_governance_scope_and_source_registry as engine
+from crypto_quant_bot.data_governance import (
+    market_data_governance_scope_and_source_registry as engine,
+)
 from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry_models import (
-    SourceRegistryValidationError,
     fail_closed_safety,
+    SourceRegistryValidationError,
 )
 from test_lot31_market_data_governance_scope_and_source_registry import (
     COMMIT,
