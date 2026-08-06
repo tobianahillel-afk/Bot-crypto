@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "analysis_only": {"const": true},
+    "approved_size": {"const": 0},
+    "audit_checksum": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "backup_source_count": {"const": 2},
+    "capability_count": {"minimum": 5, "type": "integer"},
+    "code_commit": {"pattern": "^[0-9a-f]{40}$", "type": "string"},
+    "config_checksum": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "contract_count": {"const": 5},
+    "disabled_connection_count": {"const": 3},
+    "execution_allowed": {"const": false},
+    "external_connectivity_allowed": {"const": false},
+    "network_ingestion_allowed": {"const": false},
+    "order_routing_allowed": {"const": false},
+    "real_credentials_allowed": {"const": false},
+    "risk_approval_allowed": {"const": false},
+    "schema_version": {"const": "market-data-governance-scope-source-registry-audit-v1"},
+    "signal_generation_allowed": {"const": false},
+    "source_count": {"const": 3},
+    "source_of_truth_count": {"const": 1},
+    "state_output_checksum": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "trade_allowed": {"const": false},
+    "used_for_decision": {"const": false},
+    "validation_state": {"const": "VALIDATED_METADATA_ONLY"}
+  },
+  "required": [
+    "schema_version", "code_commit", "state_output_checksum", "config_checksum",
+    "source_count", "source_of_truth_count", "backup_source_count",
+    "disabled_connection_count", "capability_count", "contract_count",
+    "validation_state", "analysis_only", "used_for_decision",
+    "external_connectivity_allowed", "network_ingestion_allowed",
+    "real_credentials_allowed", "signal_generation_allowed", "risk_approval_allowed",
+    "order_routing_allowed", "trade_allowed", "execution_allowed", "approved_size",
+    "audit_checksum"
+  ],
+  "title": "MarketDataGovernanceScopeSourceRegistryAuditV1",
+  "type": "object"
+}

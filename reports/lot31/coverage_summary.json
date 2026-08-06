@@ -1,0 +1,15 @@
+{
+  "branch_coverage_percent": 98.46,
+  "covered_branches": 128,
+  "covered_lines": 401,
+  "evidence_commit": "689079bb5f348aa1cf62059498fcaddf760665bd",
+  "line_coverage_percent": 99.50,
+  "minimum_branch_coverage_percent": 90.0,
+  "minimum_line_coverage_percent": 95.0,
+  "missing_branches": 2,
+  "missing_lines": 2,
+  "schema_version": "lot31-critical-coverage-summary-v1",
+  "status": "PASS",
+  "total_branches": 130,
+  "total_lines": 403
+}

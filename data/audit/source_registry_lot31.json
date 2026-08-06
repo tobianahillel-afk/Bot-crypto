@@ -1,0 +1,99 @@
+{
+  "registry_id": "market-data-source-registry",
+  "registry_version": "1.0.0",
+  "revision_policy": "IMMUTABLE_VERSIONED_REPLACEMENT",
+  "schema_version": "source-registry-v1",
+  "source_of_truth_id": "kraken-public-spot-metadata",
+  "sources": [
+    {
+      "approved": true,
+      "auth_mode": "NONE",
+      "backup_sources": [],
+      "cadence": 86400,
+      "connection_status": "DISABLED",
+      "criticality": "TERTIARY",
+      "enabled": false,
+      "endpoint_descriptor": "metadata-contract-only-no-network-call",
+      "endpoint_type": "PUBLIC_REFERENCE_METADATA",
+      "fields": [
+        "exchange_symbol",
+        "market_status",
+        "minimum_order_size",
+        "price_precision",
+        "quantity_precision"
+      ],
+      "license": "PUBLIC_EXCHANGE_TERMS_REVIEW_REQUIRED",
+      "provider": "Bitstamp",
+      "retention": 3650,
+      "revision": 1,
+      "revision_policy": "IMMUTABLE_VERSIONED_REPLACEMENT",
+      "schema_version": "source-registry-entry-v1",
+      "source_id": "bitstamp-public-spot-metadata",
+      "source_of_truth": false,
+      "source_schema_version": "bitstamp-public-spot-metadata-v1",
+      "timezone": "UTC",
+      "venue": "BITSTAMP"
+    },
+    {
+      "approved": true,
+      "auth_mode": "NONE",
+      "backup_sources": [],
+      "cadence": 86400,
+      "connection_status": "DISABLED",
+      "criticality": "SECONDARY",
+      "enabled": false,
+      "endpoint_descriptor": "metadata-contract-only-no-network-call",
+      "endpoint_type": "PUBLIC_REFERENCE_METADATA",
+      "fields": [
+        "exchange_symbol",
+        "market_status",
+        "minimum_order_size",
+        "price_increment",
+        "quantity_increment"
+      ],
+      "license": "PUBLIC_EXCHANGE_TERMS_REVIEW_REQUIRED",
+      "provider": "Coinbase",
+      "retention": 3650,
+      "revision": 1,
+      "revision_policy": "IMMUTABLE_VERSIONED_REPLACEMENT",
+      "schema_version": "source-registry-entry-v1",
+      "source_id": "coinbase-public-spot-metadata",
+      "source_of_truth": false,
+      "source_schema_version": "coinbase-public-spot-metadata-v1",
+      "timezone": "UTC",
+      "venue": "COINBASE"
+    },
+    {
+      "approved": true,
+      "auth_mode": "NONE",
+      "backup_sources": [
+        "coinbase-public-spot-metadata",
+        "bitstamp-public-spot-metadata"
+      ],
+      "cadence": 86400,
+      "connection_status": "DISABLED",
+      "criticality": "PRIMARY",
+      "enabled": false,
+      "endpoint_descriptor": "metadata-contract-only-no-network-call",
+      "endpoint_type": "PUBLIC_REFERENCE_METADATA",
+      "fields": [
+        "exchange_symbol",
+        "market_status",
+        "minimum_order_size",
+        "price_increment",
+        "quantity_increment"
+      ],
+      "license": "PUBLIC_EXCHANGE_TERMS_REVIEW_REQUIRED",
+      "provider": "Kraken",
+      "retention": 3650,
+      "revision": 1,
+      "revision_policy": "IMMUTABLE_VERSIONED_REPLACEMENT",
+      "schema_version": "source-registry-entry-v1",
+      "source_id": "kraken-public-spot-metadata",
+      "source_of_truth": true,
+      "source_schema_version": "kraken-public-spot-metadata-v1",
+      "timezone": "UTC",
+      "venue": "KRAKEN"
+    }
+  ]
+}

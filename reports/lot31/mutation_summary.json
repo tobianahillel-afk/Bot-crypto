@@ -1,0 +1,14 @@
+{
+  "completed": 898,
+  "evaluated": 898,
+  "evidence_commit": "689079bb5f348aa1cf62059498fcaddf760665bd",
+  "killed": 729,
+  "minimum_score_percent": 80.0,
+  "schema_version": "lot31-critical-mutation-summary-v1",
+  "score_percent": 81.18,
+  "status": "PASS",
+  "survived": 169,
+  "suspicious": 0,
+  "timeout": 0,
+  "total": 898
+}
