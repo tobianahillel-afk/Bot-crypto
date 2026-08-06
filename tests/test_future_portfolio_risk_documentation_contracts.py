@@ -103,10 +103,17 @@ def test_risk_reservation_schema_is_bound_to_intent_snapshot_and_decision() -> N
     assert schema["additionalProperties"] is False
 
 
-def test_readme_exposes_standard_without_enabling_trading() -> None:
+def test_readme_and_roadmap_expose_standard_without_enabling_trading() -> None:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    assert "CANONICAL_PORTFOLIO_RISK_SIZING_AND_EXIT_STANDARD.md" in readme
-    assert "V07_V09_PORTFOLIO_RISK_NORMATIVE_ADDENDUM.md" in readme
+    roadmap = (ROOT / "docs/ROADMAP_V1_TO_V21.md").read_text(encoding="utf-8")
+    standard_name = "CANONICAL_PORTFOLIO_RISK_SIZING_AND_EXIT_STANDARD.md"
+    addendum_name = "V07_V09_PORTFOLIO_RISK_NORMATIVE_ADDENDUM.md"
+
+    assert standard_name in readme
+    assert addendum_name in readme
+    assert standard_name in roadmap
+    assert addendum_name in roadmap
+    assert "risk reservation ≠ order intent" in roadmap
     assert "trade_allowed = false" in readme
     assert "execution_allowed = false" in readme
     assert "approved_size = 0" in readme
