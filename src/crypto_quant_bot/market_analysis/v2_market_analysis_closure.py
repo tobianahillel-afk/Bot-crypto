@@ -73,7 +73,7 @@ def _require_object(value: object, field: str) -> dict[str, Any]:
 def _require_list_of_objects(value: object, field: str) -> tuple[dict[str, Any], ...]:
     if not isinstance(value, list) or not all(isinstance(item, dict) for item in value):
         raise ClosureValidationError(f"{field} must be a list of objects")
-    return tuple(value)
+    return tuple(item for item in value if isinstance(item, dict))
 
 
 def _validate_safety(safety: object) -> None:
@@ -116,7 +116,7 @@ def _validate_config(config: dict[str, Any]) -> dict[str, str]:
     return {key: str(value) for key, value in lot29.items()}
 
 
-def _validate_fail_closed_document(document: dict[str, Any], name: str) -> None:
+def _validate_strict_fail_closed_document(document: dict[str, Any], name: str) -> None:
     expected = {
         "analysis_only": True,
         "used_for_decision": False,
@@ -130,6 +130,23 @@ def _validate_fail_closed_document(document: dict[str, Any], name: str) -> None:
     for field in ("signal_generation_allowed", "risk_approval_allowed", "order_routing_allowed"):
         if document.get(field) is True:
             raise ClosureValidationError(f"{name} enables forbidden field: {field}")
+
+
+def _validate_historical_artifact_safety(document: dict[str, Any], lot: int) -> None:
+    for field in (
+        "used_for_decision",
+        "signal_generation_allowed",
+        "risk_approval_allowed",
+        "order_routing_allowed",
+        "trade_allowed",
+        "execution_allowed",
+    ):
+        if document.get(field) is True:
+            raise ClosureValidationError(f"Lot {lot} artifact enables forbidden field: {field}")
+    if "approved_size" in document and document.get("approved_size") != 0:
+        raise ClosureValidationError(f"Lot {lot} artifact approved_size must remain zero")
+    if "analysis_only" in document and document.get("analysis_only") is not True:
+        raise ClosureValidationError(f"Lot {lot} artifact analysis_only must remain true")
 
 
 def _validate_lifecycle(lifecycle: dict[str, Any]) -> None:
@@ -175,11 +192,11 @@ def _validate_upstream_artifacts(
         observed_size = path.stat().st_size
         if item.get("byte_size") != observed_size:
             raise ClosureValidationError(f"Lot {lot} artifact byte size changed")
-        artifact_payload = load_json(path)
+        artifact_payload = _require_object(load_json(path), f"Lot {lot} artifact")
         embedded = item.get("embedded_output_checksum")
         if embedded is not None and artifact_payload.get("output_checksum") != embedded:
             raise ClosureValidationError(f"Lot {lot} embedded output checksum changed")
-        _validate_fail_closed_document(artifact_payload, f"Lot {lot} artifact")
+        _validate_historical_artifact_safety(artifact_payload, lot)
         evidence.append(
             UpstreamArtifactEvidenceV1(
                 lot=lot,
@@ -195,21 +212,15 @@ def _validate_upstream_artifacts(
 def _load_and_validate_lot29(
     root: Path,
     paths: dict[str, str],
-) -> tuple[
-    dict[str, Any],
-    dict[str, Any],
-    dict[str, Any],
-    dict[str, Any],
-    tuple[UpstreamArtifactEvidenceV1, ...],
-]:
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], tuple[UpstreamArtifactEvidenceV1, ...]]:
     state = _require_object(load_json(root / paths["state_path"]), "Lot 29 state")
     audit = _require_object(load_json(root / paths["audit_path"]), "Lot 29 audit")
     closure = _require_object(load_json(root / paths["closure_path"]), "Lot 29 closure")
     lifecycle = _require_object(load_json(root / paths["lifecycle_path"]), "Lot 29 lifecycle")
 
     output_checksum = _validate_lot29_state_checksum(state)
-    _validate_fail_closed_document(state, "Lot 29 state")
-    _validate_fail_closed_document(audit, "Lot 29 audit")
+    _validate_strict_fail_closed_document(state, "Lot 29 state")
+    _validate_strict_fail_closed_document(audit, "Lot 29 audit")
     if state.get("replay_status") != "MATCH" or audit.get("replay_status") != "MATCH":
         raise ClosureValidationError("Lot 29 replay is not MATCH")
     if state.get("closure_manifest") != closure:
@@ -224,7 +235,7 @@ def _load_and_validate_lot29(
         raise ClosureValidationError("Lot 29 closure must contain eight artifacts and validators")
     _validate_lifecycle(lifecycle)
     upstream = _validate_upstream_artifacts(root, state)
-    return state, audit, closure, lifecycle, upstream
+    return state, audit, lifecycle, upstream
 
 
 def run_lot29_validator(root: Path, run_index: int) -> ValidatorReplayEvidenceV1:
@@ -286,20 +297,8 @@ def run_negative_controls(
     unlocked_lots = _require_object(unlocked_lifecycle.get("lots"), "unlocked lifecycle lots")
     unlocked_lots["30"] = {"implementation_started": True, "status": "IMPLEMENTATION_STARTED"}
 
-    first = ValidatorReplayEvidenceV1(
-        run_index=1,
-        command=VALIDATOR_COMMAND,
-        return_code=0,
-        status="PASS",
-        stdout_checksum="1" * 64,
-    )
-    second = ValidatorReplayEvidenceV1(
-        run_index=2,
-        command=VALIDATOR_COMMAND,
-        return_code=0,
-        status="PASS",
-        stdout_checksum="2" * 64,
-    )
+    first = ValidatorReplayEvidenceV1(1, VALIDATOR_COMMAND, 0, "PASS", "1" * 64)
+    second = ValidatorReplayEvidenceV1(2, VALIDATOR_COMMAND, 0, "PASS", "2" * 64)
 
     def reject_tampered_checksum() -> None:
         if observed_checksum != "0" * 64:
@@ -362,7 +361,7 @@ def build_closure_state(
     validator_evidence: tuple[ValidatorReplayEvidenceV1, ...] | None = None,
 ) -> V2MarketAnalysisClosureStateV1:
     paths = _validate_config(config)
-    state29, audit29, closure29, lifecycle, upstream = _load_and_validate_lot29(root, paths)
+    _state29, _audit29, lifecycle, upstream = _load_and_validate_lot29(root, paths)
     if validator_evidence is None:
         if not execute_validator:
             raise ClosureValidationError("validator evidence is required when execution is disabled")
@@ -418,7 +417,6 @@ def build_closure_state(
         "execution_allowed": False,
         "approved_size": 0,
     }
-    del state29, audit29, closure29
     return V2MarketAnalysisClosureStateV1(
         code_commit=code_commit,
         version_id="V2_MARKET_ANALYSIS",
