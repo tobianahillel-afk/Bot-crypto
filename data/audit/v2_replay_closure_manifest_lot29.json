@@ -1,0 +1,27 @@
+{
+  "artifact_checksums": [
+    "3e62c55a14dbd8bba019f5545f468818b65bb9bcfa6fdb33ba3bc242ac2455a5",
+    "1010553ee2ac9bf964454ae307d9773f52db92ae5eb320791f2fef531017f09a",
+    "dfc4914be30f565e08af4add880c05998d9b945e3a0d93c7b0523625cea867bb",
+    "2ad7f3dd81990240cbe17ee3a75844f676b209312cb11a9445a215c7b907a0f8",
+    "693aab77ebf91a3bbc057081874419395a46f3afbc2b28c0291ce06f4b4bdf81",
+    "464441651def87050f6e3b3162a01e7b829eedce9a5f7a165c540dc29a5fc68d",
+    "e07f84f6f357cadec8c25c67fb06b123e9e5835293d0feaa686aeb9cbef31682",
+    "32191dd0d0707c874372d3b3e36c06579e254df8ac0804339f8e6b7524f27076"
+  ],
+  "artifact_count": 8,
+  "chain_checksum": "06826f423e3e9f3a1f7f6090a781eddbcd2dffd667815ee1d4d71df08393ffdd",
+  "closure_status": "V2_REPLAY_VALIDATED_OFFLINE_ONLY",
+  "lot_sequence": [
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28
+  ],
+  "schema_version": "v2-closure-manifest-v1",
+  "validator_count": 8
+}
