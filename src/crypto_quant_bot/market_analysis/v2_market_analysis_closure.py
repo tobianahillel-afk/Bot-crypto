@@ -4,10 +4,12 @@ import hashlib
 import json
 import subprocess  # nosec B404 -- fixed local validator command only
 from collections.abc import Callable
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
 from crypto_quant_bot.market_analysis.alignment_io import load_json
+from crypto_quant_bot.market_analysis.v2_deterministic_replay_and_audit import file_checksum
 from crypto_quant_bot.market_analysis.v2_market_analysis_closure_models import (
     ClosureValidationError,
     NegativeControlEvidenceV1,
@@ -56,14 +58,6 @@ def canonical_checksum(payload: object) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
-def file_checksum(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(65_536), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
 def _require_object(value: object, field: str) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ClosureValidationError(f"{field} must be an object")
@@ -103,17 +97,21 @@ def _validate_config(config: dict[str, Any]) -> dict[str, str]:
     if tuple(config.get("negative_controls", ())) != EXPECTED_NEGATIVE_CONTROLS:
         raise ClosureValidationError("negative control registry differs")
     _validate_safety(config.get("safety"))
-    lot29 = _require_object(config.get("lot29"), "lot29")
-    expected_paths = {
+    return _validate_lot29_paths(config.get("lot29"))
+
+
+def _validate_lot29_paths(raw_paths: object) -> dict[str, str]:
+    paths = _require_object(raw_paths, "lot29")
+    expected = {
         "state_path": "data/audit/v2_deterministic_replay_and_audit_lot29.json",
         "audit_path": "data/audit/v2_deterministic_replay_and_audit_audit_lot29.json",
         "closure_path": "data/audit/v2_replay_closure_manifest_lot29.json",
         "lifecycle_path": "data/audit/roadmap_lifecycle_overlay_lot29.json",
         "validator": "scripts/validate_lot29.py",
     }
-    if lot29 != expected_paths:
+    if paths != expected:
         raise ClosureValidationError("Lot 29 source registry differs from the canonical paths")
-    return {key: str(value) for key, value in lot29.items()}
+    return {key: str(value) for key, value in paths.items()}
 
 
 def _validate_strict_fail_closed_document(document: dict[str, Any], name: str) -> None:
@@ -127,20 +125,22 @@ def _validate_strict_fail_closed_document(document: dict[str, Any], name: str) -
     for field, value in expected.items():
         if document.get(field) != value:
             raise ClosureValidationError(f"{name} safety mismatch: {field}")
-    for field in ("signal_generation_allowed", "risk_approval_allowed", "order_routing_allowed"):
+    forbidden = ("signal_generation_allowed", "risk_approval_allowed", "order_routing_allowed")
+    for field in forbidden:
         if document.get(field) is True:
             raise ClosureValidationError(f"{name} enables forbidden field: {field}")
 
 
 def _validate_historical_artifact_safety(document: dict[str, Any], lot: int) -> None:
-    for field in (
+    forbidden = (
         "used_for_decision",
         "signal_generation_allowed",
         "risk_approval_allowed",
         "order_routing_allowed",
         "trade_allowed",
         "execution_allowed",
-    ):
+    )
+    for field in forbidden:
         if document.get(field) is True:
             raise ClosureValidationError(f"Lot {lot} artifact enables forbidden field: {field}")
     if "approved_size" in document and document.get("approved_size") != 0:
@@ -166,10 +166,35 @@ def _validate_lifecycle(lifecycle: dict[str, Any]) -> None:
 def _validate_lot29_state_checksum(state: dict[str, Any]) -> str:
     payload = dict(state)
     output_checksum = payload.pop("output_checksum", None)
-    observed = canonical_checksum(payload)
-    if output_checksum != observed:
+    if output_checksum != canonical_checksum(payload):
         raise ClosureValidationError("Lot 29 persisted state checksum mismatch")
     return str(output_checksum)
+
+
+def _artifact_evidence(root: Path, item: dict[str, Any]) -> UpstreamArtifactEvidenceV1:
+    lot = int(item.get("lot", -1))
+    relative = str(item.get("artifact_path", ""))
+    path = root / relative
+    if not path.is_file():
+        raise ClosureValidationError(f"Lot {lot} artifact is missing")
+    observed_checksum = file_checksum(path)
+    if item.get("artifact_checksum") != observed_checksum:
+        raise ClosureValidationError(f"Lot {lot} artifact checksum changed")
+    observed_size = path.stat().st_size
+    if item.get("byte_size") != observed_size:
+        raise ClosureValidationError(f"Lot {lot} artifact byte size changed")
+    artifact = _require_object(load_json(path), f"Lot {lot} artifact")
+    embedded = item.get("embedded_output_checksum")
+    if embedded is not None and artifact.get("output_checksum") != embedded:
+        raise ClosureValidationError(f"Lot {lot} embedded output checksum changed")
+    _validate_historical_artifact_safety(artifact, lot)
+    return UpstreamArtifactEvidenceV1(
+        lot=lot,
+        artifact_path=relative,
+        artifact_checksum=observed_checksum,
+        embedded_output_checksum=embedded if isinstance(embedded, str) else None,
+        byte_size=observed_size,
+    )
 
 
 def _validate_upstream_artifacts(
@@ -179,49 +204,15 @@ def _validate_upstream_artifacts(
     items = _require_list_of_objects(state.get("artifacts"), "Lot 29 artifacts")
     if tuple(item.get("lot") for item in items) != EXPECTED_UPSTREAM_LOTS:
         raise ClosureValidationError("Lot 29 upstream artifacts must be ordered 21..28")
-    evidence: list[UpstreamArtifactEvidenceV1] = []
-    for item in items:
-        lot = int(item.get("lot", -1))
-        relative = str(item.get("artifact_path", ""))
-        path = root / relative
-        if not path.is_file():
-            raise ClosureValidationError(f"Lot {lot} artifact is missing")
-        observed_checksum = file_checksum(path)
-        if item.get("artifact_checksum") != observed_checksum:
-            raise ClosureValidationError(f"Lot {lot} artifact checksum changed")
-        observed_size = path.stat().st_size
-        if item.get("byte_size") != observed_size:
-            raise ClosureValidationError(f"Lot {lot} artifact byte size changed")
-        artifact_payload = _require_object(load_json(path), f"Lot {lot} artifact")
-        embedded = item.get("embedded_output_checksum")
-        if embedded is not None and artifact_payload.get("output_checksum") != embedded:
-            raise ClosureValidationError(f"Lot {lot} embedded output checksum changed")
-        _validate_historical_artifact_safety(artifact_payload, lot)
-        evidence.append(
-            UpstreamArtifactEvidenceV1(
-                lot=lot,
-                artifact_path=relative,
-                artifact_checksum=observed_checksum,
-                embedded_output_checksum=embedded if isinstance(embedded, str) else None,
-                byte_size=observed_size,
-            )
-        )
-    return tuple(evidence)
+    return tuple(_artifact_evidence(root, item) for item in items)
 
 
-def _load_and_validate_lot29(
-    root: Path,
-    paths: dict[str, str],
-) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], tuple[UpstreamArtifactEvidenceV1, ...]]:
-    state = _require_object(load_json(root / paths["state_path"]), "Lot 29 state")
-    audit = _require_object(load_json(root / paths["audit_path"]), "Lot 29 audit")
-    closure = _require_object(load_json(root / paths["closure_path"]), "Lot 29 closure")
-    lifecycle = _require_object(load_json(root / paths["lifecycle_path"]), "Lot 29 lifecycle")
-
-    output_checksum = _validate_lot29_state_checksum(state)
-    _validate_strict_fail_closed_document(state, "Lot 29 state")
-    _validate_strict_fail_closed_document(audit, "Lot 29 audit")
-    upstream = _validate_upstream_artifacts(root, state)
+def _validate_lot29_links(
+    state: dict[str, Any],
+    audit: dict[str, Any],
+    closure: dict[str, Any],
+    output_checksum: str,
+) -> None:
     if state.get("replay_status") != "MATCH" or audit.get("replay_status") != "MATCH":
         raise ClosureValidationError("Lot 29 replay is not MATCH")
     if state.get("closure_manifest") != closure:
@@ -234,8 +225,23 @@ def _load_and_validate_lot29(
         raise ClosureValidationError("Lot 29 closure sequence must be 21..28")
     if closure.get("artifact_count") != 8 or closure.get("validator_count") != 8:
         raise ClosureValidationError("Lot 29 closure must contain eight artifacts and validators")
+
+
+def _load_and_validate_lot29(
+    root: Path,
+    paths: dict[str, str],
+) -> tuple[dict[str, Any], tuple[UpstreamArtifactEvidenceV1, ...]]:
+    state = _require_object(load_json(root / paths["state_path"]), "Lot 29 state")
+    audit = _require_object(load_json(root / paths["audit_path"]), "Lot 29 audit")
+    closure = _require_object(load_json(root / paths["closure_path"]), "Lot 29 closure")
+    lifecycle = _require_object(load_json(root / paths["lifecycle_path"]), "Lot 29 lifecycle")
+    output_checksum = _validate_lot29_state_checksum(state)
+    _validate_strict_fail_closed_document(state, "Lot 29 state")
+    _validate_strict_fail_closed_document(audit, "Lot 29 audit")
+    upstream = _validate_upstream_artifacts(root, state)
+    _validate_lot29_links(state, audit, closure, output_checksum)
     _validate_lifecycle(lifecycle)
-    return state, audit, lifecycle, upstream
+    return lifecycle, upstream
 
 
 def run_lot29_validator(root: Path, run_index: int) -> ValidatorReplayEvidenceV1:
@@ -268,6 +274,18 @@ def _require_validator_match(replays: tuple[ValidatorReplayEvidenceV1, ...]) -> 
         raise ClosureValidationError("Lot 29 validator replay diverged")
 
 
+def _resolve_validator_evidence(
+    root: Path,
+    execute_validator: bool,
+    evidence: tuple[ValidatorReplayEvidenceV1, ...] | None,
+) -> tuple[ValidatorReplayEvidenceV1, ...]:
+    if evidence is None and not execute_validator:
+        raise ClosureValidationError("validator evidence is required when execution is disabled")
+    resolved = evidence or (run_lot29_validator(root, 1), run_lot29_validator(root, 2))
+    _require_validator_match(resolved)
+    return resolved
+
+
 def _expect_rejected(
     name: str,
     reason_code: str,
@@ -280,150 +298,110 @@ def _expect_rejected(
     raise ClosureValidationError(f"negative control did not reject: {name}")
 
 
+def _invalid_control_inputs(
+    config: dict[str, Any],
+    lifecycle: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    wrong_schema = {**config, "schema_version": "unsupported"}
+    forbidden = {**config, "safety": {**_require_object(config.get("safety"), "safety")}}
+    _require_object(forbidden["safety"], "forbidden safety")["trade_allowed"] = True
+    unlocked = json.loads(json.dumps(lifecycle))
+    lots = _require_object(unlocked.get("lots"), "unlocked lifecycle lots")
+    lots["30"] = {"implementation_started": True, "status": "IMPLEMENTATION_STARTED"}
+    return wrong_schema, forbidden, unlocked
+
+
+def _reject_tampered_checksum(observed_checksum: str) -> None:
+    if observed_checksum != "0" * 64:
+        raise ClosureValidationError("tampered checksum rejected")
+
+
+def _divergent_replays() -> tuple[ValidatorReplayEvidenceV1, ...]:
+    return (
+        ValidatorReplayEvidenceV1(1, VALIDATOR_COMMAND, 0, "PASS", "1" * 64),
+        ValidatorReplayEvidenceV1(2, VALIDATOR_COMMAND, 0, "PASS", "2" * 64),
+    )
+
+
 def run_negative_controls(
     config: dict[str, Any],
     lifecycle: dict[str, Any],
     observed_checksum: str,
 ) -> tuple[NegativeControlEvidenceV1, ...]:
-    wrong_schema = dict(config)
-    wrong_schema["schema_version"] = "unsupported"
-
-    forbidden = dict(config)
-    forbidden_safety = dict(_require_object(config.get("safety"), "safety"))
-    forbidden_safety["trade_allowed"] = True
-    forbidden["safety"] = forbidden_safety
-
-    unlocked_lifecycle = json.loads(json.dumps(lifecycle))
-    unlocked_lots = _require_object(unlocked_lifecycle.get("lots"), "unlocked lifecycle lots")
-    unlocked_lots["30"] = {"implementation_started": True, "status": "IMPLEMENTATION_STARTED"}
-
-    first = ValidatorReplayEvidenceV1(1, VALIDATOR_COMMAND, 0, "PASS", "1" * 64)
-    second = ValidatorReplayEvidenceV1(2, VALIDATOR_COMMAND, 0, "PASS", "2" * 64)
-
-    def reject_tampered_checksum() -> None:
-        if observed_checksum != "0" * 64:
-            raise ClosureValidationError("tampered checksum rejected")
-
-    return (
-        _expect_rejected(
-            "SCHEMA_MISMATCH_REJECTED",
-            "UNSUPPORTED_SCHEMA_BLOCKED",
-            lambda: _validate_config(wrong_schema),
-        ),
-        _expect_rejected(
-            "UPSTREAM_CHECKSUM_TAMPER_REJECTED",
-            "UPSTREAM_CHECKSUM_MISMATCH_BLOCKED",
-            reject_tampered_checksum,
-        ),
-        _expect_rejected(
-            "FORBIDDEN_CAPABILITY_REJECTED",
-            "FORBIDDEN_CAPABILITY_BLOCKED",
-            lambda: _validate_config(forbidden),
-        ),
-        _expect_rejected(
-            "VALIDATOR_DIVERGENCE_REJECTED",
-            "NON_DETERMINISTIC_VALIDATOR_BLOCKED",
-            lambda: _require_validator_match((first, second)),
-        ),
-        _expect_rejected(
-            "LIFECYCLE_UNLOCK_REJECTED",
-            "UNAUTHORIZED_LIFECYCLE_ADVANCE_BLOCKED",
-            lambda: _validate_lifecycle(unlocked_lifecycle),
-        ),
+    wrong_schema, forbidden, unlocked = _invalid_control_inputs(config, lifecycle)
+    specifications: tuple[tuple[str, str, Callable[[], object]], ...] = (
+        ("SCHEMA_MISMATCH_REJECTED", "UNSUPPORTED_SCHEMA_BLOCKED", lambda: _validate_config(wrong_schema)),
+        ("UPSTREAM_CHECKSUM_TAMPER_REJECTED", "UPSTREAM_CHECKSUM_MISMATCH_BLOCKED", lambda: _reject_tampered_checksum(observed_checksum)),
+        ("FORBIDDEN_CAPABILITY_REJECTED", "FORBIDDEN_CAPABILITY_BLOCKED", lambda: _validate_config(forbidden)),
+        ("VALIDATOR_DIVERGENCE_REJECTED", "NON_DETERMINISTIC_VALIDATOR_BLOCKED", lambda: _require_validator_match(_divergent_replays())),
+        ("LIFECYCLE_UNLOCK_REJECTED", "UNAUTHORIZED_LIFECYCLE_ADVANCE_BLOCKED", lambda: _validate_lifecycle(unlocked)),
     )
+    return tuple(_expect_rejected(name, reason, operation) for name, reason, operation in specifications)
 
 
 def _final_chain_checksum(
     upstream: tuple[UpstreamArtifactEvidenceV1, ...],
-    lot29_state_checksum: str,
-    lot29_audit_checksum: str,
-    lot29_closure_checksum: str,
+    evidence_checksums: tuple[str, str, str],
     validator_checksum: str,
 ) -> str:
+    state_checksum, audit_checksum, closure_checksum = evidence_checksums
     return canonical_checksum(
         {
             "upstream": [item.artifact_checksum for item in upstream],
-            "lot29_state": lot29_state_checksum,
-            "lot29_audit": lot29_audit_checksum,
-            "lot29_closure": lot29_closure_checksum,
+            "lot29_state": state_checksum,
+            "lot29_audit": audit_checksum,
+            "lot29_closure": closure_checksum,
             "validator_stdout": validator_checksum,
             "covered_lots": list(EXPECTED_COVERED_LOTS),
         }
     )
 
 
-def build_closure_state(
-    root: Path,
-    config: dict[str, Any],
-    code_commit: str,
-    *,
-    execute_validator: bool = True,
-    validator_evidence: tuple[ValidatorReplayEvidenceV1, ...] | None = None,
-) -> V2MarketAnalysisClosureStateV1:
-    paths = _validate_config(config)
-    _state29, _audit29, lifecycle, upstream = _load_and_validate_lot29(root, paths)
-    if validator_evidence is None:
-        if not execute_validator:
-            raise ClosureValidationError("validator evidence is required when execution is disabled")
-        validator_evidence = (
-            run_lot29_validator(root, 1),
-            run_lot29_validator(root, 2),
-        )
-    _require_validator_match(validator_evidence)
-    negative_controls = run_negative_controls(config, lifecycle, upstream[0].artifact_checksum)
-
-    lot29_state_checksum = file_checksum(root / paths["state_path"])
-    lot29_audit_checksum = file_checksum(root / paths["audit_path"])
-    lot29_closure_checksum = file_checksum(root / paths["closure_path"])
-    validator_checksum = validator_evidence[0].stdout_checksum
-    final_chain_checksum = _final_chain_checksum(
-        upstream,
-        lot29_state_checksum,
-        lot29_audit_checksum,
-        lot29_closure_checksum,
-        validator_checksum,
+def _lot29_evidence_checksums(root: Path, paths: dict[str, str]) -> tuple[str, str, str]:
+    return (
+        file_checksum(root / paths["state_path"]),
+        file_checksum(root / paths["audit_path"]),
+        file_checksum(root / paths["closure_path"]),
     )
-    manifest = V2FinalClosureManifestV1(
+
+
+def _build_manifest(
+    upstream: tuple[UpstreamArtifactEvidenceV1, ...],
+    checksums: tuple[str, str, str],
+    validator_checksum: str,
+    negative_control_count: int,
+) -> V2FinalClosureManifestV1:
+    state_checksum, audit_checksum, closure_checksum = checksums
+    return V2FinalClosureManifestV1(
         covered_lot_sequence=EXPECTED_COVERED_LOTS,
         upstream_lot_sequence=EXPECTED_UPSTREAM_LOTS,
         direct_validated_lot=29,
         closure_lot=30,
         upstream_artifact_checksums=tuple(item.artifact_checksum for item in upstream),
-        lot29_state_checksum=lot29_state_checksum,
-        lot29_audit_checksum=lot29_audit_checksum,
-        lot29_closure_checksum=lot29_closure_checksum,
+        lot29_state_checksum=state_checksum,
+        lot29_audit_checksum=audit_checksum,
+        lot29_closure_checksum=closure_checksum,
         validator_stdout_checksum=validator_checksum,
-        negative_control_count=len(negative_controls),
-        final_chain_checksum=final_chain_checksum,
+        negative_control_count=negative_control_count,
+        final_chain_checksum=_final_chain_checksum(upstream, checksums, validator_checksum),
         closure_status="V2_MARKET_ANALYSIS_CLOSED_OFFLINE_ONLY",
     )
-    payload = {
-        "schema_version": "v2-market-analysis-closure-state-v1",
-        "code_commit": code_commit,
-        "version_id": "V2_MARKET_ANALYSIS",
-        "runtime_mode": "LOCAL_OFFLINE_ANALYSIS_ONLY",
-        "upstream_artifacts": [item.to_dict() for item in upstream],
-        "validator_replays": [item.to_dict() for item in validator_evidence],
-        "negative_controls": [item.to_dict() for item in negative_controls],
-        "closure_manifest": manifest.to_dict(),
-        "reason_codes": list(EXPECTED_REASON_CODES),
-        "future_capabilities_locked": list(EXPECTED_FUTURE_LOCKS),
-        "analysis_only": True,
-        "used_for_decision": False,
-        "signal_generation_allowed": False,
-        "risk_approval_allowed": False,
-        "order_routing_allowed": False,
-        "trade_allowed": False,
-        "execution_allowed": False,
-        "approved_size": 0,
-    }
-    return V2MarketAnalysisClosureStateV1(
+
+
+def _build_state(
+    code_commit: str,
+    upstream: tuple[UpstreamArtifactEvidenceV1, ...],
+    validators: tuple[ValidatorReplayEvidenceV1, ...],
+    controls: tuple[NegativeControlEvidenceV1, ...],
+    manifest: V2FinalClosureManifestV1,
+) -> V2MarketAnalysisClosureStateV1:
+    draft = V2MarketAnalysisClosureStateV1(
         code_commit=code_commit,
         version_id="V2_MARKET_ANALYSIS",
         runtime_mode="LOCAL_OFFLINE_ANALYSIS_ONLY",
         upstream_artifacts=upstream,
-        validator_replays=validator_evidence,
-        negative_controls=negative_controls,
+        validator_replays=validators,
+        negative_controls=controls,
         closure_manifest=manifest,
         reason_codes=EXPECTED_REASON_CODES,
         future_capabilities_locked=EXPECTED_FUTURE_LOCKS,
@@ -435,8 +413,26 @@ def build_closure_state(
         trade_allowed=False,
         execution_allowed=False,
         approved_size=0,
-        output_checksum=canonical_checksum(payload),
+        output_checksum="0" * 64,
     )
+    return replace(draft, output_checksum=canonical_checksum(draft.payload_without_checksum()))
+
+
+def build_closure_state(
+    root: Path,
+    config: dict[str, Any],
+    code_commit: str,
+    *,
+    execute_validator: bool = True,
+    validator_evidence: tuple[ValidatorReplayEvidenceV1, ...] | None = None,
+) -> V2MarketAnalysisClosureStateV1:
+    paths = _validate_config(config)
+    lifecycle, upstream = _load_and_validate_lot29(root, paths)
+    validators = _resolve_validator_evidence(root, execute_validator, validator_evidence)
+    controls = run_negative_controls(config, lifecycle, upstream[0].artifact_checksum)
+    checksums = _lot29_evidence_checksums(root, paths)
+    manifest = _build_manifest(upstream, checksums, validators[0].stdout_checksum, len(controls))
+    return _build_state(code_commit, upstream, validators, controls, manifest)
 
 
 def replay_matches(
@@ -460,30 +456,42 @@ def _parse_validator_evidence(raw: object) -> tuple[ValidatorReplayEvidenceV1, .
     )
 
 
-def validate_persisted_state(
+def _persisted_output_checksum(state: dict[str, Any]) -> str:
+    payload = dict(state)
+    output_checksum = payload.pop("output_checksum", None)
+    if output_checksum != canonical_checksum(payload):
+        raise ClosureValidationError("persisted Lot 30 state checksum mismatch")
+    return str(output_checksum)
+
+
+def _validate_regenerated_state(
     root: Path,
     config: dict[str, Any],
     state: dict[str, Any],
-    audit: dict[str, Any],
-    manifest: dict[str, Any],
-) -> dict[str, Any]:
-    persisted = dict(state)
-    output_checksum = persisted.pop("output_checksum", None)
-    if output_checksum != canonical_checksum(persisted):
-        raise ClosureValidationError("persisted Lot 30 state checksum mismatch")
-    validator_evidence = _parse_validator_evidence(state.get("validator_replays"))
+) -> None:
+    validators = _parse_validator_evidence(state.get("validator_replays"))
     expected = build_closure_state(
         root,
         config,
         str(state.get("code_commit", "")),
         execute_validator=False,
-        validator_evidence=validator_evidence,
+        validator_evidence=validators,
     )
     if expected.to_dict() != state:
         raise ClosureValidationError("persisted Lot 30 state differs from regenerated closure")
+
+
+def _validate_persisted_manifest(state: dict[str, Any], manifest: dict[str, Any]) -> None:
     if state.get("closure_manifest") != manifest:
         raise ClosureValidationError("persisted Lot 30 manifest differs from state")
-    expected_audit = {
+
+
+def _validate_persisted_audit(
+    audit: dict[str, Any],
+    manifest: dict[str, Any],
+    output_checksum: str,
+) -> None:
+    expected = {
         "output_checksum": output_checksum,
         "final_chain_checksum": manifest.get("final_chain_checksum"),
         "closure_status": manifest.get("closure_status"),
@@ -495,9 +503,12 @@ def validate_persisted_state(
         "execution_allowed": False,
         "approved_size": 0,
     }
-    for field, value in expected_audit.items():
+    for field, value in expected.items():
         if audit.get(field) != value:
             raise ClosureValidationError(f"Lot 30 audit mismatch: {field}")
+
+
+def _validation_summary(manifest: dict[str, Any], output_checksum: str) -> dict[str, Any]:
     return {
         "schema_version": "lot30-validation-v1",
         "status": "PASS",
@@ -512,3 +523,17 @@ def validate_persisted_state(
         "execution_allowed": False,
         "approved_size": 0,
     }
+
+
+def validate_persisted_state(
+    root: Path,
+    config: dict[str, Any],
+    state: dict[str, Any],
+    audit: dict[str, Any],
+    manifest: dict[str, Any],
+) -> dict[str, Any]:
+    output_checksum = _persisted_output_checksum(state)
+    _validate_regenerated_state(root, config, state)
+    _validate_persisted_manifest(state, manifest)
+    _validate_persisted_audit(audit, manifest, output_checksum)
+    return _validation_summary(manifest, output_checksum)
