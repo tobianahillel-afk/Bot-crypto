@@ -1,0 +1,44 @@
+{
+  "closure_lot": 30,
+  "closure_status": "V2_MARKET_ANALYSIS_CLOSED_OFFLINE_ONLY",
+  "covered_lot_sequence": [
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30
+  ],
+  "direct_validated_lot": 29,
+  "final_chain_checksum": "2a598990adaec7ebc1368f30295a0130d4d8bd8f89c9610772347f25ba6c17cf",
+  "lot29_audit_checksum": "e51b724e852449ddbd086c5c9e6e5576c6efc3835295659df7bbe8ccef0aa38e",
+  "lot29_closure_checksum": "64eed3154ec3f37a1dce73d815b4253944da8ab5ea57920517b76773134cc47a",
+  "lot29_state_checksum": "f614fb21da31349d86f098a0d6829a5b25ad818c3a06fa6035c125dc70b2bfb6",
+  "negative_control_count": 5,
+  "schema_version": "v2-final-closure-manifest-v1",
+  "upstream_artifact_checksums": [
+    "3e62c55a14dbd8bba019f5545f468818b65bb9bcfa6fdb33ba3bc242ac2455a5",
+    "1010553ee2ac9bf964454ae307d9773f52db92ae5eb320791f2fef531017f09a",
+    "dfc4914be30f565e08af4add880c05998d9b945e3a0d93c7b0523625cea867bb",
+    "2ad7f3dd81990240cbe17ee3a75844f676b209312cb11a9445a215c7b907a0f8",
+    "693aab77ebf91a3bbc057081874419395a46f3afbc2b28c0291ce06f4b4bdf81",
+    "464441651def87050f6e3b3162a01e7b829eedce9a5f7a165c540dc29a5fc68d",
+    "e07f84f6f357cadec8c25c67fb06b123e9e5835293d0feaa686aeb9cbef31682",
+    "32191dd0d0707c874372d3b3e36c06579e254df8ac0804339f8e6b7524f27076"
+  ],
+  "upstream_lot_sequence": [
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28
+  ],
+  "validator_stdout_checksum": "1b588dc4d61b884befaa0a245ca0204dbc6041925907a9af2e3246041a6bc839"
+}
