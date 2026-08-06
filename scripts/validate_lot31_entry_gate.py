@@ -36,10 +36,6 @@ def load_gate() -> dict[str, Any]:
 
 
 def validate_gate(gate: dict[str, Any]) -> dict[str, object]:
-    checksum_payload = dict(gate)
-    output_checksum = checksum_payload.pop("output_checksum", None)
-    require(output_checksum == EXPECTED_CHECKSUM, "Lot 31 entry gate checksum changed")
-    require(canonical_checksum(checksum_payload) == EXPECTED_CHECKSUM, "checksum mismatch")
     require(gate.get("gate_status") == "GO_LOT31_IMPLEMENTATION_ENTRY", "gate is not GO")
     require(gate.get("target_lot") == 31, "target lot must be 31")
     require(gate.get("target_version") == "V3_MARKET_DATA_GOVERNANCE", "wrong V3 target")
@@ -72,6 +68,11 @@ def validate_gate(gate: dict[str, Any]) -> dict[str, object]:
     require(isinstance(required_fields, list), "source-field registry missing")
     require(len(required_fields) == 14, "source-field registry must contain 14 fields")
     require(len(set(required_fields)) == len(required_fields), "source fields must be unique")
+
+    checksum_payload = dict(gate)
+    output_checksum = checksum_payload.pop("output_checksum", None)
+    require(output_checksum == EXPECTED_CHECKSUM, "Lot 31 entry gate checksum changed")
+    require(canonical_checksum(checksum_payload) == EXPECTED_CHECKSUM, "checksum mismatch")
     return {
         "schema_version": "lot31-entry-gate-validation-v1",
         "status": "PASS",
