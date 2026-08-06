@@ -33,6 +33,8 @@ from .timestamp_clock_timezone_validation import (
     duration_us,
     parse_aware_timestamp,
     signed_duration_us,
+    validate_precision,
+    validate_source_timezone,
 )
 
 EXPECTED_GATE_CHECKSUM = "c6942ad174c4c8a32d54ac48ed9c00e0e443f3495cc657df0c2677a4dd4cb5cc"
@@ -74,6 +76,15 @@ def _validate_config(config: dict[str, Any]) -> None:
         raise TimestampGovernanceError("Lot 33 configuration schema changed")
     if config.get("config_version") != "lot33-timestamp-governance-config-v1":
         raise TimestampGovernanceError("Lot 33 configuration version changed")
+    event = parse_aware_timestamp(require_string(config.get("event_time"), "event_time"), "event_time")
+    available = parse_aware_timestamp(
+        require_string(config.get("available_at"), "available_at"), "available_at"
+    )
+    generated = parse_aware_timestamp(
+        require_string(config.get("generated_at"), "generated_at"), "generated_at"
+    )
+    if not event <= available <= generated:
+        raise TimestampGovernanceError("Lot 33 configuration violates causal availability")
 
 
 def _nullable_string(raw: dict[str, Any], field: str) -> str | None:
@@ -94,10 +105,26 @@ def _nullable_integer(raw: dict[str, Any], field: str) -> int | None:
     return require_integer(value, field)
 
 
+def _validate_raw_metadata(raw: RawTimestampEnvelopeV1) -> None:
+    validate_source_timezone(raw.raw_timestamp, raw.source_timezone)
+    values = (
+        ("source_time", raw.source_time),
+        ("event_time", raw.event_time),
+        ("receive_time", raw.receive_time),
+        ("process_time", raw.process_time),
+        ("available_at", raw.available_at),
+        ("usable_from", raw.usable_from),
+    )
+    for field, value in values:
+        validate_precision(value, raw.timestamp_precision, field)
+    if raw.exchange_time is not None:
+        validate_precision(raw.exchange_time, raw.timestamp_precision, "exchange_time")
+
+
 def _build_raw(raw: dict[str, Any]) -> RawTimestampEnvelopeV1:
     if set(raw) != RECORD_FIELDS:
         raise TimestampGovernanceError("raw timestamp envelope fields differ")
-    return RawTimestampEnvelopeV1(
+    envelope = RawTimestampEnvelopeV1(
         record_id=require_string(raw.get("record_id"), "record_id"),
         instrument_id=require_string(raw.get("instrument_id"), "instrument_id"),
         source_id=require_string(raw.get("source_id"), "source_id"),
@@ -116,6 +143,8 @@ def _build_raw(raw: dict[str, Any]) -> RawTimestampEnvelopeV1:
         sequence_id=require_integer(raw.get("sequence_id"), "sequence_id"),
         revision_id=require_integer(raw.get("revision_id"), "revision_id"),
     )
+    _validate_raw_metadata(envelope)
+    return envelope
 
 
 def _allowed_sources(registry: dict[str, Any]) -> tuple[str, set[str]]:
@@ -177,14 +206,17 @@ def _build_health(
     envelopes: tuple[CanonicalTimeEnvelopeV1, ...],
     thresholds: dict[str, Any],
 ) -> ClockHealthStateV1:
+    if not envelopes:
+        raise TimestampGovernanceError("Lot 33 requires at least one timestamp record")
     max_drift = require_integer(thresholds.get("max_clock_drift_us"), "max_clock_drift_us")
     max_ooo = require_integer(
         thresholds.get("max_out_of_order_delay_us"), "max_out_of_order_delay_us"
     )
     max_latency = require_integer(thresholds.get("max_total_latency_us"), "max_total_latency_us")
-    if min(max_drift, max_ooo, max_latency) < 0 or set(thresholds) != {
+    expected_fields = {
         "max_clock_drift_us", "max_out_of_order_delay_us", "max_total_latency_us"
-    }:
+    }
+    if min(max_drift, max_ooo, max_latency) < 0 or set(thresholds) != expected_fields:
         raise TimestampGovernanceError("Lot 33 thresholds are invalid")
     observed_drift = max(abs(item.clock_drift_us) for item in envelopes)
     observed_ooo = max(item.out_of_order_delay_us for item in envelopes)
@@ -202,6 +234,27 @@ def _build_health(
     )
 
 
+def _build_run_context(config: dict[str, Any], code_commit: str) -> Lot33RunContextV1:
+    return Lot33RunContextV1(
+        require_string(config.get("run_id"), "run_id"),
+        "DATA_GOVERNANCE_ONLY",
+        require_string(config.get("config_version"), "config_version"),
+        code_commit,
+        require_string(config.get("correlation_id"), "correlation_id"),
+    )
+
+
+def _build_lineage(config: dict[str, Any], root: Path) -> Lot33LineageEnvelopeV1:
+    return Lot33LineageEnvelopeV1(
+        require_string(config.get("lineage_id"), "lineage_id"),
+        "data/audit/instrument_registry_lot32.json",
+        file_checksum(root / "data/audit/instrument_registry_lot32.json"),
+        file_checksum(root / "data/audit/instrument_symbol_and_contract_normalization_lot32.json"),
+        file_checksum(root / "data/audit/instrument_symbol_and_contract_normalization_audit_lot32.json"),
+        require_string(config.get("available_at"), "available_at"),
+    )
+
+
 def _build_state(
     config: dict[str, Any],
     envelopes: tuple[CanonicalTimeEnvelopeV1, ...],
@@ -210,21 +263,8 @@ def _build_state(
     code_commit: str,
 ) -> TimestampClockTimezoneGovernanceStateV1:
     state = TimestampClockTimezoneGovernanceStateV1(
-        run_context=Lot33RunContextV1(
-            require_string(config.get("run_id"), "run_id"),
-            "DATA_GOVERNANCE_ONLY",
-            require_string(config.get("config_version"), "config_version"),
-            code_commit,
-            require_string(config.get("correlation_id"), "correlation_id"),
-        ),
-        lineage=Lot33LineageEnvelopeV1(
-            require_string(config.get("lineage_id"), "lineage_id"),
-            "data/audit/instrument_registry_lot32.json",
-            file_checksum(root / "data/audit/instrument_registry_lot32.json"),
-            file_checksum(root / "data/audit/instrument_symbol_and_contract_normalization_lot32.json"),
-            file_checksum(root / "data/audit/instrument_symbol_and_contract_normalization_audit_lot32.json"),
-            require_string(config.get("available_at"), "available_at"),
-        ),
+        run_context=_build_run_context(config, code_commit),
+        lineage=_build_lineage(config, root),
         event_time=require_string(config.get("event_time"), "event_time"),
         available_at=require_string(config.get("available_at"), "available_at"),
         generated_at=require_string(config.get("generated_at"), "generated_at"),
@@ -271,6 +311,14 @@ def _build_audit(
     return replace(audit, audit_checksum=canonical_checksum(audit.payload_without_checksum()))
 
 
+def _validate_records(records: tuple[RawTimestampEnvelopeV1, ...]) -> None:
+    if not records:
+        raise TimestampGovernanceError("Lot 33 requires timestamp records")
+    record_ids = tuple(record.record_id for record in records)
+    if len(set(record_ids)) != len(record_ids):
+        raise TimestampGovernanceError("timestamp record ids must be unique")
+
+
 def build_lot33_artifacts(
     root: Path,
     code_commit: str,
@@ -283,6 +331,7 @@ def build_lot33_artifacts(
     _validate_config(config)
     instrument_id, sources = _allowed_sources(registry)
     records = tuple(_build_raw(item) for item in require_object_list(config.get("records"), "records"))
+    _validate_records(records)
     if any(item.instrument_id != instrument_id or item.source_id not in sources for item in records):
         raise TimestampGovernanceError("timestamp record references unknown instrument or source")
     delays = _out_of_order_delays(records)
@@ -300,14 +349,20 @@ def persist_lot33_artifacts(
     state: TimestampClockTimezoneGovernanceStateV1,
     audit: TimestampClockTimezoneGovernanceAuditV1,
 ) -> None:
-    atomic_write_json(root / "data/audit/timestamp_clock_and_timezone_governance_lot33.json", state.to_dict())
+    atomic_write_json(
+        root / "data/audit/timestamp_clock_and_timezone_governance_lot33.json",
+        state.to_dict(),
+    )
     atomic_write_json(
         root / "data/audit/timestamp_clock_and_timezone_governance_audit_lot33.json",
         audit.to_dict(),
     )
     atomic_write_json(
         root / "data/audit/canonical_time_envelopes_lot33.json",
-        {"schema_version": "canonical-time-envelope-collection-v1", "records": [item.to_dict() for item in state.canonical_envelopes]},
+        {
+            "schema_version": "canonical-time-envelope-collection-v1",
+            "records": [item.to_dict() for item in state.canonical_envelopes],
+        },
     )
 
 
