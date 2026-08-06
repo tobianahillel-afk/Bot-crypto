@@ -54,6 +54,28 @@ def test_canonical_checksum_has_a_fixed_oracle() -> None:
     )
 
 
+def test_canonical_checksum_preserves_unicode_and_key_order() -> None:
+    assert engine.canonical_checksum({"é": "✓", "a": "Ω"}) == (
+        "2e56365430d8ed3087ab32f5a3d8a5fa456299d93b03a3f625f2e4f6d110fe45"
+    )
+
+
+def test_fail_closed_safety_has_an_independent_literal_oracle() -> None:
+    assert fail_closed_safety() == {
+        "analysis_only": True,
+        "used_for_decision": False,
+        "external_connectivity_allowed": False,
+        "network_ingestion_allowed": False,
+        "real_credentials_allowed": False,
+        "signal_generation_allowed": False,
+        "risk_approval_allowed": False,
+        "order_routing_allowed": False,
+        "trade_allowed": False,
+        "execution_allowed": False,
+        "approved_size": 0,
+    }
+
+
 def test_file_checksum_has_a_fixed_oracle(tmp_path: Path) -> None:
     path = tmp_path / "bytes.txt"
     path.write_bytes(b"lot31\n")
