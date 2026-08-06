@@ -1,0 +1,72 @@
+name: Lot 32 implementation entry gate
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'contracts/schemas/lot32_v3_entry_gate_v1.schema.json'
+      - 'data/audit/lot32_v3_entry_gate.json'
+      - 'docs/LOT_32_V3_ENTRY_GATE.md'
+      - 'reports/lot_32_v3_entry_gate_report.md'
+      - 'scripts/validate_lot32_entry_gate.py'
+      - 'tests/test_lot32_v3_entry_gate.py'
+      - '.github/workflows/lot32-entry-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Verify gate-only production boundary
+        shell: bash
+        run: |
+          git fetch origin main
+          if ! git diff --quiet origin/main...HEAD -- src/; then
+            echo 'Production source changed inside the Lot 32 entry-gate PR'
+            git diff --stat origin/main...HEAD -- src/
+            exit 1
+          fi
+      - name: Compile lint type and schema checks
+        run: |
+          python -m compileall -q src scripts tests
+          python -m json.tool data/audit/lot32_v3_entry_gate.json >/dev/null
+          python -m json.tool contracts/schemas/lot32_v3_entry_gate_v1.schema.json >/dev/null
+          ruff check scripts/validate_lot32_entry_gate.py tests/test_lot32_v3_entry_gate.py
+          mypy src/crypto_quant_bot
+      - name: Validate gate and immutable prerequisites
+        run: |
+          python scripts/validate_lot31_entry_gate.py
+          python scripts/validate_lot31.py
+          python scripts/validate_lot31_no_connectivity.py
+          python scripts/validate_lot32_entry_gate.py
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+      - name: Gate tests and full regression
+        run: |
+          pytest -q tests/test_lot32_v3_entry_gate.py
+          pytest -q
+      - name: Gate anti-flake repetitions
+        run: |
+          pytest -q tests/test_lot32_v3_entry_gate.py
+          pytest -q tests/test_lot32_v3_entry_gate.py
+          pytest -q tests/test_lot32_v3_entry_gate.py
+      - name: Security and dependency checks
+        run: |
+          bandit -q -r src -ll
+          pip-audit -r requirements-dev.lock
