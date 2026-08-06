@@ -30,6 +30,10 @@ The state checksum and audit checksum were recomputed independently. The audit r
 to the state, and the standalone `SourceRegistryV1` is identical to the registry embedded in
 the state.
 
+The permanent command, evidence and safety mapping is recorded in
+`docs/LOT31_POST_MERGE_VALIDATION_MATRIX.md`. It preserves both the historical V2 chain
+diagnostic and the Lot 31 validators instead of treating one as a replacement for the other.
+
 ## Source-governance findings
 
 - exactly one source of truth is declared;
