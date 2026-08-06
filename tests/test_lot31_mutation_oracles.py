@@ -4,10 +4,6 @@ import json
 from pathlib import Path
 
 import pytest
-from test_lot31_market_data_governance_scope_and_source_registry import (
-    COMMIT,
-    write_fixture_root,
-)
 
 from crypto_quant_bot.data_governance import (
     market_data_governance_scope_and_source_registry as engine,
@@ -16,6 +12,40 @@ from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_re
     SourceRegistryValidationError,
     fail_closed_safety,
 )
+
+COMMIT = "0123456789abcdef0123456789abcdef01234567"
+SHA = "a" * 64
+
+
+def write_fixture_root(root: Path) -> None:
+    config = json.loads(
+        Path("config/data_governance/market_data_source_registry_v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    engine.atomic_write_json(
+        root / "config/data_governance/market_data_source_registry_v1.json",
+        config,
+    )
+    engine.atomic_write_json(
+        root / "data/audit/lot31_v3_entry_gate.json",
+        {
+            "gate_status": "GO_LOT31_IMPLEMENTATION_ENTRY",
+            "target_lot": 31,
+            "target_version": "V3_MARKET_DATA_GOVERNANCE",
+            "owner": "MarketDataGovernanceDomain",
+            "package_boundary": "src/crypto_quant_bot/data_governance",
+            "runtime_mode": "DATA_GOVERNANCE_ONLY",
+            "human_decision": "APPROVED_START_LOT31",
+            "implementation_started": False,
+            "next_lot_status": "PLANNED_LOCKED",
+            "safety": fail_closed_safety(),
+        },
+    )
+    engine.atomic_write_json(
+        root / "data/audit/v2_market_analysis_closure_lot30.json",
+        {"output_checksum": SHA},
+    )
 
 
 def test_canonical_checksum_has_a_fixed_oracle() -> None:
