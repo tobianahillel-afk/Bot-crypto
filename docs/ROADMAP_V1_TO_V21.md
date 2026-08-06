@@ -4,17 +4,19 @@ Projet : **Crypto Quant Bot V3.1-Ops**
 
 ## État actuel
 
-- Dernier lot dont l'implémentation est terminée : **Lot 28**.
+- Dernier lot dont l'implémentation est terminée : **Lot 29**.
+- Version courante : `0.29.0`.
 - Baseline P0 institutionnelle : fusionnée.
 - Gate transversal P0.6 : fusionné et conservé comme preuve historique.
 - Lot 26 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
 - Lot 27 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
 - Lot 28 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
-- Lots 29–177 : planifiés et verrouillés.
-- Recherche offline descriptive : implémentée pour le périmètre Lots 21–28, sans permission de décision ou d'exécution.
+- Lot 29 : `IMPLEMENTED_VALIDATED_OFFLINE_REPLAY_ONLY`.
+- Lots 30–177 : planifiés et verrouillés.
+- Recherche offline descriptive et replay : implémentés pour le périmètre Lots 21–29, sans permission de décision ou d'exécution.
 - Forecast, alpha, paper, sandbox et capital réel : `NO_GO`.
 
-L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot28.json`. Le registre
+L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot29.json`. Le registre
 `data/audit/product_scope_roadmap_lot21.jsonl` reste une preuve historique immuable.
 
 ## Documents normatifs transverses
@@ -82,6 +84,22 @@ prédictives ou d'exécution sont déjà implémentées.
 - Validator : `scripts/validate_lot28.py`
 - Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot28.json`
 
+## Lot 29
+
+- [Specification](LOT_29_V2_DETERMINISTIC_REPLAY_AND_AUDIT.md)
+- [Acceptance criteria](ACCEPTANCE_CRITERIA_LOT_29.md)
+- [Implementation status](LOT_29_IMPLEMENTATION_WORKLOG.md)
+- [Post-merge audit](LOT_29_POST_MERGE_AUDIT.md)
+- Configuration : `config/replay/v2_deterministic_replay_audit_v1.json`
+- Schema : `contracts/schemas/v2_deterministic_replay_audit_state_v1.schema.json`
+- State : `data/audit/v2_deterministic_replay_and_audit_lot29.json`
+- Audit : `data/audit/v2_deterministic_replay_and_audit_audit_lot29.json`
+- Closure manifest : `data/audit/v2_replay_closure_manifest_lot29.json`
+- Report : `reports/lot_29_v2_deterministic_replay_and_audit_report.md`
+- Runner : `scripts/run_lot29_v2_deterministic_replay_and_audit.py`
+- Validator : `scripts/validate_lot29.py`
+- Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot29.json`
+
 ## Séparations obligatoires
 
 ```text
@@ -114,7 +132,7 @@ timeframes et n'autorise aucune inférence de rendement futur.
 | V3 | Market Data Governance | 31–36 | flux canonique, temps et qualité | `DATA_GOVERNANCE_ONLY` |
 | V4 | Microstructure / Liquidity / Game Theory | 37–52 | carnet, order flow, participants | `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY` |
 | V5 | Alpha / Strategy Research | 53–59 | prévisions et stratégies | `OFFLINE_STRATEGY_RESEARCH_ONLY` |
-| V6 | Backtesting / EV / TCA | 60–71 | OOS, coûts, capacité | `BACKTEST_ONLY` |
+| V6 | Backtesting / Expected Value / TCA | 60–71 | OOS, coûts, capacité | `BACKTEST_ONLY` |
 | V7 | Model Risk / Sizing / Risk | 72–80 | risque et sizing | `RISK_SIMULATION_ONLY` |
 | V8 | Paper Trading | 81–87 | simulation décisions/ordres | `PAPER` |
 | V9 | Portfolio / PnL Core | 88–95 | positions, cash et PnL | `PORTFOLIO_ACCOUNTING` |
@@ -137,7 +155,7 @@ timeframes et n'autorise aucune inférence de rendement futur.
 2. Aucun lot suivant sans rapport final `GO`, CI verte sur le commit exact et revue humaine.
 3. Chaque lot atteint les seuils tests, couverture et mutation applicables.
 4. Toute formule suit le standard mathématique et possède des oracles indépendants.
-5. Toute probabilité requiert une calibration versionnée ; Lot 26 n'en produit aucune.
+5. Toute probabilité requiert une calibration versionnée ; les Lots 26–29 n'en produisent aucune.
 6. Toute décision ou absence de décision est rejouable et auditable.
 7. Zéro BLOCKER et zéro MAJOR avant promotion.
 8. HFT, options et on-chain ne contournent jamais le core.
@@ -147,3 +165,4 @@ timeframes et n'autorise aucune inférence de rendement futur.
 12. Un statut `PLANNED_LOCKED` ou `AWAITING_EXACT_COMMIT_CI` ne peut être promu sans preuve exacte.
 13. V7, V8, V9, V15 et V17 consomment le snapshot, le sizing et les réservations canoniques ; aucune implémentation locale incompatible n'est autorisée.
 14. Tout ordre augmentant le risque exige une réservation atomique active ; toute moyenne à la baisse implicite est interdite.
+15. Lot 30 reste verrouillé après l'audit post-merge du Lot 29 jusqu'à un gate d'entrée distinct et une décision humaine explicite.
