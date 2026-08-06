@@ -6,10 +6,10 @@ Plateforme quantitative crypto défensive, déterministe, extensible et auditabl
 
 | Élément | État |
 |---|---|
-| Dernier lot implémenté et validé | **Lot 29 — V2 Deterministic Replay & Audit** |
-| Version | **0.29.0** |
+| Dernier lot implémenté et validé | **Lot 30 — V2 Market Analysis Closure** |
+| Version | **0.30.0** |
 | Baseline qualité | **P0 institutionnel fusionné** |
-| Prochain lot planifié | **Lot 30 — V2 Closure**, `PLANNED_LOCKED` |
+| Prochain lot planifié | **Lot 31 — Market Data Source Registry**, `PLANNED_LOCKED` |
 | Runtime maximal | `LOCAL_OFFLINE_ANALYSIS_ONLY` |
 | Trading | **désactivé** |
 | Connectivité exchange | **désactivée** |
@@ -25,11 +25,17 @@ leverage = FORBIDDEN
 withdrawals = FORBIDDEN
 ```
 
-Le Lot 29 prouve que les artefacts certifiés des Lots 21 à 28 forment une chaîne ordonnée, déterministe et non exécutable. Il vérifie huit artefacts et huit validateurs, conserve les checksums exacts et confirme un replay `MATCH`. Il ne crée aucun état de marché, forecast, signal, risque approuvé ou ordre.
+Le Lot 29 prouve que les artefacts certifiés des Lots 21 à 28 forment une chaîne ordonnée,
+déterministe et non exécutable. Le Lot 30 clôture ensuite V2 en revérifiant les huit
+artefacts, les preuves Lot 29, deux replays identiques du validateur et cinq contrôles
+négatifs fail-closed. La clôture couvre exactement les Lots 21 à 30 et ne crée aucun état
+de marché V3, forecast, signal, risque approuvé ou ordre.
 
 ## Vision temporelle
 
-Le système cible un flux de marché canonique unique et continu, plusieurs représentations temporelles et plusieurs horizons prédictifs. Il ne crée pas un robot indépendant par timeframe.
+Le système cible un flux de marché canonique unique et continu, plusieurs représentations
+temporelles et plusieurs horizons prédictifs. Il ne crée pas un robot indépendant par
+timeframe.
 
 Six notions restent séparées :
 
@@ -53,21 +59,32 @@ flux continu amont
 → alignement descriptif et auditable
 ```
 
-Le 5m/15m est une première configuration, pas une limitation du futur système. Le registre temporel prévoit une interface extensible, tandis que les échelles supplémentaires restent désactivées dans le Lot 26.
+Le 5m/15m est une première configuration, pas une limitation du futur système. Le registre
+temporel prévoit une interface extensible, tandis que les échelles supplémentaires restent
+désactivées dans le Lot 26.
 
-Le 15m n'oppose aucun veto automatique au 5m. Une divergence peut représenter un rebond local dans une structure supérieure différente. Le vote majoritaire naïf entre timeframes est interdit.
+Le 15m n'oppose aucun veto automatique au 5m. Une divergence peut représenter un rebond
+local dans une structure supérieure différente. Le vote majoritaire naïf entre timeframes
+est interdit.
 
 ## Flux continu et données confirmées
 
-Une barre ouverte peut être observée comme état provisoire, mais elle ne peut pas être consommée comme état confirmé. Les futurs états événementiels de carnet, trades, liquidations et order flow appartiennent à V3/V4 ; ils ne sont pas simulés dans le Lot 26.
+Une barre ouverte peut être observée comme état provisoire, mais elle ne peut pas être
+consommée comme état confirmé. Les futurs états événementiels de carnet, trades,
+liquidations et order flow appartiennent à V3/V4 ; ils ne sont pas simulés dans V2.
 
 ## Prévision et modèles stochastiques
 
-La roadmap prévoit des prévisions par horizons distincts — initialement 30s, 5m, 15m et 1h — avec distributions, quantiles, volatilité, target/stop hit, MAE/MFE, temps avant événement et incertitude.
+La roadmap prévoit des prévisions par horizons distincts — initialement 30s, 5m, 15m et
+1h — avec distributions, quantiles, volatilité, target/stop hit, MAE/MFE, temps avant
+événement et incertitude.
 
-Ces contrats sont `PLANNED_LOCKED_NOT_IMPLEMENTED`. Les Lots 26 à 29 ne produisent aucune prediction, probability, expected return ou direction BUY/SELL.
+Ces contrats sont `PLANNED_LOCKED_NOT_IMPLEMENTED`. Les Lots 26 à 30 ne produisent aucune
+prediction, probability, expected return ou direction BUY/SELL.
 
-Les futurs modèles stochastiques devront être sélectionnés par preuve, comparés à des baselines et validés hors échantillon. La sophistication d'un modèle n'est pas une preuve d'alpha.
+Les futurs modèles stochastiques devront être sélectionnés par preuve, comparés à des
+baselines et validés hors échantillon. La sophistication d'un modèle n'est pas une preuve
+d'alpha.
 
 ## Carnet, participants et Game Theory
 
@@ -111,11 +128,19 @@ forecast
 → fill/reconciliation
 ```
 
-Chaque future décision augmentant le risque doit consommer un snapshot portefeuille cohérent incluant positions, ordres ouverts, intents en attente, capital réservé et risque déjà engagé. Le sizing final est le minimum de tous les caps de risque, capital, heat, concentration, corrélation, drawdown et liquidité. Une réservation atomique empêche plusieurs décisions simultanées d'utiliser le même budget.
+Chaque future décision augmentant le risque doit consommer un snapshot portefeuille
+cohérent incluant positions, ordres ouverts, intents en attente, capital réservé et risque
+déjà engagé. Le sizing final est le minimum de tous les caps de risque, capital, heat,
+concentration, corrélation, drawdown et liquidité. Une réservation atomique empêche
+plusieurs décisions simultanées d'utiliser le même budget.
 
-Toute augmentation de position exige un nouvel intent, une nouvelle décision et une nouvelle réservation. La moyenne à la baisse implicite est interdite ; un ajout dans la même direction est bloqué lorsque le PnL de liquidation net de coûts est négatif ou nul.
+Toute augmentation de position exige un nouvel intent, une nouvelle décision et une
+nouvelle réservation. La moyenne à la baisse implicite est interdite ; un ajout dans la
+même direction est bloqué lorsque le PnL de liquidation net de coûts est négatif ou nul.
 
-Les futurs ordres protecteurs — stop-loss, take-profit, break-even, trailing, partial exits, bracket et OCO — sont spécifiés mais non implémentés. Ils appartiennent à V5/V7/V8/V15 selon leurs responsabilités.
+Les futurs ordres protecteurs — stop-loss, take-profit, break-even, trailing, partial exits,
+bracket et OCO — sont spécifiés mais non implémentés. Ils appartiennent à V5/V7/V8/V15
+selon leurs responsabilités.
 
 ## Environnement canonique
 
@@ -134,14 +159,16 @@ python -m pip install -r requirements-dev.lock
 ## Validation
 
 ```bash
-python scripts/validate_lot29.py
+python scripts/validate_lot30.py
+python scripts/diagnose_exact_chain_until_lot30.py
 python scripts/validate_roadmap_documentation.py
 python scripts/validate_architecture_boundaries.py
 python scripts/check_no_silent_numeric_coercion.py
 pytest -q
 ```
 
-La CI ajoute Ruff, mypy, coverage lignes/branches, diff coverage, Bandit, `pip-audit`, complexité, mutation testing et répétitions anti-flake.
+La CI ajoute Ruff, mypy, coverage lignes/branches, diff coverage, Bandit, `pip-audit`,
+complexité, mutation testing et répétitions anti-flake.
 
 ## Sources de vérité
 
@@ -173,7 +200,18 @@ La CI ajoute Ruff, mypy, coverage lignes/branches, diff coverage, Bandit, `pip-a
 - État certifié : `data/audit/v2_deterministic_replay_and_audit_lot29.json`
 - Audit certifié : `data/audit/v2_deterministic_replay_and_audit_audit_lot29.json`
 - Manifest de clôture : `data/audit/v2_replay_closure_manifest_lot29.json`
-- Lifecycle courant : `data/audit/roadmap_lifecycle_overlay_lot29.json`
+
+### Lot 30
+
+- [Spécification](docs/LOT_30_V2_MARKET_ANALYSIS_CLOSURE.md)
+- [Critères d’acceptation](docs/ACCEPTANCE_CRITERIA_LOT_30.md)
+- [Worklog certifié](docs/LOT_30_IMPLEMENTATION_WORKLOG.md)
+- [Audit post-merge](docs/LOT_30_POST_MERGE_AUDIT.md)
+- [Rapport final](reports/lot_30_v2_market_analysis_closure_report.md)
+- État certifié : `data/audit/v2_market_analysis_closure_lot30.json`
+- Audit certifié : `data/audit/v2_market_analysis_closure_audit_lot30.json`
+- Manifest final V2 : `data/audit/closure_manifest_lot30.json`
+- Lifecycle courant : `data/audit/roadmap_lifecycle_overlay_lot30.json`
 
 ### Architecture future verrouillée
 
@@ -188,4 +226,6 @@ La CI ajoute Ruff, mypy, coverage lignes/branches, diff coverage, Bandit, `pip-a
 
 ## Contribution
 
-Toute modification suit [CONTRIBUTING.md](CONTRIBUTING.md). Aucun lot ne commence sans rapport `GO` sur le commit exact. Un contrat futur documenté ne devient pas une capability implémentée.
+Toute modification suit [CONTRIBUTING.md](CONTRIBUTING.md). Aucun lot ne commence sans
+rapport `GO` sur le commit exact. Un contrat futur documenté ne devient pas une capability
+implémentée.

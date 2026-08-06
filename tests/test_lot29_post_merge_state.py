@@ -29,11 +29,16 @@ def load_json(relative: str) -> dict[str, object]:
     return payload
 
 
+def version_tuple(value: str) -> tuple[int, int, int]:
+    major, minor, patch = value.split(".")
+    return int(major), int(minor), int(patch)
+
+
 def test_lot29_post_merge_release_and_lifecycle_are_consistent() -> None:
     project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
     overlay = load_json("data/audit/roadmap_lifecycle_overlay_lot29.json")
 
-    assert project["version"] == "0.29.0"
+    assert version_tuple(project["version"]) >= (0, 29, 0)
     assert overlay["latest_implemented_lot"] == 29
     lots = overlay["lots"]
     assert isinstance(lots, dict)

@@ -1,0 +1,64 @@
+{
+  "future_capabilities_locked": [
+    "SourceRegistryV1",
+    "ContinuousMarketStateV1",
+    "MultiHorizonForecastV1",
+    "ParticipantBehaviorScenarioV1",
+    "TradeIntent",
+    "RiskDecisionV1",
+    "RiskReservationV1",
+    "OrderIntent"
+  ],
+  "historical_registry": "data/audit/product_scope_roadmap_lot21.jsonl",
+  "latest_implemented_lot": 30,
+  "lots": {
+    "26": {
+      "execution_allowed": false,
+      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot26.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY",
+      "trade_allowed": false
+    },
+    "27": {
+      "execution_allowed": false,
+      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot27.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY",
+      "trade_allowed": false
+    },
+    "28": {
+      "execution_allowed": false,
+      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot28.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY",
+      "trade_allowed": false
+    },
+    "29": {
+      "execution_allowed": false,
+      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot29.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_REPLAY_ONLY",
+      "trade_allowed": false
+    },
+    "30": {
+      "acceptance_contract": "docs/ACCEPTANCE_CRITERIA_LOT_30.md",
+      "audit_artifact": "data/audit/v2_market_analysis_closure_audit_lot30.json",
+      "closure_manifest": "data/audit/closure_manifest_lot30.json",
+      "execution_allowed": false,
+      "implementation_commit": "602bc91b2d4c886f654840294fa740474515e0a0",
+      "implementation_contract": "docs/LOT_30_V2_MARKET_ANALYSIS_CLOSURE.md",
+      "implementation_status": "docs/LOT_30_IMPLEMENTATION_WORKLOG.md",
+      "merged_commit": "4551f4973ce535a6f2733ea4d92833d84ae298f7",
+      "pull_request": 15,
+      "report": "reports/lot_30_v2_market_analysis_closure_report.md",
+      "runner": "scripts/run_lot30_v2_market_analysis_closure.py",
+      "runtime_mode": "LOCAL_OFFLINE_ANALYSIS_ONLY",
+      "state_artifact": "data/audit/v2_market_analysis_closure_lot30.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_CLOSURE_ONLY",
+      "trade_allowed": false,
+      "validator": "scripts/validate_lot30.py"
+    },
+    "31": {
+      "implementation_started": false,
+      "status": "PLANNED_LOCKED"
+    }
+  },
+  "previous_overlay": "data/audit/roadmap_lifecycle_overlay_lot29.json",
+  "schema_version": "roadmap-lifecycle-overlay-v1"
+}

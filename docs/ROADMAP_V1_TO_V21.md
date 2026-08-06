@@ -4,19 +4,20 @@ Projet : **Crypto Quant Bot V3.1-Ops**
 
 ## État actuel
 
-- Dernier lot dont l'implémentation est terminée : **Lot 29**.
-- Version courante : `0.29.0`.
+- Dernier lot dont l'implémentation est terminée : **Lot 30**.
+- Version courante : `0.30.0`.
 - Baseline P0 institutionnelle : fusionnée.
 - Gate transversal P0.6 : fusionné et conservé comme preuve historique.
 - Lot 26 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
 - Lot 27 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
 - Lot 28 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
 - Lot 29 : `IMPLEMENTED_VALIDATED_OFFLINE_REPLAY_ONLY`.
-- Lots 30–177 : planifiés et verrouillés.
-- Recherche offline descriptive et replay : implémentés pour le périmètre Lots 21–29, sans permission de décision ou d'exécution.
+- Lot 30 : `IMPLEMENTED_VALIDATED_OFFLINE_CLOSURE_ONLY`.
+- Lots 31–177 : planifiés et verrouillés.
+- V2 Market Analysis Offline est fermée pour le périmètre Lots 21–30, sans permission de décision ou d'exécution.
 - Forecast, alpha, paper, sandbox et capital réel : `NO_GO`.
 
-L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot29.json`. Le registre
+L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot30.json`. Le registre
 `data/audit/product_scope_roadmap_lot21.jsonl` reste une preuve historique immuable.
 
 ## Documents normatifs transverses
@@ -100,6 +101,24 @@ prédictives ou d'exécution sont déjà implémentées.
 - Validator : `scripts/validate_lot29.py`
 - Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot29.json`
 
+## Lot 30
+
+- [Specification](LOT_30_V2_MARKET_ANALYSIS_CLOSURE.md)
+- [Acceptance criteria](ACCEPTANCE_CRITERIA_LOT_30.md)
+- [Implementation status](LOT_30_IMPLEMENTATION_WORKLOG.md)
+- [Post-merge audit](LOT_30_POST_MERGE_AUDIT.md)
+- Configuration : `config/closure/v2_market_analysis_closure_v1.json`
+- Schema : `contracts/schemas/v2_market_analysis_closure_state_v1.schema.json`
+- State : `data/audit/v2_market_analysis_closure_lot30.json`
+- Audit : `data/audit/v2_market_analysis_closure_audit_lot30.json`
+- Final V2 manifest : `data/audit/closure_manifest_lot30.json`
+- Report : `reports/lot_30_v2_market_analysis_closure_report.md`
+- Coverage evidence : `reports/lot30/coverage_summary.json`
+- Mutation evidence : `reports/lot30/mutation/score.json`
+- Runner : `scripts/run_lot30_v2_market_analysis_closure.py`
+- Validator : `scripts/validate_lot30.py`
+- Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot30.json`
+
 ## Séparations obligatoires
 
 ```text
@@ -155,7 +174,7 @@ timeframes et n'autorise aucune inférence de rendement futur.
 2. Aucun lot suivant sans rapport final `GO`, CI verte sur le commit exact et revue humaine.
 3. Chaque lot atteint les seuils tests, couverture et mutation applicables.
 4. Toute formule suit le standard mathématique et possède des oracles indépendants.
-5. Toute probabilité requiert une calibration versionnée ; les Lots 26–29 n'en produisent aucune.
+5. Toute probabilité requiert une calibration versionnée ; les Lots 26–30 n'en produisent aucune.
 6. Toute décision ou absence de décision est rejouable et auditable.
 7. Zéro BLOCKER et zéro MAJOR avant promotion.
 8. HFT, options et on-chain ne contournent jamais le core.
@@ -165,4 +184,4 @@ timeframes et n'autorise aucune inférence de rendement futur.
 12. Un statut `PLANNED_LOCKED` ou `AWAITING_EXACT_COMMIT_CI` ne peut être promu sans preuve exacte.
 13. V7, V8, V9, V15 et V17 consomment le snapshot, le sizing et les réservations canoniques ; aucune implémentation locale incompatible n'est autorisée.
 14. Tout ordre augmentant le risque exige une réservation atomique active ; toute moyenne à la baisse implicite est interdite.
-15. Lot 30 reste verrouillé après l'audit post-merge du Lot 29 jusqu'à un gate d'entrée distinct et une décision humaine explicite.
+15. Lot 31 reste verrouillé après l'audit post-merge du Lot 30 jusqu'à un gate d'entrée V3 distinct et une décision humaine explicite.

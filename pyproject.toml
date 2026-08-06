@@ -1,7 +1,7 @@
 [project]
 name = "crypto-quant-bot"
-version = "0.29.0"
-description = "Crypto Quant Bot V3.1-Ops — Lot 29 validated deterministic V2 replay and audit"
+version = "0.30.0"
+description = "Crypto Quant Bot V3.1-Ops — Lot 30 validated V2 market-analysis closure"
 requires-python = "==3.11.*"
 dependencies = []
 
