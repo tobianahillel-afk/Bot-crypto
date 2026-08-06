@@ -2,7 +2,11 @@
 
 ## Current status
 
-`IMPLEMENTATION_IN_PROGRESS_AWAITING_EXACT_HEAD_CI`
+`IMPLEMENTED_VALIDATED_METADATA_ONLY`
+
+## Certified evidence commit
+
+`689079bb5f348aa1cf62059498fcaddf760665bd`
 
 ## Implemented scope
 
@@ -14,7 +18,22 @@
 - runner, validator and no-connectivity validator;
 - strict JSON schemas;
 - deterministic, negative, boundary and mutation-oracle tests;
-- dedicated coverage, regression, security and mutation workflows.
+- dedicated coverage, regression, security and mutation workflows;
+- committed state, audit, registry, coverage and mutation evidence;
+- permanent release assertions compatible with exact-head regeneration.
+
+## Certified quality
+
+```text
+targeted_tests=67 PASS
+line_coverage=99.50%
+branch_coverage=98.46%
+mutation_score=81.18% (729/898 killed)
+deterministic_replay=PASS
+full_regression=PASS
+security_and_dependency_audit=PASS
+anti_flake_repetitions=3 PASS
+```
 
 ## Explicitly not implemented
 
@@ -24,9 +43,8 @@
 - forecast, signal, risk, portfolio, order or execution capability;
 - Lot 32.
 
-## Pending certification
+## Verdict
 
-- exact PR-head CI;
-- generated release artifacts from the exact head;
-- committed coverage and mutation summaries;
-- final human GO and post-merge audit.
+`GO_LOT31_SOURCE_REGISTRY_VALIDATED_METADATA_ONLY`
+
+A separate post-merge audit is mandatory before any Lot 32 entry gate.
