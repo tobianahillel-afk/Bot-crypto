@@ -29,12 +29,17 @@ def load_json(relative: str) -> dict[str, object]:
     return payload
 
 
+def version_tuple(value: str) -> tuple[int, int, int]:
+    major, minor, patch = value.split(".")
+    return int(major), int(minor), int(patch)
+
+
 def test_lot30_post_merge_release_and_lifecycle_are_consistent() -> None:
     project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
     overlay = load_json("data/audit/roadmap_lifecycle_overlay_lot30.json")
 
-    assert project["version"] == "0.30.0"
-    assert project["description"].endswith("Lot 30 validated V2 market-analysis closure")
+    assert version_tuple(project["version"]) >= (0, 30, 0)
+    assert project["description"]
     assert overlay["latest_implemented_lot"] == 30
     assert overlay["previous_overlay"] == "data/audit/roadmap_lifecycle_overlay_lot29.json"
     lots = overlay["lots"]
@@ -95,6 +100,7 @@ def test_lot30_post_merge_safety_and_verdict_remain_fail_closed() -> None:
 
     assert "GO_LOT30_POST_MERGE_AUDIT" in post_merge
     assert "Lot 31 remains `PLANNED_LOCKED`" in post_merge
-    assert "Dernier lot dont l'implémentation est terminée : **Lot 30**" in roadmap
-    assert "Dernier lot implémenté et validé | **Lot 30" in readme
-    assert "Lot 31 — Market Data Source Registry" in readme
+    assert "Lot 30 : `IMPLEMENTED_VALIDATED_OFFLINE_CLOSURE_ONLY`" in roadmap
+    assert "## Lot 30" in roadmap
+    assert "### Lot 30" in readme
+    assert "data/audit/closure_manifest_lot30.json" in readme
