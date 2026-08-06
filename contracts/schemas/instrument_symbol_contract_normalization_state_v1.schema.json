@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/schemas/instrument_symbol_contract_normalization_state_v1.schema.json",
+  "title": "InstrumentSymbolContractNormalizationStateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "run_context", "lineage", "event_time", "available_at",
+    "generated_at", "validation_state", "instrument_registry", "metrics",
+    "reason_codes", "analysis_only", "used_for_decision",
+    "external_connectivity_allowed", "network_ingestion_allowed",
+    "real_credentials_allowed", "signal_generation_allowed", "risk_approval_allowed",
+    "order_routing_allowed", "trade_allowed", "execution_allowed", "approved_size",
+    "output_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "instrument-symbol-contract-normalization-state-v1"},
+    "run_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "run_id", "runtime_mode", "config_version", "code_commit", "correlation_id"],
+      "properties": {
+        "schema_version": {"const": "run-context-v1"},
+        "run_id": {"type": "string", "minLength": 1},
+        "runtime_mode": {"const": "DATA_GOVERNANCE_ONLY"},
+        "config_version": {"type": "string", "minLength": 1},
+        "code_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "correlation_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version", "lineage_id", "source_registry_path",
+        "source_registry_checksum", "lot31_state_checksum", "lot31_audit_checksum",
+        "available_at"
+      ],
+      "properties": {
+        "schema_version": {"const": "lot32-lineage-envelope-v1"},
+        "lineage_id": {"type": "string", "minLength": 1},
+        "source_registry_path": {"const": "data/audit/source_registry_lot31.json"},
+        "source_registry_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lot31_state_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lot31_audit_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "available_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "event_time": {"type": "string", "format": "date-time"},
+    "available_at": {"type": "string", "format": "date-time"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "validation_state": {"const": "VALIDATED_NORMALIZATION_ONLY"},
+    "instrument_registry": {"$ref": "instrument_registry_v1.schema.json"},
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version", "lot_32_records_processed_total", "lot_32_venue_aliases_total",
+        "lot_32_frozen_instruments_total", "lot_32_validation_failures_total",
+        "lot_32_processing_latency_ms"
+      ],
+      "properties": {
+        "schema_version": {"const": "lot32-metrics-v1"},
+        "lot_32_records_processed_total": {"type": "integer", "minimum": 0},
+        "lot_32_venue_aliases_total": {"type": "integer", "minimum": 0},
+        "lot_32_frozen_instruments_total": {"const": 0},
+        "lot_32_validation_failures_total": {"type": "integer", "minimum": 0},
+        "lot_32_processing_latency_ms": {"type": "integer", "minimum": 0}
+      }
+    },
+    "reason_codes": {
+      "const": [
+        "LOT32_ENTRY_GATE_VERIFIED",
+        "LOT31_SOURCE_REGISTRY_LINEAGE_VERIFIED",
+        "INSTRUMENT_METADATA_NORMALIZED",
+        "CANONICAL_VENUE_ROUND_TRIP_VERIFIED",
+        "DECIMAL_CONSTRAINTS_VALIDATED",
+        "EXTERNAL_CONNECTIVITY_DISABLED",
+        "LOT33_REMAINS_LOCKED"
+      ]
+    },
+    "analysis_only": {"const": true},
+    "used_for_decision": {"const": false},
+    "external_connectivity_allowed": {"const": false},
+    "network_ingestion_allowed": {"const": false},
+    "real_credentials_allowed": {"const": false},
+    "signal_generation_allowed": {"const": false},
+    "risk_approval_allowed": {"const": false},
+    "order_routing_allowed": {"const": false},
+    "trade_allowed": {"const": false},
+    "execution_allowed": {"const": false},
+    "approved_size": {"const": 0},
+    "output_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
