@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import os
+import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 from uuid import NAMESPACE_URL, uuid5
@@ -14,8 +17,14 @@ if str(SOURCE_ROOT) not in sys.path:
 
 from crypto_quant_bot.market_analysis.alignment_io import load_json, write_json_atomic  # noqa: E402
 from crypto_quant_bot.market_analysis.v2_deterministic_replay_and_audit import (  # noqa: E402
+    MAX_VALIDATOR_STDOUT_BYTES,
     build_replay_state,
     replay_matches,
+    run_validator,
+)
+from crypto_quant_bot.market_analysis.v2_replay_audit_models import (  # noqa: E402
+    ReplayValidationError,
+    ValidatorEvidenceV1,
 )
 
 CONFIG_PATH = "config/replay/v2_deterministic_replay_audit_v1.json"
@@ -23,6 +32,10 @@ OUTPUT_PATH = "data/audit/v2_deterministic_replay_and_audit_lot29.json"
 AUDIT_PATH = "data/audit/v2_deterministic_replay_and_audit_audit_lot29.json"
 CLOSURE_PATH = "data/audit/v2_replay_closure_manifest_lot29.json"
 REPORT_PATH = "reports/lot_29_v2_deterministic_replay_and_audit_report.md"
+HISTORICAL_CHAIN_COMMAND = ("bash", "scripts/run_required_chain_until_lot25.sh")
+HISTORICAL_CHAIN_TIMEOUT_SECONDS = 360
+HISTORICAL_LOTS = frozenset(range(21, 26))
+CURRENT_LOTS = frozenset(range(26, 29))
 
 
 def _git_commit(root: Path) -> str:
@@ -34,6 +47,92 @@ def _git_commit(root: Path) -> str:
         text=True,
     )
     return result.stdout.strip()
+
+
+def _artifact_specs(config: dict[str, Any]) -> tuple[dict[str, Any], ...]:
+    raw_specs = config.get("artifacts")
+    if not isinstance(raw_specs, list) or not all(isinstance(item, dict) for item in raw_specs):
+        raise ReplayValidationError("artifacts must be an ordered list of objects")
+    return tuple(raw_specs)
+
+
+def _copy_historical_workspace(root: Path, destination: Path) -> None:
+    ignored = shutil.ignore_patterns(
+        ".git",
+        ".coverage*",
+        ".hypothesis",
+        ".mypy_cache",
+        ".pytest_cache",
+        ".ruff_cache",
+        "__pycache__",
+        "mutants",
+        ".tmp-*",
+    )
+    shutil.copytree(root, destination, ignore=ignored)
+
+
+def _run_historical_chain(workspace: Path) -> None:
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(workspace / "src")
+    completed = subprocess.run(
+        HISTORICAL_CHAIN_COMMAND,
+        cwd=workspace,
+        env=env,
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=HISTORICAL_CHAIN_TIMEOUT_SECONDS,
+    )
+    combined = (completed.stdout + "\n" + completed.stderr).encode("utf-8")
+    if len(combined) > MAX_VALIDATOR_STDOUT_BYTES:
+        raise ReplayValidationError("historical validator chain output exceeds limit")
+    if completed.returncode != 0:
+        tail = combined.decode("utf-8", errors="replace")[-2_000:]
+        raise ReplayValidationError(
+            f"historical validator chain failed with rc={completed.returncode}: {tail}"
+        )
+    if "LOT 25 REQUIRED CHAIN: PASS" not in completed.stdout:
+        raise ReplayValidationError("historical validator chain PASS marker missing")
+
+
+def _historical_validator_evidence(
+    root: Path,
+    specs: tuple[dict[str, Any], ...],
+) -> tuple[ValidatorEvidenceV1, ...]:
+    with tempfile.TemporaryDirectory(prefix="lot29-historical-replay-") as temporary:
+        workspace = Path(temporary) / "repository"
+        _copy_historical_workspace(root, workspace)
+        _run_historical_chain(workspace)
+        return tuple(
+            run_validator(workspace, int(spec["lot"]), str(spec["validator"]))
+            for spec in specs
+            if int(spec["lot"]) in HISTORICAL_LOTS
+        )
+
+
+def _current_validator_evidence(
+    root: Path,
+    specs: tuple[dict[str, Any], ...],
+) -> tuple[ValidatorEvidenceV1, ...]:
+    return tuple(
+        run_validator(root, int(spec["lot"]), str(spec["validator"]))
+        for spec in specs
+        if int(spec["lot"]) in CURRENT_LOTS
+    )
+
+
+def _validator_evidence(
+    root: Path,
+    config: dict[str, Any],
+) -> tuple[ValidatorEvidenceV1, ...]:
+    specs = _artifact_specs(config)
+    historical = _historical_validator_evidence(root, specs)
+    current = _current_validator_evidence(root, specs)
+    evidence_by_lot = {item.lot: item for item in (*historical, *current)}
+    expected_lots = tuple(int(spec["lot"]) for spec in specs)
+    if tuple(sorted(evidence_by_lot)) != expected_lots:
+        raise ReplayValidationError("validator evidence does not cover ordered lots 21..28")
+    return tuple(evidence_by_lot[lot] for lot in expected_lots)
 
 
 def _audit_payload(state: dict[str, Any]) -> dict[str, Any]:
@@ -77,7 +176,9 @@ def _report(state: dict[str, Any]) -> str:
             f"- Output checksum: `{state['output_checksum']}`",
             f"- Replay status: `{state['replay_status']}`",
             "",
-            "The closure proves deterministic continuity of the certified V2 artifact chain.",
+            "Lots 21–25 are validated in an isolated regenerated historical workspace.",
+            "Lots 26–28 are validated on the current exact head.",
+            "The closure proves deterministic continuity of the committed V2 artifact chain.",
             "It does not create a forecast, signal, trade intent, order intent or execution permission.",
             "",
             "```text",
@@ -99,11 +200,13 @@ def run(
     execute_validators: bool = True,
 ) -> dict[str, Any]:
     config = load_json(root / CONFIG_PATH)
+    evidence = _validator_evidence(root, config) if execute_validators else None
     first = build_replay_state(
         root,
         config,
         code_commit,
-        execute_validators=execute_validators,
+        execute_validators=False,
+        validator_evidence=evidence,
     )
     second = build_replay_state(
         root,
