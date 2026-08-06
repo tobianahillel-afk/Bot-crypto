@@ -33,6 +33,19 @@ EXPECTED_NAMES = {
 }
 
 
+def _repair_verified_transport_damage(index: int, text: str) -> str:
+    if index != 2:
+        return text
+    damaged_sha = "6ab886fef251ce3b340483d499afe07512dc88163b9092233ed874466ce9a4a6"
+    actual_sha = hashlib.sha256(text.encode("utf-8")).hexdigest()
+    if len(text) == 3_999 and actual_sha == damaged_sha:
+        marker = "7JegGRESdli"
+        if text.count(marker) != 1:
+            raise RuntimeError("verified segment-02 repair marker is not unique")
+        return text.replace(marker, "7JegfGRESdli", 1)
+    return text
+
+
 def main() -> int:
     part_paths = sorted((ROOT / "scripts").glob(PART_GLOB))
     if len(part_paths) != len(EXPECTED_PARTS):
@@ -40,7 +53,7 @@ def main() -> int:
 
     parts: list[str] = []
     for index, (path, expected) in enumerate(zip(part_paths, EXPECTED_PARTS, strict=True)):
-        text = path.read_text(encoding="utf-8")
+        text = _repair_verified_transport_damage(index, path.read_text(encoding="utf-8"))
         actual = (len(text), hashlib.sha256(text.encode("utf-8")).hexdigest())
         print(f"payload_part_{index:02d}: length={actual[0]} sha256={actual[1]}")
         if actual != expected:
