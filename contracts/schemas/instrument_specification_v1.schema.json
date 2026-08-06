@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/schemas/instrument_specification_v1.schema.json",
+  "title": "InstrumentSpecificationV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "instrument_id", "canonical_symbol", "base_asset", "quote_asset",
+    "market_type", "settlement_asset", "contract_size", "expiry_time", "strike_price",
+    "option_type", "aliases", "validation_state"
+  ],
+  "properties": {
+    "schema_version": {"const": "instrument-specification-v1"},
+    "instrument_id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "canonical_symbol": {"type": "string", "minLength": 1},
+    "base_asset": {"type": "string", "pattern": "^[A-Z0-9]+$"},
+    "quote_asset": {"type": "string", "pattern": "^[A-Z0-9]+$"},
+    "market_type": {"enum": ["SPOT", "PERPETUAL", "DATED_FUTURE", "OPTION"]},
+    "settlement_asset": {"type": "string", "pattern": "^[A-Z0-9]+$"},
+    "contract_size": {"anyOf": [{"type": "null"}, {"type": "string", "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"}]},
+    "expiry_time": {"anyOf": [{"type": "null"}, {"type": "string", "format": "date-time"}]},
+    "strike_price": {"anyOf": [{"type": "null"}, {"type": "string", "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"}]},
+    "option_type": {"anyOf": [{"type": "null"}, {"enum": ["CALL", "PUT"]}]},
+    "aliases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema_version", "venue", "exchange_symbol", "source_id", "source_revision",
+          "tick_size", "lot_size", "min_qty", "min_notional", "price_precision",
+          "quantity_precision", "fee_tier", "margin_mode", "leverage_policy",
+          "validation_state"
+        ],
+        "properties": {
+          "schema_version": {"const": "venue-instrument-alias-v1"},
+          "venue": {"type": "string", "pattern": "^[A-Z0-9]+$"},
+          "exchange_symbol": {"type": "string", "minLength": 1},
+          "source_id": {"type": "string", "minLength": 1},
+          "source_revision": {"type": "integer", "minimum": 1},
+          "tick_size": {"type": "string", "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"},
+          "lot_size": {"type": "string", "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"},
+          "min_qty": {"type": "string", "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"},
+          "min_notional": {"type": "string", "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"},
+          "price_precision": {"type": "integer", "minimum": 0},
+          "quantity_precision": {"type": "integer", "minimum": 0},
+          "fee_tier": {"type": "string", "minLength": 1},
+          "margin_mode": {"type": ["string", "null"]},
+          "leverage_policy": {"type": "string", "minLength": 1},
+          "validation_state": {"const": "VALIDATED_METADATA_ONLY"}
+        }
+      }
+    },
+    "validation_state": {"const": "VALIDATED_NORMALIZATION_ONLY"}
+  }
+}
