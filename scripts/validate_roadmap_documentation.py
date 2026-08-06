@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate immutable roadmap history, lifecycle and locked future standards."""
+"""Validate immutable roadmap history, current lifecycle and locked future standards."""
 from __future__ import annotations
 
 import json
@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
 ROADMAP_DIR = DOCS / "roadmap"
 REGISTRY = ROOT / "data/audit/product_scope_roadmap_lot21.jsonl"
-OVERLAY = ROOT / "data/audit/roadmap_lifecycle_overlay_lot26.json"
+OVERLAY = ROOT / "data/audit/roadmap_lifecycle_overlay_lot29.json"
 
 VERSION_DOCS = [
     f"V{number:02d}_{name}.md"
@@ -60,6 +60,23 @@ REQUIRED_LOT26_FILES = [
     "scripts/run_lot26_multi_timeframe_alignment_engine.py",
     "scripts/validate_lot26.py",
     "reports/LOT_26_MULTI_TIMEFRAME_ALIGNMENT_FINAL_REPORT.md",
+]
+
+REQUIRED_LOT29_FILES = [
+    "docs/LOT_29_V2_DETERMINISTIC_REPLAY_AND_AUDIT.md",
+    "docs/ACCEPTANCE_CRITERIA_LOT_29.md",
+    "docs/LOT_29_IMPLEMENTATION_WORKLOG.md",
+    "docs/LOT_29_POST_MERGE_AUDIT.md",
+    "config/replay/v2_deterministic_replay_audit_v1.json",
+    "contracts/schemas/v2_deterministic_replay_audit_state_v1.schema.json",
+    "data/audit/v2_deterministic_replay_and_audit_lot29.json",
+    "data/audit/v2_deterministic_replay_and_audit_audit_lot29.json",
+    "data/audit/v2_replay_closure_manifest_lot29.json",
+    "reports/lot_29_v2_deterministic_replay_and_audit_report.md",
+    "src/crypto_quant_bot/market_analysis/v2_deterministic_replay_and_audit.py",
+    "src/crypto_quant_bot/market_analysis/v2_replay_audit_models.py",
+    "scripts/run_lot29_v2_deterministic_replay_and_audit.py",
+    "scripts/validate_lot29.py",
 ]
 
 REQUIRED_PORTFOLIO_RISK_FILES = [
@@ -147,21 +164,40 @@ def validate_history(rows: list[dict[str, Any]]) -> None:
 
 def validate_lifecycle() -> None:
     overlay = load_object(OVERLAY)
-    require(overlay.get("latest_implemented_lot") == 26, "lifecycle latest lot must be 26")
+    require(overlay.get("latest_implemented_lot") == 29, "lifecycle latest lot must be 29")
+    require(
+        overlay.get("previous_overlay") == "data/audit/roadmap_lifecycle_overlay_lot28.json",
+        "Lot 29 lifecycle predecessor mismatch",
+    )
     lots = overlay.get("lots")
     require(isinstance(lots, dict), "lifecycle lots are missing")
-    lot26 = lots.get("26")
-    lot27 = lots.get("27")
-    require(isinstance(lot26, dict), "Lot 26 lifecycle entry missing")
-    require(isinstance(lot27, dict), "Lot 27 lifecycle entry missing")
+
+    for lot_number in (26, 27, 28):
+        entry = lots.get(str(lot_number))
+        require(isinstance(entry, dict), f"Lot {lot_number} lifecycle entry missing")
+        require(
+            entry.get("status") == "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY",
+            f"Lot {lot_number} validated status changed",
+        )
+        require(entry.get("trade_allowed") is False, f"Lot {lot_number} trading enabled")
+        require(entry.get("execution_allowed") is False, f"Lot {lot_number} execution enabled")
+
+    lot29 = lots.get("29")
+    lot30 = lots.get("30")
+    require(isinstance(lot29, dict), "Lot 29 lifecycle entry missing")
+    require(isinstance(lot30, dict), "Lot 30 lifecycle entry missing")
     require(
-        lot26.get("status") == "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY",
-        "Lot 26 must remain validated after exact-commit CI passes",
+        lot29.get("status") == "IMPLEMENTED_VALIDATED_OFFLINE_REPLAY_ONLY",
+        "Lot 29 must remain validated offline replay only",
     )
-    require(lot26.get("trade_allowed") is False, "Lot 26 trading must remain disabled")
-    require(lot26.get("execution_allowed") is False, "Lot 26 execution must remain disabled")
-    require(lot27.get("status") == "PLANNED_LOCKED", "Lot 27 must remain locked")
-    require(lot27.get("implementation_started") is False, "Lot 27 must not be started")
+    require(
+        lot29.get("merged_commit") == "89d5b01f4bc49b30660c46babfb837f3bcc0a276",
+        "Lot 29 merged commit mismatch",
+    )
+    require(lot29.get("trade_allowed") is False, "Lot 29 trading must remain disabled")
+    require(lot29.get("execution_allowed") is False, "Lot 29 execution must remain disabled")
+    require(lot30.get("status") == "PLANNED_LOCKED", "Lot 30 must remain locked")
+    require(lot30.get("implementation_started") is False, "Lot 30 must not be started")
 
 
 def validate_version_docs() -> None:
@@ -196,6 +232,38 @@ def validate_lot26_files_and_boundaries() -> None:
         "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY" in status,
         "Lot 26 status is not current",
     )
+
+
+def validate_lot29_release() -> None:
+    missing = [relative for relative in REQUIRED_LOT29_FILES if not (ROOT / relative).is_file()]
+    require(not missing, f"missing Lot 29 release files: {missing}")
+
+    state = load_object(ROOT / "data/audit/v2_deterministic_replay_and_audit_lot29.json")
+    audit = load_object(ROOT / "data/audit/v2_deterministic_replay_and_audit_audit_lot29.json")
+    closure = load_object(ROOT / "data/audit/v2_replay_closure_manifest_lot29.json")
+    worklog = (ROOT / "docs/LOT_29_IMPLEMENTATION_WORKLOG.md").read_text(encoding="utf-8")
+    post_merge = (ROOT / "docs/LOT_29_POST_MERGE_AUDIT.md").read_text(encoding="utf-8")
+    roadmap = (ROOT / "docs/ROADMAP_V1_TO_V21.md").read_text(encoding="utf-8")
+
+    require(state.get("replay_status") == "MATCH", "Lot 29 replay status changed")
+    require(state.get("analysis_only") is True, "Lot 29 analysis-only invariant changed")
+    require(state.get("used_for_decision") is False, "Lot 29 decision permission enabled")
+    require(state.get("trade_allowed") is False, "Lot 29 trading permission enabled")
+    require(state.get("execution_allowed") is False, "Lot 29 execution permission enabled")
+    require(state.get("approved_size") == 0, "Lot 29 approved size changed")
+    require(state.get("closure_manifest") == closure, "Lot 29 closure differs from state")
+    require(audit.get("output_checksum") == state.get("output_checksum"), "Lot 29 audit link mismatch")
+    require(audit.get("chain_checksum") == closure.get("chain_checksum"), "Lot 29 chain link mismatch")
+    require(closure.get("lot_sequence") == list(range(21, 29)), "Lot 29 lot sequence mismatch")
+    require(closure.get("artifact_count") == 8, "Lot 29 artifact count mismatch")
+    require(closure.get("validator_count") == 8, "Lot 29 validator count mismatch")
+    require(
+        "IMPLEMENTED_VALIDATED_OFFLINE_REPLAY_ONLY" in worklog,
+        "Lot 29 worklog status is not current",
+    )
+    require("GO_LOT29_POST_MERGE_AUDIT" in post_merge, "Lot 29 post-merge verdict missing")
+    require("Lot 30 remains `PLANNED_LOCKED`" in post_merge, "Lot 30 lock statement missing")
+    require("Dernier lot dont l'implémentation est terminée : **Lot 29**" in roadmap, "roadmap current Lot 29 status missing")
 
 
 def validate_portfolio_risk_standard() -> None:
@@ -311,13 +379,14 @@ def main() -> int:
         validate_lifecycle()
         validate_version_docs()
         validate_lot26_files_and_boundaries()
+        validate_lot29_release()
         validate_portfolio_risk_standard()
         validate_no_temporary_files()
     except (RoadmapValidationError, json.JSONDecodeError) as exc:
         print(f"ROADMAP DOCUMENTATION VALIDATION: FAIL\n{exc}", file=sys.stderr)
         return 1
     print("ROADMAP DOCUMENTATION VALIDATION: PASS")
-    print("historical_lots=178 lifecycle_latest=26 status=AWAITING_EXACT_COMMIT_CI next_locked=27")
+    print("historical_lots=178 lifecycle_latest=29 status=POST_MERGE_AUDITED next_locked=30")
     return 0
 
 
