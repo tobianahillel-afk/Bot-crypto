@@ -1,0 +1,20 @@
+{
+  "analysis_only": true,
+  "approved_size": 0,
+  "artifact_count": 8,
+  "chain_checksum": "06826f423e3e9f3a1f7f6090a781eddbcd2dffd667815ee1d4d71df08393ffdd",
+  "code_commit": "271e913514eb2edeee6e6a50208b0686004a2ca5",
+  "execution_allowed": false,
+  "output_checksum": "e98a3334097bba1e7d354b65357cb6cad5a500c5e5efb2122096cb3cb2c0608c",
+  "reason_codes": [
+    "V2_ARTIFACT_CHAIN_MATCH",
+    "V2_VALIDATORS_PASS",
+    "V2_OFFLINE_ONLY"
+  ],
+  "replay_status": "MATCH",
+  "run_id": "ceb370ec-d379-5c70-8afd-6a2b682e16da",
+  "schema_version": "v2-deterministic-replay-audit-audit-v1",
+  "trade_allowed": false,
+  "used_for_decision": false,
+  "validator_count": 8
+}
