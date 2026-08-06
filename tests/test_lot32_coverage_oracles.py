@@ -229,6 +229,7 @@ def test_round_trip_defensive_mismatch_branches() -> None:
 
 def test_state_and_audit_invalid_status_count_and_reason_guards() -> None:
     state, audit = build_lot32_artifacts(ROOT, VALID_SHA)
+    assert isinstance(audit, InstrumentSymbolContractNormalizationAuditV1)
     with pytest.raises(InstrumentNormalizationError, match="validation_state"):
         replace(state, validation_state="UNKNOWN")
     with pytest.raises(InstrumentNormalizationError, match="reason code"):
