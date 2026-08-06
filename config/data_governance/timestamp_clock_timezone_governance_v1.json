@@ -26,23 +26,23 @@
       "usable_from": "2026-08-06T19:15:00.171000Z"
     },
     {
-      "available_at": "2026-08-06T19:15:00.181500Z",
+      "available_at": "2026-08-06T19:15:00.181000Z",
       "clock_domain": "PROCESS_MONOTONIC_NS",
-      "event_time": "2026-08-06T19:15:00.101500Z",
-      "exchange_time": "2026-08-06T19:15:00.101500Z",
+      "event_time": "2026-08-06T19:15:00.101000Z",
+      "exchange_time": "2026-08-06T19:15:00.101000Z",
       "instrument_id": "btc-eur-spot",
       "monotonic_time": 1001000000,
-      "process_time": "2026-08-06T19:15:00.181500Z",
-      "raw_timestamp": "2026-08-06T19:15:00.101000Z",
-      "receive_time": "2026-08-06T19:15:00.161500Z",
+      "process_time": "2026-08-06T19:15:00.181000Z",
+      "raw_timestamp": "2026-08-06T19:15:00.100500Z",
+      "receive_time": "2026-08-06T19:15:00.161000Z",
       "record_id": "coinbase-record-2",
       "revision_id": 0,
       "sequence_id": 2,
       "source_id": "coinbase-public-spot-metadata",
-      "source_time": "2026-08-06T19:15:00.101000Z",
+      "source_time": "2026-08-06T19:15:00.100500Z",
       "source_timezone": "UTC",
       "timestamp_precision": "MICROSECONDS",
-      "usable_from": "2026-08-06T19:15:00.181500Z"
+      "usable_from": "2026-08-06T19:15:00.181000Z"
     },
     {
       "available_at": "2026-08-06T19:15:00.320000Z",
