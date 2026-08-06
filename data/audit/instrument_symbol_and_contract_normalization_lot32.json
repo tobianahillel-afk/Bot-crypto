@@ -1,0 +1,128 @@
+{
+  "analysis_only": true,
+  "approved_size": 0,
+  "available_at": "2026-08-06T19:15:00Z",
+  "event_time": "2026-08-06T19:15:00Z",
+  "execution_allowed": false,
+  "external_connectivity_allowed": false,
+  "generated_at": "2026-08-06T19:15:00Z",
+  "instrument_registry": {
+    "instruments": [
+      {
+        "aliases": [
+          {
+            "exchange_symbol": "btceur",
+            "fee_tier": "REFERENCE_METADATA_ONLY",
+            "leverage_policy": "FORBIDDEN",
+            "lot_size": "0.00000001",
+            "margin_mode": null,
+            "min_notional": "10",
+            "min_qty": "0.00001",
+            "price_precision": 2,
+            "quantity_precision": 8,
+            "schema_version": "venue-instrument-alias-v1",
+            "source_id": "bitstamp-public-spot-metadata",
+            "source_revision": 1,
+            "tick_size": "0.01",
+            "validation_state": "VALIDATED_METADATA_ONLY",
+            "venue": "BITSTAMP"
+          },
+          {
+            "exchange_symbol": "BTC-EUR",
+            "fee_tier": "REFERENCE_METADATA_ONLY",
+            "leverage_policy": "FORBIDDEN",
+            "lot_size": "0.00000001",
+            "margin_mode": null,
+            "min_notional": "1",
+            "min_qty": "0.00000001",
+            "price_precision": 2,
+            "quantity_precision": 8,
+            "schema_version": "venue-instrument-alias-v1",
+            "source_id": "coinbase-public-spot-metadata",
+            "source_revision": 1,
+            "tick_size": "0.01",
+            "validation_state": "VALIDATED_METADATA_ONLY",
+            "venue": "COINBASE"
+          },
+          {
+            "exchange_symbol": "XBTEUR",
+            "fee_tier": "REFERENCE_METADATA_ONLY",
+            "leverage_policy": "FORBIDDEN",
+            "lot_size": "0.00000001",
+            "margin_mode": null,
+            "min_notional": "5",
+            "min_qty": "0.0001",
+            "price_precision": 1,
+            "quantity_precision": 8,
+            "schema_version": "venue-instrument-alias-v1",
+            "source_id": "kraken-public-spot-metadata",
+            "source_revision": 1,
+            "tick_size": "0.1",
+            "validation_state": "VALIDATED_METADATA_ONLY",
+            "venue": "KRAKEN"
+          }
+        ],
+        "base_asset": "BTC",
+        "canonical_symbol": "BTC/EUR:SPOT",
+        "contract_size": null,
+        "expiry_time": null,
+        "instrument_id": "btc-eur-spot",
+        "market_type": "SPOT",
+        "option_type": null,
+        "quote_asset": "EUR",
+        "schema_version": "instrument-specification-v1",
+        "settlement_asset": "EUR",
+        "strike_price": null,
+        "validation_state": "VALIDATED_NORMALIZATION_ONLY"
+      }
+    ],
+    "registry_id": "canonical-instrument-registry",
+    "registry_version": "1.0.0",
+    "revision_policy": "IMMUTABLE_VERSIONED_REPLACEMENT",
+    "schema_version": "instrument-registry-v1"
+  },
+  "lineage": {
+    "available_at": "2026-08-06T19:15:00Z",
+    "lineage_id": "lot32-from-certified-lot31-source-registry",
+    "lot31_audit_checksum": "3e5b687dc3b76d170e2830c28d8c3a0c20c268ca7c89ebdce30a446f029645f1",
+    "lot31_state_checksum": "59d6f01a65cb071a95abe116938709c5112b82462f2b0d1941a01998df2f3955",
+    "schema_version": "lot32-lineage-envelope-v1",
+    "source_registry_checksum": "d920d24dc5e774e7aa9f221965e88796c6fecdd8bfc61531109b9b4c040c1f29",
+    "source_registry_path": "data/audit/source_registry_lot31.json"
+  },
+  "metrics": {
+    "lot_32_frozen_instruments_total": 0,
+    "lot_32_processing_latency_ms": 0,
+    "lot_32_records_processed_total": 1,
+    "lot_32_validation_failures_total": 0,
+    "lot_32_venue_aliases_total": 3,
+    "schema_version": "lot32-metrics-v1"
+  },
+  "network_ingestion_allowed": false,
+  "order_routing_allowed": false,
+  "output_checksum": "da269de9a3a94f83b3dd437362ae565bd38a098cbe0dc81190887347c7fce240",
+  "real_credentials_allowed": false,
+  "reason_codes": [
+    "LOT32_ENTRY_GATE_VERIFIED",
+    "LOT31_SOURCE_REGISTRY_LINEAGE_VERIFIED",
+    "INSTRUMENT_METADATA_NORMALIZED",
+    "CANONICAL_VENUE_ROUND_TRIP_VERIFIED",
+    "DECIMAL_CONSTRAINTS_VALIDATED",
+    "EXTERNAL_CONNECTIVITY_DISABLED",
+    "LOT33_REMAINS_LOCKED"
+  ],
+  "risk_approval_allowed": false,
+  "run_context": {
+    "code_commit": "cd9ffa91a4a64c36a71a40e746cf575fe438d59b",
+    "config_version": "lot32-instrument-normalization-config-v1",
+    "correlation_id": "lot32-v3-instrument-normalization",
+    "run_id": "lot32-instrument-normalization-certification-run",
+    "runtime_mode": "DATA_GOVERNANCE_ONLY",
+    "schema_version": "run-context-v1"
+  },
+  "schema_version": "instrument-symbol-contract-normalization-state-v1",
+  "signal_generation_allowed": false,
+  "trade_allowed": false,
+  "used_for_decision": false,
+  "validation_state": "VALIDATED_NORMALIZATION_ONLY"
+}
