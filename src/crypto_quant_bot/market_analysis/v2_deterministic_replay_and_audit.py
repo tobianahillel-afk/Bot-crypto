@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-import subprocess
+import subprocess  # nosec B404 -- fixed local validator commands only
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
@@ -121,7 +121,8 @@ def build_artifact_evidence(root: Path, spec: dict[str, Any]) -> ArtifactEvidenc
 
 def run_validator(root: Path, lot: int, script_path: str) -> ValidatorEvidenceV1:
     command = ("python", script_path)
-    result = subprocess.run(
+    # The command is a two-element tuple validated to scripts/validate_lot*.py; shell is never used.
+    result = subprocess.run(  # nosec B603
         command,
         cwd=root,
         check=False,
