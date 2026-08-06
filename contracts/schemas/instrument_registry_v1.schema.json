@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/schemas/instrument_registry_v1.schema.json",
+  "title": "InstrumentRegistryV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "registry_id",
+    "registry_version",
+    "revision_policy",
+    "instruments"
+  ],
+  "properties": {
+    "schema_version": {"const": "instrument-registry-v1"},
+    "registry_id": {"type": "string", "minLength": 1},
+    "registry_version": {"type": "string", "minLength": 1},
+    "revision_policy": {"const": "IMMUTABLE_VERSIONED_REPLACEMENT"},
+    "instruments": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "instrument_specification_v1.schema.json"}
+    }
+  }
+}

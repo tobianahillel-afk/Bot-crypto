@@ -1,0 +1,122 @@
+name: Lot 32 instrument normalization validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'config/data_governance/instrument_symbol_contract_normalization_v1.json'
+      - 'contracts/schemas/instrument_*.json'
+      - 'src/crypto_quant_bot/data_governance/**'
+      - 'scripts/*lot32*'
+      - 'tests/test_lot32_*.py'
+      - 'docs/*LOT_32*'
+      - 'docs/LOT32_*'
+      - 'reports/*lot_32*'
+      - 'data/audit/*lot32.json'
+      - '.github/workflows/lot32-instrument-normalization.yml'
+      - 'requirements-dev.lock'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lot32:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Compile lint type and schema checks
+        run: |
+          python -m compileall -q src scripts tests
+          python -m json.tool config/data_governance/instrument_symbol_contract_normalization_v1.json >/dev/null
+          python -m json.tool contracts/schemas/instrument_specification_v1.schema.json >/dev/null
+          python -m json.tool contracts/schemas/instrument_registry_v1.schema.json >/dev/null
+          python -m json.tool contracts/schemas/instrument_symbol_contract_normalization_state_v1.schema.json >/dev/null
+          python -m json.tool contracts/schemas/instrument_symbol_contract_normalization_audit_v1.schema.json >/dev/null
+          ruff check \
+            src/crypto_quant_bot/data_governance \
+            scripts/run_lot32_instrument_symbol_and_contract_normalization.py \
+            scripts/validate_lot32.py \
+            scripts/validate_lot32_no_connectivity.py \
+            tests/test_lot32_*.py
+          mypy src/crypto_quant_bot/data_governance
+      - name: Targeted line and branch coverage
+        run: |
+          mkdir -p reports/lot32
+          coverage erase
+          pytest -q \
+            tests/test_lot32_instrument_symbol_and_contract_normalization.py \
+            tests/test_lot32_validation_boundaries.py \
+            tests/test_lot32_mutation_oracles.py \
+            tests/test_lot32_coverage_oracles.py \
+            --cov=crypto_quant_bot.data_governance.instrument_symbol_and_contract_normalization \
+            --cov=crypto_quant_bot.data_governance.instrument_symbol_and_contract_normalization_models \
+            --cov-branch \
+            --cov-report=json:reports/lot32/coverage.json \
+            --cov-report=term-missing
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          totals = json.loads(Path('reports/lot32/coverage.json').read_text())['totals']
+          lines = float(totals['percent_statements_covered'])
+          branches = float(totals['percent_branches_covered'])
+          print(f'Lot32 coverage: lines={lines:.2f}% branches={branches:.2f}%')
+          if lines < 95.0 or branches < 90.0:
+              raise SystemExit('LOT32_CRITICAL_COVERAGE_BELOW_THRESHOLD')
+          PY
+      - name: Exact instrument normalization and deterministic replay
+        env:
+          CODE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          python scripts/validate_lot31.py
+          python scripts/validate_lot31_no_connectivity.py
+          python scripts/validate_lot32_entry_gate.py
+          python scripts/run_lot32_instrument_symbol_and_contract_normalization.py --code-commit "$CODE_COMMIT"
+          cp data/audit/instrument_symbol_and_contract_normalization_lot32.json /tmp/lot32-state-run1.json
+          cp data/audit/instrument_symbol_and_contract_normalization_audit_lot32.json /tmp/lot32-audit-run1.json
+          cp data/audit/instrument_registry_lot32.json /tmp/lot32-registry-run1.json
+          python scripts/validate_lot32.py
+          python scripts/validate_lot32_no_connectivity.py
+          python scripts/run_lot32_instrument_symbol_and_contract_normalization.py --code-commit "$CODE_COMMIT"
+          cmp /tmp/lot32-state-run1.json data/audit/instrument_symbol_and_contract_normalization_lot32.json
+          cmp /tmp/lot32-audit-run1.json data/audit/instrument_symbol_and_contract_normalization_audit_lot32.json
+          cmp /tmp/lot32-registry-run1.json data/audit/instrument_registry_lot32.json
+          python scripts/validate_lot32.py
+      - name: Architecture traceability quality and security
+        run: |
+          python scripts/validate_lot31.py
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          bandit -q -r src/crypto_quant_bot/data_governance
+          pip-audit -r requirements-dev.lock
+      - name: Full regression and anti-flake
+        run: |
+          pytest -q
+          pytest -q tests/test_lot32_*.py
+          pytest -q tests/test_lot32_*.py
+          pytest -q tests/test_lot32_*.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot32-instrument-normalization-evidence
+          path: |
+            data/audit/*lot32.json
+            reports/lot_32_instrument_symbol_and_contract_normalization_report.md
+            reports/lot32/

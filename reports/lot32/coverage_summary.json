@@ -1,0 +1,18 @@
+{
+  "branch_coverage_percent": 91.67,
+  "branch_minimum_percent": 90.0,
+  "covered_branches": 176,
+  "covered_statements": 610,
+  "evidence_commit": "cd9ffa91a4a64c36a71a40e746cf575fe438d59b",
+  "line_coverage_percent": 97.76,
+  "line_minimum_percent": 95.0,
+  "missing_branches": 16,
+  "missing_statements": 14,
+  "scope": [
+    "instrument_symbol_and_contract_normalization.py",
+    "instrument_symbol_and_contract_normalization_models.py"
+  ],
+  "schema_version": "lot32-independent-coverage-summary-v1",
+  "status": "PASS",
+  "test_count": 57
+}
