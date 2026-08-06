@@ -1,0 +1,171 @@
+{
+  "analysis_only": true,
+  "approved_size": 0,
+  "closure_manifest": {
+    "closure_lot": 30,
+    "closure_status": "V2_MARKET_ANALYSIS_CLOSED_OFFLINE_ONLY",
+    "covered_lot_sequence": [21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
+    "direct_validated_lot": 29,
+    "final_chain_checksum": "2a598990adaec7ebc1368f30295a0130d4d8bd8f89c9610772347f25ba6c17cf",
+    "lot29_audit_checksum": "e51b724e852449ddbd086c5c9e6e5576c6efc3835295659df7bbe8ccef0aa38e",
+    "lot29_closure_checksum": "64eed3154ec3f37a1dce73d815b4253944da8ab5ea57920517b76773134cc47a",
+    "lot29_state_checksum": "f614fb21da31349d86f098a0d6829a5b25ad818c3a06fa6035c125dc70b2bfb6",
+    "negative_control_count": 5,
+    "schema_version": "v2-final-closure-manifest-v1",
+    "upstream_artifact_checksums": [
+      "3e62c55a14dbd8bba019f5545f468818b65bb9bcfa6fdb33ba3bc242ac2455a5",
+      "1010553ee2ac9bf964454ae307d9773f52db92ae5eb320791f2fef531017f09a",
+      "dfc4914be30f565e08af4add880c05998d9b945e3a0d93c7b0523625cea867bb",
+      "2ad7f3dd81990240cbe17ee3a75844f676b209312cb11a9445a215c7b907a0f8",
+      "693aab77ebf91a3bbc057081874419395a46f3afbc2b28c0291ce06f4b4bdf81",
+      "464441651def87050f6e3b3162a01e7b829eedce9a5f7a165c540dc29a5fc68d",
+      "e07f84f6f357cadec8c25c67fb06b123e9e5835293d0feaa686aeb9cbef31682",
+      "32191dd0d0707c874372d3b3e36c06579e254df8ac0804339f8e6b7524f27076"
+    ],
+    "upstream_lot_sequence": [21, 22, 23, 24, 25, 26, 27, 28],
+    "validator_stdout_checksum": "1b588dc4d61b884befaa0a245ca0204dbc6041925907a9af2e3246041a6bc839"
+  },
+  "code_commit": "602bc91b2d4c886f654840294fa740474515e0a0",
+  "execution_allowed": false,
+  "future_capabilities_locked": [
+    "ContinuousMarketStateV1",
+    "MultiHorizonForecastV1",
+    "ParticipantBehaviorScenarioV1",
+    "TradeIntent",
+    "RiskDecisionV1",
+    "RiskReservationV1",
+    "OrderIntent"
+  ],
+  "negative_controls": [
+    {
+      "name": "SCHEMA_MISMATCH_REJECTED",
+      "reason_code": "UNSUPPORTED_SCHEMA_BLOCKED",
+      "schema_version": "v2-closure-negative-control-evidence-v1",
+      "status": "PASS"
+    },
+    {
+      "name": "UPSTREAM_CHECKSUM_TAMPER_REJECTED",
+      "reason_code": "UPSTREAM_CHECKSUM_MISMATCH_BLOCKED",
+      "schema_version": "v2-closure-negative-control-evidence-v1",
+      "status": "PASS"
+    },
+    {
+      "name": "FORBIDDEN_CAPABILITY_REJECTED",
+      "reason_code": "FORBIDDEN_CAPABILITY_BLOCKED",
+      "schema_version": "v2-closure-negative-control-evidence-v1",
+      "status": "PASS"
+    },
+    {
+      "name": "VALIDATOR_DIVERGENCE_REJECTED",
+      "reason_code": "NON_DETERMINISTIC_VALIDATOR_BLOCKED",
+      "schema_version": "v2-closure-negative-control-evidence-v1",
+      "status": "PASS"
+    },
+    {
+      "name": "LIFECYCLE_UNLOCK_REJECTED",
+      "reason_code": "UNAUTHORIZED_LIFECYCLE_ADVANCE_BLOCKED",
+      "schema_version": "v2-closure-negative-control-evidence-v1",
+      "status": "PASS"
+    }
+  ],
+  "order_routing_allowed": false,
+  "output_checksum": "c1cfab56ae33cd0add04af17a375045c631fab780e198f06dce00b5d8dec12ee",
+  "reason_codes": [
+    "V2_LOTS_21_30_COVERED",
+    "V2_REPLAY_CHAIN_MATCH",
+    "V2_NEGATIVE_CONTROLS_PASS",
+    "V3_CAPABILITIES_LOCKED",
+    "V2_OFFLINE_ONLY"
+  ],
+  "risk_approval_allowed": false,
+  "runtime_mode": "LOCAL_OFFLINE_ANALYSIS_ONLY",
+  "schema_version": "v2-market-analysis-closure-state-v1",
+  "signal_generation_allowed": false,
+  "trade_allowed": false,
+  "upstream_artifacts": [
+    {
+      "artifact_checksum": "3e62c55a14dbd8bba019f5545f468818b65bb9bcfa6fdb33ba3bc242ac2455a5",
+      "artifact_path": "data/audit/product_scope_lot21.json",
+      "byte_size": 173794,
+      "embedded_output_checksum": null,
+      "lot": 21,
+      "schema_version": "v2-closure-upstream-artifact-evidence-v1"
+    },
+    {
+      "artifact_checksum": "1010553ee2ac9bf964454ae307d9773f52db92ae5eb320791f2fef531017f09a",
+      "artifact_path": "data/audit/market_analysis_lot22.json",
+      "byte_size": 7373,
+      "embedded_output_checksum": null,
+      "lot": 22,
+      "schema_version": "v2-closure-upstream-artifact-evidence-v1"
+    },
+    {
+      "artifact_checksum": "dfc4914be30f565e08af4add880c05998d9b945e3a0d93c7b0523625cea867bb",
+      "artifact_path": "data/audit/technical_indicators_lot23.json",
+      "byte_size": 11078,
+      "embedded_output_checksum": null,
+      "lot": 23,
+      "schema_version": "v2-closure-upstream-artifact-evidence-v1"
+    },
+    {
+      "artifact_checksum": "2ad7f3dd81990240cbe17ee3a75844f676b209312cb11a9445a215c7b907a0f8",
+      "artifact_path": "data/audit/trend_range_momentum_lot24.json",
+      "byte_size": 6548,
+      "embedded_output_checksum": null,
+      "lot": 24,
+      "schema_version": "v2-closure-upstream-artifact-evidence-v1"
+    },
+    {
+      "artifact_checksum": "693aab77ebf91a3bbc057081874419395a46f3afbc2b28c0291ce06f4b4bdf81",
+      "artifact_path": "data/audit/volatility_regime_confluence_lot25.json",
+      "byte_size": 9354,
+      "embedded_output_checksum": null,
+      "lot": 25,
+      "schema_version": "v2-closure-upstream-artifact-evidence-v1"
+    },
+    {
+      "artifact_checksum": "464441651def87050f6e3b3162a01e7b829eedce9a5f7a165c540dc29a5fc68d",
+      "artifact_path": "data/audit/multi_timeframe_alignment_engine_lot26.json",
+      "byte_size": 1989,
+      "embedded_output_checksum": "c5238d4e3782ab0ae75b6dae84724f061c11917f07ee899d2341ece2e031d556",
+      "lot": 26,
+      "schema_version": "v2-closure-upstream-artifact-evidence-v1"
+    },
+    {
+      "artifact_checksum": "e07f84f6f357cadec8c25c67fb06b123e9e5835293d0feaa686aeb9cbef31682",
+      "artifact_path": "data/audit/global_market_context_aggregator_lot27.json",
+      "byte_size": 5021,
+      "embedded_output_checksum": "1bd3f23134d337cf58205f39147b32892ced1624c2428eb4d58085d48951a98d",
+      "lot": 27,
+      "schema_version": "v2-closure-upstream-artifact-evidence-v1"
+    },
+    {
+      "artifact_checksum": "32191dd0d0707c874372d3b3e36c06579e254df8ac0804339f8e6b7524f27076",
+      "artifact_path": "data/audit/explanation_core_and_why_not_trade_layer_lot28.json",
+      "byte_size": 26416,
+      "embedded_output_checksum": "e5e23e67e5d033d449b4ca46b6cdae2f6a7aad9649266ce3ad21f42de1d16e02",
+      "lot": 28,
+      "schema_version": "v2-closure-upstream-artifact-evidence-v1"
+    }
+  ],
+  "used_for_decision": false,
+  "validator_replays": [
+    {
+      "command": ["python", "scripts/validate_lot29.py"],
+      "return_code": 0,
+      "run_index": 1,
+      "schema_version": "v2-closure-validator-replay-evidence-v1",
+      "status": "PASS",
+      "stdout_checksum": "1b588dc4d61b884befaa0a245ca0204dbc6041925907a9af2e3246041a6bc839"
+    },
+    {
+      "command": ["python", "scripts/validate_lot29.py"],
+      "return_code": 0,
+      "run_index": 2,
+      "schema_version": "v2-closure-validator-replay-evidence-v1",
+      "status": "PASS",
+      "stdout_checksum": "1b588dc4d61b884befaa0a245ca0204dbc6041925907a9af2e3246041a6bc839"
+    }
+  ],
+  "version_id": "V2_MARKET_ANALYSIS"
+}
