@@ -1,0 +1,118 @@
+name: Lot 31 market data source registry validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'config/data_governance/market_data_source_registry_v1.json'
+      - 'contracts/schemas/*source_registry*.json'
+      - 'contracts/schemas/market_data_governance_scope_source_registry_*.json'
+      - 'src/crypto_quant_bot/data_governance/**'
+      - 'scripts/*lot31*'
+      - 'tests/test_lot31_*.py'
+      - 'docs/*LOT_31*'
+      - 'docs/LOT31_*'
+      - 'reports/*lot_31*'
+      - 'data/audit/*lot31.json'
+      - '.github/workflows/lot31-source-registry.yml'
+      - 'requirements-dev.lock'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lot31:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Compile lint type and schema checks
+        run: |
+          python -m compileall -q src scripts tests
+          python -m json.tool config/data_governance/market_data_source_registry_v1.json >/dev/null
+          python -m json.tool contracts/schemas/source_registry_v1.schema.json >/dev/null
+          python -m json.tool contracts/schemas/market_data_governance_scope_source_registry_state_v1.schema.json >/dev/null
+          python -m json.tool contracts/schemas/market_data_governance_scope_source_registry_audit_v1.schema.json >/dev/null
+          ruff check \
+            src/crypto_quant_bot/data_governance \
+            scripts/run_lot31_market_data_governance_scope_and_source_registry.py \
+            scripts/validate_lot31.py \
+            scripts/validate_lot31_no_connectivity.py \
+            tests/test_lot31_*.py
+          mypy src/crypto_quant_bot/data_governance
+      - name: Targeted line and branch coverage
+        run: |
+          mkdir -p reports/lot31
+          coverage erase
+          pytest -q tests/test_lot31_*.py \
+            --cov=crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry \
+            --cov=crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry_models \
+            --cov=crypto_quant_bot.data_governance.source_registry_models \
+            --cov=crypto_quant_bot.data_governance.source_registry_state \
+            --cov=crypto_quant_bot.data_governance.source_registry_validation \
+            --cov-branch \
+            --cov-report=json:reports/lot31/coverage.json \
+            --cov-report=term-missing
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          totals = json.loads(Path('reports/lot31/coverage.json').read_text())['totals']
+          lines = float(totals['percent_statements_covered'])
+          branches = float(totals['percent_branches_covered'])
+          print(f'Lot31 coverage: lines={lines:.2f}% branches={branches:.2f}%')
+          if lines < 95.0 or branches < 90.0:
+              raise SystemExit('LOT31_CRITICAL_COVERAGE_BELOW_THRESHOLD')
+          PY
+      - name: Exact metadata registry and deterministic replay
+        env:
+          CODE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          python scripts/validate_lot31_entry_gate.py
+          python scripts/run_lot31_market_data_governance_scope_and_source_registry.py --code-commit "$CODE_COMMIT"
+          cp data/audit/market_data_governance_scope_and_source_registry_lot31.json /tmp/lot31-state-run1.json
+          cp data/audit/market_data_governance_scope_and_source_registry_audit_lot31.json /tmp/lot31-audit-run1.json
+          cp data/audit/source_registry_lot31.json /tmp/lot31-registry-run1.json
+          python scripts/validate_lot31.py
+          python scripts/validate_lot31_no_connectivity.py
+          python scripts/run_lot31_market_data_governance_scope_and_source_registry.py --code-commit "$CODE_COMMIT"
+          cmp /tmp/lot31-state-run1.json data/audit/market_data_governance_scope_and_source_registry_lot31.json
+          cmp /tmp/lot31-audit-run1.json data/audit/market_data_governance_scope_and_source_registry_audit_lot31.json
+          cmp /tmp/lot31-registry-run1.json data/audit/source_registry_lot31.json
+          python scripts/validate_lot31.py
+      - name: Architecture traceability quality and security
+        run: |
+          python scripts/validate_lot30.py
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          bandit -q -r src/crypto_quant_bot/data_governance
+          pip-audit -r requirements-dev.lock
+      - name: Full regression and anti-flake
+        run: |
+          pytest -q
+          pytest -q tests/test_lot31_*.py
+          pytest -q tests/test_lot31_*.py
+          pytest -q tests/test_lot31_*.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot31-source-registry-evidence
+          path: |
+            data/audit/*lot31.json
+            reports/lot_31_market_data_governance_scope_and_source_registry_report.md
+            reports/lot31/
