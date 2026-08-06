@@ -41,6 +41,11 @@ def payload_checksum(payload: dict[str, Any], field: str) -> str:
     return checksum
 
 
+def decimal_places(value: str, field: str) -> int:
+    exponent = decimal_value(value, field).as_tuple().exponent
+    return max(0, -int(exponent))
+
+
 def _validate_aliases(instrument: dict[str, Any]) -> int:
     aliases = instrument.get("aliases")
     require(isinstance(aliases, list) and aliases, "venue aliases missing")
@@ -50,6 +55,14 @@ def _validate_aliases(instrument: dict[str, Any]) -> int:
     for alias in aliases:
         for field in ("tick_size", "lot_size", "min_qty", "min_notional"):
             decimal_value(alias[field], field)
+        require(
+            decimal_places(alias["tick_size"], "tick_size") == alias["price_precision"],
+            "price_precision differs from tick_size",
+        )
+        require(
+            decimal_places(alias["lot_size"], "lot_size") == alias["quantity_precision"],
+            "quantity_precision differs from lot_size",
+        )
         require(alias["validation_state"] == "VALIDATED_METADATA_ONLY", "alias not validated")
         require(alias["margin_mode"] is None, "spot alias enabled margin")
         require(alias["leverage_policy"] == "FORBIDDEN", "spot alias enabled leverage")
