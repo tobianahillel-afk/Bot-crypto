@@ -162,18 +162,6 @@ def _source_entries(registry: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return entries
 
 
-def _decimal_places(value: str, field: str) -> int:
-    exponent = decimal_value(value, field).as_tuple().exponent
-    return max(0, -int(exponent))
-
-
-def _validate_alias_precision(alias: VenueInstrumentAliasV1) -> None:
-    if _decimal_places(alias.tick_size, "tick_size") != alias.price_precision:
-        raise InstrumentNormalizationError("price_precision differs from tick_size")
-    if _decimal_places(alias.lot_size, "lot_size") != alias.quantity_precision:
-        raise InstrumentNormalizationError("quantity_precision differs from lot_size")
-
-
 def _build_alias(
     raw: dict[str, Any],
     sources: dict[str, dict[str, Any]],
@@ -189,7 +177,7 @@ def _build_alias(
     source_revision = require_integer(raw.get("source_revision"), "source_revision")
     if source.get("revision") != source_revision:
         raise InstrumentNormalizationError("instrument alias source revision changed")
-    alias = VenueInstrumentAliasV1(
+    return VenueInstrumentAliasV1(
         venue=venue,
         exchange_symbol=require_string(raw.get("exchange_symbol"), "exchange_symbol"),
         source_id=source_id,
@@ -205,8 +193,6 @@ def _build_alias(
         leverage_policy=require_string(raw.get("leverage_policy"), "leverage_policy"),
         validation_state="VALIDATED_METADATA_ONLY",
     )
-    _validate_alias_precision(alias)
-    return alias
 
 
 def _build_instrument(
