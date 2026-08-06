@@ -3,8 +3,9 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 from crypto_quant_bot.market_analysis.alignment_io import load_json
 from crypto_quant_bot.market_analysis.v2_replay_audit_models import (
@@ -156,7 +157,7 @@ def _synthetic_validators(specs: Iterable[dict[str, Any]]) -> tuple[ValidatorEvi
             return_code=0,
             status="PASS",
             stdout_checksum=hashlib.sha256(
-                f"synthetic-pass:{spec['lot']}:{spec['validator']}".encode("utf-8")
+                f"synthetic-pass:{spec['lot']}:{spec['validator']}".encode()
             ).hexdigest(),
         )
         for spec in specs

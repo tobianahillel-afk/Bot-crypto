@@ -8,14 +8,14 @@ from types import SimpleNamespace
 import pytest
 
 from crypto_quant_bot.market_analysis.v2_deterministic_replay_and_audit import (
-    build_replay_state,
-    canonical_checksum,
-    file_checksum,
     _parse_artifact_evidence,
     _parse_validator_evidence,
     _validate_artifact_snapshot,
     _validate_safety_documents,
     _validate_validator_snapshot,
+    build_replay_state,
+    canonical_checksum,
+    file_checksum,
     replay_matches,
     run_validator,
     validate_persisted_state,
