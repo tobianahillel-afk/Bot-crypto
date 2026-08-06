@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/contracts/risk_reservation_v1.schema.json",
+  "title": "RiskReservationV1",
+  "description": "Atomic reservation of capital, risk, notional and quantity bound to one immutable intent and one risk decision.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "reservation_id",
+    "intent_id",
+    "intent_hash",
+    "snapshot_id",
+    "snapshot_sequence",
+    "portfolio_state_version_before",
+    "portfolio_state_version_after",
+    "reserved_capital",
+    "reserved_risk",
+    "reserved_notional",
+    "reserved_quantity",
+    "currency",
+    "binding_constraints",
+    "reason_codes",
+    "created_at",
+    "expires_at",
+    "idempotency_key",
+    "decision_hash",
+    "status",
+    "lineage_id",
+    "state_hash"
+  ],
+  "properties": {
+    "schema_version": {"const": "RiskReservationV1"},
+    "reservation_id": {"type": "string", "minLength": 1},
+    "intent_id": {"type": "string", "minLength": 1},
+    "intent_hash": {"$ref": "#/$defs/sha256"},
+    "snapshot_id": {"type": "string", "minLength": 1},
+    "snapshot_sequence": {"type": "integer", "minimum": 0},
+    "portfolio_state_version_before": {"type": "integer", "minimum": 0},
+    "portfolio_state_version_after": {"type": "integer", "minimum": 1},
+    "reserved_capital": {"$ref": "#/$defs/non_negative_number"},
+    "reserved_risk": {"$ref": "#/$defs/non_negative_number"},
+    "reserved_notional": {"$ref": "#/$defs/non_negative_number"},
+    "reserved_quantity": {"$ref": "#/$defs/non_negative_number"},
+    "currency": {"type": "string", "pattern": "^[A-Z0-9]{2,12}$"},
+    "binding_constraints": {"$ref": "#/$defs/unique_ids"},
+    "reason_codes": {"$ref": "#/$defs/unique_ids"},
+    "created_at": {"$ref": "#/$defs/timestamp"},
+    "expires_at": {"$ref": "#/$defs/timestamp"},
+    "consumed_at": {"$ref": "#/$defs/nullable_timestamp"},
+    "released_at": {"$ref": "#/$defs/nullable_timestamp"},
+    "idempotency_key": {"type": "string", "minLength": 1},
+    "decision_hash": {"$ref": "#/$defs/sha256"},
+    "status": {"enum": ["PROPOSED", "RESERVED", "CONSUMED", "RELEASED", "EXPIRED", "CANCELLED"]},
+    "lineage_id": {"type": "string", "minLength": 1},
+    "state_hash": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "timestamp": {"type": "string", "format": "date-time"},
+    "nullable_timestamp": {
+      "anyOf": [
+        {"$ref": "#/$defs/timestamp"},
+        {"type": "null"}
+      ]
+    },
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "non_negative_number": {"type": "number", "minimum": 0},
+    "unique_ids": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    }
+  }
+}
