@@ -2,7 +2,7 @@
 
 ## Status
 
-`IMPLEMENTATION_IN_PROGRESS_AWAITING_EXACT_HEAD_CI`
+`IMPLEMENTED_VALIDATED_METADATA_ONLY`
 
 ## Purpose
 
@@ -160,3 +160,20 @@ Lot 31 does not:
 - architecture, ownership, traceability and engineering-deviation gates;
 - full repository regression and three anti-flake repetitions;
 - Bandit and locked dependency audit.
+
+## Certified evidence
+
+```text
+evidence_commit=689079bb5f348aa1cf62059498fcaddf760665bd
+line_coverage=99.50%
+branch_coverage=98.46%
+mutation_score=81.18%
+state_output_checksum=c25c159fa3857eba9d08c7a8ddbd15a5c61e2b1d5b2aa78eae6cbf7e13dcdf05
+audit_checksum=e06ac07872ba51a1ca21af88f5298d08a362608bc7fe69b15e4d71afbbd60b6f
+```
+
+## Verdict
+
+`GO_LOT31_SOURCE_REGISTRY_VALIDATED_METADATA_ONLY`
+
+Lot 32 remains locked until the Lot 31 implementation is merged and independently audited.
