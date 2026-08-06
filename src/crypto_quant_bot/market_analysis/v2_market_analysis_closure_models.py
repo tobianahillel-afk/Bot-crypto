@@ -18,31 +18,20 @@ def require_git_sha(value: str) -> None:
         raise ClosureValidationError("code_commit must be a lowercase 40-character git sha")
 
 
-def require_fail_closed_safety(
-    *,
-    analysis_only: bool,
-    used_for_decision: bool,
-    signal_generation_allowed: bool,
-    risk_approval_allowed: bool,
-    order_routing_allowed: bool,
-    trade_allowed: bool,
-    execution_allowed: bool,
-    approved_size: int,
-) -> None:
-    if not analysis_only:
+def require_fail_closed_safety(values: dict[str, object]) -> None:
+    if values.get("analysis_only") is not True:
         raise ClosureValidationError("analysis_only must remain true")
-    if any(
-        (
-            used_for_decision,
-            signal_generation_allowed,
-            risk_approval_allowed,
-            order_routing_allowed,
-            trade_allowed,
-            execution_allowed,
-        )
-    ):
+    forbidden_fields = (
+        "used_for_decision",
+        "signal_generation_allowed",
+        "risk_approval_allowed",
+        "order_routing_allowed",
+        "trade_allowed",
+        "execution_allowed",
+    )
+    if any(values.get(field) is not False for field in forbidden_fields):
         raise ClosureValidationError("decision, trading and execution permissions must remain false")
-    if approved_size != 0:
+    if values.get("approved_size") != 0:
         raise ClosureValidationError("approved_size must remain zero")
 
 
@@ -149,19 +138,23 @@ class V2FinalClosureManifestV1:
             raise ClosureValidationError("Lot 29 must be direct input and Lot 30 the closure")
         if len(self.upstream_artifact_checksums) != 8:
             raise ClosureValidationError("eight upstream artifact checksums are required")
-        for checksum in (
+        self._validate_checksums()
+        if self.negative_control_count != 5:
+            raise ClosureValidationError("five negative controls are required")
+        if self.closure_status != "V2_MARKET_ANALYSIS_CLOSED_OFFLINE_ONLY":
+            raise ClosureValidationError("unexpected V2 closure status")
+
+    def _validate_checksums(self) -> None:
+        checksums = (
             *self.upstream_artifact_checksums,
             self.lot29_state_checksum,
             self.lot29_audit_checksum,
             self.lot29_closure_checksum,
             self.validator_stdout_checksum,
             self.final_chain_checksum,
-        ):
+        )
+        for checksum in checksums:
             require_sha256(checksum, "closure checksum")
-        if self.negative_control_count != 5:
-            raise ClosureValidationError("five negative controls are required")
-        if self.closure_status != "V2_MARKET_ANALYSIS_CLOSED_OFFLINE_ONLY":
-            raise ClosureValidationError("unexpected V2 closure status")
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -203,21 +196,31 @@ class V2MarketAnalysisClosureStateV1:
     output_checksum: str
 
     def __post_init__(self) -> None:
+        self._validate_identity()
+        self._validate_evidence()
+        self._validate_policy()
+        require_sha256(self.output_checksum, "output_checksum")
+
+    def _validate_identity(self) -> None:
         require_git_sha(self.code_commit)
         if self.version_id != "V2_MARKET_ANALYSIS":
             raise ClosureValidationError("unexpected version_id")
         if self.runtime_mode != "LOCAL_OFFLINE_ANALYSIS_ONLY":
             raise ClosureValidationError("unexpected runtime mode")
+
+    def _validate_evidence(self) -> None:
         if tuple(item.lot for item in self.upstream_artifacts) != tuple(range(21, 29)):
             raise ClosureValidationError("upstream artifacts must be ordered 21..28")
         if tuple(item.run_index for item in self.validator_replays) != (1, 2):
             raise ClosureValidationError("two ordered validator replays are required")
         if self.validator_replays[0].stdout_checksum != self.validator_replays[1].stdout_checksum:
             raise ClosureValidationError("Lot 29 validator replay outputs must match")
-        if len(self.negative_controls) != 5 or any(
-            item.status != "PASS" for item in self.negative_controls
-        ):
+        if len(self.negative_controls) != 5:
             raise ClosureValidationError("all five negative controls must pass")
+        if any(item.status != "PASS" for item in self.negative_controls):
+            raise ClosureValidationError("all five negative controls must pass")
+
+    def _validate_policy(self) -> None:
         expected_reasons = (
             "V2_LOTS_21_30_COVERED",
             "V2_REPLAY_CHAIN_MATCH",
@@ -238,17 +241,19 @@ class V2MarketAnalysisClosureStateV1:
         )
         if self.future_capabilities_locked != expected_locks:
             raise ClosureValidationError("future capability lock set differs")
-        require_fail_closed_safety(
-            analysis_only=self.analysis_only,
-            used_for_decision=self.used_for_decision,
-            signal_generation_allowed=self.signal_generation_allowed,
-            risk_approval_allowed=self.risk_approval_allowed,
-            order_routing_allowed=self.order_routing_allowed,
-            trade_allowed=self.trade_allowed,
-            execution_allowed=self.execution_allowed,
-            approved_size=self.approved_size,
-        )
-        require_sha256(self.output_checksum, "output_checksum")
+        require_fail_closed_safety(self._safety_values())
+
+    def _safety_values(self) -> dict[str, object]:
+        return {
+            "analysis_only": self.analysis_only,
+            "used_for_decision": self.used_for_decision,
+            "signal_generation_allowed": self.signal_generation_allowed,
+            "risk_approval_allowed": self.risk_approval_allowed,
+            "order_routing_allowed": self.order_routing_allowed,
+            "trade_allowed": self.trade_allowed,
+            "execution_allowed": self.execution_allowed,
+            "approved_size": self.approved_size,
+        }
 
     def payload_without_checksum(self) -> dict[str, Any]:
         return {
@@ -262,14 +267,7 @@ class V2MarketAnalysisClosureStateV1:
             "closure_manifest": self.closure_manifest.to_dict(),
             "reason_codes": list(self.reason_codes),
             "future_capabilities_locked": list(self.future_capabilities_locked),
-            "analysis_only": self.analysis_only,
-            "used_for_decision": self.used_for_decision,
-            "signal_generation_allowed": self.signal_generation_allowed,
-            "risk_approval_allowed": self.risk_approval_allowed,
-            "order_routing_allowed": self.order_routing_allowed,
-            "trade_allowed": self.trade_allowed,
-            "execution_allowed": self.execution_allowed,
-            "approved_size": self.approved_size,
+            **self._safety_values(),
         }
 
     def to_dict(self) -> dict[str, Any]:
