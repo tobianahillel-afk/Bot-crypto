@@ -1,0 +1,38 @@
+{
+  "future_capabilities_locked": [
+    "ContinuousMarketStateV1",
+    "MultiHorizonForecastV1",
+    "ParticipantBehaviorScenarioV1",
+    "TradeIntent",
+    "RiskDecisionV1",
+    "RiskReservationV1",
+    "OrderIntent"
+  ],
+  "lot29": {
+    "audit_path": "data/audit/v2_deterministic_replay_and_audit_audit_lot29.json",
+    "closure_path": "data/audit/v2_replay_closure_manifest_lot29.json",
+    "lifecycle_path": "data/audit/roadmap_lifecycle_overlay_lot29.json",
+    "state_path": "data/audit/v2_deterministic_replay_and_audit_lot29.json",
+    "validator": "scripts/validate_lot29.py"
+  },
+  "negative_controls": [
+    "SCHEMA_MISMATCH_REJECTED",
+    "UPSTREAM_CHECKSUM_TAMPER_REJECTED",
+    "FORBIDDEN_CAPABILITY_REJECTED",
+    "VALIDATOR_DIVERGENCE_REJECTED",
+    "LIFECYCLE_UNLOCK_REJECTED"
+  ],
+  "runtime_mode": "LOCAL_OFFLINE_ANALYSIS_ONLY",
+  "safety": {
+    "analysis_only": true,
+    "approved_size": 0,
+    "execution_allowed": false,
+    "order_routing_allowed": false,
+    "risk_approval_allowed": false,
+    "signal_generation_allowed": false,
+    "trade_allowed": false,
+    "used_for_decision": false
+  },
+  "schema_version": "v2-market-analysis-closure-config-v1",
+  "version_id": "V2_MARKET_ANALYSIS"
+}
