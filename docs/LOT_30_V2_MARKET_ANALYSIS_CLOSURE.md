@@ -1,6 +1,6 @@
 # Lot 30 — V2 Market Analysis Closure
 
-Status: `IMPLEMENTATION_IN_PROGRESS`
+Status: `IMPLEMENTED_VALIDATED_OFFLINE_CLOSURE_ONLY`
 
 Runtime ceiling: `LOCAL_OFFLINE_ANALYSIS_ONLY`
 
@@ -99,6 +99,12 @@ ordered Lot 21–28 artefact checksums
 The output checksum is the canonical SHA-256 of the complete Lot 30 state excluding only
 its `output_checksum` field.
 
+Certified final chain checksum:
+
+```text
+2a598990adaec7ebc1368f30295a0130d4d8bd8f89c9610772347f25ba6c17cf
+```
+
 ## Safety invariants
 
 ```text
@@ -147,6 +153,18 @@ Every failure is fail-closed and produces no valid Lot 30 output.
 - no portfolio sizing;
 - no paper, sandbox or live execution;
 - no automatic unlock of Lot 31.
+
+## Certified quality evidence
+
+- implementation evidence commit: `602bc91b2d4c886f654840294fa740474515e0a0`;
+- critical line coverage: `97.93%`;
+- critical branch coverage: `95.27%`;
+- critical mutation score: `86.02%` (`991/1152` killed);
+- exact V2 closure replay: `MATCH`;
+- full repository regression: `PASS`;
+- three Lot 30 anti-flake repetitions: `PASS`;
+- Ruff, mypy, architecture, traceability, security and dependency audit: `PASS`;
+- institutional quality workflow: `PASS`.
 
 ## Definition of done
 
