@@ -1,52 +1,47 @@
-name: Lot 29 validator 21 restoration diagnostic
+name: Lot 29 bounded Bandit normalization
 
 on:
   pull_request:
     branches: [main]
     paths:
+      - 'scripts/fix_lot29_bandit.py'
       - '.github/workflows/lot29-validator-debug.yml'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  diagnose:
+  normalize:
+    if: github.head_ref == 'agent/lot29-v2-deterministic-replay-audit'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: agent/lot29-v2-deterministic-replay-audit
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
-      - name: Locate all current consumers
+          cache: pip
+      - name: Install locked toolchain
         run: |
-          grep -RIn --exclude-dir=.git 'product_scope_roadmap_lot21.jsonl' . || true
-      - name: Validate current canonical registry
-        continue-on-error: true
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Apply and validate exact annotations
         run: |
-          python scripts/validate_lot21.py
-          python scripts/validate_roadmap_documentation.py
-      - name: Restore certified historical snapshot in workspace
+          python scripts/fix_lot29_bandit.py
+          ruff check \
+            src/crypto_quant_bot/market_analysis/v2_deterministic_replay_and_audit.py \
+            tests/test_lot29_*.py
+          bandit -q -r \
+            src/crypto_quant_bot/market_analysis/v2_deterministic_replay_and_audit.py \
+            src/crypto_quant_bot/market_analysis/v2_replay_audit_models.py
+          pytest -q tests/test_lot29_v2_deterministic_replay_and_audit.py
+      - name: Commit non-workflow normalization
         run: |
-          git show 0955c726a29a8ee3ec957ade85166134824b7dd2:data/audit/product_scope_roadmap_lot21.jsonl \
-            > data/audit/product_scope_roadmap_lot21.jsonl
-          python - <<'PY'
-          import hashlib
-          import json
-          from pathlib import Path
-          path = Path('data/audit/product_scope_roadmap_lot21.jsonl')
-          raw = path.read_bytes()
-          rows = [json.loads(line) for line in path.read_text(encoding='utf-8').splitlines() if line.strip()]
-          print(f'restored_bytes={len(raw)}')
-          print(f'restored_sha256={hashlib.sha256(raw).hexdigest()}')
-          print(f'restored_rows={len(rows)} lot_min={rows[0]["lot_number"]} lot_max={rows[-1]["lot_number"]}')
-          PY
-      - name: Validate restored historical snapshot against all permanent consumers
-        run: |
-          python scripts/validate_lot21.py
-          python scripts/validate_roadmap_documentation.py
-          python scripts/audit_roadmap_semantics.py
-          python scripts/validate_domain_architecture.py
-          pytest -q tests/test_lot21_*.py tests/test_p06_roadmap_semantic_audit.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- ':!.github/workflows'
+          git commit -m "Document Lot 29 bounded validator subprocess"
+          git push origin HEAD:agent/lot29-v2-deterministic-replay-audit
