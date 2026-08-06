@@ -1,0 +1,16 @@
+{
+  "anti_flake_repetitions": 3,
+  "branch_coverage_percent": 91.53,
+  "branch_minimum_percent": 90.0,
+  "evidence_commit": "f4762cb7d68fd11a42962f8016f8af22e2bc1c5a",
+  "line_coverage_percent": 98.43,
+  "line_minimum_percent": 95.0,
+  "methodology": "isolated independent exact-semantic reconstruction",
+  "schema_version": "lot33-independent-coverage-summary-v1",
+  "scope": [
+    "timestamp_clock_and_timezone_governance.py",
+    "timestamp_clock_timezone_models.py",
+    "timestamp_clock_timezone_validation.py"
+  ],
+  "status": "PASS"
+}
