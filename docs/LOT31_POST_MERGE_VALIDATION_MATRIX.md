@@ -5,6 +5,7 @@ It complements `LOT_31_POST_MERGE_AUDIT.md` and does not activate Lot 32.
 
 | Requirement | Independent evidence | Expected result |
 |---|---|---|
+| Dedicated exact-head audit | `.github/workflows/lot31-post-merge-audit.yml` | PASS |
 | Historical V2 chain remains valid | `python scripts/diagnose_exact_chain_until_lot30.py` | PASS |
 | Lot 30 closure remains valid | `python scripts/validate_lot30.py` | PASS |
 | Lot 31 entry gate remains immutable | `python scripts/validate_lot31_entry_gate.py` | PASS |
