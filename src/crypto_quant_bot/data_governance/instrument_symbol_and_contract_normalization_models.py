@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
-from .source_registry_validation import fail_closed_safety, validate_fail_closed_safety
+from .source_registry_validation import fail_closed_safety
 
 MARKET_TYPES = ("SPOT", "PERPETUAL", "DATED_FUTURE", "OPTION")
 OPTION_TYPES = ("CALL", "PUT")
@@ -36,7 +36,7 @@ def require_sha256(value: str, field: str) -> None:
 
 def require_git_sha(value: str) -> None:
     if len(value) != 40 or any(character not in "0123456789abcdef" for character in value):
-        raise InstrumentNormalizationError("code_commit must be a lowercase git sha")
+        raise InstrumentNormalizationError("code_commit must be a lowercase 40-character git sha")
 
 
 def decimal_value(value: str, field: str) -> Decimal:
@@ -54,8 +54,18 @@ def decimal_value(value: str, field: str) -> Decimal:
     return parsed
 
 
+def decimal_places(value: str, field: str) -> int:
+    exponent = decimal_value(value, field).as_tuple().exponent
+    return max(0, -int(exponent))
+
+
 def optional_decimal(value: str | None, field: str) -> Decimal | None:
     return None if value is None else decimal_value(value, field)
+
+
+def validate_lot32_safety(values: dict[str, object]) -> None:
+    if values != fail_closed_safety():
+        raise InstrumentNormalizationError("Lot 32 safety boundary must remain exactly fail-closed")
 
 
 @dataclass(frozen=True, slots=True)
@@ -159,6 +169,10 @@ class VenueInstrumentAliasV1:
             decimal_value(value, field)
         if self.price_precision < 0 or self.quantity_precision < 0:
             raise InstrumentNormalizationError("instrument precision cannot be negative")
+        if decimal_places(self.tick_size, "tick_size") != self.price_precision:
+            raise InstrumentNormalizationError("price_precision differs from tick_size")
+        if decimal_places(self.lot_size, "lot_size") != self.quantity_precision:
+            raise InstrumentNormalizationError("quantity_precision differs from lot_size")
         if self.margin_mode is not None:
             require_text(self.margin_mode, "margin_mode")
         if self.validation_state != "VALIDATED_METADATA_ONLY":
@@ -226,22 +240,35 @@ class InstrumentSpecificationV1:
             require_utc(self.expiry_time, "expiry_time")
         if self.option_type is not None and self.option_type not in OPTION_TYPES:
             raise InstrumentNormalizationError("option_type must be CALL or PUT")
-        if self.market_type == "SPOT":
-            if any(value is not None for value in (contract, self.expiry_time, strike, self.option_type)):
-                raise InstrumentNormalizationError("spot derivative fields must be null")
-            if self.settlement_asset != self.quote_asset:
-                raise InstrumentNormalizationError("spot settlement must equal quote asset")
-        elif self.market_type == "PERPETUAL":
-            if contract is None or any(
-                value is not None for value in (self.expiry_time, strike, self.option_type)
-            ):
-                raise InstrumentNormalizationError("perpetual applicability fields are invalid")
-        elif self.market_type == "DATED_FUTURE":
-            if contract is None or self.expiry_time is None:
-                raise InstrumentNormalizationError("dated future requires contract size and expiry")
-            if strike is not None or self.option_type is not None:
-                raise InstrumentNormalizationError("future option fields must be null")
-        elif any(value is None for value in (contract, self.expiry_time, strike, self.option_type)):
+        validators = {
+            "SPOT": self._validate_spot,
+            "PERPETUAL": self._validate_perpetual,
+            "DATED_FUTURE": self._validate_dated_future,
+            "OPTION": self._validate_option,
+        }
+        validators[self.market_type](contract, strike)
+
+    def _validate_spot(self, contract: Decimal | None, strike: Decimal | None) -> None:
+        values = (contract, self.expiry_time, strike, self.option_type)
+        if any(value is not None for value in values):
+            raise InstrumentNormalizationError("spot derivative fields must be null")
+        if self.settlement_asset != self.quote_asset:
+            raise InstrumentNormalizationError("spot settlement must equal quote asset")
+
+    def _validate_perpetual(self, contract: Decimal | None, strike: Decimal | None) -> None:
+        invalid_optional = (self.expiry_time, strike, self.option_type)
+        if contract is None or any(value is not None for value in invalid_optional):
+            raise InstrumentNormalizationError("perpetual applicability fields are invalid")
+
+    def _validate_dated_future(self, contract: Decimal | None, strike: Decimal | None) -> None:
+        if contract is None or self.expiry_time is None:
+            raise InstrumentNormalizationError("dated future requires contract size and expiry")
+        if strike is not None or self.option_type is not None:
+            raise InstrumentNormalizationError("future option fields must be null")
+
+    def _validate_option(self, contract: Decimal | None, strike: Decimal | None) -> None:
+        required = (contract, self.expiry_time, strike, self.option_type)
+        if any(value is None for value in required):
             raise InstrumentNormalizationError("option requires contract, expiry, strike and type")
 
     def _validate_aliases(self) -> None:
@@ -391,7 +418,7 @@ class InstrumentSymbolContractNormalizationStateV1:
         )
         if self.reason_codes != expected_reasons:
             raise InstrumentNormalizationError("unexpected Lot 32 reason code sequence")
-        validate_fail_closed_safety(self.safety)
+        validate_lot32_safety(self.safety)
         require_sha256(self.output_checksum, "output_checksum")
 
     def payload_without_checksum(self) -> dict[str, Any]:
@@ -446,7 +473,7 @@ class InstrumentSymbolContractNormalizationAuditV1:
             raise InstrumentNormalizationError("certified Lot 32 output cannot contain frozen records")
         if self.validation_state != "VALIDATED_NORMALIZATION_ONLY":
             raise InstrumentNormalizationError("unexpected Lot 32 audit validation_state")
-        validate_fail_closed_safety(self.safety)
+        validate_lot32_safety(self.safety)
 
     def payload_without_checksum(self) -> dict[str, Any]:
         return {
@@ -480,6 +507,7 @@ __all__ = [
     "Lot32RunContextV1",
     "MARKET_TYPES",
     "VenueInstrumentAliasV1",
+    "decimal_places",
     "decimal_value",
     "fail_closed_safety",
 ]
