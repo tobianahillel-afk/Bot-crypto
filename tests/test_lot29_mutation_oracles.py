@@ -30,7 +30,6 @@ from crypto_quant_bot.market_analysis.v2_deterministic_replay_and_audit import (
 )
 from crypto_quant_bot.market_analysis.v2_replay_audit_models import (
     ArtifactEvidenceV1,
-    ClosureManifestV1,
     ReplayValidationError,
     V2DeterministicReplayAuditStateV1,
     ValidatorEvidenceV1,
@@ -516,7 +515,7 @@ def test_full_persisted_validation_returns_exact_summary(oracle_root: Path) -> N
         closure,
     )
     assert result == {
-        "schema_version": "v2-deterministic-replay-audit-validation-v1",
+        "schema_version": "lot29-validation-v1",
         "status": "PASS",
         "artifact_count": 8,
         "validator_count": 8,
