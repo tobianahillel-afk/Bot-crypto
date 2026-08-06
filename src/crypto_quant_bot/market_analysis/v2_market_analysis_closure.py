@@ -221,6 +221,7 @@ def _load_and_validate_lot29(
     output_checksum = _validate_lot29_state_checksum(state)
     _validate_strict_fail_closed_document(state, "Lot 29 state")
     _validate_strict_fail_closed_document(audit, "Lot 29 audit")
+    upstream = _validate_upstream_artifacts(root, state)
     if state.get("replay_status") != "MATCH" or audit.get("replay_status") != "MATCH":
         raise ClosureValidationError("Lot 29 replay is not MATCH")
     if state.get("closure_manifest") != closure:
@@ -234,7 +235,6 @@ def _load_and_validate_lot29(
     if closure.get("artifact_count") != 8 or closure.get("validator_count") != 8:
         raise ClosureValidationError("Lot 29 closure must contain eight artifacts and validators")
     _validate_lifecycle(lifecycle)
-    upstream = _validate_upstream_artifacts(root, state)
     return state, audit, lifecycle, upstream
 
 
