@@ -10,7 +10,7 @@ SOURCE_ROOT = ROOT / "src"
 if str(SOURCE_ROOT) not in sys.path:
     sys.path.insert(0, str(SOURCE_ROOT))
 
-from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry import (
+from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry import (  # noqa: E402
     build_lot31_artifacts,
     persist_lot31_artifacts,
 )
