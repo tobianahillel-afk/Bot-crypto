@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/schemas/raw_timestamp_envelope_v1.schema.json",
+  "title": "RawTimestampEnvelopeV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "record_id", "instrument_id", "source_id", "raw_timestamp",
+    "source_timezone", "timestamp_precision", "source_time", "exchange_time", "event_time",
+    "receive_time", "process_time", "available_at", "usable_from", "monotonic_time",
+    "clock_domain", "sequence_id", "revision_id"
+  ],
+  "properties": {
+    "schema_version": {"const": "raw-timestamp-envelope-v1"},
+    "record_id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "instrument_id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "source_id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "raw_timestamp": {"type": "string", "format": "date-time"},
+    "source_timezone": {"type": "string", "minLength": 1},
+    "timestamp_precision": {"enum": ["SECONDS", "MILLISECONDS", "MICROSECONDS"]},
+    "source_time": {"type": "string", "format": "date-time"},
+    "exchange_time": {"type": ["string", "null"], "format": "date-time"},
+    "event_time": {"type": "string", "format": "date-time"},
+    "receive_time": {"type": "string", "format": "date-time"},
+    "process_time": {"type": "string", "format": "date-time"},
+    "available_at": {"type": "string", "format": "date-time"},
+    "usable_from": {"type": "string", "format": "date-time"},
+    "monotonic_time": {"type": ["integer", "null"], "minimum": 0},
+    "clock_domain": {"enum": ["WALL_CLOCK_ONLY", "PROCESS_MONOTONIC_NS"]},
+    "sequence_id": {"type": "integer", "minimum": 0},
+    "revision_id": {"type": "integer", "minimum": 0}
+  }
+}
