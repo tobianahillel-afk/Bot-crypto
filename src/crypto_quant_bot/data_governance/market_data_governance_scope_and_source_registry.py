@@ -21,6 +21,13 @@ from .market_data_governance_scope_and_source_registry_models import (
     SourceRegistryValidationError,
     fail_closed_safety,
 )
+from .source_registry_validation import (
+    require_boolean,
+    require_integer,
+    require_object_list,
+    require_string,
+    require_string_list,
+)
 
 
 def canonical_checksum(payload: object) -> str:
@@ -61,46 +68,50 @@ def atomic_write_json(path: Path, payload: object) -> None:
 
 def _build_source(raw: dict[str, Any]) -> SourceRegistryEntryV1:
     return SourceRegistryEntryV1(
-        source_id=str(raw["source_id"]),
-        provider=str(raw["provider"]),
-        venue=str(raw["venue"]),
-        endpoint_type=str(raw["endpoint_type"]),
-        endpoint_descriptor=str(raw["endpoint_descriptor"]),
-        fields=tuple(str(value) for value in raw["fields"]),
-        cadence=int(raw["cadence"]),
-        timezone=str(raw["timezone"]),
-        license=str(raw["license"]),
-        auth_mode=str(raw["auth_mode"]),
-        retention=int(raw["retention"]),
-        criticality=str(raw["criticality"]),
-        source_of_truth=raw["source_of_truth"] is True,
-        backup_sources=tuple(str(value) for value in raw["backup_sources"]),
-        source_schema_version=str(raw["source_schema_version"]),
-        revision=int(raw["revision"]),
-        revision_policy=str(raw["revision_policy"]),
-        approved=raw["approved"] is True,
-        enabled=raw["enabled"] is True,
-        connection_status=str(raw["connection_status"]),
+        source_id=require_string(raw.get("source_id"), "source_id"),
+        provider=require_string(raw.get("provider"), "provider"),
+        venue=require_string(raw.get("venue"), "venue"),
+        endpoint_type=require_string(raw.get("endpoint_type"), "endpoint_type"),
+        endpoint_descriptor=require_string(
+            raw.get("endpoint_descriptor"), "endpoint_descriptor"
+        ),
+        fields=require_string_list(raw.get("fields"), "fields"),
+        cadence=require_integer(raw.get("cadence"), "cadence"),
+        timezone=require_string(raw.get("timezone"), "timezone"),
+        license=require_string(raw.get("license"), "license"),
+        auth_mode=require_string(raw.get("auth_mode"), "auth_mode"),
+        retention=require_integer(raw.get("retention"), "retention"),
+        criticality=require_string(raw.get("criticality"), "criticality"),
+        source_of_truth=require_boolean(raw.get("source_of_truth"), "source_of_truth"),
+        backup_sources=require_string_list(raw.get("backup_sources"), "backup_sources"),
+        source_schema_version=require_string(
+            raw.get("source_schema_version"), "source_schema_version"
+        ),
+        revision=require_integer(raw.get("revision"), "revision"),
+        revision_policy=require_string(raw.get("revision_policy"), "revision_policy"),
+        approved=require_boolean(raw.get("approved"), "approved"),
+        enabled=require_boolean(raw.get("enabled"), "enabled"),
+        connection_status=require_string(raw.get("connection_status"), "connection_status"),
     )
 
 
 def _build_capability(raw: dict[str, Any]) -> CapabilityMatrixEntryV1:
     return CapabilityMatrixEntryV1(
-        capability=str(raw["capability"]),
-        status=str(raw["status"]),
-        owner=str(raw["owner"]),
-        contract=str(raw["contract"]),
-        gate=str(raw["gate"]),
+        capability=require_string(raw.get("capability"), "capability"),
+        status=require_string(raw.get("status"), "status"),
+        owner=require_string(raw.get("owner"), "owner"),
+        contract=require_string(raw.get("contract"), "contract"),
+        gate=require_string(raw.get("gate"), "gate"),
     )
 
 
 def _build_contract(raw: dict[str, Any]) -> ContractRegistryEntryV1:
     return ContractRegistryEntryV1(
-        contract_name=str(raw["contract_name"]),
-        owner=str(raw["owner"]),
-        schema_path=str(raw["schema_path"]),
-        producer=str(raw["producer"]),
-        status=str(raw["status"]),
+        contract_name=require_string(raw.get("contract_name"), "contract_name"),
+        owner=require_string(raw.get("owner"), "owner"),
+        schema_path=require_string(raw.get("schema_path"), "schema_path"),
+        producer=require_string(raw.get("producer"), "producer"),
+        status=require_string(raw.get("status"), "status"),
     )
 
 
@@ -125,44 +136,47 @@ def _verify_entry_gate(gate: dict[str, Any]) -> None:
 
 def _build_run_context(config: dict[str, Any], code_commit: str) -> RunContextV1:
     return RunContextV1(
-        run_id=str(config["run_id"]),
+        run_id=require_string(config.get("run_id"), "run_id"),
         runtime_mode="DATA_GOVERNANCE_ONLY",
-        config_version=str(config["config_version"]),
+        config_version=require_string(config.get("config_version"), "config_version"),
         code_commit=code_commit,
-        correlation_id=str(config["correlation_id"]),
+        correlation_id=require_string(config.get("correlation_id"), "correlation_id"),
     )
 
 
 def _build_lineage(config: dict[str, Any], upstream_checksum: str) -> LineageEnvelopeV1:
     return LineageEnvelopeV1(
-        lineage_id=str(config["lineage_id"]),
+        lineage_id=require_string(config.get("lineage_id"), "lineage_id"),
         upstream_lot=30,
         upstream_artifact_path="data/audit/v2_market_analysis_closure_lot30.json",
         upstream_artifact_checksum=upstream_checksum,
-        available_at=str(config["available_at"]),
+        available_at=require_string(config.get("available_at"), "available_at"),
     )
 
 
 def _build_registry(config: dict[str, Any]) -> SourceRegistryV1:
     sources = tuple(
         sorted(
-            (_build_source(raw) for raw in config["sources"]),
+            (_build_source(raw) for raw in require_object_list(config.get("sources"), "sources")),
             key=lambda item: item.source_id,
         )
     )
     return SourceRegistryV1(
-        registry_id=str(config["registry_id"]),
-        registry_version=str(config["registry_version"]),
-        source_of_truth_id=str(config["source_of_truth_id"]),
+        registry_id=require_string(config.get("registry_id"), "registry_id"),
+        registry_version=require_string(config.get("registry_version"), "registry_version"),
+        source_of_truth_id=require_string(config.get("source_of_truth_id"), "source_of_truth_id"),
         sources=sources,
-        revision_policy=str(config["revision_policy"]),
+        revision_policy=require_string(config.get("revision_policy"), "revision_policy"),
     )
 
 
 def _build_capabilities(config: dict[str, Any]) -> tuple[CapabilityMatrixEntryV1, ...]:
     return tuple(
         sorted(
-            (_build_capability(raw) for raw in config["capability_matrix"]),
+            (
+                _build_capability(raw)
+                for raw in require_object_list(config.get("capability_matrix"), "capability_matrix")
+            ),
             key=lambda item: item.capability,
         )
     )
@@ -171,7 +185,10 @@ def _build_capabilities(config: dict[str, Any]) -> tuple[CapabilityMatrixEntryV1
 def _build_contracts(config: dict[str, Any]) -> tuple[ContractRegistryEntryV1, ...]:
     return tuple(
         sorted(
-            (_build_contract(raw) for raw in config["contract_registry"]),
+            (
+                _build_contract(raw)
+                for raw in require_object_list(config.get("contract_registry"), "contract_registry")
+            ),
             key=lambda item: item.contract_name,
         )
     )
@@ -186,9 +203,9 @@ def _build_state(
     state = MarketDataGovernanceScopeSourceRegistryStateV1(
         run_context=_build_run_context(config, code_commit),
         lineage=_build_lineage(config, upstream_checksum),
-        event_time=str(config["event_time"]),
-        generated_at=str(config["generated_at"]),
-        available_at=str(config["available_at"]),
+        event_time=require_string(config.get("event_time"), "event_time"),
+        generated_at=require_string(config.get("generated_at"), "generated_at"),
+        available_at=require_string(config.get("available_at"), "available_at"),
         validation_state="VALIDATED_METADATA_ONLY",
         source_registry=registry,
         capability_matrix=_build_capabilities(config),
