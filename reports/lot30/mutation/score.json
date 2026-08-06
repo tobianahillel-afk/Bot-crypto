@@ -1,0 +1,14 @@
+{
+  "completed": 1152,
+  "evaluated": 1152,
+  "killed": 991,
+  "minimum_score_percent": 80.0,
+  "schema_version": "lot30-critical-mutation-score-v1",
+  "scope": "v2_market_analysis_closure",
+  "score_percent": 86.02,
+  "status": "PASS",
+  "survived": 161,
+  "suspicious": 0,
+  "timeout": 0,
+  "total": 1152
+}
