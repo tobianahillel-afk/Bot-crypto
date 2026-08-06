@@ -96,18 +96,30 @@ jobs:
           text = path.read_text(encoding='utf-8', errors='replace')
           text = re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', text)
           text = text.replace('\r', '\n').replace('\ufe0f', '')
-          pattern = re.compile(
-              r'(\d+)/(\d+).*?🎉\s*(\d+).*?⏰\s*(\d+).*?🤔\s*(\d+).*?🙁\s*(\d+)'
+
+          counter_pattern = re.compile(r'(\d+)\s*/\s*(\d+)')
+          summary_pattern = re.compile(
+              r'🎉\s*(\d+)[\s\S]*?⏰\s*(\d+)[\s\S]*?🤔\s*(\d+)[\s\S]*?🙁\s*(\d+)'
           )
-          matches = pattern.findall(text)
-          if not matches:
+          parsed = None
+          counters = list(counter_pattern.finditer(text))
+          for counter in reversed(counters):
+              completed, total = map(int, counter.groups())
+              if completed != total or total <= 0:
+                  continue
+              summary = summary_pattern.search(text, counter.end())
+              if summary is None:
+                  continue
+              killed, timeout, suspicious, survived = map(int, summary.groups())
+              evaluated = killed + timeout + suspicious + survived
+              if evaluated == total:
+                  parsed = (completed, total, killed, timeout, suspicious, survived)
+                  break
+          if parsed is None:
               raise SystemExit('LOT29_MUTATION_SCORE_PARSE_ERROR')
-          completed, total, killed, timeout, suspicious, survived = map(int, matches[-1])
+
+          completed, total, killed, timeout, suspicious, survived = parsed
           evaluated = killed + timeout + suspicious + survived
-          if completed != total or evaluated != total or total <= 0:
-              raise SystemExit(
-                  f'LOT29_MUTATION_INCOMPLETE completed={completed} total={total} evaluated={evaluated}'
-              )
           score = 100.0 * (killed + timeout) / evaluated
           payload = {
               'schema_version': 'lot29-critical-mutation-score-v1',
@@ -117,6 +129,8 @@ jobs:
               'survived': survived,
               'suspicious': suspicious,
               'evaluated': evaluated,
+              'completed': completed,
+              'total': total,
               'score_percent': round(score, 2),
               'minimum_score_percent': 80.0,
               'status': 'PASS' if score >= 80.0 else 'FAIL',
