@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the immutable roadmap history and current Lot 26 lifecycle."""
+"""Validate immutable roadmap history, lifecycle and locked future standards."""
 from __future__ import annotations
 
 import json
@@ -62,6 +62,13 @@ REQUIRED_LOT26_FILES = [
     "reports/LOT_26_MULTI_TIMEFRAME_ALIGNMENT_FINAL_REPORT.md",
 ]
 
+REQUIRED_PORTFOLIO_RISK_FILES = [
+    "docs/CANONICAL_PORTFOLIO_RISK_SIZING_AND_EXIT_STANDARD.md",
+    "docs/roadmap/V07_V09_PORTFOLIO_RISK_NORMATIVE_ADDENDUM.md",
+    "contracts/schemas/portfolio_decision_snapshot_v1.schema.json",
+    "contracts/schemas/risk_reservation_v1.schema.json",
+]
+
 FORBIDDEN_TEMPORARY_PATTERNS = [
     ".github/workflows/apply-lot26-migration.yml",
     "scripts/apply_lot26_migration.py",
@@ -99,7 +106,10 @@ def load_registry() -> list[dict[str, Any]]:
 
 def validate_history(rows: list[dict[str, Any]]) -> None:
     require(len(rows) == 178, f"expected 178 historical lots, found {len(rows)}")
-    require([row.get("lot_number") for row in rows] == list(range(178)), "lots are not continuous 0-177")
+    require(
+        [row.get("lot_number") for row in rows] == list(range(178)),
+        "lots are not continuous 0-177",
+    )
     require(rows[25].get("status") == "IMPLEMENTED_VALIDATED", "Lot 25 historical status changed")
     require(rows[26].get("status") == "PLANNED_LOCKED", "historical Lot 21 snapshot changed")
     fields = {
@@ -121,9 +131,18 @@ def validate_history(rows: list[dict[str, Any]]) -> None:
     for row in rows[26:]:
         missing = fields.difference(row)
         require(not missing, f"Lot {row['lot_number']}: missing {sorted(missing)}")
-        require(len(row.get("processing_sequence", [])) >= 4, f"Lot {row['lot_number']}: sequence too short")
-        require(len(row.get("failure_modes", [])) >= 3, f"Lot {row['lot_number']}: failure modes too short")
-        require(len(row.get("acceptance_tests", [])) >= 6, f"Lot {row['lot_number']}: tests too short")
+        require(
+            len(row.get("processing_sequence", [])) >= 4,
+            f"Lot {row['lot_number']}: sequence too short",
+        )
+        require(
+            len(row.get("failure_modes", [])) >= 3,
+            f"Lot {row['lot_number']}: failure modes too short",
+        )
+        require(
+            len(row.get("acceptance_tests", [])) >= 6,
+            f"Lot {row['lot_number']}: tests too short",
+        )
 
 
 def validate_lifecycle() -> None:
@@ -159,7 +178,9 @@ def validate_version_docs() -> None:
 def validate_lot26_files_and_boundaries() -> None:
     missing = [relative for relative in REQUIRED_LOT26_FILES if not (ROOT / relative).is_file()]
     require(not missing, f"missing Lot 26 files: {missing}")
-    text = (ROOT / "docs/LOT_26_MULTI_TIMEFRAME_ALIGNMENT_ENGINE.md").read_text(encoding="utf-8")
+    text = (ROOT / "docs/LOT_26_MULTI_TIMEFRAME_ALIGNMENT_ENGINE.md").read_text(
+        encoding="utf-8"
+    )
     for token in (
         "timebar-5m",
         "timebar-15m",
@@ -171,7 +192,112 @@ def validate_lot26_files_and_boundaries() -> None:
     ):
         require(token in text, f"Lot 26 contract missing boundary: {token}")
     status = (ROOT / "docs/LOT_26_IMPLEMENTATION_WORKLOG.md").read_text(encoding="utf-8")
-    require("IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY" in status, "Lot 26 status is not current")
+    require(
+        "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY" in status,
+        "Lot 26 status is not current",
+    )
+
+
+def validate_portfolio_risk_standard() -> None:
+    missing = [
+        relative for relative in REQUIRED_PORTFOLIO_RISK_FILES if not (ROOT / relative).is_file()
+    ]
+    require(not missing, f"missing canonical portfolio-risk files: {missing}")
+
+    standard = (ROOT / REQUIRED_PORTFOLIO_RISK_FILES[0]).read_text(encoding="utf-8")
+    addendum = (ROOT / REQUIRED_PORTFOLIO_RISK_FILES[1]).read_text(encoding="utf-8")
+    roadmap = (ROOT / "docs/ROADMAP_V1_TO_V21.md").read_text(encoding="utf-8")
+
+    standard_tokens = (
+        "PortfolioDecisionSnapshotV1",
+        "RiskReservationV1",
+        "R_trade(q)",
+        "PortfolioHeat(P)",
+        "DeltaR(q)",
+        "MaxWeight",
+        "HHI",
+        "Drawdown_t",
+        "q_liquidity",
+        "q_approved",
+        "SNAPSHOT_CONFLICT",
+        "AVERAGING_DOWN_FORBIDDEN",
+        "NetLiquidationPnL <= 0",
+        "KILL_SWITCH > PAUSE > BLOCK_TRADING > WAIT > APPROVE",
+    )
+    for token in standard_tokens:
+        require(token in standard, f"portfolio-risk standard missing token: {token}")
+
+    addendum_tokens = (
+        "Lot 74",
+        "Lot 75",
+        "Lot 76",
+        "Lot 77",
+        "Lot 78",
+        "Lot 79",
+        "Lot 80",
+        "Lot 88",
+        "Lot 89",
+        "Lot 90",
+        "Lot 93",
+        "AVERAGING_DOWN_FORBIDDEN",
+    )
+    for token in addendum_tokens:
+        require(token in addendum, f"V7/V9 addendum missing token: {token}")
+
+    snapshot = load_object(ROOT / REQUIRED_PORTFOLIO_RISK_FILES[2])
+    reservation = load_object(ROOT / REQUIRED_PORTFOLIO_RISK_FILES[3])
+    require(snapshot.get("title") == "PortfolioDecisionSnapshotV1", "snapshot schema title mismatch")
+    require(reservation.get("title") == "RiskReservationV1", "reservation schema title mismatch")
+    require(snapshot.get("additionalProperties") is False, "snapshot schema must be strict")
+    require(reservation.get("additionalProperties") is False, "reservation schema must be strict")
+
+    snapshot_required = set(snapshot.get("required", []))
+    require(
+        {
+            "snapshot_id",
+            "snapshot_sequence",
+            "ledger_watermark",
+            "portfolio_state_id",
+            "position_state_ids",
+            "open_order_state_ids",
+            "pending_intent_state_ids",
+            "reservation_ids",
+            "cash_reserved",
+            "cash_available",
+            "portfolio_risk",
+            "reserved_risk",
+            "portfolio_heat",
+            "drawdown",
+            "state_hash",
+        }
+        <= snapshot_required,
+        "snapshot schema omits required portfolio state",
+    )
+
+    reservation_required = set(reservation.get("required", []))
+    require(
+        {
+            "reservation_id",
+            "intent_hash",
+            "snapshot_id",
+            "snapshot_sequence",
+            "reserved_capital",
+            "reserved_risk",
+            "idempotency_key",
+            "decision_hash",
+            "status",
+            "state_hash",
+        }
+        <= reservation_required,
+        "reservation schema omits atomic binding fields",
+    )
+
+    for token in (
+        "CANONICAL_PORTFOLIO_RISK_SIZING_AND_EXIT_STANDARD.md",
+        "V07_V09_PORTFOLIO_RISK_NORMATIVE_ADDENDUM.md",
+        "risk reservation ≠ order intent",
+    ):
+        require(token in roadmap, f"canonical roadmap missing portfolio-risk reference: {token}")
 
 
 def validate_no_temporary_files() -> None:
@@ -185,6 +311,7 @@ def main() -> int:
         validate_lifecycle()
         validate_version_docs()
         validate_lot26_files_and_boundaries()
+        validate_portfolio_risk_standard()
         validate_no_temporary_files()
     except (RoadmapValidationError, json.JSONDecodeError) as exc:
         print(f"ROADMAP DOCUMENTATION VALIDATION: FAIL\n{exc}", file=sys.stderr)

@@ -37,6 +37,7 @@ L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot28.json`
 - [Capability and Contract Ownership Registry](CAPABILITY_AND_CONTRACT_OWNERSHIP_REGISTRY.md)
 - [Model Retraining and Promotion Policy](MODEL_RETRAINING_AND_PROMOTION_POLICY.md)
 - [Economic Objective and Risk Utility Policy](ECONOMIC_OBJECTIVE_AND_RISK_UTILITY_POLICY.md)
+- [Canonical Portfolio Risk, Sizing, Reservation and Exit Standard](CANONICAL_PORTFOLIO_RISK_SIZING_AND_EXIT_STANDARD.md)
 
 ## Architecture quantitative multi-échelle
 
@@ -44,6 +45,7 @@ L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot28.json`
 - [Stochastic Continuous State and Multi-Horizon Forecasting Standard](STOCHASTIC_CONTINUOUS_STATE_AND_MULTI_HORIZON_FORECASTING_STANDARD.md)
 - [Participant Behavior and Liquidity Exit-Zone Inference Standard](PARTICIPANT_BEHAVIOR_AND_LIQUIDITY_EXIT_ZONE_INFERENCE_STANDARD.md)
 - [Protective Orders and Exit Lifecycle Standard](PROTECTIVE_ORDERS_AND_EXIT_LIFECYCLE_STANDARD.md)
+- [V7/V9 portfolio-risk normative addendum](roadmap/V07_V09_PORTFOLIO_RISK_NORMATIVE_ADDENDUM.md)
 - [Cross-version roadmap addendum](roadmap/MULTI_SCALE_STOCHASTIC_PREDICTION_AND_PARTICIPANT_INFERENCE_ADDENDUM.md)
 - [V3 continuous market-data addendum](roadmap/V03_CONTINUOUS_MARKET_DATA_NORMATIVE_ADDENDUM.md)
 - [V4 participant/Game Theory addendum](roadmap/V04_PARTICIPANT_GAME_THEORY_NORMATIVE_ADDENDUM.md)
@@ -86,7 +88,7 @@ prédictives ou d'exécution sont déjà implémentées.
 data resolution ≠ feature lookback ≠ forecast horizon
 decision clock ≠ signal TTL ≠ holding horizon
 alignment ≠ forecast ≠ scenario ≠ signal
-signal ≠ trade intent ≠ risk approval ≠ order intent
+signal ≠ trade intent ≠ portfolio snapshot ≠ risk approval ≠ risk reservation ≠ order intent
 order intent ≠ ordre soumis ≠ fill ≠ position réconciliée
 CI verte ≠ validation mathématique ≠ preuve statistique ≠ alpha économique
 agreement score ≠ probability ≠ expected return
@@ -143,3 +145,5 @@ timeframes et n'autorise aucune inférence de rendement futur.
 10. Les horizons ne sont jamais agrégés par vote naïf.
 11. Les données ajoutées démontrent leur valeur par ablation et hors échantillon.
 12. Un statut `PLANNED_LOCKED` ou `AWAITING_EXACT_COMMIT_CI` ne peut être promu sans preuve exacte.
+13. V7, V8, V9, V15 et V17 consomment le snapshot, le sizing et les réservations canoniques ; aucune implémentation locale incompatible n'est autorisée.
+14. Tout ordre augmentant le risque exige une réservation atomique active ; toute moyenne à la baisse implicite est interdite.
