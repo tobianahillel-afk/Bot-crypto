@@ -1,7 +1,7 @@
 [project]
 name = "crypto-quant-bot"
-version = "0.32.0"
-description = "Crypto Quant Bot V3.2-Ops — Lot 32 validated offline instrument normalization"
+version = "0.33.0"
+description = "Crypto Quant Bot V3.3-Ops — Lot 33 validated offline temporal governance"
 requires-python = "==3.11.*"
 dependencies = []
 
