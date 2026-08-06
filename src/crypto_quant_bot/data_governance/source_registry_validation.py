@@ -28,6 +28,31 @@ def require_non_empty(value: str, field: str) -> None:
         raise SourceRegistryValidationError(f"{field} must be explicit and trimmed")
 
 
+def require_string(value: object, field: str) -> str:
+    if not isinstance(value, str):
+        raise SourceRegistryValidationError(f"{field} must be a string")
+    require_non_empty(value, field)
+    return value
+
+
+def require_integer(value: object, field: str) -> int:
+    if not isinstance(value, int) or isinstance(value, bool):
+        raise SourceRegistryValidationError(f"{field} must be an integer")
+    return value
+
+
+def require_boolean(value: object, field: str) -> bool:
+    if not isinstance(value, bool):
+        raise SourceRegistryValidationError(f"{field} must be a boolean")
+    return value
+
+
+def require_string_list(value: object, field: str) -> tuple[str, ...]:
+    if not isinstance(value, list) or any(not isinstance(item, str) for item in value):
+        raise SourceRegistryValidationError(f"{field} must be a string list")
+    return tuple(value)
+
+
 def require_sha256(value: str, field: str) -> None:
     if len(value) != 64 or any(character not in "0123456789abcdef" for character in value):
         raise SourceRegistryValidationError(f"{field} must be a lowercase sha256")
