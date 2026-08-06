@@ -1,0 +1,75 @@
+{
+  "future_capabilities_locked": [
+    "InstrumentRegistryV1",
+    "InstrumentSpecificationV1",
+    "CanonicalTimeEnvelopeV1",
+    "ContinuousMarketStateV1",
+    "MultiHorizonForecastV1",
+    "ParticipantBehaviorScenarioV1",
+    "TradeIntent",
+    "RiskDecisionV1",
+    "RiskReservationV1",
+    "OrderIntent"
+  ],
+  "historical_registry": "data/audit/product_scope_roadmap_lot21.jsonl",
+  "latest_implemented_lot": 31,
+  "lots": {
+    "26": {
+      "execution_allowed": false,
+      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot26.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY",
+      "trade_allowed": false
+    },
+    "27": {
+      "execution_allowed": false,
+      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot27.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY",
+      "trade_allowed": false
+    },
+    "28": {
+      "execution_allowed": false,
+      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot28.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY",
+      "trade_allowed": false
+    },
+    "29": {
+      "execution_allowed": false,
+      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot29.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_REPLAY_ONLY",
+      "trade_allowed": false
+    },
+    "30": {
+      "execution_allowed": false,
+      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot30.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_CLOSURE_ONLY",
+      "trade_allowed": false
+    },
+    "31": {
+      "acceptance_contract": "docs/ACCEPTANCE_CRITERIA_LOT_31.md",
+      "audit_artifact": "data/audit/market_data_governance_scope_and_source_registry_audit_lot31.json",
+      "config": "config/data_governance/market_data_source_registry_v1.json",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "implementation_commit": "689079bb5f348aa1cf62059498fcaddf760665bd",
+      "implementation_contract": "docs/LOT_31_MARKET_DATA_GOVERNANCE_SCOPE_AND_SOURCE_REGISTRY.md",
+      "implementation_status": "docs/LOT_31_IMPLEMENTATION_WORKLOG.md",
+      "merged_commit": "235ee2e3a4eabd98e8a59241396f07fc4c29e39e",
+      "network_ingestion_allowed": false,
+      "pull_request": 18,
+      "report": "reports/lot_31_market_data_governance_scope_and_source_registry_report.md",
+      "runner": "scripts/run_lot31_market_data_governance_scope_and_source_registry.py",
+      "runtime_mode": "DATA_GOVERNANCE_ONLY",
+      "source_registry_artifact": "data/audit/source_registry_lot31.json",
+      "state_artifact": "data/audit/market_data_governance_scope_and_source_registry_lot31.json",
+      "status": "IMPLEMENTED_VALIDATED_METADATA_ONLY",
+      "trade_allowed": false,
+      "validator": "scripts/validate_lot31.py"
+    },
+    "32": {
+      "implementation_started": false,
+      "status": "PLANNED_LOCKED"
+    }
+  },
+  "previous_overlay": "data/audit/roadmap_lifecycle_overlay_lot30.json",
+  "schema_version": "roadmap-lifecycle-overlay-v1"
+}
