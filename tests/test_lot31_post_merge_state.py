@@ -31,14 +31,21 @@ def load_json(relative: str) -> dict[str, Any]:
     return payload
 
 
+def version_tuple(value: str) -> tuple[int, int, int]:
+    parts = value.split(".")
+    assert len(parts) == 3
+    return tuple(int(part) for part in parts)  # type: ignore[return-value]
+
+
 def test_lot31_post_merge_release_and_lifecycle_are_consistent() -> None:
     project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
-    overlay = load_json("data/audit/roadmap_lifecycle_overlay_lot31.json")
+    historical = load_json("data/audit/roadmap_lifecycle_overlay_lot31.json")
+    current = load_json("data/audit/roadmap_lifecycle_overlay_lot32.json")
 
-    assert project["version"] == "0.31.0"
-    assert overlay["latest_implemented_lot"] == 31
-    assert overlay["previous_overlay"] == "data/audit/roadmap_lifecycle_overlay_lot30.json"
-    lots = overlay["lots"]
+    assert version_tuple(project["version"]) >= (0, 31, 0)
+    assert historical["latest_implemented_lot"] == 31
+    assert historical["previous_overlay"] == "data/audit/roadmap_lifecycle_overlay_lot30.json"
+    lots = historical["lots"]
     assert lots["31"]["status"] == "IMPLEMENTED_VALIDATED_METADATA_ONLY"
     assert lots["31"]["implementation_commit"] == EVIDENCE_COMMIT
     assert lots["31"]["merged_commit"] == MERGED_COMMIT
@@ -48,10 +55,11 @@ def test_lot31_post_merge_release_and_lifecycle_are_consistent() -> None:
     assert lots["31"]["network_ingestion_allowed"] is False
     assert lots["31"]["trade_allowed"] is False
     assert lots["31"]["execution_allowed"] is False
-    assert lots["32"] == {
-        "implementation_started": False,
-        "status": "PLANNED_LOCKED",
-    }
+    assert lots["32"] == {"implementation_started": False, "status": "PLANNED_LOCKED"}
+    assert current["lots"]["31"]["historical_overlay"] == (
+        "data/audit/roadmap_lifecycle_overlay_lot31.json"
+    )
+    assert current["lots"]["31"]["status"] == "IMPLEMENTED_VALIDATED_METADATA_ONLY"
 
 
 def test_lot31_post_merge_artifacts_are_independently_linked() -> None:
