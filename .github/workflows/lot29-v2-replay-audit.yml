@@ -1,0 +1,111 @@
+name: Lot 29 V2 deterministic replay validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'config/replay/v2_deterministic_replay_audit_v1.json'
+      - 'contracts/schemas/v2_deterministic_replay_audit_state_v1.schema.json'
+      - 'src/crypto_quant_bot/market_analysis/v2_*replay*audit*.py'
+      - 'scripts/run_lot29_v2_deterministic_replay_and_audit.py'
+      - 'scripts/validate_lot29.py'
+      - 'tests/test_lot29_*.py'
+      - 'docs/*LOT_29*'
+      - 'reports/*lot_29*'
+      - 'data/audit/v2_*lot29.json'
+      - '.github/workflows/lot29-v2-replay-audit.yml'
+      - 'requirements-dev.lock'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lot29:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Compile lint type and schema checks
+        run: |
+          python -m compileall -q src scripts tests
+          python -m json.tool config/replay/v2_deterministic_replay_audit_v1.json >/dev/null
+          python -m json.tool contracts/schemas/v2_deterministic_replay_audit_state_v1.schema.json >/dev/null
+          ruff check \
+            src/crypto_quant_bot/market_analysis/v2_deterministic_replay_and_audit.py \
+            src/crypto_quant_bot/market_analysis/v2_replay_audit_models.py \
+            scripts/run_lot29_v2_deterministic_replay_and_audit.py \
+            scripts/validate_lot29.py \
+            tests/test_lot29_*.py
+          mypy \
+            src/crypto_quant_bot/market_analysis/v2_deterministic_replay_and_audit.py \
+            src/crypto_quant_bot/market_analysis/v2_replay_audit_models.py
+      - name: Targeted line and branch coverage
+        run: |
+          coverage erase
+          pytest -q tests/test_lot29_*.py \
+            --cov=crypto_quant_bot.market_analysis.v2_deterministic_replay_and_audit \
+            --cov=crypto_quant_bot.market_analysis.v2_replay_audit_models \
+            --cov-branch \
+            --cov-report=json:reports/lot29/coverage.json \
+            --cov-report=term-missing
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          totals = json.loads(Path('reports/lot29/coverage.json').read_text())['totals']
+          lines = float(totals['percent_statements_covered'])
+          branches = float(totals['percent_branches_covered'])
+          print(f'Lot29 coverage: lines={lines:.2f}% branches={branches:.2f}%')
+          if lines < 95.0 or branches < 90.0:
+              raise SystemExit('LOT29_CRITICAL_COVERAGE_BELOW_THRESHOLD')
+          PY
+      - name: Exact V2 validator chain and deterministic replay
+        env:
+          CODE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          python scripts/run_lot29_v2_deterministic_replay_and_audit.py --code-commit "$CODE_COMMIT"
+          cp data/audit/v2_deterministic_replay_and_audit_lot29.json /tmp/lot29-state-run1.json
+          cp data/audit/v2_deterministic_replay_and_audit_audit_lot29.json /tmp/lot29-audit-run1.json
+          cp data/audit/v2_replay_closure_manifest_lot29.json /tmp/lot29-closure-run1.json
+          python scripts/validate_lot29.py
+          python scripts/run_lot29_v2_deterministic_replay_and_audit.py --code-commit "$CODE_COMMIT"
+          cmp /tmp/lot29-state-run1.json data/audit/v2_deterministic_replay_and_audit_lot29.json
+          cmp /tmp/lot29-audit-run1.json data/audit/v2_deterministic_replay_and_audit_audit_lot29.json
+          cmp /tmp/lot29-closure-run1.json data/audit/v2_replay_closure_manifest_lot29.json
+          python scripts/validate_lot29.py
+      - name: Architecture traceability quality and security
+        run: |
+          python scripts/validate_lot28.py
+          python scripts/validate_domain_architecture.py
+          python scripts/validate_traceability_contract.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          bandit -q -r \
+            src/crypto_quant_bot/market_analysis/v2_deterministic_replay_and_audit.py \
+            src/crypto_quant_bot/market_analysis/v2_replay_audit_models.py
+          pip-audit -r requirements-dev.lock
+      - name: Full regression and anti-flake
+        run: |
+          pytest -q
+          pytest -q tests/test_lot29_*.py
+          pytest -q tests/test_lot29_*.py
+          pytest -q tests/test_lot29_*.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot29-v2-replay-evidence
+          path: |
+            data/audit/v2_*lot29.json
+            reports/lot_29_v2_deterministic_replay_and_audit_report.md
+            reports/lot29/
