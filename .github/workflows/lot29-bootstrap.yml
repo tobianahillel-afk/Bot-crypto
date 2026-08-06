@@ -1,0 +1,45 @@
+name: Lot 29 implementation materializer
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/bootstrap_lot29_payload.py'
+      - '.github/workflows/lot29-bootstrap.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    if: github.head_ref == 'agent/lot29-v2-deterministic-replay-audit'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/lot29-v2-deterministic-replay-audit
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+      - name: Materialize validated Lot 29 payload
+        run: |
+          if [ ! -f scripts/bootstrap_lot29_payload.py ]; then
+            echo 'Lot 29 payload already materialized.'
+            exit 0
+          fi
+          python scripts/bootstrap_lot29_payload.py
+          python -m compileall -q src scripts tests
+          PYTHONPATH=src:. pytest -q tests/test_lot29_v2_deterministic_replay_and_audit.py
+      - name: Commit non-workflow implementation files
+        run: |
+          if git diff --quiet && [ -z "$(git ls-files --others --exclude-standard)" ]; then
+            echo 'No materialization changes remain.'
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- ':!.github/workflows'
+          git commit -m "Implement Lot 29 deterministic V2 replay audit"
+          git push origin HEAD:agent/lot29-v2-deterministic-replay-audit
