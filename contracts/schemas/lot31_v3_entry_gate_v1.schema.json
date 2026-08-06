@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/schemas/lot31_v3_entry_gate_v1.schema.json",
+  "title": "Lot31V3EntryGateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "gate_id",
+    "base_commit",
+    "lot30_implementation_merge_commit",
+    "lot30_post_merge_audit_commit",
+    "previous_lifecycle_overlay",
+    "current_version",
+    "target_version",
+    "target_lot",
+    "target_capability",
+    "owner",
+    "package_boundary",
+    "runtime_mode",
+    "event_time",
+    "generated_at",
+    "lineage_id",
+    "validation_state",
+    "human_decision",
+    "human_decision_time",
+    "prerequisites",
+    "required_contracts",
+    "required_source_fields",
+    "forbidden_capabilities",
+    "safety",
+    "implementation_started",
+    "next_lot_status",
+    "gate_status",
+    "reason_codes",
+    "output_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "lot31-v3-entry-gate-v1"},
+    "gate_id": {"const": "V3_LOT31_ENTRY_GATE"},
+    "base_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "lot30_implementation_merge_commit": {"const": "4551f4973ce535a6f2733ea4d92833d84ae298f7"},
+    "lot30_post_merge_audit_commit": {"const": "71b6fd8c6a25f390aee06a962d7c3439e224bbfb"},
+    "previous_lifecycle_overlay": {"const": "data/audit/roadmap_lifecycle_overlay_lot30.json"},
+    "current_version": {"const": "0.30.0"},
+    "target_version": {"const": "V3_MARKET_DATA_GOVERNANCE"},
+    "target_lot": {"const": 31},
+    "target_capability": {"const": "Market Data Governance Scope & Source Registry"},
+    "owner": {"const": "MarketDataGovernanceDomain"},
+    "package_boundary": {"const": "src/crypto_quant_bot/data_governance"},
+    "runtime_mode": {"const": "DATA_GOVERNANCE_ONLY"},
+    "event_time": {"type": "string", "format": "date-time"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "lineage_id": {"type": "string", "format": "uuid"},
+    "validation_state": {"const": "VALIDATED"},
+    "human_decision": {"const": "APPROVED_START_LOT31"},
+    "human_decision_time": {"type": "string", "format": "date-time"},
+    "prerequisites": {
+      "const": [
+        "LOT30_IMPLEMENTED_VALIDATED_OFFLINE_CLOSURE_ONLY",
+        "LOT30_POST_MERGE_AUDIT_PASS",
+        "V2_MARKET_ANALYSIS_CLOSED_OFFLINE_ONLY",
+        "V1_V2_SAFETY_INVARIANTS_PRESERVED",
+        "V3_SCOPE_REVIEWED"
+      ]
+    },
+    "required_contracts": {
+      "const": [
+        "RunContextV1",
+        "LineageEnvelopeV1",
+        "MarketDataGovernanceScopeSourceRegistryStateV1",
+        "MarketDataGovernanceScopeSourceRegistryAuditV1",
+        "MarketDataGovernanceScopeSourceRegistryContractRegistryV1",
+        "MarketDataGovernanceScopeSourceRegistryCapabilityMatrixV1",
+        "SourceRegistryV1"
+      ]
+    },
+    "required_source_fields": {
+      "const": [
+        "source_id",
+        "provider",
+        "venue",
+        "endpoint_type",
+        "fields",
+        "cadence",
+        "timezone",
+        "license",
+        "auth_mode",
+        "retention",
+        "criticality",
+        "source_of_truth",
+        "backup_sources",
+        "revision_policy"
+      ]
+    },
+    "forbidden_capabilities": {
+      "const": [
+        "EXTERNAL_CONNECTIVITY",
+        "NETWORK_INGESTION",
+        "REAL_CREDENTIALS",
+        "EXCHANGE_AUTHENTICATION",
+        "FORECAST_GENERATION",
+        "PROBABILITY_CLAIMS",
+        "SIGNAL_GENERATION",
+        "TRADE_INTENT",
+        "RISK_APPROVAL",
+        "RISK_RESERVATION",
+        "ORDER_INTENT",
+        "PAPER_EXECUTION",
+        "LIVE_EXECUTION"
+      ]
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "analysis_only",
+        "used_for_decision",
+        "external_connectivity_allowed",
+        "network_ingestion_allowed",
+        "real_credentials_allowed",
+        "signal_generation_allowed",
+        "risk_approval_allowed",
+        "order_routing_allowed",
+        "trade_allowed",
+        "execution_allowed",
+        "approved_size"
+      ],
+      "properties": {
+        "analysis_only": {"const": true},
+        "used_for_decision": {"const": false},
+        "external_connectivity_allowed": {"const": false},
+        "network_ingestion_allowed": {"const": false},
+        "real_credentials_allowed": {"const": false},
+        "signal_generation_allowed": {"const": false},
+        "risk_approval_allowed": {"const": false},
+        "order_routing_allowed": {"const": false},
+        "trade_allowed": {"const": false},
+        "execution_allowed": {"const": false},
+        "approved_size": {"const": 0}
+      }
+    },
+    "implementation_started": {"const": false},
+    "next_lot_status": {"const": "PLANNED_LOCKED"},
+    "gate_status": {"const": "GO_LOT31_IMPLEMENTATION_ENTRY"},
+    "reason_codes": {
+      "const": [
+        "LOT30_POST_MERGE_AUDIT_VERIFIED",
+        "V2_CLOSED_OFFLINE_ONLY",
+        "LOT31_SCOPE_AND_OWNERSHIP_VERIFIED",
+        "LOT31_NO_CONNECTIVITY_BOUNDARY_VERIFIED",
+        "HUMAN_START_DECISION_RECORDED",
+        "LOT32_REMAINS_LOCKED"
+      ]
+    },
+    "output_checksum": {"const": "36595331f161a32b69afdd84e3f26353f01bdc27720ae276ea37618af794d526"}
+  }
+}
