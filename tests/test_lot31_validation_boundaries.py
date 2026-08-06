@@ -3,26 +3,116 @@ from __future__ import annotations
 from dataclasses import replace
 
 import pytest
-from test_lot31_market_data_governance_scope_and_source_registry import (
-    COMMIT,
-    SHA,
-    UTC,
-    contract,
-    source,
-    state,
-)
 
+from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry import (
+    canonical_checksum,
+)
 from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry_models import (
     CapabilityMatrixEntryV1,
+    ContractRegistryEntryV1,
     LineageEnvelopeV1,
     Lot31MetricsV1,
     MarketDataGovernanceScopeSourceRegistryAuditV1,
+    MarketDataGovernanceScopeSourceRegistryStateV1,
     RunContextV1,
+    SourceRegistryEntryV1,
     SourceRegistryV1,
     SourceRegistryValidationError,
     fail_closed_safety,
     validate_fail_closed_safety,
 )
+
+COMMIT = "0123456789abcdef0123456789abcdef01234567"
+SHA = "a" * 64
+UTC = "2026-08-06T00:00:00Z"
+
+
+def source(
+    source_id: str = "kraken-public-spot-metadata",
+    *,
+    truth: bool = True,
+    backups: tuple[str, ...] = (),
+) -> SourceRegistryEntryV1:
+    return SourceRegistryEntryV1(
+        source_id=source_id,
+        provider="Provider",
+        venue="VENUE",
+        endpoint_type="PUBLIC_REFERENCE_METADATA",
+        endpoint_descriptor="metadata-contract-only-no-network-call",
+        fields=("exchange_symbol", "market_status"),
+        cadence=86400,
+        timezone="UTC",
+        license="PUBLIC_EXCHANGE_TERMS_REVIEW_REQUIRED",
+        auth_mode="NONE",
+        retention=3650,
+        criticality="PRIMARY" if truth else "SECONDARY",
+        source_of_truth=truth,
+        backup_sources=backups,
+        source_schema_version=f"{source_id}-v1",
+        revision=1,
+        revision_policy="IMMUTABLE_VERSIONED_REPLACEMENT",
+        approved=True,
+        enabled=False,
+        connection_status="DISABLED",
+    )
+
+
+def contract(name: str) -> ContractRegistryEntryV1:
+    return ContractRegistryEntryV1(
+        contract_name=name,
+        owner="MarketDataGovernanceDomain",
+        schema_path="contracts/schemas/source_registry_v1.schema.json",
+        producer="Lot31",
+        status="IMPLEMENTED_METADATA_ONLY",
+    )
+
+
+def capability(name: str, contract_name: str = "SourceRegistryV1") -> CapabilityMatrixEntryV1:
+    return CapabilityMatrixEntryV1(
+        capability=name,
+        status="REQUIRED",
+        owner="MarketDataGovernanceDomain",
+        contract=contract_name,
+        gate="LOT31_ENTRY_GATE",
+    )
+
+
+def state() -> MarketDataGovernanceScopeSourceRegistryStateV1:
+    registry = SourceRegistryV1(
+        registry_id="registry",
+        registry_version="1.0.0",
+        source_of_truth_id="kraken-public-spot-metadata",
+        sources=(source(),),
+        revision_policy="IMMUTABLE_VERSIONED_REPLACEMENT",
+    )
+    initial = MarketDataGovernanceScopeSourceRegistryStateV1(
+        run_context=RunContextV1("run", "DATA_GOVERNANCE_ONLY", "config-v1", COMMIT, "corr"),
+        lineage=LineageEnvelopeV1(
+            "lineage",
+            30,
+            "data/audit/v2_market_analysis_closure_lot30.json",
+            SHA,
+            UTC,
+        ),
+        event_time=UTC,
+        generated_at=UTC,
+        available_at=UTC,
+        validation_state="VALIDATED_METADATA_ONLY",
+        source_registry=registry,
+        capability_matrix=(capability("source_registry"),),
+        contract_registry=(contract("SourceRegistryV1"),),
+        metrics=Lot31MetricsV1(1, 0, 0),
+        reason_codes=(
+            "LOT31_ENTRY_GATE_VERIFIED",
+            "SOURCE_REGISTRY_METADATA_VALIDATED",
+            "SOURCE_OF_TRUTH_AND_BACKUPS_DECLARED",
+            "EXTERNAL_CONNECTIVITY_DISABLED",
+            "LOT32_REMAINS_LOCKED",
+        ),
+        safety=fail_closed_safety(),
+        output_checksum="0" * 64,
+    )
+    return replace(initial, output_checksum=canonical_checksum(initial.payload_without_checksum()))
 
 
 @pytest.mark.parametrize(
