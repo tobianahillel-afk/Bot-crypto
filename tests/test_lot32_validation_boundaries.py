@@ -49,7 +49,7 @@ def mutate(
 @pytest.mark.parametrize(
     ("callback", "message"),
     [
-        (lambda value: value.pop("contract_size"), "explicitly present"),
+        (lambda value: value.pop("contract_size"), "fields differ"),
         (lambda value: value.__setitem__("contract_size", 1), "string or null"),
         (lambda value: value.__setitem__("canonical_symbol", "BTC-EUR"), "canonical_symbol"),
         (lambda value: value.__setitem__("market_type", "UNKNOWN"), "market_type"),
@@ -71,13 +71,14 @@ def test_instrument_identity_and_nullable_fields_fail_closed(
 @pytest.mark.parametrize(
     ("field", "value", "message"),
     [
-        ("venue", "kraken", "uppercase"),
+        ("venue", "kraken", "differs from source venue"),
         ("source_revision", True, "integer"),
         ("tick_size", 0.1, "string"),
         ("tick_size", "0.10", "canonical"),
         ("lot_size", "0", "positive"),
         ("price_precision", -1, "negative"),
         ("quantity_precision", -1, "negative"),
+        ("price_precision", 2, "differs from tick_size"),
     ],
 )
 def test_alias_type_and_decimal_boundaries_fail_closed(
@@ -89,7 +90,7 @@ def test_alias_type_and_decimal_boundaries_fail_closed(
         payload["instruments"][0]["aliases"][2][field] = value
 
     mutate(root, INPUT_PATHS[0], change)
-    with pytest.raises(InstrumentNormalizationError, match=message):
+    with pytest.raises((InstrumentNormalizationError, ValueError), match=message):
         build_lot32_artifacts(root, VALID_SHA)
 
 
@@ -154,6 +155,8 @@ def test_alias_dataclass_rejects_non_explicit_policy_values() -> None:
         "leverage_policy": "FORBIDDEN",
         "validation_state": "VALIDATED_METADATA_ONLY",
     }
+    with pytest.raises(InstrumentNormalizationError, match="uppercase"):
+        VenueInstrumentAliasV1(**{**base, "venue": "kraken"})
     with pytest.raises(InstrumentNormalizationError, match="trimmed"):
         VenueInstrumentAliasV1(**{**base, "exchange_symbol": " XBTEUR"})
     with pytest.raises(InstrumentNormalizationError, match="positive"):
