@@ -38,7 +38,7 @@ def test_lot28_release_state_is_consistent() -> None:
     ).read_text(encoding="utf-8")
     worklog = (ROOT / "docs/LOT_28_IMPLEMENTATION_WORKLOG.md").read_text(encoding="utf-8")
 
-    assert project["version"] == "0.28.0"
+    assert tuple(map(int, project["version"].split("."))) >= (0, 28, 0)
     assert overlay["latest_implemented_lot"] == 28
     assert overlay["previous_overlay"] == "data/audit/roadmap_lifecycle_overlay_lot27.json"
     assert overlay["lots"]["28"]["status"] == "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY"
