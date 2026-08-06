@@ -1,0 +1,118 @@
+name: Lot 33 timestamp clock timezone governance validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'config/data_governance/timestamp_clock_timezone_governance_v1.json'
+      - 'contracts/schemas/*time*.json'
+      - 'src/crypto_quant_bot/data_governance/timestamp_*.py'
+      - 'scripts/*lot33*'
+      - 'tests/test_lot33_*.py'
+      - 'docs/*LOT_33*'
+      - 'docs/LOT33_*'
+      - 'reports/*lot_33*'
+      - 'data/audit/*lot33.json'
+      - '.github/workflows/lot33-timestamp-governance.yml'
+      - 'requirements-dev.lock'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lot33:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Compile lint type and schema checks
+        run: |
+          python -m compileall -q src scripts tests
+          python -m json.tool config/data_governance/timestamp_clock_timezone_governance_v1.json >/dev/null
+          python -m json.tool contracts/schemas/raw_timestamp_envelope_v1.schema.json >/dev/null
+          python -m json.tool contracts/schemas/canonical_time_envelope_v1.schema.json >/dev/null
+          python -m json.tool contracts/schemas/timestamp_clock_timezone_governance_state_v1.schema.json >/dev/null
+          python -m json.tool contracts/schemas/timestamp_clock_timezone_governance_audit_v1.schema.json >/dev/null
+          ruff check \
+            src/crypto_quant_bot/data_governance/timestamp_*.py \
+            scripts/run_lot33_timestamp_clock_and_timezone_governance.py \
+            scripts/validate_lot33.py \
+            scripts/validate_lot33_no_connectivity.py \
+            tests/test_lot33_*.py
+          mypy src/crypto_quant_bot/data_governance
+      - name: Targeted line and branch coverage
+        run: |
+          mkdir -p reports/lot33
+          coverage erase
+          pytest -q tests/test_lot33_*.py \
+            --cov=crypto_quant_bot.data_governance.timestamp_clock_and_timezone_governance \
+            --cov=crypto_quant_bot.data_governance.timestamp_clock_timezone_models \
+            --cov=crypto_quant_bot.data_governance.timestamp_clock_timezone_validation \
+            --cov-branch \
+            --cov-report=json:reports/lot33/coverage.json \
+            --cov-report=term-missing
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          totals = json.loads(Path('reports/lot33/coverage.json').read_text())['totals']
+          lines = float(totals['percent_statements_covered'])
+          branches = float(totals['percent_branches_covered'])
+          print(f'Lot33 coverage: lines={lines:.2f}% branches={branches:.2f}%')
+          if lines < 95.0 or branches < 90.0:
+              raise SystemExit('LOT33_CRITICAL_COVERAGE_BELOW_THRESHOLD')
+          PY
+      - name: Exact temporal artifacts and deterministic replay
+        env:
+          CODE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          python scripts/validate_lot33_entry_gate.py
+          python scripts/run_lot33_timestamp_clock_and_timezone_governance.py --code-commit "$CODE_COMMIT"
+          cp data/audit/timestamp_clock_and_timezone_governance_lot33.json /tmp/lot33-state-run1.json
+          cp data/audit/timestamp_clock_and_timezone_governance_audit_lot33.json /tmp/lot33-audit-run1.json
+          cp data/audit/canonical_time_envelopes_lot33.json /tmp/lot33-envelopes-run1.json
+          python scripts/validate_lot33.py
+          python scripts/validate_lot33_no_connectivity.py
+          python scripts/run_lot33_timestamp_clock_and_timezone_governance.py --code-commit "$CODE_COMMIT"
+          cmp /tmp/lot33-state-run1.json data/audit/timestamp_clock_and_timezone_governance_lot33.json
+          cmp /tmp/lot33-audit-run1.json data/audit/timestamp_clock_and_timezone_governance_audit_lot33.json
+          cmp /tmp/lot33-envelopes-run1.json data/audit/canonical_time_envelopes_lot33.json
+          python scripts/validate_lot33.py
+      - name: Architecture traceability quality and security
+        run: |
+          python scripts/validate_lot32.py
+          python scripts/validate_lot32_no_connectivity.py
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          bandit -q -r src/crypto_quant_bot/data_governance
+          pip-audit -r requirements-dev.lock
+      - name: Full regression and anti-flake
+        run: |
+          pytest -q
+          pytest -q tests/test_lot33_*.py
+          pytest -q tests/test_lot33_*.py
+          pytest -q tests/test_lot33_*.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot33-temporal-governance-evidence
+          path: |
+            data/audit/*lot33.json
+            reports/lot_33_timestamp_clock_and_timezone_governance_report.md
+            reports/lot33/

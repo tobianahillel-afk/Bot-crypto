@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/schemas/canonical_time_envelope_v1.schema.json",
+  "title": "CanonicalTimeEnvelopeV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "raw", "source_time_utc", "exchange_time_utc", "event_time_utc",
+    "receive_time_utc", "process_time_utc", "available_at_utc", "usable_from_utc",
+    "clock_drift_us", "transport_latency_us", "processing_latency_us", "total_latency_us",
+    "out_of_order_delay_us", "validation_state"
+  ],
+  "properties": {
+    "schema_version": {"const": "canonical-time-envelope-v1"},
+    "raw": {"$ref": "raw_timestamp_envelope_v1.schema.json"},
+    "source_time_utc": {"type": "string", "pattern": "Z$"},
+    "exchange_time_utc": {"oneOf": [{"type": "string", "pattern": "Z$"}, {"type": "null"}]},
+    "event_time_utc": {"type": "string", "pattern": "Z$"},
+    "receive_time_utc": {"type": "string", "pattern": "Z$"},
+    "process_time_utc": {"type": "string", "pattern": "Z$"},
+    "available_at_utc": {"type": "string", "pattern": "Z$"},
+    "usable_from_utc": {"type": "string", "pattern": "Z$"},
+    "clock_drift_us": {"type": "integer"},
+    "transport_latency_us": {"type": "integer", "minimum": 0},
+    "processing_latency_us": {"type": "integer", "minimum": 0},
+    "total_latency_us": {"type": "integer", "minimum": 0},
+    "out_of_order_delay_us": {"type": "integer", "minimum": 0},
+    "validation_state": {"const": "VALIDATED_TEMPORAL_ONLY"}
+  }
+}
