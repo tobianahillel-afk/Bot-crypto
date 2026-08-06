@@ -16,8 +16,8 @@ from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_re
     load_json_object,
 )
 from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry_models import (  # noqa: E402
-    fail_closed_safety,
     SourceRegistryValidationError,
+    fail_closed_safety,
 )
 
 STATE_PATH = ROOT / "data/audit/market_data_governance_scope_and_source_registry_lot31.json"
