@@ -1,0 +1,19 @@
+{
+  "evaluated_mutants": 208,
+  "evidence_commit": "cd9ffa91a4a64c36a71a40e746cf575fe438d59b",
+  "excluded_patterns": [
+    "raise statements",
+    "logger calls"
+  ],
+  "killed_mutants": 175,
+  "minimum_score_percent": 80.0,
+  "mutation_score_percent": 84.13,
+  "scope": [
+    "instrument_symbol_and_contract_normalization.py",
+    "instrument_symbol_and_contract_normalization_models.py"
+  ],
+  "schema_version": "lot32-independent-mutation-summary-v1",
+  "status": "PASS",
+  "survived_mutants": 33,
+  "timeout_mutants": 0
+}
