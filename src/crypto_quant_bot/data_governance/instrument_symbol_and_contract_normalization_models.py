@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from typing import Any
 
 from .source_registry_validation import fail_closed_safety
@@ -42,10 +42,7 @@ def require_git_sha(value: str) -> None:
 def decimal_value(value: str, field: str) -> Decimal:
     if not isinstance(value, str) or not DECIMAL_PATTERN.fullmatch(value):
         raise InstrumentNormalizationError(f"{field} must be a canonical decimal string")
-    try:
-        parsed = Decimal(value)
-    except InvalidOperation as error:
-        raise InstrumentNormalizationError(f"{field} is not a valid decimal") from error
+    parsed = Decimal(value)
     if not parsed.is_finite() or parsed <= 0:
         raise InstrumentNormalizationError(f"{field} must be finite and positive")
     normalized = format(parsed.normalize(), "f")
@@ -149,6 +146,11 @@ class VenueInstrumentAliasV1:
     validation_state: str
 
     def __post_init__(self) -> None:
+        self._validate_identity()
+        self._validate_decimal_contract()
+        self._validate_policy()
+
+    def _validate_identity(self) -> None:
         if not TOKEN_PATTERN.fullmatch(self.venue):
             raise InstrumentNormalizationError("venue must be an uppercase canonical token")
         for field, value in (
@@ -160,6 +162,8 @@ class VenueInstrumentAliasV1:
             require_text(value, field)
         if self.source_revision < 1:
             raise InstrumentNormalizationError("source_revision must be positive")
+
+    def _validate_decimal_contract(self) -> None:
         for field, value in (
             ("tick_size", self.tick_size),
             ("lot_size", self.lot_size),
@@ -173,6 +177,8 @@ class VenueInstrumentAliasV1:
             raise InstrumentNormalizationError("price_precision differs from tick_size")
         if decimal_places(self.lot_size, "lot_size") != self.quantity_precision:
             raise InstrumentNormalizationError("quantity_precision differs from lot_size")
+
+    def _validate_policy(self) -> None:
         if self.margin_mode is not None:
             require_text(self.margin_mode, "margin_mode")
         if self.validation_state != "VALIDATED_METADATA_ONLY":
