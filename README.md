@@ -100,11 +100,17 @@ forecast
 → scenario
 → signal
 → TradeIntent
+→ PortfolioDecisionSnapshotV1
 → RiskDecision
+→ RiskReservationV1
 → OrderIntent
 → OMS/EMS
 → fill/reconciliation
 ```
+
+Chaque future décision augmentant le risque doit consommer un snapshot portefeuille cohérent incluant positions, ordres ouverts, intents en attente, capital réservé et risque déjà engagé. Le sizing final est le minimum de tous les caps de risque, capital, heat, concentration, corrélation, drawdown et liquidité. Une réservation atomique empêche plusieurs décisions simultanées d'utiliser le même budget.
+
+Toute augmentation de position exige un nouvel intent, une nouvelle décision et une nouvelle réservation. La moyenne à la baisse implicite est interdite ; un ajout dans la même direction est bloqué lorsque le PnL de liquidation net de coûts est négatif ou nul.
 
 Les futurs ordres protecteurs — stop-loss, take-profit, break-even, trailing, partial exits, bracket et OCO — sont spécifiés mais non implémentés. Ils appartiennent à V5/V7/V8/V15 selon leurs responsabilités.
 
@@ -160,6 +166,8 @@ La CI ajoute Ruff, mypy, coverage lignes/branches, diff coverage, Bandit, `pip-a
 - [Standard stochastique et multi-horizon](docs/STOCHASTIC_CONTINUOUS_STATE_AND_MULTI_HORIZON_FORECASTING_STANDARD.md)
 - [Participants et zones de sortie](docs/PARTICIPANT_BEHAVIOR_AND_LIQUIDITY_EXIT_ZONE_INFERENCE_STANDARD.md)
 - [Ordres protecteurs](docs/PROTECTIVE_ORDERS_AND_EXIT_LIFECYCLE_STANDARD.md)
+- [Risque portefeuille, sizing, réservations et sorties](docs/CANONICAL_PORTFOLIO_RISK_SIZING_AND_EXIT_STANDARD.md)
+- [Addendum normatif V7/V9](docs/roadmap/V07_V09_PORTFOLIO_RISK_NORMATIVE_ADDENDUM.md)
 - [Addendum de roadmap](docs/roadmap/MULTI_SCALE_STOCHASTIC_PREDICTION_AND_PARTICIPANT_INFERENCE_ADDENDUM.md)
 - [Roadmap V1 → V21](docs/ROADMAP_V1_TO_V21.md)
 
