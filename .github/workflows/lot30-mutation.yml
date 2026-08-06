@@ -41,10 +41,13 @@ jobs:
           : > .tmp-lot30-mutants/src/crypto_quant_bot/market_analysis/__init__.py
           cp src/crypto_quant_bot/market_analysis/alignment_common.py .tmp-lot30-mutants/src/crypto_quant_bot/market_analysis/
           cp src/crypto_quant_bot/market_analysis/alignment_io.py .tmp-lot30-mutants/src/crypto_quant_bot/market_analysis/
+          cp src/crypto_quant_bot/market_analysis/v2_replay_audit_models.py .tmp-lot30-mutants/src/crypto_quant_bot/market_analysis/
+          cp src/crypto_quant_bot/market_analysis/v2_deterministic_replay_and_audit.py .tmp-lot30-mutants/src/crypto_quant_bot/market_analysis/
           cp src/crypto_quant_bot/market_analysis/v2_market_analysis_closure.py .tmp-lot30-mutants/src/crypto_quant_bot/market_analysis/
           cp src/crypto_quant_bot/market_analysis/v2_market_analysis_closure_models.py .tmp-lot30-mutants/src/crypto_quant_bot/market_analysis/
           cp tests/test_lot30_v2_market_analysis_closure.py .tmp-lot30-mutants/tests/
           cp tests/test_lot30_mutation_oracles.py .tmp-lot30-mutants/tests/
+          cp tests/test_lot30_validation_boundaries.py .tmp-lot30-mutants/tests/
           cat > .tmp-lot30-mutants/pyproject.toml <<'TOML'
           [project]
           name = "crypto-quant-bot"
@@ -68,6 +71,8 @@ jobs:
             "src/crypto_quant_bot/market_analysis/__init__.py",
             "src/crypto_quant_bot/market_analysis/alignment_common.py",
             "src/crypto_quant_bot/market_analysis/alignment_io.py",
+            "src/crypto_quant_bot/market_analysis/v2_replay_audit_models.py",
+            "src/crypto_quant_bot/market_analysis/v2_deterministic_replay_and_audit.py",
           ]
           mutate_only_covered_lines = true
           timeout_factor = 8.0
