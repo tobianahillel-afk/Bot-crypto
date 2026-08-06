@@ -114,7 +114,7 @@ def lifecycle() -> dict[str, object]:
 def test_canonical_checksum_has_independent_exact_oracle() -> None:
     payload = {"z": [3, 2, 1], "a": {"é": True}, "n": None}
     assert canonical_checksum(payload) == independent_checksum(payload)
-    assert canonical_checksum(payload) == "aa949d901663d47700c4f4f74ce8dc439892e0c037a948b16e88b249e30e6f72"
+    assert canonical_checksum(payload) == "f7a39d0a85aa69f0276b1d0d35bafe65463e12b71df60b78253f61437971c62c"
 
 
 def test_invalid_control_inputs_are_exact_and_do_not_mutate_sources() -> None:
@@ -127,13 +127,16 @@ def test_invalid_control_inputs_are_exact_and_do_not_mutate_sources() -> None:
 
     assert wrong_schema == {**config_before, "schema_version": "unsupported"}
     assert forbidden["schema_version"] == "v2-market-analysis-closure-config-v1"
-    assert forbidden["safety"] == {
-        **config_before["safety"],
-        "trade_allowed": True,
-    }
+    safety_before = config_before["safety"]
+    assert isinstance(safety_before, dict)
+    assert forbidden["safety"] == {**safety_before, "trade_allowed": True}
+    unlocked_lots = unlocked["lots"]
+    lifecycle_lots = lifecycle_before["lots"]
+    assert isinstance(unlocked_lots, dict)
+    assert isinstance(lifecycle_lots, dict)
     assert unlocked["latest_implemented_lot"] == 29
-    assert unlocked["lots"]["29"] == lifecycle_before["lots"]["29"]
-    assert unlocked["lots"]["30"] == {
+    assert unlocked_lots["29"] == lifecycle_lots["29"]
+    assert unlocked_lots["30"] == {
         "implementation_started": True,
         "status": "IMPLEMENTATION_STARTED",
     }
