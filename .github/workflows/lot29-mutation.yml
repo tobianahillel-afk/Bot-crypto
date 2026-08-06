@@ -41,7 +41,7 @@ jobs:
             .tmp-lot29-mutants/tests \
             reports/lot29/mutation
           cp src/crypto_quant_bot/__init__.py .tmp-lot29-mutants/src/crypto_quant_bot/
-          cp src/crypto_quant_bot/market_analysis/__init__.py .tmp-lot29-mutants/src/crypto_quant_bot/market_analysis/
+          : > .tmp-lot29-mutants/src/crypto_quant_bot/market_analysis/__init__.py
           cp src/crypto_quant_bot/market_analysis/alignment_common.py .tmp-lot29-mutants/src/crypto_quant_bot/market_analysis/
           cp src/crypto_quant_bot/market_analysis/alignment_io.py .tmp-lot29-mutants/src/crypto_quant_bot/market_analysis/
           cp src/crypto_quant_bot/market_analysis/v2_deterministic_replay_and_audit.py .tmp-lot29-mutants/src/crypto_quant_bot/market_analysis/
