@@ -1,0 +1,17 @@
+{
+  "evaluated_mutants": 106,
+  "evidence_commit": "f4762cb7d68fd11a42962f8016f8af22e2bc1c5a",
+  "killed_mutants": 96,
+  "methodology": "independent AST operator and constant campaign on covered temporal code",
+  "minimum_score_percent": 80.0,
+  "mutation_score_percent": 90.57,
+  "schema_version": "lot33-independent-mutation-summary-v1",
+  "scope": [
+    "timestamp_clock_and_timezone_governance.py",
+    "timestamp_clock_timezone_models.py",
+    "timestamp_clock_timezone_validation.py"
+  ],
+  "status": "PASS",
+  "survived_mutants": 10,
+  "timeout_mutants": 0
+}
