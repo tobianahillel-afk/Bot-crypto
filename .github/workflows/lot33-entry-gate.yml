@@ -1,0 +1,57 @@
+name: Lot 33 implementation entry gate
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'data/audit/lot33_v3_entry_gate.json'
+      - 'contracts/schemas/lot33_v3_entry_gate_v1.schema.json'
+      - 'scripts/validate_lot33_entry_gate.py'
+      - 'tests/test_lot33_v3_entry_gate.py'
+      - 'docs/LOT_33_V3_ENTRY_GATE.md'
+      - 'reports/lot_33_v3_entry_gate_report.md'
+      - '.github/workflows/lot33-entry-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Verify gate-only boundary
+        shell: bash
+        run: |
+          git fetch origin main
+          git diff --quiet origin/main...HEAD -- src/
+      - name: Validate schema, syntax, lint and types
+        run: |
+          python -m json.tool data/audit/lot33_v3_entry_gate.json >/dev/null
+          python -m json.tool contracts/schemas/lot33_v3_entry_gate_v1.schema.json >/dev/null
+          python -m compileall -q src scripts tests
+          ruff check scripts/validate_lot33_entry_gate.py tests/test_lot33_v3_entry_gate.py
+          mypy src/crypto_quant_bot
+      - name: Validate gate and regression
+        run: |
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_lot32.py
+          python scripts/validate_lot32_no_connectivity.py
+          python scripts/validate_lot33_entry_gate.py
+          pytest -q tests/test_lot33_v3_entry_gate.py
+          pytest -q
+      - name: Security and dependency checks
+        run: |
+          bandit -q -r src -ll
+          pip-audit -r requirements-dev.lock
