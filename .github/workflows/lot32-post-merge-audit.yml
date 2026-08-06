@@ -1,0 +1,86 @@
+name: Lot 32 post-merge audit exact-head
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'README.md'
+      - 'pyproject.toml'
+      - 'data/audit/roadmap_lifecycle_overlay_lot32.json'
+      - 'docs/LOT_32_POST_MERGE_AUDIT.md'
+      - 'docs/LOT32_POST_MERGE_VALIDATION_MATRIX.md'
+      - 'docs/ROADMAP_V1_TO_V21.md'
+      - 'scripts/validate_roadmap_documentation.py'
+      - 'tests/test_lot31_post_merge_state.py'
+      - 'tests/test_lot32_post_merge_state.py'
+      - '.github/workflows/lot32-post-merge-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Verify audit-only production boundary
+        shell: bash
+        run: |
+          git fetch origin main
+          if ! git diff --quiet origin/main...HEAD -- src/; then
+            echo 'Production source changed inside the Lot 32 post-merge audit PR'
+            git diff --stat origin/main...HEAD -- src/
+            exit 1
+          fi
+      - name: Compile lint and type checks
+        run: |
+          python -m compileall -q src scripts tests
+          ruff check \
+            scripts/validate_roadmap_documentation.py \
+            tests/test_lot31_post_merge_state.py \
+            tests/test_lot32_post_merge_state.py
+          mypy src/crypto_quant_bot
+      - name: Validate Lot 31 and Lot 32 evidence
+        run: |
+          python -m json.tool data/audit/roadmap_lifecycle_overlay_lot32.json >/dev/null
+          python scripts/validate_lot30.py
+          python scripts/validate_lot31_entry_gate.py
+          python scripts/validate_lot31.py
+          python scripts/validate_lot31_no_connectivity.py
+          python scripts/validate_lot32_entry_gate.py
+          python scripts/validate_lot32.py
+          python scripts/validate_lot32_no_connectivity.py
+          python scripts/validate_roadmap_documentation.py
+      - name: Architecture traceability and quality gates
+        run: |
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+      - name: Post-merge assertions and full regression
+        run: |
+          pytest -q tests/test_lot31_post_merge_state.py tests/test_lot32_post_merge_state.py
+          pytest -q
+      - name: Audit anti-flake repetitions
+        run: |
+          pytest -q tests/test_lot31_post_merge_state.py tests/test_lot32_post_merge_state.py
+          pytest -q tests/test_lot31_post_merge_state.py tests/test_lot32_post_merge_state.py
+          pytest -q tests/test_lot31_post_merge_state.py tests/test_lot32_post_merge_state.py
+      - name: Security and dependency checks
+        run: |
+          bandit -q -r src -ll
+          pip-audit -r requirements-dev.lock
