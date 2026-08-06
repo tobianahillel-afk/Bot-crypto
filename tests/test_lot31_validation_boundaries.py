@@ -6,12 +6,10 @@ import pytest
 
 from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry_models import (
     CapabilityMatrixEntryV1,
-    ContractRegistryEntryV1,
     LineageEnvelopeV1,
     Lot31MetricsV1,
     MarketDataGovernanceScopeSourceRegistryAuditV1,
     RunContextV1,
-    SourceRegistryEntryV1,
     SourceRegistryV1,
     SourceRegistryValidationError,
     fail_closed_safety,
