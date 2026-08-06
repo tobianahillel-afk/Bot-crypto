@@ -1,0 +1,74 @@
+{
+  "schema_version": "instrument-symbol-contract-normalization-config-v1",
+  "config_version": "lot32-instrument-normalization-config-v1",
+  "run_id": "lot32-instrument-normalization-certification-run",
+  "correlation_id": "lot32-v3-instrument-normalization",
+  "lineage_id": "lot32-from-certified-lot31-source-registry",
+  "registry_id": "canonical-instrument-registry",
+  "registry_version": "1.0.0",
+  "revision_policy": "IMMUTABLE_VERSIONED_REPLACEMENT",
+  "event_time": "2026-08-06T19:15:00Z",
+  "available_at": "2026-08-06T19:15:00Z",
+  "generated_at": "2026-08-06T19:15:00Z",
+  "instruments": [
+    {
+      "instrument_id": "btc-eur-spot",
+      "canonical_symbol": "BTC/EUR:SPOT",
+      "base_asset": "BTC",
+      "quote_asset": "EUR",
+      "market_type": "SPOT",
+      "settlement_asset": "EUR",
+      "contract_size": null,
+      "expiry_time": null,
+      "strike_price": null,
+      "option_type": null,
+      "aliases": [
+        {
+          "venue": "BITSTAMP",
+          "exchange_symbol": "btceur",
+          "source_id": "bitstamp-public-spot-metadata",
+          "source_revision": 1,
+          "tick_size": "0.01",
+          "lot_size": "0.00000001",
+          "min_qty": "0.00001",
+          "min_notional": "10",
+          "price_precision": 2,
+          "quantity_precision": 8,
+          "fee_tier": "REFERENCE_METADATA_ONLY",
+          "margin_mode": null,
+          "leverage_policy": "FORBIDDEN"
+        },
+        {
+          "venue": "COINBASE",
+          "exchange_symbol": "BTC-EUR",
+          "source_id": "coinbase-public-spot-metadata",
+          "source_revision": 1,
+          "tick_size": "0.01",
+          "lot_size": "0.00000001",
+          "min_qty": "0.00000001",
+          "min_notional": "1",
+          "price_precision": 2,
+          "quantity_precision": 8,
+          "fee_tier": "REFERENCE_METADATA_ONLY",
+          "margin_mode": null,
+          "leverage_policy": "FORBIDDEN"
+        },
+        {
+          "venue": "KRAKEN",
+          "exchange_symbol": "XBTEUR",
+          "source_id": "kraken-public-spot-metadata",
+          "source_revision": 1,
+          "tick_size": "0.1",
+          "lot_size": "0.00000001",
+          "min_qty": "0.0001",
+          "min_notional": "5",
+          "price_precision": 1,
+          "quantity_precision": 8,
+          "fee_tier": "REFERENCE_METADATA_ONLY",
+          "margin_mode": null,
+          "leverage_policy": "FORBIDDEN"
+        }
+      ]
+    }
+  ]
+}
