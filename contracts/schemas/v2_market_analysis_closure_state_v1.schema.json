@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/schemas/v2_market_analysis_closure_state_v1.schema.json",
+  "title": "V2MarketAnalysisClosureStateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "code_commit",
+    "version_id",
+    "runtime_mode",
+    "upstream_artifacts",
+    "validator_replays",
+    "negative_controls",
+    "closure_manifest",
+    "reason_codes",
+    "future_capabilities_locked",
+    "analysis_only",
+    "used_for_decision",
+    "signal_generation_allowed",
+    "risk_approval_allowed",
+    "order_routing_allowed",
+    "trade_allowed",
+    "execution_allowed",
+    "approved_size",
+    "output_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "v2-market-analysis-closure-state-v1"},
+    "code_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "version_id": {"const": "V2_MARKET_ANALYSIS"},
+    "runtime_mode": {"const": "LOCAL_OFFLINE_ANALYSIS_ONLY"},
+    "upstream_artifacts": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "items": {"$ref": "#/$defs/upstreamArtifact"}
+    },
+    "validator_replays": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {"$ref": "#/$defs/validatorReplay"}
+    },
+    "negative_controls": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {"$ref": "#/$defs/negativeControl"}
+    },
+    "closure_manifest": {"$ref": "#/$defs/closureManifest"},
+    "reason_codes": {
+      "const": [
+        "V2_LOTS_21_30_COVERED",
+        "V2_REPLAY_CHAIN_MATCH",
+        "V2_NEGATIVE_CONTROLS_PASS",
+        "V3_CAPABILITIES_LOCKED",
+        "V2_OFFLINE_ONLY"
+      ]
+    },
+    "future_capabilities_locked": {
+      "const": [
+        "ContinuousMarketStateV1",
+        "MultiHorizonForecastV1",
+        "ParticipantBehaviorScenarioV1",
+        "TradeIntent",
+        "RiskDecisionV1",
+        "RiskReservationV1",
+        "OrderIntent"
+      ]
+    },
+    "analysis_only": {"const": true},
+    "used_for_decision": {"const": false},
+    "signal_generation_allowed": {"const": false},
+    "risk_approval_allowed": {"const": false},
+    "order_routing_allowed": {"const": false},
+    "trade_allowed": {"const": false},
+    "execution_allowed": {"const": false},
+    "approved_size": {"const": 0},
+    "output_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "upstreamArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "lot",
+        "artifact_path",
+        "artifact_checksum",
+        "embedded_output_checksum",
+        "byte_size"
+      ],
+      "properties": {
+        "schema_version": {"const": "v2-closure-upstream-artifact-evidence-v1"},
+        "lot": {"type": "integer", "minimum": 21, "maximum": 28},
+        "artifact_path": {"type": "string", "pattern": "^data/audit/"},
+        "artifact_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "embedded_output_checksum": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          ]
+        },
+        "byte_size": {"type": "integer", "minimum": 1}
+      }
+    },
+    "validatorReplay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "run_index",
+        "command",
+        "return_code",
+        "status",
+        "stdout_checksum"
+      ],
+      "properties": {
+        "schema_version": {"const": "v2-closure-validator-replay-evidence-v1"},
+        "run_index": {"enum": [1, 2]},
+        "command": {"const": ["python", "scripts/validate_lot29.py"]},
+        "return_code": {"const": 0},
+        "status": {"const": "PASS"},
+        "stdout_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "negativeControl": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "name", "status", "reason_code"],
+      "properties": {
+        "schema_version": {"const": "v2-closure-negative-control-evidence-v1"},
+        "name": {"type": "string", "minLength": 1},
+        "status": {"const": "PASS"},
+        "reason_code": {"type": "string", "minLength": 1}
+      }
+    },
+    "closureManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "covered_lot_sequence",
+        "upstream_lot_sequence",
+        "direct_validated_lot",
+        "closure_lot",
+        "upstream_artifact_checksums",
+        "lot29_state_checksum",
+        "lot29_audit_checksum",
+        "lot29_closure_checksum",
+        "validator_stdout_checksum",
+        "negative_control_count",
+        "final_chain_checksum",
+        "closure_status"
+      ],
+      "properties": {
+        "schema_version": {"const": "v2-final-closure-manifest-v1"},
+        "covered_lot_sequence": {"const": [21, 22, 23, 24, 25, 26, 27, 28, 29, 30]},
+        "upstream_lot_sequence": {"const": [21, 22, 23, 24, 25, 26, 27, 28]},
+        "direct_validated_lot": {"const": 29},
+        "closure_lot": {"const": 30},
+        "upstream_artifact_checksums": {
+          "type": "array",
+          "minItems": 8,
+          "maxItems": 8,
+          "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        },
+        "lot29_state_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lot29_audit_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lot29_closure_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "validator_stdout_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "negative_control_count": {"const": 5},
+        "final_chain_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "closure_status": {"const": "V2_MARKET_ANALYSIS_CLOSED_OFFLINE_ONLY"}
+      }
+    }
+  }
+}
