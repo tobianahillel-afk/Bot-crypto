@@ -1,4 +1,4 @@
-name: Lot 29 validator 21 diagnostic
+name: Lot 29 validator 21 provenance diagnostic
 
 on:
   pull_request:
@@ -15,15 +15,70 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
-          cache: pip
-      - name: Install locked toolchain
+      - name: Inspect current Lot 21 roadmap evidence
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements-dev.lock
-      - name: Run Lot 21 validator with native output
-        env:
-          LOT29_DIAGNOSTIC: validator-21
-        run: python scripts/validate_lot21.py
+          python - <<'PY'
+          from __future__ import annotations
+          import hashlib
+          import json
+          from pathlib import Path
+
+          path = Path('data/audit/product_scope_roadmap_lot21.jsonl')
+          raw = path.read_bytes()
+          lines = [line for line in path.read_text(encoding='utf-8').splitlines() if line.strip()]
+          rows = [json.loads(line) for line in lines]
+          print(f'bytes={len(raw)}')
+          print(f'sha256={hashlib.sha256(raw).hexdigest()}')
+          print(f'non_empty_lines={len(lines)}')
+          print(f'parsed_rows={len(rows)}')
+          print(f'lot_min={min(row["lot_number"] for row in rows)}')
+          print(f'lot_max={max(row["lot_number"] for row in rows)}')
+          print('first=' + json.dumps(rows[0], sort_keys=True))
+          print('last=' + json.dumps(rows[-1], sort_keys=True))
+          PY
+      - name: Trace every historical file revision
+        shell: bash
+        run: |
+          set -euo pipefail
+          path='data/audit/product_scope_roadmap_lot21.jsonl'
+          echo '=== commits touching file ==='
+          git log --follow --format='%H %ad %s' --date=iso-strict -- "$path"
+          echo '=== revision metrics ==='
+          while read -r commit; do
+            [ -n "$commit" ] || continue
+            if git cat-file -e "$commit:$path" 2>/dev/null; then
+              git show "$commit:$path" > /tmp/lot21-roadmap.jsonl
+              COMMIT="$commit" python - <<'PY'
+          from __future__ import annotations
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path('/tmp/lot21-roadmap.jsonl')
+          raw = path.read_bytes()
+          lines = [line for line in path.read_text(encoding='utf-8').splitlines() if line.strip()]
+          try:
+              rows = [json.loads(line) for line in lines]
+              lot_min = min((row.get('lot_number') for row in rows), default=None)
+              lot_max = max((row.get('lot_number') for row in rows), default=None)
+              valid = True
+          except Exception as exc:
+              rows = []
+              lot_min = None
+              lot_max = None
+              valid = False
+              print(f'parse_error={type(exc).__name__}:{exc}')
+          print(
+              f'commit={os.environ["COMMIT"]} bytes={len(raw)} '
+              f'sha256={hashlib.sha256(raw).hexdigest()} lines={len(lines)} '
+              f'rows={len(rows)} lot_min={lot_min} lot_max={lot_max} valid={valid}'
+          )
+          PY
+            fi
+          done < <(git rev-list --all -- "$path")
