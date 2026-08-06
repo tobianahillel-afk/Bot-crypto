@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 
 class SourceRegistryValidationError(ValueError):
     """Fail-closed validation error for Lot 31 source-governance contracts."""
@@ -50,6 +52,12 @@ def require_boolean(value: object, field: str) -> bool:
 def require_string_list(value: object, field: str) -> tuple[str, ...]:
     if not isinstance(value, list) or any(not isinstance(item, str) for item in value):
         raise SourceRegistryValidationError(f"{field} must be a string list")
+    return tuple(value)
+
+
+def require_object_list(value: object, field: str) -> tuple[dict[str, Any], ...]:
+    if not isinstance(value, list) or any(not isinstance(item, dict) for item in value):
+        raise SourceRegistryValidationError(f"{field} must be an object list")
     return tuple(value)
 
 
