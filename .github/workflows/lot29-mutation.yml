@@ -94,7 +94,8 @@ jobs:
           if not path.is_file():
               raise SystemExit('LOT29_MUTATION_RUN_LOG_MISSING')
           text = path.read_text(encoding='utf-8', errors='replace')
-          text = re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', text).replace('\r', '\n')
+          text = re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', text)
+          text = text.replace('\r', '\n').replace('\ufe0f', '')
           pattern = re.compile(
               r'(\d+)/(\d+).*?🎉\s*(\d+).*?⏰\s*(\d+).*?🤔\s*(\d+).*?🙁\s*(\d+)'
           )
