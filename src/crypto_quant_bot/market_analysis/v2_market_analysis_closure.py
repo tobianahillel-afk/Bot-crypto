@@ -271,7 +271,7 @@ def _require_validator_match(replays: tuple[ValidatorReplayEvidenceV1, ...]) -> 
 def _expect_rejected(
     name: str,
     reason_code: str,
-    operation: Callable[[], None],
+    operation: Callable[[], object],
 ) -> NegativeControlEvidenceV1:
     try:
         operation()
