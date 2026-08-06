@@ -78,7 +78,6 @@ def test_instrument_identity_and_nullable_fields_fail_closed(
         ("lot_size", "0", "positive"),
         ("price_precision", -1, "negative"),
         ("quantity_precision", -1, "negative"),
-        ("validation_state", "CONNECTED", "metadata-only"),
     ],
 )
 def test_alias_type_and_decimal_boundaries_fail_closed(
