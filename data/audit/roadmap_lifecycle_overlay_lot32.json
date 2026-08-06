@@ -1,0 +1,92 @@
+{
+  "future_capabilities_locked": [
+    "CanonicalTimeEnvelopeV1",
+    "ContinuousMarketStateV1",
+    "MultiHorizonForecastV1",
+    "ParticipantBehaviorScenarioV1",
+    "TradeIntent",
+    "RiskDecisionV1",
+    "RiskReservationV1",
+    "OrderIntent"
+  ],
+  "historical_registry": "data/audit/product_scope_roadmap_lot21.jsonl",
+  "latest_implemented_lot": 32,
+  "lots": {
+    "26": {
+      "execution_allowed": false,
+      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot26.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY",
+      "trade_allowed": false
+    },
+    "27": {
+      "execution_allowed": false,
+      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot27.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY",
+      "trade_allowed": false
+    },
+    "28": {
+      "execution_allowed": false,
+      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot28.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY",
+      "trade_allowed": false
+    },
+    "29": {
+      "execution_allowed": false,
+      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot29.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_REPLAY_ONLY",
+      "trade_allowed": false
+    },
+    "30": {
+      "execution_allowed": false,
+      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot30.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_CLOSURE_ONLY",
+      "trade_allowed": false
+    },
+    "31": {
+      "acceptance_contract": "docs/ACCEPTANCE_CRITERIA_LOT_31.md",
+      "audit_artifact": "data/audit/market_data_governance_scope_and_source_registry_audit_lot31.json",
+      "config": "config/data_governance/market_data_source_registry_v1.json",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot31.json",
+      "implementation_commit": "689079bb5f348aa1cf62059498fcaddf760665bd",
+      "implementation_contract": "docs/LOT_31_MARKET_DATA_GOVERNANCE_SCOPE_AND_SOURCE_REGISTRY.md",
+      "merged_commit": "235ee2e3a4eabd98e8a59241396f07fc4c29e39e",
+      "network_ingestion_allowed": false,
+      "pull_request": 18,
+      "report": "reports/lot_31_market_data_governance_scope_and_source_registry_report.md",
+      "runtime_mode": "DATA_GOVERNANCE_ONLY",
+      "source_registry_artifact": "data/audit/source_registry_lot31.json",
+      "state_artifact": "data/audit/market_data_governance_scope_and_source_registry_lot31.json",
+      "status": "IMPLEMENTED_VALIDATED_METADATA_ONLY",
+      "trade_allowed": false,
+      "validator": "scripts/validate_lot31.py"
+    },
+    "32": {
+      "acceptance_contract": "docs/ACCEPTANCE_CRITERIA_LOT_32.md",
+      "audit_artifact": "data/audit/instrument_symbol_and_contract_normalization_audit_lot32.json",
+      "config": "config/data_governance/instrument_symbol_contract_normalization_v1.json",
+      "execution_allowed": false,
+      "external_connectivity_allowed": false,
+      "implementation_commit": "cd9ffa91a4a64c36a71a40e746cf575fe438d59b",
+      "implementation_contract": "docs/LOT_32_INSTRUMENT_SYMBOL_AND_CONTRACT_NORMALIZATION.md",
+      "merged_commit": "7187f2ebfebeb67292c8a521e7e8bdbc653c3086",
+      "network_ingestion_allowed": false,
+      "pull_request": 21,
+      "registry_artifact": "data/audit/instrument_registry_lot32.json",
+      "report": "reports/lot_32_instrument_symbol_and_contract_normalization_report.md",
+      "runner": "scripts/run_lot32_instrument_symbol_and_contract_normalization.py",
+      "runtime_mode": "DATA_GOVERNANCE_ONLY",
+      "state_artifact": "data/audit/instrument_symbol_and_contract_normalization_lot32.json",
+      "status": "IMPLEMENTED_VALIDATED_NORMALIZATION_ONLY",
+      "trade_allowed": false,
+      "validator": "scripts/validate_lot32.py"
+    },
+    "33": {
+      "implementation_started": false,
+      "status": "PLANNED_LOCKED"
+    }
+  },
+  "previous_overlay": "data/audit/roadmap_lifecycle_overlay_lot31.json",
+  "schema_version": "roadmap-lifecycle-overlay-v1"
+}
