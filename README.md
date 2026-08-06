@@ -1,4 +1,4 @@
-# Crypto Quant Bot V3.1-Ops
+# Crypto Quant Bot V3.2-Ops
 
 Plateforme quantitative crypto défensive, déterministe, extensible et auditable.
 
@@ -6,10 +6,10 @@ Plateforme quantitative crypto défensive, déterministe, extensible et auditabl
 
 | Élément | État |
 |---|---|
-| Dernier lot implémenté et validé | **Lot 31 — Market Data Governance Scope & Source Registry** |
-| Version | **0.31.0** |
+| Dernier lot implémenté et validé | **Lot 32 — Instrument, Symbol & Contract Normalization** |
+| Version | **0.32.0** |
 | Baseline qualité | **P0 institutionnel fusionné** |
-| Prochain lot planifié | **Lot 32 — Instrument, Symbol & Contract Normalization**, `PLANNED_LOCKED` |
+| Prochain lot planifié | **Lot 33 — Canonical Time & Market Session Governance**, `PLANNED_LOCKED` |
 | Runtime maximal | `DATA_GOVERNANCE_ONLY` |
 | Trading | **désactivé** |
 | Connectivité exchange | **désactivée** |
@@ -34,6 +34,12 @@ Le Lot 31 ouvre V3 avec un registre de sources strictement **metadata-only**. Il
 source de vérité et deux sources de secours, versionne les responsabilités, licences,
 cadences, révisions et capacités, mais n'effectue aucune requête réseau. Toutes les sources
 restent `auth_mode=NONE`, `enabled=false` et `connection_status=DISABLED`.
+
+Le Lot 32 ajoute une identité canonique d’instrument et des alias de venue strictement
+offline. La référence certifiée est `BTC/EUR:SPOT`, reliée aux alias déclaratifs Bitstamp,
+Coinbase et Kraken. Les contraintes utilisent des chaînes décimales exactes, les conversions
+canonique ↔ venue sont bidirectionnelles et les champs dérivés non applicables restent
+explicitement nuls. Aucun connecteur ou événement de marché n’est activé.
 
 ## Vision temporelle
 
@@ -74,10 +80,11 @@ est interdit.
 ## Flux continu et données confirmées
 
 Une barre ouverte peut être observée comme état provisoire, mais elle ne peut pas être
-consommée comme état confirmé. Le Lot 31 ne publie encore aucun événement de marché : il
-possède uniquement le registre et les règles de gouvernance des sources. Les instruments,
-le temps canonique, la qualité, la réconciliation et le flux continu appartiennent aux Lots
-32 à 36 ; les features de carnet, trades, liquidations et order flow appartiennent à V4.
+consommée comme état confirmé. Les Lots 31 et 32 ne publient encore aucun événement de
+marché : ils possèdent uniquement le registre des sources et le registre canonique des
+instruments. Le temps canonique, la qualité, la réconciliation et le flux continu
+appartiennent aux Lots 33 à 36 ; les features de carnet, trades, liquidations et order flow
+appartiennent à V4.
 
 ## Prévision et modèles stochastiques
 
@@ -85,7 +92,7 @@ La roadmap prévoit des prévisions par horizons distincts — initialement 30s,
 1h — avec distributions, quantiles, volatilité, target/stop hit, MAE/MFE, temps avant
 événement et incertitude.
 
-Ces contrats sont `PLANNED_LOCKED_NOT_IMPLEMENTED`. Les Lots 26 à 31 ne produisent aucune
+Ces contrats sont `PLANNED_LOCKED_NOT_IMPLEMENTED`. Les Lots 26 à 32 ne produisent aucune
 prediction, probability, expected return ou direction BUY/SELL.
 
 Les futurs modèles stochastiques devront être sélectionnés par preuve, comparés à des
@@ -169,6 +176,9 @@ python scripts/validate_lot30.py
 python scripts/validate_lot31_entry_gate.py
 python scripts/validate_lot31.py
 python scripts/validate_lot31_no_connectivity.py
+python scripts/validate_lot32_entry_gate.py
+python scripts/validate_lot32.py
+python scripts/validate_lot32_no_connectivity.py
 python scripts/validate_roadmap_documentation.py
 python scripts/validate_architecture_boundaries.py
 python scripts/check_no_silent_numeric_coercion.py
@@ -232,7 +242,20 @@ complexité, mutation testing et répétitions anti-flake.
 - État certifié : `data/audit/market_data_governance_scope_and_source_registry_lot31.json`
 - Audit certifié : `data/audit/market_data_governance_scope_and_source_registry_audit_lot31.json`
 - Registre de sources : `data/audit/source_registry_lot31.json`
-- Lifecycle courant : `data/audit/roadmap_lifecycle_overlay_lot31.json`
+- Lifecycle historique : `data/audit/roadmap_lifecycle_overlay_lot31.json`
+
+### Lot 32
+
+- [Gate d’entrée](docs/LOT_32_V3_ENTRY_GATE.md)
+- [Spécification](docs/LOT_32_INSTRUMENT_SYMBOL_AND_CONTRACT_NORMALIZATION.md)
+- [Critères d’acceptation](docs/ACCEPTANCE_CRITERIA_LOT_32.md)
+- [Worklog certifié](docs/LOT_32_IMPLEMENTATION_WORKLOG.md)
+- [Audit post-merge](docs/LOT_32_POST_MERGE_AUDIT.md)
+- [Rapport final](reports/lot_32_instrument_symbol_and_contract_normalization_report.md)
+- État certifié : `data/audit/instrument_symbol_and_contract_normalization_lot32.json`
+- Audit certifié : `data/audit/instrument_symbol_and_contract_normalization_audit_lot32.json`
+- Registre d’instruments : `data/audit/instrument_registry_lot32.json`
+- Lifecycle courant : `data/audit/roadmap_lifecycle_overlay_lot32.json`
 
 ### Architecture future verrouillée
 
