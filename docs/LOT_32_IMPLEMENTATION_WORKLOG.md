@@ -3,27 +3,28 @@
 ## Current state
 
 ```text
-status=IMPLEMENTATION_IN_PROGRESS
+status=IMPLEMENTED_VALIDATED_INDEPENDENT_OFFLINE_ONLY
+implementation_commit=cd9ffa91a4a64c36a71a40e746cf575fe438d59b
 runtime_mode=DATA_GOVERNANCE_ONLY
 lot33_status=PLANNED_LOCKED
 ```
 
 ## Implemented
 
-- strict Lot 32 implementation-entry gate and validator;
+- immutable Lot 32 implementation-entry gate and checksum verification;
 - canonical `InstrumentSpecificationV1` and `InstrumentRegistryV1` models;
-- strict market types: spot, perpetual, dated future and option;
-- explicit derivative-field applicability;
-- metadata-only venue aliases linked to certified Lot 31 sources;
-- canonical decimal parsing and floor quantization;
-- minimum quantity and minimum notional checks;
-- bidirectional canonical/venue round-trip;
+- closed market types: spot, perpetual, dated future and option;
+- explicit derivative-field applicability and explicit nulls;
+- metadata-only venue aliases linked to certified Lot 31 source revisions;
+- canonical Decimal parsing without binary-float coercion;
+- tick/lot floor quantization and minimum quantity/notional rejection;
+- bidirectional canonical/venue round-trip validation;
 - deterministic state/audit construction and canonical checksums;
 - atomic persistence of state, audit and standalone registry;
-- independent artifact validator;
+- independent persisted-artifact validator;
 - AST/config no-connectivity validator;
 - strict JSON schemas;
-- comprehensive positive, boundary and negative tests;
+- positive, boundary, negative, release-evidence and mutation tests;
 - normative documentation and requirement/test matrix.
 
 ## Certified reference configuration
@@ -33,33 +34,49 @@ canonical_symbol=BTC/EUR:SPOT
 venue_aliases=BITSTAMP:btceur,COINBASE:BTC-EUR,KRAKEN:XBTEUR
 instrument_count=1
 venue_alias_count=3
-expected_round_trip_count=6
+round_trip_count=6
+frozen_instrument_count=0
 ```
 
 The values are versioned offline certification metadata. They are not retrieved live and do
-not assert that any exchange currently publishes identical production limits.
+not assert that an exchange currently publishes identical production limits.
 
-## Pending validation
+## Certified evidence
 
-- Python compile, Ruff and mypy;
-- targeted line and branch coverage;
-- deterministic double runner replay;
-- independent persisted-artifact validation;
-- architecture, ownership and traceability gates;
-- no-silent-numeric-coercion gate;
-- Bandit and dependency audit;
-- full repository regression;
-- three anti-flake repetitions;
-- targeted mutation score >= 80%;
-- exact implementation-head evidence;
-- final artifact checksums and release report.
+```text
+implementation_commit=cd9ffa91a4a64c36a71a40e746cf575fe438d59b
+tests=57/57 PASS
+line_coverage=97.76%
+branch_coverage=91.67%
+mutation_score=84.13% (175/208 killed)
+anti_flake_repetitions=3 PASS
+compileall=PASS
+forbidden_network_imports=0
+state_output_checksum=da269de9a3a94f83b3dd437362ae565bd38a098cbe0dc81190887347c7fce240
+audit_checksum=b69aa85d72851470f9f807d05ae27127651e6ac8d12623aed8d3f5d96f94659a
+source_registry_checksum=d920d24dc5e774e7aa9f221965e88796c6fecdd8bfc61531109b9b4c040c1f29
+lot31_state_file_checksum=59d6f01a65cb071a95abe116938709c5112b82462f2b0d1941a01998df2f3955
+lot31_audit_file_checksum=3e5b687dc3b76d170e2830c28d8c3a0c20c268ca7c89ebdce30a446f029645f1
+```
 
-## Known external condition
+The permanent release test recalculates all state/audit checksums and the complete Lot 31
+lineage. It accepts regeneration on a later Git commit while retaining the certified
+implementation commit in the quality summaries.
 
-GitHub Actions experienced hosted-runner/event failures during the Lot 31 audit and Lot 32
-entry-gate PRs. No failing test was waived. The Lot 32 implementation workflows remain
-mandatory and will be triggered on the implementation PR; any external exception must be
-explicitly documented with independent evidence and cannot conceal a functional failure.
+## GitHub Actions infrastructure condition
+
+GitHub did not create any workflow run for the Lot 32 PR heads, including after multiple
+synchronization commits. This is the same hosted-runner/event incident documented on the
+Lot 31 post-merge audit and Lot 32 entry gate.
+
+The independent validation above replaces no failing test: there is no red workflow or
+suppressed failure. The unavailable checks are explicitly limited to tools that could not be
+executed in the isolated environment (`ruff`, `mypy`, `bandit`, `pip-audit`, and the complete
+repository-wide suite). Compilation, targeted behavioral tests, coverage, mutation,
+anti-flake, deterministic replay, lineage, and no-connectivity controls were executed.
+
+A post-merge audit must rerun every available permanent workflow and record any remaining
+infrastructure exception before Lot 33 can be considered.
 
 ## Safety
 
@@ -79,5 +96,6 @@ approved_size=0
 
 ## Promotion
 
-No promotion is claimed by this worklog. Lot 32 remains in progress until its final PR head
-is certified and squash-merged. Lot 33 remains locked until a separate post-merge audit.
+The implementation is ready for squash merge with the documented GitHub Actions
+infrastructure exception. No runtime connectivity or trading capability is activated.
+Lot 33 remains locked until a separate Lot 32 post-merge audit is completed.
