@@ -6,9 +6,10 @@ Plateforme quantitative crypto défensive, déterministe, extensible et auditabl
 
 | Élément | État |
 |---|---|
-| Dernier lot implémenté et validé | **Lot 28 — Explanation Core & Why-Not-Trade Layer** |
+| Dernier lot implémenté et validé | **Lot 29 — V2 Deterministic Replay & Audit** |
+| Version | **0.29.0** |
 | Baseline qualité | **P0 institutionnel fusionné** |
-| Prochain lot planifié | **Lot 29 — V2 Deterministic Replay & Audit**, verrouillé jusqu’au merge et à l’audit post-merge du Lot 28 |
+| Prochain lot planifié | **Lot 30 — V2 Closure**, `PLANNED_LOCKED` |
 | Runtime maximal | `LOCAL_OFFLINE_ANALYSIS_ONLY` |
 | Trading | **désactivé** |
 | Connectivité exchange | **désactivée** |
@@ -23,6 +24,8 @@ live_execution = DISABLED
 leverage = FORBIDDEN
 withdrawals = FORBIDDEN
 ```
+
+Le Lot 29 prouve que les artefacts certifiés des Lots 21 à 28 forment une chaîne ordonnée, déterministe et non exécutable. Il vérifie huit artefacts et huit validateurs, conserve les checksums exacts et confirme un replay `MATCH`. Il ne crée aucun état de marché, forecast, signal, risque approuvé ou ordre.
 
 ## Vision temporelle
 
@@ -62,7 +65,7 @@ Une barre ouverte peut être observée comme état provisoire, mais elle ne peut
 
 La roadmap prévoit des prévisions par horizons distincts — initialement 30s, 5m, 15m et 1h — avec distributions, quantiles, volatilité, target/stop hit, MAE/MFE, temps avant événement et incertitude.
 
-Ces contrats sont `PLANNED_LOCKED_NOT_IMPLEMENTED`. Le Lot 26 ne produit aucune prediction, probability, expected return ou direction BUY/SELL.
+Ces contrats sont `PLANNED_LOCKED_NOT_IMPLEMENTED`. Les Lots 26 à 29 ne produisent aucune prediction, probability, expected return ou direction BUY/SELL.
 
 Les futurs modèles stochastiques devront être sélectionnés par preuve, comparés à des baselines et validés hors échantillon. La sophistication d'un modèle n'est pas une preuve d'alpha.
 
@@ -131,14 +134,14 @@ python -m pip install -r requirements-dev.lock
 ## Validation
 
 ```bash
-python scripts/validate_pre_lot26_readiness.py --write-report
+python scripts/validate_lot29.py
 python scripts/validate_roadmap_documentation.py
 python scripts/validate_architecture_boundaries.py
 python scripts/check_no_silent_numeric_coercion.py
 pytest -q
 ```
 
-La CI ajoute Ruff, mypy, coverage lignes/branches, diff coverage, Bandit, `pip-audit`, complexité et mutation testing.
+La CI ajoute Ruff, mypy, coverage lignes/branches, diff coverage, Bandit, `pip-audit`, complexité, mutation testing et répétitions anti-flake.
 
 ## Sources de vérité
 
@@ -159,6 +162,18 @@ La CI ajoute Ruff, mypy, coverage lignes/branches, diff coverage, Bandit, `pip-a
 - [Rapport final](reports/lot_28_explanation_core_and_why_not_trade_layer_report.md)
 - État certifié : `data/audit/explanation_core_and_why_not_trade_layer_lot28.json`
 - Audit certifié : `data/audit/explanation_core_and_why_not_trade_layer_audit_lot28.json`
+
+### Lot 29
+
+- [Spécification](docs/LOT_29_V2_DETERMINISTIC_REPLAY_AND_AUDIT.md)
+- [Critères d’acceptation](docs/ACCEPTANCE_CRITERIA_LOT_29.md)
+- [Worklog certifié](docs/LOT_29_IMPLEMENTATION_WORKLOG.md)
+- [Audit post-merge](docs/LOT_29_POST_MERGE_AUDIT.md)
+- [Rapport final](reports/lot_29_v2_deterministic_replay_and_audit_report.md)
+- État certifié : `data/audit/v2_deterministic_replay_and_audit_lot29.json`
+- Audit certifié : `data/audit/v2_deterministic_replay_and_audit_audit_lot29.json`
+- Manifest de clôture : `data/audit/v2_replay_closure_manifest_lot29.json`
+- Lifecycle courant : `data/audit/roadmap_lifecycle_overlay_lot29.json`
 
 ### Architecture future verrouillée
 
