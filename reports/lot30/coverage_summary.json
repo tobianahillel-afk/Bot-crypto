@@ -1,0 +1,14 @@
+{
+  "branch_coverage_percent": 95.27,
+  "covered_branches": 141,
+  "covered_lines": 379,
+  "line_coverage_percent": 97.93,
+  "minimum_branch_coverage_percent": 90.0,
+  "minimum_line_coverage_percent": 95.0,
+  "missing_branches": 7,
+  "missing_lines": 8,
+  "num_branches": 148,
+  "num_statements": 387,
+  "schema_version": "lot30-critical-coverage-summary-v1",
+  "status": "PASS"
+}
