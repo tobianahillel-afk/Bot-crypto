@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/schemas/lot32_v3_entry_gate_v1.schema.json",
+  "title": "Lot32V3EntryGateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "gate_id", "base_commit", "lot31_implementation_merge_commit",
+    "lot31_post_merge_audit_commit", "previous_lifecycle_overlay", "current_version",
+    "target_version", "target_lot", "target_capability", "owner", "package_boundary",
+    "runtime_mode", "event_time", "generated_at", "lineage_id", "validation_state",
+    "human_decision", "human_decision_time", "prerequisites", "required_contracts",
+    "required_instrument_fields", "required_market_types", "required_normalization_invariants",
+    "forbidden_capabilities", "safety", "implementation_started", "next_lot_status",
+    "gate_status", "reason_codes", "output_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "lot32-v3-entry-gate-v1"},
+    "gate_id": {"const": "V3_LOT32_ENTRY_GATE"},
+    "base_commit": {"const": "77f739102d581dbb6fc76ccbdfe13ce1049e5002"},
+    "lot31_implementation_merge_commit": {"const": "235ee2e3a4eabd98e8a59241396f07fc4c29e39e"},
+    "lot31_post_merge_audit_commit": {"const": "77f739102d581dbb6fc76ccbdfe13ce1049e5002"},
+    "previous_lifecycle_overlay": {"const": "data/audit/roadmap_lifecycle_overlay_lot31.json"},
+    "current_version": {"const": "0.31.0"},
+    "target_version": {"const": "V3_MARKET_DATA_GOVERNANCE"},
+    "target_lot": {"const": 32},
+    "target_capability": {"const": "Instrument, Symbol & Contract Normalization"},
+    "owner": {"const": "MarketDataGovernanceDomain"},
+    "package_boundary": {"const": "src/crypto_quant_bot/data_governance"},
+    "runtime_mode": {"const": "DATA_GOVERNANCE_ONLY"},
+    "event_time": {"type": "string", "format": "date-time"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "lineage_id": {"type": "string", "format": "uuid"},
+    "validation_state": {"const": "VALIDATED"},
+    "human_decision": {"const": "APPROVED_START_LOT32"},
+    "human_decision_time": {"type": "string", "format": "date-time"},
+    "prerequisites": {"const": [
+      "LOT31_IMPLEMENTED_VALIDATED_METADATA_ONLY",
+      "LOT31_POST_MERGE_AUDIT_VERIFIED",
+      "SOURCE_REGISTRY_V1_CERTIFIED_METADATA_ONLY",
+      "V3_SAFETY_INVARIANTS_PRESERVED",
+      "LOT32_SCOPE_REVIEWED"
+    ]},
+    "required_contracts": {"const": [
+      "RunContextV1", "LineageEnvelopeV1", "SourceRegistryV1",
+      "ExchangeInstrumentMetadataV1", "InstrumentSymbolContractNormalizationStateV1",
+      "InstrumentSymbolContractNormalizationAuditV1", "InstrumentRegistryV1",
+      "InstrumentSpecificationV1"
+    ]},
+    "required_instrument_fields": {"const": [
+      "instrument_id", "venue", "base_asset", "quote_asset", "market_type",
+      "canonical_symbol", "exchange_symbol", "tick_size", "lot_size", "min_qty",
+      "min_notional", "price_precision", "quantity_precision", "fee_tier",
+      "settlement_asset", "margin_mode", "leverage_policy", "contract_size",
+      "expiry_time", "strike_price", "option_type", "source_id", "source_revision",
+      "validation_state"
+    ]},
+    "required_market_types": {"const": ["SPOT", "PERPETUAL", "DATED_FUTURE", "OPTION"]},
+    "required_normalization_invariants": {"const": [
+      "CANONICAL_SYMBOL_UNIQUE", "VENUE_SYMBOL_UNIQUE",
+      "CANONICAL_TO_VENUE_ROUND_TRIP", "VENUE_TO_CANONICAL_ROUND_TRIP",
+      "DECIMAL_STRING_ONLY", "NO_FLOAT_COERCION", "TICK_SIZE_POSITIVE",
+      "LOT_SIZE_POSITIVE", "MIN_QTY_POSITIVE", "MIN_NOTIONAL_POSITIVE",
+      "NON_APPLICABLE_FIELDS_EXPLICIT_NULL", "AMBIGUOUS_OR_REVISED_INSTRUMENT_FROZEN",
+      "SOURCE_REGISTRY_LINEAGE_REQUIRED"
+    ]},
+    "forbidden_capabilities": {"const": [
+      "EXTERNAL_CONNECTIVITY", "NETWORK_INGESTION", "REAL_CREDENTIALS",
+      "LIVE_METADATA_FETCH", "MARKET_EVENT_INGESTION", "CANONICAL_TIME_PUBLICATION",
+      "DATA_QUALITY_SCORING", "FORECAST_GENERATION", "PROBABILITY_CLAIMS",
+      "SIGNAL_GENERATION", "TRADE_INTENT", "RISK_APPROVAL", "RISK_RESERVATION",
+      "ORDER_INTENT", "PAPER_EXECUTION", "LIVE_EXECUTION"
+    ]},
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "analysis_only", "used_for_decision", "external_connectivity_allowed",
+        "network_ingestion_allowed", "real_credentials_allowed", "signal_generation_allowed",
+        "risk_approval_allowed", "order_routing_allowed", "trade_allowed",
+        "execution_allowed", "approved_size"
+      ],
+      "properties": {
+        "analysis_only": {"const": true},
+        "used_for_decision": {"const": false},
+        "external_connectivity_allowed": {"const": false},
+        "network_ingestion_allowed": {"const": false},
+        "real_credentials_allowed": {"const": false},
+        "signal_generation_allowed": {"const": false},
+        "risk_approval_allowed": {"const": false},
+        "order_routing_allowed": {"const": false},
+        "trade_allowed": {"const": false},
+        "execution_allowed": {"const": false},
+        "approved_size": {"const": 0}
+      }
+    },
+    "implementation_started": {"const": false},
+    "next_lot_status": {"const": "PLANNED_LOCKED"},
+    "gate_status": {"const": "GO_LOT32_IMPLEMENTATION_ENTRY"},
+    "reason_codes": {"const": [
+      "LOT31_POST_MERGE_AUDIT_VERIFIED", "LOT31_SOURCE_REGISTRY_VERIFIED",
+      "LOT32_SCOPE_AND_OWNERSHIP_VERIFIED", "LOT32_NORMALIZATION_BOUNDARY_VERIFIED",
+      "LOT32_NO_CONNECTIVITY_BOUNDARY_VERIFIED", "HUMAN_START_DECISION_RECORDED",
+      "LOT33_REMAINS_LOCKED"
+    ]},
+    "output_checksum": {"const": "ca4f531f5a36173b0159aaab308025da7beaf66b21d1f85304c5d46c7f487a55"}
+  }
+}
