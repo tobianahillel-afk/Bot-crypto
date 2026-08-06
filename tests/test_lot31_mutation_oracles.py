@@ -100,6 +100,43 @@ def test_source_builder_preserves_every_configured_field(tmp_path: Path) -> None
         assert payload[field] == raw[field]
 
 
+def test_source_builder_rejects_silent_type_coercion(tmp_path: Path) -> None:
+    write_fixture_root(tmp_path)
+    config = engine.load_json_object(
+        tmp_path / "config/data_governance/market_data_source_registry_v1.json"
+    )
+    raw = dict(config["sources"][0])
+    mutations = (
+        ("cadence", "86400", "integer"),
+        ("retention", True, "integer"),
+        ("source_of_truth", 1, "boolean"),
+        ("fields", "exchange_symbol", "string list"),
+        ("provider", 123, "string"),
+    )
+    for field, value, message in mutations:
+        changed = dict(raw)
+        changed[field] = value
+        with pytest.raises(SourceRegistryValidationError, match=message):
+            engine._build_source(changed)
+
+
+def test_registry_builders_reject_non_object_lists(tmp_path: Path) -> None:
+    write_fixture_root(tmp_path)
+    config = engine.load_json_object(
+        tmp_path / "config/data_governance/market_data_source_registry_v1.json"
+    )
+    for field in ("sources", "capability_matrix", "contract_registry"):
+        changed = dict(config)
+        changed[field] = "not-a-list"
+        builder = {
+            "sources": engine._build_registry,
+            "capability_matrix": engine._build_capabilities,
+            "contract_registry": engine._build_contracts,
+        }[field]
+        with pytest.raises(SourceRegistryValidationError, match="object list"):
+            builder(changed)
+
+
 def test_capability_and_contract_builders_preserve_fields(tmp_path: Path) -> None:
     write_fixture_root(tmp_path)
     config = engine.load_json_object(
