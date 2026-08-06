@@ -1,0 +1,27 @@
+{
+  "analysis_only": true,
+  "approved_size": 0,
+  "closure_status": "V2_MARKET_ANALYSIS_CLOSED_OFFLINE_ONLY",
+  "code_commit": "602bc91b2d4c886f654840294fa740474515e0a0",
+  "covered_lot_count": 10,
+  "execution_allowed": false,
+  "final_chain_checksum": "2a598990adaec7ebc1368f30295a0130d4d8bd8f89c9610772347f25ba6c17cf",
+  "negative_control_count": 5,
+  "order_routing_allowed": false,
+  "output_checksum": "c1cfab56ae33cd0add04af17a375045c631fab780e198f06dce00b5d8dec12ee",
+  "reason_codes": [
+    "V2_LOTS_21_30_COVERED",
+    "V2_REPLAY_CHAIN_MATCH",
+    "V2_NEGATIVE_CONTROLS_PASS",
+    "V3_CAPABILITIES_LOCKED",
+    "V2_OFFLINE_ONLY"
+  ],
+  "risk_approval_allowed": false,
+  "run_id": "0c72bcd2-06d2-5ac9-9adb-124ec3eb186a",
+  "schema_version": "v2-market-analysis-closure-audit-v1",
+  "signal_generation_allowed": false,
+  "trade_allowed": false,
+  "upstream_artifact_count": 8,
+  "used_for_decision": false,
+  "validator_replay_count": 2
+}
