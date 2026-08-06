@@ -1,0 +1,44 @@
+{
+  "future_capabilities_locked": [
+    "ContinuousMarketStateV1",
+    "MultiHorizonForecastV1",
+    "ParticipantBehaviorScenarioV1",
+    "TradeIntent",
+    "OrderIntent"
+  ],
+  "historical_registry": "data/audit/product_scope_roadmap_lot21.jsonl",
+  "latest_implemented_lot": 28,
+  "lots": {
+    "26": {
+      "execution_allowed": false,
+      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot26.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY",
+      "trade_allowed": false
+    },
+    "27": {
+      "execution_allowed": false,
+      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot27.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY",
+      "trade_allowed": false
+    },
+    "28": {
+      "acceptance_contract": "docs/ACCEPTANCE_CRITERIA_LOT_28.md",
+      "execution_allowed": false,
+      "implementation_commit": "7c0ad0b2feb1640e98d9ca8e5f35c3657de6ffe8",
+      "implementation_contract": "docs/LOT_28_EXPLANATION_CORE_AND_WHY_NOT_TRADE_LAYER.md",
+      "implementation_status": "docs/LOT_28_IMPLEMENTATION_WORKLOG.md",
+      "pull_request": 10,
+      "runner": "scripts/run_lot28_explanation_core_and_why_not_trade_layer.py",
+      "runtime_mode": "LOCAL_OFFLINE_ANALYSIS_ONLY",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY",
+      "trade_allowed": false,
+      "validator": "scripts/validate_lot28.py"
+    },
+    "29": {
+      "implementation_started": false,
+      "status": "PLANNED_LOCKED"
+    }
+  },
+  "previous_overlay": "data/audit/roadmap_lifecycle_overlay_lot27.json",
+  "schema_version": "roadmap-lifecycle-overlay-v1"
+}

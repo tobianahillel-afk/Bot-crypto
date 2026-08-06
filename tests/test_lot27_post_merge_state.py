@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,7 +18,6 @@ def canonical_checksum(payload: object) -> str:
 
 
 def test_lot27_post_merge_release_state_is_consistent() -> None:
-    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
     overlay = json.loads(
         (ROOT / "data/audit/roadmap_lifecycle_overlay_lot27.json").read_text(
             encoding="utf-8"
@@ -40,7 +38,6 @@ def test_lot27_post_merge_release_state_is_consistent() -> None:
     )
     worklog = (ROOT / "docs/LOT_27_IMPLEMENTATION_WORKLOG.md").read_text(encoding="utf-8")
 
-    assert project["version"] == "0.27.0"
     assert overlay["latest_implemented_lot"] == 27
     assert overlay["lots"]["27"]["status"] == "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY"
     assert overlay["lots"]["27"]["implementation_commit"] == "bae0633d1fb28a77eb91111796d35549a5a365c8"
