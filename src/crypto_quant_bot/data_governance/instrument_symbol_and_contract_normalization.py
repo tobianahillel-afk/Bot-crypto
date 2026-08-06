@@ -30,6 +30,8 @@ from .source_registry_validation import (
     require_string,
 )
 
+EXPECTED_GATE_CHECKSUM = "ca4f531f5a36173b0159aaab308025da7beaf66b21d1f85304c5d46c7f487a55"
+
 
 def _explicit_nullable_string(raw: dict[str, Any], field: str) -> str | None:
     if field not in raw:
@@ -45,6 +47,14 @@ def _explicit_nullable_string(raw: dict[str, Any], field: str) -> str | None:
 
 
 def _verify_entry_gate(gate: dict[str, Any]) -> None:
+    checksum_payload = dict(gate)
+    output_checksum = checksum_payload.pop("output_checksum", None)
+    if (
+        not isinstance(output_checksum, str)
+        or canonical_checksum(checksum_payload) != output_checksum
+        or output_checksum != EXPECTED_GATE_CHECKSUM
+    ):
+        raise InstrumentNormalizationError("Lot 32 entry gate checksum changed")
     expected = {
         "gate_status": "GO_LOT32_IMPLEMENTATION_ENTRY",
         "target_lot": 32,
