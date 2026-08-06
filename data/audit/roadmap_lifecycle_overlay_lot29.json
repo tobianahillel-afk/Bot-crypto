@@ -1,0 +1,57 @@
+{
+  "future_capabilities_locked": [
+    "ContinuousMarketStateV1",
+    "MultiHorizonForecastV1",
+    "ParticipantBehaviorScenarioV1",
+    "TradeIntent",
+    "RiskDecisionV1",
+    "RiskReservationV1",
+    "OrderIntent"
+  ],
+  "historical_registry": "data/audit/product_scope_roadmap_lot21.jsonl",
+  "latest_implemented_lot": 29,
+  "lots": {
+    "26": {
+      "execution_allowed": false,
+      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot26.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY",
+      "trade_allowed": false
+    },
+    "27": {
+      "execution_allowed": false,
+      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot27.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY",
+      "trade_allowed": false
+    },
+    "28": {
+      "execution_allowed": false,
+      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot28.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY",
+      "trade_allowed": false
+    },
+    "29": {
+      "acceptance_contract": "docs/ACCEPTANCE_CRITERIA_LOT_29.md",
+      "audit_artifact": "data/audit/v2_deterministic_replay_and_audit_audit_lot29.json",
+      "closure_manifest": "data/audit/v2_replay_closure_manifest_lot29.json",
+      "execution_allowed": false,
+      "implementation_commit": "271e913514eb2edeee6e6a50208b0686004a2ca5",
+      "implementation_contract": "docs/LOT_29_V2_DETERMINISTIC_REPLAY_AND_AUDIT.md",
+      "implementation_status": "docs/LOT_29_IMPLEMENTATION_WORKLOG.md",
+      "merged_commit": "89d5b01f4bc49b30660c46babfb837f3bcc0a276",
+      "pull_request": 12,
+      "report": "reports/lot_29_v2_deterministic_replay_and_audit_report.md",
+      "runner": "scripts/run_lot29_v2_deterministic_replay_and_audit.py",
+      "runtime_mode": "LOCAL_OFFLINE_ANALYSIS_ONLY",
+      "state_artifact": "data/audit/v2_deterministic_replay_and_audit_lot29.json",
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_REPLAY_ONLY",
+      "trade_allowed": false,
+      "validator": "scripts/validate_lot29.py"
+    },
+    "30": {
+      "implementation_started": false,
+      "status": "PLANNED_LOCKED"
+    }
+  },
+  "previous_overlay": "data/audit/roadmap_lifecycle_overlay_lot28.json",
+  "schema_version": "roadmap-lifecycle-overlay-v1"
+}
