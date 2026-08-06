@@ -60,6 +60,7 @@ jobs:
             tests/test_lot32_instrument_symbol_and_contract_normalization.py \
             tests/test_lot32_validation_boundaries.py \
             tests/test_lot32_mutation_oracles.py \
+            tests/test_lot32_coverage_oracles.py \
             --cov=crypto_quant_bot.data_governance.instrument_symbol_and_contract_normalization \
             --cov=crypto_quant_bot.data_governance.instrument_symbol_and_contract_normalization_models \
             --cov-branch \
