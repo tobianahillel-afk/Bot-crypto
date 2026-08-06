@@ -1,7 +1,7 @@
 [project]
 name = "crypto-quant-bot"
-version = "0.31.0"
-description = "Crypto Quant Bot V3.1-Ops — Lot 31 validated metadata-only source registry"
+version = "0.32.0"
+description = "Crypto Quant Bot V3.2-Ops — Lot 32 validated offline instrument normalization"
 requires-python = "==3.11.*"
 dependencies = []
 
