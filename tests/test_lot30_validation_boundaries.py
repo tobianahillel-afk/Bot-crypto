@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 import pytest
 
 from crypto_quant_bot.market_analysis.v2_market_analysis_closure import (
@@ -114,7 +116,7 @@ def test_object_boundaries_reject_non_objects() -> None:
     with pytest.raises(ClosureValidationError, match="list of objects"):
         _require_list_of_objects({}, "items")
     with pytest.raises(ClosureValidationError, match="list of objects"):
-        _require_list_of_objects([{} , "bad"], "items")
+        _require_list_of_objects([{}, "bad"], "items")
 
 
 @pytest.mark.parametrize(
@@ -238,19 +240,16 @@ def test_negative_control_identity_is_required() -> None:
 
 def test_manifest_rejects_sequence_owner_count_checksum_and_status() -> None:
     base = valid_manifest()
-    values = base.to_dict()
-    values.pop("schema_version")
-
     with pytest.raises(ClosureValidationError, match="21..28"):
-        V2FinalClosureManifestV1(**{**values, "upstream_lot_sequence": (21,)})
+        replace(base, upstream_lot_sequence=(21,))
     with pytest.raises(ClosureValidationError, match="direct input"):
-        V2FinalClosureManifestV1(**{**values, "direct_validated_lot": 28})
+        replace(base, direct_validated_lot=28)
     with pytest.raises(ClosureValidationError, match="eight upstream"):
-        V2FinalClosureManifestV1(**{**values, "upstream_artifact_checksums": (SHA,)})
+        replace(base, upstream_artifact_checksums=(SHA,))
     with pytest.raises(ClosureValidationError, match="sha256"):
-        V2FinalClosureManifestV1(**{**values, "final_chain_checksum": "bad"})
+        replace(base, final_chain_checksum="bad")
     with pytest.raises(ClosureValidationError, match="unexpected V2"):
-        V2FinalClosureManifestV1(**{**values, "closure_status": "OPEN"})
+        replace(base, closure_status="OPEN")
 
 
 def test_state_rejects_upstream_order_validator_order_and_control_count() -> None:
