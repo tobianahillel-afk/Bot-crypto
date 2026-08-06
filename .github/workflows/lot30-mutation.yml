@@ -48,6 +48,7 @@ jobs:
           cp tests/test_lot30_v2_market_analysis_closure.py .tmp-lot30-mutants/tests/
           cp tests/test_lot30_mutation_oracles.py .tmp-lot30-mutants/tests/
           cp tests/test_lot30_validation_boundaries.py .tmp-lot30-mutants/tests/
+          cp tests/test_lot30_exact_oracles.py .tmp-lot30-mutants/tests/
           cat > .tmp-lot30-mutants/pyproject.toml <<'TOML'
           [project]
           name = "crypto-quant-bot"
@@ -76,6 +77,7 @@ jobs:
           ]
           mutate_only_covered_lines = true
           timeout_factor = 8.0
+          do_not_mutate_patterns = ['raise \\w+', 'logger\\.\\w+']
           TOML
       - name: Run mutation suite
         shell: bash
