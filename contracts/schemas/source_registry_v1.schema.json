@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "registry_id": {"minLength": 1, "type": "string"},
+    "registry_version": {"minLength": 1, "type": "string"},
+    "revision_policy": {"const": "IMMUTABLE_VERSIONED_REPLACEMENT"},
+    "schema_version": {"const": "source-registry-v1"},
+    "source_of_truth_id": {"minLength": 1, "type": "string"},
+    "sources": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "approved": {"const": true},
+          "auth_mode": {"const": "NONE"},
+          "backup_sources": {"items": {"minLength": 1, "type": "string"}, "type": "array", "uniqueItems": true},
+          "cadence": {"minimum": 1, "type": "integer"},
+          "connection_status": {"const": "DISABLED"},
+          "criticality": {"enum": ["PRIMARY", "SECONDARY", "TERTIARY"]},
+          "enabled": {"const": false},
+          "endpoint_descriptor": {"minLength": 1, "type": "string"},
+          "endpoint_type": {"minLength": 1, "type": "string"},
+          "fields": {"items": {"minLength": 1, "type": "string"}, "minItems": 1, "type": "array", "uniqueItems": true},
+          "license": {"minLength": 1, "type": "string"},
+          "provider": {"minLength": 1, "type": "string"},
+          "retention": {"minimum": 0, "type": "integer"},
+          "revision": {"minimum": 1, "type": "integer"},
+          "revision_policy": {"const": "IMMUTABLE_VERSIONED_REPLACEMENT"},
+          "schema_version": {"const": "source-registry-entry-v1"},
+          "source_id": {"pattern": "^[a-z0-9][a-z0-9-]+$", "type": "string"},
+          "source_of_truth": {"type": "boolean"},
+          "source_schema_version": {"minLength": 1, "type": "string"},
+          "timezone": {"const": "UTC"},
+          "venue": {"minLength": 1, "type": "string"}
+        },
+        "required": [
+          "schema_version", "source_id", "provider", "venue", "endpoint_type",
+          "endpoint_descriptor", "fields", "cadence", "timezone", "license",
+          "auth_mode", "retention", "criticality", "source_of_truth", "backup_sources",
+          "source_schema_version", "revision", "revision_policy", "approved", "enabled",
+          "connection_status"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": ["schema_version", "registry_id", "registry_version", "source_of_truth_id", "sources", "revision_policy"],
+  "title": "SourceRegistryV1",
+  "type": "object"
+}
