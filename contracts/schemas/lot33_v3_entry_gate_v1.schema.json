@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/schemas/lot33_v3_entry_gate_v1.schema.json",
+  "title": "Lot33V3EntryGateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "gate_id", "base_commit", "lot32_implementation_merge_commit",
+    "lot32_post_merge_audit_commit", "previous_lifecycle_overlay", "current_version",
+    "target_version", "target_lot", "target_capability", "owner", "package_boundary",
+    "runtime_mode", "event_time", "generated_at", "lineage_id", "validation_state",
+    "human_decision", "human_decision_time", "prerequisites", "required_contracts",
+    "required_timestamp_fields", "required_temporal_invariants", "forbidden_capabilities",
+    "safety", "implementation_started", "next_lot_status", "gate_status", "reason_codes",
+    "output_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "lot33-v3-entry-gate-v1"},
+    "gate_id": {"const": "V3_LOT33_ENTRY_GATE"},
+    "base_commit": {"const": "bb75e9f7e7b42aff1e60482b20ff66732b6dacc6"},
+    "lot32_implementation_merge_commit": {"const": "7187f2ebfebeb67292c8a521e7e8bdbc653c3086"},
+    "lot32_post_merge_audit_commit": {"const": "bb75e9f7e7b42aff1e60482b20ff66732b6dacc6"},
+    "previous_lifecycle_overlay": {"const": "data/audit/roadmap_lifecycle_overlay_lot32.json"},
+    "current_version": {"const": "0.32.0"},
+    "target_version": {"const": "V3_MARKET_DATA_GOVERNANCE"},
+    "target_lot": {"const": 33},
+    "target_capability": {"const": "Timestamp, Clock & Timezone Governance"},
+    "owner": {"const": "MarketDataGovernanceDomain"},
+    "package_boundary": {"const": "src/crypto_quant_bot/data_governance"},
+    "runtime_mode": {"const": "DATA_GOVERNANCE_ONLY"},
+    "event_time": {"type": "string", "format": "date-time"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "lineage_id": {"type": "string", "format": "uuid"},
+    "validation_state": {"const": "VALIDATED"},
+    "human_decision": {"const": "APPROVED_START_LOT33"},
+    "human_decision_time": {"type": "string", "format": "date-time"},
+    "prerequisites": {"type": "array", "minItems": 5, "uniqueItems": true, "items": {"type": "string"}},
+    "required_contracts": {"type": "array", "minItems": 8, "uniqueItems": true, "items": {"type": "string"}},
+    "required_timestamp_fields": {"type": "array", "minItems": 14, "maxItems": 14, "uniqueItems": true, "items": {"type": "string"}},
+    "required_temporal_invariants": {"type": "array", "minItems": 14, "maxItems": 14, "uniqueItems": true, "items": {"type": "string"}},
+    "forbidden_capabilities": {"type": "array", "minItems": 16, "uniqueItems": true, "items": {"type": "string"}},
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "analysis_only", "used_for_decision", "external_connectivity_allowed",
+        "network_ingestion_allowed", "real_credentials_allowed", "signal_generation_allowed",
+        "risk_approval_allowed", "order_routing_allowed", "trade_allowed",
+        "execution_allowed", "approved_size"
+      ],
+      "properties": {
+        "analysis_only": {"const": true},
+        "used_for_decision": {"const": false},
+        "external_connectivity_allowed": {"const": false},
+        "network_ingestion_allowed": {"const": false},
+        "real_credentials_allowed": {"const": false},
+        "signal_generation_allowed": {"const": false},
+        "risk_approval_allowed": {"const": false},
+        "order_routing_allowed": {"const": false},
+        "trade_allowed": {"const": false},
+        "execution_allowed": {"const": false},
+        "approved_size": {"const": 0}
+      }
+    },
+    "implementation_started": {"const": false},
+    "next_lot_status": {"const": "PLANNED_LOCKED"},
+    "gate_status": {"const": "GO_LOT33_IMPLEMENTATION_ENTRY"},
+    "reason_codes": {"type": "array", "minItems": 7, "uniqueItems": true, "items": {"type": "string"}},
+    "output_checksum": {"const": "c6942ad174c4c8a32d54ac48ed9c00e0e443f3495cc657df0c2677a4dd4cb5cc"}
+  }
+}
