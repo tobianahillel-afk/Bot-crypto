@@ -1,0 +1,11 @@
+{
+  "action": "ALLOW_ANALYSIS",
+  "blocking_anomaly_types": [],
+  "minimum_quality_bps": 9500,
+  "observed_quality_bps": 10000,
+  "quality_known": true,
+  "reason_codes": [
+    "DATA_QUALITY_GATE_PASSED"
+  ],
+  "schema_version": "data-quality-veto-v1"
+}

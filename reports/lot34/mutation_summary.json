@@ -1,0 +1,18 @@
+{
+  "evaluated_mutants": 1631,
+  "evidence_commit": "e1276409fab61a9b2f884435697145d38bd1c85c",
+  "killed_mutants": 1370,
+  "methodology": "GitHub Actions isolated mutmut campaign over covered Lot 34 engine, model and validation code",
+  "minimum_score_percent": 80.0,
+  "mutation_score_percent": 84.0,
+  "schema_version": "lot34-mutation-summary-v1",
+  "scope": [
+    "market_data_quality_engine.py",
+    "market_data_quality_engine_models.py",
+    "market_data_quality_engine_validation.py"
+  ],
+  "status": "PASS",
+  "survived_mutants": 261,
+  "suspicious_mutants": 0,
+  "timeout_mutants": 0
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "data_quality_veto_v1.schema.json",
+  "title": "DataQualityVetoV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "action", "quality_known", "minimum_quality_bps", "observed_quality_bps", "blocking_anomaly_types", "reason_codes"],
+  "properties": {
+    "schema_version": {"const": "data-quality-veto-v1"},
+    "action": {"enum": ["ALLOW_ANALYSIS", "BLOCK_ANALYSIS_OR_TRADING"]},
+    "quality_known": {"type": "boolean"},
+    "minimum_quality_bps": {"type": "integer", "minimum": 0, "maximum": 10000},
+    "observed_quality_bps": {"type": "integer", "minimum": 0, "maximum": 10000},
+    "blocking_anomaly_types": {"type": "array", "uniqueItems": true, "items": {"enum": ["MISSING_INTERVAL", "DUPLICATE", "OUT_OF_ORDER", "STALE_DATA", "INVALID_OHLC", "NEGATIVE_VOLUME", "IMPOSSIBLE_SPREAD", "SCHEMA_DRIFT"]}},
+    "reason_codes": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+  }
+}

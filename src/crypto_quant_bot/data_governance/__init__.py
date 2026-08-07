@@ -1,4 +1,4 @@
-"""Public V3 market-data governance API introduced by Lots 31 to 33."""
+"""Public V3 market-data governance API introduced by Lots 31 to 34."""
 
 from .instrument_symbol_and_contract_normalization import (
     build_lot32_artifacts,
@@ -33,6 +33,22 @@ from .market_data_governance_scope_and_source_registry_models import (
     SourceRegistryV1,
     SourceRegistryValidationError,
 )
+from .market_data_quality_engine import (
+    build_lot34_artifacts,
+    detect_anomalies,
+    persist_lot34_artifacts,
+)
+from .market_data_quality_engine_models import (
+    DataAnomalyV1,
+    DataQualityStateV1,
+    DataQualityVetoV1,
+    Lot34LineageEnvelopeV1,
+    Lot34MetricsV1,
+    Lot34RunContextV1,
+    MarketDataQualityEngineAuditV1,
+    MarketDataQualityEngineStateV1,
+)
+from .market_data_quality_engine_validation import MarketDataQualityError
 from .timestamp_clock_and_timezone_governance import (
     build_lot33_artifacts,
     persist_lot33_artifacts,
@@ -54,6 +70,9 @@ __all__ = [
     "CapabilityMatrixEntryV1",
     "ClockHealthStateV1",
     "ContractRegistryEntryV1",
+    "DataAnomalyV1",
+    "DataQualityStateV1",
+    "DataQualityVetoV1",
     "InstrumentNormalizationError",
     "InstrumentRegistryV1",
     "InstrumentSpecificationV1",
@@ -66,8 +85,14 @@ __all__ = [
     "Lot33LineageEnvelopeV1",
     "Lot33MetricsV1",
     "Lot33RunContextV1",
+    "Lot34LineageEnvelopeV1",
+    "Lot34MetricsV1",
+    "Lot34RunContextV1",
     "MarketDataGovernanceScopeSourceRegistryAuditV1",
     "MarketDataGovernanceScopeSourceRegistryStateV1",
+    "MarketDataQualityEngineAuditV1",
+    "MarketDataQualityEngineStateV1",
+    "MarketDataQualityError",
     "RawTimestampEnvelopeV1",
     "RunContextV1",
     "SourceRegistryEntryV1",
@@ -80,10 +105,13 @@ __all__ = [
     "build_lot31_artifacts",
     "build_lot32_artifacts",
     "build_lot33_artifacts",
+    "build_lot34_artifacts",
     "canonical_checksum",
+    "detect_anomalies",
     "normalize_candidate_amounts",
     "persist_lot31_artifacts",
     "persist_lot32_artifacts",
     "persist_lot33_artifacts",
+    "persist_lot34_artifacts",
     "quantize_to_increment",
 ]

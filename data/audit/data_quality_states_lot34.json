@@ -1,0 +1,21 @@
+{
+  "records": [
+    {
+      "anomaly_count": 0,
+      "completeness_bps": 10000,
+      "consistency_bps": 10000,
+      "coverage_bps": 10000,
+      "expected_interval_count": 3,
+      "freshness_bps": 10000,
+      "instrument_id": "btc-eur-spot",
+      "observed_interval_count": 3,
+      "quality_score_bps": 10000,
+      "record_count": 3,
+      "schema_version": "data-quality-state-v1",
+      "source_id": "kraken-public-spot-metadata",
+      "status": "PASS",
+      "timeframe": "1m"
+    }
+  ],
+  "schema_version": "data-quality-state-collection-v1"
+}

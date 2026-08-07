@@ -1,0 +1,172 @@
+name: Lot 34 critical mutation assurance
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/crypto_quant_bot/data_governance/market_data_quality_engine*.py'
+      - 'tests/test_lot34_*.py'
+      - 'config/data_governance/market_data_quality_engine_v1.json'
+      - '.github/workflows/lot34-mutation.yml'
+      - 'requirements-dev.lock'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mutation:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Build isolated Lot 34 mutation workspace
+        run: |
+          rm -rf .tmp-lot34-mutants reports/lot34/mutation
+          mkdir -p \
+            .tmp-lot34-mutants/src/crypto_quant_bot/data_governance \
+            .tmp-lot34-mutants/tests \
+            .tmp-lot34-mutants/config/data_governance \
+            .tmp-lot34-mutants/data/audit \
+            .tmp-lot34-mutants/mutants/src/crypto_quant_bot/data_governance \
+            .tmp-lot34-mutants/mutants/config/data_governance \
+            .tmp-lot34-mutants/mutants/data/audit \
+            reports/lot34/mutation
+          cp src/crypto_quant_bot/__init__.py .tmp-lot34-mutants/src/crypto_quant_bot/
+          cp src/crypto_quant_bot/data_governance/*.py .tmp-lot34-mutants/src/crypto_quant_bot/data_governance/
+          cat > .tmp-lot34-mutants/src/crypto_quant_bot/data_governance/__init__.py <<'PY'
+          """Minimal Lot 34 package used only by the isolated mutation campaign."""
+          PY
+          cp tests/test_lot34_market_data_quality_engine.py .tmp-lot34-mutants/tests/
+          cp tests/test_lot34_contract_boundaries.py .tmp-lot34-mutants/tests/
+          cp tests/test_lot34_mutation_contracts.py .tmp-lot34-mutants/tests/
+          cp config/data_governance/market_data_quality_engine_v1.json \
+            .tmp-lot34-mutants/config/data_governance/
+          cp data/audit/lot34_v3_entry_gate.json .tmp-lot34-mutants/data/audit/
+          cp data/audit/timestamp_clock_and_timezone_governance_lot33.json \
+            .tmp-lot34-mutants/data/audit/
+          cp data/audit/timestamp_clock_and_timezone_governance_audit_lot33.json \
+            .tmp-lot34-mutants/data/audit/
+          cp data/audit/canonical_time_envelopes_lot33.json .tmp-lot34-mutants/data/audit/
+          cat > .tmp-lot34-mutants/pyproject.toml <<'TOML'
+          [project]
+          name = "crypto-quant-bot-lot34-mutation"
+          version = "0.34.0.dev0"
+          requires-python = "==3.11.*"
+          dependencies = []
+
+          [tool.pytest.ini_options]
+          pythonpath = ["src", "."]
+          addopts = ["--tb=short", "-p", "no:cacheprovider"]
+
+          [tool.mutmut]
+          paths_to_mutate = [
+            "src/crypto_quant_bot/data_governance/market_data_quality_engine.py",
+            "src/crypto_quant_bot/data_governance/market_data_quality_engine_models.py",
+            "src/crypto_quant_bot/data_governance/market_data_quality_engine_validation.py",
+          ]
+          tests_dir = ["tests/"]
+          runner = "python -m pytest -q tests/test_lot34_market_data_quality_engine.py tests/test_lot34_contract_boundaries.py tests/test_lot34_mutation_contracts.py"
+          also_copy = [
+            "src/crypto_quant_bot/__init__.py",
+            "src/crypto_quant_bot/data_governance/__init__.py",
+            "src/crypto_quant_bot/data_governance/source_registry_validation.py",
+            "src/crypto_quant_bot/data_governance/source_registry_models.py",
+            "src/crypto_quant_bot/data_governance/source_registry_state.py",
+            "src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry.py",
+            "src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry_models.py",
+            "config/data_governance/market_data_quality_engine_v1.json",
+            "data/audit/lot34_v3_entry_gate.json",
+            "data/audit/timestamp_clock_and_timezone_governance_lot33.json",
+            "data/audit/timestamp_clock_and_timezone_governance_audit_lot33.json",
+            "data/audit/canonical_time_envelopes_lot33.json",
+          ]
+          mutate_only_covered_lines = true
+          timeout_factor = 8.0
+          do_not_mutate_patterns = ['raise \\w+', 'logger\\.\\w+']
+          TOML
+      - name: Run mutation suite
+        shell: bash
+        run: |
+          set -o pipefail
+          cd .tmp-lot34-mutants
+          mutmut run 2>&1 | tee ../reports/lot34/mutation/run.txt
+          mutmut results 2>&1 | tee ../reports/lot34/mutation/results.txt || true
+      - name: Enforce mutation score
+        run: |
+          python - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          path = Path('reports/lot34/mutation/run.txt')
+          if not path.is_file():
+              raise SystemExit('LOT34_MUTATION_RUN_LOG_MISSING')
+          text = path.read_text(encoding='utf-8', errors='replace')
+          text = re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', text)
+          text = text.replace('\r', '\n').replace('\ufe0f', '')
+          counter_pattern = re.compile(r'(\d+)\s*/\s*(\d+)')
+          summary_pattern = re.compile(
+              r'🎉\s*(\d+)[\s\S]*?⏰\s*(\d+)[\s\S]*?🤔\s*(\d+)[\s\S]*?🙁\s*(\d+)'
+          )
+          parsed = None
+          for counter in reversed(list(counter_pattern.finditer(text))):
+              completed, total = map(int, counter.groups())
+              if completed != total or total <= 0:
+                  continue
+              summary = summary_pattern.search(text, counter.end())
+              if summary is None:
+                  continue
+              killed, timeout, suspicious, survived = map(int, summary.groups())
+              if killed + timeout + suspicious + survived == total:
+                  parsed = (completed, total, killed, timeout, suspicious, survived)
+                  break
+          if parsed is None:
+              raise SystemExit('LOT34_MUTATION_SCORE_PARSE_ERROR')
+          completed, total, killed, timeout, suspicious, survived = parsed
+          evaluated = killed + timeout + suspicious + survived
+          score = 100.0 * (killed + timeout) / evaluated
+          payload = {
+              'schema_version': 'lot34-critical-mutation-score-v1',
+              'scope': 'market_data_quality_engine',
+              'killed': killed,
+              'timeout': timeout,
+              'survived': survived,
+              'suspicious': suspicious,
+              'evaluated': evaluated,
+              'completed': completed,
+              'total': total,
+              'score_percent': round(score, 2),
+              'minimum_score_percent': 80.0,
+              'status': 'PASS' if score >= 80.0 else 'FAIL',
+          }
+          output = Path('reports/lot34/mutation/score.json')
+          output.write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+          )
+          print(json.dumps(payload, sort_keys=True))
+          if score < 80.0:
+              raise SystemExit('LOT34_MUTATION_BELOW_80_PERCENT')
+          PY
+      - name: Verify canonical source immutability
+        run: |
+          rm -rf .tmp-lot34-mutants
+          git diff --exit-code -- src/crypto_quant_bot
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot34-critical-mutation-evidence
+          path: |
+            reports/lot34/mutation/
+            .tmp-lot34-mutants/mutants/src/crypto_quant_bot/data_governance/market_data_quality_engine*.py

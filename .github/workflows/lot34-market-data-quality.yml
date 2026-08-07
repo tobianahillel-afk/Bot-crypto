@@ -1,0 +1,137 @@
+name: Lot 34 market data quality engine validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'config/data_governance/market_data_quality_engine_v1.json'
+      - 'contracts/schemas/*quality*.json'
+      - 'contracts/schemas/data_anomaly_v1.schema.json'
+      - 'src/crypto_quant_bot/data_governance/market_data_quality_engine*.py'
+      - 'src/crypto_quant_bot/data_governance/__init__.py'
+      - 'scripts/*lot34*'
+      - 'tests/test_lot34_*.py'
+      - 'docs/*LOT_34*'
+      - 'reports/*lot_34*'
+      - 'data/audit/*lot34.json'
+      - 'data/audit/data_quality*_lot34.json'
+      - 'data/audit/data_anomalies_lot34.json'
+      - '.github/workflows/lot34-market-data-quality.yml'
+      - 'requirements-dev.lock'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lot34:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Compile lint type and schema checks
+        run: |
+          python -m compileall -q src scripts tests
+          python -m json.tool config/data_governance/market_data_quality_engine_v1.json >/dev/null
+          python -m json.tool contracts/schemas/data_anomaly_v1.schema.json >/dev/null
+          python -m json.tool contracts/schemas/data_quality_state_v1.schema.json >/dev/null
+          python -m json.tool contracts/schemas/data_quality_veto_v1.schema.json >/dev/null
+          python -m json.tool contracts/schemas/market_data_quality_engine_state_v1.schema.json >/dev/null
+          python -m json.tool contracts/schemas/market_data_quality_engine_audit_v1.schema.json >/dev/null
+          ruff check \
+            src/crypto_quant_bot/data_governance/market_data_quality_engine*.py \
+            scripts/run_lot34_market_data_quality_engine.py \
+            scripts/validate_lot34.py \
+            scripts/validate_lot34_no_connectivity.py \
+            tests/test_lot34_*.py
+          mypy src/crypto_quant_bot/data_governance
+      - name: Targeted line and branch coverage
+        run: |
+          mkdir -p reports/lot34
+          coverage erase
+          pytest -q tests/test_lot34_*.py \
+            --cov=crypto_quant_bot.data_governance.market_data_quality_engine \
+            --cov=crypto_quant_bot.data_governance.market_data_quality_engine_models \
+            --cov=crypto_quant_bot.data_governance.market_data_quality_engine_validation \
+            --cov-branch \
+            --cov-report=json:reports/lot34/coverage.json \
+            --cov-report=term-missing
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          totals = json.loads(Path('reports/lot34/coverage.json').read_text())['totals']
+          lines = float(totals['percent_statements_covered'])
+          branches = float(totals['percent_branches_covered'])
+          print(f'Lot34 coverage: lines={lines:.2f}% branches={branches:.2f}%')
+          if lines < 95.0 or branches < 90.0:
+              raise SystemExit('LOT34_CRITICAL_COVERAGE_BELOW_THRESHOLD')
+          PY
+      - name: Exact quality artifacts and deterministic replay
+        env:
+          CODE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          python scripts/validate_lot34_entry_gate.py
+          echo 'Lot33 canonical collection SHA-256:'
+          sha256sum data/audit/canonical_time_envelopes_lot33.json
+          python scripts/run_lot34_market_data_quality_engine.py --code-commit "$CODE_COMMIT"
+          cp data/audit/market_data_quality_engine_lot34.json /tmp/lot34-state-run1.json
+          cp data/audit/market_data_quality_engine_audit_lot34.json /tmp/lot34-audit-run1.json
+          cp data/audit/data_quality_states_lot34.json /tmp/lot34-quality-run1.json
+          cp data/audit/data_anomalies_lot34.json /tmp/lot34-anomalies-run1.json
+          cp data/audit/data_quality_veto_lot34.json /tmp/lot34-veto-run1.json
+          python scripts/validate_lot34.py
+          python scripts/validate_lot34_no_connectivity.py
+          python scripts/run_lot34_market_data_quality_engine.py --code-commit "$CODE_COMMIT"
+          cmp /tmp/lot34-state-run1.json data/audit/market_data_quality_engine_lot34.json
+          cmp /tmp/lot34-audit-run1.json data/audit/market_data_quality_engine_audit_lot34.json
+          cmp /tmp/lot34-quality-run1.json data/audit/data_quality_states_lot34.json
+          cmp /tmp/lot34-anomalies-run1.json data/audit/data_anomalies_lot34.json
+          cmp /tmp/lot34-veto-run1.json data/audit/data_quality_veto_lot34.json
+          python scripts/validate_lot34.py
+          git checkout -- \
+            data/audit/market_data_quality_engine_lot34.json \
+            data/audit/market_data_quality_engine_audit_lot34.json \
+            data/audit/data_quality_states_lot34.json \
+            data/audit/data_anomalies_lot34.json \
+            data/audit/data_quality_veto_lot34.json
+          python scripts/validate_lot34.py
+      - name: Historical architecture traceability quality and security
+        run: |
+          python scripts/validate_lot33_post_merge.py
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          bandit -q -r src/crypto_quant_bot/data_governance/market_data_quality_engine.py \
+            src/crypto_quant_bot/data_governance/market_data_quality_engine_models.py \
+            src/crypto_quant_bot/data_governance/market_data_quality_engine_validation.py
+          pip-audit -r requirements-dev.lock
+      - name: Full regression and anti-flake
+        run: |
+          pytest -q
+          pytest -q tests/test_lot34_*.py
+          pytest -q tests/test_lot34_*.py
+          pytest -q tests/test_lot34_*.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot34-market-data-quality-evidence
+          path: |
+            data/audit/*lot34.json
+            reports/lot_34_market_data_quality_engine_report.md
+            reports/lot34/
