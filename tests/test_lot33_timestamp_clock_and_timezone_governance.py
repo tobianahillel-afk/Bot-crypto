@@ -17,7 +17,6 @@ from crypto_quant_bot.data_governance.timestamp_clock_timezone_models import (
     Lot33MetricsV1,
     Lot33RunContextV1,
     RawTimestampEnvelopeV1,
-    TimestampClockTimezoneGovernanceStateV1,
 )
 from crypto_quant_bot.data_governance.timestamp_clock_timezone_validation import (
     TimestampGovernanceError,
