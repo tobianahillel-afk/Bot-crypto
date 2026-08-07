@@ -28,7 +28,7 @@ def first_raw() -> dict[str, Any]:
 
 
 def wrap(
-    monkeypatch: object,
+    monkeypatch: Any,
     name: str,
     calls: list[tuple[object, ...]],
 ) -> Callable[..., object]:
@@ -38,7 +38,7 @@ def wrap(
         calls.append((*args, *(tuple(sorted(kwargs.items())) if kwargs else ())))
         return original(*args, **kwargs)
 
-    monkeypatch.setattr(engine, name, spy)  # type: ignore[attr-defined]
+    monkeypatch.setattr(engine, name, spy)
     return original
 
 
