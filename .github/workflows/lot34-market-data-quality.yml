@@ -62,6 +62,8 @@ jobs:
           coverage erase
           pytest -q tests/test_lot34_*.py \
             --cov=crypto_quant_bot.data_governance.market_data_quality_engine \
+            --cov=crypto_quant_bot.data_governance.market_data_quality_engine_models \
+            --cov=crypto_quant_bot.data_governance.market_data_quality_engine_validation \
             --cov-branch \
             --cov-report=json:reports/lot34/coverage.json \
             --cov-report=term-missing
