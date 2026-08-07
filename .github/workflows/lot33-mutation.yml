@@ -39,9 +39,11 @@ jobs:
             .tmp-lot33-mutants/tests \
             .tmp-lot33-mutants/config/data_governance \
             .tmp-lot33-mutants/data/audit \
+            .tmp-lot33-mutants/contracts/schemas \
             .tmp-lot33-mutants/mutants/src/crypto_quant_bot/data_governance \
             .tmp-lot33-mutants/mutants/config/data_governance \
             .tmp-lot33-mutants/mutants/data/audit \
+            .tmp-lot33-mutants/mutants/contracts/schemas \
             reports/lot33/mutation
           cp src/crypto_quant_bot/__init__.py .tmp-lot33-mutants/src/crypto_quant_bot/
           cp src/crypto_quant_bot/data_governance/*.py .tmp-lot33-mutants/src/crypto_quant_bot/data_governance/
@@ -59,6 +61,14 @@ jobs:
             .tmp-lot33-mutants/data/audit/
           cp data/audit/instrument_symbol_and_contract_normalization_audit_lot32.json \
             .tmp-lot33-mutants/data/audit/
+          cp contracts/schemas/raw_timestamp_envelope_v1.schema.json \
+            .tmp-lot33-mutants/contracts/schemas/
+          cp contracts/schemas/canonical_time_envelope_v1.schema.json \
+            .tmp-lot33-mutants/contracts/schemas/
+          cp contracts/schemas/timestamp_clock_timezone_governance_state_v1.schema.json \
+            .tmp-lot33-mutants/contracts/schemas/
+          cp contracts/schemas/timestamp_clock_timezone_governance_audit_v1.schema.json \
+            .tmp-lot33-mutants/contracts/schemas/
           cat > .tmp-lot33-mutants/pyproject.toml <<'TOML'
           [project]
           name = "crypto-quant-bot"
@@ -91,6 +101,10 @@ jobs:
             "data/audit/instrument_registry_lot32.json",
             "data/audit/instrument_symbol_and_contract_normalization_lot32.json",
             "data/audit/instrument_symbol_and_contract_normalization_audit_lot32.json",
+            "contracts/schemas/raw_timestamp_envelope_v1.schema.json",
+            "contracts/schemas/canonical_time_envelope_v1.schema.json",
+            "contracts/schemas/timestamp_clock_timezone_governance_state_v1.schema.json",
+            "contracts/schemas/timestamp_clock_timezone_governance_audit_v1.schema.json",
           ]
           mutate_only_covered_lines = true
           timeout_factor = 8.0
