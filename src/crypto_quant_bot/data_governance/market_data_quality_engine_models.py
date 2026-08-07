@@ -321,20 +321,20 @@ class MarketDataQualityEngineAuditV1:
 
     def __post_init__(self) -> None:
         require_git_sha(self.code_commit)
-        for field, value in (
+        for checksum_field, checksum_value in (
             ("state_output_checksum", self.state_output_checksum),
             ("config_checksum", self.config_checksum),
             ("lot33_state_checksum", self.lot33_state_checksum),
             ("lot33_audit_checksum", self.lot33_audit_checksum),
             ("audit_checksum", self.audit_checksum),
         ):
-            require_sha256(value, field)
-        for field, value in (
+            require_sha256(checksum_value, checksum_field)
+        for count_field, count_value in (
             ("record_count", self.record_count),
             ("anomaly_count", self.anomaly_count),
             ("quarantined_record_count", self.quarantined_record_count),
         ):
-            require_integer(value, field, minimum=0)
+            require_integer(count_value, count_field, minimum=0)
         if self.veto_action not in VETO_ACTIONS:
             raise MarketDataQualityError("audit veto action invalid")
         validate_lot34_safety(self.safety)
