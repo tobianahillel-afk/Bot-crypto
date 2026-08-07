@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lot34_v3_entry_gate_v1.schema.json",
+  "title": "Lot34V3EntryGateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "target_lot", "base_commit", "current_version", "gate_status",
+    "human_decision", "implementation_started", "owner", "runtime_mode", "prerequisites",
+    "allowed_scope", "required_outputs", "forbidden_scope", "quality_gates", "safety",
+    "next_lot", "next_lot_status", "output_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "lot34-v3-entry-gate-v1"},
+    "target_lot": {"const": 34},
+    "base_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "current_version": {"const": "0.33.0"},
+    "gate_status": {"const": "GO_LOT34_IMPLEMENTATION_ENTRY"},
+    "human_decision": {"const": "APPROVED_START_LOT34"},
+    "implementation_started": {"const": false},
+    "owner": {"const": "MarketDataGovernanceDomain"},
+    "runtime_mode": {"const": "DATA_GOVERNANCE_ONLY"},
+    "prerequisites": {
+      "type": "object", "additionalProperties": false,
+      "required": ["latest_implemented_lot", "lot33_status", "lot33_merged_commit", "lot33_state_checksum", "lot33_audit_checksum", "clock_health_status", "canonical_record_count"],
+      "properties": {
+        "latest_implemented_lot": {"const": 33},
+        "lot33_status": {"const": "IMPLEMENTED_VALIDATED_TEMPORAL_ONLY"},
+        "lot33_merged_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "lot33_state_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lot33_audit_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "clock_health_status": {"const": "HEALTHY"},
+        "canonical_record_count": {"const": 3}
+      }
+    },
+    "allowed_scope": {"type": "array", "minItems": 11, "uniqueItems": true, "items": {"type": "string"}},
+    "required_outputs": {"type": "array", "minItems": 5, "uniqueItems": true, "items": {"type": "string"}},
+    "forbidden_scope": {"type": "array", "minItems": 9, "uniqueItems": true, "items": {"type": "string"}},
+    "quality_gates": {
+      "type": "object", "additionalProperties": false,
+      "required": ["line_coverage_min_percent", "branch_coverage_min_percent", "mutation_score_min_percent", "anti_flake_repetitions"],
+      "properties": {
+        "line_coverage_min_percent": {"const": 95},
+        "branch_coverage_min_percent": {"const": 90},
+        "mutation_score_min_percent": {"const": 80},
+        "anti_flake_repetitions": {"const": 3}
+      }
+    },
+    "safety": {
+      "type": "object", "additionalProperties": false,
+      "required": ["analysis_only", "used_for_decision", "external_connectivity_allowed", "network_ingestion_allowed", "real_credentials_allowed", "market_event_publication_allowed", "raw_data_mutation_allowed", "signal_generation_allowed", "risk_approval_allowed", "order_routing_allowed", "trade_allowed", "execution_allowed", "approved_size"],
+      "properties": {
+        "analysis_only": {"const": true},
+        "used_for_decision": {"const": false},
+        "external_connectivity_allowed": {"const": false},
+        "network_ingestion_allowed": {"const": false},
+        "real_credentials_allowed": {"const": false},
+        "market_event_publication_allowed": {"const": false},
+        "raw_data_mutation_allowed": {"const": false},
+        "signal_generation_allowed": {"const": false},
+        "risk_approval_allowed": {"const": false},
+        "order_routing_allowed": {"const": false},
+        "trade_allowed": {"const": false},
+        "execution_allowed": {"const": false},
+        "approved_size": {"const": 0}
+      }
+    },
+    "next_lot": {"const": 35},
+    "next_lot_status": {"const": "PLANNED_LOCKED"},
+    "output_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

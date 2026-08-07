@@ -1,0 +1,75 @@
+{
+  "allowed_scope": [
+    "MISSING_INTERVAL_DETECTION",
+    "DUPLICATE_DETECTION",
+    "OUT_OF_ORDER_DETECTION",
+    "STALE_DATA_DETECTION",
+    "INVALID_OHLC_DETECTION",
+    "NEGATIVE_VOLUME_DETECTION",
+    "IMPOSSIBLE_SPREAD_DETECTION",
+    "SCHEMA_DRIFT_DETECTION",
+    "COVERAGE_FRESHNESS_COMPLETENESS_CONSISTENCY_SCORING",
+    "NON_DESTRUCTIVE_QUARANTINE",
+    "DATA_QUALITY_VETO"
+  ],
+  "base_commit": "dcd7af6f3ce3b5c73c52893aaca708fea227b37e",
+  "current_version": "0.33.0",
+  "forbidden_scope": [
+    "DESTRUCTIVE_RAW_DATA_CORRECTION",
+    "CANDLE_TRADE_BOOK_RECONCILIATION",
+    "CONTINUOUS_MARKET_STATE_PUBLICATION",
+    "FORECAST_GENERATION",
+    "SIGNAL_GENERATION",
+    "RISK_APPROVAL",
+    "ORDER_ROUTING",
+    "TRADING",
+    "EXECUTION"
+  ],
+  "gate_status": "GO_LOT34_IMPLEMENTATION_ENTRY",
+  "human_decision": "APPROVED_START_LOT34",
+  "implementation_started": false,
+  "next_lot": 35,
+  "next_lot_status": "PLANNED_LOCKED",
+  "output_checksum": "4a5bf1d61f97ce4a49836da577e6a2464544f16554143973caf32777de4830fa",
+  "owner": "MarketDataGovernanceDomain",
+  "prerequisites": {
+    "canonical_record_count": 3,
+    "clock_health_status": "HEALTHY",
+    "latest_implemented_lot": 33,
+    "lot33_audit_checksum": "73afe6a1d7dc73565d76f7e6d5f7c96cbc4fdecc6dadce88c2e88edb1ca365ad",
+    "lot33_merged_commit": "0c6619e0a57afed6b8cd342e341b066917743edc",
+    "lot33_state_checksum": "4bb5f8df3b49a8a54b6a932a37d35a4575edc63f897c55e88df90dfaf000f450",
+    "lot33_status": "IMPLEMENTED_VALIDATED_TEMPORAL_ONLY"
+  },
+  "quality_gates": {
+    "anti_flake_repetitions": 3,
+    "branch_coverage_min_percent": 90,
+    "line_coverage_min_percent": 95,
+    "mutation_score_min_percent": 80
+  },
+  "required_outputs": [
+    "MarketDataQualityEngineStateV1",
+    "MarketDataQualityEngineAuditV1",
+    "DataQualityStateV1",
+    "DataAnomalyV1",
+    "DataQualityVetoV1"
+  ],
+  "runtime_mode": "DATA_GOVERNANCE_ONLY",
+  "safety": {
+    "analysis_only": true,
+    "approved_size": 0,
+    "execution_allowed": false,
+    "external_connectivity_allowed": false,
+    "market_event_publication_allowed": false,
+    "network_ingestion_allowed": false,
+    "order_routing_allowed": false,
+    "raw_data_mutation_allowed": false,
+    "real_credentials_allowed": false,
+    "risk_approval_allowed": false,
+    "signal_generation_allowed": false,
+    "trade_allowed": false,
+    "used_for_decision": false
+  },
+  "schema_version": "lot34-v3-entry-gate-v1",
+  "target_lot": 34
+}
