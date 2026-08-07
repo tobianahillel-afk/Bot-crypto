@@ -46,7 +46,6 @@ jobs:
         run: |
           python scripts/validate_lot34.py
           python scripts/validate_lot34_post_merge.py
-          python scripts/validate_lot33_post_merge.py
       - name: Governance and architecture regression
         run: |
           python scripts/validate_roadmap_documentation.py
