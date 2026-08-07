@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Callable
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
+
+import pytest
 
 import crypto_quant_bot.data_governance.timestamp_clock_and_timezone_governance as engine
 
@@ -27,32 +29,45 @@ def first_raw() -> dict[str, Any]:
     return value
 
 
-def wrap(
-    monkeypatch: Any,
-    name: str,
-    calls: list[tuple[object, ...]],
-) -> Callable[..., object]:
-    original = getattr(engine, name)
+def test_build_raw_uses_every_exact_input_field(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    string_calls: list[tuple[object, str]] = []
+    integer_calls: list[tuple[object, str]] = []
+    nullable_string_calls: list[tuple[dict[str, Any], str]] = []
+    nullable_integer_calls: list[tuple[dict[str, Any], str]] = []
+    metadata_calls: list[object] = []
 
-    def spy(*args: object, **kwargs: object) -> object:
-        calls.append((*args, *(tuple(sorted(kwargs.items())) if kwargs else ())))
-        return original(*args, **kwargs)
+    def require_string(value: object, field: str) -> str:
+        string_calls.append((value, field))
+        assert isinstance(value, str)
+        return value
 
-    monkeypatch.setattr(engine, name, spy)
-    return original
+    def require_integer(value: object, field: str) -> int:
+        integer_calls.append((value, field))
+        assert isinstance(value, int)
+        return value
 
+    def nullable_string(raw: dict[str, Any], field: str) -> str | None:
+        nullable_string_calls.append((raw, field))
+        value = raw[field]
+        assert value is None or isinstance(value, str)
+        return value
 
-def test_build_raw_uses_every_exact_input_field(monkeypatch: object) -> None:
-    string_calls: list[tuple[object, ...]] = []
-    integer_calls: list[tuple[object, ...]] = []
-    nullable_string_calls: list[tuple[object, ...]] = []
-    nullable_integer_calls: list[tuple[object, ...]] = []
-    metadata_calls: list[tuple[object, ...]] = []
-    wrap(monkeypatch, "require_string", string_calls)
-    wrap(monkeypatch, "require_integer", integer_calls)
-    wrap(monkeypatch, "_nullable_string", nullable_string_calls)
-    wrap(monkeypatch, "_nullable_integer", nullable_integer_calls)
-    wrap(monkeypatch, "_validate_raw_metadata", metadata_calls)
+    def nullable_integer(raw: dict[str, Any], field: str) -> int | None:
+        nullable_integer_calls.append((raw, field))
+        value = raw[field]
+        assert value is None or isinstance(value, int)
+        return value
+
+    def validate_metadata(value: object) -> None:
+        metadata_calls.append(value)
+
+    monkeypatch.setattr(engine, "require_string", require_string)
+    monkeypatch.setattr(engine, "require_integer", require_integer)
+    monkeypatch.setattr(engine, "_nullable_string", nullable_string)
+    monkeypatch.setattr(engine, "_nullable_integer", nullable_integer)
+    monkeypatch.setattr(engine, "_validate_raw_metadata", validate_metadata)
 
     raw = first_raw()
     envelope = engine._build_raw(raw)
@@ -78,17 +93,24 @@ def test_build_raw_uses_every_exact_input_field(monkeypatch: object) -> None:
     ]
     assert nullable_string_calls == [(raw, "exchange_time")]
     assert nullable_integer_calls == [(raw, "monotonic_time")]
-    assert metadata_calls == [(envelope,)]
+    assert metadata_calls == [envelope]
 
 
 def test_raw_metadata_validates_timezone_and_every_declared_precision(
-    monkeypatch: object,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     envelope = engine._build_raw(first_raw())
-    timezone_calls: list[tuple[object, ...]] = []
-    precision_calls: list[tuple[object, ...]] = []
-    wrap(monkeypatch, "validate_source_timezone", timezone_calls)
-    wrap(monkeypatch, "validate_precision", precision_calls)
+    timezone_calls: list[tuple[str, str]] = []
+    precision_calls: list[tuple[str, str, str]] = []
+
+    def validate_timezone(value: str, timezone_name: str) -> None:
+        timezone_calls.append((value, timezone_name))
+
+    def validate_precision(value: str, precision: str, field: str) -> None:
+        precision_calls.append((value, precision, field))
+
+    monkeypatch.setattr(engine, "validate_source_timezone", validate_timezone)
+    monkeypatch.setattr(engine, "validate_precision", validate_precision)
 
     engine._validate_raw_metadata(envelope)
 
@@ -105,15 +127,42 @@ def test_raw_metadata_validates_timezone_and_every_declared_precision(
 
 
 def test_normalize_raw_uses_exact_timestamp_and_latency_contracts(
-    monkeypatch: object,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     envelope = engine._build_raw(first_raw())
-    canonical_calls: list[tuple[object, ...]] = []
-    signed_calls: list[tuple[object, ...]] = []
-    duration_calls: list[tuple[object, ...]] = []
-    wrap(monkeypatch, "canonical_utc", canonical_calls)
-    wrap(monkeypatch, "signed_duration_us", signed_calls)
-    wrap(monkeypatch, "duration_us", duration_calls)
+    canonical_calls: list[tuple[str, str, str]] = []
+    signed_calls: list[tuple[str, str]] = []
+    duration_calls: list[tuple[str, str, str]] = []
+    canonical_values = {
+        "source_time": "2026-08-06T19:15:00.100000Z",
+        "exchange_time": "2026-08-06T19:15:00.101000Z",
+        "event_time": "2026-08-06T19:15:00.101000Z",
+        "receive_time": "2026-08-06T19:15:00.151000Z",
+        "process_time": "2026-08-06T19:15:00.171000Z",
+        "available_at": "2026-08-06T19:15:00.171000Z",
+        "usable_from": "2026-08-06T19:15:00.171000Z",
+    }
+    latency_values = {
+        "transport_latency": 50_000,
+        "processing_latency": 20_000,
+        "total_latency": 70_000,
+    }
+
+    def canonical_utc(value: str, precision: str, field: str) -> str:
+        canonical_calls.append((value, precision, field))
+        return canonical_values[field]
+
+    def signed_duration(start: str, end: str) -> int:
+        signed_calls.append((start, end))
+        return 1_000
+
+    def duration(start: str, end: str, field: str) -> int:
+        duration_calls.append((start, end, field))
+        return latency_values[field]
+
+    monkeypatch.setattr(engine, "canonical_utc", canonical_utc)
+    monkeypatch.setattr(engine, "signed_duration_us", signed_duration)
+    monkeypatch.setattr(engine, "duration_us", duration)
 
     normalized = engine._normalize_raw(envelope, 17)
 
@@ -126,23 +175,57 @@ def test_normalize_raw_uses_exact_timestamp_and_latency_contracts(
         (envelope.available_at, envelope.timestamp_precision, "available_at"),
         (envelope.usable_from, envelope.timestamp_precision, "usable_from"),
     ]
-    assert signed_calls == [(normalized.source_time_utc, normalized.exchange_time_utc)]
-    assert duration_calls == [
-        (normalized.event_time_utc, normalized.receive_time_utc, "transport_latency"),
-        (normalized.receive_time_utc, normalized.process_time_utc, "processing_latency"),
-        (normalized.event_time_utc, normalized.process_time_utc, "total_latency"),
+    assert signed_calls == [
+        (canonical_values["source_time"], canonical_values["exchange_time"])
     ]
+    assert duration_calls == [
+        (
+            canonical_values["event_time"],
+            canonical_values["receive_time"],
+            "transport_latency",
+        ),
+        (
+            canonical_values["receive_time"],
+            canonical_values["process_time"],
+            "processing_latency",
+        ),
+        (
+            canonical_values["event_time"],
+            canonical_values["process_time"],
+            "total_latency",
+        ),
+    ]
+    assert normalized.clock_drift_us == 1_000
+    assert normalized.transport_latency_us == 50_000
+    assert normalized.processing_latency_us == 20_000
+    assert normalized.total_latency_us == 70_000
     assert normalized.out_of_order_delay_us == 17
 
 
 def test_config_validation_uses_exact_three_causal_timestamps(
-    monkeypatch: object,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     config = load(CONFIG_PATH)
-    string_calls: list[tuple[object, ...]] = []
-    parse_calls: list[tuple[object, ...]] = []
-    wrap(monkeypatch, "require_string", string_calls)
-    wrap(monkeypatch, "parse_aware_timestamp", parse_calls)
+    string_calls: list[tuple[object, str]] = []
+    parse_calls: list[tuple[str, str]] = []
+    base = datetime(2026, 8, 6, 19, 15, tzinfo=UTC)
+    parsed_values = {
+        "event_time": base,
+        "available_at": base + timedelta(microseconds=1),
+        "generated_at": base + timedelta(microseconds=2),
+    }
+
+    def require_string(value: object, field: str) -> str:
+        string_calls.append((value, field))
+        assert isinstance(value, str)
+        return value
+
+    def parse_timestamp(value: str, field: str) -> datetime:
+        parse_calls.append((value, field))
+        return parsed_values[field]
+
+    monkeypatch.setattr(engine, "require_string", require_string)
+    monkeypatch.setattr(engine, "parse_aware_timestamp", parse_timestamp)
 
     engine._validate_config(config)
 
@@ -158,20 +241,25 @@ def test_config_validation_uses_exact_three_causal_timestamps(
     ]
 
 
-def test_run_context_lineage_and_allowed_sources_use_exact_dependencies(
-    monkeypatch: object,
+def test_run_context_uses_exact_configuration_fields(
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     config = load(CONFIG_PATH)
-    registry = load(REGISTRY_PATH)
-    string_calls: list[tuple[object, ...]] = []
-    checksum_calls: list[tuple[object, ...]] = []
-    wrap(monkeypatch, "require_string", string_calls)
-    wrap(monkeypatch, "file_checksum", checksum_calls)
+    string_calls: list[tuple[object, str]] = []
 
+    def require_string(value: object, field: str) -> str:
+        string_calls.append((value, field))
+        assert isinstance(value, str)
+        return value
+
+    monkeypatch.setattr(engine, "require_string", require_string)
     context = engine._build_run_context(config, VALID_SHA)
-    lineage = engine._build_lineage(config, ROOT)
-    instrument_id, sources = engine._allowed_sources(registry)
 
+    assert string_calls == [
+        (config["run_id"], "run_id"),
+        (config["config_version"], "config_version"),
+        (config["correlation_id"], "correlation_id"),
+    ]
     assert context.to_dict() == {
         "schema_version": "run-context-v1",
         "run_id": config["run_id"],
@@ -180,22 +268,66 @@ def test_run_context_lineage_and_allowed_sources_use_exact_dependencies(
         "code_commit": VALID_SHA,
         "correlation_id": config["correlation_id"],
     }
-    assert string_calls[:3] == [
-        (config["run_id"], "run_id"),
-        (config["config_version"], "config_version"),
-        (config["correlation_id"], "correlation_id"),
+
+
+def test_lineage_uses_exact_paths_and_configuration_fields(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config = load(CONFIG_PATH)
+    string_calls: list[tuple[object, str]] = []
+    checksum_calls: list[Path] = []
+    checksum_values = {
+        ROOT / "data/audit/instrument_registry_lot32.json": "a" * 64,
+        ROOT / "data/audit/instrument_symbol_and_contract_normalization_lot32.json": "b" * 64,
+        ROOT
+        / "data/audit/instrument_symbol_and_contract_normalization_audit_lot32.json": "c"
+        * 64,
+    }
+
+    def require_string(value: object, field: str) -> str:
+        string_calls.append((value, field))
+        assert isinstance(value, str)
+        return value
+
+    def checksum(path: Path) -> str:
+        checksum_calls.append(path)
+        return checksum_values[path]
+
+    monkeypatch.setattr(engine, "require_string", require_string)
+    monkeypatch.setattr(engine, "file_checksum", checksum)
+    lineage = engine._build_lineage(config, ROOT)
+
+    assert string_calls == [
+        (config["lineage_id"], "lineage_id"),
+        (config["available_at"], "available_at"),
     ]
-    assert string_calls[3] == (config["lineage_id"], "lineage_id")
-    assert string_calls[4] == (config["available_at"], "available_at")
-    assert checksum_calls == [
-        (ROOT / "data/audit/instrument_registry_lot32.json",),
-        (ROOT / "data/audit/instrument_symbol_and_contract_normalization_lot32.json",),
-        (
-            ROOT
-            / "data/audit/instrument_symbol_and_contract_normalization_audit_lot32.json",
-        ),
-    ]
+    assert checksum_calls == list(checksum_values)
     assert lineage.instrument_registry_path == "data/audit/instrument_registry_lot32.json"
+    assert lineage.instrument_registry_checksum == "a" * 64
+    assert lineage.lot32_state_checksum == "b" * 64
+    assert lineage.lot32_audit_checksum == "c" * 64
+
+
+def test_allowed_sources_uses_exact_registry_fields(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    registry = load(REGISTRY_PATH)
+    string_calls: list[tuple[object, str]] = []
+
+    def require_string(value: object, field: str) -> str:
+        string_calls.append((value, field))
+        assert isinstance(value, str)
+        return value
+
+    monkeypatch.setattr(engine, "require_string", require_string)
+    instrument_id, sources = engine._allowed_sources(registry)
+    instrument = registry["instruments"][0]
+    aliases = instrument["aliases"]
+
+    assert string_calls == [
+        (instrument["instrument_id"], "instrument_id"),
+        *((alias["source_id"], "source_id") for alias in aliases),
+    ]
     assert instrument_id == "btc-eur-spot"
     assert sources == {
         "bitstamp-public-spot-metadata",
