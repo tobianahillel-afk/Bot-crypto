@@ -13,6 +13,7 @@ if str(SOURCE_ROOT) not in sys.path:
 
 from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry import (  # noqa: E402
     canonical_checksum,
+    file_checksum,
     load_json_object,
 )
 from crypto_quant_bot.data_governance.market_data_quality_engine_validation import (  # noqa: E402
@@ -27,6 +28,7 @@ ANOMALY_PATH = ROOT / "data/audit/data_anomalies_lot34.json"
 VETO_PATH = ROOT / "data/audit/data_quality_veto_lot34.json"
 LOT33_STATE_PATH = ROOT / "data/audit/timestamp_clock_and_timezone_governance_lot33.json"
 LOT33_AUDIT_PATH = ROOT / "data/audit/timestamp_clock_and_timezone_governance_audit_lot33.json"
+LOT33_CANONICAL_TIME_PATH = ROOT / "data/audit/canonical_time_envelopes_lot33.json"
 
 
 def require(condition: bool, message: str) -> None:
@@ -60,6 +62,11 @@ def validate() -> dict[str, object]:
     require(
         state["lineage"]["lot33_audit_checksum"] == lot33_audit["audit_checksum"],
         "Lot 33 audit lineage mismatch",
+    )
+    require(
+        state["lineage"]["canonical_time_collection_checksum"]
+        == file_checksum(LOT33_CANONICAL_TIME_PATH),
+        "Lot 33 canonical-time collection lineage mismatch",
     )
     require(quality["records"] == state["quality_states"], "quality-state collection differs")
     require(anomalies["records"] == state["anomalies"], "anomaly collection differs")
