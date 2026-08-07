@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 
 
@@ -52,7 +52,7 @@ def parse_utc_timestamp(value: object, field: str) -> datetime:
         parsed = datetime.fromisoformat(text[:-1] + "+00:00")
     except ValueError as exc:
         raise MarketDataQualityError(f"{field} is not a valid timestamp") from exc
-    if parsed.tzinfo is None or parsed.utcoffset() != timezone.utc.utcoffset(parsed):
+    if parsed.tzinfo is None or parsed.utcoffset() != UTC.utcoffset(parsed):
         raise MarketDataQualityError(f"{field} must be timezone-aware UTC")
     return parsed
 
