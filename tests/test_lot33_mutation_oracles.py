@@ -10,6 +10,7 @@ from crypto_quant_bot.data_governance.timestamp_clock_and_timezone_governance im
 )
 from crypto_quant_bot.data_governance.timestamp_clock_timezone_models import (
     ClockHealthStateV1,
+    Lot33RunContextV1,
     RawTimestampEnvelopeV1,
 )
 from crypto_quant_bot.data_governance.timestamp_clock_timezone_validation import (
@@ -209,6 +210,4 @@ def test_failure_oracles_are_not_self_referential() -> None:
             "negative",
         )
     with pytest.raises(TimestampGovernanceError, match="runtime"):
-        from crypto_quant_bot.data_governance.timestamp_clock_timezone_models import Lot33RunContextV1
-
         Lot33RunContextV1("run", "LIVE", "config", VALID_SHA, "correlation")
