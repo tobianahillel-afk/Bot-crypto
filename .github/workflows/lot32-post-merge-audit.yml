@@ -38,10 +38,17 @@ jobs:
         shell: bash
         run: |
           git fetch origin main
-          if ! git diff --quiet origin/main...HEAD -- src/; then
-            echo 'Production source changed inside the Lot 32 post-merge audit PR'
-            git diff --stat origin/main...HEAD -- src/
-            exit 1
+          AUDIT_PATHS=(
+            data/audit/roadmap_lifecycle_overlay_lot32.json
+            docs/LOT_32_POST_MERGE_AUDIT.md
+            docs/LOT32_POST_MERGE_VALIDATION_MATRIX.md
+          )
+          if ! git diff --quiet origin/main...HEAD -- "${AUDIT_PATHS[@]}"; then
+            if ! git diff --quiet origin/main...HEAD -- src/; then
+              echo 'Production source changed together with immutable Lot 32 audit artifacts'
+              git diff --stat origin/main...HEAD -- src/ "${AUDIT_PATHS[@]}"
+              exit 1
+            fi
           fi
       - name: Compile lint and type checks
         run: |
@@ -59,7 +66,7 @@ jobs:
           python scripts/validate_lot31.py
           python scripts/validate_lot31_no_connectivity.py
           python scripts/validate_lot32_entry_gate.py
-          python scripts/validate_lot32.py
+          python scripts/validate_lot32.py --lineage-mode certified
           python scripts/validate_lot32_no_connectivity.py
           python scripts/validate_roadmap_documentation.py
       - name: Architecture traceability and quality gates

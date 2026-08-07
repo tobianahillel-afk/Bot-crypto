@@ -503,6 +503,7 @@ class InstrumentSymbolContractNormalizationAuditV1:
 
 
 __all__ = [
+    "MARKET_TYPES",
     "InstrumentNormalizationError",
     "InstrumentRegistryV1",
     "InstrumentSpecificationV1",
@@ -511,7 +512,6 @@ __all__ = [
     "Lot32LineageEnvelopeV1",
     "Lot32MetricsV1",
     "Lot32RunContextV1",
-    "MARKET_TYPES",
     "VenueInstrumentAliasV1",
     "decimal_places",
     "decimal_value",

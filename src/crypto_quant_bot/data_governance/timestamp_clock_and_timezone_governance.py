@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -192,7 +192,7 @@ def _out_of_order_delays(records: tuple[RawTimestampEnvelopeV1, ...]) -> tuple[i
     delays: list[int] = []
     maximum: datetime | None = None
     for record in records:
-        current = parse_aware_timestamp(record.event_time, "event_time").astimezone(timezone.utc)
+        current = parse_aware_timestamp(record.event_time, "event_time").astimezone(UTC)
         if maximum is None or current >= maximum:
             delays.append(0)
             maximum = current

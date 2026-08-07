@@ -83,17 +83,23 @@ jobs:
           python scripts/validate_lot31.py
           python scripts/validate_lot31_no_connectivity.py
           python scripts/validate_lot32_entry_gate.py
+          python scripts/validate_lot32.py --lineage-mode certified
           python scripts/run_lot32_instrument_symbol_and_contract_normalization.py --code-commit "$CODE_COMMIT"
           cp data/audit/instrument_symbol_and_contract_normalization_lot32.json /tmp/lot32-state-run1.json
           cp data/audit/instrument_symbol_and_contract_normalization_audit_lot32.json /tmp/lot32-audit-run1.json
           cp data/audit/instrument_registry_lot32.json /tmp/lot32-registry-run1.json
-          python scripts/validate_lot32.py
+          python scripts/validate_lot32.py --lineage-mode current
           python scripts/validate_lot32_no_connectivity.py
           python scripts/run_lot32_instrument_symbol_and_contract_normalization.py --code-commit "$CODE_COMMIT"
           cmp /tmp/lot32-state-run1.json data/audit/instrument_symbol_and_contract_normalization_lot32.json
           cmp /tmp/lot32-audit-run1.json data/audit/instrument_symbol_and_contract_normalization_audit_lot32.json
           cmp /tmp/lot32-registry-run1.json data/audit/instrument_registry_lot32.json
-          python scripts/validate_lot32.py
+          python scripts/validate_lot32.py --lineage-mode current
+          git checkout -- \
+            data/audit/instrument_symbol_and_contract_normalization_lot32.json \
+            data/audit/instrument_symbol_and_contract_normalization_audit_lot32.json \
+            data/audit/instrument_registry_lot32.json
+          python scripts/validate_lot32.py --lineage-mode certified
       - name: Architecture traceability quality and security
         run: |
           python scripts/validate_lot31.py

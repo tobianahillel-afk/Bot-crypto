@@ -91,6 +91,11 @@ jobs:
           cmp /tmp/lot31-audit-run1.json data/audit/market_data_governance_scope_and_source_registry_audit_lot31.json
           cmp /tmp/lot31-registry-run1.json data/audit/source_registry_lot31.json
           python scripts/validate_lot31.py
+          git checkout -- \
+            data/audit/market_data_governance_scope_and_source_registry_lot31.json \
+            data/audit/market_data_governance_scope_and_source_registry_audit_lot31.json \
+            data/audit/source_registry_lot31.json
+          python scripts/validate_lot31.py
       - name: Architecture traceability quality and security
         run: |
           python scripts/validate_lot30.py

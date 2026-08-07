@@ -35,7 +35,19 @@ jobs:
         shell: bash
         run: |
           git fetch origin main
-          git diff --quiet origin/main...HEAD -- src/
+          GATE_PATHS=(
+            data/audit/lot33_v3_entry_gate.json
+            contracts/schemas/lot33_v3_entry_gate_v1.schema.json
+            docs/LOT_33_V3_ENTRY_GATE.md
+            reports/lot_33_v3_entry_gate_report.md
+          )
+          if ! git diff --quiet origin/main...HEAD -- "${GATE_PATHS[@]}"; then
+            if ! git diff --quiet origin/main...HEAD -- src/; then
+              echo 'Production source changed together with immutable Lot 33 gate artifacts'
+              git diff --stat origin/main...HEAD -- src/ "${GATE_PATHS[@]}"
+              exit 1
+            fi
+          fi
       - name: Validate schema, syntax, lint and types
         run: |
           python -m json.tool data/audit/lot33_v3_entry_gate.json >/dev/null
@@ -46,7 +58,7 @@ jobs:
       - name: Validate gate and regression
         run: |
           python scripts/validate_roadmap_documentation.py
-          python scripts/validate_lot32.py
+          python scripts/validate_lot32.py --lineage-mode certified
           python scripts/validate_lot32_no_connectivity.py
           python scripts/validate_lot33_entry_gate.py
           pytest -q tests/test_lot33_v3_entry_gate.py

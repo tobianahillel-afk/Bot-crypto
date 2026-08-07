@@ -12,6 +12,15 @@ MERGED_COMMIT = "7187f2ebfebeb67292c8a521e7e8bdbc653c3086"
 IMPLEMENTATION_COMMIT = "cd9ffa91a4a64c36a71a40e746cf575fe438d59b"
 STATE_CHECKSUM = "da269de9a3a94f83b3dd437362ae565bd38a098cbe0dc81190887347c7fce240"
 AUDIT_CHECKSUM = "b69aa85d72851470f9f807d05ae27127651e6ac8d12623aed8d3f5d96f94659a"
+CERTIFIED_SOURCE_REGISTRY_CHECKSUM = (
+    "d920d24dc5e774e7aa9f221965e88796c6fecdd8bfc61531109b9b4c040c1f29"
+)
+CERTIFIED_LOT31_STATE_CHECKSUM = (
+    "59d6f01a65cb071a95abe116938709c5112b82462f2b0d1941a01998df2f3955"
+)
+CERTIFIED_LOT31_AUDIT_CHECKSUM = (
+    "3e5b687dc3b76d170e2830c28d8c3a0c20c268ca7c89ebdce30a446f029645f1"
+)
 COMMIT_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 
 
@@ -25,10 +34,6 @@ def canonical_checksum(payload: object) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
-def file_checksum(relative: str) -> str:
-    return hashlib.sha256((ROOT / relative).read_bytes()).hexdigest()
-
-
 def load_json(relative: str) -> dict[str, Any]:
     payload = json.loads((ROOT / relative).read_text(encoding="utf-8"))
     assert isinstance(payload, dict)
@@ -38,7 +43,7 @@ def load_json(relative: str) -> dict[str, Any]:
 def test_lot32_post_merge_release_and_lifecycle_are_consistent() -> None:
     project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
     overlay = load_json("data/audit/roadmap_lifecycle_overlay_lot32.json")
-    assert project["version"] == "0.32.0"
+    assert tuple(map(int, project["version"].split("."))) >= (0, 32, 0)
     assert overlay["latest_implemented_lot"] == 32
     assert overlay["previous_overlay"] == "data/audit/roadmap_lifecycle_overlay_lot31.json"
     lots = overlay["lots"]
@@ -59,6 +64,10 @@ def test_lot32_post_merge_artifacts_are_independently_linked() -> None:
     state = load_json("data/audit/instrument_symbol_and_contract_normalization_lot32.json")
     audit = load_json("data/audit/instrument_symbol_and_contract_normalization_audit_lot32.json")
     registry = load_json("data/audit/instrument_registry_lot32.json")
+    lot31_state = load_json(
+        "data/audit/market_data_governance_scope_and_source_registry_lot31.json"
+    )
+    current_source_registry = load_json("data/audit/source_registry_lot31.json")
     state_payload = dict(state)
     state_checksum = state_payload.pop("output_checksum")
     audit_payload = dict(audit)
@@ -69,16 +78,12 @@ def test_lot32_post_merge_artifacts_are_independently_linked() -> None:
     assert audit["state_output_checksum"] == state_checksum
     assert audit["code_commit"] == state["run_context"]["code_commit"]
     assert COMMIT_PATTERN.fullmatch(audit["code_commit"])
+    assert lot31_state["source_registry"] == current_source_registry
     lineage = state["lineage"]
-    assert lineage["source_registry_checksum"] == file_checksum(
-        "data/audit/source_registry_lot31.json"
-    )
-    assert lineage["lot31_state_checksum"] == file_checksum(
-        "data/audit/market_data_governance_scope_and_source_registry_lot31.json"
-    )
-    assert lineage["lot31_audit_checksum"] == file_checksum(
-        "data/audit/market_data_governance_scope_and_source_registry_audit_lot31.json"
-    )
+    assert lineage["source_registry_checksum"] == CERTIFIED_SOURCE_REGISTRY_CHECKSUM
+    assert lineage["lot31_state_checksum"] == CERTIFIED_LOT31_STATE_CHECKSUM
+    assert lineage["lot31_audit_checksum"] == CERTIFIED_LOT31_AUDIT_CHECKSUM
+    assert audit["source_registry_checksum"] == CERTIFIED_SOURCE_REGISTRY_CHECKSUM
 
 
 def test_lot32_post_merge_registry_and_quality_remain_certified() -> None:

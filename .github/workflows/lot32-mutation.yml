@@ -44,10 +44,18 @@ jobs:
             .tmp-lot32-mutants/config/data_governance \
             .tmp-lot32-mutants/data/audit \
             .tmp-lot32-mutants/contracts/schemas \
+            .tmp-lot32-mutants/mutants/src/crypto_quant_bot/data_governance \
+            .tmp-lot32-mutants/mutants/scripts \
+            .tmp-lot32-mutants/mutants/config/data_governance \
+            .tmp-lot32-mutants/mutants/data/audit \
+            .tmp-lot32-mutants/mutants/contracts/schemas \
             reports/lot32/mutation
           cp src/crypto_quant_bot/__init__.py .tmp-lot32-mutants/src/crypto_quant_bot/
           cp src/crypto_quant_bot/data_governance/*.py \
             .tmp-lot32-mutants/src/crypto_quant_bot/data_governance/
+          cat > .tmp-lot32-mutants/src/crypto_quant_bot/data_governance/__init__.py <<'PY'
+          """Minimal Lot 32 package used only by the isolated mutation campaign."""
+          PY
           cp tests/test_lot32_instrument_symbol_and_contract_normalization.py \
             .tmp-lot32-mutants/tests/
           cp tests/test_lot32_validation_boundaries.py .tmp-lot32-mutants/tests/

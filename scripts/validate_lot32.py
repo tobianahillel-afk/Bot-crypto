@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -26,6 +27,20 @@ STATE_PATH = ROOT / "data/audit/instrument_symbol_and_contract_normalization_lot
 AUDIT_PATH = ROOT / "data/audit/instrument_symbol_and_contract_normalization_audit_lot32.json"
 REGISTRY_PATH = ROOT / "data/audit/instrument_registry_lot32.json"
 SOURCE_REGISTRY_PATH = ROOT / "data/audit/source_registry_lot31.json"
+LOT31_STATE_PATH = ROOT / "data/audit/market_data_governance_scope_and_source_registry_lot31.json"
+LOT31_AUDIT_PATH = (
+    ROOT / "data/audit/market_data_governance_scope_and_source_registry_audit_lot31.json"
+)
+CERTIFIED_SOURCE_REGISTRY_CHECKSUM = (
+    "d920d24dc5e774e7aa9f221965e88796c6fecdd8bfc61531109b9b4c040c1f29"
+)
+CERTIFIED_LOT31_STATE_CHECKSUM = (
+    "59d6f01a65cb071a95abe116938709c5112b82462f2b0d1941a01998df2f3955"
+)
+CERTIFIED_LOT31_AUDIT_CHECKSUM = (
+    "3e5b687dc3b76d170e2830c28d8c3a0c20c268ca7c89ebdce30a446f029645f1"
+)
+LINEAGE_MODES = ("certified", "current")
 
 
 def require(condition: bool, message: str) -> None:
@@ -107,7 +122,47 @@ def _validate_registry(registry: dict[str, Any]) -> tuple[int, int]:
     return len(instruments), alias_count
 
 
-def validate() -> dict[str, object]:
+def _expected_lineage(lineage_mode: str) -> dict[str, str]:
+    require(lineage_mode in LINEAGE_MODES, f"unknown lineage mode: {lineage_mode}")
+    if lineage_mode == "certified":
+        return {
+            "source_registry_checksum": CERTIFIED_SOURCE_REGISTRY_CHECKSUM,
+            "lot31_state_checksum": CERTIFIED_LOT31_STATE_CHECKSUM,
+            "lot31_audit_checksum": CERTIFIED_LOT31_AUDIT_CHECKSUM,
+        }
+    return {
+        "source_registry_checksum": file_checksum(SOURCE_REGISTRY_PATH),
+        "lot31_state_checksum": file_checksum(LOT31_STATE_PATH),
+        "lot31_audit_checksum": file_checksum(LOT31_AUDIT_PATH),
+    }
+
+
+def _validate_lineage(
+    state: dict[str, Any],
+    audit: dict[str, Any],
+    lineage_mode: str,
+) -> None:
+    lot31_state = load_json_object(LOT31_STATE_PATH)
+    source_registry = load_json_object(SOURCE_REGISTRY_PATH)
+    require(
+        lot31_state.get("source_registry") == source_registry,
+        "current Lot 31 registry semantic content changed",
+    )
+    lineage = state.get("lineage")
+    require(isinstance(lineage, dict), "Lot 32 lineage missing")
+    expected = _expected_lineage(lineage_mode)
+    for field, value in expected.items():
+        require(
+            lineage.get(field) == value,
+            f"{lineage_mode} Lot 32 lineage mismatch: {field}",
+        )
+    require(
+        audit.get("source_registry_checksum") == expected["source_registry_checksum"],
+        f"{lineage_mode} source registry lineage checksum mismatch",
+    )
+
+
+def validate(lineage_mode: str = "certified") -> dict[str, object]:
     state = load_json_object(STATE_PATH)
     audit = load_json_object(AUDIT_PATH)
     registry = load_json_object(REGISTRY_PATH)
@@ -115,10 +170,7 @@ def validate() -> dict[str, object]:
     audit_checksum = payload_checksum(audit, "audit_checksum")
     require(state["instrument_registry"] == registry, "persisted registry differs from state")
     require(audit["state_output_checksum"] == state_checksum, "audit/state checksum mismatch")
-    require(
-        audit["source_registry_checksum"] == file_checksum(SOURCE_REGISTRY_PATH),
-        "source registry lineage checksum mismatch",
-    )
+    _validate_lineage(state, audit, lineage_mode)
     require(
         state["validation_state"] == "VALIDATED_NORMALIZATION_ONLY",
         "state is not validated",
@@ -138,6 +190,7 @@ def validate() -> dict[str, object]:
     return {
         "schema_version": "lot32-validation-v1",
         "status": "PASS",
+        "lineage_mode": lineage_mode,
         "instrument_count": instrument_count,
         "venue_alias_count": alias_count,
         "round_trip_count": alias_count * 2,
@@ -151,9 +204,21 @@ def validate() -> dict[str, object]:
     }
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Validate Lot 32 certified or replay lineage")
+    parser.add_argument(
+        "--lineage-mode",
+        choices=LINEAGE_MODES,
+        default="certified",
+        help="certified validates immutable release lineage; current validates replay inputs",
+    )
+    return parser.parse_args()
+
+
 def main() -> int:
     try:
-        print(json.dumps(validate(), sort_keys=True))
+        args = parse_args()
+        print(json.dumps(validate(args.lineage_mode), sort_keys=True))
     except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
         print(f"LOT32 VALIDATION: FAIL\n{exc}", file=sys.stderr)
         return 1

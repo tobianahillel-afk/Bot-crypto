@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Final
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
@@ -79,7 +79,7 @@ def validate_source_timezone(value: str, source_timezone: str) -> None:
 
 def canonical_utc(value: str, precision: str, field: str) -> str:
     validate_precision(value, precision, field)
-    parsed = parse_aware_timestamp(value, field).astimezone(timezone.utc)
+    parsed = parse_aware_timestamp(value, field).astimezone(UTC)
     digits = PRECISION_DIGITS[precision]
     if digits == 0:
         return parsed.strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -90,7 +90,7 @@ def canonical_utc(value: str, precision: str, field: str) -> str:
 def duration_us(start: str, end: str, field: str) -> int:
     start_time = parse_aware_timestamp(start, f"{field}_start")
     end_time = parse_aware_timestamp(end, f"{field}_end")
-    delta = end_time.astimezone(timezone.utc) - start_time.astimezone(timezone.utc)
+    delta = end_time.astimezone(UTC) - start_time.astimezone(UTC)
     microseconds = delta.days * 86_400_000_000 + delta.seconds * 1_000_000 + delta.microseconds
     if microseconds < 0:
         raise TimestampGovernanceError(f"{field} cannot be negative")
@@ -100,7 +100,7 @@ def duration_us(start: str, end: str, field: str) -> int:
 def signed_duration_us(start: str, end: str) -> int:
     start_time = parse_aware_timestamp(start, "signed_start")
     end_time = parse_aware_timestamp(end, "signed_end")
-    delta = end_time.astimezone(timezone.utc) - start_time.astimezone(timezone.utc)
+    delta = end_time.astimezone(UTC) - start_time.astimezone(UTC)
     return delta.days * 86_400_000_000 + delta.seconds * 1_000_000 + delta.microseconds
 
 

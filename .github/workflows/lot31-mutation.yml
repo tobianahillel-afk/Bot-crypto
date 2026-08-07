@@ -42,6 +42,9 @@ jobs:
             reports/lot31/mutation
           cp src/crypto_quant_bot/__init__.py .tmp-lot31-mutants/src/crypto_quant_bot/
           cp src/crypto_quant_bot/data_governance/*.py .tmp-lot31-mutants/src/crypto_quant_bot/data_governance/
+          cat > .tmp-lot31-mutants/src/crypto_quant_bot/data_governance/__init__.py <<'PY'
+          """Minimal Lot 31 package used only by the isolated mutation campaign."""
+          PY
           cp tests/test_lot31_market_data_governance_scope_and_source_registry.py \
             .tmp-lot31-mutants/tests/
           cp tests/test_lot31_validation_boundaries.py .tmp-lot31-mutants/tests/
