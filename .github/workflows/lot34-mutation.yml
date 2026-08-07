@@ -39,6 +39,9 @@ jobs:
             .tmp-lot34-mutants/tests \
             .tmp-lot34-mutants/config/data_governance \
             .tmp-lot34-mutants/data/audit \
+            .tmp-lot34-mutants/mutants/src/crypto_quant_bot/data_governance \
+            .tmp-lot34-mutants/mutants/config/data_governance \
+            .tmp-lot34-mutants/mutants/data/audit \
             reports/lot34/mutation
           cp src/crypto_quant_bot/__init__.py .tmp-lot34-mutants/src/crypto_quant_bot/
           cp src/crypto_quant_bot/data_governance/*.py .tmp-lot34-mutants/src/crypto_quant_bot/data_governance/
@@ -50,8 +53,10 @@ jobs:
           cp config/data_governance/market_data_quality_engine_v1.json \
             .tmp-lot34-mutants/config/data_governance/
           cp data/audit/lot34_v3_entry_gate.json .tmp-lot34-mutants/data/audit/
-          cp data/audit/timestamp_clock_and_timezone_governance_lot33.json .tmp-lot34-mutants/data/audit/
-          cp data/audit/timestamp_clock_and_timezone_governance_audit_lot33.json .tmp-lot34-mutants/data/audit/
+          cp data/audit/timestamp_clock_and_timezone_governance_lot33.json \
+            .tmp-lot34-mutants/data/audit/
+          cp data/audit/timestamp_clock_and_timezone_governance_audit_lot33.json \
+            .tmp-lot34-mutants/data/audit/
           cp data/audit/canonical_time_envelopes_lot33.json .tmp-lot34-mutants/data/audit/
           cat > .tmp-lot34-mutants/pyproject.toml <<'TOML'
           [project]
@@ -75,11 +80,11 @@ jobs:
           also_copy = [
             "src/crypto_quant_bot/__init__.py",
             "src/crypto_quant_bot/data_governance/__init__.py",
-            "src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry.py",
-            "src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry_models.py",
             "src/crypto_quant_bot/data_governance/source_registry_validation.py",
             "src/crypto_quant_bot/data_governance/source_registry_models.py",
             "src/crypto_quant_bot/data_governance/source_registry_state.py",
+            "src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry.py",
+            "src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry_models.py",
             "config/data_governance/market_data_quality_engine_v1.json",
             "data/audit/lot34_v3_entry_gate.json",
             "data/audit/timestamp_clock_and_timezone_governance_lot33.json",
@@ -146,7 +151,9 @@ jobs:
               'status': 'PASS' if score >= 80.0 else 'FAIL',
           }
           output = Path('reports/lot34/mutation/score.json')
-          output.write_text(json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+          output.write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+          )
           print(json.dumps(payload, sort_keys=True))
           if score < 80.0:
               raise SystemExit('LOT34_MUTATION_BELOW_80_PERCENT')
