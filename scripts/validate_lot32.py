@@ -18,7 +18,6 @@ from crypto_quant_bot.data_governance.instrument_symbol_and_contract_normalizati
 )
 from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry import (  # noqa: E402
     canonical_checksum,
-    file_checksum,
     load_json_object,
 )
 
@@ -26,6 +25,16 @@ STATE_PATH = ROOT / "data/audit/instrument_symbol_and_contract_normalization_lot
 AUDIT_PATH = ROOT / "data/audit/instrument_symbol_and_contract_normalization_audit_lot32.json"
 REGISTRY_PATH = ROOT / "data/audit/instrument_registry_lot32.json"
 SOURCE_REGISTRY_PATH = ROOT / "data/audit/source_registry_lot31.json"
+LOT31_STATE_PATH = ROOT / "data/audit/market_data_governance_scope_and_source_registry_lot31.json"
+CERTIFIED_SOURCE_REGISTRY_CHECKSUM = (
+    "d920d24dc5e774e7aa9f221965e88796c6fecdd8bfc61531109b9b4c040c1f29"
+)
+CERTIFIED_LOT31_STATE_CHECKSUM = (
+    "59d6f01a65cb071a95abe116938709c5112b82462f2b0d1941a01998df2f3955"
+)
+CERTIFIED_LOT31_AUDIT_CHECKSUM = (
+    "3e5b687dc3b76d170e2830c28d8c3a0c20c268ca7c89ebdce30a446f029645f1"
+)
 
 
 def require(condition: bool, message: str) -> None:
@@ -107,6 +116,28 @@ def _validate_registry(registry: dict[str, Any]) -> tuple[int, int]:
     return len(instruments), alias_count
 
 
+def _validate_certified_lineage(state: dict[str, Any], audit: dict[str, Any]) -> None:
+    lot31_state = load_json_object(LOT31_STATE_PATH)
+    source_registry = load_json_object(SOURCE_REGISTRY_PATH)
+    require(
+        lot31_state.get("source_registry") == source_registry,
+        "current Lot 31 registry semantic content changed",
+    )
+    lineage = state.get("lineage")
+    require(isinstance(lineage, dict), "Lot 32 lineage missing")
+    expected = {
+        "source_registry_checksum": CERTIFIED_SOURCE_REGISTRY_CHECKSUM,
+        "lot31_state_checksum": CERTIFIED_LOT31_STATE_CHECKSUM,
+        "lot31_audit_checksum": CERTIFIED_LOT31_AUDIT_CHECKSUM,
+    }
+    for field, value in expected.items():
+        require(lineage.get(field) == value, f"certified Lot 32 lineage mismatch: {field}")
+    require(
+        audit.get("source_registry_checksum") == CERTIFIED_SOURCE_REGISTRY_CHECKSUM,
+        "certified source registry lineage checksum mismatch",
+    )
+
+
 def validate() -> dict[str, object]:
     state = load_json_object(STATE_PATH)
     audit = load_json_object(AUDIT_PATH)
@@ -115,10 +146,7 @@ def validate() -> dict[str, object]:
     audit_checksum = payload_checksum(audit, "audit_checksum")
     require(state["instrument_registry"] == registry, "persisted registry differs from state")
     require(audit["state_output_checksum"] == state_checksum, "audit/state checksum mismatch")
-    require(
-        audit["source_registry_checksum"] == file_checksum(SOURCE_REGISTRY_PATH),
-        "source registry lineage checksum mismatch",
-    )
+    _validate_certified_lineage(state, audit)
     require(
         state["validation_state"] == "VALIDATED_NORMALIZATION_ONLY",
         "state is not validated",
