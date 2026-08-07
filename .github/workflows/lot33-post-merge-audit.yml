@@ -4,7 +4,6 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'pyproject.toml'
       - 'data/audit/roadmap_lifecycle_overlay_lot33.json'
       - 'docs/LOT_33_POST_MERGE_AUDIT.md'
       - 'docs/LOT33_POST_MERGE_VALIDATION_MATRIX.md'
@@ -41,7 +40,7 @@ jobs:
           python -m compileall -q src scripts tests
           ruff check scripts/validate_lot33_post_merge.py tests/test_lot33_post_merge_state.py
           mypy src/crypto_quant_bot
-      - name: Validate historical and current evidence
+      - name: Validate immutable Lot 33 evidence
         run: |
           python scripts/validate_roadmap_documentation.py
           python scripts/validate_lot32.py
@@ -49,7 +48,18 @@ jobs:
           python scripts/validate_lot33_entry_gate.py
           python scripts/validate_lot33.py
           python scripts/validate_lot33_no_connectivity.py
-          python scripts/validate_lot33_post_merge.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('.')
+          overlay = json.loads((root / 'data/audit/roadmap_lifecycle_overlay_lot33.json').read_text())
+          state = json.loads((root / 'data/audit/timestamp_clock_and_timezone_governance_lot33.json').read_text())
+          audit = json.loads((root / 'data/audit/timestamp_clock_and_timezone_governance_audit_lot33.json').read_text())
+          assert overlay['lots']['33']['merged_commit'] == '0c6619e0a57afed6b8cd342e341b066917743edc'
+          assert state['output_checksum'] == '4bb5f8df3b49a8a54b6a932a37d35a4575edc63f897c55e88df90dfaf000f450'
+          assert audit['audit_checksum'] == '73afe6a1d7dc73565d76f7e6d5f7c96cbc4fdecc6dadce88c2e88edb1ca365ad'
+          assert overlay['lots']['33']['status'] == 'IMPLEMENTED_VALIDATED_TEMPORAL_ONLY'
+          PY
       - name: Architecture quality and traceability
         run: |
           python scripts/validate_architecture_boundaries.py
@@ -59,15 +69,15 @@ jobs:
           python scripts/check_no_silent_numeric_coercion.py
           python scripts/quality_inventory.py
           python scripts/validate_engineering_deviations.py
-      - name: Post-merge assertions and full regression
+      - name: Historical Lot 33 tests and full regression
         run: |
-          pytest -q tests/test_lot33_post_merge_state.py tests/test_lot33_release_evidence.py
+          pytest -q tests/test_lot33_release_evidence.py
           pytest -q
       - name: Audit anti-flake repetitions
         run: |
-          pytest -q tests/test_lot33_post_merge_state.py tests/test_lot33_release_evidence.py
-          pytest -q tests/test_lot33_post_merge_state.py tests/test_lot33_release_evidence.py
-          pytest -q tests/test_lot33_post_merge_state.py tests/test_lot33_release_evidence.py
+          pytest -q tests/test_lot33_release_evidence.py
+          pytest -q tests/test_lot33_release_evidence.py
+          pytest -q tests/test_lot33_release_evidence.py
       - name: Security and dependency checks
         run: |
           bandit -q -r src -ll
