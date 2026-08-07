@@ -54,6 +54,17 @@ REQUIRED_RECORD_FIELDS = {
     "ask",
 }
 MICROSECONDS_PER_SECOND = 1_000_000
+
+
+def _duration_us(start: datetime, end: datetime) -> int:
+    delta = end - start
+    return (
+        delta.days * 86_400_000_000
+        + delta.seconds * MICROSECONDS_PER_SECOND
+        + delta.microseconds
+    )
+
+
 ANOMALY_REASON = {
     "MISSING_INTERVAL": "DQ_MISSING_INTERVAL",
     "DUPLICATE": "DQ_DUPLICATE_EVENT",
@@ -64,15 +75,31 @@ ANOMALY_REASON = {
     "IMPOSSIBLE_SPREAD": "DQ_IMPOSSIBLE_SPREAD",
     "SCHEMA_DRIFT": "DQ_SCHEMA_DRIFT",
 }
-
-
-def _duration_us(start: datetime, end: datetime) -> int:
-    delta = end - start
-    return (
-        delta.days * 86_400_000_000
-        + delta.seconds * MICROSECONDS_PER_SECOND
-        + delta.microseconds
-    )
+LOT34_REASON_CODES = (
+    "LOT34_ENTRY_GATE_VERIFIED",
+    "LOT33_TEMPORAL_LINEAGE_VERIFIED",
+    "QUALITY_ANOMALY_FAMILIES_EVALUATED",
+    "QUALITY_SCORES_COMPUTED_IN_BASIS_POINTS",
+    "NON_DESTRUCTIVE_QUARANTINE_ENFORCED",
+    "DATA_QUALITY_VETO_EVALUATED_FAIL_CLOSED",
+    "EXTERNAL_CONNECTIVITY_DISABLED",
+    "LOT35_REMAINS_LOCKED",
+)
+LOT34_CONFIG_FIELDS = {
+    "schema_version",
+    "config_version",
+    "run_id",
+    "correlation_id",
+    "lineage_id",
+    "event_time",
+    "available_at",
+    "generated_at",
+    "expected_source_schema_version",
+    "minimum_quality_bps",
+    "max_staleness_seconds",
+    "timeframe_seconds",
+    "records",
+}
 
 
 def _verify_gate(gate: dict[str, Any]) -> None:
@@ -97,44 +124,47 @@ def _verify_gate(gate: dict[str, Any]) -> None:
         raise MarketDataQualityError("Lot 34 gate safety boundary changed")
 
 
-def _validate_config(config: dict[str, Any]) -> None:
-    expected = {
-        "schema_version",
-        "config_version",
-        "run_id",
-        "correlation_id",
-        "lineage_id",
-        "event_time",
-        "available_at",
-        "generated_at",
-        "expected_source_schema_version",
-        "minimum_quality_bps",
-        "max_staleness_seconds",
-        "timeframe_seconds",
-        "records",
-    }
-    if set(config) != expected:
+def _validate_config_identity(config: dict[str, Any]) -> None:
+    if set(config) != LOT34_CONFIG_FIELDS:
         raise MarketDataQualityError("Lot 34 configuration fields differ")
     if config["schema_version"] != "market-data-quality-config-v1":
         raise MarketDataQualityError("Lot 34 configuration schema changed")
     if config["config_version"] != "lot34-market-data-quality-config-v1":
         raise MarketDataQualityError("Lot 34 configuration version changed")
+
+
+def _validate_config_times(config: dict[str, Any]) -> None:
     event = parse_utc_timestamp(config["event_time"], "event_time")
     available = parse_utc_timestamp(config["available_at"], "available_at")
     generated = parse_utc_timestamp(config["generated_at"], "generated_at")
     if not event <= available <= generated:
         raise MarketDataQualityError("Lot 34 configuration violates causal availability")
-    require_integer(config["minimum_quality_bps"], "minimum_quality_bps", minimum=0)
-    require_integer(config["max_staleness_seconds"], "max_staleness_seconds", minimum=0)
-    if config["minimum_quality_bps"] > 10_000:
+
+
+def _validate_config_limits(config: dict[str, Any]) -> None:
+    minimum = require_integer(
+        config["minimum_quality_bps"], "minimum_quality_bps", minimum=0
+    )
+    require_integer(
+        config["max_staleness_seconds"], "max_staleness_seconds", minimum=0
+    )
+    if minimum > 10_000:
         raise MarketDataQualityError("minimum_quality_bps cannot exceed 10000")
-    if not isinstance(config["timeframe_seconds"], dict) or not config["timeframe_seconds"]:
+    intervals = config["timeframe_seconds"]
+    if not isinstance(intervals, dict) or not intervals:
         raise MarketDataQualityError("timeframe_seconds must be a non-empty object")
-    for timeframe, seconds in config["timeframe_seconds"].items():
+    for timeframe, seconds in intervals.items():
         require_identifier(timeframe, "timeframe")
         require_integer(seconds, "timeframe_seconds", minimum=1)
-    if not isinstance(config["records"], list) or not config["records"]:
+    records = config["records"]
+    if not isinstance(records, list) or not records:
         raise MarketDataQualityError("Lot 34 requires at least one quality record")
+
+
+def _validate_config(config: dict[str, Any]) -> None:
+    _validate_config_identity(config)
+    _validate_config_times(config)
+    _validate_config_limits(config)
 
 
 def _record_key(record: dict[str, Any]) -> tuple[str, str, str]:
@@ -268,7 +298,10 @@ def _missing_interval_anomalies(
         if set(record) != REQUIRED_RECORD_FIELDS:
             continue
         grouped.setdefault(_record_key(record), []).append(
-            (parse_utc_timestamp(record["event_time"], "event_time"), record["record_id"])
+            (
+                parse_utc_timestamp(record["event_time"], "event_time"),
+                record["record_id"],
+            )
         )
     for key, values in sorted(grouped.items()):
         step = timeframe_seconds.get(key[2])
@@ -292,6 +325,62 @@ def _missing_interval_anomalies(
     return anomalies
 
 
+def _record_value_anomalies(
+    record: dict[str, Any],
+    generated_at: datetime,
+    max_staleness: int,
+    offset: int,
+) -> list[DataAnomalyV1]:
+    record_id = require_identifier(record["record_id"], "record_id")
+    event_time = require_text(record["event_time"], "event_time")
+    available = parse_utc_timestamp(record["available_at"], "available_at")
+    if available < parse_utc_timestamp(event_time, "event_time"):
+        raise MarketDataQualityError("record available_at cannot precede event_time")
+    anomalies: list[DataAnomalyV1] = []
+    if _duration_us(available, generated_at) > max_staleness * MICROSECONDS_PER_SECOND:
+        anomalies.append(
+            _anomaly(offset + 1, "STALE_DATA", (record_id,), event_time, event_time)
+        )
+    open_price = decimal_from_string(record["open"], "open")
+    high = decimal_from_string(record["high"], "high")
+    low = decimal_from_string(record["low"], "low")
+    close = decimal_from_string(record["close"], "close")
+    volume = decimal_from_string(record["volume"], "volume")
+    bid = decimal_from_string(record["bid"], "bid")
+    ask = decimal_from_string(record["ask"], "ask")
+    if high < low or high < max(open_price, close) or low > min(open_price, close):
+        anomalies.append(
+            _anomaly(
+                offset + len(anomalies) + 1,
+                "INVALID_OHLC",
+                (record_id,),
+                event_time,
+                event_time,
+            )
+        )
+    if volume < Decimal("0"):
+        anomalies.append(
+            _anomaly(
+                offset + len(anomalies) + 1,
+                "NEGATIVE_VOLUME",
+                (record_id,),
+                event_time,
+                event_time,
+            )
+        )
+    if bid < Decimal("0") or ask < Decimal("0") or bid > ask:
+        anomalies.append(
+            _anomaly(
+                offset + len(anomalies) + 1,
+                "IMPOSSIBLE_SPREAD",
+                (record_id,),
+                event_time,
+                event_time,
+            )
+        )
+    return anomalies
+
+
 def _value_anomalies(
     records: list[dict[str, Any]],
     generated_at: datetime,
@@ -302,59 +391,14 @@ def _value_anomalies(
     for record in records:
         if set(record) != REQUIRED_RECORD_FIELDS:
             continue
-        record_id = require_identifier(record["record_id"], "record_id")
-        event_time = require_text(record["event_time"], "event_time")
-        available = parse_utc_timestamp(record["available_at"], "available_at")
-        if available < parse_utc_timestamp(event_time, "event_time"):
-            raise MarketDataQualityError("record available_at cannot precede event_time")
-        age_us = _duration_us(available, generated_at)
-        if age_us > max_staleness * MICROSECONDS_PER_SECOND:
-            anomalies.append(
-                _anomaly(
-                    offset + len(anomalies) + 1,
-                    "STALE_DATA",
-                    (record_id,),
-                    event_time,
-                    event_time,
-                )
+        anomalies.extend(
+            _record_value_anomalies(
+                record,
+                generated_at,
+                max_staleness,
+                offset + len(anomalies),
             )
-        open_price = decimal_from_string(record["open"], "open")
-        high = decimal_from_string(record["high"], "high")
-        low = decimal_from_string(record["low"], "low")
-        close = decimal_from_string(record["close"], "close")
-        volume = decimal_from_string(record["volume"], "volume")
-        bid = decimal_from_string(record["bid"], "bid")
-        ask = decimal_from_string(record["ask"], "ask")
-        if high < low or high < max(open_price, close) or low > min(open_price, close):
-            anomalies.append(
-                _anomaly(
-                    offset + len(anomalies) + 1,
-                    "INVALID_OHLC",
-                    (record_id,),
-                    event_time,
-                    event_time,
-                )
-            )
-        if volume < Decimal("0"):
-            anomalies.append(
-                _anomaly(
-                    offset + len(anomalies) + 1,
-                    "NEGATIVE_VOLUME",
-                    (record_id,),
-                    event_time,
-                    event_time,
-                )
-            )
-        if bid < Decimal("0") or ask < Decimal("0") or bid > ask:
-            anomalies.append(
-                _anomaly(
-                    offset + len(anomalies) + 1,
-                    "IMPOSSIBLE_SPREAD",
-                    (record_id,),
-                    event_time,
-                    event_time,
-                )
-            )
+        )
     return anomalies
 
 
@@ -396,14 +440,11 @@ def detect_anomalies(config: dict[str, Any]) -> tuple[DataAnomalyV1, ...]:
     )
 
 
-def _quality_state_for_group(
-    key: tuple[str, str, str],
-    records: list[dict[str, Any]],
-    anomalies: tuple[DataAnomalyV1, ...],
+def _coverage_components(
+    valid_records: list[dict[str, Any]],
+    timeframe: str,
     config: dict[str, Any],
-) -> DataQualityStateV1:
-    source_id, instrument_id, timeframe = key
-    valid_records = [record for record in records if set(record) == REQUIRED_RECORD_FIELDS]
+) -> tuple[int, int, int]:
     times = sorted(
         {
             parse_utc_timestamp(record["event_time"], "event_time")
@@ -411,17 +452,23 @@ def _quality_state_for_group(
         }
     )
     step = require_integer(
-        config["timeframe_seconds"][timeframe],
-        "timeframe_seconds",
-        minimum=1,
+        config["timeframe_seconds"][timeframe], "timeframe_seconds", minimum=1
     )
     expected = (
         1
         if len(times) <= 1
-        else _duration_us(times[0], times[-1]) // (step * MICROSECONDS_PER_SECOND) + 1
+        else _duration_us(times[0], times[-1])
+        // (step * MICROSECONDS_PER_SECOND)
+        + 1
     )
     observed = len(times)
     coverage = min(10_000, 10_000 * observed // max(1, expected))
+    return expected, observed, coverage
+
+
+def _freshness_score(
+    valid_records: list[dict[str, Any]], config: dict[str, Any]
+) -> int:
     generated = parse_utc_timestamp(config["generated_at"], "generated_at")
     newest_available = max(
         (
@@ -430,41 +477,61 @@ def _quality_state_for_group(
         ),
         default=None,
     )
-    max_staleness = require_integer(
-        config["max_staleness_seconds"],
-        "max_staleness_seconds",
-        minimum=0,
-    )
     if newest_available is None:
-        freshness = 0
-    else:
-        age_us = max(0, _duration_us(newest_available, generated))
-        age_seconds = age_us // MICROSECONDS_PER_SECOND
-        freshness = (
-            10_000
-            if max_staleness == 0 and age_seconds == 0
-            else max(
-                0,
-                10_000 - (10_000 * age_seconds // max(1, max_staleness)),
-            )
-        )
-    completeness = 10_000 * len(valid_records) // max(1, len(records))
+        return 0
+    max_staleness = require_integer(
+        config["max_staleness_seconds"], "max_staleness_seconds", minimum=0
+    )
+    age_seconds = (
+        max(0, _duration_us(newest_available, generated)) // MICROSECONDS_PER_SECOND
+    )
+    if max_staleness == 0 and age_seconds == 0:
+        return 10_000
+    return max(
+        0,
+        10_000 - (10_000 * age_seconds // max(1, max_staleness)),
+    )
+
+
+def _consistency_components(
+    records: list[dict[str, Any]], anomalies: tuple[DataAnomalyV1, ...]
+) -> tuple[int, int, int]:
+    valid_count = sum(set(record) == REQUIRED_RECORD_FIELDS for record in records)
+    completeness = 10_000 * valid_count // max(1, len(records))
     group_ids = {
         record.get("record_id")
         for record in records
         if isinstance(record.get("record_id"), str)
     }
-    group_anomalies = [
-        item for item in anomalies if group_ids.intersection(item.record_ids)
+    anomaly_count = sum(
+        bool(group_ids.intersection(item.record_ids)) for item in anomalies
+    )
+    consistency = max(0, 10_000 - 1_250 * anomaly_count)
+    return completeness, consistency, anomaly_count
+
+
+def _quality_state_for_group(
+    key: tuple[str, str, str],
+    records: list[dict[str, Any]],
+    anomalies: tuple[DataAnomalyV1, ...],
+    config: dict[str, Any],
+) -> DataQualityStateV1:
+    source_id, instrument_id, timeframe = key
+    valid_records = [
+        record for record in records if set(record) == REQUIRED_RECORD_FIELDS
     ]
-    consistency = max(0, 10_000 - 1_250 * len(group_anomalies))
+    expected, observed, coverage = _coverage_components(
+        valid_records, timeframe, config
+    )
+    freshness = _freshness_score(valid_records, config)
+    completeness, consistency, anomaly_count = _consistency_components(
+        records, anomalies
+    )
     quality = (coverage + freshness + completeness + consistency) // 4
     minimum = require_integer(
-        config["minimum_quality_bps"],
-        "minimum_quality_bps",
-        minimum=0,
+        config["minimum_quality_bps"], "minimum_quality_bps", minimum=0
     )
-    status = "PASS" if not group_anomalies and quality >= minimum else "BLOCKED"
+    status = "PASS" if anomaly_count == 0 and quality >= minimum else "BLOCKED"
     return DataQualityStateV1(
         source_id,
         instrument_id,
@@ -472,7 +539,7 @@ def _quality_state_for_group(
         len(records),
         expected,
         observed,
-        len(group_anomalies),
+        anomaly_count,
         coverage,
         freshness,
         completeness,
@@ -483,8 +550,7 @@ def _quality_state_for_group(
 
 
 def _build_quality_states(
-    config: dict[str, Any],
-    anomalies: tuple[DataAnomalyV1, ...],
+    config: dict[str, Any], anomalies: tuple[DataAnomalyV1, ...]
 ) -> tuple[DataQualityStateV1, ...]:
     grouped: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
     for record in config["records"]:
@@ -552,26 +618,15 @@ def _build_lineage(root: Path, config: dict[str, Any]) -> Lot34LineageEnvelopeV1
     )
 
 
-def build_lot34_artifacts(
+def _build_state(
     root: Path,
+    config: dict[str, Any],
     code_commit: str,
-) -> tuple[MarketDataQualityEngineStateV1, MarketDataQualityEngineAuditV1]:
-    gate = load_json_object(root / "data/audit/lot34_v3_entry_gate.json")
-    config_path = root / "config/data_governance/market_data_quality_engine_v1.json"
-    config = load_json_object(config_path)
-    _verify_gate(gate)
-    _validate_config(config)
-    anomalies = detect_anomalies(config)
-    states = _build_quality_states(config, anomalies)
-    minimum = require_integer(
-        config["minimum_quality_bps"],
-        "minimum_quality_bps",
-        minimum=0,
-    )
-    veto = _build_veto(states, anomalies, minimum)
-    quarantine = tuple(
-        sorted({record_id for anomaly in anomalies for record_id in anomaly.record_ids})
-    )
+    anomalies: tuple[DataAnomalyV1, ...],
+    states: tuple[DataQualityStateV1, ...],
+    veto: DataQualityVetoV1,
+    quarantine: tuple[str, ...],
+) -> MarketDataQualityEngineStateV1:
     validation_state = (
         "VALIDATED_DATA_QUALITY_ONLY"
         if veto.action == "ALLOW_ANALYSIS"
@@ -589,23 +644,24 @@ def build_lot34_artifacts(
         quarantine,
         veto,
         Lot34MetricsV1(len(config["records"]), 0, len(anomalies), len(quarantine), 0),
-        (
-            "LOT34_ENTRY_GATE_VERIFIED",
-            "LOT33_TEMPORAL_LINEAGE_VERIFIED",
-            "QUALITY_ANOMALY_FAMILIES_EVALUATED",
-            "QUALITY_SCORES_COMPUTED_IN_BASIS_POINTS",
-            "NON_DESTRUCTIVE_QUARANTINE_ENFORCED",
-            "DATA_QUALITY_VETO_EVALUATED_FAIL_CLOSED",
-            "EXTERNAL_CONNECTIVITY_DISABLED",
-            "LOT35_REMAINS_LOCKED",
-        ),
+        LOT34_REASON_CODES,
         lot34_safety(),
         "0" * 64,
     )
-    state = replace(
+    return replace(
         state,
         output_checksum=canonical_checksum(state.payload_without_checksum()),
     )
+
+
+def _build_audit(
+    config_path: Path,
+    code_commit: str,
+    config: dict[str, Any],
+    state: MarketDataQualityEngineStateV1,
+    anomalies: tuple[DataAnomalyV1, ...],
+    quarantine: tuple[str, ...],
+) -> MarketDataQualityEngineAuditV1:
     audit = MarketDataQualityEngineAuditV1(
         code_commit,
         state.output_checksum,
@@ -615,14 +671,37 @@ def build_lot34_artifacts(
         len(config["records"]),
         len(anomalies),
         len(quarantine),
-        veto.action,
-        validation_state,
+        state.veto.action,
+        state.validation_state,
         lot34_safety(),
         "0" * 64,
     )
-    audit = replace(
+    return replace(
         audit,
         audit_checksum=canonical_checksum(audit.payload_without_checksum()),
+    )
+
+
+def build_lot34_artifacts(
+    root: Path, code_commit: str
+) -> tuple[MarketDataQualityEngineStateV1, MarketDataQualityEngineAuditV1]:
+    gate = load_json_object(root / "data/audit/lot34_v3_entry_gate.json")
+    config_path = root / "config/data_governance/market_data_quality_engine_v1.json"
+    config = load_json_object(config_path)
+    _verify_gate(gate)
+    _validate_config(config)
+    anomalies = detect_anomalies(config)
+    states = _build_quality_states(config, anomalies)
+    minimum = require_integer(
+        config["minimum_quality_bps"], "minimum_quality_bps", minimum=0
+    )
+    veto = _build_veto(states, anomalies, minimum)
+    quarantine = tuple(
+        sorted({record_id for item in anomalies for record_id in item.record_ids})
+    )
+    state = _build_state(root, config, code_commit, anomalies, states, veto, quarantine)
+    audit = _build_audit(
+        config_path, code_commit, config, state, anomalies, quarantine
     )
     return state, audit
 
