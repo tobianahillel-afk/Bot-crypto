@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "data_anomaly_v1.schema.json",
+  "title": "DataAnomalyV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "anomaly_id", "anomaly_type", "severity", "record_ids", "interval_start", "interval_end", "correction_permitted", "quarantined", "reason_code"],
+  "properties": {
+    "schema_version": {"const": "data-anomaly-v1"},
+    "anomaly_id": {"type": "string", "minLength": 1},
+    "anomaly_type": {"enum": ["MISSING_INTERVAL", "DUPLICATE", "OUT_OF_ORDER", "STALE_DATA", "INVALID_OHLC", "NEGATIVE_VOLUME", "IMPOSSIBLE_SPREAD", "SCHEMA_DRIFT"]},
+    "severity": {"enum": ["INFO", "WARNING", "ERROR", "CRITICAL"]},
+    "record_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "interval_start": {"type": "string", "format": "date-time"},
+    "interval_end": {"type": "string", "format": "date-time"},
+    "correction_permitted": {"const": false},
+    "quarantined": {"const": true},
+    "reason_code": {"type": "string", "minLength": 1}
+  }
+}
