@@ -9,7 +9,7 @@
   "generated_at": "2026-08-06T19:18:00.100000Z",
   "expected_source_schema_version": "ohlc-quality-record-v1",
   "minimum_quality_bps": 9500,
-  "max_staleness_seconds": 120,
+  "max_staleness_seconds": 121,
   "timeframe_seconds": {"1m": 60},
   "records": [
     {
