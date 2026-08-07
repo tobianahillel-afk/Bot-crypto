@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 from datetime import datetime
 from decimal import Decimal
+from itertools import pairwise
 from pathlib import Path
 from typing import Any
 
@@ -276,7 +277,7 @@ def _missing_interval_anomalies(
                 f"missing interval definition for timeframe {key[2]}"
             )
         ordered = sorted(set(values))
-        for previous, current in zip(ordered, ordered[1:], strict=False):
+        for previous, current in pairwise(ordered):
             delta_us = _duration_us(previous[0], current[0])
             if delta_us > step * MICROSECONDS_PER_SECOND:
                 anomalies.append(
