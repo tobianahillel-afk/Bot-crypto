@@ -40,7 +40,6 @@ from crypto_quant_bot.data_governance.market_data_quality_engine import (
 )
 from crypto_quant_bot.data_governance.market_data_quality_engine_models import (
     DataAnomalyV1,
-    DataQualityStateV1,
 )
 from crypto_quant_bot.data_governance.market_data_quality_engine_validation import (
     MarketDataQualityError,
@@ -91,27 +90,55 @@ def test_validation_helpers_have_exact_success_contracts() -> None:
 
 
 def test_validation_helpers_have_exact_failure_contracts() -> None:
-    assert_quality_error("field must be an explicit trimmed string", require_text, " x ", "field")
-    assert_quality_error("identifier contains unsupported characters", require_identifier, "x/y", "identifier")
+    assert_quality_error(
+        "field must be an explicit trimmed string", require_text, " x ", "field"
+    )
+    assert_quality_error(
+        "identifier contains unsupported characters",
+        require_identifier,
+        "x/y",
+        "identifier",
+    )
     assert_quality_error("integer must be an integer", require_integer, True, "integer")
-    assert_quality_error("hash must be a lowercase sha256", require_sha256, "A" * 64, "hash")
-    assert_quality_error("code_commit must be a lowercase 40-character git sha", require_git_sha, "A" * 40)
-    assert_quality_error("time must be UTC and end with Z", parse_utc_timestamp, "2026-08-06T19:15:00+00:00", "time")
-    assert_quality_error("decimal must be finite", decimal_from_string, "Infinity", "decimal")
-    assert_quality_error("values must be a list", require_string_list, ("a",), "values")
+    assert_quality_error(
+        "hash must be a lowercase sha256", require_sha256, "A" * 64, "hash"
+    )
+    assert_quality_error(
+        "code_commit must be a lowercase 40-character git sha",
+        require_git_sha,
+        "A" * 40,
+    )
+    assert_quality_error(
+        "time must be UTC and end with Z",
+        parse_utc_timestamp,
+        "2026-08-06T19:15:00+00:00",
+        "time",
+    )
+    assert_quality_error(
+        "decimal must be finite", decimal_from_string, "Infinity", "decimal"
+    )
+    assert_quality_error(
+        "values must be a list", require_string_list, ("a",), "values"
+    )
 
 
 def test_config_identity_validates_exact_schema_and_version() -> None:
     config = config_copy()
     _validate_config_identity(config)
     config["schema_version"] = "market-data-quality-config-v2"
-    assert_quality_error("Lot 34 configuration schema changed", _validate_config_identity, config)
+    assert_quality_error(
+        "Lot 34 configuration schema changed", _validate_config_identity, config
+    )
     config = config_copy()
     config["config_version"] = "other"
-    assert_quality_error("Lot 34 configuration version changed", _validate_config_identity, config)
+    assert_quality_error(
+        "Lot 34 configuration version changed", _validate_config_identity, config
+    )
     config = config_copy()
     del config["lineage_id"]
-    assert_quality_error("Lot 34 configuration fields differ", _validate_config_identity, config)
+    assert_quality_error(
+        "Lot 34 configuration fields differ", _validate_config_identity, config
+    )
 
 
 def test_config_times_validate_all_three_boundaries() -> None:
@@ -122,17 +149,27 @@ def test_config_times_validate_all_three_boundaries() -> None:
     _validate_config_times(config)
     config = config_copy()
     config["event_time"] = "2026-08-06T19:18:00.060000Z"
-    assert_quality_error("Lot 34 configuration violates causal availability", _validate_config_times, config)
+    assert_quality_error(
+        "Lot 34 configuration violates causal availability",
+        _validate_config_times,
+        config,
+    )
     config = config_copy()
     config["generated_at"] = "2026-08-06T19:18:00.040000Z"
-    assert_quality_error("Lot 34 configuration violates causal availability", _validate_config_times, config)
+    assert_quality_error(
+        "Lot 34 configuration violates causal availability",
+        _validate_config_times,
+        config,
+    )
 
 
 def test_config_times_reject_invalid_timestamp_at_each_position() -> None:
     for field in ("event_time", "available_at", "generated_at"):
         config = config_copy()
         config[field] = "badZ"
-        assert_quality_error(f"{field} is not a valid timestamp", _validate_config_times, config)
+        assert_quality_error(
+            f"{field} is not a valid timestamp", _validate_config_times, config
+        )
 
 
 def test_config_limits_validate_each_bound_and_container() -> None:
@@ -141,7 +178,11 @@ def test_config_limits_validate_each_bound_and_container() -> None:
     cases = [
         ("minimum_quality_bps", -1, "minimum_quality_bps must be >= 0"),
         ("max_staleness_seconds", -1, "max_staleness_seconds must be >= 0"),
-        ("minimum_quality_bps", 10_001, "minimum_quality_bps cannot exceed 10000"),
+        (
+            "minimum_quality_bps",
+            10_001,
+            "minimum_quality_bps cannot exceed 10000",
+        ),
     ]
     for field, value, message in cases:
         current = config_copy()
@@ -153,20 +194,30 @@ def test_config_limits_validate_timeframe_map_entries() -> None:
     for value in ([], {}):
         config = config_copy()
         config["timeframe_seconds"] = value
-        assert_quality_error("timeframe_seconds must be a non-empty object", _validate_config_limits, config)
+        assert_quality_error(
+            "timeframe_seconds must be a non-empty object",
+            _validate_config_limits,
+            config,
+        )
     config = config_copy()
     config["timeframe_seconds"] = {"bad/id": 60}
-    assert_quality_error("timeframe contains unsupported characters", _validate_config_limits, config)
+    assert_quality_error(
+        "timeframe contains unsupported characters", _validate_config_limits, config
+    )
     config = config_copy()
     config["timeframe_seconds"] = {"1m": 0}
-    assert_quality_error("timeframe_seconds must be >= 1", _validate_config_limits, config)
+    assert_quality_error(
+        "timeframe_seconds must be >= 1", _validate_config_limits, config
+    )
 
 
 def test_config_limits_validate_records_container() -> None:
     for value in ("records", []):
         config = config_copy()
         config["records"] = value
-        assert_quality_error("Lot 34 requires at least one quality record", _validate_config_limits, config)
+        assert_quality_error(
+            "Lot 34 requires at least one quality record", _validate_config_limits, config
+        )
 
 
 def test_record_key_and_event_identity_are_exact() -> None:
@@ -230,14 +281,21 @@ def test_duplicate_identity_uses_every_identity_component() -> None:
 def test_ordering_detects_event_sequence_and_revision_regressions() -> None:
     first = copy.deepcopy(config_copy()["records"][0])
     later = copy.deepcopy(first)
-    later.update(record_id="later", event_time="2026-08-06T19:16:00.000000Z", sequence_id=2)
+    later.update(
+        record_id="later",
+        event_time="2026-08-06T19:16:00.000000Z",
+        sequence_id=2,
+    )
     assert _ordering_anomalies([first, later], 0) == []
     anomaly = _ordering_anomalies([later, first], 3)[0]
     assert anomaly.anomaly_id == "lot34-out_of_order-0004"
     assert anomaly.record_ids == ("later", "quality-candle-1")
     same_time = copy.deepcopy(later)
     same_time.update(record_id="seq-back", sequence_id=1)
-    assert _ordering_anomalies([later, same_time], 0)[0].record_ids == ("later", "seq-back")
+    assert _ordering_anomalies([later, same_time], 0)[0].record_ids == (
+        "later",
+        "seq-back",
+    )
     revision = copy.deepcopy(later)
     revision.update(record_id="revision-2", revision_id=2)
     revision_back = copy.deepcopy(revision)
@@ -292,12 +350,17 @@ def test_market_value_checks_each_ohlc_relation() -> None:
     for field, value, expected in variants:
         record = copy.deepcopy(base)
         record[field] = value
-        assert expected in {item.anomaly_type for item in _record_market_value_anomalies(record, 0)}
+        anomaly_types = {
+            item.anomaly_type for item in _record_market_value_anomalies(record, 0)
+        }
+        assert expected in anomaly_types
 
 
 def test_market_value_boundary_values_are_allowed() -> None:
     record = copy.deepcopy(config_copy()["records"][0])
-    record.update(high="57050.00", low="57000.00", volume="0", bid="0", ask="0")
+    record.update(
+        high="57050.00", low="57000.00", volume="0", bid="0", ask="0"
+    )
     assert _record_market_value_anomalies(record, 0) == []
 
 
@@ -305,7 +368,11 @@ def test_coverage_components_are_exact_for_full_single_and_gapped_data() -> None
     records = copy.deepcopy(config_copy()["records"])
     assert _coverage_components(records, "1m", CONFIG) == (3, 3, 10_000)
     assert _coverage_components(records[:1], "1m", CONFIG) == (1, 1, 10_000)
-    assert _coverage_components([records[0], records[2]], "1m", CONFIG) == (3, 2, 6666)
+    assert _coverage_components([records[0], records[2]], "1m", CONFIG) == (
+        3,
+        2,
+        6666,
+    )
 
 
 def test_freshness_score_is_exact_and_uses_newest_available_record() -> None:
@@ -324,12 +391,26 @@ def test_consistency_components_count_only_group_anomalies() -> None:
     drifted = copy.deepcopy(records)
     drifted[0]["extra"] = 1
     foreign = DataAnomalyV1(
-        "foreign", "STALE_DATA", "ERROR", ("foreign-record",),
-        "2026-08-06T19:15:00Z", "2026-08-06T19:15:00Z", False, True, "DQ_STALE_DATA"
+        "foreign",
+        "STALE_DATA",
+        "ERROR",
+        ("foreign-record",),
+        "2026-08-06T19:15:00Z",
+        "2026-08-06T19:15:00Z",
+        False,
+        True,
+        "DQ_STALE_DATA",
     )
     local = DataAnomalyV1(
-        "local", "STALE_DATA", "ERROR", ("quality-candle-2",),
-        "2026-08-06T19:16:00Z", "2026-08-06T19:16:00Z", False, True, "DQ_STALE_DATA"
+        "local",
+        "STALE_DATA",
+        "ERROR",
+        ("quality-candle-2",),
+        "2026-08-06T19:16:00Z",
+        "2026-08-06T19:16:00Z",
+        False,
+        True,
+        "DQ_STALE_DATA",
     )
     assert _consistency_components(drifted, (foreign, local)) == (6666, 8750, 1)
 
@@ -363,8 +444,28 @@ def test_veto_uses_minimum_group_score_and_sorted_blocking_types() -> None:
     assert veto.observed_quality_bps == 9700
     assert veto.action == "ALLOW_ANALYSIS"
     anomalies = (
-        DataAnomalyV1("z", "STALE_DATA", "ERROR", ("r",), "2026-08-06T19:15:00Z", "2026-08-06T19:15:00Z", False, True, "DQ_STALE_DATA"),
-        DataAnomalyV1("a", "DUPLICATE", "ERROR", ("r",), "2026-08-06T19:15:00Z", "2026-08-06T19:15:00Z", False, True, "DQ_DUPLICATE_EVENT"),
+        DataAnomalyV1(
+            "z",
+            "STALE_DATA",
+            "ERROR",
+            ("r",),
+            "2026-08-06T19:15:00Z",
+            "2026-08-06T19:15:00Z",
+            False,
+            True,
+            "DQ_STALE_DATA",
+        ),
+        DataAnomalyV1(
+            "a",
+            "DUPLICATE",
+            "ERROR",
+            ("r",),
+            "2026-08-06T19:15:00Z",
+            "2026-08-06T19:15:00Z",
+            False,
+            True,
+            "DQ_DUPLICATE_EVENT",
+        ),
     )
     blocked = _build_veto(states, anomalies, 9500)
     assert blocked.blocking_anomaly_types == ("DUPLICATE", "STALE_DATA")
@@ -385,8 +486,12 @@ def test_run_context_and_lineage_are_exact() -> None:
     assert lineage.canonical_time_collection_checksum == file_checksum(
         ROOT / "data/audit/canonical_time_envelopes_lot33.json"
     )
-    assert lineage.lot33_state_checksum == "4bb5f8df3b49a8a54b6a932a37d35a4575edc63f897c55e88df90dfaf000f450"
-    assert lineage.lot33_audit_checksum == "73afe6a1d7dc73565d76f7e6d5f7c96cbc4fdecc6dadce88c2e88edb1ca365ad"
+    assert lineage.lot33_state_checksum == (
+        "4bb5f8df3b49a8a54b6a932a37d35a4575edc63f897c55e88df90dfaf000f450"
+    )
+    assert lineage.lot33_audit_checksum == (
+        "73afe6a1d7dc73565d76f7e6d5f7c96cbc4fdecc6dadce88c2e88edb1ca365ad"
+    )
 
 
 def test_build_artifacts_have_exact_reason_metrics_safety_and_checksums() -> None:
@@ -423,7 +528,20 @@ def test_persistence_writes_all_five_exact_payloads(tmp_path: Path) -> None:
 
 def test_required_record_field_set_is_exact() -> None:
     assert REQUIRED_RECORD_FIELDS == {
-        "record_id", "source_id", "instrument_id", "timeframe", "event_time",
-        "available_at", "sequence_id", "revision_id", "source_schema_version",
-        "open", "high", "low", "close", "volume", "bid", "ask",
+        "record_id",
+        "source_id",
+        "instrument_id",
+        "timeframe",
+        "event_time",
+        "available_at",
+        "sequence_id",
+        "revision_id",
+        "source_schema_version",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "bid",
+        "ask",
     }
