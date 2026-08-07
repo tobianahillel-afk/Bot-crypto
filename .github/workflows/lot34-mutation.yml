@@ -50,6 +50,7 @@ jobs:
           PY
           cp tests/test_lot34_market_data_quality_engine.py .tmp-lot34-mutants/tests/
           cp tests/test_lot34_contract_boundaries.py .tmp-lot34-mutants/tests/
+          cp tests/test_lot34_mutation_contracts.py .tmp-lot34-mutants/tests/
           cp config/data_governance/market_data_quality_engine_v1.json \
             .tmp-lot34-mutants/config/data_governance/
           cp data/audit/lot34_v3_entry_gate.json .tmp-lot34-mutants/data/audit/
@@ -76,7 +77,7 @@ jobs:
             "src/crypto_quant_bot/data_governance/market_data_quality_engine_validation.py",
           ]
           tests_dir = ["tests/"]
-          runner = "python -m pytest -q tests/test_lot34_market_data_quality_engine.py tests/test_lot34_contract_boundaries.py"
+          runner = "python -m pytest -q tests/test_lot34_market_data_quality_engine.py tests/test_lot34_contract_boundaries.py tests/test_lot34_mutation_contracts.py"
           also_copy = [
             "src/crypto_quant_bot/__init__.py",
             "src/crypto_quant_bot/data_governance/__init__.py",
@@ -166,4 +167,6 @@ jobs:
         if: always()
         with:
           name: lot34-critical-mutation-evidence
-          path: reports/lot34/mutation/
+          path: |
+            reports/lot34/mutation/
+            .tmp-lot34-mutants/mutants/src/crypto_quant_bot/data_governance/market_data_quality_engine*.py
