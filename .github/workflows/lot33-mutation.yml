@@ -43,6 +43,9 @@ jobs:
             reports/lot33/mutation
           cp src/crypto_quant_bot/__init__.py .tmp-lot33-mutants/src/crypto_quant_bot/
           cp src/crypto_quant_bot/data_governance/*.py .tmp-lot33-mutants/src/crypto_quant_bot/data_governance/
+          cat > .tmp-lot33-mutants/src/crypto_quant_bot/data_governance/__init__.py <<'PY'
+          """Minimal Lot 33 package used only by the isolated mutation campaign."""
+          PY
           cp tests/test_lot33_timestamp_clock_and_timezone_governance.py .tmp-lot33-mutants/tests/
           cp tests/test_lot33_validation_boundaries.py .tmp-lot33-mutants/tests/
           cp tests/test_lot33_mutation_oracles.py .tmp-lot33-mutants/tests/
