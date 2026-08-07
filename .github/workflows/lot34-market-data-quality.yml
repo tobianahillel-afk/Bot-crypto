@@ -9,13 +9,20 @@ on:
       - 'contracts/schemas/data_anomaly_v1.schema.json'
       - 'src/crypto_quant_bot/data_governance/market_data_quality_engine*.py'
       - 'src/crypto_quant_bot/data_governance/__init__.py'
-      - 'scripts/*lot34*'
-      - 'tests/test_lot34_*.py'
-      - 'docs/*LOT_34*'
-      - 'reports/*lot_34*'
-      - 'data/audit/*lot34.json'
-      - 'data/audit/data_quality*_lot34.json'
+      - 'scripts/run_lot34_market_data_quality_engine.py'
+      - 'scripts/validate_lot34.py'
+      - 'scripts/validate_lot34_no_connectivity.py'
+      - 'tests/test_lot34_market_data_quality_engine.py'
+      - 'tests/test_lot34_contract_boundaries.py'
+      - 'tests/test_lot34_mutation_contracts.py'
+      - 'docs/LOT_34_MARKET_DATA_QUALITY_ENGINE.md'
+      - 'docs/ACCEPTANCE_CRITERIA_LOT_34.md'
+      - 'reports/lot_34_market_data_quality_engine_report.md'
+      - 'data/audit/market_data_quality_engine_lot34.json'
+      - 'data/audit/market_data_quality_engine_audit_lot34.json'
+      - 'data/audit/data_quality_states_lot34.json'
       - 'data/audit/data_anomalies_lot34.json'
+      - 'data/audit/data_quality_veto_lot34.json'
       - '.github/workflows/lot34-market-data-quality.yml'
       - 'requirements-dev.lock'
   push:
@@ -54,13 +61,18 @@ jobs:
             scripts/run_lot34_market_data_quality_engine.py \
             scripts/validate_lot34.py \
             scripts/validate_lot34_no_connectivity.py \
-            tests/test_lot34_*.py
+            tests/test_lot34_market_data_quality_engine.py \
+            tests/test_lot34_contract_boundaries.py \
+            tests/test_lot34_mutation_contracts.py
           mypy src/crypto_quant_bot/data_governance
       - name: Targeted line and branch coverage
         run: |
           mkdir -p reports/lot34
           coverage erase
-          pytest -q tests/test_lot34_*.py \
+          pytest -q \
+            tests/test_lot34_market_data_quality_engine.py \
+            tests/test_lot34_contract_boundaries.py \
+            tests/test_lot34_mutation_contracts.py \
             --cov=crypto_quant_bot.data_governance.market_data_quality_engine \
             --cov=crypto_quant_bot.data_governance.market_data_quality_engine_models \
             --cov=crypto_quant_bot.data_governance.market_data_quality_engine_validation \
@@ -108,7 +120,8 @@ jobs:
           python scripts/validate_lot34.py
       - name: Historical architecture traceability quality and security
         run: |
-          python scripts/validate_lot33_post_merge.py
+          python scripts/validate_lot33.py
+          python scripts/validate_lot33_no_connectivity.py
           python scripts/validate_roadmap_documentation.py
           python scripts/validate_architecture_boundaries.py
           python scripts/validate_domain_architecture.py
@@ -124,9 +137,9 @@ jobs:
       - name: Full regression and anti-flake
         run: |
           pytest -q
-          pytest -q tests/test_lot34_*.py
-          pytest -q tests/test_lot34_*.py
-          pytest -q tests/test_lot34_*.py
+          pytest -q tests/test_lot34_market_data_quality_engine.py tests/test_lot34_contract_boundaries.py tests/test_lot34_mutation_contracts.py
+          pytest -q tests/test_lot34_market_data_quality_engine.py tests/test_lot34_contract_boundaries.py tests/test_lot34_mutation_contracts.py
+          pytest -q tests/test_lot34_market_data_quality_engine.py tests/test_lot34_contract_boundaries.py tests/test_lot34_mutation_contracts.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -1,0 +1,65 @@
+name: Lot 34 independent post-merge audit
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'pyproject.toml'
+      - 'data/audit/roadmap_lifecycle_overlay_lot34.json'
+      - 'docs/LOT_34_POST_MERGE_AUDIT.md'
+      - 'docs/LOT34_POST_MERGE_VALIDATION_MATRIX.md'
+      - 'scripts/validate_lot34_post_merge.py'
+      - 'tests/test_lot34_post_merge_state.py'
+      - '.github/workflows/lot34-post-merge-audit.yml'
+      - 'reports/lot34/coverage_summary.json'
+      - 'reports/lot34/mutation_summary.json'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  post-merge-audit:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Prove governance-only diff
+        run: |
+          if git diff --name-only origin/main...HEAD -- src/ | grep -q .; then
+            echo 'LOT34 POST-MERGE AUDIT: production source changes are forbidden' >&2
+            git diff --name-only origin/main...HEAD -- src/
+            exit 1
+          fi
+      - name: Validate exact merged state
+        run: |
+          python scripts/validate_lot34.py
+          python scripts/validate_lot34_post_merge.py
+      - name: Governance and architecture regression
+        run: |
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          ruff check scripts/validate_lot34_post_merge.py tests/test_lot34_post_merge_state.py
+      - name: Audit tests and full regression
+        run: |
+          pytest -q tests/test_lot34_post_merge_state.py
+          pytest -q
+      - name: Re-run post-merge validator after regression
+        run: python scripts/validate_lot34_post_merge.py
