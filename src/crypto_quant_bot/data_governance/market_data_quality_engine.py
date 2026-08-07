@@ -52,6 +52,7 @@ REQUIRED_RECORD_FIELDS = {
     "bid",
     "ask",
 }
+MICROSECONDS_PER_SECOND = 1_000_000
 ANOMALY_REASON = {
     "MISSING_INTERVAL": "DQ_MISSING_INTERVAL",
     "DUPLICATE": "DQ_DUPLICATE_EVENT",
@@ -62,6 +63,15 @@ ANOMALY_REASON = {
     "IMPOSSIBLE_SPREAD": "DQ_IMPOSSIBLE_SPREAD",
     "SCHEMA_DRIFT": "DQ_SCHEMA_DRIFT",
 }
+
+
+def _duration_us(start: datetime, end: datetime) -> int:
+    delta = end - start
+    return (
+        delta.days * 86_400_000_000
+        + delta.seconds * MICROSECONDS_PER_SECOND
+        + delta.microseconds
+    )
 
 
 def _verify_gate(gate: dict[str, Any]) -> None:
@@ -166,7 +176,9 @@ def _anomaly(
     )
 
 
-def _schema_anomalies(records: list[dict[str, Any]], expected_schema: str) -> list[DataAnomalyV1]:
+def _schema_anomalies(
+    records: list[dict[str, Any]], expected_schema: str
+) -> list[DataAnomalyV1]:
     anomalies: list[DataAnomalyV1] = []
     for record in records:
         record_id = require_identifier(record.get("record_id"), "record_id")
@@ -186,7 +198,9 @@ def _schema_anomalies(records: list[dict[str, Any]], expected_schema: str) -> li
     return anomalies
 
 
-def _duplicate_anomalies(records: list[dict[str, Any]], offset: int) -> list[DataAnomalyV1]:
+def _duplicate_anomalies(
+    records: list[dict[str, Any]], offset: int
+) -> list[DataAnomalyV1]:
     anomalies: list[DataAnomalyV1] = []
     seen: dict[tuple[str, str, str, str, int, int], str] = {}
     for record in records:
@@ -211,7 +225,9 @@ def _duplicate_anomalies(records: list[dict[str, Any]], offset: int) -> list[Dat
     return anomalies
 
 
-def _ordering_anomalies(records: list[dict[str, Any]], offset: int) -> list[DataAnomalyV1]:
+def _ordering_anomalies(
+    records: list[dict[str, Any]], offset: int
+) -> list[DataAnomalyV1]:
     anomalies: list[DataAnomalyV1] = []
     latest: dict[tuple[str, str, str], tuple[datetime, int, int, str]] = {}
     for record in records:
@@ -256,11 +272,13 @@ def _missing_interval_anomalies(
     for key, values in sorted(grouped.items()):
         step = timeframe_seconds.get(key[2])
         if step is None:
-            raise MarketDataQualityError(f"missing interval definition for timeframe {key[2]}")
+            raise MarketDataQualityError(
+                f"missing interval definition for timeframe {key[2]}"
+            )
         ordered = sorted(set(values))
         for previous, current in zip(ordered, ordered[1:], strict=False):
-            delta_seconds = int((current[0] - previous[0]).total_seconds())
-            if delta_seconds > step:
+            delta_us = _duration_us(previous[0], current[0])
+            if delta_us > step * MICROSECONDS_PER_SECOND:
                 anomalies.append(
                     _anomaly(
                         offset + len(anomalies) + 1,
@@ -288,8 +306,8 @@ def _value_anomalies(
         available = parse_utc_timestamp(record["available_at"], "available_at")
         if available < parse_utc_timestamp(event_time, "event_time"):
             raise MarketDataQualityError("record available_at cannot precede event_time")
-        age = int((generated_at - available).total_seconds())
-        if age > max_staleness:
+        age_us = _duration_us(available, generated_at)
+        if age_us > max_staleness * MICROSECONDS_PER_SECOND:
             anomalies.append(
                 _anomaly(
                     offset + len(anomalies) + 1,
@@ -350,7 +368,12 @@ def detect_anomalies(config: dict[str, Any]) -> tuple[DataAnomalyV1, ...]:
     anomalies = _schema_anomalies(records, expected_schema)
     anomalies.extend(_duplicate_anomalies(records, len(anomalies)))
     anomalies.extend(_ordering_anomalies(records, len(anomalies)))
-    intervals = {key: int(value) for key, value in config["timeframe_seconds"].items()}
+    intervals = {
+        require_identifier(key, "timeframe"): require_integer(
+            value, "timeframe_seconds", minimum=1
+        )
+        for key, value in config["timeframe_seconds"].items()
+    }
     anomalies.extend(_missing_interval_anomalies(records, intervals, len(anomalies)))
     anomalies.extend(
         _value_anomalies(
@@ -394,7 +417,7 @@ def _quality_state_for_group(
     expected = (
         1
         if len(times) <= 1
-        else int((times[-1] - times[0]).total_seconds()) // step + 1
+        else _duration_us(times[0], times[-1]) // (step * MICROSECONDS_PER_SECOND) + 1
     )
     observed = len(times)
     coverage = min(10_000, 10_000 * observed // max(1, expected))
@@ -414,11 +437,15 @@ def _quality_state_for_group(
     if newest_available is None:
         freshness = 0
     else:
-        age = max(0, int((generated - newest_available).total_seconds()))
+        age_us = max(0, _duration_us(newest_available, generated))
+        age_seconds = age_us // MICROSECONDS_PER_SECOND
         freshness = (
             10_000
-            if max_staleness == 0 and age == 0
-            else max(0, 10_000 - (10_000 * age // max(1, max_staleness)))
+            if max_staleness == 0 and age_seconds == 0
+            else max(
+                0,
+                10_000 - (10_000 * age_seconds // max(1, max_staleness)),
+            )
         )
     completeness = 10_000 * len(valid_records) // max(1, len(records))
     group_ids = {
