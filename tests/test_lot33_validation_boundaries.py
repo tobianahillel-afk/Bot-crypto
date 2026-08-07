@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import json
 import shutil
 from pathlib import Path
@@ -117,14 +116,18 @@ def test_signed_drift_can_be_negative_but_latency_cannot() -> None:
     assert envelope.clock_drift_us == 0
 
 
-def test_gate_scope_and_safety_changes_are_rejected(tmp_path: Path) -> None:
+def test_gate_scope_and_safety_changes_are_rejected(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     copy_inputs(tmp_path)
     gate_path = tmp_path / INPUT_PATHS[1]
     gate = load(gate_path)
     gate["human_decision"] = "UNKNOWN"
     payload = dict(gate)
     payload.pop("output_checksum")
-    gate["output_checksum"] = canonical_checksum(payload)
+    semantic_checksum = canonical_checksum(payload)
+    gate["output_checksum"] = semantic_checksum
+    monkeypatch.setattr(engine, "EXPECTED_GATE_CHECKSUM", semantic_checksum)
     write(gate_path, gate)
     with pytest.raises(TimestampGovernanceError, match="does not authorize"):
         build_lot33_artifacts(tmp_path, VALID_SHA)
@@ -136,7 +139,9 @@ def test_gate_scope_and_safety_changes_are_rejected(tmp_path: Path) -> None:
     safety["trade_allowed"] = True
     payload = dict(gate)
     payload.pop("output_checksum")
-    gate["output_checksum"] = canonical_checksum(payload)
+    semantic_checksum = canonical_checksum(payload)
+    gate["output_checksum"] = semantic_checksum
+    monkeypatch.setattr(engine, "EXPECTED_GATE_CHECKSUM", semantic_checksum)
     write(gate_path, gate)
     with pytest.raises(TimestampGovernanceError, match="safety"):
         build_lot33_artifacts(tmp_path, VALID_SHA)
@@ -267,7 +272,10 @@ def test_threshold_field_types_and_each_degradation_path(tmp_path: Path) -> None
 
 def test_lineage_health_audit_and_envelope_models_reject_invalid_values() -> None:
     with pytest.raises(TimestampGovernanceError, match="InstrumentRegistryV1"):
-        Lot33LineageEnvelopeV1("lineage", "wrong.json", "a" * 64, "b" * 64, "c" * 64, "2026-08-06T19:15:00Z")
+        Lot33LineageEnvelopeV1(
+            "lineage", "wrong.json", "a" * 64, "b" * 64, "c" * 64,
+            "2026-08-06T19:15:00Z",
+        )
     with pytest.raises(TimestampGovernanceError, match="reason codes"):
         ClockHealthStateV1("HEALTHY", 1, 1, 1, 0, 0, 0, ())
     with pytest.raises(TimestampGovernanceError, match="audit counts"):

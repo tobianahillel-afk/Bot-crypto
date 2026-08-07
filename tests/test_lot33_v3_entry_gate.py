@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+import scripts.validate_lot33_entry_gate as gate_validator
 from scripts.validate_lot33_entry_gate import (
     EXPECTED_CHECKSUM,
     EXPECTED_FIELDS,
@@ -19,10 +20,12 @@ ROOT = Path(__file__).resolve().parents[1]
 GATE_PATH = ROOT / "data/audit/lot33_v3_entry_gate.json"
 
 
-def recompute(gate: dict[str, object]) -> None:
+def recompute(gate: dict[str, object]) -> str:
     payload = dict(gate)
     payload.pop("output_checksum", None)
-    gate["output_checksum"] = canonical_checksum(payload)
+    checksum = canonical_checksum(payload)
+    gate["output_checksum"] = checksum
+    return checksum
 
 
 def test_lot33_entry_gate_is_valid_and_fail_closed() -> None:
@@ -67,7 +70,10 @@ def test_lot33_entry_gate_checksum_is_independently_recomputed() -> None:
     ],
 )
 def test_lot33_entry_gate_rejects_scope_or_permission_changes(
-    path: tuple[str, ...], value: object, message: str
+    path: tuple[str, ...],
+    value: object,
+    message: str,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     gate = copy.deepcopy(load_json(GATE_PATH))
     target = gate
@@ -76,7 +82,8 @@ def test_lot33_entry_gate_rejects_scope_or_permission_changes(
         assert isinstance(nested, dict)
         target = nested
     target[path[-1]] = value
-    recompute(gate)
+    semantic_checksum = recompute(gate)
+    monkeypatch.setattr(gate_validator, "EXPECTED_CHECKSUM", semantic_checksum)
     with pytest.raises(Lot33EntryGateError, match=message):
         validate_gate(gate)
 

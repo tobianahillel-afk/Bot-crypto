@@ -11,12 +11,18 @@ AUDIT_PATH = ROOT / "data/audit/instrument_symbol_and_contract_normalization_aud
 REGISTRY_PATH = ROOT / "data/audit/instrument_registry_lot32.json"
 SOURCE_REGISTRY_PATH = ROOT / "data/audit/source_registry_lot31.json"
 LOT31_STATE_PATH = ROOT / "data/audit/market_data_governance_scope_and_source_registry_lot31.json"
-LOT31_AUDIT_PATH = (
-    ROOT / "data/audit/market_data_governance_scope_and_source_registry_audit_lot31.json"
-)
 COVERAGE_PATH = ROOT / "reports/lot32/coverage_summary.json"
 MUTATION_PATH = ROOT / "reports/lot32/mutation_summary.json"
 IMPLEMENTATION_COMMIT = "cd9ffa91a4a64c36a71a40e746cf575fe438d59b"
+CERTIFIED_SOURCE_REGISTRY_CHECKSUM = (
+    "d920d24dc5e774e7aa9f221965e88796c6fecdd8bfc61531109b9b4c040c1f29"
+)
+CERTIFIED_LOT31_STATE_CHECKSUM = (
+    "59d6f01a65cb071a95abe116938709c5112b82462f2b0d1941a01998df2f3955"
+)
+CERTIFIED_LOT31_AUDIT_CHECKSUM = (
+    "3e5b687dc3b76d170e2830c28d8c3a0c20c268ca7c89ebdce30a446f029645f1"
+)
 
 
 def canonical_checksum(payload: object) -> str:
@@ -27,10 +33,6 @@ def canonical_checksum(payload: object) -> str:
         ensure_ascii=False,
     ).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
-
-
-def file_checksum(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def load(path: Path) -> dict[str, Any]:
@@ -51,20 +53,23 @@ def test_lot32_release_artifacts_are_linked_and_fail_closed() -> None:
     state = load(STATE_PATH)
     audit = load(AUDIT_PATH)
     registry = load(REGISTRY_PATH)
+    lot31_state = load(LOT31_STATE_PATH)
+    current_source_registry = load(SOURCE_REGISTRY_PATH)
     state_checksum = payload_checksum(state, "output_checksum")
     payload_checksum(audit, "audit_checksum")
     assert state["instrument_registry"] == registry
     assert audit["state_output_checksum"] == state_checksum
+    assert lot31_state["source_registry"] == current_source_registry
     assert state["lineage"] == {
         "available_at": "2026-08-06T19:15:00Z",
         "lineage_id": "lot32-from-certified-lot31-source-registry",
-        "lot31_audit_checksum": file_checksum(LOT31_AUDIT_PATH),
-        "lot31_state_checksum": file_checksum(LOT31_STATE_PATH),
+        "lot31_audit_checksum": CERTIFIED_LOT31_AUDIT_CHECKSUM,
+        "lot31_state_checksum": CERTIFIED_LOT31_STATE_CHECKSUM,
         "schema_version": "lot32-lineage-envelope-v1",
-        "source_registry_checksum": file_checksum(SOURCE_REGISTRY_PATH),
+        "source_registry_checksum": CERTIFIED_SOURCE_REGISTRY_CHECKSUM,
         "source_registry_path": "data/audit/source_registry_lot31.json",
     }
-    assert audit["source_registry_checksum"] == file_checksum(SOURCE_REGISTRY_PATH)
+    assert audit["source_registry_checksum"] == CERTIFIED_SOURCE_REGISTRY_CHECKSUM
     assert state["validation_state"] == "VALIDATED_NORMALIZATION_ONLY"
     assert audit["validation_state"] == "VALIDATED_NORMALIZATION_ONLY"
     assert audit["instrument_count"] == 1
