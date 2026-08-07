@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "data_quality_state_v1.schema.json",
+  "title": "DataQualityStateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source_id", "instrument_id", "timeframe", "record_count", "expected_interval_count", "observed_interval_count", "anomaly_count", "coverage_bps", "freshness_bps", "completeness_bps", "consistency_bps", "quality_score_bps", "status"],
+  "properties": {
+    "schema_version": {"const": "data-quality-state-v1"},
+    "source_id": {"type": "string", "minLength": 1},
+    "instrument_id": {"type": "string", "minLength": 1},
+    "timeframe": {"type": "string", "minLength": 1},
+    "record_count": {"type": "integer", "minimum": 0},
+    "expected_interval_count": {"type": "integer", "minimum": 0},
+    "observed_interval_count": {"type": "integer", "minimum": 0},
+    "anomaly_count": {"type": "integer", "minimum": 0},
+    "coverage_bps": {"type": "integer", "minimum": 0, "maximum": 10000},
+    "freshness_bps": {"type": "integer", "minimum": 0, "maximum": 10000},
+    "completeness_bps": {"type": "integer", "minimum": 0, "maximum": 10000},
+    "consistency_bps": {"type": "integer", "minimum": 0, "maximum": 10000},
+    "quality_score_bps": {"type": "integer", "minimum": 0, "maximum": 10000},
+    "status": {"enum": ["PASS", "DEGRADED", "BLOCKED", "UNKNOWN"]}
+  }
+}
