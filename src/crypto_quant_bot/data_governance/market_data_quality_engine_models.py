@@ -10,7 +10,6 @@ from .market_data_quality_engine_validation import (
     require_identifier,
     require_integer,
     require_sha256,
-    require_text,
     validate_lot34_safety,
 )
 
