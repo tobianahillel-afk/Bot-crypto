@@ -325,7 +325,7 @@ def _missing_interval_anomalies(
     return anomalies
 
 
-def _record_value_anomalies(
+def _record_temporal_anomalies(
     record: dict[str, Any],
     generated_at: datetime,
     max_staleness: int,
@@ -333,14 +333,20 @@ def _record_value_anomalies(
 ) -> list[DataAnomalyV1]:
     record_id = require_identifier(record["record_id"], "record_id")
     event_time = require_text(record["event_time"], "event_time")
+    event = parse_utc_timestamp(event_time, "event_time")
     available = parse_utc_timestamp(record["available_at"], "available_at")
-    if available < parse_utc_timestamp(event_time, "event_time"):
+    if available < event:
         raise MarketDataQualityError("record available_at cannot precede event_time")
-    anomalies: list[DataAnomalyV1] = []
-    if _duration_us(available, generated_at) > max_staleness * MICROSECONDS_PER_SECOND:
-        anomalies.append(
-            _anomaly(offset + 1, "STALE_DATA", (record_id,), event_time, event_time)
-        )
+    if _duration_us(available, generated_at) <= max_staleness * MICROSECONDS_PER_SECOND:
+        return []
+    return [_anomaly(offset + 1, "STALE_DATA", (record_id,), event_time, event_time)]
+
+
+def _record_market_value_anomalies(
+    record: dict[str, Any], offset: int
+) -> list[DataAnomalyV1]:
+    record_id = require_identifier(record["record_id"], "record_id")
+    event_time = require_text(record["event_time"], "event_time")
     open_price = decimal_from_string(record["open"], "open")
     high = decimal_from_string(record["high"], "high")
     low = decimal_from_string(record["low"], "low")
@@ -348,10 +354,11 @@ def _record_value_anomalies(
     volume = decimal_from_string(record["volume"], "volume")
     bid = decimal_from_string(record["bid"], "bid")
     ask = decimal_from_string(record["ask"], "ask")
+    anomalies: list[DataAnomalyV1] = []
     if high < low or high < max(open_price, close) or low > min(open_price, close):
         anomalies.append(
             _anomaly(
-                offset + len(anomalies) + 1,
+                offset + 1,
                 "INVALID_OHLC",
                 (record_id,),
                 event_time,
@@ -379,6 +386,19 @@ def _record_value_anomalies(
             )
         )
     return anomalies
+
+
+def _record_value_anomalies(
+    record: dict[str, Any],
+    generated_at: datetime,
+    max_staleness: int,
+    offset: int,
+) -> list[DataAnomalyV1]:
+    temporal = _record_temporal_anomalies(
+        record, generated_at, max_staleness, offset
+    )
+    market = _record_market_value_anomalies(record, offset + len(temporal))
+    return [*temporal, *market]
 
 
 def _value_anomalies(
