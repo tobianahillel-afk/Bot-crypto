@@ -25,7 +25,6 @@
       "config": "config/data_governance/timestamp_clock_timezone_governance_v1.json",
       "execution_allowed": false,
       "external_connectivity_allowed": false,
-      "historical_overlay": "data/audit/roadmap_lifecycle_overlay_lot33.json",
       "implementation_commit": "f4762cb7d68fd11a42962f8016f8af22e2bc1c5a",
       "implementation_contract": "docs/LOT_33_TIMESTAMP_CLOCK_AND_TIMEZONE_GOVERNANCE.md",
       "merged_commit": "0c6619e0a57afed6b8cd342e341b066917743edc",
