@@ -1,0 +1,16 @@
+{
+  "anti_flake_repetitions": 3,
+  "branch_coverage_percent": 97.3,
+  "branch_minimum_percent": 90.0,
+  "evidence_commit": "e1276409fab61a9b2f884435697145d38bd1c85c",
+  "line_coverage_percent": 98.8,
+  "line_minimum_percent": 95.0,
+  "methodology": "GitHub Actions targeted branch coverage on the complete Lot 34 production surface",
+  "schema_version": "lot34-coverage-summary-v1",
+  "scope": [
+    "market_data_quality_engine.py",
+    "market_data_quality_engine_models.py",
+    "market_data_quality_engine_validation.py"
+  ],
+  "status": "PASS"
+}
