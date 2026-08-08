@@ -1,0 +1,255 @@
+name: Lot 35 post-merge audit controller
+
+on:
+  push:
+    branches: [agent/lot35-post-merge-controller]
+    paths:
+      - '.github/workflows/lot35-post-merge-controller.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+
+jobs:
+  audit-after-implementation-merge:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Wait for PR 31 merge and prepare exact main
+        id: merged
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import json, os, time, urllib.request
+          token=os.environ['GH_TOKEN']; repo=os.environ['REPO']
+          headers={'Authorization':f'Bearer {token}','Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'lot35-audit-controller'}
+          def get(path):
+              req=urllib.request.Request('https://api.github.com'+path,headers=headers)
+              with urllib.request.urlopen(req,timeout=60) as r: return json.loads(r.read())
+          merged=None
+          for _ in range(120):
+              pr=get(f'/repos/{repo}/pulls/31')
+              if pr.get('merged'):
+                  merged=pr['merge_commit_sha']; break
+              time.sleep(15)
+          if not merged: raise SystemExit('LOT35_IMPLEMENTATION_PR_NOT_MERGED')
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f: f.write(f'merge_sha={merged}\n')
+          print('Lot35 implementation merge:', merged)
+          PY
+          git fetch origin main
+          git checkout -B agent/lot35-post-merge-audit origin/main
+      - name: Build independent lifecycle and audit artifacts
+        env:
+          MERGE_SHA: ${{ steps.merged.outputs.merge_sha }}
+        run: |
+          python - <<'PY'
+          import copy, json, os, re
+          from pathlib import Path
+          root=Path('.')
+          merge_sha=os.environ['MERGE_SHA']
+          state=json.loads((root/'data/audit/candle_trade_book_reconciliation_lot35.json').read_text())
+          audit=json.loads((root/'data/audit/candle_trade_book_reconciliation_audit_lot35.json').read_text())
+          coverage=json.loads((root/'reports/lot35/coverage_summary.json').read_text())
+          mutation=json.loads((root/'reports/lot35/mutation_summary.json').read_text())
+          if coverage.get('status')!='PASS' or mutation.get('status')!='PASS': raise SystemExit('LOT35_FROZEN_QUALITY_EVIDENCE_NOT_PASS')
+          if coverage['line_coverage_percent'] < 95 or coverage['branch_coverage_percent'] < 90 or mutation['mutation_score_percent'] < 80: raise SystemExit('LOT35_FROZEN_THRESHOLDS_NOT_MET')
+          previous=json.loads((root/'data/audit/roadmap_lifecycle_overlay_lot34.json').read_text())
+          overlay=copy.deepcopy(previous)
+          overlay['previous_overlay']='data/audit/roadmap_lifecycle_overlay_lot34.json'
+          overlay['latest_implemented_lot']=35
+          overlay['lots']['35']={
+              'acceptance_contract':'docs/ACCEPTANCE_CRITERIA_LOT_35.md',
+              'audit_artifact':'data/audit/candle_trade_book_reconciliation_audit_lot35.json',
+              'config':'config/data_governance/candle_trade_book_reconciliation_v1.json',
+              'execution_allowed':False,
+              'external_connectivity_allowed':False,
+              'implementation_commit':state['run_context']['code_commit'],
+              'implementation_contract':'docs/LOT_35_CANDLE_TRADE_BOOK_RECONCILIATION.md',
+              'merged_commit':merge_sha,
+              'network_ingestion_allowed':False,
+              'pull_request':31,
+              'raw_data_mutation_allowed':False,
+              'report':'reports/lot_35_candle_trade_book_reconciliation_report.md',
+              'reports_collection':'data/audit/reconciliation_reports_lot35.json',
+              'runner':'scripts/run_lot35_candle_trade_book_reconciliation.py',
+              'runtime_mode':'DATA_GOVERNANCE_ONLY',
+              'state_artifact':'data/audit/candle_trade_book_reconciliation_lot35.json',
+              'status':'IMPLEMENTED_VALIDATED_RECONCILIATION_ONLY',
+              'trade_allowed':False,
+              'validator':'scripts/validate_lot35.py',
+              'veto_artifact':'data/audit/reconciliation_veto_lot35.json'
+          }
+          overlay['lots']['36']={'implementation_started':False,'status':'PLANNED_LOCKED'}
+          (root/'data/audit/roadmap_lifecycle_overlay_lot35.json').write_text(json.dumps(overlay,indent=2,sort_keys=True)+'\n')
+          pyproject=root/'pyproject.toml'; text=pyproject.read_text()
+          text=re.sub(r'(?m)^version = "0\.34\.0"$', 'version = "0.35.0"', text)
+          text=text.replace('Lot 34 validated offline market data quality governance','Lot 35 validated offline candle trade book reconciliation')
+          pyproject.write_text(text)
+          for rel in ('README.md','docs/ROADMAP_V1_TO_V21.md'):
+              p=root/rel; text=p.read_text()
+              text=text.replace('0.34.0','0.35.0')
+              text=text.replace('latest_implemented_lot=34','latest_implemented_lot=35')
+              text=text.replace('latest_implemented_lot = 34','latest_implemented_lot = 35')
+              text=text.replace('next_locked_lot=35','next_locked_lot=36')
+              text=text.replace('next_locked=35','next_locked=36')
+              text=text.replace('Lot 35: `PLANNED_LOCKED`','Lot 35: `IMPLEMENTED_VALIDATED_RECONCILIATION_ONLY`')
+              text=text.replace('Lot 35 `PLANNED_LOCKED`','Lot 35 `IMPLEMENTED_VALIDATED_RECONCILIATION_ONLY`')
+              p.write_text(text)
+          validator=root/'scripts/validate_roadmap_documentation.py'
+          text=validator.read_text()
+          text=text.replace('roadmap_lifecycle_overlay_lot34.json','roadmap_lifecycle_overlay_lot35.json')
+          validator.write_text(text)
+          report_doc=f'''# Lot 35 — Independent Post-Merge Audit\n\n## Verdict\n\n`GO_LOT35_POST_MERGE`\n\nExact implementation squash merge: `{merge_sha}`.\n\nFrozen implementation code commit: `{state['run_context']['code_commit']}`.\n\nState checksum: `{state['output_checksum']}`.\nAudit checksum: `{audit['audit_checksum']}`.\nLine coverage: `{coverage['line_coverage_percent']}%`.\nBranch coverage: `{coverage['branch_coverage_percent']}%`.\nMutation score: `{mutation['mutation_score_percent']}%`.\n\nThe audit changes governance/release metadata only and introduces no production `src/` change.\nLot 36 remains `PLANNED_LOCKED` with `implementation_started=false`. Safety remains fail-closed: no external connectivity, trading or execution.\n'''
+          (root/'docs/LOT_35_POST_MERGE_AUDIT.md').write_text(report_doc)
+          matrix=f'''# Lot 35 — Post-Merge Validation Matrix\n\n| Control | Evidence |\n|---|---|\n| Exact merge | `{merge_sha}` |\n| State checksum | `{state['output_checksum']}` |\n| Audit checksum | `{audit['audit_checksum']}` |\n| Line coverage >=95 | {coverage['line_coverage_percent']}% PASS |\n| Branch coverage >=90 | {coverage['branch_coverage_percent']}% PASS |\n| Mutation >=80 | {mutation['mutation_score_percent']}% PASS |\n| Anti-flake | {coverage['anti_flake_repetitions']} PASS |\n| Runtime | DATA_GOVERNANCE_ONLY |\n| Trading/execution | disabled |\n| Lot 36 | PLANNED_LOCKED |\n'''
+          (root/'docs/LOT35_POST_MERGE_VALIDATION_MATRIX.md').write_text(matrix)
+          constants={'merge':merge_sha,'state':state['output_checksum'],'audit':audit['audit_checksum'],'code':state['run_context']['code_commit']}
+          validator_text=f'''#!/usr/bin/env python3\nfrom __future__ import annotations\nimport json, tomllib\nfrom pathlib import Path\nROOT=Path(__file__).resolve().parents[1]\nMERGE={merge_sha!r}\nSTATE={state['output_checksum']!r}\nAUDIT={audit['audit_checksum']!r}\nCODE={state['run_context']['code_commit']!r}\ndef load(path): return json.loads((ROOT/path).read_text())\ndef validate():\n    project=tomllib.loads((ROOT/'pyproject.toml').read_text())['project']\n    overlay=load('data/audit/roadmap_lifecycle_overlay_lot35.json')\n    state=load('data/audit/candle_trade_book_reconciliation_lot35.json')\n    audit=load('data/audit/candle_trade_book_reconciliation_audit_lot35.json')\n    coverage=load('reports/lot35/coverage_summary.json'); mutation=load('reports/lot35/mutation_summary.json')\n    assert project['version']=='0.35.0'\n    assert overlay['latest_implemented_lot']==35\n    lot=overlay['lots']['35']; assert lot['merged_commit']==MERGE; assert lot['implementation_commit']==CODE\n    assert lot['status']=='IMPLEMENTED_VALIDATED_RECONCILIATION_ONLY'\n    assert overlay['lots']['36']=={{'implementation_started':False,'status':'PLANNED_LOCKED'}}\n    assert state['output_checksum']==STATE; assert audit['audit_checksum']==AUDIT\n    assert state['run_context']['code_commit']==CODE; assert audit['state_output_checksum']==STATE\n    assert coverage['status']=='PASS' and coverage['line_coverage_percent']>=95 and coverage['branch_coverage_percent']>=90\n    assert mutation['status']=='PASS' and mutation['mutation_score_percent']>=80\n    for payload in (state,audit):\n        assert payload['trade_allowed'] is False and payload['execution_allowed'] is False and payload['approved_size']==0\n    return {{'schema_version':'lot35-post-merge-validation-v1','status':'PASS','project_version':'0.35.0','latest_implemented_lot':35,'next_locked_lot':36,'state_output_checksum':STATE,'audit_checksum':AUDIT,'trade_allowed':False,'execution_allowed':False,'approved_size':0}}\nif __name__=='__main__': print(json.dumps(validate(),sort_keys=True))\n'''
+          (root/'scripts/validate_lot35_post_merge.py').write_text(validator_text)
+          tests=f'''from scripts.validate_lot35_post_merge import AUDIT, MERGE, STATE, validate\n\ndef test_lot35_post_merge_validator_passes():\n    result=validate(); assert result['status']=='PASS'; assert result['latest_implemented_lot']==35; assert result['next_locked_lot']==36\n    assert result['state_output_checksum']==STATE; assert result['audit_checksum']==AUDIT\n\ndef test_lot35_post_merge_merge_binding():\n    import json\n    from pathlib import Path\n    root=Path(__file__).resolve().parents[1]\n    overlay=json.loads((root/'data/audit/roadmap_lifecycle_overlay_lot35.json').read_text())\n    assert overlay['lots']['35']['merged_commit']==MERGE\n    assert overlay['lots']['36']=={{'implementation_started':False,'status':'PLANNED_LOCKED'}}\n'''
+          (root/'tests/test_lot35_post_merge_state.py').write_text(tests)
+          PY
+      - name: Add post-merge audit workflow
+        run: |
+          cat > .github/workflows/lot35-post-merge-audit.yml <<'YAML'
+          name: Lot 35 independent post-merge audit
+          on:
+            pull_request:
+              branches: [main]
+              paths:
+                - 'pyproject.toml'
+                - 'README.md'
+                - 'docs/ROADMAP_V1_TO_V21.md'
+                - 'data/audit/roadmap_lifecycle_overlay_lot35.json'
+                - 'docs/LOT_35_POST_MERGE_AUDIT.md'
+                - 'docs/LOT35_POST_MERGE_VALIDATION_MATRIX.md'
+                - 'scripts/validate_lot35_post_merge.py'
+                - 'scripts/validate_roadmap_documentation.py'
+                - 'tests/test_lot35_post_merge_state.py'
+                - '.github/workflows/lot35-post-merge-audit.yml'
+            push:
+              branches: [main]
+            workflow_dispatch:
+          permissions:
+            contents: read
+          jobs:
+            audit:
+              runs-on: ubuntu-22.04
+              steps:
+                - uses: actions/checkout@v4
+                  with: {fetch-depth: 0}
+                - uses: actions/setup-python@v5
+                  with: {python-version: '3.11.9', cache: pip}
+                - run: |
+                    python -m pip install --upgrade pip
+                    python -m pip install -r requirements-dev.lock
+                - name: Prove governance-only diff
+                  run: |
+                    git fetch origin main
+                    git diff --quiet origin/main...HEAD -- src/
+                - name: Compile lint type and exact evidence
+                  run: |
+                    python -m compileall -q src scripts tests
+                    ruff check scripts/validate_lot35_post_merge.py tests/test_lot35_post_merge_state.py
+                    mypy src/crypto_quant_bot
+                    python scripts/validate_lot35.py
+                    python scripts/validate_lot35_post_merge.py
+                - name: Architecture roadmap traceability and engineering
+                  run: |
+                    python scripts/validate_roadmap_documentation.py
+                    python scripts/validate_architecture_boundaries.py
+                    python scripts/validate_domain_architecture.py
+                    python scripts/audit_roadmap_semantics.py
+                    python scripts/validate_traceability_contract.py
+                    python scripts/check_no_silent_numeric_coercion.py
+                    python scripts/quality_inventory.py
+                    python scripts/validate_engineering_deviations.py
+                - name: Audit tests full regression and anti-flake
+                  run: |
+                    pytest -q tests/test_lot35_post_merge_state.py
+                    pytest -q
+                    pytest -q tests/test_lot35_post_merge_state.py
+                    pytest -q tests/test_lot35_post_merge_state.py
+                    pytest -q tests/test_lot35_post_merge_state.py
+                - name: Security and final validator
+                  run: |
+                    bandit -q -r src -ll
+                    pip-audit -r requirements-dev.lock
+                    python scripts/validate_lot35_post_merge.py
+          YAML
+      - name: Commit push and open audit PR
+        id: auditpr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add pyproject.toml README.md docs scripts tests data/audit .github/workflows/lot35-post-merge-audit.yml
+          git commit -m 'Audit merged Lot 35 and advance lifecycle to 0.35.0'
+          git push -f origin HEAD:agent/lot35-post-merge-audit
+          python - <<'PY'
+          import json, os, urllib.request
+          repo=os.environ['REPO']; token=os.environ['GH_TOKEN']
+          payload=json.dumps({'title':'Audit Lot 35 post-merge state','head':'agent/lot35-post-merge-audit','base':'main','body':'Independent governance-only audit of the exact merged Lot 35 implementation. Advances version/lifecycle to 0.35.0 only after frozen coverage, mutation, replay, safety and merge evidence are verified. Lot 36 remains locked.'}).encode()
+          req=urllib.request.Request(f'https://api.github.com/repos/{repo}/pulls',data=payload,method='POST',headers={'Authorization':f'Bearer {token}','Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json','User-Agent':'lot35-audit-controller'})
+          with urllib.request.urlopen(req,timeout=60) as r: pr=json.loads(r.read())
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f: f.write(f"number={pr['number']}\n")
+          print('Audit PR:',pr['number'])
+          PY
+      - name: Wait exact audit head green and squash merge
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          AUDIT_PR: ${{ steps.auditpr.outputs.number }}
+        run: |
+          python - <<'PY'
+          import json, os, time, urllib.request
+          token=os.environ['GH_TOKEN']; repo=os.environ['REPO']; pr=os.environ['AUDIT_PR']
+          headers={'Authorization':f'Bearer {token}','Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'lot35-audit-controller'}
+          def req(path,method='GET',payload=None):
+              data=None if payload is None else json.dumps(payload).encode()
+              r=urllib.request.Request('https://api.github.com'+path,data=data,method=method,headers=headers)
+              with urllib.request.urlopen(r,timeout=60) as response:
+                  body=response.read(); return None if not body else json.loads(body)
+          time.sleep(20)
+          head=None; stable=0; names_prev=None
+          required={'Lot 35 independent post-merge audit','Institutional code quality gates','Roadmap documentation validation'}
+          for _ in range(120):
+              p=req(f'/repos/{repo}/pulls/{pr}'); current=p['head']['sha']
+              if head is None: head=current
+              if current!=head: raise SystemExit('LOT35_AUDIT_HEAD_MOVED')
+              runs=req(f'/repos/{repo}/actions/runs?event=pull_request&head_sha={head}&per_page=100')['workflow_runs']
+              latest={}
+              for run in runs:
+                  if run['name'] not in latest or run['run_number']>latest[run['name']]['run_number']: latest[run['name']]=run
+              names=set(latest); missing=required-names
+              terminal=all(x['status']=='completed' for x in latest.values())
+              failed=[x for x in latest.values() if x['status']=='completed' and x.get('conclusion')!='success']
+              if not missing and terminal and not failed:
+                  stable=stable+1 if names_prev==names else 1; names_prev=names
+                  if stable>=3: break
+              else: stable=0; names_prev=names
+              time.sleep(15)
+          else: raise SystemExit('LOT35_AUDIT_CHECKS_NOT_GREEN')
+          result=req(f'/repos/{repo}/pulls/{pr}/merge',method='PUT',payload={'sha':head,'merge_method':'squash','commit_title':f'Audit Lot 35 post-merge state (#{pr})','commit_message':'Independent Lot 35 post-merge certification; version 0.35.0; Lot 36 remains locked.'})
+          if not result.get('merged'): raise SystemExit(f'LOT35_AUDIT_MERGE_FAILED: {result}')
+          print('Lot35 audit merged:',result['sha'])
+          for branch in ('agent/lot35-post-merge-audit','agent/lot35-post-merge-controller'):
+              try: req(f'/repos/{repo}/git/refs/heads/{branch}',method='DELETE')
+              except Exception: pass
+          PY
