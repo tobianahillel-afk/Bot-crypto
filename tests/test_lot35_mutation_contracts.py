@@ -154,6 +154,42 @@ def test_duplicate_flag_changes_classification_and_veto_exactly() -> None:
     }
 
 
+def test_duplicate_never_downgrades_underlying_critical_divergence() -> None:
+    config = one_record()
+    duplicate = copy.deepcopy(config["records"][0])
+    duplicate["secondary"]["identifier"] = "BTC-EUR-SPOT:1m:critical-mismatch"
+    config["records"].append(duplicate)
+
+    reports = build_reconciliation_reports(config)
+    classifications = sorted(report.classification for report in reports)
+    assert classifications == ["CRITICAL_DIVERGENCE", "MINOR_DIVERGENCE"]
+
+    critical = next(
+        report for report in reports if report.classification == "CRITICAL_DIVERGENCE"
+    )
+    assert critical.reason_codes == (
+        "RECONCILIATION_IDENTIFIER_MISMATCH",
+        "RECONCILIATION_DUPLICATE",
+    )
+    assert critical.corrective_action == "MANUAL_RECONCILIATION_REQUIRED"
+    assert _build_veto(reports).action == "KILL_SWITCH"
+
+
+def test_duplicate_same_ids_with_different_values_has_canonical_order() -> None:
+    config = one_record()
+    duplicate = copy.deepcopy(config["records"][0])
+    duplicate["secondary"]["price"] = "50010.005"
+    config["records"].append(duplicate)
+
+    first = [report.to_dict() for report in build_reconciliation_reports(config)]
+    config["records"] = list(reversed(config["records"]))
+    second = [report.to_dict() for report in build_reconciliation_reports(config)]
+
+    assert first == second
+    assert len(first) == 2
+    assert first[0] != first[1]
+
+
 def test_critical_veto_has_priority_over_minor_veto() -> None:
     minor = ReconciliationReportV1(
         "minor", "TRADE", "PRIMARY", "p1", "s1", "MINOR_DIVERGENCE",
