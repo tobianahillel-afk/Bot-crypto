@@ -1,0 +1,326 @@
+name: Lot 35 canonical finalizer
+
+on:
+  push:
+    branches: [agent/lot35-candle-trade-book-reconciliation]
+    paths:
+      - '.github/workflows/lot35-canonical-finalizer.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/lot35-candle-trade-book-reconciliation
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Normalize branch to canonical staged content
+        run: |
+          git pull --ff-only origin agent/lot35-candle-trade-book-reconciliation
+          for staged in \
+            src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation.py.next \
+            scripts/validate_lot35.py.next \
+            contracts/schemas/reconciliation_report_v1.schema.json.next \
+            contracts/schemas/reconciliation_veto_v1.schema.json.next \
+            contracts/schemas/candle_trade_book_reconciliation_state_v1.schema.json.next \
+            contracts/schemas/candle_trade_book_reconciliation_audit_v1.schema.json.next \
+            tests/test_lot35_candle_trade_book_reconciliation.py.next \
+            tests/test_lot35_reconciliation_boundaries.py.next \
+            tests/test_lot35_mutation_contracts.py.next
+          do
+            if [ -f "$staged" ]; then
+              mv "$staged" "${staged%.next}"
+            fi
+          done
+          grep -q '_apply_duplicate_floor' src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation.py
+          grep -q 'payload_without_checksum' src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation_models.py
+          grep -q 'lineage_id' contracts/schemas/reconciliation_report_v1.schema.json
+          grep -q 'output_checksum' contracts/schemas/reconciliation_veto_v1.schema.json
+      - name: Keep permanent mutation workflow self-contained
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('.github/workflows/lot35-mutation.yml')
+          text = path.read_text(encoding='utf-8')
+          copy_anchor = '''          cp data/audit/data_quality_veto_lot34.json .tmp-lot35-mutants/data/audit/\n'''
+          copy_line = '''          cp data/audit/candle_trade_book_reconciliation_lot35.json .tmp-lot35-mutants/data/audit/\n'''
+          if copy_line not in text:
+              text = text.replace(copy_anchor, copy_anchor + copy_line)
+          list_anchor = '''            "data/audit/data_quality_veto_lot34.json",\n'''
+          list_line = '''            "data/audit/candle_trade_book_reconciliation_lot35.json",\n'''
+          if list_line not in text:
+              text = text.replace(list_anchor, list_anchor + list_line)
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Synchronize canonical documentation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          spec = Path('docs/LOT_35_CANDLE_TRADE_BOOK_RECONCILIATION.md')
+          text = spec.read_text(encoding='utf-8')
+          if '## Canonical per-output evidence metadata' not in text:
+              text += '''\n\n## Canonical per-output evidence metadata\n\nEvery report and veto has lineage, event/availability timestamps, validation state, stable\nreason codes and a canonical checksum. Audit carries the same lineage plus generated time.\nDuplicate detection is a severity floor: it can promote benign results to minor but can never\ndowngrade an underlying minor or critical divergence.\n'''
+          spec.write_text(text, encoding='utf-8')
+          acceptance = Path('docs/ACCEPTANCE_CRITERIA_LOT_35.md')
+          text = acceptance.read_text(encoding='utf-8')
+          if 'Duplicate detection never downgrades' not in text:
+              text += '''\n- [ ] Every report/veto exposes canonical lineage, causal timestamps, validation state, reason codes and checksum.\n- [ ] Audit metadata matches state lineage and causal timestamps.\n- [ ] Duplicate detection never downgrades an underlying minor or critical divergence.\n'''
+          acceptance.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit any pending canonical source changes
+        id: source
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src scripts/validate_lot35.py contracts/schemas tests docs .github/workflows/lot35-mutation.yml
+          git add -u
+          if ! git diff --cached --quiet; then
+            git commit -m 'Finalize canonical Lot 35 reconciliation contracts'
+          fi
+          echo "sha=$(git log -1 --format=%H -- src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation.py src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation_models.py src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation_validation.py config/data_governance/candle_trade_book_reconciliation_v1.json)" >> "$GITHUB_OUTPUT"
+      - name: Static and targeted test gates
+        shell: bash
+        run: |
+          set -o pipefail
+          python -m compileall -q src scripts tests
+          ruff check \
+            src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation*.py \
+            src/crypto_quant_bot/data_governance/__init__.py \
+            scripts/run_lot35_candle_trade_book_reconciliation.py \
+            scripts/validate_lot35.py \
+            scripts/validate_lot35_no_connectivity.py \
+            tests/test_lot35_candle_trade_book_reconciliation.py \
+            tests/test_lot35_reconciliation_boundaries.py \
+            tests/test_lot35_mutation_contracts.py
+          mypy src/crypto_quant_bot/data_governance
+          pytest -q tests/test_lot35_candle_trade_book_reconciliation.py tests/test_lot35_reconciliation_boundaries.py tests/test_lot35_mutation_contracts.py
+      - name: Generate exact evidence and prove deterministic replay
+        env:
+          CODE_COMMIT: ${{ steps.source.outputs.sha }}
+        run: |
+          python scripts/validate_lot35_entry_gate.py
+          python scripts/validate_lot34.py
+          python scripts/validate_lot34_no_connectivity.py
+          python scripts/run_lot35_candle_trade_book_reconciliation.py --code-commit "$CODE_COMMIT"
+          python scripts/validate_lot35.py
+          python scripts/validate_lot35_no_connectivity.py
+          cp data/audit/candle_trade_book_reconciliation_lot35.json /tmp/state.json
+          cp data/audit/candle_trade_book_reconciliation_audit_lot35.json /tmp/audit.json
+          cp data/audit/reconciliation_reports_lot35.json /tmp/reports.json
+          cp data/audit/reconciliation_veto_lot35.json /tmp/veto.json
+          python scripts/run_lot35_candle_trade_book_reconciliation.py --code-commit "$CODE_COMMIT"
+          cmp /tmp/state.json data/audit/candle_trade_book_reconciliation_lot35.json
+          cmp /tmp/audit.json data/audit/candle_trade_book_reconciliation_audit_lot35.json
+          cmp /tmp/reports.json data/audit/reconciliation_reports_lot35.json
+          cmp /tmp/veto.json data/audit/reconciliation_veto_lot35.json
+          python scripts/validate_lot35.py
+      - name: Targeted line and branch coverage
+        run: |
+          rm -rf reports/lot35/final-coverage
+          mkdir -p reports/lot35/final-coverage
+          pytest -q \
+            tests/test_lot35_candle_trade_book_reconciliation.py \
+            tests/test_lot35_reconciliation_boundaries.py \
+            tests/test_lot35_mutation_contracts.py \
+            --cov=crypto_quant_bot.data_governance.candle_trade_book_reconciliation \
+            --cov=crypto_quant_bot.data_governance.candle_trade_book_reconciliation_models \
+            --cov=crypto_quant_bot.data_governance.candle_trade_book_reconciliation_validation \
+            --cov-branch \
+            --cov-report=json:reports/lot35/final-coverage/coverage.json \
+            --cov-report=term-missing
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          totals = json.loads(Path('reports/lot35/final-coverage/coverage.json').read_text())['totals']
+          lines = float(totals['percent_statements_covered'])
+          branches = float(totals['percent_branches_covered'])
+          print(f'LOT35 FINAL COVERAGE lines={lines:.2f}% branches={branches:.2f}%')
+          if lines < 95.0 or branches < 90.0:
+              raise SystemExit('LOT35_FINAL_COVERAGE_BELOW_THRESHOLD')
+          PY
+      - name: Isolated Lot 35 mutation campaign
+        shell: bash
+        run: |
+          rm -rf .tmp-lot35-final-mutants reports/lot35/final-mutation
+          mkdir -p .tmp-lot35-final-mutants/src/crypto_quant_bot/data_governance .tmp-lot35-final-mutants/tests \
+            .tmp-lot35-final-mutants/config/data_governance .tmp-lot35-final-mutants/data/audit \
+            .tmp-lot35-final-mutants/mutants/src/crypto_quant_bot/data_governance \
+            .tmp-lot35-final-mutants/mutants/config/data_governance .tmp-lot35-final-mutants/mutants/data/audit \
+            reports/lot35/final-mutation
+          cp src/crypto_quant_bot/__init__.py .tmp-lot35-final-mutants/src/crypto_quant_bot/
+          cp src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation*.py .tmp-lot35-final-mutants/src/crypto_quant_bot/data_governance/
+          cp src/crypto_quant_bot/data_governance/market_data_quality_engine_validation.py .tmp-lot35-final-mutants/src/crypto_quant_bot/data_governance/
+          cp src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry.py .tmp-lot35-final-mutants/src/crypto_quant_bot/data_governance/
+          cp src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry_models.py .tmp-lot35-final-mutants/src/crypto_quant_bot/data_governance/
+          cp src/crypto_quant_bot/data_governance/source_registry_models.py .tmp-lot35-final-mutants/src/crypto_quant_bot/data_governance/
+          cp src/crypto_quant_bot/data_governance/source_registry_state.py .tmp-lot35-final-mutants/src/crypto_quant_bot/data_governance/
+          cp src/crypto_quant_bot/data_governance/source_registry_validation.py .tmp-lot35-final-mutants/src/crypto_quant_bot/data_governance/
+          printf '%s\n' '"""Minimal Lot 35 package for final mutation."""' > .tmp-lot35-final-mutants/src/crypto_quant_bot/data_governance/__init__.py
+          cp tests/test_lot35_*.py .tmp-lot35-final-mutants/tests/
+          cp config/data_governance/candle_trade_book_reconciliation_v1.json .tmp-lot35-final-mutants/config/data_governance/
+          cp data/audit/lot35_v3_entry_gate.json .tmp-lot35-final-mutants/data/audit/
+          cp data/audit/market_data_quality_engine_lot34.json data/audit/market_data_quality_engine_audit_lot34.json \
+             data/audit/data_quality_states_lot34.json data/audit/data_anomalies_lot34.json data/audit/data_quality_veto_lot34.json \
+             data/audit/candle_trade_book_reconciliation_lot35.json .tmp-lot35-final-mutants/data/audit/
+          cat > .tmp-lot35-final-mutants/pyproject.toml <<'TOML'
+          [project]
+          name = "lot35-final-mutation"
+          version = "0.35.0.dev0"
+          requires-python = "==3.11.*"
+          dependencies = []
+          [tool.pytest.ini_options]
+          pythonpath = ["src", "."]
+          addopts = ["--tb=short", "-p", "no:cacheprovider"]
+          [tool.mutmut]
+          paths_to_mutate = [
+            "src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation.py",
+            "src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation_models.py",
+            "src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation_validation.py",
+          ]
+          tests_dir = ["tests/"]
+          runner = "python -m pytest -q tests/test_lot35_candle_trade_book_reconciliation.py tests/test_lot35_reconciliation_boundaries.py tests/test_lot35_mutation_contracts.py"
+          also_copy = [
+            "src/crypto_quant_bot/__init__.py",
+            "src/crypto_quant_bot/data_governance/__init__.py",
+            "src/crypto_quant_bot/data_governance/market_data_quality_engine_validation.py",
+            "src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry.py",
+            "src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry_models.py",
+            "src/crypto_quant_bot/data_governance/source_registry_models.py",
+            "src/crypto_quant_bot/data_governance/source_registry_state.py",
+            "src/crypto_quant_bot/data_governance/source_registry_validation.py",
+            "config/data_governance/candle_trade_book_reconciliation_v1.json",
+            "data/audit/lot35_v3_entry_gate.json",
+            "data/audit/market_data_quality_engine_lot34.json",
+            "data/audit/market_data_quality_engine_audit_lot34.json",
+            "data/audit/data_quality_states_lot34.json",
+            "data/audit/data_anomalies_lot34.json",
+            "data/audit/data_quality_veto_lot34.json",
+            "data/audit/candle_trade_book_reconciliation_lot35.json",
+          ]
+          mutate_only_covered_lines = true
+          timeout_factor = 8.0
+          do_not_mutate_patterns = ['raise \\w+', 'logger\\.\\w+']
+          TOML
+          cd .tmp-lot35-final-mutants
+          set -o pipefail
+          mutmut run 2>&1 | tee ../reports/lot35/final-mutation/run.txt
+          mutmut results 2>&1 | tee ../reports/lot35/final-mutation/results.txt || true
+          cd ..
+      - name: Enforce mutation >= 80 and write summary
+        env:
+          CODE_COMMIT: ${{ steps.source.outputs.sha }}
+        run: |
+          python - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          text = Path('reports/lot35/final-mutation/run.txt').read_text(encoding='utf-8', errors='replace')
+          text = re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', text).replace('\r', '\n').replace('\ufe0f', '')
+          counters = list(re.finditer(r'(\d+)\s*/\s*(\d+)', text))
+          summary_pattern = re.compile(r'🎉\s*(\d+)[\s\S]*?⏰\s*(\d+)[\s\S]*?🤔\s*(\d+)[\s\S]*?🙁\s*(\d+)')
+          parsed = None
+          for counter in reversed(counters):
+              completed, total = map(int, counter.groups())
+              if completed != total or total <= 0:
+                  continue
+              summary = summary_pattern.search(text, counter.end())
+              if summary:
+                  killed, timeout, suspicious, survived = map(int, summary.groups())
+                  if killed + timeout + suspicious + survived == total:
+                      parsed = (completed, total, killed, timeout, suspicious, survived)
+                      break
+          if parsed is None:
+              raise SystemExit('LOT35_MUTATION_SCORE_PARSE_ERROR')
+          completed, total, killed, timeout, suspicious, survived = parsed
+          evaluated = killed + timeout + suspicious + survived
+          score = 100.0 * (killed + timeout) / evaluated
+          payload = {
+              'schema_version': 'lot35-critical-mutation-summary-v1',
+              'evidence_commit': os.environ['CODE_COMMIT'],
+              'evaluated_mutants': evaluated,
+              'killed_mutants': killed,
+              'timeout_mutants': timeout,
+              'suspicious_mutants': suspicious,
+              'survived_mutants': survived,
+              'mutation_score_percent': round(score, 2),
+              'minimum_score_percent': 80.0,
+              'status': 'PASS' if score >= 80.0 else 'FAIL',
+          }
+          Path('reports/lot35/mutation_summary.json').write_text(json.dumps(payload, indent=2, sort_keys=True) + '\n')
+          print(json.dumps(payload, sort_keys=True))
+          if score < 80.0:
+              raise SystemExit('LOT35_MUTATION_BELOW_80_PERCENT')
+          PY
+      - name: Architecture security full regression and anti-flake
+        run: |
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          bandit -q -r src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation.py \
+            src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation_models.py \
+            src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation_validation.py -ll
+          pip-audit -r requirements-dev.lock
+          pytest -q
+          pytest -q tests/test_lot35_candle_trade_book_reconciliation.py tests/test_lot35_reconciliation_boundaries.py tests/test_lot35_mutation_contracts.py
+          pytest -q tests/test_lot35_candle_trade_book_reconciliation.py tests/test_lot35_reconciliation_boundaries.py tests/test_lot35_mutation_contracts.py
+          pytest -q tests/test_lot35_candle_trade_book_reconciliation.py tests/test_lot35_reconciliation_boundaries.py tests/test_lot35_mutation_contracts.py
+      - name: Freeze coverage summary and report
+        env:
+          CODE_COMMIT: ${{ steps.source.outputs.sha }}
+        run: |
+          python - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          totals = json.loads(Path('reports/lot35/final-coverage/coverage.json').read_text())['totals']
+          coverage = {
+              'schema_version': 'lot35-critical-coverage-summary-v1',
+              'evidence_commit': os.environ['CODE_COMMIT'],
+              'line_coverage_percent': round(float(totals['percent_statements_covered']), 2),
+              'line_minimum_percent': 95.0,
+              'branch_coverage_percent': round(float(totals['percent_branches_covered']), 2),
+              'branch_minimum_percent': 90.0,
+              'anti_flake_repetitions': 3,
+              'status': 'PASS',
+          }
+          Path('reports/lot35/coverage_summary.json').write_text(json.dumps(coverage, indent=2, sort_keys=True) + '\n')
+          mutation = json.loads(Path('reports/lot35/mutation_summary.json').read_text())
+          state = json.loads(Path('data/audit/candle_trade_book_reconciliation_lot35.json').read_text())
+          audit = json.loads(Path('data/audit/candle_trade_book_reconciliation_audit_lot35.json').read_text())
+          path = Path('reports/lot_35_candle_trade_book_reconciliation_report.md')
+          text = path.read_text(encoding='utf-8')
+          text = re.sub(r'IMPLEMENTED_AWAITING_EXACT_HEAD_CI', 'IMPLEMENTED_VALIDATED_PRE_MERGE', text)
+          text = re.sub(r'state_output_checksum=[0-9a-f]+', f"state_output_checksum={state['output_checksum']}", text)
+          text = re.sub(r'audit_checksum=[0-9a-f]+', f"audit_checksum={audit['audit_checksum']}", text)
+          text = re.sub(r'reference_code_commit=[0-9a-f]+', f"reference_code_commit={os.environ['CODE_COMMIT']}", text)
+          metrics = f'''\n\n## Exact-head quality evidence\n\n```text\nline_coverage_percent={coverage['line_coverage_percent']}\nbranch_coverage_percent={coverage['branch_coverage_percent']}\nmutation_score_percent={mutation['mutation_score_percent']}\nanti_flake_repetitions=3\nfull_regression=PASS\n```\n'''
+          if '## Exact-head quality evidence' not in text:
+              text += metrics
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Remove temporary machinery and push final evidence commit
+        run: |
+          rm -f .github/workflows/lot35-canonical-contract-migration.yml
+          rm -f .github/workflows/lot35-canonical-finalizer.yml
+          find . -name '*.next' -delete
+          rm -rf .tmp-lot35-final-mutants reports/lot35/final-coverage reports/lot35/final-mutation
+          git add data/audit reports/lot35 reports/lot_35_candle_trade_book_reconciliation_report.md \
+            .github/workflows/lot35-mutation.yml docs src scripts contracts tests
+          git add -u
+          git commit -m 'Freeze Lot 35 coverage mutation and canonical evidence'
+          git push origin HEAD:agent/lot35-candle-trade-book-reconciliation
