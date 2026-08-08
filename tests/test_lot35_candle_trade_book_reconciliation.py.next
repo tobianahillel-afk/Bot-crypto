@@ -1,0 +1,165 @@
+from __future__ import annotations
+
+import copy
+import json
+from pathlib import Path
+
+from crypto_quant_bot.data_governance.candle_trade_book_reconciliation import (
+    _build_veto,
+    build_lot35_artifacts,
+    build_reconciliation_reports,
+    persist_lot35_artifacts,
+)
+from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry import (
+    canonical_checksum,
+)
+
+ROOT = Path(__file__).resolve().parents[1]
+CONFIG_PATH = ROOT / "config/data_governance/candle_trade_book_reconciliation_v1.json"
+STATE_PATH = ROOT / "data/audit/candle_trade_book_reconciliation_lot35.json"
+
+
+def load_config() -> dict[str, object]:
+    payload = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    assert isinstance(payload, dict)
+    return payload
+
+
+def frozen_code_commit() -> str:
+    payload = json.loads(STATE_PATH.read_text(encoding="utf-8"))
+    return payload["run_context"]["code_commit"]
+
+
+def test_reference_artifacts_are_deterministic_and_fail_closed() -> None:
+    commit = frozen_code_commit()
+    state1, audit1 = build_lot35_artifacts(ROOT, commit)
+    state2, audit2 = build_lot35_artifacts(ROOT, commit)
+    assert state1 == state2
+    assert audit1 == audit2
+    assert canonical_checksum(state1.payload_without_checksum()) == state1.output_checksum
+    assert canonical_checksum(audit1.payload_without_checksum()) == audit1.audit_checksum
+    assert state1.veto.action == "ALLOW_ANALYSIS"
+    assert state1.validation_state == "VALIDATED_RECONCILIATION_ONLY"
+    assert state1.safety["trade_allowed"] is False
+    assert state1.safety["execution_allowed"] is False
+    assert state1.safety["approved_size"] == 0
+
+
+def test_reference_reports_have_canonical_metadata_and_checksums() -> None:
+    state, audit = build_lot35_artifacts(ROOT, frozen_code_commit())
+    assert [report.entity_type for report in state.reports] == ["BOOK", "CANDLE", "TRADE"]
+    assert [report.classification for report in state.reports] == ["MATCH", "MATCH", "TOLERATED_DIFF"]
+    for report in state.reports:
+        assert report.lineage_id == state.lineage.lineage_id
+        assert report.event_time == state.event_time
+        assert report.available_at == state.available_at
+        assert canonical_checksum(report.payload_without_checksum()) == report.output_checksum
+    assert canonical_checksum(state.veto.payload_without_checksum()) == state.veto.output_checksum
+    assert state.veto.lineage_id == state.lineage.lineage_id
+    assert state.veto.validation_state == state.validation_state
+    assert audit.lineage_id == state.lineage.lineage_id
+    assert audit.event_time == state.event_time
+    assert audit.available_at == state.available_at
+    assert audit.generated_at == state.generated_at
+    assert audit.validation_state == state.validation_state
+    assert audit.reason_codes
+
+
+def test_reference_counts_and_tolerated_trade_delta_are_exact() -> None:
+    state, audit = build_lot35_artifacts(ROOT, frozen_code_commit())
+    trade = state.reports[2]
+    assert trade.delta is not None
+    assert trade.delta.fee_abs == "0.005"
+    assert trade.delta.timestamp_us == 50_000
+    assert audit.report_count == 3
+    assert audit.match_count == 2
+    assert audit.tolerated_diff_count == 1
+    assert audit.minor_divergence_count == 0
+    assert audit.critical_divergence_count == 0
+
+
+def test_persistence_writes_four_atomic_artifacts(tmp_path: Path) -> None:
+    state, audit = build_lot35_artifacts(ROOT, frozen_code_commit())
+    persist_lot35_artifacts(tmp_path, state, audit)
+    state_payload = json.loads((tmp_path / "data/audit/candle_trade_book_reconciliation_lot35.json").read_text())
+    audit_payload = json.loads((tmp_path / "data/audit/candle_trade_book_reconciliation_audit_lot35.json").read_text())
+    reports_payload = json.loads((tmp_path / "data/audit/reconciliation_reports_lot35.json").read_text())
+    veto_payload = json.loads((tmp_path / "data/audit/reconciliation_veto_lot35.json").read_text())
+    assert state_payload == state.to_dict()
+    assert audit_payload == audit.to_dict()
+    assert reports_payload["records"] == state_payload["reports"]
+    assert veto_payload == state_payload["veto"]
+
+
+def test_exact_tolerance_boundary_is_tolerated() -> None:
+    config = load_config()
+    record = copy.deepcopy(config["records"][0])
+    record["secondary"]["price"] = "50010.01"
+    config["records"] = [record]
+    report = build_reconciliation_reports(config)[0]
+    assert report.classification == "TOLERATED_DIFF"
+    assert report.validation_state == "VALIDATED_RECONCILIATION_REPORT"
+    assert report.delta is not None and report.delta.price_abs == "0.01"
+
+
+def test_minor_divergence_pauses() -> None:
+    config = load_config()
+    record = copy.deepcopy(config["records"][0])
+    record["secondary"]["price"] = "50010.02"
+    config["records"] = [record]
+    reports = build_reconciliation_reports(config)
+    report = reports[0]
+    veto = _build_veto(reports, config)
+    assert report.classification == "MINOR_DIVERGENCE"
+    assert report.validation_state == "DIVERGENT_RECONCILIATION_REPORT"
+    assert report.corrective_action == "REVIEW_AND_PAUSE"
+    assert veto.action == "PAUSE"
+    assert veto.validation_state == "BLOCKED_RECONCILIATION"
+
+
+def test_critical_divergence_uses_kill_switch_governance_semantics() -> None:
+    config = load_config()
+    record = copy.deepcopy(config["records"][0])
+    record["secondary"]["price"] = "50010.11"
+    config["records"] = [record]
+    reports = build_reconciliation_reports(config)
+    report = reports[0]
+    veto = _build_veto(reports, config)
+    assert report.classification == "CRITICAL_DIVERGENCE"
+    assert report.corrective_action == "MANUAL_RECONCILIATION_REQUIRED"
+    assert veto.action == "KILL_SWITCH"
+    assert veto.critical_divergence_count == 1
+
+
+def test_duplicate_never_downgrades_identifier_mismatch() -> None:
+    config = load_config()
+    first = copy.deepcopy(config["records"][0])
+    second = copy.deepcopy(first)
+    second["primary"]["record_id"] = "duplicate-primary"
+    second["secondary"]["record_id"] = "duplicate-secondary"
+    first["secondary"]["identifier"] = "mismatched-id"
+    second["secondary"]["identifier"] = "mismatched-id"
+    config["records"] = [first, second]
+    reports = build_reconciliation_reports(config)
+    assert all(report.duplicate for report in reports)
+    assert all(report.classification == "CRITICAL_DIVERGENCE" for report in reports)
+    assert all("RECONCILIATION_DUPLICATE" in report.reason_codes for report in reports)
+    assert _build_veto(reports, config).action == "KILL_SWITCH"
+
+
+def test_orphan_and_unknown_source_are_critical_without_fabricated_delta() -> None:
+    config = load_config()
+    orphan = copy.deepcopy(config["records"][0])
+    orphan["secondary"] = None
+    config["records"] = [orphan]
+    report = build_reconciliation_reports(config)[0]
+    assert report.orphan is True and report.delta is None
+    assert report.classification == "CRITICAL_DIVERGENCE"
+
+    config = load_config()
+    unknown = copy.deepcopy(config["records"][0])
+    unknown["source_of_truth"] = "UNKNOWN"
+    config["records"] = [unknown]
+    report = build_reconciliation_reports(config)[0]
+    assert report.classification == "CRITICAL_DIVERGENCE"
+    assert report.reason_codes == ("RECONCILIATION_SOURCE_OF_TRUTH_UNKNOWN",)
