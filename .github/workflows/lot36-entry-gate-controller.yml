@@ -1,0 +1,222 @@
+name: Lot 36 entry gate controller
+
+on:
+  push:
+    branches: [agent/lot36-entry-gate-controller]
+    paths:
+      - '.github/workflows/lot36-entry-gate-controller.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+
+jobs:
+  gate-after-lot35-audit:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Wait for certified Lot 35 main
+        id: base
+        run: |
+          for i in $(seq 1 120); do
+            git fetch origin main
+            VERSION=$(git show origin/main:pyproject.toml | sed -n 's/^version = "\([^"]*\)"/\1/p' | head -1)
+            if [ "$VERSION" = "0.35.0" ] && git cat-file -e origin/main:data/audit/roadmap_lifecycle_overlay_lot35.json 2>/dev/null; then
+              SHA=$(git rev-parse origin/main)
+              echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+              git checkout -B agent/lot36-entry-gate origin/main
+              exit 0
+            fi
+            sleep 15
+          done
+          echo 'LOT36_GATE_WAITED_WITHOUT_CERTIFIED_LOT35' >&2
+          exit 1
+      - name: Build Lot 36 gate from canonical roadmap record
+        env:
+          BASE_SHA: ${{ steps.base.outputs.sha }}
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, re
+          from pathlib import Path
+          root=Path('.')
+          overlay=json.loads((root/'data/audit/roadmap_lifecycle_overlay_lot35.json').read_text())
+          if overlay['latest_implemented_lot'] != 35: raise SystemExit('LOT36_GATE_LATEST_LOT_NOT_35')
+          if overlay['lots'].get('36') != {'implementation_started':False,'status':'PLANNED_LOCKED'}: raise SystemExit('LOT36_NOT_LOCKED_BEFORE_GATE')
+          state=json.loads((root/'data/audit/candle_trade_book_reconciliation_lot35.json').read_text())
+          audit=json.loads((root/'data/audit/candle_trade_book_reconciliation_audit_lot35.json').read_text())
+
+          candidates=[]
+          jsonl=root/'data/audit/product_scope_roadmap_lot21.jsonl'
+          if jsonl.exists():
+              for line in jsonl.read_text().splitlines():
+                  if not line.strip(): continue
+                  item=json.loads(line)
+                  lot=item.get('lot',item.get('lot_number',item.get('id')))
+                  try: lot_num=int(lot)
+                  except (TypeError,ValueError): continue
+                  if lot_num==36: candidates.append(item)
+          if len(candidates)!=1: raise SystemExit(f'LOT36_CANONICAL_ROADMAP_RECORD_COUNT={len(candidates)}')
+          record=candidates[0]
+          owner=record.get('owner') or record.get('domain_owner') or 'MarketDataGovernanceDomain'
+          if owner!='MarketDataGovernanceDomain': raise SystemExit(f'LOT36_OWNER_UNEXPECTED={owner}')
+          outputs=None
+          for key in ('required_outputs','output_contracts','outputs','contracts'):
+              value=record.get(key)
+              if isinstance(value,list) and value:
+                  outputs=value; break
+          if outputs is None:
+              def collect(value):
+                  if isinstance(value,str) and re.search(r'(V\d+|State|Envelope|Report|Event|Contract)',value): return [value]
+                  if isinstance(value,list): return sum((collect(x) for x in value),[])
+                  if isinstance(value,dict): return sum((collect(x) for x in value.values()),[])
+                  return []
+              outputs=sorted(set(collect(record)))
+          if not outputs: raise SystemExit('LOT36_REQUIRED_OUTPUTS_UNRESOLVED')
+          outputs=[x if isinstance(x,str) else json.dumps(x,sort_keys=True) for x in outputs]
+          safety={
+              'analysis_only':True,'used_for_decision':False,'external_connectivity_allowed':False,
+              'network_ingestion_allowed':False,'real_credentials_allowed':False,
+              'market_event_publication_allowed':False,'raw_data_mutation_allowed':False,
+              'signal_generation_allowed':False,'risk_approval_allowed':False,'order_routing_allowed':False,
+              'trade_allowed':False,'execution_allowed':False,'approved_size':0,
+          }
+          payload={
+              'schema_version':'lot36-v3-entry-gate-v1','target_lot':36,'base_commit':os.environ['BASE_SHA'],
+              'current_version':'0.35.0','gate_status':'GO_LOT36_IMPLEMENTATION_ENTRY',
+              'human_decision':'APPROVED_START_LOT36','implementation_started':False,
+              'owner':'MarketDataGovernanceDomain','runtime_mode':'DATA_GOVERNANCE_ONLY',
+              'roadmap_authority':record,
+              'allowed_scope':['IMPLEMENT_ONLY_CANONICAL_ROADMAP_LOT_36'] + [f'OUTPUT:{x}' for x in outputs],
+              'required_outputs':outputs,
+              'forbidden_scope':[
+                  'EXTERNAL_NETWORK_ACCESS','LIVE_EXCHANGE_DATA','REAL_CREDENTIALS','DESTRUCTIVE_RAW_DATA_CORRECTION',
+                  'LOT37_IMPLEMENTATION','FORECAST_GENERATION','SIGNAL_GENERATION','RISK_APPROVAL','ORDER_ROUTING','TRADING','EXECUTION'
+              ],
+              'prerequisites':{
+                  'latest_implemented_lot':35,'lot35_status':'IMPLEMENTED_VALIDATED_RECONCILIATION_ONLY',
+                  'lot35_merged_commit':overlay['lots']['35']['merged_commit'],
+                  'lot35_state_checksum':state['output_checksum'],'lot35_audit_checksum':audit['audit_checksum'],
+                  'reconciliation_veto_action':state['veto']['action'],
+              },
+              'quality_gates':{'line_coverage_min_percent':95,'branch_coverage_min_percent':90,'mutation_score_min_percent':80,'anti_flake_repetitions':3},
+              'safety':safety,'next_lot':37,'next_lot_status':'PLANNED_LOCKED',
+          }
+          canonical=json.dumps(payload,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()
+          payload['output_checksum']=hashlib.sha256(canonical).hexdigest()
+          (root/'data/audit/lot36_v3_entry_gate.json').write_text(json.dumps(payload,indent=2,sort_keys=True)+'\n')
+          doc=f'''# Lot 36 — V3 Entry Gate\n\n## Verdict\n\n`GO_LOT36_IMPLEMENTATION_ENTRY`\n\nBase commit: `{os.environ['BASE_SHA']}`  \nCurrent version: `0.35.0`  \nOwner: `MarketDataGovernanceDomain`  \nRuntime: `DATA_GOVERNANCE_ONLY`\n\nThe exact canonical roadmap record is embedded in `data/audit/lot36_v3_entry_gate.json`.\nImplementation is restricted to that record and its resolved required outputs. No external network, live exchange data, real credentials, destructive correction, forecast, signal, risk, order, trading or execution scope is authorized. Lot 37 remains locked.\n\nRequired outputs resolved from roadmap:\n'''+''.join(f'- `{x}`\n' for x in outputs)+f'''\nGate checksum: `{payload['output_checksum']}`\n'''
+          (root/'docs/LOT_36_V3_ENTRY_GATE.md').write_text(doc)
+          validator=f'''#!/usr/bin/env python3\nfrom __future__ import annotations\nimport hashlib,json,tomllib\nfrom pathlib import Path\nROOT=Path(__file__).resolve().parents[1]\nEXPECTED={payload['output_checksum']!r}\ndef load(path): return json.loads((ROOT/path).read_text())\ndef checksum(value): return hashlib.sha256(json.dumps(value,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()).hexdigest()\ndef validate():\n    gate=load('data/audit/lot36_v3_entry_gate.json'); body=dict(gate); actual=body.pop('output_checksum')\n    assert actual==EXPECTED==checksum(body)\n    project=tomllib.loads((ROOT/'pyproject.toml').read_text())['project']; assert project['version']=='0.35.0'\n    overlay=load('data/audit/roadmap_lifecycle_overlay_lot35.json'); assert overlay['latest_implemented_lot']==35\n    assert overlay['lots']['36']=={{'implementation_started':False,'status':'PLANNED_LOCKED'}}\n    state=load('data/audit/candle_trade_book_reconciliation_lot35.json'); audit=load('data/audit/candle_trade_book_reconciliation_audit_lot35.json')\n    pre=gate['prerequisites']; assert pre['lot35_state_checksum']==state['output_checksum']; assert pre['lot35_audit_checksum']==audit['audit_checksum']\n    assert pre['reconciliation_veto_action']==state['veto']['action']; assert gate['required_outputs']\n    assert gate['gate_status']=='GO_LOT36_IMPLEMENTATION_ENTRY' and gate['target_lot']==36 and gate['next_lot_status']=='PLANNED_LOCKED'\n    assert gate['safety']['trade_allowed'] is False and gate['safety']['execution_allowed'] is False and gate['safety']['approved_size']==0\n    return {{'schema_version':'lot36-entry-gate-validation-v1','status':'PASS','target_lot':36,'gate_status':gate['gate_status'],'required_output_count':len(gate['required_outputs']),'output_checksum':EXPECTED,'next_locked_lot':37,'trade_allowed':False,'execution_allowed':False,'approved_size':0}}\nif __name__=='__main__': print(json.dumps(validate(),sort_keys=True))\n'''
+          (root/'scripts/validate_lot36_entry_gate.py').write_text(validator)
+          tests='''from scripts.validate_lot36_entry_gate import EXPECTED, validate\n\ndef test_lot36_entry_gate_passes():\n    result=validate(); assert result['status']=='PASS'; assert result['target_lot']==36; assert result['output_checksum']==EXPECTED; assert result['next_locked_lot']==37\n'''
+          (root/'tests/test_lot36_v3_entry_gate.py').write_text(tests)
+          PY
+      - name: Add gate CI workflow
+        run: |
+          cat > .github/workflows/lot36-entry-gate.yml <<'YAML'
+          name: Lot 36 V3 entry gate
+          on:
+            pull_request:
+              branches: [main]
+              paths:
+                - 'data/audit/lot36_v3_entry_gate.json'
+                - 'docs/LOT_36_V3_ENTRY_GATE.md'
+                - 'scripts/validate_lot36_entry_gate.py'
+                - 'tests/test_lot36_v3_entry_gate.py'
+                - '.github/workflows/lot36-entry-gate.yml'
+            workflow_dispatch:
+          permissions: {contents: read}
+          jobs:
+            gate:
+              runs-on: ubuntu-22.04
+              steps:
+                - uses: actions/checkout@v4
+                  with: {fetch-depth: 0}
+                - uses: actions/setup-python@v5
+                  with: {python-version: '3.11.9', cache: pip}
+                - run: |
+                    python -m pip install --upgrade pip
+                    python -m pip install -r requirements-dev.lock
+                - name: Gate-only boundary
+                  run: |
+                    git fetch origin main
+                    git diff --quiet origin/main...HEAD -- src/
+                - name: Validate gate and governance prerequisites
+                  run: |
+                    python -m json.tool data/audit/lot36_v3_entry_gate.json >/dev/null
+                    python -m compileall -q scripts tests
+                    ruff check scripts/validate_lot36_entry_gate.py tests/test_lot36_v3_entry_gate.py
+                    python scripts/validate_lot36_entry_gate.py
+                    pytest -q tests/test_lot36_v3_entry_gate.py
+                    python scripts/validate_roadmap_documentation.py
+                    python scripts/validate_architecture_boundaries.py
+                    python scripts/validate_domain_architecture.py
+                    python scripts/audit_roadmap_semantics.py
+                    python scripts/validate_traceability_contract.py
+                    pytest -q
+          YAML
+      - name: Commit push and open Lot 36 gate PR
+        id: gatepr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/audit/lot36_v3_entry_gate.json docs/LOT_36_V3_ENTRY_GATE.md scripts/validate_lot36_entry_gate.py tests/test_lot36_v3_entry_gate.py .github/workflows/lot36-entry-gate.yml
+          git commit -m 'Authorize Lot 36 V3 entry from canonical roadmap'
+          git push -f origin HEAD:agent/lot36-entry-gate
+          python - <<'PY'
+          import json,os,urllib.request
+          repo=os.environ['REPO']; token=os.environ['GH_TOKEN']
+          payload=json.dumps({'title':'Authorize Lot 36 V3 implementation entry','head':'agent/lot36-entry-gate','base':'main','body':'Gate-only PR generated from the canonical Lot 36 roadmap record after Lot 35 post-merge certification. No production source change. Lot 37 remains locked.'}).encode()
+          req=urllib.request.Request(f'https://api.github.com/repos/{repo}/pulls',data=payload,method='POST',headers={'Authorization':f'Bearer {token}','Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json','User-Agent':'lot36-gate-controller'})
+          with urllib.request.urlopen(req,timeout=60) as r: pr=json.loads(r.read())
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write(f"number={pr['number']}\n")
+          PY
+      - name: Require exact gate head green and merge
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ steps.gatepr.outputs.number }}
+        run: |
+          python - <<'PY'
+          import json,os,time,urllib.request
+          token=os.environ['GH_TOKEN']; repo=os.environ['REPO']; pr=os.environ['PR']
+          h={'Authorization':f'Bearer {token}','Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'lot36-gate-controller'}
+          def req(path,method='GET',payload=None):
+              data=None if payload is None else json.dumps(payload).encode(); r=urllib.request.Request('https://api.github.com'+path,data=data,method=method,headers=h)
+              with urllib.request.urlopen(r,timeout=60) as x: b=x.read(); return None if not b else json.loads(b)
+          time.sleep(20); head=None; stable=0; previous=None
+          required={'Lot 36 V3 entry gate','Institutional code quality gates','Roadmap documentation validation'}
+          for _ in range(120):
+              p=req(f'/repos/{repo}/pulls/{pr}'); current=p['head']['sha']; head=head or current
+              if current!=head: raise SystemExit('LOT36_GATE_HEAD_MOVED')
+              runs=req(f'/repos/{repo}/actions/runs?event=pull_request&head_sha={head}&per_page=100')['workflow_runs']; latest={}
+              for r in runs:
+                  if r['name'] not in latest or r['run_number']>latest[r['name']]['run_number']:latest[r['name']]=r
+              names=set(latest); terminal=all(r['status']=='completed' for r in latest.values()); failed=[r for r in latest.values() if r['status']=='completed' and r.get('conclusion')!='success']
+              if required<=names and terminal and not failed:
+                  stable=stable+1 if names==previous else 1; previous=names
+                  if stable>=3:break
+              else:stable=0;previous=names
+              time.sleep(15)
+          else:raise SystemExit('LOT36_GATE_CHECKS_NOT_GREEN')
+          result=req(f'/repos/{repo}/pulls/{pr}/merge',method='PUT',payload={'sha':head,'merge_method':'squash','commit_title':f'Authorize Lot 36 V3 implementation entry (#{pr})','commit_message':'Canonical roadmap-bound Lot 36 entry gate; Lot 37 remains locked.'})
+          if not result.get('merged'):raise SystemExit(f'LOT36_GATE_MERGE_FAILED:{result}')
+          for branch in ('agent/lot36-entry-gate','agent/lot36-entry-gate-controller'):
+              try:req(f'/repos/{repo}/git/refs/heads/{branch}',method='DELETE')
+              except Exception:pass
+          print('Lot36 gate merged:',result['sha'])
+          PY
