@@ -1,0 +1,166 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+from typing import Any
+
+ROOT = Path(__file__).resolve().parents[1]
+SOURCE_ROOT = ROOT / "src"
+if str(SOURCE_ROOT) not in sys.path:
+    sys.path.insert(0, str(SOURCE_ROOT))
+
+from crypto_quant_bot.data_governance.candle_trade_book_reconciliation_validation import (  # noqa: E402
+    ReconciliationError,
+    lot35_safety,
+    parse_utc_timestamp,
+)
+from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry import (  # noqa: E402
+    canonical_checksum,
+    file_checksum,
+    load_json_object,
+)
+
+STATE_PATH = ROOT / "data/audit/candle_trade_book_reconciliation_lot35.json"
+AUDIT_PATH = ROOT / "data/audit/candle_trade_book_reconciliation_audit_lot35.json"
+REPORTS_PATH = ROOT / "data/audit/reconciliation_reports_lot35.json"
+VETO_PATH = ROOT / "data/audit/reconciliation_veto_lot35.json"
+LOT34_STATE_PATH = ROOT / "data/audit/market_data_quality_engine_lot34.json"
+LOT34_AUDIT_PATH = ROOT / "data/audit/market_data_quality_engine_audit_lot34.json"
+LOT34_QUALITY_PATH = ROOT / "data/audit/data_quality_states_lot34.json"
+LOT34_ANOMALY_PATH = ROOT / "data/audit/data_anomalies_lot34.json"
+LOT34_VETO_PATH = ROOT / "data/audit/data_quality_veto_lot34.json"
+
+
+def require(condition: bool, message: str) -> None:
+    if not condition:
+        raise ReconciliationError(message)
+
+
+def payload_checksum(payload: dict[str, Any], field: str) -> str:
+    content = dict(payload)
+    checksum = content.pop(field, None)
+    require(isinstance(checksum, str), f"{field} missing")
+    require(canonical_checksum(content) == checksum, f"{field} mismatch")
+    return checksum
+
+
+def validate_lineage(state: dict[str, Any]) -> None:
+    lot34_state = load_json_object(LOT34_STATE_PATH)
+    lot34_audit = load_json_object(LOT34_AUDIT_PATH)
+    lineage = state["lineage"]
+    expected = {
+        "lot34_state_checksum": lot34_state["output_checksum"],
+        "lot34_audit_checksum": lot34_audit["audit_checksum"],
+        "quality_state_collection_checksum": file_checksum(LOT34_QUALITY_PATH),
+        "anomaly_collection_checksum": file_checksum(LOT34_ANOMALY_PATH),
+        "quality_veto_checksum": file_checksum(LOT34_VETO_PATH),
+    }
+    for field, value in expected.items():
+        require(lineage[field] == value, f"Lot 34 lineage mismatch: {field}")
+
+
+def validate_report_metadata(report: dict[str, Any], state: dict[str, Any]) -> None:
+    payload_checksum(report, "output_checksum")
+    require(report["lineage_id"] == state["lineage"]["lineage_id"], "report lineage mismatch")
+    event = parse_utc_timestamp(report["event_time"], "report.event_time")
+    available = parse_utc_timestamp(report["available_at"], "report.available_at")
+    generated = parse_utc_timestamp(state["generated_at"], "state.generated_at")
+    require(event <= available <= generated, "report causal time mismatch")
+    classification = report["classification"]
+    expected_state = (
+        "VALIDATED_RECONCILIATION_REPORT"
+        if classification in {"MATCH", "TOLERATED_DIFF"}
+        else "DIVERGENT_RECONCILIATION_REPORT"
+    )
+    require(report["validation_state"] == expected_state, "report validation state mismatch")
+    require(bool(report["reason_codes"]), "report reason codes missing")
+
+
+def validate_reports(state: dict[str, Any], collection: dict[str, Any]) -> None:
+    require(collection["records"] == state["reports"], "reconciliation report collection differs")
+    for report in state["reports"]:
+        require(
+            report["classification"] in {
+                "MATCH", "TOLERATED_DIFF", "MINOR_DIVERGENCE", "CRITICAL_DIVERGENCE"
+            },
+            "unknown reconciliation classification",
+        )
+        if report["orphan"]:
+            require(report["delta"] is None, "orphan reconciliation cannot expose exact delta")
+        else:
+            require(isinstance(report["delta"], dict), "non-orphan reconciliation requires exact delta")
+            require(report["delta"]["timestamp_us"] >= 0, "negative timestamp delta")
+        validate_report_metadata(report, state)
+
+
+def validate_veto(state: dict[str, Any], veto: dict[str, Any]) -> None:
+    require(veto == state["veto"], "reconciliation veto artifact differs")
+    payload_checksum(veto, "output_checksum")
+    require(veto["lineage_id"] == state["lineage"]["lineage_id"], "veto lineage mismatch")
+    require(veto["event_time"] == state["event_time"], "veto event time mismatch")
+    require(veto["available_at"] == state["available_at"], "veto availability mismatch")
+    require(veto["validation_state"] == state["validation_state"], "veto validation state mismatch")
+    require(bool(veto["reason_codes"]), "veto reason codes missing")
+
+
+def validate_audit(state: dict[str, Any], audit: dict[str, Any], state_checksum: str) -> None:
+    require(audit["state_output_checksum"] == state_checksum, "audit/state checksum mismatch")
+    for field in ("lineage_id", "event_time", "available_at", "generated_at", "validation_state"):
+        expected = state["lineage"]["lineage_id"] if field == "lineage_id" else state[field]
+        require(audit[field] == expected, f"audit metadata mismatch: {field}")
+    require(bool(audit["reason_codes"]), "audit reason codes missing")
+    count_total = sum(
+        audit[field]
+        for field in (
+            "match_count", "tolerated_diff_count", "minor_divergence_count", "critical_divergence_count"
+        )
+    )
+    require(audit["report_count"] == len(state["reports"]), "report count mismatch")
+    require(count_total == audit["report_count"], "classification counts do not reconcile")
+
+
+def validate() -> dict[str, object]:
+    state = load_json_object(STATE_PATH)
+    audit = load_json_object(AUDIT_PATH)
+    reports = load_json_object(REPORTS_PATH)
+    veto = load_json_object(VETO_PATH)
+    state_checksum = payload_checksum(state, "output_checksum")
+    audit_checksum = payload_checksum(audit, "audit_checksum")
+    validate_lineage(state)
+    validate_reports(state, reports)
+    validate_veto(state, veto)
+    validate_audit(state, audit, state_checksum)
+    for field, expected in lot35_safety().items():
+        require(state.get(field) == expected, f"state safety mismatch: {field}")
+        require(audit.get(field) == expected, f"audit safety mismatch: {field}")
+    require(state["veto"]["reconciliation_known"] is True, "reconciliation must be known")
+    return {
+        "schema_version": "lot35-validation-v1",
+        "status": "PASS",
+        "report_count": audit["report_count"],
+        "match_count": audit["match_count"],
+        "tolerated_diff_count": audit["tolerated_diff_count"],
+        "minor_divergence_count": audit["minor_divergence_count"],
+        "critical_divergence_count": audit["critical_divergence_count"],
+        "veto_action": audit["veto_action"],
+        "state_output_checksum": state_checksum,
+        "audit_checksum": audit_checksum,
+        "trade_allowed": False,
+        "execution_allowed": False,
+        "approved_size": 0,
+    }
+
+
+def main() -> int:
+    try:
+        print(json.dumps(validate(), sort_keys=True))
+    except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        print(f"LOT35 VALIDATION: FAIL\n{exc}", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
