@@ -312,16 +312,21 @@ def _build_report(
         if source_of_truth == "UNKNOWN":
             classification = "CRITICAL_DIVERGENCE"
             reasons = ("RECONCILIATION_SOURCE_OF_TRUTH_UNKNOWN",)
-        elif duplicate:
-            classification = "MINOR_DIVERGENCE"
-            reasons = ("RECONCILIATION_DUPLICATE",)
         else:
-            classification, reasons = _base_classification(
+            classification, base_reasons = _base_classification(
                 primary,
                 secondary,
                 delta,
                 config,
             )
+            if duplicate:
+                if classification == "CRITICAL_DIVERGENCE":
+                    reasons = (*base_reasons, "RECONCILIATION_DUPLICATE")
+                else:
+                    classification = "MINOR_DIVERGENCE"
+                    reasons = ("RECONCILIATION_DUPLICATE",)
+            else:
+                reasons = base_reasons
     if classification not in CLASSIFICATIONS:
         raise ReconciliationError("classification escaped contract")
     return ReconciliationReportV1(
@@ -340,6 +345,15 @@ def _build_report(
     )
 
 
+def _report_sort_key(report: ReconciliationReportV1) -> tuple[str, str, str, str]:
+    return (
+        report.reconciliation_id,
+        report.primary_record_id or "",
+        report.secondary_record_id or "",
+        canonical_checksum(report.to_dict()),
+    )
+
+
 def build_reconciliation_reports(config: dict[str, Any]) -> tuple[ReconciliationReportV1, ...]:
     _validate_config(config)
     identifiers = [record["reconciliation_id"] for record in config["records"]]
@@ -348,16 +362,7 @@ def build_reconciliation_reports(config: dict[str, Any]) -> tuple[Reconciliation
         _build_report(record, counts[record["reconciliation_id"]] > 1, config)
         for record in config["records"]
     ]
-    return tuple(
-        sorted(
-            reports,
-            key=lambda report: (
-                report.reconciliation_id,
-                report.primary_record_id or "",
-                report.secondary_record_id or "",
-            ),
-        )
-    )
+    return tuple(sorted(reports, key=_report_sort_key))
 
 
 def _build_veto(reports: tuple[ReconciliationReportV1, ...]) -> ReconciliationVetoV1:
