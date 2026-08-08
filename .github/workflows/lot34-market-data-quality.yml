@@ -15,6 +15,7 @@ on:
       - 'tests/test_lot34_market_data_quality_engine.py'
       - 'tests/test_lot34_contract_boundaries.py'
       - 'tests/test_lot34_mutation_contracts.py'
+      - 'tests/test_lot34_v3_entry_gate.py'
       - 'docs/LOT_34_MARKET_DATA_QUALITY_ENGINE.md'
       - 'docs/ACCEPTANCE_CRITERIA_LOT_34.md'
       - 'reports/lot_34_market_data_quality_engine_report.md'
@@ -63,7 +64,8 @@ jobs:
             scripts/validate_lot34_no_connectivity.py \
             tests/test_lot34_market_data_quality_engine.py \
             tests/test_lot34_contract_boundaries.py \
-            tests/test_lot34_mutation_contracts.py
+            tests/test_lot34_mutation_contracts.py \
+            tests/test_lot34_v3_entry_gate.py
           mypy src/crypto_quant_bot/data_governance
       - name: Targeted line and branch coverage
         run: |
@@ -93,7 +95,7 @@ jobs:
         env:
           CODE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
-          python scripts/validate_lot34_entry_gate.py
+          pytest -q tests/test_lot34_v3_entry_gate.py
           echo 'Lot33 canonical collection SHA-256:'
           sha256sum data/audit/canonical_time_envelopes_lot33.json
           python scripts/run_lot34_market_data_quality_engine.py --code-commit "$CODE_COMMIT"
