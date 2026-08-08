@@ -318,6 +318,7 @@ def _build_report(
     primary = _snapshot(record["primary"])
     secondary = _snapshot(record["secondary"])
     source_of_truth = require_text(record["source_of_truth"], "source_of_truth")
+    reasons: tuple[str, ...]
     if primary is None or secondary is None:
         orphan = True
         delta = None
