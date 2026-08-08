@@ -188,20 +188,20 @@ def test_delta_and_report_contracts_reject_invalid_combinations() -> None:
 
 def test_report_contract_rejects_all_invalid_enums_and_empty_reasons() -> None:
     delta = ReconciliationDeltaV1("0", "0", "0", "0", "0", 0)
-    base = dict(
-        reconciliation_id="r",
-        entity_type="TRADE",
-        source_of_truth="PRIMARY",
-        primary_record_id="p",
-        secondary_record_id="s",
-        classification="MATCH",
-        delta=delta,
-        tolerance_version="tol",
-        duplicate=False,
-        orphan=False,
-        corrective_action="NONE",
-        reason_codes=("MATCH",),
-    )
+    base = {
+        "reconciliation_id": "r",
+        "entity_type": "TRADE",
+        "source_of_truth": "PRIMARY",
+        "primary_record_id": "p",
+        "secondary_record_id": "s",
+        "classification": "MATCH",
+        "delta": delta,
+        "tolerance_version": "tol",
+        "duplicate": False,
+        "orphan": False,
+        "corrective_action": "NONE",
+        "reason_codes": ("MATCH",),
+    }
     for field, value, message in (
         ("entity_type", "ORDER", "entity type"),
         ("source_of_truth", "MAGIC", "source-of-truth"),
