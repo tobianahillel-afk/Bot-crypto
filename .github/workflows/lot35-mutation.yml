@@ -54,6 +54,8 @@ jobs:
             .tmp-lot35-mutants/src/crypto_quant_bot/data_governance/
           cp src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry_models.py \
             .tmp-lot35-mutants/src/crypto_quant_bot/data_governance/
+          cp src/crypto_quant_bot/data_governance/source_registry_models.py \
+            .tmp-lot35-mutants/src/crypto_quant_bot/data_governance/
           cp src/crypto_quant_bot/data_governance/source_registry_validation.py \
             .tmp-lot35-mutants/src/crypto_quant_bot/data_governance/
           cat > .tmp-lot35-mutants/src/crypto_quant_bot/data_governance/__init__.py <<'PY'
@@ -95,6 +97,7 @@ jobs:
             "src/crypto_quant_bot/data_governance/market_data_quality_engine_validation.py",
             "src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry.py",
             "src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry_models.py",
+            "src/crypto_quant_bot/data_governance/source_registry_models.py",
             "src/crypto_quant_bot/data_governance/source_registry_validation.py",
             "config/data_governance/candle_trade_book_reconciliation_v1.json",
             "data/audit/lot35_v3_entry_gate.json",
