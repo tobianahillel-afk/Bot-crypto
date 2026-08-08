@@ -292,6 +292,24 @@ def _corrective_action(classification: str) -> str:
     raise ReconciliationError("unexpected reconciliation classification")
 
 
+def _classify_present_pair(
+    primary: ReconciliationSnapshotV1,
+    secondary: ReconciliationSnapshotV1,
+    source_of_truth: str,
+    duplicate: bool,
+    config: dict[str, Any],
+) -> tuple[ReconciliationDeltaV1, str, tuple[str, ...]]:
+    delta = _delta(primary, secondary)
+    if source_of_truth == "UNKNOWN":
+        return delta, "CRITICAL_DIVERGENCE", ("RECONCILIATION_SOURCE_OF_TRUTH_UNKNOWN",)
+    classification, reasons = _base_classification(primary, secondary, delta, config)
+    if not duplicate:
+        return delta, classification, reasons
+    if classification == "CRITICAL_DIVERGENCE":
+        return delta, classification, (*reasons, "RECONCILIATION_DUPLICATE")
+    return delta, "MINOR_DIVERGENCE", ("RECONCILIATION_DUPLICATE",)
+
+
 def _build_report(
     record: dict[str, Any],
     duplicate: bool,
@@ -300,7 +318,6 @@ def _build_report(
     primary = _snapshot(record["primary"])
     secondary = _snapshot(record["secondary"])
     source_of_truth = require_text(record["source_of_truth"], "source_of_truth")
-    reasons: tuple[str, ...]
     if primary is None or secondary is None:
         orphan = True
         delta = None
@@ -308,25 +325,13 @@ def _build_report(
         reasons = ("RECONCILIATION_ORPHAN",)
     else:
         orphan = False
-        delta = _delta(primary, secondary)
-        if source_of_truth == "UNKNOWN":
-            classification = "CRITICAL_DIVERGENCE"
-            reasons = ("RECONCILIATION_SOURCE_OF_TRUTH_UNKNOWN",)
-        else:
-            classification, base_reasons = _base_classification(
-                primary,
-                secondary,
-                delta,
-                config,
-            )
-            if duplicate:
-                if classification == "CRITICAL_DIVERGENCE":
-                    reasons = (*base_reasons, "RECONCILIATION_DUPLICATE")
-                else:
-                    classification = "MINOR_DIVERGENCE"
-                    reasons = ("RECONCILIATION_DUPLICATE",)
-            else:
-                reasons = base_reasons
+        delta, classification, reasons = _classify_present_pair(
+            primary,
+            secondary,
+            source_of_truth,
+            duplicate,
+            config,
+        )
     if classification not in CLASSIFICATIONS:
         raise ReconciliationError("classification escaped contract")
     return ReconciliationReportV1(
