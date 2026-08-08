@@ -1,0 +1,74 @@
+{
+  "records": [
+    {
+      "classification": "MATCH",
+      "corrective_action": "NONE",
+      "delta": {
+        "balance_abs": "0",
+        "fee_abs": "0",
+        "position_abs": "0",
+        "price_abs": "0",
+        "quantity_abs": "0",
+        "schema_version": "reconciliation-delta-v1",
+        "timestamp_us": 0
+      },
+      "duplicate": false,
+      "entity_type": "BOOK",
+      "orphan": false,
+      "primary_record_id": "book-primary-003",
+      "reason_codes": ["RECONCILIATION_MATCH"],
+      "reconciliation_id": "lot35-book-btc-eur-003",
+      "schema_version": "reconciliation-report-v1",
+      "secondary_record_id": "book-secondary-003",
+      "source_of_truth": "PRIMARY",
+      "tolerance_version": "lot35-reconciliation-tolerance-v1"
+    },
+    {
+      "classification": "MATCH",
+      "corrective_action": "NONE",
+      "delta": {
+        "balance_abs": "0",
+        "fee_abs": "0",
+        "position_abs": "0",
+        "price_abs": "0",
+        "quantity_abs": "0",
+        "schema_version": "reconciliation-delta-v1",
+        "timestamp_us": 0
+      },
+      "duplicate": false,
+      "entity_type": "CANDLE",
+      "orphan": false,
+      "primary_record_id": "candle-primary-001",
+      "reason_codes": ["RECONCILIATION_MATCH"],
+      "reconciliation_id": "lot35-candle-btc-eur-001",
+      "schema_version": "reconciliation-report-v1",
+      "secondary_record_id": "candle-secondary-001",
+      "source_of_truth": "PRIMARY",
+      "tolerance_version": "lot35-reconciliation-tolerance-v1"
+    },
+    {
+      "classification": "TOLERATED_DIFF",
+      "corrective_action": "NONE",
+      "delta": {
+        "balance_abs": "0",
+        "fee_abs": "0.005",
+        "position_abs": "0",
+        "price_abs": "0",
+        "quantity_abs": "0",
+        "schema_version": "reconciliation-delta-v1",
+        "timestamp_us": 50000
+      },
+      "duplicate": false,
+      "entity_type": "TRADE",
+      "orphan": false,
+      "primary_record_id": "trade-primary-002",
+      "reason_codes": ["RECONCILIATION_WITHIN_TOLERANCE"],
+      "reconciliation_id": "lot35-trade-btc-eur-002",
+      "schema_version": "reconciliation-report-v1",
+      "secondary_record_id": "trade-secondary-002",
+      "source_of_truth": "PRIMARY",
+      "tolerance_version": "lot35-reconciliation-tolerance-v1"
+    }
+  ],
+  "schema_version": "reconciliation-report-collection-v1"
+}
