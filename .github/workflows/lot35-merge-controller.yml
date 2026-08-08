@@ -1,0 +1,143 @@
+name: Lot 35 exact-head merge controller
+
+on:
+  push:
+    branches: [agent/lot35-merge-controller]
+    paths:
+      - '.github/workflows/lot35-merge-controller.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+
+jobs:
+  merge-when-exact-head-green:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Wait for final evidence head and all PR workflows
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: '31'
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import time
+          import urllib.error
+          import urllib.request
+
+          token = os.environ['GH_TOKEN']
+          repo = os.environ['REPO']
+          pr = os.environ['PR']
+          api = 'https://api.github.com'
+          headers = {
+              'Authorization': f'Bearer {token}',
+              'Accept': 'application/vnd.github+json',
+              'X-GitHub-Api-Version': '2022-11-28',
+              'User-Agent': 'lot35-exact-head-controller',
+          }
+
+          def request(path, method='GET', payload=None):
+              data = None if payload is None else json.dumps(payload).encode()
+              req = urllib.request.Request(api + path, data=data, method=method, headers=headers)
+              with urllib.request.urlopen(req, timeout=60) as response:
+                  body = response.read()
+                  return None if not body else json.loads(body)
+
+          required = {
+              'Lot 35 candle trade book reconciliation validation',
+              'Lot 35 critical mutation assurance',
+              'Institutional code quality gates',
+              'Roadmap documentation validation',
+          }
+
+          final_head = None
+          for _ in range(80):
+              pr_data = request(f'/repos/{repo}/pulls/{pr}')
+              commits = request(f'/repos/{repo}/pulls/{pr}/commits?per_page=100')
+              head = pr_data['head']['sha']
+              final_commit_seen = any(
+                  'Freeze Lot 35 coverage mutation and canonical evidence' in item['commit']['message']
+                  for item in commits
+              )
+              if final_commit_seen:
+                  final_head = head
+                  break
+              time.sleep(15)
+          if final_head is None:
+              raise SystemExit('LOT35_FINAL_EVIDENCE_COMMIT_NOT_OBSERVED')
+
+          print('Final evidence head:', final_head)
+          time.sleep(20)
+          rerun_attempted = False
+          stable_success_polls = 0
+          previous_names = None
+
+          for _ in range(120):
+              pr_data = request(f'/repos/{repo}/pulls/{pr}')
+              if pr_data['head']['sha'] != final_head:
+                  raise SystemExit('LOT35_PR_HEAD_MOVED_AFTER_FINAL_EVIDENCE')
+              runs_payload = request(
+                  f'/repos/{repo}/actions/runs?event=pull_request&head_sha={final_head}&per_page=100'
+              )
+              latest = {}
+              for run in runs_payload['workflow_runs']:
+                  name = run['name']
+                  previous = latest.get(name)
+                  if previous is None or run['run_number'] > previous['run_number']:
+                      latest[name] = run
+              names = set(latest)
+              missing = required - names
+              terminal = all(run['status'] == 'completed' for run in latest.values())
+              failed = [
+                  run for run in latest.values()
+                  if run['status'] == 'completed' and run.get('conclusion') != 'success'
+              ]
+              if not missing and terminal and failed and not rerun_attempted:
+                  for run in failed:
+                      try:
+                          request(f"/repos/{repo}/actions/runs/{run['id']}/rerun-failed-jobs", method='POST')
+                      except urllib.error.HTTPError as exc:
+                          if exc.code not in {201, 409}:
+                              raise
+                  rerun_attempted = True
+                  stable_success_polls = 0
+                  time.sleep(20)
+                  continue
+              if not missing and terminal and not failed:
+                  if previous_names == names:
+                      stable_success_polls += 1
+                  else:
+                      stable_success_polls = 1
+                  previous_names = names
+                  if stable_success_polls >= 3:
+                      print('Exact-head PR workflows successful:', sorted(names))
+                      break
+              else:
+                  stable_success_polls = 0
+                  previous_names = names
+              time.sleep(15)
+          else:
+              raise SystemExit('LOT35_EXACT_HEAD_WORKFLOWS_NOT_GREEN')
+
+          result = request(
+              f'/repos/{repo}/pulls/{pr}/merge',
+              method='PUT',
+              payload={
+                  'sha': final_head,
+                  'merge_method': 'squash',
+                  'commit_title': 'Implement Lot 35 candle trade book reconciliation (#31)',
+                  'commit_message': 'Deterministic offline Lot 35 reconciliation with canonical evidence, fail-closed veto, exact coverage/mutation gates, and Lot 36 remaining locked.',
+              },
+          )
+          if not result.get('merged'):
+              raise SystemExit(f"LOT35_MERGE_FAILED: {result}")
+          print('Merged Lot 35 at:', result['sha'])
+          request(
+              f'/repos/{repo}/git/refs/heads/agent/lot35-merge-controller',
+              method='DELETE',
+          )
+          PY
