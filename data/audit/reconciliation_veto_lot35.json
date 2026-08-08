@@ -1,0 +1,8 @@
+{
+  "action": "ALLOW_ANALYSIS",
+  "critical_divergence_count": 0,
+  "minor_divergence_count": 0,
+  "reason_codes": ["RECONCILIATION_GATE_PASSED"],
+  "reconciliation_known": true,
+  "schema_version": "reconciliation-veto-v1"
+}
