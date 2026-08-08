@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "reconciliation_veto_v1.schema.json",
+  "title": "ReconciliationVetoV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "action", "reconciliation_known", "minor_divergence_count",
+    "critical_divergence_count", "lineage_id", "event_time", "available_at",
+    "validation_state", "reason_codes", "output_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "reconciliation-veto-v1"},
+    "action": {"enum": ["ALLOW_ANALYSIS", "PAUSE", "KILL_SWITCH"]},
+    "reconciliation_known": {"type": "boolean"},
+    "minor_divergence_count": {"type": "integer", "minimum": 0},
+    "critical_divergence_count": {"type": "integer", "minimum": 0},
+    "lineage_id": {"type": "string", "minLength": 1},
+    "event_time": {"type": "string", "pattern": "Z$"},
+    "available_at": {"type": "string", "pattern": "Z$"},
+    "validation_state": {"enum": ["VALIDATED_RECONCILIATION_ONLY", "BLOCKED_RECONCILIATION"]},
+    "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "output_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
