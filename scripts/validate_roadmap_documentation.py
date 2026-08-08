@@ -12,7 +12,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 ROADMAP_DIR = ROOT / "docs/roadmap"
 REGISTRY = ROOT / "data/audit/product_scope_roadmap_lot21.jsonl"
-OVERLAY = ROOT / "data/audit/roadmap_lifecycle_overlay_lot33.json"
+OVERLAY = ROOT / "data/audit/roadmap_lifecycle_overlay_lot34.json"
 
 VERSION_NAMES = (
     "DEFENSIVE_AUDIT_NO_TRADING", "MARKET_ANALYSIS_OFFLINE",
@@ -70,6 +70,17 @@ REQUIRED_RELEASE_FILES = {
         "data/audit/canonical_time_envelopes_lot33.json",
         "reports/lot33/coverage_summary.json",
         "reports/lot33/mutation_summary.json",
+    ],
+    34: [
+        "docs/LOT_34_MARKET_DATA_QUALITY_ENGINE.md",
+        "docs/LOT_34_POST_MERGE_AUDIT.md",
+        "data/audit/market_data_quality_engine_lot34.json",
+        "data/audit/market_data_quality_engine_audit_lot34.json",
+        "data/audit/data_quality_states_lot34.json",
+        "data/audit/data_anomalies_lot34.json",
+        "data/audit/data_quality_veto_lot34.json",
+        "reports/lot34/coverage_summary.json",
+        "reports/lot34/mutation_summary.json",
     ],
 }
 PORTFOLIO_RISK_FILES = [
@@ -161,10 +172,10 @@ def validate_version_docs() -> None:
 
 def validate_lifecycle() -> None:
     overlay = load_object(OVERLAY)
-    require(overlay.get("latest_implemented_lot") == 33, "lifecycle latest lot must be 33")
+    require(overlay.get("latest_implemented_lot") == 34, "lifecycle latest lot must be 34")
     require(
-        overlay.get("previous_overlay") == "data/audit/roadmap_lifecycle_overlay_lot32.json",
-        "Lot 33 lifecycle predecessor mismatch",
+        overlay.get("previous_overlay") == "data/audit/roadmap_lifecycle_overlay_lot33.json",
+        "Lot 34 lifecycle predecessor mismatch",
     )
     lots = overlay.get("lots")
     require(isinstance(lots, dict), "lifecycle lots missing")
@@ -177,6 +188,7 @@ def validate_lifecycle() -> None:
         "31": "IMPLEMENTED_VALIDATED_METADATA_ONLY",
         "32": "IMPLEMENTED_VALIDATED_NORMALIZATION_ONLY",
         "33": "IMPLEMENTED_VALIDATED_TEMPORAL_ONLY",
+        "34": "IMPLEMENTED_VALIDATED_DATA_QUALITY_ONLY",
     }
     for lot_number, status in expected.items():
         entry = lots.get(lot_number)
@@ -191,9 +203,17 @@ def validate_lifecycle() -> None:
     )
     require(lot33.get("external_connectivity_allowed") is False, "Lot 33 connectivity enabled")
     require(lot33.get("network_ingestion_allowed") is False, "Lot 33 ingestion enabled")
+    lot34 = lots["34"]
     require(
-        lots.get("34") == {"implementation_started": False, "status": "PLANNED_LOCKED"},
-        "Lot 34 must remain locked before its entry gate",
+        lot34.get("merged_commit") == "27880f7e14f3d1c97cce9a73f9fe4b5498947068",
+        "Lot 34 merged commit mismatch",
+    )
+    require(lot34.get("external_connectivity_allowed") is False, "Lot 34 connectivity enabled")
+    require(lot34.get("network_ingestion_allowed") is False, "Lot 34 ingestion enabled")
+    require(lot34.get("raw_data_mutation_allowed") is False, "Lot 34 raw mutation enabled")
+    require(
+        lots.get("35") == {"implementation_started": False, "status": "PLANNED_LOCKED"},
+        "Lot 35 must remain locked before its entry gate",
     )
 
 
@@ -333,6 +353,43 @@ def validate_lot33() -> None:
     validate_fail_closed((state, audit), "Lot 33")
 
 
+def validate_lot34() -> None:
+    state = load_object(ROOT / "data/audit/market_data_quality_engine_lot34.json")
+    audit = load_object(ROOT / "data/audit/market_data_quality_engine_audit_lot34.json")
+    quality_states = load_object(ROOT / "data/audit/data_quality_states_lot34.json")
+    anomalies = load_object(ROOT / "data/audit/data_anomalies_lot34.json")
+    veto = load_object(ROOT / "data/audit/data_quality_veto_lot34.json")
+    coverage = load_object(ROOT / "reports/lot34/coverage_summary.json")
+    mutation = load_object(ROOT / "reports/lot34/mutation_summary.json")
+    state_checksum = validate_payload_checksum(
+        state, "output_checksum",
+        "bc66816383ddf141016ad66796cc5dd4ad3442cd3594d96ad1f7db13d7c6bc01",
+        "Lot 34 state",
+    )
+    validate_payload_checksum(
+        audit, "audit_checksum",
+        "cd4410a2ea9ef6cdc061caf5115d908d03575e219eb9f4da402bff1712f6c7ce",
+        "Lot 34 audit",
+    )
+    require(audit.get("state_output_checksum") == state_checksum, "Lot 34 audit link mismatch")
+    require(audit.get("validation_state") == "VALIDATED_DATA_QUALITY_ONLY", "Lot 34 audit state changed")
+    require(state.get("validation_state") == "VALIDATED_DATA_QUALITY_ONLY", "Lot 34 state changed")
+    require(state.get("raw_data_mutation_allowed") is False, "Lot 34 raw mutation enabled")
+    require(state.get("market_event_publication_allowed") is False, "Lot 34 market publication enabled")
+    require(state.get("metrics", {}).get("lot_34_records_processed_total") == 3, "Lot 34 record count changed")
+    require(state.get("metrics", {}).get("lot_34_anomalies_detected_total") == 0, "Lot 34 anomaly count changed")
+    require(state.get("quality_states") == quality_states.get("quality_states"), "Lot 34 quality-state collection mismatch")
+    require(state.get("anomalies") == anomalies.get("anomalies"), "Lot 34 anomaly collection mismatch")
+    require(state.get("veto") == veto.get("veto"), "Lot 34 veto artifact mismatch")
+    require(coverage.get("status") == "PASS", "Lot 34 coverage status changed")
+    require(coverage.get("line_coverage_percent", 0) >= 95.0, "Lot 34 line coverage")
+    require(coverage.get("branch_coverage_percent", 0) >= 90.0, "Lot 34 branch coverage")
+    require(coverage.get("anti_flake_repetitions", 0) >= 3, "Lot 34 anti-flake evidence")
+    require(mutation.get("status") == "PASS", "Lot 34 mutation status changed")
+    require(mutation.get("mutation_score_percent", 0) >= 80.0, "Lot 34 mutation")
+    validate_fail_closed((state, audit), "Lot 34")
+
+
 def validate_portfolio_risk_standard() -> None:
     require_files(PORTFOLIO_RISK_FILES, "portfolio-risk")
     standard = (ROOT / PORTFOLIO_RISK_FILES[0]).read_text(encoding="utf-8")
@@ -368,13 +425,14 @@ def main() -> int:
         lot31_state, _, _ = validate_lot31()
         validate_lot32(lot31_state)
         validate_lot33()
+        validate_lot34()
         validate_portfolio_risk_standard()
         validate_no_temporary_files()
     except (RoadmapValidationError, OSError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
         print(f"ROADMAP DOCUMENTATION VALIDATION: FAIL\n{exc}", file=sys.stderr)
         return 1
     print("ROADMAP DOCUMENTATION VALIDATION: PASS")
-    print("historical_lots=178 lifecycle_latest=33 status=POST_MERGE_AUDITED next_locked=34")
+    print("historical_lots=178 lifecycle_latest=34 status=POST_MERGE_AUDITED next_locked=35")
     return 0
 
 
