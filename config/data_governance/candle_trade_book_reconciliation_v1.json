@@ -1,0 +1,97 @@
+{
+  "schema_version": "candle-trade-book-reconciliation-config-v1",
+  "config_version": "lot35-candle-trade-book-reconciliation-config-v1",
+  "run_id": "lot35-reference-run",
+  "correlation_id": "lot35-reference-correlation",
+  "lineage_id": "lot35-from-certified-lot34-quality-evidence",
+  "event_time": "2026-08-06T19:19:00.000000Z",
+  "available_at": "2026-08-06T19:19:00.050000Z",
+  "generated_at": "2026-08-06T19:19:00.100000Z",
+  "tolerance_version": "lot35-reconciliation-tolerance-v1",
+  "tolerances": {
+    "quantity_abs": "0.00000001",
+    "price_abs": "0.01",
+    "fee_abs": "0.01",
+    "balance_abs": "0.01",
+    "position_abs": "0.00000001",
+    "timestamp_us": 100000
+  },
+  "critical_multiplier": 10,
+  "records": [
+    {
+      "reconciliation_id": "lot35-candle-btc-eur-001",
+      "entity_type": "CANDLE",
+      "source_of_truth": "PRIMARY",
+      "primary": {
+        "record_id": "candle-primary-001",
+        "identifier": "btc-eur-spot:1m:20260806T191800Z",
+        "quantity": "1.25000000",
+        "price": "50010.00",
+        "fee": "0.00",
+        "balance": "100000.00",
+        "position": "1.25000000",
+        "event_time": "2026-08-06T19:18:00.000000Z"
+      },
+      "secondary": {
+        "record_id": "candle-secondary-001",
+        "identifier": "btc-eur-spot:1m:20260806T191800Z",
+        "quantity": "1.25000000",
+        "price": "50010.00",
+        "fee": "0.00",
+        "balance": "100000.00",
+        "position": "1.25000000",
+        "event_time": "2026-08-06T19:18:00.000000Z"
+      }
+    },
+    {
+      "reconciliation_id": "lot35-trade-btc-eur-002",
+      "entity_type": "TRADE",
+      "source_of_truth": "PRIMARY",
+      "primary": {
+        "record_id": "trade-primary-002",
+        "identifier": "btc-eur-spot:trade-002",
+        "quantity": "0.10000000",
+        "price": "50020.00",
+        "fee": "2.50",
+        "balance": "94995.50",
+        "position": "1.35000000",
+        "event_time": "2026-08-06T19:18:20.000000Z"
+      },
+      "secondary": {
+        "record_id": "trade-secondary-002",
+        "identifier": "btc-eur-spot:trade-002",
+        "quantity": "0.10000000",
+        "price": "50020.00",
+        "fee": "2.505",
+        "balance": "94995.50",
+        "position": "1.35000000",
+        "event_time": "2026-08-06T19:18:20.050000Z"
+      }
+    },
+    {
+      "reconciliation_id": "lot35-book-btc-eur-003",
+      "entity_type": "BOOK",
+      "source_of_truth": "PRIMARY",
+      "primary": {
+        "record_id": "book-primary-003",
+        "identifier": "btc-eur-spot:book-003",
+        "quantity": "3.50000000",
+        "price": "50025.00",
+        "fee": "0.00",
+        "balance": "94995.50",
+        "position": "1.35000000",
+        "event_time": "2026-08-06T19:18:40.000000Z"
+      },
+      "secondary": {
+        "record_id": "book-secondary-003",
+        "identifier": "btc-eur-spot:book-003",
+        "quantity": "3.50000000",
+        "price": "50025.00",
+        "fee": "0.00",
+        "balance": "94995.50",
+        "position": "1.35000000",
+        "event_time": "2026-08-06T19:18:40.000000Z"
+      }
+    }
+  ]
+}

@@ -1,5 +1,22 @@
-"""Public V3 market-data governance API introduced by Lots 31 to 34."""
+"""Public V3 market-data governance API introduced by Lots 31 to 35."""
 
+from .candle_trade_book_reconciliation import (
+    build_lot35_artifacts,
+    build_reconciliation_reports,
+    persist_lot35_artifacts,
+)
+from .candle_trade_book_reconciliation_models import (
+    CandleTradeBookReconciliationAuditV1,
+    CandleTradeBookReconciliationStateV1,
+    Lot35LineageEnvelopeV1,
+    Lot35MetricsV1,
+    Lot35RunContextV1,
+    ReconciliationDeltaV1,
+    ReconciliationReportV1,
+    ReconciliationSnapshotV1,
+    ReconciliationVetoV1,
+)
+from .candle_trade_book_reconciliation_validation import ReconciliationError
 from .instrument_symbol_and_contract_normalization import (
     build_lot32_artifacts,
     normalize_candidate_amounts,
@@ -66,6 +83,8 @@ from .timestamp_clock_timezone_models import (
 from .timestamp_clock_timezone_validation import TimestampGovernanceError
 
 __all__ = [
+    "CandleTradeBookReconciliationAuditV1",
+    "CandleTradeBookReconciliationStateV1",
     "CanonicalTimeEnvelopeV1",
     "CapabilityMatrixEntryV1",
     "ClockHealthStateV1",
@@ -88,12 +107,20 @@ __all__ = [
     "Lot34LineageEnvelopeV1",
     "Lot34MetricsV1",
     "Lot34RunContextV1",
+    "Lot35LineageEnvelopeV1",
+    "Lot35MetricsV1",
+    "Lot35RunContextV1",
     "MarketDataGovernanceScopeSourceRegistryAuditV1",
     "MarketDataGovernanceScopeSourceRegistryStateV1",
     "MarketDataQualityEngineAuditV1",
     "MarketDataQualityEngineStateV1",
     "MarketDataQualityError",
     "RawTimestampEnvelopeV1",
+    "ReconciliationDeltaV1",
+    "ReconciliationError",
+    "ReconciliationReportV1",
+    "ReconciliationSnapshotV1",
+    "ReconciliationVetoV1",
     "RunContextV1",
     "SourceRegistryEntryV1",
     "SourceRegistryV1",
@@ -106,6 +133,8 @@ __all__ = [
     "build_lot32_artifacts",
     "build_lot33_artifacts",
     "build_lot34_artifacts",
+    "build_lot35_artifacts",
+    "build_reconciliation_reports",
     "canonical_checksum",
     "detect_anomalies",
     "normalize_candidate_amounts",
@@ -113,5 +142,6 @@ __all__ = [
     "persist_lot32_artifacts",
     "persist_lot33_artifacts",
     "persist_lot34_artifacts",
+    "persist_lot35_artifacts",
     "quantize_to_increment",
 ]

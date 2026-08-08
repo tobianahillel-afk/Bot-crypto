@@ -1,0 +1,139 @@
+{
+  "analysis_only": true,
+  "approved_size": 0,
+  "available_at": "2026-08-06T19:19:00.050000Z",
+  "event_time": "2026-08-06T19:19:00.000000Z",
+  "execution_allowed": false,
+  "external_connectivity_allowed": false,
+  "generated_at": "2026-08-06T19:19:00.100000Z",
+  "lineage": {
+    "anomaly_collection_checksum": "2f5114c2fdb6a27e5074e1618ea5078689a9ab11265d3485422e02039ec03fef",
+    "available_at": "2026-08-06T19:19:00.050000Z",
+    "lineage_id": "lot35-from-certified-lot34-quality-evidence",
+    "lot34_audit_checksum": "cd4410a2ea9ef6cdc061caf5115d908d03575e219eb9f4da402bff1712f6c7ce",
+    "lot34_state_checksum": "bc66816383ddf141016ad66796cc5dd4ad3442cd3594d96ad1f7db13d7c6bc01",
+    "quality_state_collection_checksum": "6b4ba6a63b11ab6dfb36d0e7cd084a2f1e77bbae7364bdbcb15f134e84e514c9",
+    "quality_veto_checksum": "fcfece60496c59246fe84f36d8b4bcc6790426c67546c8c2db44efd6033d32b9",
+    "schema_version": "lot35-lineage-envelope-v1"
+  },
+  "market_event_publication_allowed": false,
+  "metrics": {
+    "lot_35_critical_divergence_total": 0,
+    "lot_35_match_total": 2,
+    "lot_35_minor_divergence_total": 0,
+    "lot_35_processing_latency_us": 0,
+    "lot_35_records_processed_total": 3,
+    "lot_35_tolerated_diff_total": 1,
+    "lot_35_validation_failures_total": 0,
+    "schema_version": "lot35-metrics-v1"
+  },
+  "network_ingestion_allowed": false,
+  "order_routing_allowed": false,
+  "output_checksum": "8fc7243beffdf985fd6947557b87ab7bd27f9191520eb2d5d9af25d1e7a886b4",
+  "raw_data_mutation_allowed": false,
+  "real_credentials_allowed": false,
+  "reason_codes": [
+    "LOT35_ENTRY_GATE_VERIFIED",
+    "LOT34_DATA_QUALITY_LINEAGE_VERIFIED",
+    "RECONCILIATION_DELTAS_COMPUTED_EXACTLY",
+    "VERSIONED_TOLERANCES_APPLIED",
+    "SOURCE_OF_TRUTH_RECORDED_EXPLICITLY",
+    "RECONCILIATION_VETO_EVALUATED_FAIL_CLOSED",
+    "RAW_DATA_IMMUTABILITY_PRESERVED",
+    "EXTERNAL_CONNECTIVITY_DISABLED",
+    "LOT36_REMAINS_LOCKED"
+  ],
+  "reports": [
+    {
+      "classification": "MATCH",
+      "corrective_action": "NONE",
+      "delta": {
+        "balance_abs": "0",
+        "fee_abs": "0",
+        "position_abs": "0",
+        "price_abs": "0",
+        "quantity_abs": "0",
+        "schema_version": "reconciliation-delta-v1",
+        "timestamp_us": 0
+      },
+      "duplicate": false,
+      "entity_type": "BOOK",
+      "orphan": false,
+      "primary_record_id": "book-primary-003",
+      "reason_codes": ["RECONCILIATION_MATCH"],
+      "reconciliation_id": "lot35-book-btc-eur-003",
+      "schema_version": "reconciliation-report-v1",
+      "secondary_record_id": "book-secondary-003",
+      "source_of_truth": "PRIMARY",
+      "tolerance_version": "lot35-reconciliation-tolerance-v1"
+    },
+    {
+      "classification": "MATCH",
+      "corrective_action": "NONE",
+      "delta": {
+        "balance_abs": "0",
+        "fee_abs": "0",
+        "position_abs": "0",
+        "price_abs": "0",
+        "quantity_abs": "0",
+        "schema_version": "reconciliation-delta-v1",
+        "timestamp_us": 0
+      },
+      "duplicate": false,
+      "entity_type": "CANDLE",
+      "orphan": false,
+      "primary_record_id": "candle-primary-001",
+      "reason_codes": ["RECONCILIATION_MATCH"],
+      "reconciliation_id": "lot35-candle-btc-eur-001",
+      "schema_version": "reconciliation-report-v1",
+      "secondary_record_id": "candle-secondary-001",
+      "source_of_truth": "PRIMARY",
+      "tolerance_version": "lot35-reconciliation-tolerance-v1"
+    },
+    {
+      "classification": "TOLERATED_DIFF",
+      "corrective_action": "NONE",
+      "delta": {
+        "balance_abs": "0",
+        "fee_abs": "0.005",
+        "position_abs": "0",
+        "price_abs": "0",
+        "quantity_abs": "0",
+        "schema_version": "reconciliation-delta-v1",
+        "timestamp_us": 50000
+      },
+      "duplicate": false,
+      "entity_type": "TRADE",
+      "orphan": false,
+      "primary_record_id": "trade-primary-002",
+      "reason_codes": ["RECONCILIATION_WITHIN_TOLERANCE"],
+      "reconciliation_id": "lot35-trade-btc-eur-002",
+      "schema_version": "reconciliation-report-v1",
+      "secondary_record_id": "trade-secondary-002",
+      "source_of_truth": "PRIMARY",
+      "tolerance_version": "lot35-reconciliation-tolerance-v1"
+    }
+  ],
+  "risk_approval_allowed": false,
+  "run_context": {
+    "code_commit": "a4501bb0d400c6c1b5cf970fc5aa6456ad8c6ea8",
+    "config_version": "lot35-candle-trade-book-reconciliation-config-v1",
+    "correlation_id": "lot35-reference-correlation",
+    "run_id": "lot35-reference-run",
+    "runtime_mode": "DATA_GOVERNANCE_ONLY",
+    "schema_version": "run-context-v1"
+  },
+  "schema_version": "candle-trade-book-reconciliation-state-v1",
+  "signal_generation_allowed": false,
+  "trade_allowed": false,
+  "used_for_decision": false,
+  "validation_state": "VALIDATED_RECONCILIATION_ONLY",
+  "veto": {
+    "action": "ALLOW_ANALYSIS",
+    "critical_divergence_count": 0,
+    "minor_divergence_count": 0,
+    "reason_codes": ["RECONCILIATION_GATE_PASSED"],
+    "reconciliation_known": true,
+    "schema_version": "reconciliation-veto-v1"
+  }
+}

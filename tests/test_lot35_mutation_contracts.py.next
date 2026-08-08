@@ -1,0 +1,169 @@
+from __future__ import annotations
+
+import copy
+import json
+from decimal import Decimal
+from pathlib import Path
+
+import pytest
+
+from crypto_quant_bot.data_governance.candle_trade_book_reconciliation import (
+    _build_veto,
+    build_reconciliation_reports,
+)
+from crypto_quant_bot.data_governance.candle_trade_book_reconciliation_validation import (
+    ReconciliationError,
+    canonical_decimal,
+    decimal_from_string,
+    parse_utc_timestamp,
+    require_git_sha,
+    require_identifier,
+    require_integer,
+    require_sha256,
+    require_text,
+)
+from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry import canonical_checksum
+
+ROOT = Path(__file__).resolve().parents[1]
+CONFIG_PATH = ROOT / "config/data_governance/candle_trade_book_reconciliation_v1.json"
+
+
+def load_config() -> dict[str, object]:
+    payload = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    assert isinstance(payload, dict)
+    return payload
+
+
+def one_record() -> dict[str, object]:
+    config = load_config()
+    config["records"] = [copy.deepcopy(config["records"][0])]
+    return config
+
+
+def classify_with(field: str, value: object):
+    config = one_record()
+    config["records"][0]["secondary"][field] = value
+    return build_reconciliation_reports(config)[0]
+
+
+@pytest.mark.parametrize(
+    ("field", "inside", "boundary", "outside"),
+    [
+        ("quantity", "1.250000005", "1.25000001", "1.250000011"),
+        ("price", "50010.005", "50010.01", "50010.011"),
+        ("fee", "0.005", "0.01", "0.011"),
+        ("balance", "100000.005", "100000.01", "100000.011"),
+        ("position", "1.250000005", "1.25000001", "1.250000011"),
+    ],
+)
+def test_each_decimal_tolerance_is_inclusive_and_discriminating(
+    field: str, inside: str, boundary: str, outside: str
+) -> None:
+    assert classify_with(field, inside).classification == "TOLERATED_DIFF"
+    assert classify_with(field, boundary).classification == "TOLERATED_DIFF"
+    assert classify_with(field, outside).classification == "MINOR_DIVERGENCE"
+
+
+def test_each_decimal_critical_boundary_is_inclusive() -> None:
+    cases = {
+        "quantity": ("1.25000010", "1.250000101"),
+        "price": ("50010.10", "50010.1001"),
+        "fee": ("0.10", "0.1001"),
+        "balance": ("100000.10", "100000.1001"),
+        "position": ("1.25000010", "1.250000101"),
+    }
+    for field, (boundary, outside) in cases.items():
+        assert classify_with(field, boundary).classification == "MINOR_DIVERGENCE"
+        assert classify_with(field, outside).classification == "CRITICAL_DIVERGENCE"
+
+
+def test_timestamp_boundaries_by_one_microsecond() -> None:
+    config = one_record()
+    secondary = config["records"][0]["secondary"]
+    for timestamp, expected in (
+        ("2026-08-06T19:18:00.100000Z", "TOLERATED_DIFF"),
+        ("2026-08-06T19:18:00.100001Z", "MINOR_DIVERGENCE"),
+        ("2026-08-06T19:18:01.000000Z", "MINOR_DIVERGENCE"),
+        ("2026-08-06T19:18:01.000001Z", "CRITICAL_DIVERGENCE"),
+    ):
+        secondary["event_time"] = timestamp
+        assert build_reconciliation_reports(config)[0].classification == expected
+
+
+def test_duplicate_promotes_benign_but_never_downgrades_severity() -> None:
+    config = one_record()
+    duplicate = copy.deepcopy(config["records"][0])
+    duplicate["primary"]["record_id"] = "p-copy"
+    duplicate["secondary"]["record_id"] = "s-copy"
+    config["records"].append(duplicate)
+    reports = build_reconciliation_reports(config)
+    assert all(item.classification == "MINOR_DIVERGENCE" for item in reports)
+    assert _build_veto(reports, config).action == "PAUSE"
+
+    for record in config["records"]:
+        record["secondary"]["identifier"] = "critical-mismatch"
+    reports = build_reconciliation_reports(config)
+    assert all(item.classification == "CRITICAL_DIVERGENCE" for item in reports)
+    assert _build_veto(reports, config).action == "KILL_SWITCH"
+
+
+def test_output_checksums_bind_all_report_and_veto_metadata() -> None:
+    config = load_config()
+    reports = build_reconciliation_reports(config)
+    for report in reports:
+        assert canonical_checksum(report.payload_without_checksum()) == report.output_checksum
+        assert report.lineage_id == config["lineage_id"]
+        assert report.event_time == config["event_time"]
+        assert report.available_at == config["available_at"]
+    veto = _build_veto(reports, config)
+    assert canonical_checksum(veto.payload_without_checksum()) == veto.output_checksum
+    assert veto.lineage_id == config["lineage_id"]
+    assert veto.event_time == config["event_time"]
+    assert veto.available_at == config["available_at"]
+
+
+def test_fee_pause_reason_only_appears_above_normal_tolerance() -> None:
+    tolerated = classify_with("fee", "0.01")
+    assert "RECONCILIATION_FEE_DIFF_REQUIRES_PAUSE" not in tolerated.reason_codes
+    minor = classify_with("fee", "0.011")
+    assert minor.reason_codes == (
+        "RECONCILIATION_MINOR_DIVERGENCE",
+        "RECONCILIATION_FEE_DIFF_REQUIRES_PAUSE",
+    )
+
+
+def test_identifier_comparison_is_exact() -> None:
+    config = one_record()
+    config["records"][0]["secondary"]["identifier"] = "BTC-EUR-SPOT:1m:20260806T191800Z"
+    report = build_reconciliation_reports(config)[0]
+    assert report.classification == "CRITICAL_DIVERGENCE"
+    assert report.reason_codes == ("RECONCILIATION_IDENTIFIER_MISMATCH",)
+
+
+def test_record_order_does_not_change_report_order() -> None:
+    config = load_config()
+    first = build_reconciliation_reports(config)
+    config["records"] = list(reversed(config["records"]))
+    second = build_reconciliation_reports(config)
+    assert [item.to_dict() for item in first] == [item.to_dict() for item in second]
+
+
+def test_canonical_decimal_is_stable() -> None:
+    assert canonical_decimal(Decimal("100.0000")) == "100"
+    assert canonical_decimal(Decimal("0.0000000100")) == "0.00000001"
+    assert canonical_decimal(Decimal("123.450000")) == "123.45"
+
+
+def test_validation_wrappers_translate_to_lot35_exception() -> None:
+    failing_calls = (
+        lambda: require_text("", "text"),
+        lambda: require_identifier("bad id", "identifier"),
+        lambda: require_integer(True, "integer"),
+        lambda: require_sha256("not-a-sha", "checksum"),
+        lambda: require_git_sha("not-a-commit"),
+        lambda: parse_utc_timestamp("2026-08-06T00:00:00+01:00", "time"),
+        lambda: decimal_from_string("not-a-number", "decimal"),
+    )
+    for call in failing_calls:
+        with pytest.raises(ReconciliationError):
+            call()
