@@ -247,7 +247,7 @@ class Lot35MetricsV1:
     processing_latency_us: int
 
     def __post_init__(self) -> None:
-        for field, value in (
+        for metric_field, metric_value in (
             ("records_processed_total", self.records_processed_total),
             ("validation_failures_total", self.validation_failures_total),
             ("match_total", self.match_total),
@@ -256,7 +256,7 @@ class Lot35MetricsV1:
             ("critical_divergence_total", self.critical_divergence_total),
             ("processing_latency_us", self.processing_latency_us),
         ):
-            require_integer(value, field, minimum=0)
+            require_integer(metric_value, metric_field, minimum=0)
 
     def to_dict(self) -> dict[str, int | str]:
         return {
@@ -343,22 +343,22 @@ class CandleTradeBookReconciliationAuditV1:
 
     def __post_init__(self) -> None:
         require_git_sha(self.code_commit)
-        for field, value in (
+        for checksum_field, checksum_value in (
             ("state_output_checksum", self.state_output_checksum),
             ("config_checksum", self.config_checksum),
             ("lot34_state_checksum", self.lot34_state_checksum),
             ("lot34_audit_checksum", self.lot34_audit_checksum),
             ("audit_checksum", self.audit_checksum),
         ):
-            require_sha256(value, field)
-        for field, value in (
+            require_sha256(checksum_value, checksum_field)
+        for count_field, count_value in (
             ("report_count", self.report_count),
             ("match_count", self.match_count),
             ("tolerated_diff_count", self.tolerated_diff_count),
             ("minor_divergence_count", self.minor_divergence_count),
             ("critical_divergence_count", self.critical_divergence_count),
         ):
-            require_integer(value, field, minimum=0)
+            require_integer(count_value, count_field, minimum=0)
         if self.veto_action not in VETO_ACTIONS:
             raise ReconciliationError("audit veto action invalid")
         validate_lot35_safety(self.safety)
