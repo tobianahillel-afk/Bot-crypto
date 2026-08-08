@@ -1,11 +1,11 @@
 # Roadmap canonique V1 → V21 — Lots 0 à 177
 
-Projet : **Crypto Quant Bot V3.2-Ops**
+Projet : **Crypto Quant Bot V3.4-Ops**
 
 ## État actuel
 
-- Dernier lot dont l'implémentation est terminée : **Lot 32**.
-- Version courante : `0.32.0`.
+- Dernier lot dont l'implémentation est terminée : **Lot 34**.
+- Version courante : `0.34.0`.
 - Baseline P0 institutionnelle : fusionnée.
 - Gate transversal P0.6 : fusionné et conservé comme preuve historique.
 - Lot 26 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
@@ -15,12 +15,14 @@ Projet : **Crypto Quant Bot V3.2-Ops**
 - Lot 30 : `IMPLEMENTED_VALIDATED_OFFLINE_CLOSURE_ONLY`.
 - Lot 31 : `IMPLEMENTED_VALIDATED_METADATA_ONLY`.
 - Lot 32 : `IMPLEMENTED_VALIDATED_NORMALIZATION_ONLY`.
-- Lots 33–177 : planifiés et verrouillés.
+- Lot 33 : `IMPLEMENTED_VALIDATED_TEMPORAL_ONLY`.
+- Lot 34 : `IMPLEMENTED_VALIDATED_DATA_QUALITY_ONLY`.
+- Lots 35–177 : planifiés et verrouillés.
 - V2 Market Analysis Offline est fermée pour le périmètre Lots 21–30.
-- V3 possède le registre de sources et le registre canonique d'instruments, sans connectivité ni ingestion.
+- V3 possède le registre de sources, le registre canonique d'instruments, la gouvernance temporelle et le quality gate offline, sans connectivité ni ingestion.
 - Forecast, alpha, paper, sandbox et capital réel : `NO_GO`.
 
-L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot32.json`. Le registre
+L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot34.json`. Le registre
 `data/audit/product_scope_roadmap_lot21.jsonl` reste une preuve historique immuable.
 
 ## Documents normatifs transverses
@@ -167,6 +169,45 @@ prédictives ou d'exécution sont déjà implémentées.
 - No-connectivity validator : `scripts/validate_lot32_no_connectivity.py`
 - Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot32.json`
 
+## Lot 33
+
+- [Entry gate](LOT_33_V3_ENTRY_GATE.md)
+- [Specification](LOT_33_TIMESTAMP_CLOCK_AND_TIMEZONE_GOVERNANCE.md)
+- [Acceptance criteria](ACCEPTANCE_CRITERIA_LOT_33.md)
+- [Implementation status](LOT_33_IMPLEMENTATION_WORKLOG.md)
+- [Post-merge audit](LOT_33_POST_MERGE_AUDIT.md)
+- State : `data/audit/timestamp_clock_and_timezone_governance_lot33.json`
+- Audit : `data/audit/timestamp_clock_and_timezone_governance_audit_lot33.json`
+- Canonical time collection : `data/audit/canonical_time_envelopes_lot33.json`
+- Report : `reports/lot_33_timestamp_clock_and_timezone_governance_report.md`
+- Coverage evidence : `reports/lot33/coverage_summary.json`
+- Mutation evidence : `reports/lot33/mutation_summary.json`
+- Runner : `scripts/run_lot33_timestamp_clock_and_timezone_governance.py`
+- Validator : `scripts/validate_lot33.py`
+- No-connectivity validator : `scripts/validate_lot33_no_connectivity.py`
+- Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot33.json`
+
+## Lot 34
+
+- [Entry gate](LOT_34_V3_ENTRY_GATE.md)
+- [Specification](LOT_34_MARKET_DATA_QUALITY_ENGINE.md)
+- [Acceptance criteria](ACCEPTANCE_CRITERIA_LOT_34.md)
+- [Post-merge audit](LOT_34_POST_MERGE_AUDIT.md)
+- Configuration : `config/data_governance/market_data_quality_engine_v1.json`
+- State : `data/audit/market_data_quality_engine_lot34.json`
+- Audit : `data/audit/market_data_quality_engine_audit_lot34.json`
+- Quality states : `data/audit/data_quality_states_lot34.json`
+- Anomalies : `data/audit/data_anomalies_lot34.json`
+- Quality veto : `data/audit/data_quality_veto_lot34.json`
+- Report : `reports/lot_34_market_data_quality_engine_report.md`
+- Coverage evidence : `reports/lot34/coverage_summary.json`
+- Mutation evidence : `reports/lot34/mutation_summary.json`
+- Runner : `scripts/run_lot34_market_data_quality_engine.py`
+- Validator : `scripts/validate_lot34.py`
+- No-connectivity validator : `scripts/validate_lot34_no_connectivity.py`
+- Post-merge validator : `scripts/validate_lot34_post_merge.py`
+- Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot34.json`
+
 ## Séparations obligatoires
 
 ```text
@@ -224,7 +265,7 @@ timeframes et n'autorise aucune inférence de rendement futur.
 2. Aucun lot suivant sans rapport final `GO`, validation exacte disponible et revue humaine.
 3. Chaque lot atteint les seuils tests, couverture et mutation applicables.
 4. Toute formule suit le standard mathématique et possède des oracles indépendants.
-5. Toute probabilité requiert une calibration versionnée ; les Lots 26–32 n'en produisent aucune.
+5. Toute probabilité requiert une calibration versionnée ; les Lots 26–34 n'en produisent aucune.
 6. Toute décision ou absence de décision est rejouable et auditable.
 7. Zéro BLOCKER et zéro MAJOR avant promotion.
 8. HFT, options et on-chain ne contournent jamais le core.
@@ -234,4 +275,4 @@ timeframes et n'autorise aucune inférence de rendement futur.
 12. Un statut `PLANNED_LOCKED` ou `AWAITING_EXACT_COMMIT_CI` ne peut être promu sans preuve exacte.
 13. V7, V8, V9, V15 et V17 consomment le snapshot, le sizing et les réservations canoniques ; aucune implémentation locale incompatible n'est autorisée.
 14. Tout ordre augmentant le risque exige une réservation atomique active ; toute moyenne à la baisse implicite est interdite.
-15. Lot 33 reste verrouillé après l'audit post-merge du Lot 32 jusqu'à un gate d'entrée distinct et une décision humaine explicite.
+15. Lot 35 reste verrouillé après l'audit post-merge du Lot 34 jusqu'à un gate d'entrée distinct et une décision humaine explicite.
