@@ -1,0 +1,158 @@
+name: Lot 35 canonical contract migration
+
+on:
+  push:
+    branches: [agent/lot35-candle-trade-book-reconciliation]
+    paths:
+      - '.github/workflows/lot35-canonical-contract-migration.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/lot35-candle-trade-book-reconciliation
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Install staged canonical files
+        run: |
+          mv src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation.py.next \
+             src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation.py
+          mv scripts/validate_lot35.py.next scripts/validate_lot35.py
+          mv contracts/schemas/reconciliation_report_v1.schema.json.next \
+             contracts/schemas/reconciliation_report_v1.schema.json
+          mv contracts/schemas/reconciliation_veto_v1.schema.json.next \
+             contracts/schemas/reconciliation_veto_v1.schema.json
+          mv contracts/schemas/candle_trade_book_reconciliation_state_v1.schema.json.next \
+             contracts/schemas/candle_trade_book_reconciliation_state_v1.schema.json
+          mv contracts/schemas/candle_trade_book_reconciliation_audit_v1.schema.json.next \
+             contracts/schemas/candle_trade_book_reconciliation_audit_v1.schema.json
+          mv tests/test_lot35_candle_trade_book_reconciliation.py.next \
+             tests/test_lot35_candle_trade_book_reconciliation.py
+          mv tests/test_lot35_reconciliation_boundaries.py.next \
+             tests/test_lot35_reconciliation_boundaries.py
+          mv tests/test_lot35_mutation_contracts.py.next \
+             tests/test_lot35_mutation_contracts.py
+      - name: Synchronize specification and acceptance criteria
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          spec = Path('docs/LOT_35_CANDLE_TRADE_BOOK_RECONCILIATION.md')
+          text = spec.read_text(encoding='utf-8')
+          marker = '## Canonical per-output evidence metadata'
+          if marker not in text:
+              text += '''\n\n## Canonical per-output evidence metadata\n\nEvery `ReconciliationReportV1` and `ReconciliationVetoV1` carries its own lineage id,\nevent/availability timestamps, validation state, stable reason codes and canonical SHA-256\nchecksum. The audit carries the same lineage plus event/availability/generated timestamps and\nreason codes. These fields are part of the checksummed payload and are independently\nrevalidated from persisted evidence.\n\nDuplicate detection is a **severity floor**, never an override: a duplicate may promote\n`MATCH` or `TOLERATED_DIFF` to `MINOR_DIVERGENCE`, but it can never downgrade an underlying\n`MINOR_DIVERGENCE` or `CRITICAL_DIVERGENCE`. Critical consequences retain priority.\n'''
+          spec.write_text(text, encoding='utf-8')
+
+          acceptance = Path('docs/ACCEPTANCE_CRITERIA_LOT_35.md')
+          text = acceptance.read_text(encoding='utf-8')
+          additions = '''\n- [ ] Every report has lineage, event/availability timestamps, validation state, reason codes and checksum.\n- [ ] The veto has lineage, event/availability timestamps, validation state, reason codes and checksum.\n- [ ] Audit metadata matches state lineage and causal timestamps.\n- [ ] Duplicate detection never downgrades an underlying minor or critical divergence.\n'''
+          if 'Duplicate detection never downgrades' not in text:
+              text += additions
+          acceptance.write_text(text, encoding='utf-8')
+          PY
+      - name: Pre-commit code and contract gates
+        shell: bash
+        run: |
+          set -o pipefail
+          python -m compileall -q src scripts tests
+          ruff check \
+            src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation*.py \
+            scripts/validate_lot35.py \
+            scripts/validate_lot35_no_connectivity.py \
+            tests/test_lot35_candle_trade_book_reconciliation.py \
+            tests/test_lot35_reconciliation_boundaries.py \
+            tests/test_lot35_mutation_contracts.py
+          mypy src/crypto_quant_bot/data_governance
+          pytest -q \
+            tests/test_lot35_candle_trade_book_reconciliation.py \
+            tests/test_lot35_reconciliation_boundaries.py \
+            tests/test_lot35_mutation_contracts.py
+      - name: Commit canonical implementation
+        id: code
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation.py \
+            src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation_models.py \
+            src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation_validation.py \
+            scripts/validate_lot35.py \
+            contracts/schemas/reconciliation_report_v1.schema.json \
+            contracts/schemas/reconciliation_veto_v1.schema.json \
+            contracts/schemas/candle_trade_book_reconciliation_state_v1.schema.json \
+            contracts/schemas/candle_trade_book_reconciliation_audit_v1.schema.json \
+            tests/test_lot35_candle_trade_book_reconciliation.py \
+            tests/test_lot35_reconciliation_boundaries.py \
+            tests/test_lot35_mutation_contracts.py \
+            docs/LOT_35_CANDLE_TRADE_BOOK_RECONCILIATION.md \
+            docs/ACCEPTANCE_CRITERIA_LOT_35.md
+          git add -u
+          git commit -m 'Complete canonical Lot 35 reconciliation evidence contracts'
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Generate and independently validate exact reference evidence
+        env:
+          CODE_COMMIT: ${{ steps.code.outputs.sha }}
+        run: |
+          python scripts/validate_lot35_entry_gate.py
+          python scripts/validate_lot34.py
+          python scripts/validate_lot34_no_connectivity.py
+          python scripts/run_lot35_candle_trade_book_reconciliation.py --code-commit "$CODE_COMMIT"
+          python scripts/validate_lot35.py
+          python scripts/validate_lot35_no_connectivity.py
+          cp data/audit/candle_trade_book_reconciliation_lot35.json /tmp/lot35-state-run1.json
+          cp data/audit/candle_trade_book_reconciliation_audit_lot35.json /tmp/lot35-audit-run1.json
+          cp data/audit/reconciliation_reports_lot35.json /tmp/lot35-reports-run1.json
+          cp data/audit/reconciliation_veto_lot35.json /tmp/lot35-veto-run1.json
+          python scripts/run_lot35_candle_trade_book_reconciliation.py --code-commit "$CODE_COMMIT"
+          cmp /tmp/lot35-state-run1.json data/audit/candle_trade_book_reconciliation_lot35.json
+          cmp /tmp/lot35-audit-run1.json data/audit/candle_trade_book_reconciliation_audit_lot35.json
+          cmp /tmp/lot35-reports-run1.json data/audit/reconciliation_reports_lot35.json
+          cmp /tmp/lot35-veto-run1.json data/audit/reconciliation_veto_lot35.json
+          python scripts/validate_lot35.py
+      - name: Bind report to generated evidence
+        env:
+          CODE_COMMIT: ${{ steps.code.outputs.sha }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          state = json.loads(Path('data/audit/candle_trade_book_reconciliation_lot35.json').read_text())
+          audit = json.loads(Path('data/audit/candle_trade_book_reconciliation_audit_lot35.json').read_text())
+          path = Path('reports/lot_35_candle_trade_book_reconciliation_report.md')
+          text = path.read_text(encoding='utf-8')
+          text = re.sub(r'state_output_checksum=[0-9a-f]+', f"state_output_checksum={state['output_checksum']}", text)
+          text = re.sub(r'audit_checksum=[0-9a-f]+', f"audit_checksum={audit['audit_checksum']}", text)
+          text = re.sub(r'reference_code_commit=[0-9a-f]+', f"reference_code_commit={os.environ['CODE_COMMIT']}", text)
+          if 'per_output_checksums=true' not in text:
+              text += '\n\n```text\nper_output_checksums=true\ncanonical_metadata_complete=true\nduplicate_severity_floor=true\n```\n'
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Freeze evidence and remove migration workflow
+        run: |
+          rm .github/workflows/lot35-canonical-contract-migration.yml
+          git add \
+            data/audit/candle_trade_book_reconciliation_lot35.json \
+            data/audit/candle_trade_book_reconciliation_audit_lot35.json \
+            data/audit/reconciliation_reports_lot35.json \
+            data/audit/reconciliation_veto_lot35.json \
+            reports/lot_35_candle_trade_book_reconciliation_report.md
+          git add -u
+          git commit -m 'Freeze canonical Lot 35 reconciliation reference evidence'
+          git push origin HEAD:agent/lot35-candle-trade-book-reconciliation
