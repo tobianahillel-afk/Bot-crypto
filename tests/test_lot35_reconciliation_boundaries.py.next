@@ -1,0 +1,290 @@
+from __future__ import annotations
+
+import copy
+import json
+from datetime import UTC, datetime
+from decimal import Decimal
+from pathlib import Path
+
+import pytest
+
+from crypto_quant_bot.data_governance.candle_trade_book_reconciliation import (
+    _build_veto,
+    _corrective_action,
+    _snapshot,
+    build_reconciliation_reports,
+)
+from crypto_quant_bot.data_governance.candle_trade_book_reconciliation_models import (
+    CandleTradeBookReconciliationAuditV1,
+    CandleTradeBookReconciliationStateV1,
+    Lot35LineageEnvelopeV1,
+    Lot35MetricsV1,
+    Lot35RunContextV1,
+    ReconciliationDeltaV1,
+    ReconciliationReportV1,
+    ReconciliationSnapshotV1,
+    ReconciliationVetoV1,
+)
+from crypto_quant_bot.data_governance.candle_trade_book_reconciliation_validation import (
+    ReconciliationError,
+    canonical_decimal,
+    duration_us,
+    lot35_safety,
+    require_causal_times,
+    require_reason_codes,
+    validate_lot35_safety,
+)
+
+ROOT = Path(__file__).resolve().parents[1]
+CONFIG_PATH = ROOT / "config/data_governance/candle_trade_book_reconciliation_v1.json"
+ZERO_SHA = "0" * 64
+EVENT = "2026-08-06T00:00:00Z"
+AVAILABLE = "2026-08-06T00:00:01Z"
+
+
+def load_config() -> dict[str, object]:
+    payload = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    assert isinstance(payload, dict)
+    return payload
+
+
+def one_record() -> dict[str, object]:
+    config = load_config()
+    config["records"] = [copy.deepcopy(config["records"][0])]
+    return config
+
+
+def delta(price: str = "0") -> ReconciliationDeltaV1:
+    return ReconciliationDeltaV1("0", price, "0", "0", "0", 0)
+
+
+def report(
+    classification: str = "MATCH",
+    *,
+    duplicate: bool = False,
+    orphan: bool = False,
+    reason_codes: tuple[str, ...] = ("MATCH",),
+) -> ReconciliationReportV1:
+    divergent = classification in {"MINOR_DIVERGENCE", "CRITICAL_DIVERGENCE"}
+    action = (
+        "MANUAL_RECONCILIATION_REQUIRED"
+        if classification == "CRITICAL_DIVERGENCE"
+        else "REVIEW_AND_PAUSE"
+        if classification == "MINOR_DIVERGENCE"
+        else "NONE"
+    )
+    return ReconciliationReportV1(
+        "r", "TRADE", "PRIMARY", "p", None if orphan else "s", classification,
+        None if orphan else delta("0.02" if divergent else "0"), "tol", duplicate, orphan,
+        action, "lineage", EVENT, AVAILABLE,
+        "DIVERGENT_RECONCILIATION_REPORT" if divergent else "VALIDATED_RECONCILIATION_REPORT",
+        reason_codes, ZERO_SHA,
+    )
+
+
+def test_critical_multiplier_and_timestamp_boundaries() -> None:
+    config = one_record()
+    secondary = config["records"][0]["secondary"]
+    secondary["price"] = "50010.10"
+    assert build_reconciliation_reports(config)[0].classification == "MINOR_DIVERGENCE"
+    secondary["price"] = "50010.1001"
+    assert build_reconciliation_reports(config)[0].classification == "CRITICAL_DIVERGENCE"
+
+    config = one_record()
+    secondary = config["records"][0]["secondary"]
+    secondary["event_time"] = "2026-08-06T19:18:00.100000Z"
+    assert build_reconciliation_reports(config)[0].classification == "TOLERATED_DIFF"
+    secondary["event_time"] = "2026-08-06T19:18:00.100001Z"
+    assert build_reconciliation_reports(config)[0].classification == "MINOR_DIVERGENCE"
+    secondary["event_time"] = "2026-08-06T19:18:01.000001Z"
+    assert build_reconciliation_reports(config)[0].classification == "CRITICAL_DIVERGENCE"
+
+
+def test_fee_quantity_balance_and_position_deltas_are_exact() -> None:
+    config = one_record()
+    secondary = config["records"][0]["secondary"]
+    secondary["quantity"] = "1.25000001"
+    secondary["balance"] = "100000.01"
+    secondary["position"] = "1.25000001"
+    report_value = build_reconciliation_reports(config)[0]
+    assert report_value.classification == "TOLERATED_DIFF"
+    assert report_value.delta is not None
+    assert report_value.delta.quantity_abs == "0.00000001"
+    assert report_value.delta.balance_abs == "0.01"
+    assert report_value.delta.position_abs == "0.00000001"
+
+    config = one_record()
+    config["records"][0]["secondary"]["fee"] = "0.02"
+    report_value = build_reconciliation_reports(config)[0]
+    assert report_value.classification == "MINOR_DIVERGENCE"
+    assert "RECONCILIATION_FEE_DIFF_REQUIRES_PAUSE" in report_value.reason_codes
+
+
+def test_duplicate_is_floor_not_override_for_minor_or_critical() -> None:
+    config = one_record()
+    first = config["records"][0]
+    second = copy.deepcopy(first)
+    second["primary"]["record_id"] = "copy-primary"
+    second["secondary"]["record_id"] = "copy-secondary"
+    first["secondary"]["price"] = "50010.02"
+    second["secondary"]["price"] = "50010.02"
+    config["records"] = [first, second]
+    reports = build_reconciliation_reports(config)
+    assert all(item.classification == "MINOR_DIVERGENCE" for item in reports)
+
+    first["secondary"]["price"] = "50010.11"
+    second["secondary"]["price"] = "50010.11"
+    reports = build_reconciliation_reports(config)
+    assert all(item.classification == "CRITICAL_DIVERGENCE" for item in reports)
+    assert _build_veto(reports, config).action == "KILL_SWITCH"
+
+
+def test_config_fail_closed_boundaries() -> None:
+    config = load_config()
+    config["records"] = []
+    with pytest.raises(ReconciliationError, match="requires reconciliation records"):
+        build_reconciliation_reports(config)
+
+    config = load_config()
+    config["unexpected"] = True
+    with pytest.raises(ReconciliationError, match="configuration fields"):
+        build_reconciliation_reports(config)
+
+    for field, value, message in (
+        ("schema_version", "wrong", "configuration schema"),
+        ("config_version", "wrong", "configuration version"),
+    ):
+        config = load_config()
+        config[field] = value
+        with pytest.raises(ReconciliationError, match=message):
+            build_reconciliation_reports(config)
+
+    config = load_config()
+    config["available_at"] = "2026-08-06T19:18:59Z"
+    with pytest.raises(ReconciliationError, match="causal availability"):
+        build_reconciliation_reports(config)
+
+
+def test_tolerance_record_and_snapshot_fail_closed_boundaries() -> None:
+    config = load_config()
+    del config["tolerances"]["fee_abs"]
+    with pytest.raises(ReconciliationError, match="tolerances differ"):
+        build_reconciliation_reports(config)
+
+    config = load_config()
+    config["tolerances"]["fee_abs"] = "-0.01"
+    with pytest.raises(ReconciliationError, match="non-negative"):
+        build_reconciliation_reports(config)
+
+    config = load_config()
+    config["critical_multiplier"] = 0
+    with pytest.raises(ReconciliationError, match=">= 1"):
+        build_reconciliation_reports(config)
+
+    config = one_record()
+    config["records"][0]["extra"] = "x"
+    with pytest.raises(ReconciliationError, match="record fields"):
+        build_reconciliation_reports(config)
+
+    config = one_record()
+    del config["records"][0]["primary"]["fee"]
+    with pytest.raises(ReconciliationError, match="snapshot fields"):
+        build_reconciliation_reports(config)
+
+
+def test_entity_source_and_double_orphan_fail_closed() -> None:
+    config = one_record()
+    config["records"][0]["entity_type"] = "ORDER"
+    with pytest.raises(ReconciliationError, match="entity type"):
+        build_reconciliation_reports(config)
+
+    config = one_record()
+    config["records"][0]["source_of_truth"] = "MAGIC"
+    with pytest.raises(ReconciliationError, match="source-of-truth"):
+        build_reconciliation_reports(config)
+
+    config = one_record()
+    config["records"][0]["primary"] = None
+    config["records"][0]["secondary"] = None
+    with pytest.raises(ReconciliationError, match="two absent sources"):
+        build_reconciliation_reports(config)
+
+
+def test_snapshot_delta_report_and_veto_contract_fail_closed() -> None:
+    with pytest.raises(ReconciliationError, match="non-negative"):
+        ReconciliationSnapshotV1("r", "i", "-1", "1", "0", "1", "0", EVENT)
+    with pytest.raises(ReconciliationError, match="must be UTC"):
+        ReconciliationSnapshotV1("r", "i", "1", "1", "0", "1", "0", "2026-08-06T00:00:00+01:00")
+    with pytest.raises(ReconciliationError, match="non-negative"):
+        ReconciliationDeltaV1("-1", "0", "0", "0", "0", 0)
+    with pytest.raises(ReconciliationError, match="orphan reconciliation"):
+        ReconciliationReportV1(
+            "r", "TRADE", "PRIMARY", "p", None, "CRITICAL_DIVERGENCE", delta(), "tol",
+            False, True, "MANUAL_RECONCILIATION_REQUIRED", "lineage", EVENT, AVAILABLE,
+            "DIVERGENT_RECONCILIATION_REPORT", ("ORPHAN",), ZERO_SHA,
+        )
+    with pytest.raises(ReconciliationError, match="veto action"):
+        ReconciliationVetoV1("WAIT", True, 0, 0, "lineage", EVENT, AVAILABLE, "BLOCKED_RECONCILIATION", ("X",), ZERO_SHA)
+
+
+def test_report_metadata_contract_rejects_invalid_states_and_reasons() -> None:
+    base = report()
+    with pytest.raises(ReconciliationError, match="validation state"):
+        ReconciliationReportV1(
+            base.reconciliation_id, base.entity_type, base.source_of_truth, base.primary_record_id,
+            base.secondary_record_id, base.classification, base.delta, base.tolerance_version,
+            base.duplicate, base.orphan, base.corrective_action, base.lineage_id, base.event_time,
+            base.available_at, "UNKNOWN", base.reason_codes, ZERO_SHA,
+        )
+    with pytest.raises(ReconciliationError, match="must not be empty"):
+        ReconciliationReportV1(
+            base.reconciliation_id, base.entity_type, base.source_of_truth, base.primary_record_id,
+            base.secondary_record_id, base.classification, base.delta, base.tolerance_version,
+            base.duplicate, base.orphan, base.corrective_action, base.lineage_id, base.event_time,
+            base.available_at, base.validation_state, (), ZERO_SHA,
+        )
+
+
+def test_validation_helpers_are_exact() -> None:
+    assert duration_us(datetime(2026, 1, 1, tzinfo=UTC), datetime(2026, 1, 1, 0, 0, 0, 1, tzinfo=UTC)) == 1
+    assert canonical_decimal(Decimal("1.230000")) == "1.23"
+    assert canonical_decimal(Decimal("100")) == "100"
+    assert canonical_decimal(Decimal("0.000")) == "0"
+    with pytest.raises(ReconciliationError, match="finite"):
+        canonical_decimal(Decimal("Infinity"))
+    require_causal_times(EVENT, AVAILABLE)
+    with pytest.raises(ReconciliationError, match="event_time"):
+        require_causal_times(AVAILABLE, EVENT)
+    with pytest.raises(ReconciliationError, match="generated_at"):
+        require_causal_times(EVENT, AVAILABLE, EVENT)
+    assert require_reason_codes(("A",)) == ("A",)
+    with pytest.raises(ReconciliationError, match="must not be empty"):
+        require_reason_codes(())
+    assert validate_lot35_safety(lot35_safety()) == lot35_safety()
+    with pytest.raises(ReconciliationError, match="safety boundary"):
+        validate_lot35_safety({})
+
+
+def test_run_context_private_helper_state_and_audit_fail_closed() -> None:
+    with pytest.raises(ReconciliationError, match="DATA_GOVERNANCE_ONLY"):
+        Lot35RunContextV1("r", "PAPER", "c", "0" * 40, "x")
+    with pytest.raises(ReconciliationError, match="snapshot must be an object"):
+        _snapshot("not-an-object")
+    with pytest.raises(ReconciliationError, match="unexpected reconciliation classification"):
+        _corrective_action("UNKNOWN")
+
+    context = Lot35RunContextV1("r", "DATA_GOVERNANCE_ONLY", "c", "0" * 40, "x")
+    lineage = Lot35LineageEnvelopeV1("l", "0" * 64, "1" * 64, "2" * 64, "3" * 64, "4" * 64, AVAILABLE)
+    veto = ReconciliationVetoV1("ALLOW_ANALYSIS", True, 0, 0, "l", EVENT, AVAILABLE, "VALIDATED_RECONCILIATION_ONLY", ("PASS",), ZERO_SHA)
+    metrics = Lot35MetricsV1(1, 0, 1, 0, 0, 0, 0)
+    with pytest.raises(ReconciliationError, match="requires reconciliation reports"):
+        CandleTradeBookReconciliationStateV1(
+            context, lineage, EVENT, AVAILABLE, "2026-08-06T00:00:02Z",
+            "VALIDATED_RECONCILIATION_ONLY", (), veto, metrics, ("PASS",), lot35_safety(), ZERO_SHA,
+        )
+    with pytest.raises(ReconciliationError, match="audit veto action"):
+        CandleTradeBookReconciliationAuditV1(
+            "0" * 40, "1" * 64, "2" * 64, "3" * 64, "4" * 64,
+            1, 1, 0, 0, 0, "WAIT", "l", EVENT, AVAILABLE, "2026-08-06T00:00:02Z",
+            "VALIDATED_RECONCILIATION_ONLY", ("PASS",), lot35_safety(), "5" * 64,
+        )
