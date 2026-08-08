@@ -4,8 +4,8 @@ from datetime import datetime
 from decimal import Decimal
 
 from .market_data_quality_engine_validation import (
-    MarketDataQualityError,
     decimal_from_string as _decimal_from_string,
+    MarketDataQualityError,
     parse_utc_timestamp as _parse_utc_timestamp,
     require_git_sha as _require_git_sha,
     require_identifier as _require_identifier,
