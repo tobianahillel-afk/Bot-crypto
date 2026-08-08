@@ -1,0 +1,147 @@
+name: Lot 35 candle trade book reconciliation validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'config/data_governance/candle_trade_book_reconciliation_v1.json'
+      - 'contracts/schemas/*reconciliation*.json'
+      - 'src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation*.py'
+      - 'src/crypto_quant_bot/data_governance/__init__.py'
+      - 'scripts/run_lot35_candle_trade_book_reconciliation.py'
+      - 'scripts/validate_lot35.py'
+      - 'scripts/validate_lot35_no_connectivity.py'
+      - 'tests/test_lot35_candle_trade_book_reconciliation.py'
+      - 'tests/test_lot35_reconciliation_boundaries.py'
+      - 'tests/test_lot35_mutation_contracts.py'
+      - 'docs/LOT_35_CANDLE_TRADE_BOOK_RECONCILIATION.md'
+      - 'docs/ACCEPTANCE_CRITERIA_LOT_35.md'
+      - 'reports/lot_35_candle_trade_book_reconciliation_report.md'
+      - 'data/audit/candle_trade_book_reconciliation_lot35.json'
+      - 'data/audit/candle_trade_book_reconciliation_audit_lot35.json'
+      - 'data/audit/reconciliation_reports_lot35.json'
+      - 'data/audit/reconciliation_veto_lot35.json'
+      - '.github/workflows/lot35-candle-trade-book-reconciliation.yml'
+      - 'requirements-dev.lock'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lot35:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Compile lint type and schema checks
+        run: |
+          python -m compileall -q src scripts tests
+          python -m json.tool config/data_governance/candle_trade_book_reconciliation_v1.json >/dev/null
+          python -m json.tool contracts/schemas/reconciliation_report_v1.schema.json >/dev/null
+          python -m json.tool contracts/schemas/reconciliation_veto_v1.schema.json >/dev/null
+          python -m json.tool contracts/schemas/candle_trade_book_reconciliation_state_v1.schema.json >/dev/null
+          python -m json.tool contracts/schemas/candle_trade_book_reconciliation_audit_v1.schema.json >/dev/null
+          ruff check \
+            src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation*.py \
+            src/crypto_quant_bot/data_governance/__init__.py \
+            scripts/run_lot35_candle_trade_book_reconciliation.py \
+            scripts/validate_lot35.py \
+            scripts/validate_lot35_no_connectivity.py \
+            tests/test_lot35_candle_trade_book_reconciliation.py \
+            tests/test_lot35_reconciliation_boundaries.py \
+            tests/test_lot35_mutation_contracts.py
+          mypy src/crypto_quant_bot/data_governance
+      - name: Targeted line and branch coverage
+        run: |
+          mkdir -p reports/lot35
+          coverage erase
+          pytest -q \
+            tests/test_lot35_candle_trade_book_reconciliation.py \
+            tests/test_lot35_reconciliation_boundaries.py \
+            tests/test_lot35_mutation_contracts.py \
+            --cov=crypto_quant_bot.data_governance.candle_trade_book_reconciliation \
+            --cov=crypto_quant_bot.data_governance.candle_trade_book_reconciliation_models \
+            --cov=crypto_quant_bot.data_governance.candle_trade_book_reconciliation_validation \
+            --cov-branch \
+            --cov-report=json:reports/lot35/coverage.json \
+            --cov-report=term-missing
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          totals = json.loads(Path('reports/lot35/coverage.json').read_text())['totals']
+          lines = float(totals['percent_statements_covered'])
+          branches = float(totals['percent_branches_covered'])
+          print(f'Lot35 coverage: lines={lines:.2f}% branches={branches:.2f}%')
+          if lines < 95.0 or branches < 90.0:
+              raise SystemExit('LOT35_CRITICAL_COVERAGE_BELOW_THRESHOLD')
+          PY
+      - name: Exact reconciliation artifacts and deterministic replay
+        env:
+          CODE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          python scripts/validate_lot35_entry_gate.py
+          python scripts/validate_lot34.py
+          python scripts/validate_lot34_no_connectivity.py
+          python scripts/run_lot35_candle_trade_book_reconciliation.py --code-commit "$CODE_COMMIT"
+          cp data/audit/candle_trade_book_reconciliation_lot35.json /tmp/lot35-state-run1.json
+          cp data/audit/candle_trade_book_reconciliation_audit_lot35.json /tmp/lot35-audit-run1.json
+          cp data/audit/reconciliation_reports_lot35.json /tmp/lot35-reports-run1.json
+          cp data/audit/reconciliation_veto_lot35.json /tmp/lot35-veto-run1.json
+          python scripts/validate_lot35.py
+          python scripts/validate_lot35_no_connectivity.py
+          python scripts/run_lot35_candle_trade_book_reconciliation.py --code-commit "$CODE_COMMIT"
+          cmp /tmp/lot35-state-run1.json data/audit/candle_trade_book_reconciliation_lot35.json
+          cmp /tmp/lot35-audit-run1.json data/audit/candle_trade_book_reconciliation_audit_lot35.json
+          cmp /tmp/lot35-reports-run1.json data/audit/reconciliation_reports_lot35.json
+          cmp /tmp/lot35-veto-run1.json data/audit/reconciliation_veto_lot35.json
+          python scripts/validate_lot35.py
+          git checkout -- \
+            data/audit/candle_trade_book_reconciliation_lot35.json \
+            data/audit/candle_trade_book_reconciliation_audit_lot35.json \
+            data/audit/reconciliation_reports_lot35.json \
+            data/audit/reconciliation_veto_lot35.json
+          python scripts/validate_lot35.py
+      - name: Historical architecture traceability quality and security
+        run: |
+          python scripts/validate_lot34.py
+          python scripts/validate_lot34_post_merge.py
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          bandit -q -r \
+            src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation.py \
+            src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation_models.py \
+            src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation_validation.py \
+            -ll
+          pip-audit -r requirements-dev.lock
+      - name: Full regression and anti-flake
+        run: |
+          pytest -q
+          pytest -q tests/test_lot35_candle_trade_book_reconciliation.py tests/test_lot35_reconciliation_boundaries.py tests/test_lot35_mutation_contracts.py
+          pytest -q tests/test_lot35_candle_trade_book_reconciliation.py tests/test_lot35_reconciliation_boundaries.py tests/test_lot35_mutation_contracts.py
+          pytest -q tests/test_lot35_candle_trade_book_reconciliation.py tests/test_lot35_reconciliation_boundaries.py tests/test_lot35_mutation_contracts.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot35-candle-trade-book-reconciliation-evidence
+          path: |
+            data/audit/*lot35.json
+            reports/lot_35_candle_trade_book_reconciliation_report.md
+            reports/lot35/
