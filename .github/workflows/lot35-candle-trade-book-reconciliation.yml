@@ -46,7 +46,10 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
       - name: Compile lint type and schema checks
+        shell: bash
         run: |
+          set -o pipefail
+          mkdir -p reports/lot35
           python -m compileall -q src scripts tests
           python -m json.tool config/data_governance/candle_trade_book_reconciliation_v1.json >/dev/null
           python -m json.tool contracts/schemas/reconciliation_report_v1.schema.json >/dev/null
@@ -61,8 +64,9 @@ jobs:
             scripts/validate_lot35_no_connectivity.py \
             tests/test_lot35_candle_trade_book_reconciliation.py \
             tests/test_lot35_reconciliation_boundaries.py \
-            tests/test_lot35_mutation_contracts.py
-          mypy src/crypto_quant_bot/data_governance
+            tests/test_lot35_mutation_contracts.py \
+            --output-format=concise 2>&1 | tee reports/lot35/ruff.txt
+          mypy src/crypto_quant_bot/data_governance 2>&1 | tee reports/lot35/mypy.txt
       - name: Targeted line and branch coverage
         run: |
           mkdir -p reports/lot35
