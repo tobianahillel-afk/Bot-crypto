@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "candle_trade_book_reconciliation_state_v1.schema.json",
+  "title": "CandleTradeBookReconciliationStateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "run_context", "lineage", "event_time", "available_at", "generated_at",
+    "validation_state", "reports", "veto", "metrics", "reason_codes", "analysis_only",
+    "used_for_decision", "external_connectivity_allowed", "network_ingestion_allowed",
+    "real_credentials_allowed", "market_event_publication_allowed", "raw_data_mutation_allowed",
+    "signal_generation_allowed", "risk_approval_allowed", "order_routing_allowed",
+    "trade_allowed", "execution_allowed", "approved_size", "output_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "candle-trade-book-reconciliation-state-v1"},
+    "run_context": {"type": "object"},
+    "lineage": {"type": "object"},
+    "event_time": {"type": "string"},
+    "available_at": {"type": "string"},
+    "generated_at": {"type": "string"},
+    "validation_state": {"enum": ["VALIDATED_RECONCILIATION_ONLY", "BLOCKED_RECONCILIATION"]},
+    "reports": {"type": "array", "minItems": 1, "items": {"$ref": "reconciliation_report_v1.schema.json"}},
+    "veto": {"$ref": "reconciliation_veto_v1.schema.json"},
+    "metrics": {"type": "object"},
+    "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+    "analysis_only": {"const": true},
+    "used_for_decision": {"const": false},
+    "external_connectivity_allowed": {"const": false},
+    "network_ingestion_allowed": {"const": false},
+    "real_credentials_allowed": {"const": false},
+    "market_event_publication_allowed": {"const": false},
+    "raw_data_mutation_allowed": {"const": false},
+    "signal_generation_allowed": {"const": false},
+    "risk_approval_allowed": {"const": false},
+    "order_routing_allowed": {"const": false},
+    "trade_allowed": {"const": false},
+    "execution_allowed": {"const": false},
+    "approved_size": {"const": 0},
+    "output_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
