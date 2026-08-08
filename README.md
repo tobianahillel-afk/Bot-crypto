@@ -260,7 +260,7 @@ complexité, mutation testing et répétitions anti-flake.
 - Registre de sources : `data/audit/source_registry_lot31.json`
 - Lifecycle historique : `data/audit/roadmap_lifecycle_overlay_lot31.json`
 
-### Lot 32
+### Lot 32 — Instrument, Symbol & Contract Normalization
 
 - [Gate d’entrée](docs/LOT_32_V3_ENTRY_GATE.md)
 - [Spécification](docs/LOT_32_INSTRUMENT_SYMBOL_AND_CONTRACT_NORMALIZATION.md)
