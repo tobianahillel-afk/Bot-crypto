@@ -26,6 +26,11 @@ CORRECTIVE_ACTIONS = {"NONE", "REVIEW_AND_PAUSE", "MANUAL_RECONCILIATION_REQUIRE
 VETO_ACTIONS = {"ALLOW_ANALYSIS", "PAUSE", "KILL_SWITCH"}
 
 
+def _require_optional_identifier(value: str | None, field: str) -> None:
+    if value is not None:
+        require_identifier(value, field)
+
+
 @dataclass(frozen=True, slots=True)
 class Lot35RunContextV1:
     run_id: str
@@ -173,10 +178,8 @@ class ReconciliationReportV1:
             raise ReconciliationError("unknown reconciliation entity type")
         if self.source_of_truth not in SOURCE_OF_TRUTH:
             raise ReconciliationError("unknown source-of-truth value")
-        if self.primary_record_id is not None:
-            require_identifier(self.primary_record_id, "primary_record_id")
-        if self.secondary_record_id is not None:
-            require_identifier(self.secondary_record_id, "secondary_record_id")
+        _require_optional_identifier(self.primary_record_id, "primary_record_id")
+        _require_optional_identifier(self.secondary_record_id, "secondary_record_id")
         if self.classification not in CLASSIFICATIONS:
             raise ReconciliationError("unknown reconciliation classification")
         if self.corrective_action not in CORRECTIVE_ACTIONS:
