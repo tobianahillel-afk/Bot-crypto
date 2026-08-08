@@ -36,12 +36,12 @@ jobs:
         run: |
           git fetch origin main
           git diff --quiet origin/main...HEAD -- src/
-      - name: Compile lint and gate validation
+      - name: Compile lint and archived gate validation
         run: |
           python -m compileall -q scripts tests
           ruff check scripts/validate_lot34_entry_gate.py tests/test_lot34_v3_entry_gate.py
-          python scripts/validate_lot33_post_merge.py
-          python scripts/validate_lot34_entry_gate.py
+          python scripts/validate_lot33.py
+          python scripts/validate_lot33_no_connectivity.py
           pytest -q tests/test_lot34_v3_entry_gate.py
       - name: Historical architecture and roadmap checks
         run: |
