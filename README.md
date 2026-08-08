@@ -1,4 +1,4 @@
-# Crypto Quant Bot V3.2-Ops
+# Crypto Quant Bot V3.4-Ops
 
 Plateforme quantitative crypto défensive, déterministe, extensible et auditable.
 
@@ -6,10 +6,10 @@ Plateforme quantitative crypto défensive, déterministe, extensible et auditabl
 
 | Élément | État |
 |---|---|
-| Dernier lot implémenté et validé | **Lot 32 — Instrument, Symbol & Contract Normalization** |
-| Version | **0.32.0** |
+| Dernier lot implémenté et validé | **Lot 34 — Market Data Quality Engine** |
+| Version | **0.34.0** |
 | Baseline qualité | **P0 institutionnel fusionné** |
-| Prochain lot planifié | **Lot 33 — Canonical Time & Market Session Governance**, `PLANNED_LOCKED` |
+| Prochain lot planifié | **Lot 35 — Candle / Trade / Book Reconciliation**, `PLANNED_LOCKED` |
 | Runtime maximal | `DATA_GOVERNANCE_ONLY` |
 | Trading | **désactivé** |
 | Connectivité exchange | **désactivée** |
@@ -40,6 +40,19 @@ offline. La référence certifiée est `BTC/EUR:SPOT`, reliée aux alias déclar
 Coinbase et Kraken. Les contraintes utilisent des chaînes décimales exactes, les conversions
 canonique ↔ venue sont bidirectionnelles et les champs dérivés non applicables restent
 explicitement nuls. Aucun connecteur ou événement de marché n’est activé.
+
+Le Lot 33 normalise les timestamps, horloges et timezones de façon déterministe. Les valeurs
+canoniques sont en UTC, les offsets sont vérifiés contre les timezones IANA, les durées
+critiques utilisent des microsecondes entières et l'ordre canonique est
+`(event_time_utc, sequence_id, revision_id)`. La fixture certifiée reste `HEALTHY` et aucune
+connectivité ou publication d'événement de marché n'est autorisée.
+
+Le Lot 34 ajoute le **Market Data Quality Engine** offline : détection des intervalles
+manquants, doublons, out-of-order, stale data, OHLC invalides, volumes négatifs, spreads
+impossibles et schema drift. Il calcule coverage/freshness/completeness/consistency en points
+de base, applique une quarantaine non destructive et un veto fail-closed. Les preuves
+certifiées sont 98.80% lignes, 97.30% branches et 84.00% mutation. Le raw reste immuable,
+le réseau reste désactivé et aucune capacité de trading n'est ouverte.
 
 ## Vision temporelle
 
@@ -80,10 +93,10 @@ est interdit.
 ## Flux continu et données confirmées
 
 Une barre ouverte peut être observée comme état provisoire, mais elle ne peut pas être
-consommée comme état confirmé. Les Lots 31 et 32 ne publient encore aucun événement de
-marché : ils possèdent uniquement le registre des sources et le registre canonique des
-instruments. Le temps canonique, la qualité, la réconciliation et le flux continu
-appartiennent aux Lots 33 à 36 ; les features de carnet, trades, liquidations et order flow
+consommée comme état confirmé. Les Lots 31 à 34 restent dans un périmètre de gouvernance
+offline : registre de sources, instruments canoniques, temps canonique et qualité des données.
+Le Lot 35 possède la réconciliation candle/trade/book et le Lot 36 la fermeture V3 avec les
+audits de freshness/gap/outage. Les features de carnet, trades, liquidations et order flow
 appartiennent à V4.
 
 ## Prévision et modèles stochastiques
@@ -92,7 +105,7 @@ La roadmap prévoit des prévisions par horizons distincts — initialement 30s,
 1h — avec distributions, quantiles, volatilité, target/stop hit, MAE/MFE, temps avant
 événement et incertitude.
 
-Ces contrats sont `PLANNED_LOCKED_NOT_IMPLEMENTED`. Les Lots 26 à 32 ne produisent aucune
+Ces contrats sont `PLANNED_LOCKED_NOT_IMPLEMENTED`. Les Lots 26 à 34 ne produisent aucune
 prediction, probability, expected return ou direction BUY/SELL.
 
 Les futurs modèles stochastiques devront être sélectionnés par preuve, comparés à des
@@ -173,12 +186,15 @@ python -m pip install -r requirements-dev.lock
 
 ```bash
 python scripts/validate_lot30.py
-python scripts/validate_lot31_entry_gate.py
 python scripts/validate_lot31.py
 python scripts/validate_lot31_no_connectivity.py
-python scripts/validate_lot32_entry_gate.py
 python scripts/validate_lot32.py
 python scripts/validate_lot32_no_connectivity.py
+python scripts/validate_lot33.py
+python scripts/validate_lot33_no_connectivity.py
+python scripts/validate_lot34.py
+python scripts/validate_lot34_no_connectivity.py
+python scripts/validate_lot34_post_merge.py
 python scripts/validate_roadmap_documentation.py
 python scripts/validate_architecture_boundaries.py
 python scripts/check_no_silent_numeric_coercion.py
@@ -255,7 +271,32 @@ complexité, mutation testing et répétitions anti-flake.
 - État certifié : `data/audit/instrument_symbol_and_contract_normalization_lot32.json`
 - Audit certifié : `data/audit/instrument_symbol_and_contract_normalization_audit_lot32.json`
 - Registre d’instruments : `data/audit/instrument_registry_lot32.json`
-- Lifecycle courant : `data/audit/roadmap_lifecycle_overlay_lot32.json`
+- Lifecycle historique : `data/audit/roadmap_lifecycle_overlay_lot32.json`
+
+### Lot 33
+
+- [Gate d’entrée](docs/LOT_33_V3_ENTRY_GATE.md)
+- [Spécification](docs/LOT_33_TIMESTAMP_CLOCK_AND_TIMEZONE_GOVERNANCE.md)
+- [Critères d’acceptation](docs/ACCEPTANCE_CRITERIA_LOT_33.md)
+- [Audit post-merge](docs/LOT_33_POST_MERGE_AUDIT.md)
+- État certifié : `data/audit/timestamp_clock_and_timezone_governance_lot33.json`
+- Audit certifié : `data/audit/timestamp_clock_and_timezone_governance_audit_lot33.json`
+- Collection canonique : `data/audit/canonical_time_envelopes_lot33.json`
+- Lifecycle historique : `data/audit/roadmap_lifecycle_overlay_lot33.json`
+
+### Lot 34
+
+- [Gate d’entrée](docs/LOT_34_V3_ENTRY_GATE.md)
+- [Spécification](docs/LOT_34_MARKET_DATA_QUALITY_ENGINE.md)
+- [Critères d’acceptation](docs/ACCEPTANCE_CRITERIA_LOT_34.md)
+- [Audit post-merge](docs/LOT_34_POST_MERGE_AUDIT.md)
+- [Rapport final](reports/lot_34_market_data_quality_engine_report.md)
+- État certifié : `data/audit/market_data_quality_engine_lot34.json`
+- Audit certifié : `data/audit/market_data_quality_engine_audit_lot34.json`
+- États qualité : `data/audit/data_quality_states_lot34.json`
+- Anomalies : `data/audit/data_anomalies_lot34.json`
+- Veto qualité : `data/audit/data_quality_veto_lot34.json`
+- Lifecycle courant : `data/audit/roadmap_lifecycle_overlay_lot34.json`
 
 ### Architecture future verrouillée
 
