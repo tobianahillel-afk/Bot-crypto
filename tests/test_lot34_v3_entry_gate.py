@@ -9,7 +9,6 @@ from scripts.validate_lot34_entry_gate import (
     EXPECTED_CHECKSUM,
     Lot34EntryGateError,
     canonical_checksum,
-    validate,
     validate_gate_checksum,
     validate_quality_and_safety,
     validate_scope,
@@ -25,17 +24,17 @@ def load_gate() -> dict[str, object]:
     return value
 
 
-def test_lot34_entry_gate_validator_passes() -> None:
-    assert validate() == {
-        "schema_version": "lot34-entry-gate-validation-v1",
-        "status": "PASS",
-        "gate_status": "GO_LOT34_IMPLEMENTATION_ENTRY",
-        "output_checksum": EXPECTED_CHECKSUM,
-        "next_locked_lot": 35,
-        "trade_allowed": False,
-        "execution_allowed": False,
-        "approved_size": 0,
-    }
+def test_lot34_entry_gate_archive_remains_certified() -> None:
+    gate = load_gate()
+    validate_gate_checksum(gate)
+    validate_scope(gate)
+    validate_quality_and_safety(gate)
+    assert gate["current_version"] == "0.33.0"
+    assert gate["gate_status"] == "GO_LOT34_IMPLEMENTATION_ENTRY"
+    assert gate["human_decision"] == "APPROVED_START_LOT34"
+    assert gate["implementation_started"] is False
+    assert gate["next_lot"] == 35
+    assert gate["next_lot_status"] == "PLANNED_LOCKED"
 
 
 def test_lot34_gate_checksum_recomputes() -> None:
