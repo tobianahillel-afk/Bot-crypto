@@ -300,19 +300,28 @@ def _build_report(
     primary = _snapshot(record["primary"])
     secondary = _snapshot(record["secondary"])
     source_of_truth = require_text(record["source_of_truth"], "source_of_truth")
-    orphan = primary is None or secondary is None
-    delta = None if orphan else _delta(primary, secondary)
-    if orphan:
+    reasons: tuple[str, ...]
+    if primary is None or secondary is None:
+        orphan = True
+        delta = None
         classification = "CRITICAL_DIVERGENCE"
         reasons = ("RECONCILIATION_ORPHAN",)
-    elif source_of_truth == "UNKNOWN":
-        classification = "CRITICAL_DIVERGENCE"
-        reasons = ("RECONCILIATION_SOURCE_OF_TRUTH_UNKNOWN",)
-    elif duplicate:
-        classification = "MINOR_DIVERGENCE"
-        reasons = ("RECONCILIATION_DUPLICATE",)
     else:
-        classification, reasons = _base_classification(primary, secondary, delta, config)
+        orphan = False
+        delta = _delta(primary, secondary)
+        if source_of_truth == "UNKNOWN":
+            classification = "CRITICAL_DIVERGENCE"
+            reasons = ("RECONCILIATION_SOURCE_OF_TRUTH_UNKNOWN",)
+        elif duplicate:
+            classification = "MINOR_DIVERGENCE"
+            reasons = ("RECONCILIATION_DUPLICATE",)
+        else:
+            classification, reasons = _base_classification(
+                primary,
+                secondary,
+                delta,
+                config,
+            )
     if classification not in CLASSIFICATIONS:
         raise ReconciliationError("classification escaped contract")
     return ReconciliationReportV1(
