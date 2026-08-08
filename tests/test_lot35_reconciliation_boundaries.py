@@ -8,9 +8,12 @@ import pytest
 
 from crypto_quant_bot.data_governance.candle_trade_book_reconciliation import (
     _build_veto,
+    _corrective_action,
+    _snapshot,
     build_reconciliation_reports,
 )
 from crypto_quant_bot.data_governance.candle_trade_book_reconciliation_models import (
+    CandleTradeBookReconciliationAuditV1,
     CandleTradeBookReconciliationStateV1,
     Lot35LineageEnvelopeV1,
     Lot35MetricsV1,
@@ -166,6 +169,10 @@ def test_snapshot_rejects_negative_values_and_bad_time() -> None:
         ReconciliationSnapshotV1("r", "i", "-1", "1", "0", "1", "0", "2026-08-06T00:00:00Z")
     with pytest.raises(ReconciliationError, match="must be UTC"):
         ReconciliationSnapshotV1("r", "i", "1", "1", "0", "1", "0", "2026-08-06T00:00:00+01:00")
+    snapshot = ReconciliationSnapshotV1(
+        "r", "i", "1", "2", "0", "3", "4", "2026-08-06T00:00:00Z"
+    )
+    assert snapshot.to_dict()["schema_version"] == "reconciliation-snapshot-v1"
 
 
 def test_delta_and_report_contracts_reject_invalid_combinations() -> None:
@@ -177,6 +184,43 @@ def test_delta_and_report_contracts_reject_invalid_combinations() -> None:
             "r", "TRADE", "PRIMARY", "p", None, "CRITICAL_DIVERGENCE",
             delta, "tol-v1", False, True, "MANUAL_RECONCILIATION_REQUIRED", ("ORPHAN",),
         )
+
+
+def test_report_contract_rejects_all_invalid_enums_and_empty_reasons() -> None:
+    delta = ReconciliationDeltaV1("0", "0", "0", "0", "0", 0)
+    base = dict(
+        reconciliation_id="r",
+        entity_type="TRADE",
+        source_of_truth="PRIMARY",
+        primary_record_id="p",
+        secondary_record_id="s",
+        classification="MATCH",
+        delta=delta,
+        tolerance_version="tol",
+        duplicate=False,
+        orphan=False,
+        corrective_action="NONE",
+        reason_codes=("MATCH",),
+    )
+    for field, value, message in (
+        ("entity_type", "ORDER", "entity type"),
+        ("source_of_truth", "MAGIC", "source-of-truth"),
+        ("classification", "UNKNOWN", "classification"),
+        ("corrective_action", "WAIT", "corrective action"),
+    ):
+        payload = dict(base)
+        payload[field] = value
+        with pytest.raises(ReconciliationError, match=message):
+            ReconciliationReportV1(**payload)
+    payload = dict(base)
+    payload["reason_codes"] = ()
+    with pytest.raises(ReconciliationError, match="requires reason codes"):
+        ReconciliationReportV1(**payload)
+    orphan_primary_missing = ReconciliationReportV1(
+        "orphan-primary", "TRADE", "PRIMARY", None, "s", "CRITICAL_DIVERGENCE",
+        None, "tol", False, True, "MANUAL_RECONCILIATION_REQUIRED", ("ORPHAN",),
+    )
+    assert orphan_primary_missing.primary_record_id is None
 
 
 def test_veto_contract_and_priority() -> None:
@@ -200,6 +244,8 @@ def test_veto_contract_and_priority() -> None:
     assert _build_veto((minor_report, critical_report)).action == "KILL_SWITCH"
     with pytest.raises(ReconciliationError, match="veto action"):
         ReconciliationVetoV1("WAIT", True, 0, 0, ("X",))
+    with pytest.raises(ReconciliationError, match="requires reason codes"):
+        ReconciliationVetoV1("PAUSE", True, 1, 0, ())
 
 
 def test_validation_helpers_are_exact_and_fail_closed() -> None:
@@ -211,15 +257,36 @@ def test_validation_helpers_are_exact_and_fail_closed() -> None:
         datetime(2026, 1, 1, 0, 0, 0, 1, tzinfo=UTC),
     ) == 1
     assert canonical_decimal(Decimal("1.230000")) == "1.23"
+    assert canonical_decimal(Decimal("100")) == "100"
     assert canonical_decimal(Decimal("0.000")) == "0"
+    with pytest.raises(ReconciliationError, match="finite"):
+        canonical_decimal(Decimal("Infinity"))
     assert validate_lot35_safety(lot35_safety()) == lot35_safety()
     with pytest.raises(ReconciliationError, match="safety boundary"):
         validate_lot35_safety({})
 
 
-def test_state_rejects_bad_causality_and_bad_safety() -> None:
+def test_run_context_and_private_helpers_fail_closed() -> None:
+    with pytest.raises(ReconciliationError, match="DATA_GOVERNANCE_ONLY"):
+        Lot35RunContextV1("r", "PAPER", "c", "0" * 40, "x")
+    with pytest.raises(ReconciliationError, match="snapshot must be an object"):
+        _snapshot("not-an-object")
+    with pytest.raises(ReconciliationError, match="unexpected reconciliation classification"):
+        _corrective_action("UNKNOWN")
+
+
+def _valid_state_parts() -> tuple[
+    Lot35RunContextV1,
+    Lot35LineageEnvelopeV1,
+    ReconciliationReportV1,
+    ReconciliationVetoV1,
+    Lot35MetricsV1,
+]:
     context = Lot35RunContextV1("r", "DATA_GOVERNANCE_ONLY", "c", "0" * 40, "x")
-    lineage = Lot35LineageEnvelopeV1("l", "0" * 64, "1" * 64, "2" * 64, "3" * 64, "4" * 64, "2026-08-06T00:00:00Z")
+    lineage = Lot35LineageEnvelopeV1(
+        "l", "0" * 64, "1" * 64, "2" * 64, "3" * 64, "4" * 64,
+        "2026-08-06T00:00:00Z",
+    )
     report = ReconciliationReportV1(
         "m", "BOOK", "PRIMARY", "p", "s", "MATCH",
         ReconciliationDeltaV1("0", "0", "0", "0", "0", 0),
@@ -227,10 +294,27 @@ def test_state_rejects_bad_causality_and_bad_safety() -> None:
     )
     veto = ReconciliationVetoV1("ALLOW_ANALYSIS", True, 0, 0, ("PASS",))
     metrics = Lot35MetricsV1(1, 0, 1, 0, 0, 0, 0)
+    return context, lineage, report, veto, metrics
+
+
+def test_state_rejects_bad_causality_validation_state_empty_reports_and_safety() -> None:
+    context, lineage, report, veto, metrics = _valid_state_parts()
     with pytest.raises(ReconciliationError, match="causal availability"):
         CandleTradeBookReconciliationStateV1(
             context, lineage, "2026-08-06T00:00:02Z", "2026-08-06T00:00:01Z",
             "2026-08-06T00:00:03Z", "VALIDATED_RECONCILIATION_ONLY", (report,), veto,
+            metrics, ("PASS",), lot35_safety(), "5" * 64,
+        )
+    with pytest.raises(ReconciliationError, match="validation state"):
+        CandleTradeBookReconciliationStateV1(
+            context, lineage, "2026-08-06T00:00:00Z", "2026-08-06T00:00:01Z",
+            "2026-08-06T00:00:02Z", "UNKNOWN", (report,), veto,
+            metrics, ("PASS",), lot35_safety(), "5" * 64,
+        )
+    with pytest.raises(ReconciliationError, match="requires reconciliation reports"):
+        CandleTradeBookReconciliationStateV1(
+            context, lineage, "2026-08-06T00:00:00Z", "2026-08-06T00:00:01Z",
+            "2026-08-06T00:00:02Z", "VALIDATED_RECONCILIATION_ONLY", (), veto,
             metrics, ("PASS",), lot35_safety(), "5" * 64,
         )
     bad_safety = lot35_safety()
@@ -240,4 +324,13 @@ def test_state_rejects_bad_causality_and_bad_safety() -> None:
             context, lineage, "2026-08-06T00:00:00Z", "2026-08-06T00:00:01Z",
             "2026-08-06T00:00:02Z", "VALIDATED_RECONCILIATION_ONLY", (report,), veto,
             metrics, ("PASS",), bad_safety, "5" * 64,
+        )
+
+
+def test_audit_contract_rejects_invalid_veto() -> None:
+    with pytest.raises(ReconciliationError, match="audit veto action"):
+        CandleTradeBookReconciliationAuditV1(
+            "0" * 40, "1" * 64, "2" * 64, "3" * 64, "4" * 64,
+            1, 1, 0, 0, 0, "WAIT", "VALIDATED_RECONCILIATION_ONLY",
+            lot35_safety(), "5" * 64,
         )
