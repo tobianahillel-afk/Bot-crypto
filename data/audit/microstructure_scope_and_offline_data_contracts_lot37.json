@@ -1,0 +1,118 @@
+{
+  "available_at": "2026-08-06T19:18:40.050000Z",
+  "capability_matrix": {
+    "entries": [
+      {"capability_id":"EXECUTION","classification":"FORBIDDEN","contract_ref":"ExecutionEventV1","enabled_by_lot":0,"gate_ref":"NO_GATE","implementation_status":"FORBIDDEN_BY_LOT37","owner":"OrderExecutionDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Execution"},
+      {"capability_id":"EXTERNAL_NETWORK_ACCESS","classification":"FORBIDDEN","contract_ref":"NONE","enabled_by_lot":0,"gate_ref":"NO_GATE","implementation_status":"FORBIDDEN_BY_LOT37","owner":"SafetyKernel","schema_version":"lot37-capability-matrix-entry-v1","title":"External Network Access"},
+      {"capability_id":"LOT38_ORDER_BOOK_L2_SNAPSHOT_ENGINE","classification":"DISABLED","contract_ref":"OrderBookL2SnapshotEngineStateV1","enabled_by_lot":38,"gate_ref":"LOT38","implementation_status":"PLANNED_LOCKED","owner":"MicrostructureDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Order Book L2 Snapshot Engine"},
+      {"capability_id":"LOT39_ORDER_BOOK_DELTA_SEQUENCE_RECONSTRUCTOR","classification":"DISABLED","contract_ref":"OrderBookDeltaSequenceReconstructorStateV1","enabled_by_lot":39,"gate_ref":"LOT39","implementation_status":"PLANNED_LOCKED","owner":"MicrostructureDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Order Book Delta & Sequence Reconstructor"},
+      {"capability_id":"LOT40_BOOK_INTEGRITY_DESYNCHRONIZATION_DETECTOR","classification":"DISABLED","contract_ref":"BookIntegrityDesynchronizationDetectorStateV1","enabled_by_lot":40,"gate_ref":"LOT40","implementation_status":"PLANNED_LOCKED","owner":"MicrostructureDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Book Integrity / Desynchronization Detector"},
+      {"capability_id":"LOT41_SPREAD_DEPTH_IMBALANCE_ENGINE","classification":"DISABLED","contract_ref":"SpreadDepthImbalanceEngineStateV1","enabled_by_lot":41,"gate_ref":"LOT41","implementation_status":"PLANNED_LOCKED","owner":"MicrostructureDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Spread, Depth & Imbalance Engine"},
+      {"capability_id":"LOT42_LIQUIDITY_ZONES_WALLS_VOIDS_ENGINE","classification":"DISABLED","contract_ref":"LiquidityZonesWallsVoidsEngineStateV1","enabled_by_lot":42,"gate_ref":"LOT42","implementation_status":"PLANNED_LOCKED","owner":"MicrostructureDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Liquidity Zones, Walls & Voids Engine"},
+      {"capability_id":"LOT43_BOOK_RESILIENCE_REPLENISHMENT_ENGINE","classification":"DISABLED","contract_ref":"BookResilienceReplenishmentEngineStateV1","enabled_by_lot":43,"gate_ref":"LOT43","implementation_status":"PLANNED_LOCKED","owner":"MicrostructureDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Book Resilience & Replenishment Engine"},
+      {"capability_id":"LOT44_TRADES_AGGRESSOR_CLASSIFICATION_SCHEMA","classification":"DISABLED","contract_ref":"TradesAggressorClassificationSchemaStateV1","enabled_by_lot":44,"gate_ref":"LOT44","implementation_status":"PLANNED_LOCKED","owner":"MicrostructureDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Trades & Aggressor Classification Schema"},
+      {"capability_id":"LOT45_ORDER_FLOW_DELTA_CVD_ENGINE","classification":"DISABLED","contract_ref":"OrderFlowDeltaCVDEngineStateV1","enabled_by_lot":45,"gate_ref":"LOT45","implementation_status":"PLANNED_LOCKED","owner":"MicrostructureDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Order Flow, Delta & CVD Engine"},
+      {"capability_id":"LOT46_TRADE_CLASSIFICATION_CONFIDENCE_ENGINE","classification":"DISABLED","contract_ref":"TradeClassificationConfidenceEngineStateV1","enabled_by_lot":46,"gate_ref":"LOT46","implementation_status":"PLANNED_LOCKED","owner":"MicrostructureDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Trade Classification Confidence Engine"},
+      {"capability_id":"LOT47_ABSORPTION_DEFENSE_HIDDEN_LIQUIDITY_PROXY","classification":"DISABLED","contract_ref":"AbsorptionDefenseHiddenLiquidityProxyStateV1","enabled_by_lot":47,"gate_ref":"LOT47","implementation_status":"PLANNED_LOCKED","owner":"MicrostructureDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Absorption, Defense & Hidden Liquidity Proxy"},
+      {"capability_id":"LOT48_VOLUME_CLUSTERS_TIME_AT_LEVEL_ENGINE","classification":"DISABLED","contract_ref":"VolumeClustersTimeAtLevelEngineStateV1","enabled_by_lot":48,"gate_ref":"LOT48","implementation_status":"PLANNED_LOCKED","owner":"MicrostructureDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Volume Clusters & Time-at-Level Engine"},
+      {"capability_id":"LOT49_STOP_ZONES_LIQUIDITY_POOLS_BREAKOUT_ATTRACTION","classification":"DISABLED","contract_ref":"StopZonesLiquidityPoolsBreakoutAttractionStateV1","enabled_by_lot":49,"gate_ref":"LOT49","implementation_status":"PLANNED_LOCKED","owner":"MicrostructureDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Stop Zones, Liquidity Pools & Breakout Attraction"},
+      {"capability_id":"LOT50_SWEEP_FAKEOUT_TRAP_FAILED_AUCTION_ENGINE","classification":"DISABLED","contract_ref":"SweepFakeoutTrapFailedAuctionEngineStateV1","enabled_by_lot":50,"gate_ref":"LOT50","implementation_status":"PLANNED_LOCKED","owner":"MicrostructureDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Sweep, Fakeout, Trap & Failed Auction Engine"},
+      {"capability_id":"LOT51_DERIVATIVES_CONTEXT","classification":"DISABLED","contract_ref":"DerivativesContextOIFundingBasisLiquidationsStateV1","enabled_by_lot":51,"gate_ref":"LOT51","implementation_status":"PLANNED_LOCKED","owner":"MicrostructureDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Derivatives Context: OI, Funding, Basis & Liquidations"},
+      {"capability_id":"LOT52_GAME_THEORY_SCENARIO_AGGREGATION_V4_CLOSURE","classification":"DISABLED","contract_ref":"GameTheoryScenarioAggregationV4ClosureStateV1","enabled_by_lot":52,"gate_ref":"LOT52","implementation_status":"PLANNED_LOCKED","owner":"MicrostructureDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Game Theory, Scenario Aggregation & V4 Closure"},
+      {"capability_id":"OFFLINE_DATA_CONTRACT_REGISTRY","classification":"REQUIRED","contract_ref":"MicrostructureScopeOfflineDataContractsContractRegistryV1","enabled_by_lot":37,"gate_ref":"LOT37","implementation_status":"ACTIVE_LOT37_SCOPE","owner":"MicrostructureDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Offline Data Contract Registry"},
+      {"capability_id":"ORDER_ROUTING","classification":"FORBIDDEN","contract_ref":"OrderIntentV1","enabled_by_lot":0,"gate_ref":"NO_GATE","implementation_status":"FORBIDDEN_BY_LOT37","owner":"OrderExecutionDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Order Routing"},
+      {"capability_id":"PARTICIPANT_INTENT_AS_FACT","classification":"FORBIDDEN","contract_ref":"NONE","enabled_by_lot":0,"gate_ref":"NO_GATE","implementation_status":"FORBIDDEN_BY_V4_BOUNDARY","owner":"MicrostructureDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Participant Intent Presented as Fact"},
+      {"capability_id":"PUBLIC_API_BOUNDARY","classification":"REQUIRED","contract_ref":"MicrostructureScopeOfflineDataContractsStateV1","enabled_by_lot":37,"gate_ref":"LOT37","implementation_status":"ACTIVE_LOT37_SCOPE","owner":"MicrostructureDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Microstructure Public API Boundary"},
+      {"capability_id":"RISK_APPROVAL","classification":"FORBIDDEN","contract_ref":"RiskDecisionV1","enabled_by_lot":0,"gate_ref":"NO_GATE","implementation_status":"FORBIDDEN_BY_LOT37","owner":"RiskDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Risk Approval"},
+      {"capability_id":"SCENARIO_SCORE_AS_SIGNAL","classification":"FORBIDDEN","contract_ref":"NONE","enabled_by_lot":0,"gate_ref":"NO_GATE","implementation_status":"FORBIDDEN_BY_V4_BOUNDARY","owner":"SafetyKernel","schema_version":"lot37-capability-matrix-entry-v1","title":"Scenario Score Converted to Signal"},
+      {"capability_id":"SIGNAL_GENERATION","classification":"FORBIDDEN","contract_ref":"SignalV1","enabled_by_lot":0,"gate_ref":"NO_GATE","implementation_status":"FORBIDDEN_BY_LOT37","owner":"StrategyResearchDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Signal Generation"},
+      {"capability_id":"TRADING","classification":"FORBIDDEN","contract_ref":"NONE","enabled_by_lot":0,"gate_ref":"NO_GATE","implementation_status":"FORBIDDEN_BY_LOT37","owner":"LiveGovernanceDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"Trading"},
+      {"capability_id":"V4_CAPABILITY_MATRIX","classification":"REQUIRED","contract_ref":"MicrostructureScopeOfflineDataContractsCapabilityMatrixV1","enabled_by_lot":37,"gate_ref":"LOT37","implementation_status":"ACTIVE_LOT37_SCOPE","owner":"MicrostructureDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"V4 Capability Matrix"},
+      {"capability_id":"V4_SCOPE_BOUNDARY","classification":"REQUIRED","contract_ref":"MicrostructureScopeOfflineDataContractsStateV1","enabled_by_lot":37,"gate_ref":"LOT37","implementation_status":"ACTIVE_LOT37_SCOPE","owner":"MicrostructureDomain","schema_version":"lot37-capability-matrix-entry-v1","title":"V4 Scope and Domain Boundary"}
+    ],
+    "matrix_id": "v4-microstructure-capability-matrix-v1",
+    "matrix_version": "1.0.0",
+    "schema_version": "microstructure-scope-offline-data-contracts-capability-matrix-v1"
+  },
+  "contract_registry": {
+    "entries": [
+      {"consumer":"MicrostructureDomain","contract_kind":"INPUT","contract_name":"MicrostructureOfflineL2InputV1","enabled_by_lot":37,"owner":"MicrostructureDomain","producer":"OFFLINE_DATASET_OR_FIXTURE","schema_path":"contracts/schemas/microstructure_offline_l2_input_v1.schema.json","schema_version":"lot37-contract-registry-entry-v1","status":"ACTIVE_LOT37_CONTRACT"},
+      {"consumer":"MicrostructureDomain","contract_kind":"INPUT","contract_name":"MicrostructureOfflineTradeInputV1","enabled_by_lot":37,"owner":"MicrostructureDomain","producer":"OFFLINE_DATASET_OR_FIXTURE","schema_path":"contracts/schemas/microstructure_offline_trade_input_v1.schema.json","schema_version":"lot37-contract-registry-entry-v1","status":"ACTIVE_LOT37_CONTRACT"},
+      {"consumer":"AUDIT_GOVERNANCE","contract_kind":"OUTPUT","contract_name":"MicrostructureScopeOfflineDataContractsAuditV1","enabled_by_lot":37,"owner":"MicrostructureDomain","producer":"MicrostructureDomain","schema_path":"contracts/schemas/microstructure_scope_offline_data_contracts_audit_v1.schema.json","schema_version":"lot37-contract-registry-entry-v1","status":"ACTIVE_LOT37_CONTRACT"},
+      {"consumer":"AUDIT_AND_FUTURE_V4_GATES","contract_kind":"OUTPUT","contract_name":"MicrostructureScopeOfflineDataContractsCapabilityMatrixV1","enabled_by_lot":37,"owner":"MicrostructureDomain","producer":"MicrostructureDomain","schema_path":"contracts/schemas/microstructure_scope_offline_data_contracts_capability_matrix_v1.schema.json","schema_version":"lot37-contract-registry-entry-v1","status":"ACTIVE_LOT37_CONTRACT"},
+      {"consumer":"AUDIT_AND_FUTURE_V4_LOTS","contract_kind":"OUTPUT","contract_name":"MicrostructureScopeOfflineDataContractsContractRegistryV1","enabled_by_lot":37,"owner":"MicrostructureDomain","producer":"MicrostructureDomain","schema_path":"contracts/schemas/microstructure_scope_offline_data_contracts_contract_registry_v1.schema.json","schema_version":"lot37-contract-registry-entry-v1","status":"ACTIVE_LOT37_CONTRACT"},
+      {"consumer":"AUDIT_AND_FUTURE_V4_LOTS","contract_kind":"OUTPUT","contract_name":"MicrostructureScopeOfflineDataContractsStateV1","enabled_by_lot":37,"owner":"MicrostructureDomain","producer":"MicrostructureDomain","schema_path":"contracts/schemas/microstructure_scope_offline_data_contracts_state_v1.schema.json","schema_version":"lot37-contract-registry-entry-v1","status":"ACTIVE_LOT37_CONTRACT"}
+    ],
+    "registry_id": "microstructure-offline-contract-registry-v1",
+    "registry_version": "1.0.0",
+    "schema_version": "microstructure-scope-offline-data-contracts-contract-registry-v1"
+  },
+  "event_time": "2026-08-06T19:18:40.000000Z",
+  "generated_at": "2026-08-06T19:18:41.000000Z",
+  "lineage": {
+    "available_at": "2026-08-06T19:18:40.050000Z",
+    "entry_gate_checksum": "37ffdb72b1f83a506e95802518f77a5b06e164b342b6e2cf7985c1c695cda58d",
+    "l2_fixture_checksum": "f3715a14e8f04395b9ca5b514ac01ff8fcf924b82812f3388fdf500d6ecf5ece",
+    "lineage_id": "lot37-from-audited-v3-closure-and-v4-entry-gate",
+    "lot36_audit_checksum": "ca8f70e8f75b0e18b5b5c8835646ccb4c0e6adf4177023a9bd2117c0f1d81f42",
+    "lot36_state_checksum": "635b5504d21ca8d46faf51bd46639538345b4bcd94437330791b49036ee07592",
+    "schema_version": "lot37-lineage-envelope-v1",
+    "trade_fixture_checksum": "b07e3a6a784c801c9ae386a33a1cbe1f936901b1549d5001bc5e53e42de9e2f8",
+    "v3_post_merge_audit_commit": "33fba0abf7463fc54a36282476ee51655ff09919"
+  },
+  "metrics": {
+    "lot_37_capabilities_total": 27,
+    "lot_37_contracts_total": 6,
+    "lot_37_disabled_capabilities_total": 15,
+    "lot_37_forbidden_capabilities_total": 8,
+    "lot_37_offline_fixture_total": 2,
+    "lot_37_processing_latency_us": 950000,
+    "lot_37_public_api_symbols_total": 4,
+    "lot_37_required_capabilities_total": 4,
+    "lot_37_validation_failures_total": 0,
+    "schema_version": "lot37-metrics-v1"
+  },
+  "output_checksum": "ea960217eb9a2159c4a99c56257a37c43869ffad0da86555fef24eb356e5f8e7",
+  "public_api": [
+    {"kind":"CONTRACT","module":"crypto_quant_bot.microstructure.microstructure_scope_and_offline_data_contracts_models","schema_version":"lot37-public-api-entry-v1","status":"ACTIVE_LOT37_API","symbol":"MicrostructureScopeOfflineDataContractsAuditV1"},
+    {"kind":"CONTRACT","module":"crypto_quant_bot.microstructure.microstructure_scope_and_offline_data_contracts_models","schema_version":"lot37-public-api-entry-v1","status":"ACTIVE_LOT37_API","symbol":"MicrostructureScopeOfflineDataContractsStateV1"},
+    {"kind":"FUNCTION","module":"crypto_quant_bot.microstructure.microstructure_scope_and_offline_data_contracts","schema_version":"lot37-public-api-entry-v1","status":"ACTIVE_LOT37_API","symbol":"build_lot37_artifacts"},
+    {"kind":"FUNCTION","module":"crypto_quant_bot.microstructure.microstructure_scope_and_offline_data_contracts","schema_version":"lot37-public-api-entry-v1","status":"ACTIVE_LOT37_API","symbol":"write_lot37_artifacts"}
+  ],
+  "reason_codes": [
+    "LOT37_SCOPE_CONTRACTS_VALIDATED",
+    "V3_POST_MERGE_CLOSURE_VERIFIED",
+    "OFFLINE_INPUT_AVAILABILITY_VERIFIED",
+    "FUTURE_V4_CAPABILITIES_LOCKED",
+    "PARTICIPANT_INFERENCE_MUST_BE_EXPLICIT",
+    "SCENARIO_SCORE_IS_NOT_SIGNAL",
+    "LOT38_REMAINS_LOCKED"
+  ],
+  "run_context": {
+    "code_commit": "59b189e9980772245993a9212b6c8ad5e9a88a00",
+    "config_version": "lot37-microstructure-scope-config-v1",
+    "correlation_id": "lot37-reference-correlation",
+    "run_id": "lot37-reference-run",
+    "runtime_mode": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "schema_version": "lot37-run-context-v1"
+  },
+  "safety": {
+    "analysis_only": true,
+    "approved_size": 0,
+    "execution_allowed": false,
+    "external_connectivity_allowed": false,
+    "market_event_publication_allowed": false,
+    "network_ingestion_allowed": false,
+    "order_routing_allowed": false,
+    "participant_behavior_inference_explicitly_labeled": true,
+    "raw_data_mutation_allowed": false,
+    "real_credentials_allowed": false,
+    "risk_approval_allowed": false,
+    "scenario_score_is_signal": false,
+    "signal_generation_allowed": false,
+    "trade_allowed": false,
+    "used_for_decision": false
+  },
+  "schema_version": "microstructure-scope-offline-data-contracts-state-v1",
+  "validation_state": "VALIDATED_OFFLINE_CONTRACT_SCOPE"
+}
