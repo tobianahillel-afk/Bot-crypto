@@ -18,3 +18,5 @@
 | Trading / execution | disabled / disabled | PASS |
 | Approved size | `0` | PASS |
 | Lot 36 | `PLANNED_LOCKED`, `implementation_started=false` | PASS |
+
+The quality metrics above are frozen from the exact final implementation-head GitHub Actions artifacts. A later audit run may revalidate the repository, but it must not silently replace this certified implementation evidence.
