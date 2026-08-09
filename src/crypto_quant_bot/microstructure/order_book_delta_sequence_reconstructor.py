@@ -58,7 +58,7 @@ COMMON_REASON_CODES = (
 class ReconstructionOutcome:
     synchronization_state: str
     reconstructed_book: ReconstructedOrderBookV1 | None
-    sequence_gap_event: SequenceGapEventV1
+    sequence_gap_event: SequenceGapEventV1 | None
     metrics: Lot39MetricsV1
     reason_codes: tuple[str, ...]
 
@@ -161,7 +161,9 @@ def _verify_lot38(root: Path, config: dict[str, Any]) -> OrderBookSnapshotV1:
     return _snapshot_from_payload(snapshot_payload)
 
 
-def _levels_from_payload(value: Any, side: str, *, allow_empty: bool) -> tuple[OrderBookLevelV1, ...]:
+def _levels_from_payload(
+    value: Any, side: str, *, allow_empty: bool
+) -> tuple[OrderBookLevelV1, ...]:
     if not isinstance(value, list) or (not allow_empty and not value):
         raise OrderBookDeltaSequenceValidationError(f"{side} must be a valid level list")
     levels: list[OrderBookLevelV1] = []
@@ -253,8 +255,12 @@ def _load_deltas(
     fixture_checksum = file_checksum(path)
     fixture = load_json_object(path)
     expected_fields = {
-        "schema_version", "fixture_only", "canonical_contract_records", "used_for_decision",
-        "description", "deltas",
+        "schema_version",
+        "fixture_only",
+        "canonical_contract_records",
+        "used_for_decision",
+        "description",
+        "deltas",
     }
     if set(fixture) != expected_fields:
         raise OrderBookDeltaSequenceValidationError("Lot 39 fixture fields changed")
@@ -311,20 +317,6 @@ def _gap_event(
         delta.prev_sequence,
         delta.event_time,
         (reason, "LOT39_RESYNC_REQUIRED", "LOT40_REMAINS_LOCKED"),
-        ZERO_SHA256,
-    )
-    return replace(event, event_checksum=canonical_checksum(event.payload_without_checksum()))
-
-
-def _no_gap_event(final_sequence: int, event_time: str) -> SequenceGapEventV1:
-    event = SequenceGapEventV1(
-        False,
-        "SYNCED",
-        final_sequence + 1,
-        None,
-        None,
-        event_time,
-        ("LOT39_NO_SEQUENCE_GAP_DETECTED", "LOT40_REMAINS_LOCKED"),
         ZERO_SHA256,
     )
     return replace(event, event_checksum=canonical_checksum(event.payload_without_checksum()))
@@ -435,7 +427,9 @@ def reconstruct_sequence(
                 deleted=deleted,
                 upserted=upserted,
             )
-        sorted_bids = tuple(OrderBookLevelV1(price, bids[price]) for price in sorted(bids, reverse=True))
+        sorted_bids = tuple(
+            OrderBookLevelV1(price, bids[price]) for price in sorted(bids, reverse=True)
+        )
         sorted_asks = tuple(OrderBookLevelV1(price, asks[price]) for price in sorted(asks))
         if sorted_bids[0].price >= sorted_asks[0].price:
             return _resync_outcome(
@@ -506,11 +500,10 @@ def reconstruct_sequence(
         final_book,
         book_checksum=canonical_checksum(final_book.payload_without_checksum()),
     )
-    gap_event = _no_gap_event(current_sequence, deltas[-1].event_time)
     return ReconstructionOutcome(
         "SYNCED",
         final_book,
-        gap_event,
+        None,
         Lot39MetricsV1(len(deltas), applied, deleted, upserted, 0, current_sequence),
         COMMON_REASON_CODES,
     )
@@ -525,9 +518,6 @@ def build_lot39_artifacts(
     snapshot = _verify_lot38(root, config)
     deltas, fixture_checksum = _load_deltas(root, config)
     outcome = reconstruct_sequence(snapshot, deltas)
-    if outcome.synchronization_state != "SYNCED" or outcome.reconstructed_book is None:
-        raise OrderBookDeltaSequenceValidationError("canonical Lot 39 fixture requires resync")
-
     generated_at = require_text(config.get("generated_at"), "generated_at")
     run_context = Lot39RunContextV1(
         require_text(config.get("run_id"), "run_id"),
@@ -536,6 +526,20 @@ def build_lot39_artifacts(
         code_commit,
         require_text(config.get("correlation_id"), "correlation_id"),
     )
+    if outcome.reconstructed_book is not None:
+        event_time = outcome.reconstructed_book.event_time
+        receive_time = outcome.reconstructed_book.receive_time
+        available_at = receive_time
+        validation_state = "VALIDATED_OFFLINE_DELTA_SEQUENCE_RECONSTRUCTION_ONLY"
+    else:
+        if outcome.sequence_gap_event is None:
+            raise OrderBookDeltaSequenceValidationError("resync outcome missing gap evidence")
+        failed_index = min(outcome.metrics.deltas_applied_total, len(deltas) - 1)
+        failed_delta = deltas[failed_index]
+        event_time = outcome.sequence_gap_event.event_time
+        receive_time = failed_delta.receive_time
+        available_at = receive_time
+        validation_state = "BLOCKED_RESYNC_REQUIRED"
     lineage = Lot39LineageEnvelopeV1(
         require_text(config.get("lineage_id"), "lineage_id"),
         EXPECTED_GATE_CHECKSUM,
@@ -544,16 +548,16 @@ def build_lot39_artifacts(
         EXPECTED_LOT38_SNAPSHOT,
         EXPECTED_LOT38_HEALTH,
         fixture_checksum,
-        outcome.reconstructed_book.receive_time,
+        available_at,
     )
     state = OrderBookDeltaSequenceReconstructorStateV1(
         run_context,
         lineage,
-        outcome.reconstructed_book.event_time,
-        outcome.reconstructed_book.receive_time,
+        event_time,
+        receive_time,
         generated_at,
-        "VALIDATED_OFFLINE_DELTA_SEQUENCE_RECONSTRUCTION_ONLY",
-        "SYNCED",
+        validation_state,
+        outcome.synchronization_state,
         snapshot.snapshot_checksum,
         fixture_checksum,
         outcome.reconstructed_book,
@@ -572,8 +576,16 @@ def build_lot39_artifacts(
         EXPECTED_LOT38_SNAPSHOT,
         fixture_checksum,
         state.output_checksum,
-        outcome.reconstructed_book.book_checksum,
-        outcome.sequence_gap_event.event_checksum,
+        (
+            outcome.reconstructed_book.book_checksum
+            if outcome.reconstructed_book is not None
+            else None
+        ),
+        (
+            outcome.sequence_gap_event.event_checksum
+            if outcome.sequence_gap_event is not None
+            else None
+        ),
         state.validation_state,
         state.synchronization_state,
         lot39_safety(),
@@ -589,6 +601,12 @@ def write_lot39_artifacts(
     state, audit = build_lot39_artifacts(root, code_commit)
     atomic_write_json(root / STATE_PATH, state.to_dict())
     atomic_write_json(root / AUDIT_PATH, audit.to_dict())
-    atomic_write_json(root / BOOK_PATH, state.reconstructed_book.to_dict())
-    atomic_write_json(root / GAP_EVENT_PATH, state.sequence_gap_event.to_dict())
+    if state.reconstructed_book is not None:
+        atomic_write_json(root / BOOK_PATH, state.reconstructed_book.to_dict())
+        (root / GAP_EVENT_PATH).unlink(missing_ok=True)
+    else:
+        if state.sequence_gap_event is None:
+            raise OrderBookDeltaSequenceValidationError("resync state missing gap event")
+        atomic_write_json(root / GAP_EVENT_PATH, state.sequence_gap_event.to_dict())
+        (root / BOOK_PATH).unlink(missing_ok=True)
     return state, audit
