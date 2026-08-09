@@ -13,9 +13,9 @@ from .order_book_l2_snapshot_engine_validation import (
     require_sha256,
     require_text,
     validate_causal_times,
+    validate_lot38_run_context,
     validate_lot38_safety,
     validate_reason_codes,
-    validate_runtime_mode,
     validate_venue_state,
 )
 
@@ -29,11 +29,13 @@ class Lot38RunContextV1:
     correlation_id: str
 
     def __post_init__(self) -> None:
-        require_text(self.run_id, "run_id")
-        validate_runtime_mode(self.runtime_mode)
-        require_text(self.config_version, "config_version")
-        require_git_sha(self.code_commit, "code_commit")
-        require_text(self.correlation_id, "correlation_id")
+        validate_lot38_run_context(
+            self.run_id,
+            self.runtime_mode,
+            self.config_version,
+            self.code_commit,
+            self.correlation_id,
+        )
 
     def to_dict(self) -> dict[str, Any]:
         return {
