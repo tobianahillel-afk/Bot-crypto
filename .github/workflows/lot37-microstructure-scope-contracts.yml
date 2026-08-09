@@ -9,7 +9,7 @@ on:
       - 'src/crypto_quant_bot/microstructure/**'
       - 'scripts/run_lot37_microstructure_scope_and_offline_data_contracts.py'
       - 'scripts/validate_lot37.py'
-      - 'tests/test_lot37_microstructure_scope_and_offline_data_contracts.py'
+      - 'tests/test_lot37*.py'
       - 'docs/LOT_37_MICROSTRUCTURE_SCOPE_AND_OFFLINE_DATA_CONTRACTS.md'
       - 'docs/ACCEPTANCE_CRITERIA_LOT_37.md'
       - 'reports/lot_37_microstructure_scope_and_offline_data_contracts_report.md'
@@ -82,6 +82,7 @@ jobs:
             scripts/run_lot37_microstructure_scope_and_offline_data_contracts.py \
             scripts/validate_lot37.py \
             tests/test_lot37_microstructure_scope_and_offline_data_contracts.py \
+            tests/test_lot37_branch_coverage.py \
             --output-format=concise 2>&1 | tee reports/lot37/ruff.txt
           mypy src/crypto_quant_bot/microstructure 2>&1 | tee reports/lot37/mypy.txt
       - name: Targeted line and branch coverage
@@ -93,6 +94,7 @@ jobs:
           coverage erase
           pytest -q \
             tests/test_lot37_microstructure_scope_and_offline_data_contracts.py \
+            tests/test_lot37_branch_coverage.py \
             --cov=crypto_quant_bot.microstructure.microstructure_scope_and_offline_data_contracts \
             --cov=crypto_quant_bot.microstructure.microstructure_scope_and_offline_data_contracts_models \
             --cov=crypto_quant_bot.microstructure.microstructure_scope_and_offline_data_contracts_validation \
@@ -180,9 +182,9 @@ jobs:
       - name: Full regression and anti-flake
         run: |
           pytest -q
-          pytest -q tests/test_lot37_microstructure_scope_and_offline_data_contracts.py
-          pytest -q tests/test_lot37_microstructure_scope_and_offline_data_contracts.py
-          pytest -q tests/test_lot37_microstructure_scope_and_offline_data_contracts.py
+          pytest -q tests/test_lot37_microstructure_scope_and_offline_data_contracts.py tests/test_lot37_branch_coverage.py
+          pytest -q tests/test_lot37_microstructure_scope_and_offline_data_contracts.py tests/test_lot37_branch_coverage.py
+          pytest -q tests/test_lot37_microstructure_scope_and_offline_data_contracts.py tests/test_lot37_branch_coverage.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
