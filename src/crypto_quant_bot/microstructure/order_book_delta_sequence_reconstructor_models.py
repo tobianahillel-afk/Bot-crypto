@@ -20,8 +20,11 @@ from .order_book_delta_sequence_reconstructor_validation import (
 )
 from .order_book_l2_snapshot_engine_models import OrderBookLevelV1
 
+SUCCESS_STATE = "VALIDATED_OFFLINE_DELTA_SEQUENCE_RECONSTRUCTION_ONLY"
+BLOCKED_STATE = "BLOCKED_RESYNC_REQUIRED"
 
-@dataclass(frozen=True)
+
+@dataclass(frozen=True, slots=True)
 class Lot39RunContextV1:
     run_id: str
     runtime_mode: str
@@ -49,7 +52,7 @@ class Lot39RunContextV1:
         }
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Lot39LineageEnvelopeV1:
     lineage_id: str
     entry_gate_checksum: str
@@ -62,16 +65,19 @@ class Lot39LineageEnvelopeV1:
 
     def __post_init__(self) -> None:
         require_text(self.lineage_id, "lineage_id")
-        for value, field in (
+        for value, field in self._checksums():
+            require_sha256(value, field)
+        parse_utc_timestamp(self.available_at, "available_at")
+
+    def _checksums(self) -> tuple[tuple[str, str], ...]:
+        return (
             (self.entry_gate_checksum, "entry_gate_checksum"),
             (self.lot38_state_checksum, "lot38_state_checksum"),
             (self.lot38_audit_checksum, "lot38_audit_checksum"),
             (self.lot38_snapshot_checksum, "lot38_snapshot_checksum"),
             (self.lot38_health_checksum, "lot38_health_checksum"),
             (self.delta_fixture_checksum, "delta_fixture_checksum"),
-        ):
-            require_sha256(value, field)
-        parse_utc_timestamp(self.available_at, "available_at")
+        )
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -87,7 +93,7 @@ class Lot39LineageEnvelopeV1:
         }
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class OrderBookDeltaV1:
     source_id: str
     venue: str
@@ -103,13 +109,7 @@ class OrderBookDeltaV1:
     used_for_decision: bool = False
 
     def __post_init__(self) -> None:
-        require_text(self.source_id, "source_id")
-        require_text(self.venue, "venue")
-        require_text(self.instrument_id, "instrument_id")
-        if self.market_type != "SPOT":
-            raise OrderBookDeltaSequenceValidationError(
-                "Lot 39 delta market_type must be SPOT"
-            )
+        _validate_delta_identity(self)
         validate_causal_times(self.event_time, self.receive_time, self.receive_time)
         require_integer(self.sequence_id, "sequence_id")
         require_integer(self.prev_sequence, "prev_sequence")
@@ -142,7 +142,20 @@ class OrderBookDeltaV1:
         }
 
 
-@dataclass(frozen=True)
+def _validate_delta_identity(delta: OrderBookDeltaV1) -> None:
+    for value, field in (
+        (delta.source_id, "source_id"),
+        (delta.venue, "venue"),
+        (delta.instrument_id, "instrument_id"),
+    ):
+        require_text(value, field)
+    if delta.market_type != "SPOT":
+        raise OrderBookDeltaSequenceValidationError(
+            "Lot 39 delta market_type must be SPOT"
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class ReconstructedOrderBookV1:
     source_id: str
     venue: str
@@ -161,43 +174,9 @@ class ReconstructedOrderBookV1:
     book_checksum: str
 
     def __post_init__(self) -> None:
-        require_text(self.source_id, "source_id")
-        require_text(self.venue, "venue")
-        require_text(self.instrument_id, "instrument_id")
-        if self.market_type != "SPOT":
-            raise OrderBookDeltaSequenceValidationError(
-                "reconstructed market_type must be SPOT"
-            )
-        validate_causal_times(self.event_time, self.receive_time, self.receive_time)
-        require_sha256(self.base_snapshot_checksum, "base_snapshot_checksum")
-        require_integer(self.base_sequence_id, "base_sequence_id")
-        require_integer(self.sequence_id, "sequence_id")
-        if self.sequence_id <= self.base_sequence_id:
-            raise OrderBookDeltaSequenceValidationError(
-                "reconstructed sequence must advance"
-            )
-        require_sha256(self.sequence_anchor, "sequence_anchor")
-        if self.synchronization_state != "SYNCED":
-            raise OrderBookDeltaSequenceValidationError(
-                "only SYNCED books may be published"
-            )
-        if not self.bids or not self.asks:
-            raise OrderBookDeltaSequenceValidationError(
-                "reconstructed book sides must be non-empty"
-            )
-        if tuple(sorted(self.bids, key=lambda level: level.price, reverse=True)) != self.bids:
-            raise OrderBookDeltaSequenceValidationError(
-                "reconstructed bids must be descending"
-            )
-        if tuple(sorted(self.asks, key=lambda level: level.price)) != self.asks:
-            raise OrderBookDeltaSequenceValidationError(
-                "reconstructed asks must be ascending"
-            )
-        if self.bids[0].price >= self.asks[0].price:
-            raise OrderBookDeltaSequenceValidationError(
-                "crossed or locked reconstructed book forbidden"
-            )
-        require_integer(self.applied_delta_count, "applied_delta_count", minimum=1)
+        _validate_reconstructed_identity(self)
+        _validate_reconstructed_sequence(self)
+        _validate_reconstructed_levels(self)
         require_sha256(self.book_checksum, "book_checksum")
 
     def payload_without_checksum(self) -> dict[str, Any]:
@@ -226,7 +205,56 @@ class ReconstructedOrderBookV1:
         }
 
 
-@dataclass(frozen=True)
+def _validate_reconstructed_identity(book: ReconstructedOrderBookV1) -> None:
+    for value, field in (
+        (book.source_id, "source_id"),
+        (book.venue, "venue"),
+        (book.instrument_id, "instrument_id"),
+    ):
+        require_text(value, field)
+    if book.market_type != "SPOT":
+        raise OrderBookDeltaSequenceValidationError(
+            "reconstructed market_type must be SPOT"
+        )
+    validate_causal_times(book.event_time, book.receive_time, book.receive_time)
+
+
+def _validate_reconstructed_sequence(book: ReconstructedOrderBookV1) -> None:
+    require_sha256(book.base_snapshot_checksum, "base_snapshot_checksum")
+    require_integer(book.base_sequence_id, "base_sequence_id")
+    require_integer(book.sequence_id, "sequence_id")
+    if book.sequence_id <= book.base_sequence_id:
+        raise OrderBookDeltaSequenceValidationError(
+            "reconstructed sequence must advance"
+        )
+    require_sha256(book.sequence_anchor, "sequence_anchor")
+    if book.synchronization_state != "SYNCED":
+        raise OrderBookDeltaSequenceValidationError(
+            "only SYNCED books may be published"
+        )
+    require_integer(book.applied_delta_count, "applied_delta_count", minimum=1)
+
+
+def _validate_reconstructed_levels(book: ReconstructedOrderBookV1) -> None:
+    if not book.bids or not book.asks:
+        raise OrderBookDeltaSequenceValidationError(
+            "reconstructed book sides must be non-empty"
+        )
+    if tuple(sorted(book.bids, key=lambda level: level.price, reverse=True)) != book.bids:
+        raise OrderBookDeltaSequenceValidationError(
+            "reconstructed bids must be descending"
+        )
+    if tuple(sorted(book.asks, key=lambda level: level.price)) != book.asks:
+        raise OrderBookDeltaSequenceValidationError(
+            "reconstructed asks must be ascending"
+        )
+    if book.bids[0].price >= book.asks[0].price:
+        raise OrderBookDeltaSequenceValidationError(
+            "crossed or locked reconstructed book forbidden"
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class SequenceGapEventV1:
     gap_detected: bool
     synchronization_state: str
@@ -238,34 +266,7 @@ class SequenceGapEventV1:
     event_checksum: str
 
     def __post_init__(self) -> None:
-        if not isinstance(self.gap_detected, bool):
-            raise OrderBookDeltaSequenceValidationError(
-                "gap_detected must be boolean"
-            )
-        validate_sync_state(self.synchronization_state)
-        require_integer(self.expected_sequence, "expected_sequence")
-        parse_utc_timestamp(self.event_time, "event_time")
-        validate_reason_codes(self.reason_codes)
-        if self.gap_detected:
-            if self.synchronization_state != "RESYNC_REQUIRED":
-                raise OrderBookDeltaSequenceValidationError(
-                    "detected gap requires resync"
-                )
-            if self.observed_sequence is None or self.observed_prev_sequence is None:
-                raise OrderBookDeltaSequenceValidationError(
-                    "detected gap requires observed sequence"
-                )
-            require_integer(self.observed_sequence, "observed_sequence")
-            require_integer(self.observed_prev_sequence, "observed_prev_sequence")
-        else:
-            if self.synchronization_state != "SYNCED":
-                raise OrderBookDeltaSequenceValidationError(
-                    "no-gap event must remain SYNCED"
-                )
-            if self.observed_sequence is not None or self.observed_prev_sequence is not None:
-                raise OrderBookDeltaSequenceValidationError(
-                    "no-gap event cannot carry observed gap"
-                )
+        _validate_gap_event(self)
         require_sha256(self.event_checksum, "event_checksum")
 
     def payload_without_checksum(self) -> dict[str, Any]:
@@ -287,7 +288,28 @@ class SequenceGapEventV1:
         }
 
 
-@dataclass(frozen=True)
+def _validate_gap_event(event: SequenceGapEventV1) -> None:
+    if not isinstance(event.gap_detected, bool):
+        raise OrderBookDeltaSequenceValidationError("gap_detected must be boolean")
+    validate_sync_state(event.synchronization_state)
+    require_integer(event.expected_sequence, "expected_sequence")
+    parse_utc_timestamp(event.event_time, "event_time")
+    validate_reason_codes(event.reason_codes)
+    observed = (event.observed_sequence, event.observed_prev_sequence)
+    if event.gap_detected:
+        if event.synchronization_state != "RESYNC_REQUIRED" or None in observed:
+            raise OrderBookDeltaSequenceValidationError(
+                "detected gap requires resync and observed sequence"
+            )
+        require_integer(event.observed_sequence, "observed_sequence")
+        require_integer(event.observed_prev_sequence, "observed_prev_sequence")
+    elif event.synchronization_state != "SYNCED" or observed != (None, None):
+        raise OrderBookDeltaSequenceValidationError(
+            "no-gap event must remain SYNCED without observed gap"
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class Lot39MetricsV1:
     deltas_received_total: int
     deltas_applied_total: int
@@ -299,14 +321,7 @@ class Lot39MetricsV1:
     latency_measurement_status: str = "NOT_MEASURED_OFFLINE_DETERMINISTIC_REPLAY"
 
     def __post_init__(self) -> None:
-        for value, field in (
-            (self.deltas_received_total, "deltas_received_total"),
-            (self.deltas_applied_total, "deltas_applied_total"),
-            (self.levels_deleted_total, "levels_deleted_total"),
-            (self.levels_upserted_total, "levels_upserted_total"),
-            (self.sequence_gap_events_total, "sequence_gap_events_total"),
-            (self.final_sequence_id, "final_sequence_id"),
-        ):
+        for value, field in self._integer_fields():
             require_integer(value, field)
         if self.deltas_applied_total > self.deltas_received_total:
             raise OrderBookDeltaSequenceValidationError(
@@ -315,6 +330,16 @@ class Lot39MetricsV1:
         if self.processing_latency_us is not None:
             require_integer(self.processing_latency_us, "processing_latency_us")
         require_text(self.latency_measurement_status, "latency_measurement_status")
+
+    def _integer_fields(self) -> tuple[tuple[int, str], ...]:
+        return (
+            (self.deltas_received_total, "deltas_received_total"),
+            (self.deltas_applied_total, "deltas_applied_total"),
+            (self.levels_deleted_total, "levels_deleted_total"),
+            (self.levels_upserted_total, "levels_upserted_total"),
+            (self.sequence_gap_events_total, "sequence_gap_events_total"),
+            (self.final_sequence_id, "final_sequence_id"),
+        )
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -334,75 +359,38 @@ def _validate_state_outcome(
     validation_state: str,
     synchronization_state: str,
     reconstructed_book: ReconstructedOrderBookV1 | None,
-    sequence_gap_event: SequenceGapEventV1,
+    sequence_gap_event: SequenceGapEventV1 | None,
 ) -> None:
     validate_sync_state(synchronization_state)
     if synchronization_state == "SYNCED":
-        if validation_state != "VALIDATED_OFFLINE_DELTA_SEQUENCE_RECONSTRUCTION_ONLY":
+        if validation_state != SUCCESS_STATE or reconstructed_book is None:
             raise OrderBookDeltaSequenceValidationError(
-                "SYNCED Lot 39 state requires validated reconstruction"
+                "SYNCED Lot 39 state requires validated reconstructed book"
             )
-        if reconstructed_book is None or reconstructed_book.synchronization_state != "SYNCED":
+        if reconstructed_book.synchronization_state != "SYNCED":
             raise OrderBookDeltaSequenceValidationError(
-                "SYNCED Lot 39 state requires a published reconstructed book"
+                "state/book synchronization mismatch"
             )
-        if sequence_gap_event.gap_detected:
+        if sequence_gap_event is not None:
             raise OrderBookDeltaSequenceValidationError(
-                "SYNCED Lot 39 state requires explicit no-gap event"
-            )
-        if sequence_gap_event.synchronization_state != "SYNCED":
-            raise OrderBookDeltaSequenceValidationError(
-                "SYNCED Lot 39 sequence event state mismatch"
+                "SYNCED Lot 39 state cannot carry gap event"
             )
         return
-    if validation_state != "BLOCKED_RESYNC_REQUIRED":
+    if validation_state != BLOCKED_STATE or reconstructed_book is not None:
         raise OrderBookDeltaSequenceValidationError(
-            "RESYNC_REQUIRED Lot 39 state must be blocked"
+            "RESYNC_REQUIRED Lot 39 state must be blocked without book"
         )
-    if reconstructed_book is not None:
+    if sequence_gap_event is None or not sequence_gap_event.gap_detected:
         raise OrderBookDeltaSequenceValidationError(
-            "RESYNC_REQUIRED Lot 39 state cannot publish a reconstructed book"
-        )
-    if not sequence_gap_event.gap_detected:
-        raise OrderBookDeltaSequenceValidationError(
-            "RESYNC_REQUIRED Lot 39 state requires a detected sequence event"
+            "RESYNC_REQUIRED Lot 39 state requires gap evidence"
         )
     if sequence_gap_event.synchronization_state != "RESYNC_REQUIRED":
         raise OrderBookDeltaSequenceValidationError(
-            "RESYNC_REQUIRED Lot 39 sequence event state mismatch"
+            "state/gap synchronization mismatch"
         )
 
 
-def _validate_audit_outcome(
-    validation_state: str,
-    synchronization_state: str,
-    reconstructed_book_checksum: str | None,
-    sequence_gap_event_checksum: str,
-) -> None:
-    validate_sync_state(synchronization_state)
-    require_sha256(sequence_gap_event_checksum, "sequence_gap_event_checksum")
-    if synchronization_state == "SYNCED":
-        if validation_state != "VALIDATED_OFFLINE_DELTA_SEQUENCE_RECONSTRUCTION_ONLY":
-            raise OrderBookDeltaSequenceValidationError(
-                "SYNCED Lot 39 audit requires validated reconstruction"
-            )
-        if reconstructed_book_checksum is None:
-            raise OrderBookDeltaSequenceValidationError(
-                "SYNCED Lot 39 audit requires reconstructed book checksum"
-            )
-        require_sha256(reconstructed_book_checksum, "reconstructed_book_checksum")
-        return
-    if validation_state != "BLOCKED_RESYNC_REQUIRED":
-        raise OrderBookDeltaSequenceValidationError(
-            "RESYNC_REQUIRED Lot 39 audit must be blocked"
-        )
-    if reconstructed_book_checksum is not None:
-        raise OrderBookDeltaSequenceValidationError(
-            "RESYNC_REQUIRED Lot 39 audit cannot carry book checksum"
-        )
-
-
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class OrderBookDeltaSequenceReconstructorStateV1:
     run_context: Lot39RunContextV1
     lineage: Lot39LineageEnvelopeV1
@@ -414,7 +402,7 @@ class OrderBookDeltaSequenceReconstructorStateV1:
     base_snapshot_checksum: str
     delta_fixture_checksum: str
     reconstructed_book: ReconstructedOrderBookV1 | None
-    sequence_gap_event: SequenceGapEventV1
+    sequence_gap_event: SequenceGapEventV1 | None
     metrics: Lot39MetricsV1
     reason_codes: tuple[str, ...]
     safety: dict[str, object]
@@ -454,7 +442,9 @@ class OrderBookDeltaSequenceReconstructorStateV1:
             "reconstructed_book": (
                 None if self.reconstructed_book is None else self.reconstructed_book.to_dict()
             ),
-            "sequence_gap_event": self.sequence_gap_event.to_dict(),
+            "sequence_gap_event": (
+                None if self.sequence_gap_event is None else self.sequence_gap_event.to_dict()
+            ),
             "metrics": self.metrics.to_dict(),
             "reason_codes": list(self.reason_codes),
             "safety": dict(self.safety),
@@ -462,7 +452,36 @@ class OrderBookDeltaSequenceReconstructorStateV1:
         }
 
 
-@dataclass(frozen=True)
+def _validate_audit_outcome(
+    validation_state: str,
+    synchronization_state: str,
+    reconstructed_book_checksum: str | None,
+    sequence_gap_event_checksum: str | None,
+) -> None:
+    validate_sync_state(synchronization_state)
+    if synchronization_state == "SYNCED":
+        if validation_state != SUCCESS_STATE or reconstructed_book_checksum is None:
+            raise OrderBookDeltaSequenceValidationError(
+                "SYNCED Lot 39 audit requires validated book checksum"
+            )
+        require_sha256(reconstructed_book_checksum, "reconstructed_book_checksum")
+        if sequence_gap_event_checksum is not None:
+            raise OrderBookDeltaSequenceValidationError(
+                "SYNCED Lot 39 audit cannot carry gap checksum"
+            )
+        return
+    if validation_state != BLOCKED_STATE or reconstructed_book_checksum is not None:
+        raise OrderBookDeltaSequenceValidationError(
+            "RESYNC_REQUIRED Lot 39 audit must be blocked without book checksum"
+        )
+    if sequence_gap_event_checksum is None:
+        raise OrderBookDeltaSequenceValidationError(
+            "RESYNC_REQUIRED Lot 39 audit requires gap checksum"
+        )
+    require_sha256(sequence_gap_event_checksum, "sequence_gap_event_checksum")
+
+
+@dataclass(frozen=True, slots=True)
 class OrderBookDeltaSequenceReconstructorAuditV1:
     code_commit: str
     config_checksum: str
@@ -472,7 +491,7 @@ class OrderBookDeltaSequenceReconstructorAuditV1:
     delta_fixture_checksum: str
     state_output_checksum: str
     reconstructed_book_checksum: str | None
-    sequence_gap_event_checksum: str
+    sequence_gap_event_checksum: str | None
     validation_state: str
     synchronization_state: str
     safety: dict[str, object]
@@ -480,15 +499,7 @@ class OrderBookDeltaSequenceReconstructorAuditV1:
 
     def __post_init__(self) -> None:
         require_git_sha(self.code_commit, "code_commit")
-        for value, field in (
-            (self.config_checksum, "config_checksum"),
-            (self.entry_gate_checksum, "entry_gate_checksum"),
-            (self.lot38_state_checksum, "lot38_state_checksum"),
-            (self.lot38_snapshot_checksum, "lot38_snapshot_checksum"),
-            (self.delta_fixture_checksum, "delta_fixture_checksum"),
-            (self.state_output_checksum, "state_output_checksum"),
-            (self.audit_checksum, "audit_checksum"),
-        ):
+        for value, field in self._required_checksums():
             require_sha256(value, field)
         _validate_audit_outcome(
             self.validation_state,
@@ -497,6 +508,17 @@ class OrderBookDeltaSequenceReconstructorAuditV1:
             self.sequence_gap_event_checksum,
         )
         validate_lot39_safety(self.safety)
+
+    def _required_checksums(self) -> tuple[tuple[str, str], ...]:
+        return (
+            (self.config_checksum, "config_checksum"),
+            (self.entry_gate_checksum, "entry_gate_checksum"),
+            (self.lot38_state_checksum, "lot38_state_checksum"),
+            (self.lot38_snapshot_checksum, "lot38_snapshot_checksum"),
+            (self.delta_fixture_checksum, "delta_fixture_checksum"),
+            (self.state_output_checksum, "state_output_checksum"),
+            (self.audit_checksum, "audit_checksum"),
+        )
 
     def payload_without_checksum(self) -> dict[str, Any]:
         payload = self.to_dict()
