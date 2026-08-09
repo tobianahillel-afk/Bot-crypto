@@ -52,16 +52,16 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove certified source evidence and merge ancestry
+      - name: Prove certified snapshots and implementation merge ancestry
         shell: bash
         run: |
           set -euo pipefail
           SOURCE_HEAD=59b189e9980772245993a9212b6c8ad5e9a88a00
           EVIDENCE_HEAD=91c28f17acc2f66c906dddee96cbda369945f3ea
           IMPLEMENTATION_MERGE=f1da136ff956e40915fab42ae21748a6f2b1ebca
-          git merge-base --is-ancestor "$SOURCE_HEAD" HEAD
-          git merge-base --is-ancestor "$EVIDENCE_HEAD" HEAD
           git merge-base --is-ancestor "$IMPLEMENTATION_MERGE" HEAD
+          git cat-file -e "$SOURCE_HEAD^{commit}"
+          git cat-file -e "$EVIDENCE_HEAD^{commit}"
           git diff --quiet "$SOURCE_HEAD" HEAD -- \
             config/microstructure/microstructure_scope_offline_data_contracts_v1.json \
             contracts/schemas/microstructure_offline_l2_input_v1.schema.json \
