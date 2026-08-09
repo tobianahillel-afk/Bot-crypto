@@ -68,8 +68,14 @@ def verified(path: str, checksum_field: str, expected: str) -> dict[str, Any]:
 
 def validate_version() -> None:
     project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
-    require(project["version"] == "0.35.0", "project version must be 0.35.0")
-    require("Lot 35" in project["description"], "project description must identify Lot 35")
+    version = project.get("version")
+    require(isinstance(version, str), "project version must be a semantic version string")
+    try:
+        parts = tuple(int(part) for part in version.split("."))
+    except ValueError as exc:
+        raise Lot35PostMergeError("project version must be numeric semantic version") from exc
+    require(len(parts) == 3, "project version must contain major.minor.patch")
+    require(parts >= (0, 35, 0), "project version cannot predate audited Lot 35 release 0.35.0")
 
 
 def validate_lifecycle() -> dict[str, Any]:
@@ -87,8 +93,9 @@ def validate_lifecycle() -> dict[str, Any]:
         )
     validate_lot35_lifecycle_entry(current["lots"]["35"])
     require(
-        current["lots"]["36"] == {"implementation_started": False, "status": "PLANNED_LOCKED"},
-        "Lot 36 must remain locked",
+        current["lots"]["36"]
+        == {"implementation_started": False, "status": "PLANNED_LOCKED"},
+        "historical Lot 36 lock changed",
     )
     return current
 
@@ -98,10 +105,16 @@ def validate_lot35_lifecycle_entry(lot35: dict[str, Any]) -> None:
         lot35["status"] == "IMPLEMENTED_VALIDATED_RECONCILIATION_ONLY",
         "Lot 35 lifecycle status mismatch",
     )
-    require(lot35["implementation_commit"] == IMPLEMENTATION_COMMIT, "implementation commit mismatch")
+    require(
+        lot35["implementation_commit"] == IMPLEMENTATION_COMMIT,
+        "implementation commit mismatch",
+    )
     require(lot35["merged_commit"] == MERGED_COMMIT, "merged commit mismatch")
     require(lot35["pull_request"] == 31, "Lot 35 PR mismatch")
-    require(lot35["runtime_mode"] == "DATA_GOVERNANCE_ONLY", "Lot 35 runtime mismatch")
+    require(
+        lot35["runtime_mode"] == "DATA_GOVERNANCE_ONLY",
+        "Lot 35 runtime mismatch",
+    )
     for field in (
         "trade_allowed",
         "execution_allowed",
@@ -130,11 +143,23 @@ def validate_certified_evidence() -> tuple[dict[str, Any], dict[str, Any]]:
         "audit_checksum",
         EXPECTED_AUDIT_CHECKSUM,
     )
-    require(state["run_context"]["code_commit"] == IMPLEMENTATION_COMMIT, "state code commit changed")
+    require(
+        state["run_context"]["code_commit"] == IMPLEMENTATION_COMMIT,
+        "state code commit changed",
+    )
     require(audit["code_commit"] == IMPLEMENTATION_COMMIT, "audit code commit changed")
-    require(audit["state_output_checksum"] == EXPECTED_STATE_CHECKSUM, "state/audit mismatch")
-    require(state["validation_state"] == "VALIDATED_RECONCILIATION_ONLY", "state validation changed")
-    require(audit["validation_state"] == "VALIDATED_RECONCILIATION_ONLY", "audit validation changed")
+    require(
+        audit["state_output_checksum"] == EXPECTED_STATE_CHECKSUM,
+        "state/audit mismatch",
+    )
+    require(
+        state["validation_state"] == "VALIDATED_RECONCILIATION_ONLY",
+        "state validation changed",
+    )
+    require(
+        audit["validation_state"] == "VALIDATED_RECONCILIATION_ONLY",
+        "audit validation changed",
+    )
     validate_collections(state)
     validate_reference_metrics(state)
     validate_fail_closed(state, "Lot 35 state")
@@ -167,10 +192,16 @@ def validate_reference_metrics(state: dict[str, Any]) -> None:
 def validate_coverage_evidence() -> dict[str, Any]:
     coverage = load("reports/lot35/coverage_summary.json")
     require(coverage["status"] == "PASS", "coverage evidence is not PASS")
-    require(coverage["evidence_commit"] == EVIDENCE_COMMIT, "coverage evidence commit changed")
+    require(
+        coverage["evidence_commit"] == EVIDENCE_COMMIT,
+        "coverage evidence commit changed",
+    )
     require(coverage["workflow_run_id"] == 31284931048, "coverage workflow run changed")
     require(coverage["artifact_id"] == 9029508289, "coverage artifact id changed")
-    require(coverage["artifact_digest"] == EXPECTED_VALIDATION_ARTIFACT_DIGEST, "coverage digest changed")
+    require(
+        coverage["artifact_digest"] == EXPECTED_VALIDATION_ARTIFACT_DIGEST,
+        "coverage digest changed",
+    )
     require(coverage["line_coverage_percent"] == 96.43, "line coverage changed")
     require(coverage["branch_coverage_percent"] == 93.75, "branch coverage changed")
     require(coverage["anti_flake_repetitions"] == 3, "anti-flake evidence changed")
@@ -182,10 +213,16 @@ def validate_coverage_evidence() -> dict[str, Any]:
 def validate_mutation_evidence() -> dict[str, Any]:
     mutation = load("reports/lot35/mutation_summary.json")
     require(mutation["status"] == "PASS", "mutation evidence is not PASS")
-    require(mutation["evidence_commit"] == EVIDENCE_COMMIT, "mutation evidence commit changed")
+    require(
+        mutation["evidence_commit"] == EVIDENCE_COMMIT,
+        "mutation evidence commit changed",
+    )
     require(mutation["workflow_run_id"] == 31284931041, "mutation workflow run changed")
     require(mutation["artifact_id"] == 9029508744, "mutation artifact id changed")
-    require(mutation["artifact_digest"] == EXPECTED_MUTATION_ARTIFACT_DIGEST, "mutation digest changed")
+    require(
+        mutation["artifact_digest"] == EXPECTED_MUTATION_ARTIFACT_DIGEST,
+        "mutation digest changed",
+    )
     require(mutation["mutation_score_percent"] == 83.73, "mutation score changed")
     require(mutation["killed_mutants"] == 1029, "killed-mutant evidence changed")
     require(mutation["evaluated_mutants"] == 1229, "evaluated-mutant evidence changed")
@@ -195,16 +232,15 @@ def validate_mutation_evidence() -> dict[str, Any]:
 
 def validate_documents() -> None:
     audit_doc = (ROOT / "docs/LOT_35_POST_MERGE_AUDIT.md").read_text(encoding="utf-8")
-    matrix = (ROOT / "docs/LOT35_POST_MERGE_VALIDATION_MATRIX.md").read_text(encoding="utf-8")
-    readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    roadmap = (ROOT / "docs/ROADMAP_V1_TO_V21.md").read_text(encoding="utf-8")
+    matrix = (ROOT / "docs/LOT35_POST_MERGE_VALIDATION_MATRIX.md").read_text(
+        encoding="utf-8"
+    )
     for text in (audit_doc, matrix):
         require(MERGED_COMMIT in text, "audit document missing exact merge commit")
         require(EVIDENCE_COMMIT in text, "audit document missing evidence commit")
+        require("0.35.0" in text, "audit document missing historical release 0.35.0")
+        require("Lot 36" in text, "audit document missing historical Lot 36 boundary")
     require("GO_LOT35_POST_MERGE" in audit_doc, "audit verdict missing")
-    require("0.35.0" in readme, "README release version is not 0.35.0")
-    require("Lot 35" in readme, "README current lot missing")
-    require("Lot 36" in roadmap and "PLANNED_LOCKED" in roadmap, "roadmap Lot 36 lock missing")
 
 
 def validate() -> dict[str, Any]:
@@ -241,7 +277,15 @@ def validate() -> dict[str, Any]:
 def main() -> int:
     try:
         print(json.dumps(validate(), sort_keys=True))
-    except (Lot35PostMergeError, OSError, KeyError, IndexError, TypeError, ValueError, json.JSONDecodeError) as exc:
+    except (
+        Lot35PostMergeError,
+        OSError,
+        KeyError,
+        IndexError,
+        TypeError,
+        ValueError,
+        json.JSONDecodeError,
+    ) as exc:
         print(f"LOT35 POST-MERGE VALIDATION: FAIL\n{exc}", file=sys.stderr)
         return 1
     return 0
