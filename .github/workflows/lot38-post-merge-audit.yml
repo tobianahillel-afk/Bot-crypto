@@ -12,8 +12,9 @@ on:
       - 'reports/lot38/mutation_summary.json'
       - 'scripts/validate_lot37_post_merge.py'
       - 'scripts/validate_lot38_post_merge.py'
-      - 'tests/test_lot38_coverage_completion.py'
+      - 'tests/test_lot37_post_merge_state.py'
       - 'tests/test_lot38_post_merge_state.py'
+      - 'tests/test_lot38_v4_entry_gate.py'
       - '.github/workflows/lot37-post-merge-audit.yml'
       - '.github/workflows/lot38-order-book-l2-snapshot.yml'
       - '.github/workflows/lot38-mutation-assurance.yml'
@@ -72,9 +73,8 @@ jobs:
             contracts/schemas/order_book_l2_snapshot_engine_audit_v1.schema.json \
             tests/test_lot38_order_book_l2_snapshot_engine.py \
             tests/test_lot38_branch_coverage.py \
-            tests/test_lot38_mutation_contracts.py
-          git diff --name-only "$BASE_SHA" HEAD -- tests/test_lot38_coverage_completion.py \
-            | grep -q '^tests/test_lot38_coverage_completion.py$'
+            tests/test_lot38_mutation_contracts.py \
+            tests/test_lot38_coverage_completion.py
       - name: Compile lint type and frozen Lot 38 evidence
         env:
           PYTHONPATH: src
@@ -83,8 +83,9 @@ jobs:
           ruff check \
             scripts/validate_lot37_post_merge.py \
             scripts/validate_lot38_post_merge.py \
-            tests/test_lot38_coverage_completion.py \
-            tests/test_lot38_post_merge_state.py
+            tests/test_lot37_post_merge_state.py \
+            tests/test_lot38_post_merge_state.py \
+            tests/test_lot38_v4_entry_gate.py
           mypy src/crypto_quant_bot
           python scripts/validate_lot37_post_merge.py
           python scripts/validate_lot38_frozen_evidence.py
