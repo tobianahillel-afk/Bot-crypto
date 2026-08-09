@@ -19,12 +19,16 @@ L2_FIXTURE_PATH = ROOT / "tests/fixtures/lot37/offline_l2_availability_fixture_v
 
 EXPECTED_BASE = "c7ff8eecafd5f34196e9383013e97548b1a0ba02"
 EXPECTED_ROADMAP_BLOB = "84de51bda788a8d124fb7d344419c4a4b12030b5"
-EXPECTED_GATE_CHECKSUM = "4f82b04a98c542cf01d3047360f2beb54a1d808b4dd0c7160388f454c4506673"
+EXPECTED_GATE_CHECKSUM = "29fe4a5fd14b3bce95e3016fce67e10f94edcca1c2aad60c9fda382f3eb9d6a0"
 EXPECTED_L2_SHA256 = "f3715a14e8f04395b9ca5b514ac01ff8fcf924b82812f3388fdf500d6ecf5ece"
 EXPECTED_REGISTRY_CHECKSUM = "129140ffb7e812afd59d0174d318c5e3388d23bc49cc554168bde558bc0bf590"
 EXPECTED_MATRIX_CHECKSUM = "f7132fcfdab898af3f733b2715e0836d23e6284f8c0c1f3e7dd92ccf0070f1b4"
 
-EXPECTED_INPUTS = {"RunContextV1", "LineageEnvelopeV1", "OrderBookSnapshotRawV1"}
+EXPECTED_INPUTS = {
+    "RunContextV1 (run_id, runtime_mode, config_version, code_commit, correlation_id)",
+    "LineageEnvelopeV1 des artefacts produits par les lots préalables",
+    "OrderBookSnapshotRawV1",
+}
 EXPECTED_OUTPUTS = {
     "OrderBookL2SnapshotEngineStateV1",
     "OrderBookL2SnapshotEngineAuditV1",
@@ -49,17 +53,65 @@ EXPECTED_ALLOWED = {
     "FULL_CHAIN_VALIDATION_UNTIL_LOT38",
 }
 EXPECTED_FORBIDDEN = {
-    "EXTERNAL_NETWORK_ACCESS", "LIVE_EXCHANGE_DATA", "REAL_CREDENTIALS",
-    "NETWORK_INGESTION", "ORDER_BOOK_DELTA_SEQUENCE_RECONSTRUCTION",
-    "BOOK_INTEGRITY_DESYNCHRONIZATION_ENGINE", "SPREAD_DEPTH_IMBALANCE_ANALYTICS",
-    "LIQUIDITY_ZONE_WALL_VOID_INFERENCE", "BOOK_RESILIENCE_REPLENISHMENT_ENGINE",
-    "TRADE_AGGRESSOR_CLASSIFICATION", "ORDER_FLOW_DELTA_CVD_ENGINE",
-    "CLASSIFICATION_CONFIDENCE_ENGINE", "ABSORPTION_HIDDEN_LIQUIDITY_INFERENCE",
-    "VOLUME_CLUSTER_TIME_AT_LEVEL_ENGINE", "STOP_ZONE_LIQUIDITY_POOL_INFERENCE",
-    "SWEEP_FAKEOUT_TRAP_FAILED_AUCTION_ENGINE", "DERIVATIVES_CONTEXT_ENGINE",
-    "GAME_THEORY_SCENARIO_AGGREGATION", "PARTICIPANT_INTENT_AS_FACT",
-    "SCENARIO_TO_SIGNAL_CONVERSION", "FORECAST_GENERATION", "SIGNAL_GENERATION",
-    "RISK_APPROVAL", "ORDER_ROUTING", "TRADING", "EXECUTION",
+    "EXTERNAL_NETWORK_ACCESS",
+    "LIVE_EXCHANGE_DATA",
+    "REAL_CREDENTIALS",
+    "NETWORK_INGESTION",
+    "ORDER_BOOK_DELTA_SEQUENCE_RECONSTRUCTION",
+    "BOOK_INTEGRITY_DESYNCHRONIZATION_ENGINE",
+    "SPREAD_DEPTH_IMBALANCE_ANALYTICS",
+    "LIQUIDITY_ZONE_WALL_VOID_INFERENCE",
+    "BOOK_RESILIENCE_REPLENISHMENT_ENGINE",
+    "TRADE_AGGRESSOR_CLASSIFICATION",
+    "ORDER_FLOW_DELTA_CVD_ENGINE",
+    "CLASSIFICATION_CONFIDENCE_ENGINE",
+    "ABSORPTION_HIDDEN_LIQUIDITY_INFERENCE",
+    "VOLUME_CLUSTER_TIME_AT_LEVEL_ENGINE",
+    "STOP_ZONE_LIQUIDITY_POOL_INFERENCE",
+    "SWEEP_FAKEOUT_TRAP_FAILED_AUCTION_ENGINE",
+    "DERIVATIVES_CONTEXT_ENGINE",
+    "GAME_THEORY_SCENARIO_AGGREGATION",
+    "PARTICIPANT_INTENT_AS_FACT",
+    "SCENARIO_TO_SIGNAL_CONVERSION",
+    "FORECAST_GENERATION",
+    "SIGNAL_GENERATION",
+    "RISK_APPROVAL",
+    "ORDER_ROUTING",
+    "TRADING",
+    "EXECUTION",
+}
+EXPECTED_PREREQUISITES = {
+    "anti_flake_repetitions": 3,
+    "branch_coverage_percent": 100.0,
+    "latest_implemented_lot": 37,
+    "line_coverage_percent": 100.0,
+    "lot37_audit_checksum": (
+        "aa2df489e636860c119eb2ed54f7a5f03ede09838dfbd056dae0bb5a8a2a482f"
+    ),
+    "lot37_capability_matrix_checksum": EXPECTED_MATRIX_CHECKSUM,
+    "lot37_config_checksum": (
+        "a6e79dae8567aeafd5b25e3793a901097dd1714e9ec6c5f19a771417e78d6a78"
+    ),
+    "lot37_contract_registry_checksum": EXPECTED_REGISTRY_CHECKSUM,
+    "lot37_evidence_head": "91c28f17acc2f66c906dddee96cbda369945f3ea",
+    "lot37_implementation_merge": "f1da136ff956e40915fab42ae21748a6f2b1ebca",
+    "lot37_post_merge_audit_merge_commit": EXPECTED_BASE,
+    "lot37_source_head": "59b189e9980772245993a9212b6c8ad5e9a88a00",
+    "lot37_state_checksum": (
+        "ea960217eb9a2159c4a99c56257a37c43869ffad0da86555fef24eb356e5f8e7"
+    ),
+    "lot37_status": "IMPLEMENTED_VALIDATED_OFFLINE_SCOPE_CONTRACTS_ONLY",
+    "lot38_capability_status": "PLANNED_LOCKED",
+    "mutation_score_percent": 80.26,
+    "offline_input_availability_status": "AVAILABLE_FIXTURE_ONLY_NON_CANONICAL",
+    "offline_l2_contract_name": "MicrostructureOfflineL2InputV1",
+    "offline_l2_contract_schema": (
+        "contracts/schemas/microstructure_offline_l2_input_v1.schema.json"
+    ),
+    "offline_l2_fixture_path": (
+        "tests/fixtures/lot37/offline_l2_availability_fixture_v1.json"
+    ),
+    "offline_l2_fixture_sha256": EXPECTED_L2_SHA256,
 }
 
 
@@ -100,7 +152,7 @@ def positive_decimal(value: object, field: str) -> Decimal:
         number = Decimal(value)
     except InvalidOperation as exc:
         raise Lot38EntryGateError(f"{field} invalid decimal") from exc
-    require(number >= 0, f"{field} must not be negative")
+    require(number > 0, f"{field} must be positive")
     return number
 
 
@@ -124,9 +176,11 @@ def canonical_roadmap_record() -> dict[str, Any]:
 def validate_roadmap(gate: dict[str, Any]) -> None:
     record = canonical_roadmap_record()
     expected = {
-        "lot_id": "Lot 38", "lot_number": 38,
+        "lot_id": "Lot 38",
+        "lot_number": 38,
         "title": "Order Book L2 Snapshot Engine",
-        "version_id": "V4_MICROSTRUCTURE_LIQUIDITY", "version_number": 4,
+        "version_id": "V4_MICROSTRUCTURE_LIQUIDITY",
+        "version_number": 4,
         "responsible_component": "MicrostructureDomain",
         "runtime_mode": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
         "package_boundary": "src/crypto_quant_bot/microstructure",
@@ -155,6 +209,13 @@ def validate_previous_release() -> dict[str, Any]:
     return previous
 
 
+def validate_prerequisites(gate: dict[str, Any]) -> None:
+    require(
+        gate["prerequisites"] == EXPECTED_PREREQUISITES,
+        "Lot 38 prerequisite evidence changed",
+    )
+
+
 def validate_lot37_registry_and_matrix() -> None:
     registry = load(REGISTRY_PATH)
     matrix = load(MATRIX_PATH)
@@ -180,7 +241,10 @@ def validate_lot37_registry_and_matrix() -> None:
 
 
 def validate_offline_l2_fixture() -> None:
-    require(file_sha256(L2_FIXTURE_PATH) == EXPECTED_L2_SHA256, "offline L2 fixture bytes changed")
+    require(
+        file_sha256(L2_FIXTURE_PATH) == EXPECTED_L2_SHA256,
+        "offline L2 fixture bytes changed",
+    )
     fixture = load(L2_FIXTURE_PATH)
     require(fixture["fixture_only"] is True, "offline L2 input must remain fixture-only")
     require(fixture["canonical_contract"] is False, "fixture cannot become canonical contract")
@@ -199,14 +263,16 @@ def validate_offline_l2_fixture() -> None:
 def validate_scope(gate: dict[str, Any]) -> None:
     expected_fields = {
         "schema_version": "lot38-v4-entry-gate-v1",
-        "target_lot": 38, "base_commit": EXPECTED_BASE,
+        "target_lot": 38,
+        "base_commit": EXPECTED_BASE,
         "current_version": "0.37.0",
         "gate_status": "GO_LOT38_IMPLEMENTATION_ENTRY",
         "human_decision": "APPROVED_START_LOT38",
         "implementation_started": False,
         "owner": "MicrostructureDomain",
         "runtime_mode": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
-        "next_lot": 39, "next_lot_status": "PLANNED_LOCKED",
+        "next_lot": 39,
+        "next_lot_status": "PLANNED_LOCKED",
     }
     for field, value in expected_fields.items():
         require(gate[field] == value, f"Lot 38 gate field changed: {field}")
@@ -214,23 +280,39 @@ def validate_scope(gate: dict[str, Any]) -> None:
     require(set(gate["required_outputs"]) == EXPECTED_OUTPUTS, "Lot 38 gate outputs changed")
     require(set(gate["allowed_scope"]) == EXPECTED_ALLOWED, "Lot 38 allowed scope changed")
     require(set(gate["forbidden_scope"]) == EXPECTED_FORBIDDEN, "Lot 38 forbidden scope changed")
-    require(gate["quality_gates"] == {
-        "line_coverage_min_percent": 95, "branch_coverage_min_percent": 90,
-        "mutation_score_min_percent": 80, "anti_flake_repetitions": 3,
-    }, "Lot 38 quality gates changed")
+    require(
+        gate["quality_gates"]
+        == {
+            "line_coverage_min_percent": 95,
+            "branch_coverage_min_percent": 90,
+            "mutation_score_min_percent": 80,
+            "anti_flake_repetitions": 3,
+        },
+        "Lot 38 quality gates changed",
+    )
 
 
 def validate_safety(gate: dict[str, Any]) -> None:
     safety = gate["safety"]
     require(safety["analysis_only"] is True, "analysis-only boundary changed")
     require(safety["approved_size"] == 0, "approved size changed")
-    require(safety["participant_behavior_inference_explicitly_labeled"] is True,
-            "participant-inference labeling changed")
+    require(
+        safety["participant_behavior_inference_explicitly_labeled"] is True,
+        "participant-inference labeling changed",
+    )
     for field in (
-        "used_for_decision", "external_connectivity_allowed", "network_ingestion_allowed",
-        "real_credentials_allowed", "market_event_publication_allowed", "raw_data_mutation_allowed",
-        "scenario_score_is_signal", "signal_generation_allowed", "risk_approval_allowed",
-        "order_routing_allowed", "trade_allowed", "execution_allowed",
+        "used_for_decision",
+        "external_connectivity_allowed",
+        "network_ingestion_allowed",
+        "real_credentials_allowed",
+        "market_event_publication_allowed",
+        "raw_data_mutation_allowed",
+        "scenario_score_is_signal",
+        "signal_generation_allowed",
+        "risk_approval_allowed",
+        "order_routing_allowed",
+        "trade_allowed",
+        "execution_allowed",
     ):
         require(safety[field] is False, f"Lot 38 permission enabled: {field}")
 
@@ -240,6 +322,7 @@ def validate() -> dict[str, object]:
     validate_gate_checksum(gate)
     validate_roadmap(gate)
     previous = validate_previous_release()
+    validate_prerequisites(gate)
     validate_lot37_registry_and_matrix()
     validate_offline_l2_fixture()
     validate_scope(gate)
@@ -265,8 +348,13 @@ def main() -> int:
     try:
         print(json.dumps(validate(), sort_keys=True))
     except (
-        Lot38EntryGateError, OSError, KeyError, StopIteration, TypeError,
-        ValueError, json.JSONDecodeError,
+        Lot38EntryGateError,
+        OSError,
+        KeyError,
+        StopIteration,
+        TypeError,
+        ValueError,
+        json.JSONDecodeError,
     ) as exc:
         print(f"LOT38 ENTRY GATE: FAIL\n{exc}", file=sys.stderr)
         return 1
