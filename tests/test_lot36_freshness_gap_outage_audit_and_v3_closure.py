@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import copy
 import json
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -12,6 +14,9 @@ from crypto_quant_bot.data_governance.freshness_gap_outage_audit_and_v3_closure 
     audit_freshness_gap_outage,
     build_lot36_artifacts,
     build_replay_evidence,
+)
+from crypto_quant_bot.data_governance.freshness_gap_outage_audit_and_v3_closure_models import (
+    FreshnessGapOutageEvidenceV1,
 )
 from crypto_quant_bot.data_governance.freshness_gap_outage_audit_and_v3_closure_validation import (
     V3ClosureError,
@@ -23,34 +28,75 @@ from crypto_quant_bot.data_governance.market_data_quality_engine import (
     build_lot34_artifacts,
     detect_anomalies,
 )
+from crypto_quant_bot.data_governance.market_data_quality_engine_models import (
+    DataQualityStateV1,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 QUALITY_CONFIG = ROOT / "config/data_governance/market_data_quality_engine_v1.json"
 CODE_COMMIT = "1" * 40
+Mutation = Callable[[list[dict[str, Any]]], None]
 
 
-def _quality_fixture() -> tuple[dict[str, object], tuple[object, ...]]:
+def _quality_fixture() -> tuple[dict[str, Any], tuple[DataQualityStateV1, ...]]:
     config = load_json_object(QUALITY_CONFIG)
     state, _ = build_lot34_artifacts(ROOT, EXPECTED_LOT34_IMPLEMENTATION_COMMIT)
     return config, state.quality_states
 
 
-def _records(config: dict[str, object]) -> list[dict[str, object]]:
+def _records(config: dict[str, Any]) -> list[dict[str, Any]]:
     records = config["records"]
     assert isinstance(records, list)
     assert all(isinstance(record, dict) for record in records)
     return records
 
 
-def _audit(records: list[dict[str, object]], quality_states: tuple[object, ...], reference: str, max_staleness: int = 121) -> tuple[object, ...]:
+def _audit(
+    records: list[dict[str, Any]],
+    quality_states: tuple[DataQualityStateV1, ...],
+    reference: str,
+    max_staleness: int = 121,
+) -> tuple[FreshnessGapOutageEvidenceV1, ...]:
     return audit_freshness_gap_outage(
         records,
-        quality_states,  # type: ignore[arg-type]
+        quality_states,
         {"1m": 60},
         reference,
         max_staleness,
         3,
     )
+
+
+def _remove_middle(records: list[dict[str, Any]]) -> None:
+    records.pop(1)
+
+
+def _append_duplicate(records: list[dict[str, Any]]) -> None:
+    records.append(copy.deepcopy(records[0]))
+
+
+def _reverse(records: list[dict[str, Any]]) -> None:
+    records.reverse()
+
+
+def _make_stale(records: list[dict[str, Any]]) -> None:
+    records[0]["available_at"] = "2026-08-06T19:15:00.000000Z"
+
+
+def _break_ohlc(records: list[dict[str, Any]]) -> None:
+    records[0]["high"] = "56000.00"
+
+
+def _negative_volume(records: list[dict[str, Any]]) -> None:
+    records[0]["volume"] = "-1"
+
+
+def _impossible_spread(records: list[dict[str, Any]]) -> None:
+    records[0]["bid"] = "58000.00"
+
+
+def _schema_drift(records: list[dict[str, Any]]) -> None:
+    records[0]["source_schema_version"] = "future-schema-v9"
 
 
 def test_lot36_reference_build_is_candidate_only_and_fail_closed() -> None:
@@ -66,9 +112,9 @@ def test_lot36_reference_build_is_candidate_only_and_fail_closed() -> None:
     assert state.closure_manifest.next_lot_status == "PLANNED_LOCKED"
     assert audit.state_output_checksum == state.output_checksum
     assert audit.validation_state == state.validation_state
-    assert state.trade_allowed is False
-    assert state.execution_allowed is False
-    assert state.approved_size == 0
+    assert state.safety["trade_allowed"] is False
+    assert state.safety["execution_allowed"] is False
+    assert state.safety["approved_size"] == 0
 
 
 def test_lot36_reference_freshness_gap_outage_audit_passes() -> None:
@@ -151,20 +197,22 @@ def test_lot36_freshness_audit_is_input_order_independent() -> None:
 @pytest.mark.parametrize(
     ("expected_type", "mutate"),
     [
-        ("MISSING_INTERVAL", lambda records: records.pop(1)),
-        ("DUPLICATE", lambda records: records.append(copy.deepcopy(records[0]))),
-        ("OUT_OF_ORDER", lambda records: records.reverse()),
-        ("STALE_DATA", lambda records: records[0].__setitem__("available_at", "2026-08-06T19:15:00.000000Z")),
-        ("INVALID_OHLC", lambda records: records[0].__setitem__("high", "56000.00")),
-        ("NEGATIVE_VOLUME", lambda records: records[0].__setitem__("volume", "-1")),
-        ("IMPOSSIBLE_SPREAD", lambda records: records[0].__setitem__("bid", "58000.00")),
-        ("SCHEMA_DRIFT", lambda records: records[0].__setitem__("source_schema_version", "future-schema-v9")),
+        ("MISSING_INTERVAL", _remove_middle),
+        ("DUPLICATE", _append_duplicate),
+        ("OUT_OF_ORDER", _reverse),
+        ("STALE_DATA", _make_stale),
+        ("INVALID_OHLC", _break_ohlc),
+        ("NEGATIVE_VOLUME", _negative_volume),
+        ("IMPOSSIBLE_SPREAD", _impossible_spread),
+        ("SCHEMA_DRIFT", _schema_drift),
     ],
 )
-def test_lot36_reaudit_detects_every_lot34_anomaly_family(expected_type: str, mutate: object) -> None:
+def test_lot36_reaudit_detects_every_lot34_anomaly_family(
+    expected_type: str, mutate: Mutation
+) -> None:
     config = copy.deepcopy(load_json_object(QUALITY_CONFIG))
     records = _records(config)
-    mutate(records)  # type: ignore[operator]
+    mutate(records)
     anomalies = detect_anomalies(config)
     assert expected_type in {item.anomaly_type for item in anomalies}
 
@@ -176,7 +224,7 @@ def test_lot36_any_quality_anomaly_forces_fail_closed_veto() -> None:
     records[0]["volume"] = "-1"
     anomalies = detect_anomalies(mutated)
     freshness = _audit(records, states, "2026-08-06T19:18:00.100000Z")
-    veto = _closure_quality_veto(states, anomalies, freshness, 9500)  # type: ignore[arg-type]
+    veto = _closure_quality_veto(states, anomalies, freshness, 9500)
     assert veto.action == "BLOCK_ANALYSIS_OR_TRADING"
     assert "NEGATIVE_VOLUME" in veto.blocking_anomaly_types
 
