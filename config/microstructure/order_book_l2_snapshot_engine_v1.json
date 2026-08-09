@@ -1,0 +1,19 @@
+{
+  "schema_version": "lot38-order-book-l2-snapshot-config-v1",
+  "config_version": "lot38-order-book-l2-snapshot-config-v1",
+  "run_id": "lot38-reference-run-001",
+  "correlation_id": "lot38-reference-correlation-001",
+  "lineage_id": "lot38-reference-lineage-001",
+  "generated_at": "2026-08-06T19:18:40.050000Z",
+  "input_reference_time": "2026-08-06T19:18:40.050000Z",
+  "max_input_age_us": 1000000,
+  "published_depth_limit": 2,
+  "fixture_venue_state": "OPEN",
+  "entry_gate_path": "data/audit/lot38_v4_entry_gate.json",
+  "lot37_lifecycle_overlay_path": "data/audit/roadmap_lifecycle_overlay_lot37.json",
+  "lot37_state_path": "data/audit/microstructure_scope_and_offline_data_contracts_lot37.json",
+  "lot37_audit_path": "data/audit/microstructure_scope_and_offline_data_contracts_audit_lot37.json",
+  "lot37_contract_registry_path": "data/audit/microstructure_contract_registry_lot37.json",
+  "lot37_capability_matrix_path": "data/audit/microstructure_capability_matrix_lot37.json",
+  "offline_l2_fixture_path": "tests/fixtures/lot37/offline_l2_availability_fixture_v1.json"
+}

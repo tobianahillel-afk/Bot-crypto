@@ -1,0 +1,39 @@
+{
+  "asks": [
+    {
+      "price": "50025.1",
+      "quantity": "0.7"
+    },
+    {
+      "price": "50025.2",
+      "quantity": "1.1"
+    }
+  ],
+  "bids": [
+    {
+      "price": "50024.9",
+      "quantity": "0.8"
+    },
+    {
+      "price": "50024.8",
+      "quantity": "1.25"
+    }
+  ],
+  "event_time": "2026-08-06T19:18:40.000000Z",
+  "instrument_id": "BTC-EUR-SPOT",
+  "market_type": "SPOT",
+  "normalized_ask_depth": 3,
+  "normalized_bid_depth": 3,
+  "published_ask_depth": 2,
+  "published_bid_depth": 2,
+  "receive_time": "2026-08-06T19:18:40.050000Z",
+  "schema_version": "order-book-snapshot-v1",
+  "sequence_anchor": "9d5b399044b6fcdbacd6e30e4a7c975638c039cf1afb6d5c7df3ee5515c6aa24",
+  "sequence_id": 1001,
+  "snapshot_checksum": "0d63ca7ac1ca48b44e58c0b0f1eb8946190eaf2da6745c2bbd2dd8de14f49b16",
+  "source_ask_depth": 3,
+  "source_bid_depth": 3,
+  "source_id": "kraken-reference-offline-fixture",
+  "venue": "KRAKEN",
+  "venue_state": "OPEN"
+}

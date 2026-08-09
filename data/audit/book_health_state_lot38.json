@@ -1,0 +1,20 @@
+{
+  "crossed": false,
+  "health_checksum": "58b56f7cf21aa74dd67620b8dd6e19cad11b77412cdcc3103b6d60bd15703837",
+  "health_status": "HEALTHY",
+  "locked": false,
+  "normalized_ask_depth": 3,
+  "normalized_bid_depth": 3,
+  "published_ask_depth": 2,
+  "published_bid_depth": 2,
+  "reason_codes": [
+    "LOT38_BOOK_OPEN_HEALTHY",
+    "LOT38_SEQUENCE_PRESENT",
+    "LOT39_REMAINS_LOCKED"
+  ],
+  "schema_version": "book-health-state-v1",
+  "sequence_present": true,
+  "source_ask_depth": 3,
+  "source_bid_depth": 3,
+  "venue_state": "OPEN"
+}

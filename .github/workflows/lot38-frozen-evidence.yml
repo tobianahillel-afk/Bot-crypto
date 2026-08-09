@@ -1,0 +1,91 @@
+name: Lot 38 frozen evidence attestation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'data/audit/order_book_l2_snapshot_engine_lot38.json'
+      - 'data/audit/order_book_l2_snapshot_engine_audit_lot38.json'
+      - 'data/audit/order_book_snapshot_lot38.json'
+      - 'data/audit/book_health_state_lot38.json'
+      - 'reports/lot38/**'
+      - 'reports/lot_38_order_book_l2_snapshot_engine_report.md'
+      - 'scripts/validate_lot38_frozen_evidence.py'
+      - '.github/workflows/lot38-frozen-evidence.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  evidence:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+      - name: Prove evidence-only ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_HEAD=b74bea4329d5e5cb7cf2452058b684ea5a5df13c
+          git merge-base --is-ancestor "$SOURCE_HEAD" HEAD
+          changed_src="$(git diff --name-only "$SOURCE_HEAD"...HEAD -- src/ || true)"
+          test -z "$changed_src" || {
+            echo 'LOT38_SOURCE_CHANGED_AFTER_CERTIFIED_HEAD'
+            echo "$changed_src"
+            exit 1
+          }
+          changed_contract="$(git diff --name-only "$SOURCE_HEAD"...HEAD -- \
+            config/microstructure/order_book_l2_snapshot_engine_v1.json \
+            contracts/schemas/order_book_snapshot_raw_v1.schema.json \
+            contracts/schemas/order_book_snapshot_v1.schema.json \
+            contracts/schemas/book_health_state_v1.schema.json \
+            contracts/schemas/order_book_l2_snapshot_engine_state_v1.schema.json \
+            contracts/schemas/order_book_l2_snapshot_engine_audit_v1.schema.json \
+            tests/test_lot38_order_book_l2_snapshot_engine.py \
+            tests/test_lot38_branch_coverage.py \
+            tests/test_lot38_mutation_contracts.py \
+            tests/test_lot38_coverage_completion.py \
+            docs/LOT_38_ORDER_BOOK_L2_SNAPSHOT_ENGINE.md \
+            docs/ACCEPTANCE_CRITERIA_LOT_38.md || true)"
+          test -z "$changed_contract" || {
+            echo 'LOT38_CONTRACT_OR_TEST_CHANGED_AFTER_CERTIFIED_HEAD'
+            echo "$changed_contract"
+            exit 1
+          }
+      - name: Validate frozen canonical artifacts
+        env:
+          PYTHONPATH: src
+        run: |
+          python scripts/validate_lot38_frozen_evidence.py
+          python scripts/validate_lot38.py --expected-code-commit b74bea4329d5e5cb7cf2452058b684ea5a5df13c
+          python scripts/validate_lot38_no_connectivity.py
+      - name: Validate evidence JSON syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          for path in \
+            data/audit/order_book_l2_snapshot_engine_lot38.json \
+            data/audit/order_book_l2_snapshot_engine_audit_lot38.json \
+            data/audit/order_book_snapshot_lot38.json \
+            data/audit/book_health_state_lot38.json \
+            reports/lot38/coverage_summary.json \
+            reports/lot38/mutation_summary.json; do
+            python -m json.tool "$path" >/dev/null
+          done
+      - name: Recheck institutional governance
+        env:
+          PYTHONPATH: src
+        run: |
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "order_book_l2_snapshot_engine_audit_v1.schema.json",
+  "title": "OrderBookL2SnapshotEngineAuditV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "code_commit", "state_output_checksum", "config_checksum", "entry_gate_checksum", "input_fixture_checksum", "snapshot_checksum", "health_checksum", "validation_state", "safety", "audit_checksum"],
+  "properties": {
+    "schema_version": {"const": "order-book-l2-snapshot-engine-audit-v1"},
+    "code_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "state_output_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "config_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "entry_gate_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "input_fixture_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "snapshot_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "health_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "validation_state": {"const": "VALIDATED_OFFLINE_L2_SNAPSHOT_ONLY"},
+    "safety": {"type": "object"},
+    "audit_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
