@@ -1,0 +1,186 @@
+name: Lot 39 order book delta sequence validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'config/microstructure/order_book_delta_sequence_reconstructor_v1.json'
+      - 'contracts/schemas/order_book_delta*.json'
+      - 'contracts/schemas/reconstructed_order_book_v1.schema.json'
+      - 'contracts/schemas/sequence_gap_event_v1.schema.json'
+      - 'src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor*.py'
+      - 'src/crypto_quant_bot/microstructure/__init__.py'
+      - 'scripts/run_lot39_order_book_delta_sequence_reconstructor.py'
+      - 'scripts/validate_lot39*.py'
+      - 'tests/test_lot39*.py'
+      - 'tests/fixtures/lot39/**'
+      - '.github/workflows/lot39-order-book-delta-sequence.yml'
+      - 'requirements-dev.lock'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lot39:
+    runs-on: ubuntu-22.04
+    env:
+      PYTHONPATH: src
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Prove exact Lot 39 gate ancestry and source boundary
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_BASE=938a0e9cf92ef5bbda02045486afbd9a32dc67ec
+          git merge-base --is-ancestor "$EXPECTED_BASE" HEAD
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            test "$PR_BASE_SHA" = "$EXPECTED_BASE"
+          fi
+          find src/crypto_quant_bot/microstructure -maxdepth 1 -type f \
+            \( -name '*book_integrity*' -o -name '*desynchronization_detector*' \) \
+            | grep -q . && { echo 'LOT40_ENGINE_PRESENT'; exit 1; } || true
+      - name: Compile lint type and schema checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports/lot39
+          python -m compileall -q src scripts tests
+          for path in \
+            config/microstructure/order_book_delta_sequence_reconstructor_v1.json \
+            contracts/schemas/order_book_delta_v1.schema.json \
+            contracts/schemas/reconstructed_order_book_v1.schema.json \
+            contracts/schemas/sequence_gap_event_v1.schema.json \
+            contracts/schemas/order_book_delta_sequence_reconstructor_state_v1.schema.json \
+            contracts/schemas/order_book_delta_sequence_reconstructor_audit_v1.schema.json; do
+            python -m json.tool "$path" >/dev/null
+          done
+          ruff check \
+            src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor.py \
+            src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor_models.py \
+            src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor_validation.py \
+            src/crypto_quant_bot/microstructure/__init__.py \
+            scripts/run_lot39_order_book_delta_sequence_reconstructor.py \
+            scripts/validate_lot39.py \
+            scripts/validate_lot39_no_connectivity.py \
+            tests/test_lot39_order_book_delta_sequence_reconstructor.py \
+            --output-format=concise 2>&1 | tee reports/lot39/ruff.txt
+          mypy src/crypto_quant_bot/microstructure 2>&1 | tee reports/lot39/mypy.txt
+      - name: Targeted line and branch coverage
+        env:
+          SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          coverage erase
+          pytest -q tests/test_lot39_order_book_delta_sequence_reconstructor.py \
+            --cov=crypto_quant_bot.microstructure.order_book_delta_sequence_reconstructor \
+            --cov=crypto_quant_bot.microstructure.order_book_delta_sequence_reconstructor_models \
+            --cov=crypto_quant_bot.microstructure.order_book_delta_sequence_reconstructor_validation \
+            --cov-branch \
+            --cov-report=json:reports/lot39/coverage.json \
+            --cov-report=term-missing \
+            --junitxml=reports/lot39/targeted-tests.xml \
+            2>&1 | tee reports/lot39/targeted-tests.txt
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          totals = json.loads(Path('reports/lot39/coverage.json').read_text())['totals']
+          lines = float(totals['percent_statements_covered'])
+          branches = float(totals['percent_branches_covered'])
+          payload = {
+              'schema_version': 'lot39-coverage-summary-v1',
+              'status': 'PASS' if lines >= 95.0 and branches >= 90.0 else 'FAIL',
+              'source_head_sha': os.environ['SOURCE_HEAD_SHA'],
+              'line_coverage_percent': round(lines, 2),
+              'branch_coverage_percent': round(branches, 2),
+              'line_coverage_min_percent': 95.0,
+              'branch_coverage_min_percent': 90.0,
+              'anti_flake_repetitions': 3,
+          }
+          Path('reports/lot39/coverage_summary.json').write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+          )
+          print(json.dumps(payload, sort_keys=True))
+          if payload['status'] != 'PASS':
+              raise SystemExit('LOT39_CRITICAL_COVERAGE_BELOW_THRESHOLD')
+          PY
+      - name: Generate validate and replay exact Lot 39 candidate
+        env:
+          SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          outputs=(
+            data/audit/order_book_delta_sequence_reconstructor_lot39.json
+            data/audit/order_book_delta_sequence_reconstructor_audit_lot39.json
+            data/audit/reconstructed_order_book_lot39.json
+          )
+          rm -rf /tmp/lot39-run1 reports/lot39/generated
+          mkdir -p /tmp/lot39-run1 reports/lot39/generated
+          rm -f data/audit/sequence_gap_event_lot39.json
+          python scripts/run_lot39_order_book_delta_sequence_reconstructor.py --code-commit "$SOURCE_HEAD_SHA"
+          python scripts/validate_lot39.py --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
+          python scripts/validate_lot39_no_connectivity.py
+          test ! -e data/audit/sequence_gap_event_lot39.json
+          for path in "${outputs[@]}"; do
+            cp "$path" "/tmp/lot39-run1/$(basename "$path")"
+            cp "$path" "reports/lot39/generated/$(basename "$path")"
+          done
+          python scripts/run_lot39_order_book_delta_sequence_reconstructor.py --code-commit "$SOURCE_HEAD_SHA"
+          python scripts/validate_lot39.py --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
+          for path in "${outputs[@]}"; do
+            cmp "/tmp/lot39-run1/$(basename "$path")" "$path"
+          done
+      - name: Architecture roadmap traceability engineering and safety
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          python scripts/validate_lot39_no_connectivity.py
+      - name: Security dependency regression and anti-flake
+        run: |
+          bandit -q -r \
+            src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor.py \
+            src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor_models.py \
+            src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor_validation.py \
+            scripts/run_lot39_order_book_delta_sequence_reconstructor.py \
+            scripts/validate_lot39.py -ll
+          pip-audit -r requirements-dev.lock
+          pytest -q
+          for repetition in 1 2 3; do
+            pytest -q tests/test_lot39_order_book_delta_sequence_reconstructor.py
+          done
+          git diff --exit-code -- src/crypto_quant_bot
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot39-order-book-delta-sequence-evidence
+          path: |
+            reports/lot39/
+            data/audit/order_book_delta_sequence_reconstructor_lot39.json
+            data/audit/order_book_delta_sequence_reconstructor_audit_lot39.json
+            data/audit/reconstructed_order_book_lot39.json
+            data/audit/sequence_gap_event_lot39.json
