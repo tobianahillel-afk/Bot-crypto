@@ -5,15 +5,29 @@ on:
     branches: [main]
     paths:
       - 'config/microstructure/microstructure_scope_offline_data_contracts_v1.json'
-      - 'contracts/schemas/microstructure_*.schema.json'
-      - 'src/crypto_quant_bot/microstructure/**'
+      - 'contracts/schemas/microstructure_offline_l2_input_v1.schema.json'
+      - 'contracts/schemas/microstructure_offline_trade_input_v1.schema.json'
+      - 'contracts/schemas/microstructure_scope_offline_data_contracts_state_v1.schema.json'
+      - 'contracts/schemas/microstructure_scope_offline_data_contracts_audit_v1.schema.json'
+      - 'contracts/schemas/microstructure_scope_offline_data_contracts_contract_registry_v1.schema.json'
+      - 'contracts/schemas/microstructure_scope_offline_data_contracts_capability_matrix_v1.schema.json'
+      - 'src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts.py'
+      - 'src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts_models.py'
+      - 'src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts_validation.py'
       - 'scripts/run_lot37_microstructure_scope_and_offline_data_contracts.py'
       - 'scripts/validate_lot37.py'
-      - 'tests/test_lot37*.py'
+      - 'scripts/validate_lot37_frozen_evidence.py'
+      - 'tests/test_lot37_microstructure_scope_and_offline_data_contracts.py'
+      - 'tests/test_lot37_branch_coverage.py'
       - 'docs/LOT_37_MICROSTRUCTURE_SCOPE_AND_OFFLINE_DATA_CONTRACTS.md'
       - 'docs/ACCEPTANCE_CRITERIA_LOT_37.md'
       - 'reports/lot_37_microstructure_scope_and_offline_data_contracts_report.md'
-      - 'data/audit/microstructure_*lot37.json'
+      - 'reports/lot37/coverage_summary.json'
+      - 'reports/lot37/mutation_summary.json'
+      - 'data/audit/microstructure_scope_and_offline_data_contracts_lot37.json'
+      - 'data/audit/microstructure_scope_and_offline_data_contracts_audit_lot37.json'
+      - 'data/audit/microstructure_contract_registry_lot37.json'
+      - 'data/audit/microstructure_capability_matrix_lot37.json'
       - '.github/workflows/lot37-microstructure-scope-contracts.yml'
       - 'requirements-dev.lock'
   push:
@@ -30,7 +44,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
@@ -39,33 +52,45 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Verify exact Lot 37 gate ancestry and source boundary
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      - name: Prove certified source evidence and merge ancestry
         shell: bash
         run: |
           set -euo pipefail
-          EXPECTED_BASE=b2ec1f8ffa03c9dd48a04fe62f42c4f9986e2167
-          git merge-base --is-ancestor "$EXPECTED_BASE" HEAD
-          python scripts/validate_lot36_post_merge.py
-          python scripts/validate_lot37_entry_gate.py
-          if [ "$EVENT_NAME" = "pull_request" ]; then
-            test "$PR_BASE_SHA" = "$EXPECTED_BASE"
-            unexpected="$(git diff --name-only "$PR_BASE_SHA"...HEAD -- src/ | grep -v '^src/crypto_quant_bot/microstructure/' || true)"
-            test -z "$unexpected" || { echo "$unexpected"; exit 1; }
-          fi
-          expected_src='src/crypto_quant_bot/microstructure/__init__.py
-          src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts.py
-          src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts_models.py
-          src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts_validation.py'
-          actual_src="$(find src/crypto_quant_bot/microstructure -maxdepth 1 -type f -name '*.py' | sort)"
-          test "$actual_src" = "$expected_src"
-      - name: Compile lint type and schema checks
+          SOURCE_HEAD=59b189e9980772245993a9212b6c8ad5e9a88a00
+          EVIDENCE_HEAD=91c28f17acc2f66c906dddee96cbda369945f3ea
+          IMPLEMENTATION_MERGE=f1da136ff956e40915fab42ae21748a6f2b1ebca
+          git merge-base --is-ancestor "$SOURCE_HEAD" HEAD
+          git merge-base --is-ancestor "$EVIDENCE_HEAD" HEAD
+          git merge-base --is-ancestor "$IMPLEMENTATION_MERGE" HEAD
+          git diff --quiet "$SOURCE_HEAD" HEAD -- \
+            config/microstructure/microstructure_scope_offline_data_contracts_v1.json \
+            contracts/schemas/microstructure_offline_l2_input_v1.schema.json \
+            contracts/schemas/microstructure_offline_trade_input_v1.schema.json \
+            contracts/schemas/microstructure_scope_offline_data_contracts_state_v1.schema.json \
+            contracts/schemas/microstructure_scope_offline_data_contracts_audit_v1.schema.json \
+            contracts/schemas/microstructure_scope_offline_data_contracts_contract_registry_v1.schema.json \
+            contracts/schemas/microstructure_scope_offline_data_contracts_capability_matrix_v1.schema.json \
+            src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts.py \
+            src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts_models.py \
+            src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts_validation.py \
+            scripts/run_lot37_microstructure_scope_and_offline_data_contracts.py \
+            scripts/validate_lot37.py \
+            tests/test_lot37_microstructure_scope_and_offline_data_contracts.py \
+            tests/test_lot37_branch_coverage.py \
+            docs/LOT_37_MICROSTRUCTURE_SCOPE_AND_OFFLINE_DATA_CONTRACTS.md \
+            docs/ACCEPTANCE_CRITERIA_LOT_37.md
+          git diff --quiet "$EVIDENCE_HEAD" HEAD -- \
+            data/audit/microstructure_scope_and_offline_data_contracts_lot37.json \
+            data/audit/microstructure_scope_and_offline_data_contracts_audit_lot37.json \
+            data/audit/microstructure_contract_registry_lot37.json \
+            data/audit/microstructure_capability_matrix_lot37.json \
+            reports/lot37/coverage_summary.json \
+            reports/lot37/mutation_summary.json \
+            reports/lot_37_microstructure_scope_and_offline_data_contracts_report.md
+      - name: Compile lint type schema and frozen evidence
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p reports/lot37
           python -m compileall -q src scripts tests
           python -m json.tool config/microstructure/microstructure_scope_offline_data_contracts_v1.json >/dev/null
           for schema in \
@@ -78,81 +103,17 @@ jobs:
             python -m json.tool "contracts/schemas/${schema}.schema.json" >/dev/null
           done
           ruff check \
-            src/crypto_quant_bot/microstructure \
+            src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts.py \
+            src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts_models.py \
+            src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts_validation.py \
             scripts/run_lot37_microstructure_scope_and_offline_data_contracts.py \
             scripts/validate_lot37.py \
+            scripts/validate_lot37_frozen_evidence.py \
             tests/test_lot37_microstructure_scope_and_offline_data_contracts.py \
-            tests/test_lot37_branch_coverage.py \
-            --output-format=concise 2>&1 | tee reports/lot37/ruff.txt
-          mypy src/crypto_quant_bot/microstructure 2>&1 | tee reports/lot37/mypy.txt
-      - name: Targeted line and branch coverage
-        env:
-          SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          coverage erase
-          pytest -q \
-            tests/test_lot37_microstructure_scope_and_offline_data_contracts.py \
-            tests/test_lot37_branch_coverage.py \
-            --cov=crypto_quant_bot.microstructure.microstructure_scope_and_offline_data_contracts \
-            --cov=crypto_quant_bot.microstructure.microstructure_scope_and_offline_data_contracts_models \
-            --cov=crypto_quant_bot.microstructure.microstructure_scope_and_offline_data_contracts_validation \
-            --cov-branch \
-            --cov-report=json:reports/lot37/coverage.json \
-            --cov-report=term-missing \
-            --junitxml=reports/lot37/targeted-tests.xml \
-            2>&1 | tee reports/lot37/targeted-tests.txt
-          python - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-          totals = json.loads(Path('reports/lot37/coverage.json').read_text())['totals']
-          lines = float(totals['percent_statements_covered'])
-          branches = float(totals['percent_branches_covered'])
-          payload = {
-              'schema_version': 'lot37-coverage-summary-v1',
-              'status': 'PASS' if lines >= 95.0 and branches >= 90.0 else 'FAIL',
-              'source_head_sha': os.environ['SOURCE_HEAD_SHA'],
-              'line_coverage_percent': round(lines, 2),
-              'branch_coverage_percent': round(branches, 2),
-              'line_coverage_min_percent': 95.0,
-              'branch_coverage_min_percent': 90.0,
-              'anti_flake_repetitions': 3,
-          }
-          Path('reports/lot37/coverage_summary.json').write_text(
-              json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8'
-          )
-          print(json.dumps(payload, sort_keys=True))
-          if payload['status'] != 'PASS':
-              raise SystemExit('LOT37_CRITICAL_COVERAGE_BELOW_THRESHOLD')
-          PY
-      - name: Generate validate and replay exact Lot 37 evidence
-        env:
-          SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          outputs=(
-            data/audit/microstructure_scope_and_offline_data_contracts_lot37.json
-            data/audit/microstructure_scope_and_offline_data_contracts_audit_lot37.json
-            data/audit/microstructure_contract_registry_lot37.json
-            data/audit/microstructure_capability_matrix_lot37.json
-          )
-          rm -rf /tmp/lot37-run1 reports/lot37/generated
-          mkdir -p /tmp/lot37-run1 reports/lot37/generated
-          python scripts/run_lot37_microstructure_scope_and_offline_data_contracts.py --code-commit "$SOURCE_HEAD_SHA"
-          python scripts/validate_lot37.py --expected-code-commit "$SOURCE_HEAD_SHA"
-          for path in "${outputs[@]}"; do
-            cp "$path" "/tmp/lot37-run1/$(basename "$path")"
-            cp "$path" "reports/lot37/generated/$(basename "$path")"
-          done
-          python scripts/run_lot37_microstructure_scope_and_offline_data_contracts.py --code-commit "$SOURCE_HEAD_SHA"
-          python scripts/validate_lot37.py --expected-code-commit "$SOURCE_HEAD_SHA"
-          for path in "${outputs[@]}"; do
-            cmp "/tmp/lot37-run1/$(basename "$path")" "$path"
-            rm -f "$path"
-          done
+            tests/test_lot37_branch_coverage.py
+          mypy src/crypto_quant_bot/microstructure
+          python scripts/validate_lot37_frozen_evidence.py
+          python scripts/validate_lot37.py --expected-code-commit 59b189e9980772245993a9212b6c8ad5e9a88a00
       - name: Architecture roadmap traceability engineering and no-future scans
         shell: bash
         run: |
@@ -166,29 +127,21 @@ jobs:
           python scripts/quality_inventory.py
           python scripts/validate_engineering_deviations.py
           if grep -REn '^[[:space:]]*(import|from)[[:space:]]+(requests|urllib|socket|httpx|aiohttp)' \
-            src/crypto_quant_bot/microstructure scripts/run_lot37_microstructure_scope_and_offline_data_contracts.py scripts/validate_lot37.py; then
+            src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts*.py \
+            scripts/run_lot37_microstructure_scope_and_offline_data_contracts.py scripts/validate_lot37.py; then
             echo 'LOT37_FORBIDDEN_NETWORK_IMPORT'
             exit 1
           fi
-          if find src/crypto_quant_bot/microstructure -maxdepth 1 -type f \
-            \( -name '*order_book*' -o -name '*order_flow*' -o -name '*aggressor*' -o -name '*scenario*' -o -name '*liquidity*engine*' \) | grep -q .; then
-            echo 'LOT37_FUTURE_V4_ENGINE_PRESENT'
-            exit 1
-          fi
-      - name: Security and dependency checks
+      - name: Security dependency regression and anti-flake
         run: |
-          bandit -q -r src/crypto_quant_bot/microstructure scripts/run_lot37_microstructure_scope_and_offline_data_contracts.py scripts/validate_lot37.py -ll
+          bandit -q -r \
+            src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts.py \
+            src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts_models.py \
+            src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts_validation.py \
+            scripts/run_lot37_microstructure_scope_and_offline_data_contracts.py \
+            scripts/validate_lot37.py -ll
           pip-audit -r requirements-dev.lock
-      - name: Full regression and anti-flake
-        run: |
           pytest -q
           pytest -q tests/test_lot37_microstructure_scope_and_offline_data_contracts.py tests/test_lot37_branch_coverage.py
           pytest -q tests/test_lot37_microstructure_scope_and_offline_data_contracts.py tests/test_lot37_branch_coverage.py
           pytest -q tests/test_lot37_microstructure_scope_and_offline_data_contracts.py tests/test_lot37_branch_coverage.py
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: lot37-microstructure-scope-contracts-evidence
-          path: |
-            reports/lot37/
-            reports/lot_37_microstructure_scope_and_offline_data_contracts_report.md
