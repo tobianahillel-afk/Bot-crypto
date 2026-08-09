@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lot37-v4-entry-gate-v1.schema.json",
+  "title": "Lot 37 V4 Entry Gate V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "target_lot",
+    "base_commit",
+    "current_version",
+    "canonical_roadmap",
+    "gate_status",
+    "human_decision",
+    "implementation_started",
+    "owner",
+    "runtime_mode",
+    "allowed_scope",
+    "required_outputs",
+    "forbidden_scope",
+    "prerequisites",
+    "quality_gates",
+    "safety",
+    "next_lot",
+    "next_lot_status",
+    "output_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "lot37-v4-entry-gate-v1"},
+    "target_lot": {"const": 37},
+    "base_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "current_version": {"const": "0.36.0"},
+    "canonical_roadmap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_path", "source_line", "source_blob_sha", "lot_id", "title", "version_id"],
+      "properties": {
+        "source_path": {"const": "data/audit/product_scope_roadmap_lot21.jsonl"},
+        "source_line": {"const": 38},
+        "source_blob_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "lot_id": {"const": "Lot 37"},
+        "title": {"const": "Microstructure Scope & Offline Data Contracts"},
+        "version_id": {"const": "V4_MICROSTRUCTURE_LIQUIDITY"}
+      }
+    },
+    "gate_status": {"const": "GO_LOT37_IMPLEMENTATION_ENTRY"},
+    "human_decision": {"const": "APPROVED_START_LOT37"},
+    "implementation_started": {"const": false},
+    "owner": {"const": "MicrostructureDomain"},
+    "runtime_mode": {"const": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY"},
+    "allowed_scope": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+    "required_outputs": {"type": "array", "minItems": 4, "uniqueItems": true, "items": {"type": "string"}},
+    "forbidden_scope": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+    "prerequisites": {
+      "type": "object",
+      "required": [
+        "latest_implemented_lot",
+        "v3_closed",
+        "lot36_status",
+        "lot36_post_merge_audit_merge_commit",
+        "lot36_state_checksum",
+        "lot36_audit_checksum",
+        "lot36_manifest_checksum",
+        "lot36_replay_checksum",
+        "line_coverage_percent",
+        "branch_coverage_percent",
+        "mutation_score_percent",
+        "anti_flake_repetitions",
+        "offline_input_availability_status",
+        "offline_l2_fixture_path",
+        "offline_l2_fixture_sha256",
+        "offline_trade_fixture_path",
+        "offline_trade_fixture_sha256"
+      ],
+      "properties": {
+        "latest_implemented_lot": {"const": 36},
+        "v3_closed": {"const": true},
+        "lot36_status": {"const": "IMPLEMENTED_VALIDATED_V3_CLOSURE_ONLY"},
+        "lot36_post_merge_audit_merge_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "lot36_state_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lot36_audit_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lot36_manifest_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lot36_replay_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "line_coverage_percent": {"type": "number", "minimum": 95, "maximum": 100},
+        "branch_coverage_percent": {"type": "number", "minimum": 90, "maximum": 100},
+        "mutation_score_percent": {"type": "number", "minimum": 80, "maximum": 100},
+        "anti_flake_repetitions": {"type": "integer", "minimum": 3},
+        "offline_input_availability_status": {"const": "AVAILABLE_FIXTURE_ONLY_NON_CANONICAL"},
+        "offline_l2_fixture_path": {"type": "string"},
+        "offline_l2_fixture_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "offline_trade_fixture_path": {"type": "string"},
+        "offline_trade_fixture_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "quality_gates": {
+      "type": "object",
+      "required": ["line_coverage_min_percent", "branch_coverage_min_percent", "mutation_score_min_percent", "anti_flake_repetitions"]
+    },
+    "safety": {
+      "type": "object",
+      "required": [
+        "analysis_only",
+        "approved_size",
+        "execution_allowed",
+        "external_connectivity_allowed",
+        "market_event_publication_allowed",
+        "network_ingestion_allowed",
+        "order_routing_allowed",
+        "raw_data_mutation_allowed",
+        "real_credentials_allowed",
+        "risk_approval_allowed",
+        "signal_generation_allowed",
+        "trade_allowed",
+        "used_for_decision",
+        "participant_behavior_inference_explicitly_labeled",
+        "scenario_score_is_signal"
+      ]
+    },
+    "next_lot": {"const": 38},
+    "next_lot_status": {"const": "PLANNED_LOCKED"},
+    "output_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
