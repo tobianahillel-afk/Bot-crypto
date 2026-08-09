@@ -147,19 +147,21 @@ serial_digest_2   = sha256:ad5f413a4b24bc41c5b89fe0eaaa720e07d9ff3eba521eb3970e2
 
 The artifact ZIP digests differ because workflow-produced logs/metadata differ between executions; the canonical mutation summary itself is byte-identical and is the committed evidence object.
 
-## Frozen evidence attestation
+## Final exact-head CI before merge
 
-The dedicated `Lot 38 frozen evidence attestation` workflow independently verifies that:
+The evidence/report head `ef197437d13012644e48a9044cf0883bd17700fb` passed all seven applicable workflows before this final record-only commit:
 
-- no `src/` drift occurred after the certified source head;
-- no Lot 38 config/schema/test/acceptance-contract drift occurred after the certified source head;
-- all four canonical artifact checksums recompute exactly;
-- state/audit/snapshot/health reconcile exactly;
-- the gate checksum and runtime boundary remain exact;
-- coverage and mutation summaries match the certified source and thresholds;
-- no-connectivity and institutional governance validators remain PASS.
+```text
+Lot 38 frozen evidence attestation = PASS
+Lot 38 order book L2 snapshot validation = PASS
+Lot 38 mutation assurance = PASS
+Institutional code quality gates = PASS
+Roadmap documentation validation = PASS
+Lot 26 foundation and lifecycle validation = PASS
+Lot 37 historical mutation assurance = PASS
+```
 
-A successful attestation was obtained on the committed frozen evidence before this report finalization. The final PR head must pass the same attestation again after this report-only change before merge.
+This final record-only commit must itself pass the same applicable CI before merge; no source/config/contract/test/evidence object changed after `ef197437...`.
 
 ## Safety boundary
 
