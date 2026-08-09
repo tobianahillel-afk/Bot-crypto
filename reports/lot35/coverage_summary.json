@@ -1,0 +1,23 @@
+{
+  "anti_flake_repetitions": 3,
+  "artifact_digest": "sha256:64584097fe4d2136e497149ad6473ff8c9a6ce58ca7eb375187cd8ac5aa4c781",
+  "artifact_id": 9029508289,
+  "branch_coverage_percent": 93.75,
+  "branch_minimum_percent": 90.0,
+  "covered_branches": 120,
+  "covered_lines": 486,
+  "evidence_commit": "09701c7d5ebefbeba41143a2838564b09ea5fb3a",
+  "line_coverage_percent": 96.43,
+  "line_minimum_percent": 95.0,
+  "methodology": "GitHub Actions targeted branch coverage on the complete Lot 35 production surface; frozen from exact PR head artifact",
+  "schema_version": "lot35-coverage-summary-v1",
+  "scope": [
+    "candle_trade_book_reconciliation.py",
+    "candle_trade_book_reconciliation_models.py",
+    "candle_trade_book_reconciliation_validation.py"
+  ],
+  "status": "PASS",
+  "total_branches": 128,
+  "total_lines": 504,
+  "workflow_run_id": 31284931048
+}
