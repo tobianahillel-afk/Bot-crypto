@@ -34,7 +34,8 @@ jobs:
         run: |
           pytest -q \
             tests/test_lot37_microstructure_scope_and_offline_data_contracts.py \
-            tests/test_lot37_branch_coverage.py
+            tests/test_lot37_branch_coverage.py \
+            tests/test_lot37_mutation_oracles.py
       - name: Build isolated mutation workspace
         shell: bash
         run: |
@@ -47,6 +48,7 @@ jobs:
           cp -R contracts .tmp-lot37-mutants/
           cp tests/test_lot37_microstructure_scope_and_offline_data_contracts.py .tmp-lot37-mutants/tests/
           cp tests/test_lot37_branch_coverage.py .tmp-lot37-mutants/tests/
+          cp tests/test_lot37_mutation_oracles.py .tmp-lot37-mutants/tests/
           cp tests/fixtures/lot37/*.json .tmp-lot37-mutants/tests/fixtures/lot37/
           python - <<'PY'
           from pathlib import Path
@@ -55,7 +57,8 @@ jobs:
           root = Path('.tmp-lot37-mutants')
           test_paths = (
               'tests/test_lot37_microstructure_scope_and_offline_data_contracts.py '
-              'tests/test_lot37_branch_coverage.py'
+              'tests/test_lot37_branch_coverage.py '
+              'tests/test_lot37_mutation_oracles.py'
           )
           config = {
               'project': {
