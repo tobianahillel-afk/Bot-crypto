@@ -8,13 +8,13 @@ from pathlib import Path
 import pytest
 
 from crypto_quant_bot.microstructure.order_book_l2_snapshot_engine import (
-    CONFIG_PATH,
-    ZERO_SHA256,
     _levels,
     _validate_config,
-    _validate_fixture_identity,
     _validate_fixture_freshness,
+    _validate_fixture_identity,
     _verify_gate,
+    CONFIG_PATH,
+    ZERO_SHA256,
 )
 from crypto_quant_bot.microstructure.order_book_l2_snapshot_engine_models import (
     BookHealthStateV1,
@@ -90,7 +90,9 @@ def test_config_contract_rejects_invalid_limits_and_state() -> None:
         _validate_config(changed)
 
 
-def test_gate_verification_accepts_exact_gate_and_rejects_wrong_path(tmp_path: Path) -> None:
+def test_gate_verification_accepts_exact_gate_and_rejects_wrong_path(
+    tmp_path: Path,
+) -> None:
     value = config()
     gate = _verify_gate(ROOT, value)
     assert gate["target_lot"] == 38
@@ -228,8 +230,19 @@ def test_snapshot_contract_rejects_ordering_and_depth_mismatches() -> None:
 def test_health_and_metrics_contracts_reject_inconsistent_values() -> None:
     with pytest.raises(OrderBookL2SnapshotValidationError, match="status mismatch"):
         BookHealthStateV1(
-            "LOCKED", "OPEN", False, False, True, 1, 1, 1, 1, 1, 1,
-            ("LOT38_BOOK_OPEN_HEALTHY",), ZERO_SHA256,
+            "LOCKED",
+            "OPEN",
+            False,
+            False,
+            True,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            ("LOT38_BOOK_OPEN_HEALTHY",),
+            ZERO_SHA256,
         )
     with pytest.raises(OrderBookL2SnapshotValidationError, match="normalized levels"):
         Lot38MetricsV1(1, 2, 0, 1)
