@@ -4,12 +4,17 @@ from dataclasses import dataclass
 from typing import Any
 
 from .candle_trade_book_reconciliation_models import ReconciliationVetoV1
+from .candle_trade_book_reconciliation_validation import (
+    parse_utc_timestamp,
+    require_git_sha,
+    require_identifier,
+    require_integer,
+    require_sha256,
+)
 from .freshness_gap_outage_audit_and_v3_closure_validation import (
     V3ClosureError,
     require_basis_points,
-    require_non_empty_string_tuple,
     validate_causal_times,
-    validate_git_and_sha256,
     validate_lot36_safety,
     validate_reason_codes,
     validate_runtime_mode,
@@ -18,12 +23,6 @@ from .market_data_quality_engine_models import (
     DataAnomalyV1,
     DataQualityStateV1,
     DataQualityVetoV1,
-)
-from .candle_trade_book_reconciliation_validation import (
-    parse_utc_timestamp,
-    require_identifier,
-    require_integer,
-    require_sha256,
 )
 
 FRESHNESS_STATUSES = {"PASS", "BLOCKED", "UNKNOWN"}
@@ -36,6 +35,11 @@ CLOSURE_MANIFEST_STATES = {
     "BLOCKED",
 }
 REPLAY_STATUSES = {"REPLAY_MATCH", "REPLAY_DIVERGENCE", "REPLAY_IMPOSSIBLE"}
+
+
+def _validate_sha256_fields(values: tuple[tuple[str, str], ...]) -> None:
+    for field, value in values:
+        require_sha256(value, field)
 
 
 @dataclass(frozen=True, slots=True)
@@ -51,7 +55,7 @@ class Lot36RunContextV1:
         require_identifier(self.config_version, "config_version")
         require_identifier(self.correlation_id, "correlation_id")
         validate_runtime_mode(self.runtime_mode)
-        validate_git_and_sha256(self.code_commit, {})
+        require_git_sha(self.code_commit)
 
     def to_dict(self) -> dict[str, str]:
         return {
@@ -77,19 +81,16 @@ class Lot36LineageEnvelopeV1:
 
     def __post_init__(self) -> None:
         require_identifier(self.lineage_id, "lineage_id")
-        validate_git_and_sha256(
-            "0" * 40,
-            {
-                "entry_gate_checksum": self.entry_gate_checksum,
-                "lot34_state_checksum": self.lot34_state_checksum,
-                "lot34_audit_checksum": self.lot34_audit_checksum,
-                "lot35_state_checksum": self.lot35_state_checksum,
-                "lot35_audit_checksum": self.lot35_audit_checksum,
-            },
+        _validate_sha256_fields(
+            (
+                ("entry_gate_checksum", self.entry_gate_checksum),
+                ("lot34_state_checksum", self.lot34_state_checksum),
+                ("lot34_audit_checksum", self.lot34_audit_checksum),
+                ("lot35_state_checksum", self.lot35_state_checksum),
+                ("lot35_audit_checksum", self.lot35_audit_checksum),
+            )
         )
-        if len(self.canonical_roadmap_blob_sha) != 40:
-            raise V3ClosureError("canonical roadmap blob SHA must be a Git SHA")
-        int(self.canonical_roadmap_blob_sha, 16)
+        require_git_sha(self.canonical_roadmap_blob_sha)
         parse_utc_timestamp(self.available_at, "available_at")
 
     def to_dict(self) -> dict[str, str]:
@@ -119,6 +120,7 @@ class FreshnessGapOutageEvidenceV1:
     outage_count: int
     stale_record_count: int
     latest_event_time: str
+    latest_available_at: str
     reference_time: str
     freshness_age_us: int
     max_staleness_us: int
@@ -130,6 +132,18 @@ class FreshnessGapOutageEvidenceV1:
         require_identifier(self.source_id, "source_id")
         require_identifier(self.instrument_id, "instrument_id")
         require_identifier(self.timeframe, "timeframe")
+        self._validate_counts()
+        event = parse_utc_timestamp(self.latest_event_time, "latest_event_time")
+        available = parse_utc_timestamp(self.latest_available_at, "latest_available_at")
+        reference = parse_utc_timestamp(self.reference_time, "reference_time")
+        if not event <= available <= reference:
+            raise V3ClosureError("freshness evidence violates causal availability")
+        require_basis_points(self.freshness_bps, "freshness_bps")
+        if self.status not in FRESHNESS_STATUSES:
+            raise V3ClosureError("unknown freshness/gap/outage status")
+        validate_reason_codes(self.reason_codes, "freshness audit")
+
+    def _validate_counts(self) -> None:
         for field, value in (
             ("record_count", self.record_count),
             ("expected_interval_count", self.expected_interval_count),
@@ -142,12 +156,6 @@ class FreshnessGapOutageEvidenceV1:
             ("max_staleness_us", self.max_staleness_us),
         ):
             require_integer(value, field, minimum=0)
-        parse_utc_timestamp(self.latest_event_time, "latest_event_time")
-        parse_utc_timestamp(self.reference_time, "reference_time")
-        require_basis_points(self.freshness_bps, "freshness_bps")
-        if self.status not in FRESHNESS_STATUSES:
-            raise V3ClosureError("unknown freshness/gap/outage status")
-        validate_reason_codes(self.reason_codes, "freshness audit")
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -163,6 +171,7 @@ class FreshnessGapOutageEvidenceV1:
             "outage_count": self.outage_count,
             "stale_record_count": self.stale_record_count,
             "latest_event_time": self.latest_event_time,
+            "latest_available_at": self.latest_available_at,
             "reference_time": self.reference_time,
             "freshness_age_us": self.freshness_age_us,
             "max_staleness_us": self.max_staleness_us,
@@ -254,12 +263,13 @@ class ReplayEvidenceV1:
     replay_checksum: str
 
     def __post_init__(self) -> None:
-        for field, value in (
-            ("run1_checksum", self.run1_checksum),
-            ("run2_checksum", self.run2_checksum),
-            ("replay_checksum", self.replay_checksum),
-        ):
-            require_sha256(value, field)
+        _validate_sha256_fields(
+            (
+                ("run1_checksum", self.run1_checksum),
+                ("run2_checksum", self.run2_checksum),
+                ("replay_checksum", self.replay_checksum),
+            )
+        )
         if self.replay_status not in REPLAY_STATUSES:
             raise V3ClosureError("unknown replay status")
         if self.match != (self.run1_checksum == self.run2_checksum):
@@ -395,18 +405,18 @@ class FreshnessGapOutageAuditV3ClosureAuditV1:
     audit_checksum: str
 
     def __post_init__(self) -> None:
-        validate_git_and_sha256(
-            self.code_commit,
-            {
-                "state_output_checksum": self.state_output_checksum,
-                "config_checksum": self.config_checksum,
-                "closure_manifest_checksum": self.closure_manifest_checksum,
-                "lot34_state_checksum": self.lot34_state_checksum,
-                "lot34_audit_checksum": self.lot34_audit_checksum,
-                "lot35_state_checksum": self.lot35_state_checksum,
-                "lot35_audit_checksum": self.lot35_audit_checksum,
-                "audit_checksum": self.audit_checksum,
-            },
+        require_git_sha(self.code_commit)
+        _validate_sha256_fields(
+            (
+                ("state_output_checksum", self.state_output_checksum),
+                ("config_checksum", self.config_checksum),
+                ("closure_manifest_checksum", self.closure_manifest_checksum),
+                ("lot34_state_checksum", self.lot34_state_checksum),
+                ("lot34_audit_checksum", self.lot34_audit_checksum),
+                ("lot35_state_checksum", self.lot35_state_checksum),
+                ("lot35_audit_checksum", self.lot35_audit_checksum),
+                ("audit_checksum", self.audit_checksum),
+            )
         )
         require_integer(self.freshness_audit_count, "freshness_audit_count", minimum=1)
         require_integer(self.anomaly_count, "anomaly_count", minimum=0)
