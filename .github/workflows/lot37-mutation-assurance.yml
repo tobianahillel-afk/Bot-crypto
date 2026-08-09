@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - 'src/crypto_quant_bot/microstructure/**'
-      - 'tests/test_lot37_microstructure_scope_and_offline_data_contracts.py'
+      - 'tests/test_lot37*.py'
       - '.github/workflows/lot37-mutation-assurance.yml'
       - 'pyproject.toml'
       - 'requirements-dev.lock'
@@ -31,7 +31,10 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
       - name: Baseline Lot 37 tests
-        run: pytest -q tests/test_lot37_microstructure_scope_and_offline_data_contracts.py
+        run: |
+          pytest -q \
+            tests/test_lot37_microstructure_scope_and_offline_data_contracts.py \
+            tests/test_lot37_branch_coverage.py
       - name: Build isolated mutation workspace
         shell: bash
         run: |
@@ -43,6 +46,7 @@ jobs:
           cp -R data .tmp-lot37-mutants/
           cp -R contracts .tmp-lot37-mutants/
           cp tests/test_lot37_microstructure_scope_and_offline_data_contracts.py .tmp-lot37-mutants/tests/
+          cp tests/test_lot37_branch_coverage.py .tmp-lot37-mutants/tests/
           cp tests/fixtures/lot37/*.json .tmp-lot37-mutants/tests/fixtures/lot37/
           python - <<'PY'
           from pathlib import Path
@@ -59,7 +63,10 @@ jobs:
               for path in sorted((root / 'src/crypto_quant_bot').rglob('*.py'))
               if str(path.relative_to(root)) not in mutated
           ]
-          test_path = 'tests/test_lot37_microstructure_scope_and_offline_data_contracts.py'
+          test_paths = (
+              'tests/test_lot37_microstructure_scope_and_offline_data_contracts.py '
+              'tests/test_lot37_branch_coverage.py'
+          )
           config = {
               'project': {
                   'name': 'crypto-quant-bot-lot37-mutation',
@@ -77,7 +84,7 @@ jobs:
                   'mutmut': {
                       'paths_to_mutate': sorted(mutated),
                       'tests_dir': ['tests/'],
-                      'runner': f'python -m pytest -q {test_path}',
+                      'runner': f'python -m pytest -q {test_paths}',
                       'also_copy': dependency_files + [
                           'config/',
                           'data/audit/',
