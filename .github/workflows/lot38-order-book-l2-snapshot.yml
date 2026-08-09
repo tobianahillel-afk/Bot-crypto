@@ -19,6 +19,11 @@ on:
       - 'docs/LOT_38_ORDER_BOOK_L2_SNAPSHOT_ENGINE.md'
       - 'docs/ACCEPTANCE_CRITERIA_LOT_38.md'
       - 'reports/lot_38_order_book_l2_snapshot_engine_report.md'
+      - 'reports/lot38/coverage_summary.json'
+      - 'data/audit/order_book_l2_snapshot_engine_lot38.json'
+      - 'data/audit/order_book_l2_snapshot_engine_audit_lot38.json'
+      - 'data/audit/order_book_snapshot_lot38.json'
+      - 'data/audit/book_health_state_lot38.json'
       - '.github/workflows/lot38-order-book-l2-snapshot.yml'
       - 'requirements-dev.lock'
   workflow_dispatch:
@@ -31,6 +36,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       PYTHONPATH: src
+      SOURCE_HEAD_SHA: b74bea4329d5e5cb7cf2452058b684ea5a5df13c
     steps:
       - uses: actions/checkout@v4
         with:
@@ -44,7 +50,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove exact Lot 38 gate ancestry and source boundary
+      - name: Prove exact Lot 38 gate ancestry and frozen source boundary
         env:
           EVENT_NAME: ${{ github.event_name }}
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -52,12 +58,31 @@ jobs:
         run: |
           set -euo pipefail
           EXPECTED_BASE=2120aab94d54fde6e9ad36022499b1f9f284c3f6
-          git merge-base --is-ancestor "$EXPECTED_BASE" HEAD
+          git merge-base --is-ancestor "$EXPECTED_BASE" "$SOURCE_HEAD_SHA"
+          git merge-base --is-ancestor "$SOURCE_HEAD_SHA" HEAD
           if [ "$EVENT_NAME" = "pull_request" ]; then
             test "$PR_BASE_SHA" = "$EXPECTED_BASE"
             unexpected="$(git diff --name-only "$PR_BASE_SHA"...HEAD -- src/ | grep -Ev '^src/crypto_quant_bot/microstructure/(__init__|order_book_l2_snapshot_engine(_models|_validation)?)\.py$' || true)"
             test -z "$unexpected" || { echo "$unexpected"; exit 1; }
           fi
+          frozen_drift="$(git diff --name-only "$SOURCE_HEAD_SHA"...HEAD -- \
+            src/crypto_quant_bot/microstructure/ \
+            config/microstructure/order_book_l2_snapshot_engine_v1.json \
+            contracts/schemas/order_book_snapshot_raw_v1.schema.json \
+            contracts/schemas/order_book_snapshot_v1.schema.json \
+            contracts/schemas/book_health_state_v1.schema.json \
+            contracts/schemas/order_book_l2_snapshot_engine_state_v1.schema.json \
+            contracts/schemas/order_book_l2_snapshot_engine_audit_v1.schema.json \
+            scripts/run_lot38_order_book_l2_snapshot_engine.py \
+            scripts/validate_lot38.py \
+            scripts/validate_lot38_no_connectivity.py \
+            tests/test_lot38_order_book_l2_snapshot_engine.py \
+            tests/test_lot38_branch_coverage.py \
+            tests/test_lot38_mutation_contracts.py \
+            tests/test_lot38_coverage_completion.py \
+            docs/LOT_38_ORDER_BOOK_L2_SNAPSHOT_ENGINE.md \
+            docs/ACCEPTANCE_CRITERIA_LOT_38.md)"
+          test -z "$frozen_drift" || { echo "$frozen_drift"; exit 1; }
           find src/crypto_quant_bot/microstructure -maxdepth 1 -type f \
             \( -name '*delta*' -o -name '*reconstructor*' -o -name '*imbalance*' -o -name '*order_flow*' \) \
             | grep -q . && { echo 'LOT38_FUTURE_V4_ENGINE_PRESENT'; exit 1; } || true
@@ -91,8 +116,6 @@ jobs:
             --output-format=concise 2>&1 | tee reports/lot38/ruff.txt
           mypy src/crypto_quant_bot/microstructure 2>&1 | tee reports/lot38/mypy.txt
       - name: Targeted line and branch coverage
-        env:
-          SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         shell: bash
         run: |
           set -euo pipefail
@@ -134,9 +157,10 @@ jobs:
           if payload['status'] != 'PASS':
               raise SystemExit('LOT38_CRITICAL_COVERAGE_BELOW_THRESHOLD')
           PY
+          if git ls-files --error-unmatch reports/lot38/coverage_summary.json >/dev/null 2>&1; then
+            git diff --exit-code -- reports/lot38/coverage_summary.json
+          fi
       - name: Generate validate and replay exact Lot 38 evidence
-        env:
-          SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         shell: bash
         run: |
           set -euo pipefail
@@ -159,6 +183,9 @@ jobs:
           python scripts/validate_lot38.py --expected-code-commit "$SOURCE_HEAD_SHA"
           for path in "${outputs[@]}"; do
             cmp "/tmp/lot38-run1/$(basename "$path")" "$path"
+            if git ls-files --error-unmatch "$path" >/dev/null 2>&1; then
+              git diff --exit-code -- "$path"
+            fi
           done
       - name: Architecture roadmap traceability engineering and safety
         shell: bash
