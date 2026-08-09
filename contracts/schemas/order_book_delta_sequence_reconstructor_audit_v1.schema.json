@@ -29,11 +29,48 @@
     "lot38_snapshot_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "delta_fixture_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "state_output_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "reconstructed_book_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "sequence_gap_event_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "validation_state": {"const": "VALIDATED_OFFLINE_DELTA_SEQUENCE_RECONSTRUCTION_ONLY"},
-    "synchronization_state": {"const": "SYNCED"},
+    "reconstructed_book_checksum": {
+      "oneOf": [
+        {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        {"type": "null"}
+      ]
+    },
+    "sequence_gap_event_checksum": {
+      "oneOf": [
+        {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        {"type": "null"}
+      ]
+    },
+    "validation_state": {
+      "enum": [
+        "VALIDATED_OFFLINE_DELTA_SEQUENCE_RECONSTRUCTION_ONLY",
+        "BLOCKED_RESYNC_REQUIRED"
+      ]
+    },
+    "synchronization_state": {"enum": ["SYNCED", "RESYNC_REQUIRED"]},
     "safety": {"type": "object"},
     "audit_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
-  }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"synchronization_state": {"const": "SYNCED"}}},
+      "then": {
+        "properties": {
+          "validation_state": {"const": "VALIDATED_OFFLINE_DELTA_SEQUENCE_RECONSTRUCTION_ONLY"},
+          "reconstructed_book_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "sequence_gap_event_checksum": {"type": "null"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"synchronization_state": {"const": "RESYNC_REQUIRED"}}},
+      "then": {
+        "properties": {
+          "validation_state": {"const": "BLOCKED_RESYNC_REQUIRED"},
+          "reconstructed_book_checksum": {"type": "null"},
+          "sequence_gap_event_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    }
+  ]
 }
