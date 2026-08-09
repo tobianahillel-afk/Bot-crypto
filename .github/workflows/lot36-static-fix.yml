@@ -1,0 +1,66 @@
+name: Lot36 one-shot static typing fix
+
+on:
+  push:
+    branches: [agent/lot36-v3-closure-implementation]
+    paths: ['.github/workflows/lot36-static-fix.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/lot36-v3-closure-implementation
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: python -m pip install -r requirements-dev.lock
+      - name: Apply exact typing-only corrections
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('src/crypto_quant_bot/data_governance/freshness_gap_outage_audit_and_v3_closure.py')
+          text = path.read_text(encoding='utf-8')
+          text = text.replace(
+              ') -> tuple[int, int, int, int]:\n    unique_times = sorted({_record_order(record)[0] for record in ordered})',
+              ') -> tuple[int, int, int, int, int]:\n    unique_times = sorted({_record_order(record)[0] for record in ordered})',
+          )
+          old_manifest = '''def _build_manifest(ready: bool) -> ClosureManifestV1:\n    payload = {\n        "schema_version": "closure-manifest-v1",\n        "version_id": "V3_MARKET_DATA_GOVERNANCE",\n        "lots_included": list(range(31, 37)),\n        "closure_status": "CANDIDATE_VALIDATED_AWAITING_POST_MERGE_AUDIT" if ready else "BLOCKED",\n        "v3_closed": False,\n        "post_merge_audit_required": True,\n        "human_review_required": True,\n        "next_lot": 37,\n        "next_lot_status": "PLANNED_LOCKED",\n        "reason_codes": [\n            "V3_CLOSURE_CANDIDATE_READY" if ready else "V3_CLOSURE_BLOCKED",\n            "POST_MERGE_AUDIT_REQUIRED",\n            "HUMAN_REVIEW_REQUIRED",\n            "LOT37_REMAINS_LOCKED",\n        ],\n    }\n    return ClosureManifestV1(\n        version_id=payload["version_id"],\n        lots_included=tuple(payload["lots_included"]),\n        closure_status=payload["closure_status"],\n        v3_closed=False,\n        post_merge_audit_required=True,\n        human_review_required=True,\n        next_lot=37,\n        next_lot_status="PLANNED_LOCKED",\n        reason_codes=tuple(payload["reason_codes"]),\n        manifest_checksum=canonical_checksum(payload),\n    )\n'''
+          new_manifest = '''def _build_manifest(ready: bool) -> ClosureManifestV1:\n    closure_status = (\n        "CANDIDATE_VALIDATED_AWAITING_POST_MERGE_AUDIT" if ready else "BLOCKED"\n    )\n    reason_codes = (\n        "V3_CLOSURE_CANDIDATE_READY" if ready else "V3_CLOSURE_BLOCKED",\n        "POST_MERGE_AUDIT_REQUIRED",\n        "HUMAN_REVIEW_REQUIRED",\n        "LOT37_REMAINS_LOCKED",\n    )\n    payload: dict[str, Any] = {\n        "schema_version": "closure-manifest-v1",\n        "version_id": "V3_MARKET_DATA_GOVERNANCE",\n        "lots_included": list(range(31, 37)),\n        "closure_status": closure_status,\n        "v3_closed": False,\n        "post_merge_audit_required": True,\n        "human_review_required": True,\n        "next_lot": 37,\n        "next_lot_status": "PLANNED_LOCKED",\n        "reason_codes": list(reason_codes),\n    }\n    return ClosureManifestV1(\n        version_id="V3_MARKET_DATA_GOVERNANCE",\n        lots_included=tuple(range(31, 37)),\n        closure_status=closure_status,\n        v3_closed=False,\n        post_merge_audit_required=True,\n        human_review_required=True,\n        next_lot=37,\n        next_lot_status="PLANNED_LOCKED",\n        reason_codes=reason_codes,\n        manifest_checksum=canonical_checksum(payload),\n    )\n'''
+          if old_manifest not in text:
+              raise SystemExit('manifest block not found')
+          text = text.replace(old_manifest, new_manifest)
+          old_replay = '''def build_replay_evidence(root: Path, code_commit: str) -> ReplayEvidenceV1:\n    run1, _ = build_lot36_artifacts(root, code_commit)\n    run2, _ = build_lot36_artifacts(root, code_commit)\n    match = run1.output_checksum == run2.output_checksum\n    payload = {\n        "schema_version": "replay-evidence-v1",\n        "run1_checksum": run1.output_checksum,\n        "run2_checksum": run2.output_checksum,\n        "replay_status": "REPLAY_MATCH" if match else "REPLAY_DIVERGENCE",\n        "match": match,\n        "reason_codes": ["LOT36_DETERMINISTIC_REPLAY_MATCH" if match else "LOT36_NON_DETERMINISTIC_REPLAY"],\n    }\n    return ReplayEvidenceV1(\n        run1_checksum=run1.output_checksum,\n        run2_checksum=run2.output_checksum,\n        replay_status=payload["replay_status"],\n        match=match,\n        reason_codes=tuple(payload["reason_codes"]),\n        replay_checksum=canonical_checksum(payload),\n    )\n'''
+          new_replay = '''def build_replay_evidence(root: Path, code_commit: str) -> ReplayEvidenceV1:\n    run1, _ = build_lot36_artifacts(root, code_commit)\n    run2, _ = build_lot36_artifacts(root, code_commit)\n    match = run1.output_checksum == run2.output_checksum\n    replay_status = "REPLAY_MATCH" if match else "REPLAY_DIVERGENCE"\n    reason_codes = (\n        "LOT36_DETERMINISTIC_REPLAY_MATCH" if match else "LOT36_NON_DETERMINISTIC_REPLAY",\n    )\n    payload: dict[str, Any] = {\n        "schema_version": "replay-evidence-v1",\n        "run1_checksum": run1.output_checksum,\n        "run2_checksum": run2.output_checksum,\n        "replay_status": replay_status,\n        "match": match,\n        "reason_codes": list(reason_codes),\n    }\n    return ReplayEvidenceV1(\n        run1_checksum=run1.output_checksum,\n        run2_checksum=run2.output_checksum,\n        replay_status=replay_status,\n        match=match,\n        reason_codes=reason_codes,\n        replay_checksum=canonical_checksum(payload),\n    )\n'''
+          if old_replay not in text:
+              raise SystemExit('replay block not found')
+          path.write_text(text.replace(old_replay, new_replay), encoding='utf-8')
+
+          validator = Path('scripts/validate_lot36.py')
+          vtext = validator.read_text(encoding='utf-8')
+          vtext = vtext.replace(
+              'except (OSError, KeyError, IndexError, TypeError, ValueError, json.JSONDecodeError) as exc:',
+              'except (V3ClosureError, OSError, KeyError, IndexError, TypeError, ValueError, json.JSONDecodeError) as exc:',
+          )
+          validator.write_text(vtext, encoding='utf-8')
+          PY
+      - name: Verify corrections
+        run: |
+          ruff check src/crypto_quant_bot/data_governance/freshness_gap_outage_audit_and_v3_closure*.py scripts/validate_lot36.py
+          mypy src/crypto_quant_bot/data_governance
+      - name: Commit corrections and remove one-shot workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          rm .github/workflows/lot36-static-fix.yml
+          git add -A
+          git commit -m 'Fix Lot 36 static typing contracts'
+          git push origin HEAD:agent/lot36-v3-closure-implementation
