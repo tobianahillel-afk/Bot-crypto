@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "book_health_state_v1.schema.json",
+  "title": "BookHealthStateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "health_status", "venue_state", "crossed", "locked", "sequence_present", "source_bid_depth", "source_ask_depth", "normalized_bid_depth", "normalized_ask_depth", "published_bid_depth", "published_ask_depth", "reason_codes", "health_checksum"],
+  "properties": {
+    "schema_version": {"const": "book-health-state-v1"},
+    "health_status": {"enum": ["HEALTHY", "LOCKED"]},
+    "venue_state": {"enum": ["OPEN", "LOCKED"]},
+    "crossed": {"const": false},
+    "locked": {"type": "boolean"},
+    "sequence_present": {"const": true},
+    "source_bid_depth": {"type": "integer", "minimum": 1},
+    "source_ask_depth": {"type": "integer", "minimum": 1},
+    "normalized_bid_depth": {"type": "integer", "minimum": 1},
+    "normalized_ask_depth": {"type": "integer", "minimum": 1},
+    "published_bid_depth": {"type": "integer", "minimum": 1},
+    "published_ask_depth": {"type": "integer", "minimum": 1},
+    "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z0-9_]+$"}},
+    "health_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
