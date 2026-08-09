@@ -1,0 +1,73 @@
+{
+  "entries": [
+    {
+      "consumer": "MicrostructureDomain",
+      "contract_kind": "INPUT",
+      "contract_name": "MicrostructureOfflineL2InputV1",
+      "enabled_by_lot": 37,
+      "owner": "MicrostructureDomain",
+      "producer": "OFFLINE_DATASET_OR_FIXTURE",
+      "schema_path": "contracts/schemas/microstructure_offline_l2_input_v1.schema.json",
+      "schema_version": "lot37-contract-registry-entry-v1",
+      "status": "ACTIVE_LOT37_CONTRACT"
+    },
+    {
+      "consumer": "MicrostructureDomain",
+      "contract_kind": "INPUT",
+      "contract_name": "MicrostructureOfflineTradeInputV1",
+      "enabled_by_lot": 37,
+      "owner": "MicrostructureDomain",
+      "producer": "OFFLINE_DATASET_OR_FIXTURE",
+      "schema_path": "contracts/schemas/microstructure_offline_trade_input_v1.schema.json",
+      "schema_version": "lot37-contract-registry-entry-v1",
+      "status": "ACTIVE_LOT37_CONTRACT"
+    },
+    {
+      "consumer": "AUDIT_GOVERNANCE",
+      "contract_kind": "OUTPUT",
+      "contract_name": "MicrostructureScopeOfflineDataContractsAuditV1",
+      "enabled_by_lot": 37,
+      "owner": "MicrostructureDomain",
+      "producer": "MicrostructureDomain",
+      "schema_path": "contracts/schemas/microstructure_scope_offline_data_contracts_audit_v1.schema.json",
+      "schema_version": "lot37-contract-registry-entry-v1",
+      "status": "ACTIVE_LOT37_CONTRACT"
+    },
+    {
+      "consumer": "AUDIT_AND_FUTURE_V4_GATES",
+      "contract_kind": "OUTPUT",
+      "contract_name": "MicrostructureScopeOfflineDataContractsCapabilityMatrixV1",
+      "enabled_by_lot": 37,
+      "owner": "MicrostructureDomain",
+      "producer": "MicrostructureDomain",
+      "schema_path": "contracts/schemas/microstructure_scope_offline_data_contracts_capability_matrix_v1.schema.json",
+      "schema_version": "lot37-contract-registry-entry-v1",
+      "status": "ACTIVE_LOT37_CONTRACT"
+    },
+    {
+      "consumer": "AUDIT_AND_FUTURE_V4_LOTS",
+      "contract_kind": "OUTPUT",
+      "contract_name": "MicrostructureScopeOfflineDataContractsContractRegistryV1",
+      "enabled_by_lot": 37,
+      "owner": "MicrostructureDomain",
+      "producer": "MicrostructureDomain",
+      "schema_path": "contracts/schemas/microstructure_scope_offline_data_contracts_contract_registry_v1.schema.json",
+      "schema_version": "lot37-contract-registry-entry-v1",
+      "status": "ACTIVE_LOT37_CONTRACT"
+    },
+    {
+      "consumer": "AUDIT_AND_FUTURE_V4_LOTS",
+      "contract_kind": "OUTPUT",
+      "contract_name": "MicrostructureScopeOfflineDataContractsStateV1",
+      "enabled_by_lot": 37,
+      "owner": "MicrostructureDomain",
+      "producer": "MicrostructureDomain",
+      "schema_path": "contracts/schemas/microstructure_scope_offline_data_contracts_state_v1.schema.json",
+      "schema_version": "lot37-contract-registry-entry-v1",
+      "status": "ACTIVE_LOT37_CONTRACT"
+    }
+  ],
+  "registry_id": "microstructure-offline-contract-registry-v1",
+  "registry_version": "1.0.0",
+  "schema_version": "microstructure-scope-offline-data-contracts-contract-registry-v1"
+}

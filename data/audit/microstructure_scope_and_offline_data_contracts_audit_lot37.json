@@ -1,0 +1,28 @@
+{
+  "audit_checksum": "aa2df489e636860c119eb2ed54f7a5f03ede09838dfbd056dae0bb5a8a2a482f",
+  "capability_matrix_checksum": "f7132fcfdab898af3f733b2715e0836d23e6284f8c0c1f3e7dd92ccf0070f1b4",
+  "code_commit": "59b189e9980772245993a9212b6c8ad5e9a88a00",
+  "config_checksum": "a6e79dae8567aeafd5b25e3793a901097dd1714e9ec6c5f19a771417e78d6a78",
+  "contract_registry_checksum": "129140ffb7e812afd59d0174d318c5e3388d23bc49cc554168bde558bc0bf590",
+  "entry_gate_checksum": "37ffdb72b1f83a506e95802518f77a5b06e164b342b6e2cf7985c1c695cda58d",
+  "safety": {
+    "analysis_only": true,
+    "approved_size": 0,
+    "execution_allowed": false,
+    "external_connectivity_allowed": false,
+    "market_event_publication_allowed": false,
+    "network_ingestion_allowed": false,
+    "order_routing_allowed": false,
+    "participant_behavior_inference_explicitly_labeled": true,
+    "raw_data_mutation_allowed": false,
+    "real_credentials_allowed": false,
+    "risk_approval_allowed": false,
+    "scenario_score_is_signal": false,
+    "signal_generation_allowed": false,
+    "trade_allowed": false,
+    "used_for_decision": false
+  },
+  "schema_version": "microstructure-scope-offline-data-contracts-audit-v1",
+  "state_output_checksum": "ea960217eb9a2159c4a99c56257a37c43869ffad0da86555fef24eb356e5f8e7",
+  "validation_state": "VALIDATED_OFFLINE_CONTRACT_SCOPE"
+}

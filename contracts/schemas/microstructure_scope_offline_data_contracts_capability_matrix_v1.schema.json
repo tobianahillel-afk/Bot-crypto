@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "microstructure_scope_offline_data_contracts_capability_matrix_v1.schema.json",
+  "title": "MicrostructureScopeOfflineDataContractsCapabilityMatrixV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "matrix_id", "matrix_version", "entries"],
+  "properties": {
+    "schema_version": {"const": "microstructure-scope-offline-data-contracts-capability-matrix-v1"},
+    "matrix_id": {"type": "string", "minLength": 1},
+    "matrix_version": {"type": "string", "minLength": 1},
+    "entries": {"type": "array", "minItems": 27, "uniqueItems": true, "items": {"$ref": "#/$defs/entry"}}
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "capability_id", "title", "classification", "owner", "enabled_by_lot", "implementation_status", "contract_ref", "gate_ref"],
+      "properties": {
+        "schema_version": {"const": "lot37-capability-matrix-entry-v1"},
+        "capability_id": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+        "title": {"type": "string", "minLength": 1},
+        "classification": {"enum": ["REQUIRED", "OPTIONAL_RESEARCH", "DISABLED", "FORBIDDEN"]},
+        "owner": {"type": "string", "minLength": 1},
+        "enabled_by_lot": {"type": "integer", "minimum": 0, "maximum": 52},
+        "implementation_status": {"type": "string", "minLength": 1},
+        "contract_ref": {"type": "string", "minLength": 1},
+        "gate_ref": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
