@@ -30,7 +30,7 @@ runtime_mode=OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY
 package_boundary=src/crypto_quant_bot/microstructure
 ```
 
-The validator recomputes the Git blob SHA, parses line 39 directly, and checks the exact identity plus canonical input/output contract sets. The detailed V4 authority is `docs/roadmap/V04_MICROSTRUCTURE_LIQUIDITY_GAME_THEORY.md`.
+The validator recomputes the Git blob SHA, parses line 39 directly, and checks the exact identity plus canonical input/output contract strings. The detailed V4 authority is `docs/roadmap/V04_MICROSTRUCTURE_LIQUIDITY_GAME_THEORY.md`.
 
 ## Verified Lot 37 prerequisites
 
@@ -50,6 +50,8 @@ The validator recomputes the Git blob SHA, parses line 39 directly, and checks t
 - anti-flake: `3` repetitions PASS;
 - Lot 38 remains `PLANNED_LOCKED` in the audited Lot 37 capability matrix until this gate is merged.
 
+The validator compares the complete prerequisite evidence object exactly; a changed commit, checksum, score, fixture identity, contract path or lifecycle status invalidates the gate.
+
 ## Offline L2 prerequisite
 
 Lot 37 created the active offline input contract `MicrostructureOfflineL2InputV1` at `contracts/schemas/microstructure_offline_l2_input_v1.schema.json`. The test-only L2 availability fixture remains:
@@ -64,10 +66,10 @@ The fixture is not `OrderBookSnapshotRawV1` and is not silently promoted into a 
 
 ## Canonical Lot 38 contracts
 
-Inputs:
+Inputs, reproduced exactly from canonical roadmap line 39:
 
-- `RunContextV1`;
-- `LineageEnvelopeV1`;
+- `RunContextV1 (run_id, runtime_mode, config_version, code_commit, correlation_id)`;
+- `LineageEnvelopeV1 des artefacts produits par les lots préalables`;
 - `OrderBookSnapshotRawV1`.
 
 Outputs:
@@ -140,7 +142,7 @@ Unknown, stale, incompatible, crossed or ambiguous input is fail-closed. A succe
 ## Gate checksum
 
 ```text
-4f82b04a98c542cf01d3047360f2beb54a1d808b4dd0c7160388f454c4506673
+29fe4a5fd14b3bce95e3016fce67e10f94edcca1c2aad60c9fda382f3eb9d6a0
 ```
 
 ## Promotion rule
