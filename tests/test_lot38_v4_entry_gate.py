@@ -22,23 +22,6 @@ ROOT = Path(__file__).resolve().parents[1]
 GATE_PATH = ROOT / "data/audit/lot38_v4_entry_gate.json"
 SCHEMA_PATH = ROOT / "contracts/schemas/lot38_v4_entry_gate_v1.schema.json"
 MATRIX_PATH = ROOT / "data/audit/microstructure_capability_matrix_lot37.json"
-HISTORICAL_LOT37_POSTMERGE = {
-    "status": "PASS",
-    "verdict": "GO_LOT37_POST_MERGE",
-    "project_version": "0.37.0",
-    "latest_implemented_lot": 37,
-    "next_lot": 38,
-    "next_lot_status": "PLANNED_LOCKED",
-}
-
-
-@pytest.fixture(autouse=True)
-def _freeze_historical_lot37_predecessor(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(
-        gate_validator,
-        "validate_lot37_post_merge",
-        lambda: dict(HISTORICAL_LOT37_POSTMERGE),
-    )
 
 
 def _write_json(path: Path, payload: object) -> None:
@@ -69,30 +52,6 @@ def _install_tampered_gate(
         "EXPECTED_GATE_CHECKSUM",
         tampered["output_checksum"],
     )
-
-
-def test_historical_lot37_predecessor_snapshot_matches_archived_overlay() -> None:
-    overlay = json.loads(
-        (ROOT / "data/audit/roadmap_lifecycle_overlay_lot37.json").read_text(
-            encoding="utf-8"
-        )
-    )
-    assert overlay["latest_implemented_lot"] == 37
-    assert overlay["lots"]["37"]["status"] == (
-        "IMPLEMENTED_VALIDATED_OFFLINE_SCOPE_CONTRACTS_ONLY"
-    )
-    assert overlay["lots"]["38"] == {
-        "implementation_started": False,
-        "status": "PLANNED_LOCKED",
-    }
-    assert HISTORICAL_LOT37_POSTMERGE == {
-        "status": "PASS",
-        "verdict": "GO_LOT37_POST_MERGE",
-        "project_version": "0.37.0",
-        "latest_implemented_lot": 37,
-        "next_lot": 38,
-        "next_lot_status": "PLANNED_LOCKED",
-    }
 
 
 def test_lot38_entry_gate_passes_exact_audited_state() -> None:
