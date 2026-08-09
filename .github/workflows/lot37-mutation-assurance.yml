@@ -55,6 +55,11 @@ jobs:
           import toml
 
           root = Path('.tmp-lot37-mutants')
+          package_init = root / 'src/crypto_quant_bot/microstructure/__init__.py'
+          package_init.write_text(
+              '"""Hermetic Lot 37 mutation package boundary."""\n',
+              encoding='utf-8',
+          )
           test_paths = (
               'tests/test_lot37_microstructure_scope_and_offline_data_contracts.py '
               'tests/test_lot37_branch_coverage.py '
