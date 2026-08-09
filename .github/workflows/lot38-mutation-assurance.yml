@@ -26,12 +26,17 @@ jobs:
           python-version: '3.11.9'
           cache: pip
       - name: Baseline Lot 38 tests
+        shell: bash
         run: |
+          set -o pipefail
+          mkdir -p reports/lot38/mutation
           pytest -q \
             tests/test_lot38_order_book_l2_snapshot_engine.py \
             tests/test_lot38_branch_coverage.py \
             tests/test_lot38_mutation_contracts.py \
-            tests/test_lot38_coverage_completion.py
+            tests/test_lot38_coverage_completion.py \
+            --junitxml=reports/lot38/mutation/baseline.xml \
+            2>&1 | tee reports/lot38/mutation/baseline.txt
       - name: Build isolated mutation workspace
         shell: bash
         run: |
