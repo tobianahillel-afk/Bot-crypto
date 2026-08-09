@@ -1,0 +1,48 @@
+{
+  "schema_version": "lot39-order-book-delta-sequence-fixture-v1",
+  "fixture_only": true,
+  "canonical_contract_records": true,
+  "used_for_decision": false,
+  "description": "Deterministic offline OrderBookDeltaV1 sequence starting from the certified Lot 38 snapshot.",
+  "deltas": [
+    {
+      "schema_version": "order-book-delta-v1",
+      "source_id": "kraken-reference-offline-fixture",
+      "venue": "KRAKEN",
+      "instrument_id": "BTC-EUR-SPOT",
+      "market_type": "SPOT",
+      "event_time": "2026-08-06T19:18:40.055000Z",
+      "receive_time": "2026-08-06T19:18:40.060000Z",
+      "sequence_id": 1002,
+      "prev_sequence": 1001,
+      "bids": [
+        {"price": "50024.9", "quantity": "0.9"},
+        {"price": "50024.7", "quantity": "0.5"}
+      ],
+      "asks": [
+        {"price": "50025.1", "quantity": "0.65"}
+      ],
+      "expected_book_checksum": null,
+      "used_for_decision": false
+    },
+    {
+      "schema_version": "order-book-delta-v1",
+      "source_id": "kraken-reference-offline-fixture",
+      "venue": "KRAKEN",
+      "instrument_id": "BTC-EUR-SPOT",
+      "market_type": "SPOT",
+      "event_time": "2026-08-06T19:18:40.065000Z",
+      "receive_time": "2026-08-06T19:18:40.070000Z",
+      "sequence_id": 1003,
+      "prev_sequence": 1002,
+      "bids": [
+        {"price": "50024.8", "quantity": "0"}
+      ],
+      "asks": [
+        {"price": "50025.3", "quantity": "0.4"}
+      ],
+      "expected_book_checksum": null,
+      "used_for_decision": false
+    }
+  ]
+}
