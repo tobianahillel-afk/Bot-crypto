@@ -1,0 +1,89 @@
+name: Lot 37 independent post-merge audit
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'pyproject.toml'
+      - 'docs/LOT_37_POST_MERGE_AUDIT.md'
+      - 'docs/LOT37_POST_MERGE_VALIDATION_MATRIX.md'
+      - 'data/audit/roadmap_lifecycle_overlay_lot37.json'
+      - 'reports/lot37/coverage_summary.json'
+      - 'reports/lot37/mutation_summary.json'
+      - 'scripts/validate_lot37_post_merge.py'
+      - 'tests/test_lot37_post_merge_state.py'
+      - '.github/workflows/lot37-post-merge-audit.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Prove exact merged ancestry and governance-only diff
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          MERGED_COMMIT=f1da136ff956e40915fab42ae21748a6f2b1ebca
+          git merge-base --is-ancestor "$MERGED_COMMIT" HEAD
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            BASE_SHA="$PR_BASE_SHA"
+            test "$BASE_SHA" = "$MERGED_COMMIT"
+          elif [ "$EVENT_NAME" = "push" ]; then
+            BASE_SHA="$PUSH_BEFORE_SHA"
+          else
+            BASE_SHA="$(git merge-base origin/main HEAD)"
+          fi
+          test -n "$BASE_SHA"
+          test "$BASE_SHA" != "0000000000000000000000000000000000000000"
+          git cat-file -e "$BASE_SHA^{commit}"
+          git diff --quiet "$BASE_SHA" HEAD -- src/
+      - name: Compile lint type and frozen Lot 37 evidence
+        run: |
+          python -m compileall -q src scripts tests
+          ruff check scripts/validate_lot37_post_merge.py tests/test_lot37_post_merge_state.py
+          mypy src/crypto_quant_bot
+          python scripts/validate_lot37_frozen_evidence.py
+          python scripts/validate_lot37.py --expected-code-commit 59b189e9980772245993a9212b6c8ad5e9a88a00
+          python scripts/validate_lot37_post_merge.py
+      - name: Architecture traceability and engineering gates
+        run: |
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+      - name: Audit tests full regression and anti-flake
+        run: |
+          pytest -q tests/test_lot37_post_merge_state.py
+          pytest -q
+          pytest -q tests/test_lot37_post_merge_state.py
+          pytest -q tests/test_lot37_post_merge_state.py
+          pytest -q tests/test_lot37_post_merge_state.py
+      - name: Security and final validator
+        run: |
+          bandit -q -r src -ll
+          pip-audit -r requirements-dev.lock
+          python scripts/validate_lot37_post_merge.py
