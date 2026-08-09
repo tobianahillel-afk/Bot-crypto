@@ -169,7 +169,15 @@ def validate() -> dict[str, object]:
 def main() -> int:
     try:
         print(json.dumps(validate(), sort_keys=True))
-    except (OSError, KeyError, IndexError, TypeError, ValueError, json.JSONDecodeError) as exc:
+    except (
+        V3ClosureError,
+        OSError,
+        KeyError,
+        IndexError,
+        TypeError,
+        ValueError,
+        json.JSONDecodeError,
+    ) as exc:
         print(f"LOT36 VALIDATION: FAIL\n{exc}", file=sys.stderr)
         return 1
     return 0
