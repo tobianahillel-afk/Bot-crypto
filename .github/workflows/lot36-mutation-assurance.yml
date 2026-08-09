@@ -126,20 +126,28 @@ jobs:
           text = path.read_text(encoding='utf-8', errors='replace')
           text = re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', text)
           text = text.replace('\r', '\n').replace('\ufe0f', '')
-          counter_pattern = re.compile(r'(\d+)\s*/\s*(\d+)')
-          summary_pattern = re.compile(
-              r'🎉\s*(\d+)[\s\S]*?⏰\s*(\d+)[\s\S]*?🤔\s*(\d+)[\s\S]*?🙁\s*(\d+)'
-          )
+
           parsed = None
-          for counter in reversed(list(counter_pattern.finditer(text))):
+          counter_re = re.compile(r'(\d+)\s*/\s*(\d+)')
+          metric_res = {
+              'killed': re.compile(r'🎉\s*(\d+)'),
+              'timeout': re.compile(r'⏰\s*(\d+)'),
+              'suspicious': re.compile(r'🤔\s*(\d+)'),
+              'survived': re.compile(r'🙁\s*(\d+)'),
+          }
+          for line in reversed(text.splitlines()):
+              if not all(icon in line for icon in ('🎉', '⏰', '🤔', '🙁')):
+                  continue
+              counter = counter_re.search(line)
+              values = {name: pattern.search(line) for name, pattern in metric_res.items()}
+              if counter is None or any(match is None for match in values.values()):
+                  continue
               completed, total = map(int, counter.groups())
-              if completed != total or total <= 0:
-                  continue
-              summary = summary_pattern.search(text, counter.end())
-              if summary is None:
-                  continue
-              killed, timeout, suspicious, survived = map(int, summary.groups())
-              if killed + timeout + suspicious + survived == total:
+              killed = int(values['killed'].group(1))
+              timeout = int(values['timeout'].group(1))
+              suspicious = int(values['suspicious'].group(1))
+              survived = int(values['survived'].group(1))
+              if completed == total > 0 and killed + timeout + suspicious + survived == total:
                   parsed = (completed, total, killed, timeout, suspicious, survived)
                   break
           if parsed is None:
