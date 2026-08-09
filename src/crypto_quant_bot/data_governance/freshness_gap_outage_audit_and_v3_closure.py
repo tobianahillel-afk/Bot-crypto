@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from datetime import datetime
 from itertools import pairwise
 from pathlib import Path
@@ -87,6 +87,17 @@ COMMON_REASON_CODES = (
     "LOT37_REMAINS_LOCKED",
     "POST_MERGE_AUDIT_REQUIRED_FOR_V3_FINALIZATION",
 )
+
+
+@dataclass(frozen=True, slots=True)
+class _ClosureBuildInputs:
+    config: dict[str, Any]
+    lot34_state: MarketDataQualityEngineStateV1
+    lot35_state: CandleTradeBookReconciliationStateV1
+    records: list[dict[str, Any]]
+    freshness: tuple[FreshnessGapOutageEvidenceV1, ...]
+    anomalies: tuple[DataAnomalyV1, ...]
+    quality_veto: DataQualityVetoV1
 
 
 def _git_blob_sha(data: bytes) -> str:
@@ -471,38 +482,27 @@ def _quality_inputs(
     return quality_config, [dict(item) for item in records], intervals
 
 
-def _closure_ready(
-    quality_veto: DataQualityVetoV1,
-    lot35_state: CandleTradeBookReconciliationStateV1,
-    freshness: tuple[FreshnessGapOutageEvidenceV1, ...],
-    anomalies: tuple[DataAnomalyV1, ...],
-) -> bool:
+def _closure_ready(inputs: _ClosureBuildInputs) -> bool:
     return (
-        quality_veto.action == "ALLOW_ANALYSIS"
-        and lot35_state.veto.action == "ALLOW_ANALYSIS"
-        and all(item.status == "PASS" for item in freshness)
-        and not anomalies
+        inputs.quality_veto.action == "ALLOW_ANALYSIS"
+        and inputs.lot35_state.veto.action == "ALLOW_ANALYSIS"
+        and all(item.status == "PASS" for item in inputs.freshness)
+        and not inputs.anomalies
     )
 
 
 def _build_state(
-    config: dict[str, Any],
-    code_commit: str,
-    lot34_state: MarketDataQualityEngineStateV1,
-    lot35_state: CandleTradeBookReconciliationStateV1,
-    records: list[dict[str, Any]],
-    freshness: tuple[FreshnessGapOutageEvidenceV1, ...],
-    anomalies: tuple[DataAnomalyV1, ...],
-    quality_veto: DataQualityVetoV1,
+    inputs: _ClosureBuildInputs, code_commit: str
 ) -> FreshnessGapOutageAuditV3ClosureStateV1:
-    ready = _closure_ready(quality_veto, lot35_state, freshness, anomalies)
+    ready = _closure_ready(inputs)
+    config = inputs.config
     state = FreshnessGapOutageAuditV3ClosureStateV1(
         Lot36RunContextV1(config["run_id"], "DATA_GOVERNANCE_ONLY", config["config_version"], code_commit, config["correlation_id"]),
         _build_lineage(config), config["event_time"], config["available_at"], config["generated_at"],
         "VALIDATED_V3_CLOSURE_CANDIDATE" if ready else "BLOCKED_V3_CLOSURE",
-        freshness, lot34_state.quality_states, anomalies, quality_veto, lot35_state.veto,
-        _build_validation_report(ready), _build_manifest(ready),
-        _build_metrics(records, freshness, len(anomalies), ready, config),
+        inputs.freshness, inputs.lot34_state.quality_states, inputs.anomalies,
+        inputs.quality_veto, inputs.lot35_state.veto, _build_validation_report(ready),
+        _build_manifest(ready), _build_metrics(inputs.records, inputs.freshness, len(inputs.anomalies), ready, config),
         (*COMMON_REASON_CODES, "V3_CLOSURE_CANDIDATE_READY" if ready else "V3_CLOSURE_BLOCKED"),
         lot36_safety(), "0" * 64,
     )
@@ -547,7 +547,10 @@ def build_lot36_artifacts(
     )
     minimum = require_basis_points(quality_config["minimum_quality_bps"], "minimum_quality_bps")
     quality_veto = _closure_quality_veto(lot34_state.quality_states, anomalies, freshness, minimum)
-    state = _build_state(config, code_commit, lot34_state, lot35_state, records, freshness, anomalies, quality_veto)
+    inputs = _ClosureBuildInputs(
+        config, lot34_state, lot35_state, records, freshness, anomalies, quality_veto
+    )
+    state = _build_state(inputs, code_commit)
     return state, _build_audit(state, code_commit, config_path)
 
 
