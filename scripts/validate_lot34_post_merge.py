@@ -4,7 +4,6 @@ from __future__ import annotations
 import hashlib
 import json
 import sys
-import tomllib
 from pathlib import Path
 from typing import Any
 
@@ -45,32 +44,50 @@ def verified_payload(path: Path, checksum_field: str) -> tuple[dict[str, Any], s
     return payload, checksum
 
 
-def validate_version() -> None:
-    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
-    require(project["version"] == "0.34.0", "project version must be 0.34.0")
-    require("Lot 34" in project["description"], "project description must identify Lot 34")
-
-
 def validate_lifecycle() -> dict[str, Any]:
     previous = load_json_object(ROOT / "data/audit/roadmap_lifecycle_overlay_lot33.json")
     current = load_json_object(ROOT / "data/audit/roadmap_lifecycle_overlay_lot34.json")
-    require(current["previous_overlay"] == "data/audit/roadmap_lifecycle_overlay_lot33.json", "Lot 34 lifecycle previous overlay mismatch")
+    require(
+        current["previous_overlay"] == "data/audit/roadmap_lifecycle_overlay_lot33.json",
+        "Lot 34 lifecycle previous overlay mismatch",
+    )
     require(current["latest_implemented_lot"] == 34, "latest implemented lot must be 34")
     for lot in range(26, 34):
-        require(current["lots"][str(lot)] == previous["lots"][str(lot)], f"Lot {lot} lifecycle was rewritten")
+        require(
+            current["lots"][str(lot)] == previous["lots"][str(lot)],
+            f"Lot {lot} lifecycle was rewritten",
+        )
     lot34 = current["lots"]["34"]
-    require(lot34["status"] == "IMPLEMENTED_VALIDATED_DATA_QUALITY_ONLY", "Lot 34 lifecycle status mismatch")
-    require(lot34["implementation_commit"] == IMPLEMENTATION_COMMIT, "Lot 34 implementation commit mismatch")
+    require(
+        lot34["status"] == "IMPLEMENTED_VALIDATED_DATA_QUALITY_ONLY",
+        "Lot 34 lifecycle status mismatch",
+    )
+    require(
+        lot34["implementation_commit"] == IMPLEMENTATION_COMMIT,
+        "Lot 34 implementation commit mismatch",
+    )
     require(lot34["merged_commit"] == MERGED_COMMIT, "Lot 34 merged commit mismatch")
     require(lot34["pull_request"] == 28, "Lot 34 PR mismatch")
     require(lot34["runtime_mode"] == "DATA_GOVERNANCE_ONLY", "Lot 34 runtime mismatch")
     require(lot34["trade_allowed"] is False, "Lot 34 trade boundary changed")
     require(lot34["execution_allowed"] is False, "Lot 34 execution boundary changed")
-    require(lot34["external_connectivity_allowed"] is False, "Lot 34 connectivity boundary changed")
+    require(
+        lot34["external_connectivity_allowed"] is False,
+        "Lot 34 connectivity boundary changed",
+    )
     require(lot34["network_ingestion_allowed"] is False, "Lot 34 ingestion boundary changed")
-    require(lot34["raw_data_mutation_allowed"] is False, "Lot 34 raw mutation boundary changed")
-    require(current["lots"]["35"] == {"implementation_started": False, "status": "PLANNED_LOCKED"}, "Lot 35 must remain locked")
-    require("ContinuousMarketStateV1" in current["future_capabilities_locked"], "Lot 35 capability must remain locked")
+    require(
+        lot34["raw_data_mutation_allowed"] is False,
+        "Lot 34 raw mutation boundary changed",
+    )
+    require(
+        current["lots"]["35"] == {"implementation_started": False, "status": "PLANNED_LOCKED"},
+        "Lot 35 must remain locked",
+    )
+    require(
+        "ContinuousMarketStateV1" in current["future_capabilities_locked"],
+        "historical Lot 34 future capability lock changed",
+    )
     return current
 
 
@@ -84,19 +101,49 @@ def validate_lot34_evidence() -> tuple[dict[str, Any], dict[str, Any]]:
     require(state_checksum == EXPECTED_STATE_CHECKSUM, "Lot 34 state checksum changed after merge")
     require(audit_checksum == EXPECTED_AUDIT_CHECKSUM, "Lot 34 audit checksum changed after merge")
     require(audit["state_output_checksum"] == state_checksum, "Lot 34 state/audit mismatch")
-    require(state["lineage"]["canonical_time_collection_checksum"] == EXPECTED_CANONICAL_TIME_SHA256, "Lot 34 canonical-time lineage changed")
-    require(file_checksum(ROOT / "data/audit/canonical_time_envelopes_lot33.json") == EXPECTED_CANONICAL_TIME_SHA256, "Lot 33 canonical-time file changed")
+    require(
+        state["lineage"]["canonical_time_collection_checksum"] == EXPECTED_CANONICAL_TIME_SHA256,
+        "Lot 34 canonical-time lineage changed",
+    )
+    require(
+        file_checksum(ROOT / "data/audit/canonical_time_envelopes_lot33.json")
+        == EXPECTED_CANONICAL_TIME_SHA256,
+        "Lot 33 canonical-time file changed",
+    )
     require(state["anomalies"] == [], "certified Lot 34 reference fixture must remain anomaly-free")
-    require(state["quarantine_record_ids"] == [], "certified Lot 34 reference fixture must remain unquarantined")
-    require(state["quality_states"][0]["quality_score_bps"] == 10_000, "certified Lot 34 reference quality changed")
-    require(state["veto"]["action"] == "ALLOW_ANALYSIS", "certified Lot 34 reference analysis veto changed")
-    require(state["veto"]["quality_known"] is True, "certified Lot 34 reference quality became unknown")
+    require(
+        state["quarantine_record_ids"] == [],
+        "certified Lot 34 reference fixture must remain unquarantined",
+    )
+    require(
+        state["quality_states"][0]["quality_score_bps"] == 10_000,
+        "certified Lot 34 reference quality changed",
+    )
+    require(
+        state["veto"]["action"] == "ALLOW_ANALYSIS",
+        "certified Lot 34 reference analysis veto changed",
+    )
+    require(
+        state["veto"]["quality_known"] is True,
+        "certified Lot 34 reference quality became unknown",
+    )
     for field, expected in lot34_safety().items():
         require(state[field] == expected, f"Lot 34 state safety mismatch: {field}")
         require(audit[field] == expected, f"Lot 34 audit safety mismatch: {field}")
-    require(load_json_object(ROOT / "data/audit/data_quality_states_lot34.json")["records"] == state["quality_states"], "Lot 34 quality-state collection mismatch")
-    require(load_json_object(ROOT / "data/audit/data_anomalies_lot34.json")["records"] == state["anomalies"], "Lot 34 anomaly collection mismatch")
-    require(load_json_object(ROOT / "data/audit/data_quality_veto_lot34.json") == state["veto"], "Lot 34 veto artifact mismatch")
+    require(
+        load_json_object(ROOT / "data/audit/data_quality_states_lot34.json")["records"]
+        == state["quality_states"],
+        "Lot 34 quality-state collection mismatch",
+    )
+    require(
+        load_json_object(ROOT / "data/audit/data_anomalies_lot34.json")["records"]
+        == state["anomalies"],
+        "Lot 34 anomaly collection mismatch",
+    )
+    require(
+        load_json_object(ROOT / "data/audit/data_quality_veto_lot34.json") == state["veto"],
+        "Lot 34 veto artifact mismatch",
+    )
     return state, audit
 
 
@@ -104,12 +151,21 @@ def validate_quality_proofs() -> tuple[dict[str, Any], dict[str, Any]]:
     coverage = load_json_object(ROOT / "reports/lot34/coverage_summary.json")
     mutation = load_json_object(ROOT / "reports/lot34/mutation_summary.json")
     require(coverage["status"] == "PASS", "Lot 34 coverage evidence is not PASS")
-    require(coverage["evidence_commit"] == QUALITY_EVIDENCE_COMMIT, "Lot 34 coverage evidence commit mismatch")
+    require(
+        coverage["evidence_commit"] == QUALITY_EVIDENCE_COMMIT,
+        "Lot 34 coverage evidence commit mismatch",
+    )
     require(float(coverage["line_coverage_percent"]) >= 95.0, "Lot 34 line coverage below 95%")
-    require(float(coverage["branch_coverage_percent"]) >= 90.0, "Lot 34 branch coverage below 90%")
+    require(
+        float(coverage["branch_coverage_percent"]) >= 90.0,
+        "Lot 34 branch coverage below 90%",
+    )
     require(coverage["anti_flake_repetitions"] >= 3, "Lot 34 anti-flake repetitions below 3")
     require(mutation["status"] == "PASS", "Lot 34 mutation evidence is not PASS")
-    require(mutation["evidence_commit"] == QUALITY_EVIDENCE_COMMIT, "Lot 34 mutation evidence commit mismatch")
+    require(
+        mutation["evidence_commit"] == QUALITY_EVIDENCE_COMMIT,
+        "Lot 34 mutation evidence commit mismatch",
+    )
     require(float(mutation["mutation_score_percent"]) >= 80.0, "Lot 34 mutation score below 80%")
     require(mutation["killed_mutants"] == 1370, "Lot 34 killed-mutant evidence changed")
     require(mutation["evaluated_mutants"] == 1631, "Lot 34 evaluated-mutant evidence changed")
@@ -121,13 +177,12 @@ def validate_audit_documents() -> None:
     matrix_doc = (ROOT / "docs/LOT34_POST_MERGE_VALIDATION_MATRIX.md").read_text(encoding="utf-8")
     for text in (audit_doc, matrix_doc):
         require(MERGED_COMMIT in text, "post-merge document missing exact merge commit")
-        require("0.34.0" in text, "post-merge document missing version 0.34.0")
-        require("Lot 35" in text, "post-merge document missing Lot 35 lock")
+        require("0.34.0" in text, "post-merge document missing historical version 0.34.0")
+        require("Lot 35" in text, "post-merge document missing historical Lot 35 lock")
     require("GO_LOT34_POST_MERGE" in audit_doc, "post-merge audit verdict missing")
 
 
 def validate() -> dict[str, Any]:
-    validate_version()
     lifecycle = validate_lifecycle()
     state, audit = validate_lot34_evidence()
     coverage, mutation = validate_quality_proofs()

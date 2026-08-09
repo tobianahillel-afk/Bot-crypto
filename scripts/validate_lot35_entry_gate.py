@@ -4,7 +4,6 @@ from __future__ import annotations
 import hashlib
 import json
 import sys
-import tomllib
 from pathlib import Path
 from typing import Any
 
@@ -120,8 +119,6 @@ def validate_gate_checksum(gate: dict[str, Any]) -> None:
 
 
 def validate_current_lifecycle() -> dict[str, Any]:
-    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
-    require(project["version"] == "0.34.0", "Lot 35 gate requires project version 0.34.0")
     overlay = load(OVERLAY_PATH)
     require(overlay.get("latest_implemented_lot") == 34, "current lifecycle is not Lot 34")
     lots = overlay.get("lots")

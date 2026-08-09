@@ -1,11 +1,11 @@
 # Roadmap canonique V1 → V21 — Lots 0 à 177
 
-Projet : **Crypto Quant Bot V3.4-Ops**
+Projet : **Crypto Quant Bot V3.5-Ops**
 
 ## État actuel
 
-- Dernier lot dont l'implémentation est terminée : **Lot 34**.
-- Version courante : `0.34.0`.
+- Dernier lot dont l'implémentation est terminée : **Lot 35**.
+- Version courante : `0.35.0`.
 - Baseline P0 institutionnelle : fusionnée.
 - Gate transversal P0.6 : fusionné et conservé comme preuve historique.
 - Lot 26 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
@@ -17,12 +17,13 @@ Projet : **Crypto Quant Bot V3.4-Ops**
 - Lot 32 : `IMPLEMENTED_VALIDATED_NORMALIZATION_ONLY`.
 - Lot 33 : `IMPLEMENTED_VALIDATED_TEMPORAL_ONLY`.
 - Lot 34 : `IMPLEMENTED_VALIDATED_DATA_QUALITY_ONLY`.
-- Lots 35–177 : planifiés et verrouillés.
+- Lot 35 : `IMPLEMENTED_VALIDATED_RECONCILIATION_ONLY`.
+- Lots 36–177 : planifiés et verrouillés.
 - V2 Market Analysis Offline est fermée pour le périmètre Lots 21–30.
-- V3 possède le registre de sources, le registre canonique d'instruments, la gouvernance temporelle et le quality gate offline, sans connectivité ni ingestion.
+- V3 possède le registre de sources, le registre canonique d'instruments, la gouvernance temporelle, le quality gate et la réconciliation candle/trade/book offline, sans connectivité ni ingestion.
 - Forecast, alpha, paper, sandbox et capital réel : `NO_GO`.
 
-L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot34.json`. Le registre
+L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot35.json`. Le registre
 `data/audit/product_scope_roadmap_lot21.jsonl` reste une preuve historique immuable.
 
 ## Documents normatifs transverses
@@ -208,6 +209,26 @@ prédictives ou d'exécution sont déjà implémentées.
 - Post-merge validator : `scripts/validate_lot34_post_merge.py`
 - Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot34.json`
 
+## Lot 35
+
+- [Entry gate](LOT_35_V3_ENTRY_GATE.md)
+- [Specification](LOT_35_CANDLE_TRADE_BOOK_RECONCILIATION.md)
+- [Acceptance criteria](ACCEPTANCE_CRITERIA_LOT_35.md)
+- [Post-merge audit](LOT_35_POST_MERGE_AUDIT.md)
+- Configuration : `config/data_governance/candle_trade_book_reconciliation_v1.json`
+- State : `data/audit/candle_trade_book_reconciliation_lot35.json`
+- Audit : `data/audit/candle_trade_book_reconciliation_audit_lot35.json`
+- Reconciliation reports : `data/audit/reconciliation_reports_lot35.json`
+- Reconciliation veto : `data/audit/reconciliation_veto_lot35.json`
+- Report : `reports/lot_35_candle_trade_book_reconciliation_report.md`
+- Coverage evidence : `reports/lot35/coverage_summary.json`
+- Mutation evidence : `reports/lot35/mutation_summary.json`
+- Runner : `scripts/run_lot35_candle_trade_book_reconciliation.py`
+- Validator : `scripts/validate_lot35.py`
+- No-connectivity validator : `scripts/validate_lot35_no_connectivity.py`
+- Post-merge validator : `scripts/validate_lot35_post_merge.py`
+- Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot35.json`
+
 ## Séparations obligatoires
 
 ```text
@@ -275,4 +296,4 @@ timeframes et n'autorise aucune inférence de rendement futur.
 12. Un statut `PLANNED_LOCKED` ou `AWAITING_EXACT_COMMIT_CI` ne peut être promu sans preuve exacte.
 13. V7, V8, V9, V15 et V17 consomment le snapshot, le sizing et les réservations canoniques ; aucune implémentation locale incompatible n'est autorisée.
 14. Tout ordre augmentant le risque exige une réservation atomique active ; toute moyenne à la baisse implicite est interdite.
-15. Lot 35 reste verrouillé après l'audit post-merge du Lot 34 jusqu'à un gate d'entrée distinct et une décision humaine explicite.
+15. Lot 36 reste verrouillé après l'audit post-merge du Lot 35 jusqu'à un gate d'entrée distinct et une décision humaine explicite.
