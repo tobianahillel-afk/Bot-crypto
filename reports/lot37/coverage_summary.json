@@ -1,0 +1,19 @@
+{
+  "anti_flake_repetitions": 3,
+  "artifact_digest": "sha256:c163bd5855ddb6ce99b36fbd52834702ee8ea9706d162acc47fe0e474a37dab4",
+  "artifact_id": 9041433151,
+  "branch_coverage_percent": 100.0,
+  "branch_minimum_percent": 90.0,
+  "line_coverage_percent": 100.0,
+  "line_minimum_percent": 95.0,
+  "methodology": "GitHub Actions targeted branch coverage on the complete Lot 37 production surface; frozen from exact source head artifact",
+  "schema_version": "lot37-coverage-summary-v1",
+  "scope": [
+    "microstructure_scope_and_offline_data_contracts.py",
+    "microstructure_scope_and_offline_data_contracts_models.py",
+    "microstructure_scope_and_offline_data_contracts_validation.py"
+  ],
+  "source_head_sha": "59b189e9980772245993a9212b6c8ad5e9a88a00",
+  "status": "PASS",
+  "workflow_run_id": 31325582304
+}
