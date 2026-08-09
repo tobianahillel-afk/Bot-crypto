@@ -1,0 +1,21 @@
+{
+  "artifact_digest": "sha256:36a80853e7d3c3bbd4b0255e063ae4ecfe6314b82249f24eb736f8e1dc03bbfc",
+  "artifact_id": 9029508744,
+  "evaluated_mutants": 1229,
+  "evidence_commit": "09701c7d5ebefbeba41143a2838564b09ea5fb3a",
+  "killed_mutants": 1029,
+  "methodology": "GitHub Actions isolated mutmut campaign over covered Lot 35 engine, model and validation code; frozen from exact PR head artifact",
+  "minimum_score_percent": 80.0,
+  "mutation_score_percent": 83.73,
+  "schema_version": "lot35-mutation-summary-v1",
+  "scope": [
+    "candle_trade_book_reconciliation.py",
+    "candle_trade_book_reconciliation_models.py",
+    "candle_trade_book_reconciliation_validation.py"
+  ],
+  "status": "PASS",
+  "survived_mutants": 200,
+  "suspicious_mutants": 0,
+  "timeout_mutants": 0,
+  "workflow_run_id": 31284931041
+}
