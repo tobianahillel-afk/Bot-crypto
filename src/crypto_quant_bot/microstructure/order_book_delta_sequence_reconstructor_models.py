@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from decimal import Decimal
 from typing import Any
 
 from .order_book_delta_sequence_reconstructor_validation import (
     OrderBookDeltaSequenceValidationError,
-    decimal_text,
     parse_utc_timestamp,
     require_git_sha,
     require_integer,
