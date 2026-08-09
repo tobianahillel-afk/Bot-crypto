@@ -1,0 +1,47 @@
+name: Lot 36 post-merge PR bootstrap
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/lot36-post-merge-audit
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+      - name: Execute embedded audit builder and publish final governance tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import textwrap
+
+          path = Path('.github/workflows/lot36-post-merge-build-controller.yml')
+          text = path.read_text(encoding='utf-8')
+          start_marker = "          python - <<'PY'\n"
+          end_marker = "\n          PY\n"
+          start = text.index(start_marker) + len(start_marker)
+          end = text.index(end_marker, start)
+          code = textwrap.dedent(text[start:end])
+          compile(code, '<lot36-audit-builder>', 'exec')
+          Path('/tmp/lot36_audit_builder.py').write_text(code, encoding='utf-8')
+          PY
+          python /tmp/lot36_audit_builder.py
+          git rm .github/workflows/lot36-post-merge-build-controller.yml
+          git rm .github/workflows/lot36-post-merge-pr-bootstrap.yml
+          git diff --quiet 87da195283797247505e4fc650214e33e759e21a...HEAD -- src/
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git commit -m "Audit merged Lot 36 and close V3 lifecycle"
+          git push origin HEAD:agent/lot36-post-merge-audit
