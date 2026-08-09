@@ -40,9 +40,23 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
       - name: Prove governance-only diff
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
         run: |
           git fetch origin main
-          git diff --quiet origin/main...HEAD -- src/
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            BASE_SHA="$PR_BASE_SHA"
+          elif [ "$EVENT_NAME" = "push" ]; then
+            BASE_SHA="$PUSH_BEFORE_SHA"
+          else
+            BASE_SHA="$(git merge-base origin/main HEAD)"
+          fi
+          test -n "$BASE_SHA"
+          test "$BASE_SHA" != "0000000000000000000000000000000000000000"
+          git cat-file -e "$BASE_SHA^{commit}"
+          git diff --quiet "$BASE_SHA" HEAD -- src/
       - name: Compile lint type and exact frozen evidence
         run: |
           python -m compileall -q src scripts tests
