@@ -1,0 +1,125 @@
+name: Lot 38 independent post-merge audit
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'pyproject.toml'
+      - 'docs/LOT_38_POST_MERGE_AUDIT.md'
+      - 'docs/LOT38_POST_MERGE_VALIDATION_MATRIX.md'
+      - 'data/audit/roadmap_lifecycle_overlay_lot38.json'
+      - 'reports/lot38/coverage_summary.json'
+      - 'reports/lot38/mutation_summary.json'
+      - 'scripts/validate_lot37_post_merge.py'
+      - 'scripts/validate_lot38_post_merge.py'
+      - 'tests/test_lot37_post_merge_state.py'
+      - 'tests/test_lot38_coverage_completion.py'
+      - 'tests/test_lot38_post_merge_state.py'
+      - 'tests/test_lot38_v4_entry_gate.py'
+      - '.github/workflows/lot37-post-merge-audit.yml'
+      - '.github/workflows/lot38-order-book-l2-snapshot.yml'
+      - '.github/workflows/lot38-mutation-assurance.yml'
+      - '.github/workflows/lot38-post-merge-audit.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Prove exact merged ancestry and immutable production boundary
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          MERGED_COMMIT=e4b44d27886ade86f9d1d05d480b89010b03700d
+          git merge-base --is-ancestor "$MERGED_COMMIT" HEAD
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            BASE_SHA="$PR_BASE_SHA"
+            test "$BASE_SHA" = "$MERGED_COMMIT"
+          elif [ "$EVENT_NAME" = "push" ]; then
+            BASE_SHA="$PUSH_BEFORE_SHA"
+          else
+            BASE_SHA="$(git merge-base origin/main HEAD)"
+          fi
+          test -n "$BASE_SHA"
+          test "$BASE_SHA" != "0000000000000000000000000000000000000000"
+          git cat-file -e "$BASE_SHA^{commit}"
+          git diff --quiet "$BASE_SHA" HEAD -- src/
+          git diff --quiet "$BASE_SHA" HEAD -- \
+            config/microstructure/order_book_l2_snapshot_engine_v1.json \
+            contracts/schemas/order_book_snapshot_raw_v1.schema.json \
+            contracts/schemas/order_book_snapshot_v1.schema.json \
+            contracts/schemas/book_health_state_v1.schema.json \
+            contracts/schemas/order_book_l2_snapshot_engine_state_v1.schema.json \
+            contracts/schemas/order_book_l2_snapshot_engine_audit_v1.schema.json \
+            tests/test_lot38_order_book_l2_snapshot_engine.py \
+            tests/test_lot38_branch_coverage.py \
+            tests/test_lot38_mutation_contracts.py
+      - name: Compile lint type and frozen Lot 38 evidence
+        env:
+          PYTHONPATH: src
+        run: |
+          python -m compileall -q src scripts tests
+          ruff check \
+            scripts/validate_lot37_post_merge.py \
+            scripts/validate_lot38_post_merge.py \
+            tests/test_lot37_post_merge_state.py \
+            tests/test_lot38_coverage_completion.py \
+            tests/test_lot38_post_merge_state.py \
+            tests/test_lot38_v4_entry_gate.py
+          mypy src/crypto_quant_bot
+          python scripts/validate_lot37_post_merge.py
+          python scripts/validate_lot38_frozen_evidence.py
+          python scripts/validate_lot38.py --expected-code-commit b74bea4329d5e5cb7cf2452058b684ea5a5df13c
+          python scripts/validate_lot38_no_connectivity.py
+          python scripts/validate_lot38_post_merge.py
+      - name: Architecture roadmap traceability and engineering gates
+        env:
+          PYTHONPATH: src
+        run: |
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+      - name: Audit tests full regression and anti-flake
+        env:
+          PYTHONPATH: src
+        run: |
+          pytest -q tests/test_lot38_post_merge_state.py
+          pytest -q
+          pytest -q tests/test_lot38_post_merge_state.py
+          pytest -q tests/test_lot38_post_merge_state.py
+          pytest -q tests/test_lot38_post_merge_state.py
+      - name: Security and final validator
+        env:
+          PYTHONPATH: src
+        run: |
+          bandit -q -r src -ll
+          pip-audit -r requirements-dev.lock
+          python scripts/validate_lot37_post_merge.py
+          python scripts/validate_lot38_frozen_evidence.py
+          python scripts/validate_lot38_post_merge.py

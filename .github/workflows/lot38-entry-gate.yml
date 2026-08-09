@@ -11,6 +11,8 @@ on:
       - 'scripts/validate_lot38_entry_gate.py'
       - 'tests/test_lot38_v4_entry_gate.py'
       - '.github/workflows/lot38-entry-gate.yml'
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -31,20 +33,22 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove exact audited base and gate-only diff
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      - name: Prove immutable historical gate ancestry
         shell: bash
         run: |
           set -euo pipefail
-          EXPECTED_BASE=c7ff8eecafd5f34196e9383013e97548b1a0ba02
-          git merge-base --is-ancestor "$EXPECTED_BASE" HEAD
-          if [ "$EVENT_NAME" = "pull_request" ]; then
-            test "$PR_BASE_SHA" = "$EXPECTED_BASE"
-            git diff --quiet "$PR_BASE_SHA"...HEAD -- src/
-          fi
-      - name: Compile lint type schema and exact gate
+          GATE_BASE=c7ff8eecafd5f34196e9383013e97548b1a0ba02
+          GATE_MERGE=2120aab94d54fde6e9ad36022499b1f9f284c3f6
+          git merge-base --is-ancestor "$GATE_BASE" "$GATE_MERGE"
+          git merge-base --is-ancestor "$GATE_MERGE" HEAD
+          git diff --quiet "$GATE_MERGE" HEAD -- \
+            data/audit/lot38_v4_entry_gate.json \
+            contracts/schemas/lot38_v4_entry_gate_v1.schema.json \
+            docs/LOT_38_V4_ENTRY_GATE.md \
+            reports/lot_38_v4_entry_gate_report.md \
+            scripts/validate_lot38_entry_gate.py \
+            tests/test_lot38_v4_entry_gate.py
+      - name: Compile lint type schema and immutable gate
         run: |
           python -m compileall -q scripts tests
           python -m json.tool data/audit/lot38_v4_entry_gate.json >/dev/null

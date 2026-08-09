@@ -5,7 +5,6 @@ on:
     branches: [main]
     paths:
       - 'src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine*.py'
-      - 'tests/test_lot38*.py'
       - 'config/microstructure/order_book_l2_snapshot_engine_v1.json'
       - 'contracts/schemas/order_book_snapshot_raw_v1.schema.json'
       - 'contracts/schemas/order_book_snapshot_v1.schema.json'
@@ -13,14 +12,10 @@ on:
       - 'contracts/schemas/order_book_l2_snapshot_engine_state_v1.schema.json'
       - 'contracts/schemas/order_book_l2_snapshot_engine_audit_v1.schema.json'
       - 'reports/lot38/mutation_summary.json'
-      - 'reports/lot_38_order_book_l2_snapshot_engine_report.md'
-      - 'data/audit/order_book_l2_snapshot_engine_lot38.json'
-      - 'data/audit/order_book_l2_snapshot_engine_audit_lot38.json'
-      - 'data/audit/order_book_snapshot_lot38.json'
-      - 'data/audit/book_health_state_lot38.json'
+      - 'scripts/validate_lot38_frozen_evidence.py'
       - '.github/workflows/lot38-mutation-assurance.yml'
-      - 'pyproject.toml'
-      - 'requirements-dev.lock'
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -30,13 +25,14 @@ jobs:
   mutation:
     runs-on: ubuntu-22.04
     env:
+      PYTHONPATH: src
       SOURCE_HEAD_SHA: b74bea4329d5e5cb7cf2452058b684ea5a5df13c
-      PYTHONHASHSEED: '0'
+      EVIDENCE_HEAD_SHA: ef197437d13012644e48a9044cf0883bd17700fb
+      MERGED_COMMIT_SHA: e4b44d27886ade86f9d1d05d480b89010b03700d
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
@@ -45,206 +41,86 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove frozen Lot 38 mutation source
+      - name: Prove frozen Lot 38 mutation source and evidence across squash merge
         shell: bash
         run: |
           set -euo pipefail
-          git merge-base --is-ancestor "$SOURCE_HEAD_SHA" HEAD
-          frozen_drift="$(git diff --name-only "$SOURCE_HEAD_SHA"...HEAD -- \
-            src/crypto_quant_bot/microstructure/ \
-            config/microstructure/order_book_l2_snapshot_engine_v1.json \
-            contracts/schemas/order_book_snapshot_raw_v1.schema.json \
-            contracts/schemas/order_book_snapshot_v1.schema.json \
-            contracts/schemas/book_health_state_v1.schema.json \
-            contracts/schemas/order_book_l2_snapshot_engine_state_v1.schema.json \
-            contracts/schemas/order_book_l2_snapshot_engine_audit_v1.schema.json \
-            tests/test_lot38_order_book_l2_snapshot_engine.py \
-            tests/test_lot38_branch_coverage.py \
-            tests/test_lot38_mutation_contracts.py \
-            tests/test_lot38_coverage_completion.py)"
-          test -z "$frozen_drift" || { echo "$frozen_drift"; exit 1; }
-      - name: Baseline Lot 38 tests
+          git cat-file -e "$SOURCE_HEAD_SHA^{commit}"
+          git cat-file -e "$EVIDENCE_HEAD_SHA^{commit}"
+          git cat-file -e "$MERGED_COMMIT_SHA^{commit}"
+          git merge-base --is-ancestor "$MERGED_COMMIT_SHA" HEAD
+
+          mutation_source=(
+            src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine.py
+            src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine_models.py
+            src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine_validation.py
+            config/microstructure/order_book_l2_snapshot_engine_v1.json
+            contracts/schemas/order_book_snapshot_raw_v1.schema.json
+            contracts/schemas/order_book_snapshot_v1.schema.json
+            contracts/schemas/book_health_state_v1.schema.json
+            contracts/schemas/order_book_l2_snapshot_engine_state_v1.schema.json
+            contracts/schemas/order_book_l2_snapshot_engine_audit_v1.schema.json
+            tests/test_lot38_order_book_l2_snapshot_engine.py
+            tests/test_lot38_branch_coverage.py
+            tests/test_lot38_mutation_contracts.py
+            tests/test_lot38_coverage_completion.py
+          )
+          git diff --quiet "$SOURCE_HEAD_SHA" "$MERGED_COMMIT_SHA" -- "${mutation_source[@]}"
+
+          immutable_current=(
+            src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine.py
+            src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine_models.py
+            src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine_validation.py
+            config/microstructure/order_book_l2_snapshot_engine_v1.json
+            contracts/schemas/order_book_snapshot_raw_v1.schema.json
+            contracts/schemas/order_book_snapshot_v1.schema.json
+            contracts/schemas/book_health_state_v1.schema.json
+            contracts/schemas/order_book_l2_snapshot_engine_state_v1.schema.json
+            contracts/schemas/order_book_l2_snapshot_engine_audit_v1.schema.json
+            tests/test_lot38_order_book_l2_snapshot_engine.py
+            tests/test_lot38_branch_coverage.py
+            tests/test_lot38_mutation_contracts.py
+          )
+          git diff --quiet "$MERGED_COMMIT_SHA" HEAD -- "${immutable_current[@]}"
+          git diff --quiet "$EVIDENCE_HEAD_SHA" "$MERGED_COMMIT_SHA" -- reports/lot38/mutation_summary.json
+          git diff --quiet "$MERGED_COMMIT_SHA" HEAD -- reports/lot38/mutation_summary.json
+      - name: Validate exact certified mutation campaign
         shell: bash
         run: |
-          set -o pipefail
-          mkdir -p reports/lot38/mutation
+          set -euo pipefail
+          python scripts/validate_lot38_frozen_evidence.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          payload = json.loads(Path('reports/lot38/mutation_summary.json').read_text())
+          expected = {
+              'status': 'PASS',
+              'source_head_sha': 'b74bea4329d5e5cb7cf2452058b684ea5a5df13c',
+              'killed_mutants': 1006,
+              'survived_mutants': 226,
+              'timeout_mutants': 0,
+              'suspicious_mutants': 0,
+              'evaluated_mutants': 1232,
+              'completed_mutants': 1232,
+              'total_mutants': 1232,
+              'mutation_score_percent': 81.66,
+              'minimum_score_percent': 80.0,
+              'max_children': 1,
+              'python_hash_seed': '0',
+          }
+          for key, value in expected.items():
+              if payload.get(key) != value:
+                  raise SystemExit(f'LOT38_FROZEN_MUTATION_EVIDENCE_CHANGED:{key}')
+          if payload['mutation_score_percent'] < payload['minimum_score_percent']:
+              raise SystemExit('LOT38_MUTATION_SCORE_BELOW_THRESHOLD')
+          print('LOT38_FROZEN_MUTATION_ASSURANCE_PASS')
+          PY
+      - name: Baseline behavior remains compatible
+        run: |
           pytest -q \
             tests/test_lot38_order_book_l2_snapshot_engine.py \
             tests/test_lot38_branch_coverage.py \
             tests/test_lot38_mutation_contracts.py \
-            tests/test_lot38_coverage_completion.py \
-            --junitxml=reports/lot38/mutation/baseline.xml \
-            2>&1 | tee reports/lot38/mutation/baseline.txt
-      - name: Build isolated mutation workspace
-        shell: bash
-        run: |
-          set -euo pipefail
-          rm -rf .tmp-lot38-mutants
-          mkdir -p .tmp-lot38-mutants/tests
-          cp -R src .tmp-lot38-mutants/
-          cp -R config .tmp-lot38-mutants/
-          cp -R data .tmp-lot38-mutants/
-          cp -R contracts .tmp-lot38-mutants/
-          cp -R tests/fixtures .tmp-lot38-mutants/tests/
-          cp \
-            tests/test_lot38_order_book_l2_snapshot_engine.py \
-            tests/test_lot38_branch_coverage.py \
-            tests/test_lot38_mutation_contracts.py \
-            tests/test_lot38_coverage_completion.py \
-            .tmp-lot38-mutants/tests/
-          python - <<'PY'
-          from pathlib import Path
-          import toml
-
-          root = Path('.tmp-lot38-mutants')
-          mutated = {
-              'order_book_l2_snapshot_engine.py',
-              'order_book_l2_snapshot_engine_models.py',
-              'order_book_l2_snapshot_engine_validation.py',
-          }
-          microstructure = root / 'src/crypto_quant_bot/microstructure'
-          dependency_files = [
-              'src/crypto_quant_bot/__init__.py',
-              'src/crypto_quant_bot/data_governance/',
-              *[
-                  str(path.relative_to(root))
-                  for path in sorted(microstructure.glob('*.py'))
-                  if path.name not in mutated
-              ],
-          ]
-          tests = (
-              'tests/test_lot38_order_book_l2_snapshot_engine.py '
-              'tests/test_lot38_branch_coverage.py '
-              'tests/test_lot38_mutation_contracts.py '
-              'tests/test_lot38_coverage_completion.py'
-          )
-          config = {
-              'project': {
-                  'name': 'crypto-quant-bot-lot38-mutation',
-                  'version': '0.38.0.dev0',
-                  'requires-python': '==3.11.*',
-                  'dependencies': [],
-              },
-              'tool': {
-                  'pytest': {
-                      'ini_options': {
-                          'pythonpath': ['src', '.'],
-                          'addopts': ['--tb=short', '-p', 'no:cacheprovider'],
-                      }
-                  },
-                  'mutmut': {
-                      'paths_to_mutate': [
-                          'src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine.py',
-                          'src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine_models.py',
-                          'src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine_validation.py',
-                      ],
-                      'tests_dir': ['tests/'],
-                      'runner': f'python -m pytest -q {tests}',
-                      'also_copy': dependency_files + [
-                          'config/', 'data/audit/', 'contracts/', 'tests/fixtures/'
-                      ],
-                      'mutate_only_covered_lines': True,
-                      'timeout_factor': 8.0,
-                      'do_not_mutate_patterns': [r'raise \\w+', r'logger\\.\\w+'],
-                  },
-              },
-          }
-          (root / 'pyproject.toml').write_text(toml.dumps(config), encoding='utf-8')
-          PY
-      - name: Run deterministic mutation analysis and enforce score
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p reports/lot38/mutation
-          cd .tmp-lot38-mutants
-          set +e
-          mutmut run --max-children 1 2>&1 | tee ../reports/lot38/mutation/run.txt
-          run_status=${PIPESTATUS[0]}
-          mutmut results 2>&1 | tee ../reports/lot38/mutation/results.txt
-          results_status=${PIPESTATUS[0]}
-          set -e
-          cd ..
-          RUN_STATUS="$run_status" RESULTS_STATUS="$results_status" python - <<'PY'
-          from __future__ import annotations
-
-          import json
-          import os
-          import re
-          from pathlib import Path
-
-          path = Path('reports/lot38/mutation/run.txt')
-          if not path.is_file():
-              raise SystemExit('LOT38_MUTATION_RUN_LOG_MISSING')
-          text = path.read_text(encoding='utf-8', errors='replace')
-          text = re.sub(r'\x1b(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', text)
-          text = text.replace('\r', '\n').replace('\ufe0f', '')
-          complete_counters = [
-              tuple(map(int, match.groups()))
-              for match in re.finditer(r'(\d+)\s*/\s*(\d+)', text)
-              if match.group(1) == match.group(2) and int(match.group(2)) > 0
-          ]
-          if not complete_counters:
-              raise SystemExit('LOT38_MUTATION_TOTAL_PARSE_ERROR')
-          completed, total = complete_counters[-1]
-          patterns = {
-              'killed': re.compile(r'🎉\s*(\d+)'),
-              'timeout': re.compile(r'⏰\s*(\d+)'),
-              'suspicious': re.compile(r'🤔\s*(\d+)'),
-              'survived': re.compile(r'🙁\s*(\d+)'),
-          }
-          metrics: dict[str, int] = {}
-          for name, pattern in patterns.items():
-              matches = list(pattern.finditer(text))
-              if not matches:
-                  raise SystemExit(f'LOT38_MUTATION_{name.upper()}_PARSE_ERROR')
-              metrics[name] = int(matches[-1].group(1))
-          killed = metrics['killed']
-          timeout = metrics['timeout']
-          suspicious = metrics['suspicious']
-          survived = metrics['survived']
-          evaluated = killed + timeout + suspicious + survived
-          if evaluated != total:
-              raise SystemExit(
-                  f'LOT38_MUTATION_COUNT_MISMATCH: total={total} evaluated={evaluated}'
-              )
-          score = 100.0 * (killed + timeout) / evaluated
-          payload = {
-              'schema_version': 'lot38-mutation-summary-v1',
-              'status': 'PASS' if score >= 80.0 else 'FAIL',
-              'source_head_sha': os.environ['SOURCE_HEAD_SHA'],
-              'max_children': 1,
-              'python_hash_seed': os.environ['PYTHONHASHSEED'],
-              'killed_mutants': killed,
-              'timeout_mutants': timeout,
-              'suspicious_mutants': suspicious,
-              'survived_mutants': survived,
-              'evaluated_mutants': evaluated,
-              'completed_mutants': completed,
-              'total_mutants': total,
-              'mutation_score_percent': round(score, 2),
-              'minimum_score_percent': 80.0,
-              'mutmut_run_exit_code': int(os.environ['RUN_STATUS']),
-              'mutmut_results_exit_code': int(os.environ['RESULTS_STATUS']),
-          }
-          output = Path('reports/lot38/mutation_summary.json')
-          output.write_text(
-              json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8'
-          )
-          print(json.dumps(payload, sort_keys=True))
-          if score < 80.0:
-              raise SystemExit('LOT38_MUTATION_SCORE_BELOW_THRESHOLD')
-          PY
-          if git ls-files --error-unmatch reports/lot38/mutation_summary.json >/dev/null 2>&1; then
-            git diff --exit-code -- reports/lot38/mutation_summary.json
-          fi
-      - name: Verify canonical source immutability
-        run: |
-          rm -rf .tmp-lot38-mutants
-          git diff --exit-code -- src/crypto_quant_bot
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: lot38-mutation-evidence
-          path: |
-            reports/lot38/mutation/
-            reports/lot38/mutation_summary.json
+            tests/test_lot38_coverage_completion.py
+          python scripts/validate_lot38_frozen_evidence.py

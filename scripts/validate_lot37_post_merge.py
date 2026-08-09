@@ -4,7 +4,6 @@ from __future__ import annotations
 import hashlib
 import json
 import sys
-import tomllib
 from pathlib import Path
 from typing import Any
 
@@ -12,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE_HEAD = "59b189e9980772245993a9212b6c8ad5e9a88a00"
 EVIDENCE_HEAD = "91c28f17acc2f66c906dddee96cbda369945f3ea"
 MERGED_COMMIT = "f1da136ff956e40915fab42ae21748a6f2b1ebca"
+CERTIFIED_RELEASE = "0.37.0"
 STATE_CHECKSUM = "ea960217eb9a2159c4a99c56257a37c43869ffad0da86555fef24eb356e5f8e7"
 AUDIT_CHECKSUM = "aa2df489e636860c119eb2ed54f7a5f03ede09838dfbd056dae0bb5a8a2a482f"
 REGISTRY_CHECKSUM = "129140ffb7e812afd59d0174d318c5e3388d23bc49cc554168bde558bc0bf590"
@@ -53,9 +53,13 @@ def verify_checksum(path: str, field: str, expected: str) -> dict[str, Any]:
 
 
 def validate_version_and_lifecycle() -> dict[str, Any]:
-    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
-    require(project["version"] == "0.37.0", "project version must be 0.37.0")
-    require("Lot 37" in project["description"], "project description must identify Lot 37")
+    """Validate the frozen Lot 37 release, independent of the current project version.
+
+    Lot 37 was certified as release 0.37.0. Later audited releases must not make the
+    historical proof fail merely because ``pyproject.toml`` advances to 0.38.0+.
+    The certified release identity remains bound by the immutable audit documents,
+    lifecycle overlay, source/evidence heads and artifact checksums below.
+    """
     previous = load("data/audit/roadmap_lifecycle_overlay_lot36.json")
     current = load("data/audit/roadmap_lifecycle_overlay_lot37.json")
     require(
@@ -102,7 +106,7 @@ def validate_version_and_lifecycle() -> dict[str, Any]:
     require(
         current["lots"]["38"]
         == {"implementation_started": False, "status": "PLANNED_LOCKED"},
-        "Lot 38 must remain exactly locked",
+        "Lot 38 historical lock changed",
     )
     return current
 
@@ -159,8 +163,11 @@ def validate_artifacts() -> tuple[dict[str, Any], dict[str, Any]]:
         item for item in matrix["entries"]
         if item["capability_id"] == "LOT38_ORDER_BOOK_L2_SNAPSHOT_ENGINE"
     )
-    require(lot38["classification"] == "DISABLED", "Lot 38 capability classification changed")
-    require(lot38["implementation_status"] == "PLANNED_LOCKED", "Lot 38 capability unlocked")
+    require(lot38["classification"] == "DISABLED", "Lot 38 historical classification changed")
+    require(
+        lot38["implementation_status"] == "PLANNED_LOCKED",
+        "Lot 38 historical capability lock changed",
+    )
     return state, audit
 
 
@@ -199,7 +206,7 @@ def validate_documents() -> None:
         for commit in (SOURCE_HEAD, EVIDENCE_HEAD, MERGED_COMMIT):
             require(commit in text, "Lot 37 audit documentation missing exact lineage commit")
     require("GO_LOT37_POST_MERGE" in audit_doc, "Lot 37 post-merge verdict missing")
-    require("Lot 38" in audit_doc and "PLANNED_LOCKED" in audit_doc, "Lot 38 lock missing")
+    require("Lot 38" in audit_doc and "PLANNED_LOCKED" in audit_doc, "Lot 38 historical lock missing")
 
 
 def validate() -> dict[str, Any]:
@@ -211,7 +218,7 @@ def validate() -> dict[str, Any]:
         "schema_version": "lot37-post-merge-validation-v1",
         "status": "PASS",
         "verdict": "GO_LOT37_POST_MERGE",
-        "project_version": "0.37.0",
+        "project_version": CERTIFIED_RELEASE,
         "source_head": SOURCE_HEAD,
         "evidence_head": EVIDENCE_HEAD,
         "merged_commit": MERGED_COMMIT,
@@ -252,3 +259,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

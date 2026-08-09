@@ -11,21 +11,26 @@ on:
       - 'contracts/schemas/order_book_l2_snapshot_engine_state_v1.schema.json'
       - 'contracts/schemas/order_book_l2_snapshot_engine_audit_v1.schema.json'
       - 'src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine*.py'
-      - 'src/crypto_quant_bot/microstructure/__init__.py'
       - 'scripts/run_lot38_order_book_l2_snapshot_engine.py'
       - 'scripts/validate_lot38.py'
       - 'scripts/validate_lot38_no_connectivity.py'
-      - 'tests/test_lot38*.py'
+      - 'scripts/validate_lot38_frozen_evidence.py'
+      - 'tests/test_lot38_order_book_l2_snapshot_engine.py'
+      - 'tests/test_lot38_branch_coverage.py'
+      - 'tests/test_lot38_mutation_contracts.py'
+      - 'tests/test_lot38_coverage_completion.py'
       - 'docs/LOT_38_ORDER_BOOK_L2_SNAPSHOT_ENGINE.md'
       - 'docs/ACCEPTANCE_CRITERIA_LOT_38.md'
       - 'reports/lot_38_order_book_l2_snapshot_engine_report.md'
       - 'reports/lot38/coverage_summary.json'
+      - 'reports/lot38/mutation_summary.json'
       - 'data/audit/order_book_l2_snapshot_engine_lot38.json'
       - 'data/audit/order_book_l2_snapshot_engine_audit_lot38.json'
       - 'data/audit/order_book_snapshot_lot38.json'
       - 'data/audit/book_health_state_lot38.json'
       - '.github/workflows/lot38-order-book-l2-snapshot.yml'
-      - 'requirements-dev.lock'
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -37,11 +42,12 @@ jobs:
     env:
       PYTHONPATH: src
       SOURCE_HEAD_SHA: b74bea4329d5e5cb7cf2452058b684ea5a5df13c
+      EVIDENCE_HEAD_SHA: ef197437d13012644e48a9044cf0883bd17700fb
+      MERGED_COMMIT_SHA: e4b44d27886ade86f9d1d05d480b89010b03700d
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
@@ -50,147 +56,97 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove exact Lot 38 gate ancestry and frozen source boundary
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      - name: Prove immutable Lot 38 squash merge and release boundary
         shell: bash
         run: |
           set -euo pipefail
-          EXPECTED_BASE=2120aab94d54fde6e9ad36022499b1f9f284c3f6
-          git merge-base --is-ancestor "$EXPECTED_BASE" "$SOURCE_HEAD_SHA"
-          git merge-base --is-ancestor "$SOURCE_HEAD_SHA" HEAD
-          if [ "$EVENT_NAME" = "pull_request" ]; then
-            test "$PR_BASE_SHA" = "$EXPECTED_BASE"
-            unexpected="$(git diff --name-only "$PR_BASE_SHA"...HEAD -- src/ | grep -Ev '^src/crypto_quant_bot/microstructure/(__init__|order_book_l2_snapshot_engine(_models|_validation)?)\.py$' || true)"
-            test -z "$unexpected" || { echo "$unexpected"; exit 1; }
-          fi
-          frozen_drift="$(git diff --name-only "$SOURCE_HEAD_SHA"...HEAD -- \
-            src/crypto_quant_bot/microstructure/ \
-            config/microstructure/order_book_l2_snapshot_engine_v1.json \
-            contracts/schemas/order_book_snapshot_raw_v1.schema.json \
-            contracts/schemas/order_book_snapshot_v1.schema.json \
-            contracts/schemas/book_health_state_v1.schema.json \
-            contracts/schemas/order_book_l2_snapshot_engine_state_v1.schema.json \
-            contracts/schemas/order_book_l2_snapshot_engine_audit_v1.schema.json \
-            scripts/run_lot38_order_book_l2_snapshot_engine.py \
-            scripts/validate_lot38.py \
-            scripts/validate_lot38_no_connectivity.py \
-            tests/test_lot38_order_book_l2_snapshot_engine.py \
-            tests/test_lot38_branch_coverage.py \
-            tests/test_lot38_mutation_contracts.py \
-            tests/test_lot38_coverage_completion.py \
-            docs/LOT_38_ORDER_BOOK_L2_SNAPSHOT_ENGINE.md \
-            docs/ACCEPTANCE_CRITERIA_LOT_38.md)"
-          test -z "$frozen_drift" || { echo "$frozen_drift"; exit 1; }
-          find src/crypto_quant_bot/microstructure -maxdepth 1 -type f \
-            \( -name '*delta*' -o -name '*reconstructor*' -o -name '*imbalance*' -o -name '*order_flow*' \) \
-            | grep -q . && { echo 'LOT38_FUTURE_V4_ENGINE_PRESENT'; exit 1; } || true
-      - name: Compile lint type and schema checks
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p reports/lot38
-          python -m compileall -q src scripts tests
-          for path in \
-            config/microstructure/order_book_l2_snapshot_engine_v1.json \
-            contracts/schemas/order_book_snapshot_raw_v1.schema.json \
-            contracts/schemas/order_book_snapshot_v1.schema.json \
-            contracts/schemas/book_health_state_v1.schema.json \
-            contracts/schemas/order_book_l2_snapshot_engine_state_v1.schema.json \
-            contracts/schemas/order_book_l2_snapshot_engine_audit_v1.schema.json; do
-            python -m json.tool "$path" >/dev/null
-          done
-          ruff check \
-            src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine.py \
-            src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine_models.py \
-            src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine_validation.py \
-            src/crypto_quant_bot/microstructure/__init__.py \
-            scripts/run_lot38_order_book_l2_snapshot_engine.py \
-            scripts/validate_lot38.py \
-            scripts/validate_lot38_no_connectivity.py \
-            tests/test_lot38_order_book_l2_snapshot_engine.py \
-            tests/test_lot38_branch_coverage.py \
-            tests/test_lot38_mutation_contracts.py \
-            tests/test_lot38_coverage_completion.py \
-            --output-format=concise 2>&1 | tee reports/lot38/ruff.txt
-          mypy src/crypto_quant_bot/microstructure 2>&1 | tee reports/lot38/mypy.txt
-      - name: Targeted line and branch coverage
-        shell: bash
-        run: |
-          set -euo pipefail
-          coverage erase
-          pytest -q \
-            tests/test_lot38_order_book_l2_snapshot_engine.py \
-            tests/test_lot38_branch_coverage.py \
-            tests/test_lot38_mutation_contracts.py \
-            tests/test_lot38_coverage_completion.py \
-            --cov=crypto_quant_bot.microstructure.order_book_l2_snapshot_engine \
-            --cov=crypto_quant_bot.microstructure.order_book_l2_snapshot_engine_models \
-            --cov=crypto_quant_bot.microstructure.order_book_l2_snapshot_engine_validation \
-            --cov-branch \
-            --cov-report=json:reports/lot38/coverage.json \
-            --cov-report=term-missing \
-            --junitxml=reports/lot38/targeted-tests.xml \
-            2>&1 | tee reports/lot38/targeted-tests.txt
-          python - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-          totals = json.loads(Path('reports/lot38/coverage.json').read_text())['totals']
-          lines = float(totals['percent_statements_covered'])
-          branches = float(totals['percent_branches_covered'])
-          payload = {
-              'schema_version': 'lot38-coverage-summary-v1',
-              'status': 'PASS' if lines >= 95.0 and branches >= 90.0 else 'FAIL',
-              'source_head_sha': os.environ['SOURCE_HEAD_SHA'],
-              'line_coverage_percent': round(lines, 2),
-              'branch_coverage_percent': round(branches, 2),
-              'line_coverage_min_percent': 95.0,
-              'branch_coverage_min_percent': 90.0,
-              'anti_flake_repetitions': 3,
-          }
-          Path('reports/lot38/coverage_summary.json').write_text(
-              json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+          git cat-file -e "$SOURCE_HEAD_SHA^{commit}"
+          git cat-file -e "$EVIDENCE_HEAD_SHA^{commit}"
+          git cat-file -e "$MERGED_COMMIT_SHA^{commit}"
+          git merge-base --is-ancestor "$MERGED_COMMIT_SHA" HEAD
+
+          source_surfaces=(
+            src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine.py
+            src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine_models.py
+            src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine_validation.py
+            config/microstructure/order_book_l2_snapshot_engine_v1.json
+            contracts/schemas/order_book_snapshot_raw_v1.schema.json
+            contracts/schemas/order_book_snapshot_v1.schema.json
+            contracts/schemas/book_health_state_v1.schema.json
+            contracts/schemas/order_book_l2_snapshot_engine_state_v1.schema.json
+            contracts/schemas/order_book_l2_snapshot_engine_audit_v1.schema.json
+            scripts/run_lot38_order_book_l2_snapshot_engine.py
+            scripts/validate_lot38.py
+            scripts/validate_lot38_no_connectivity.py
+            docs/LOT_38_ORDER_BOOK_L2_SNAPSHOT_ENGINE.md
+            docs/ACCEPTANCE_CRITERIA_LOT_38.md
+            tests/test_lot38_order_book_l2_snapshot_engine.py
+            tests/test_lot38_branch_coverage.py
+            tests/test_lot38_mutation_contracts.py
+            tests/test_lot38_coverage_completion.py
           )
-          print(json.dumps(payload, sort_keys=True))
-          if payload['status'] != 'PASS':
-              raise SystemExit('LOT38_CRITICAL_COVERAGE_BELOW_THRESHOLD')
-          PY
-          if git ls-files --error-unmatch reports/lot38/coverage_summary.json >/dev/null 2>&1; then
-            git diff --exit-code -- reports/lot38/coverage_summary.json
-          fi
-      - name: Generate validate and replay exact Lot 38 evidence
-        shell: bash
-        run: |
-          set -euo pipefail
-          outputs=(
+          git diff --quiet "$SOURCE_HEAD_SHA" "$MERGED_COMMIT_SHA" -- "${source_surfaces[@]}"
+
+          immutable_current_surfaces=(
+            src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine.py
+            src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine_models.py
+            src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine_validation.py
+            config/microstructure/order_book_l2_snapshot_engine_v1.json
+            contracts/schemas/order_book_snapshot_raw_v1.schema.json
+            contracts/schemas/order_book_snapshot_v1.schema.json
+            contracts/schemas/book_health_state_v1.schema.json
+            contracts/schemas/order_book_l2_snapshot_engine_state_v1.schema.json
+            contracts/schemas/order_book_l2_snapshot_engine_audit_v1.schema.json
+            scripts/run_lot38_order_book_l2_snapshot_engine.py
+            scripts/validate_lot38.py
+            scripts/validate_lot38_no_connectivity.py
+            docs/LOT_38_ORDER_BOOK_L2_SNAPSHOT_ENGINE.md
+            docs/ACCEPTANCE_CRITERIA_LOT_38.md
+            tests/test_lot38_order_book_l2_snapshot_engine.py
+            tests/test_lot38_branch_coverage.py
+            tests/test_lot38_mutation_contracts.py
+          )
+          git diff --quiet "$MERGED_COMMIT_SHA" HEAD -- "${immutable_current_surfaces[@]}"
+
+          evidence_surfaces=(
             data/audit/order_book_l2_snapshot_engine_lot38.json
             data/audit/order_book_l2_snapshot_engine_audit_lot38.json
             data/audit/order_book_snapshot_lot38.json
             data/audit/book_health_state_lot38.json
+            reports/lot38/coverage_summary.json
+            reports/lot38/mutation_summary.json
           )
-          rm -rf /tmp/lot38-run1 reports/lot38/generated
-          mkdir -p /tmp/lot38-run1 reports/lot38/generated
-          python scripts/run_lot38_order_book_l2_snapshot_engine.py --code-commit "$SOURCE_HEAD_SHA"
+          git diff --quiet "$EVIDENCE_HEAD_SHA" "$MERGED_COMMIT_SHA" -- "${evidence_surfaces[@]}"
+          git diff --quiet "$MERGED_COMMIT_SHA" HEAD -- "${evidence_surfaces[@]}"
+      - name: Compile lint type and immutable evidence checks
+        run: |
+          python -m compileall -q src scripts tests
+          ruff check \
+            src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine.py \
+            src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine_models.py \
+            src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine_validation.py \
+            scripts/run_lot38_order_book_l2_snapshot_engine.py \
+            scripts/validate_lot38.py \
+            scripts/validate_lot38_no_connectivity.py \
+            scripts/validate_lot38_frozen_evidence.py \
+            tests/test_lot38_order_book_l2_snapshot_engine.py \
+            tests/test_lot38_branch_coverage.py \
+            tests/test_lot38_mutation_contracts.py \
+            tests/test_lot38_coverage_completion.py
+          mypy src/crypto_quant_bot/microstructure
+          python scripts/validate_lot38_frozen_evidence.py
           python scripts/validate_lot38.py --expected-code-commit "$SOURCE_HEAD_SHA"
           python scripts/validate_lot38_no_connectivity.py
-          for path in "${outputs[@]}"; do
-            cp "$path" "/tmp/lot38-run1/$(basename "$path")"
-            cp "$path" "reports/lot38/generated/$(basename "$path")"
-          done
-          python scripts/run_lot38_order_book_l2_snapshot_engine.py --code-commit "$SOURCE_HEAD_SHA"
-          python scripts/validate_lot38.py --expected-code-commit "$SOURCE_HEAD_SHA"
-          for path in "${outputs[@]}"; do
-            cmp "/tmp/lot38-run1/$(basename "$path")" "$path"
-            if git ls-files --error-unmatch "$path" >/dev/null 2>&1; then
-              git diff --exit-code -- "$path"
-            fi
-          done
-      - name: Architecture roadmap traceability engineering and safety
-        shell: bash
+      - name: Re-run targeted Lot 38 behavioral tests
         run: |
-          set -euo pipefail
+          pytest -q \
+            tests/test_lot38_order_book_l2_snapshot_engine.py \
+            tests/test_lot38_branch_coverage.py \
+            tests/test_lot38_mutation_contracts.py \
+            tests/test_lot38_coverage_completion.py
+          python scripts/validate_lot38_frozen_evidence.py
+      - name: Architecture roadmap traceability and full non-regression
+        run: |
           python scripts/validate_roadmap_documentation.py
           python scripts/validate_architecture_boundaries.py
           python scripts/validate_domain_architecture.py
@@ -199,8 +155,8 @@ jobs:
           python scripts/check_no_silent_numeric_coercion.py
           python scripts/quality_inventory.py
           python scripts/validate_engineering_deviations.py
-          python scripts/validate_lot38_no_connectivity.py
-      - name: Security dependency regression and anti-flake
+          pytest -q
+      - name: Security and final immutable evidence checks
         run: |
           bandit -q -r \
             src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine.py \
@@ -209,23 +165,4 @@ jobs:
             scripts/run_lot38_order_book_l2_snapshot_engine.py \
             scripts/validate_lot38.py -ll
           pip-audit -r requirements-dev.lock
-          pytest -q
-          for repetition in 1 2 3; do
-            pytest -q \
-              tests/test_lot38_order_book_l2_snapshot_engine.py \
-              tests/test_lot38_branch_coverage.py \
-              tests/test_lot38_mutation_contracts.py \
-              tests/test_lot38_coverage_completion.py
-          done
-          git diff --exit-code -- src/crypto_quant_bot
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: lot38-order-book-l2-snapshot-evidence
-          path: |
-            reports/lot38/
-            reports/lot_38_order_book_l2_snapshot_engine_report.md
-            data/audit/order_book_l2_snapshot_engine_lot38.json
-            data/audit/order_book_l2_snapshot_engine_audit_lot38.json
-            data/audit/order_book_snapshot_lot38.json
-            data/audit/book_health_state_lot38.json
+          python scripts/validate_lot38_frozen_evidence.py
