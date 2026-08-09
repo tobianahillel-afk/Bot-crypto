@@ -10,8 +10,13 @@ on:
       - 'data/audit/roadmap_lifecycle_overlay_lot38.json'
       - 'reports/lot38/coverage_summary.json'
       - 'reports/lot38/mutation_summary.json'
+      - 'scripts/validate_lot37_post_merge.py'
       - 'scripts/validate_lot38_post_merge.py'
+      - 'tests/test_lot38_coverage_completion.py'
       - 'tests/test_lot38_post_merge_state.py'
+      - '.github/workflows/lot37-post-merge-audit.yml'
+      - '.github/workflows/lot38-order-book-l2-snapshot.yml'
+      - '.github/workflows/lot38-mutation-assurance.yml'
       - '.github/workflows/lot38-post-merge-audit.yml'
   push:
     branches: [main]
@@ -35,7 +40,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove exact merged ancestry and governance-only diff
+      - name: Prove exact merged ancestry and immutable production boundary
         env:
           EVENT_NAME: ${{ github.event_name }}
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -67,15 +72,21 @@ jobs:
             contracts/schemas/order_book_l2_snapshot_engine_audit_v1.schema.json \
             tests/test_lot38_order_book_l2_snapshot_engine.py \
             tests/test_lot38_branch_coverage.py \
-            tests/test_lot38_mutation_contracts.py \
-            tests/test_lot38_coverage_completion.py
+            tests/test_lot38_mutation_contracts.py
+          git diff --name-only "$BASE_SHA" HEAD -- tests/test_lot38_coverage_completion.py \
+            | grep -q '^tests/test_lot38_coverage_completion.py$'
       - name: Compile lint type and frozen Lot 38 evidence
         env:
           PYTHONPATH: src
         run: |
           python -m compileall -q src scripts tests
-          ruff check scripts/validate_lot38_post_merge.py tests/test_lot38_post_merge_state.py
+          ruff check \
+            scripts/validate_lot37_post_merge.py \
+            scripts/validate_lot38_post_merge.py \
+            tests/test_lot38_coverage_completion.py \
+            tests/test_lot38_post_merge_state.py
           mypy src/crypto_quant_bot
+          python scripts/validate_lot37_post_merge.py
           python scripts/validate_lot38_frozen_evidence.py
           python scripts/validate_lot38.py --expected-code-commit b74bea4329d5e5cb7cf2452058b684ea5a5df13c
           python scripts/validate_lot38_no_connectivity.py
@@ -107,4 +118,6 @@ jobs:
         run: |
           bandit -q -r src -ll
           pip-audit -r requirements-dev.lock
+          python scripts/validate_lot37_post_merge.py
+          python scripts/validate_lot38_frozen_evidence.py
           python scripts/validate_lot38_post_merge.py
