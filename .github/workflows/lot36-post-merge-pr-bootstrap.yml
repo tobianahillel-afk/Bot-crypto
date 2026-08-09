@@ -51,10 +51,10 @@ jobs:
             docs/ROADMAP_V1_TO_V21.md \
             docs/LOT_36_POST_MERGE_AUDIT.md \
             docs/LOT36_POST_MERGE_VALIDATION_MATRIX.md \
-            data/audit/roadmap_lifecycle_overlay_lot36.json \
             scripts/validate_lot36_post_merge.py \
             scripts/validate_roadmap_documentation.py \
             tests/test_lot36_post_merge_state.py
+          git add -f data/audit/roadmap_lifecycle_overlay_lot36.json
           git diff --cached --quiet && exit 0
           git commit -m "Audit merged Lot 36 and close V3 lifecycle"
           git push origin HEAD:agent/lot36-post-merge-audit
