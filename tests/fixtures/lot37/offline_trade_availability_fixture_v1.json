@@ -1,0 +1,38 @@
+{
+  "available_at": "2026-08-06T19:18:40.050000Z",
+  "canonical_contract": false,
+  "event_time": "2026-08-06T19:18:40.000000Z",
+  "fixture_id": "lot37-v4-entry-trades-btc-eur-kraken-001",
+  "fixture_only": true,
+  "instrument_id": "BTC-EUR-SPOT",
+  "market_type": "SPOT",
+  "reason_codes": [
+    "OFFLINE_FIXTURE_ONLY",
+    "LOT37_ENTRY_PREREQUISITE_ONLY",
+    "AGGRESSOR_NOT_CLASSIFIED"
+  ],
+  "schema_version": "lot37-offline-trade-availability-fixture-v1",
+  "source_id": "kraken-reference-offline-fixture",
+  "trades": [
+    {
+      "price": "50025.00",
+      "quantity": "0.05000000",
+      "side": "UNKNOWN",
+      "trade_id": "fixture-trade-001"
+    },
+    {
+      "price": "50025.10",
+      "quantity": "0.08000000",
+      "side": "UNKNOWN",
+      "trade_id": "fixture-trade-002"
+    },
+    {
+      "price": "50024.90",
+      "quantity": "0.03000000",
+      "side": "UNKNOWN",
+      "trade_id": "fixture-trade-003"
+    }
+  ],
+  "used_for_decision": false,
+  "venue": "KRAKEN"
+}
