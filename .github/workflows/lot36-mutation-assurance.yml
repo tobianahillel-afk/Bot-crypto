@@ -124,36 +124,40 @@ jobs:
           if not path.is_file():
               raise SystemExit('LOT36_MUTATION_RUN_LOG_MISSING')
           text = path.read_text(encoding='utf-8', errors='replace')
-          text = re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', text)
+          text = re.sub(r'\x1b(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', text)
           text = text.replace('\r', '\n').replace('\ufe0f', '')
 
-          parsed = None
-          counter_re = re.compile(r'(\d+)\s*/\s*(\d+)')
-          metric_res = {
+          complete_counters = [
+              tuple(map(int, match.groups()))
+              for match in re.finditer(r'(\d+)\s*/\s*(\d+)', text)
+              if match.group(1) == match.group(2) and int(match.group(2)) > 0
+          ]
+          if not complete_counters:
+              raise SystemExit('LOT36_MUTATION_TOTAL_PARSE_ERROR')
+          completed, total = complete_counters[-1]
+
+          metric_patterns = {
               'killed': re.compile(r'🎉\s*(\d+)'),
               'timeout': re.compile(r'⏰\s*(\d+)'),
               'suspicious': re.compile(r'🤔\s*(\d+)'),
               'survived': re.compile(r'🙁\s*(\d+)'),
           }
-          for line in reversed(text.splitlines()):
-              if not all(icon in line for icon in ('🎉', '⏰', '🤔', '🙁')):
-                  continue
-              counter = counter_re.search(line)
-              values = {name: pattern.search(line) for name, pattern in metric_res.items()}
-              if counter is None or any(match is None for match in values.values()):
-                  continue
-              completed, total = map(int, counter.groups())
-              killed = int(values['killed'].group(1))
-              timeout = int(values['timeout'].group(1))
-              suspicious = int(values['suspicious'].group(1))
-              survived = int(values['survived'].group(1))
-              if completed == total > 0 and killed + timeout + suspicious + survived == total:
-                  parsed = (completed, total, killed, timeout, suspicious, survived)
-                  break
-          if parsed is None:
-              raise SystemExit('LOT36_MUTATION_SCORE_PARSE_ERROR')
-          completed, total, killed, timeout, suspicious, survived = parsed
+          metrics: dict[str, int] = {}
+          for name, pattern in metric_patterns.items():
+              matches = list(pattern.finditer(text))
+              if not matches:
+                  raise SystemExit(f'LOT36_MUTATION_{name.upper()}_PARSE_ERROR')
+              metrics[name] = int(matches[-1].group(1))
+
+          killed = metrics['killed']
+          timeout = metrics['timeout']
+          suspicious = metrics['suspicious']
+          survived = metrics['survived']
           evaluated = killed + timeout + suspicious + survived
+          if evaluated != total:
+              raise SystemExit(
+                  f'LOT36_MUTATION_COUNT_MISMATCH: total={total} evaluated={evaluated}'
+              )
           score = 100.0 * (killed + timeout) / evaluated
           payload = {
               'schema_version': 'lot36-mutation-summary-v1',
