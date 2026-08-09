@@ -52,10 +52,14 @@ jobs:
               'freshness_gap_outage_audit_and_v3_closure_models.py',
               'freshness_gap_outage_audit_and_v3_closure_validation.py',
           }
+          data_governance = root / 'src/crypto_quant_bot/data_governance'
           dependency_files = [
-              str(path.relative_to(root))
-              for path in sorted((root / 'src/crypto_quant_bot').rglob('*.py'))
-              if path.name not in mutated
+              'src/crypto_quant_bot/__init__.py',
+              *[
+                  str(path.relative_to(root))
+                  for path in sorted(data_governance.glob('*.py'))
+                  if path.name not in mutated
+              ],
           ]
           config = {
               'project': {
