@@ -334,7 +334,7 @@ def _validate_state_outcome(
     validation_state: str,
     synchronization_state: str,
     reconstructed_book: ReconstructedOrderBookV1 | None,
-    sequence_gap_event: SequenceGapEventV1 | None,
+    sequence_gap_event: SequenceGapEventV1,
 ) -> None:
     validate_sync_state(synchronization_state)
     if synchronization_state == "SYNCED":
@@ -346,9 +346,13 @@ def _validate_state_outcome(
             raise OrderBookDeltaSequenceValidationError(
                 "SYNCED Lot 39 state requires a published reconstructed book"
             )
-        if sequence_gap_event is not None:
+        if sequence_gap_event.gap_detected:
             raise OrderBookDeltaSequenceValidationError(
-                "SYNCED Lot 39 state cannot publish a gap event"
+                "SYNCED Lot 39 state requires explicit no-gap event"
+            )
+        if sequence_gap_event.synchronization_state != "SYNCED":
+            raise OrderBookDeltaSequenceValidationError(
+                "SYNCED Lot 39 sequence event state mismatch"
             )
         return
     if validation_state != "BLOCKED_RESYNC_REQUIRED":
@@ -359,13 +363,13 @@ def _validate_state_outcome(
         raise OrderBookDeltaSequenceValidationError(
             "RESYNC_REQUIRED Lot 39 state cannot publish a reconstructed book"
         )
-    if sequence_gap_event is None or not sequence_gap_event.gap_detected:
+    if not sequence_gap_event.gap_detected:
         raise OrderBookDeltaSequenceValidationError(
-            "RESYNC_REQUIRED Lot 39 state requires a gap event"
+            "RESYNC_REQUIRED Lot 39 state requires a detected sequence event"
         )
     if sequence_gap_event.synchronization_state != "RESYNC_REQUIRED":
         raise OrderBookDeltaSequenceValidationError(
-            "RESYNC_REQUIRED Lot 39 gap event state mismatch"
+            "RESYNC_REQUIRED Lot 39 sequence event state mismatch"
         )
 
 
@@ -373,9 +377,10 @@ def _validate_audit_outcome(
     validation_state: str,
     synchronization_state: str,
     reconstructed_book_checksum: str | None,
-    sequence_gap_event_checksum: str | None,
+    sequence_gap_event_checksum: str,
 ) -> None:
     validate_sync_state(synchronization_state)
+    require_sha256(sequence_gap_event_checksum, "sequence_gap_event_checksum")
     if synchronization_state == "SYNCED":
         if validation_state != "VALIDATED_OFFLINE_DELTA_SEQUENCE_RECONSTRUCTION_ONLY":
             raise OrderBookDeltaSequenceValidationError(
@@ -386,10 +391,6 @@ def _validate_audit_outcome(
                 "SYNCED Lot 39 audit requires reconstructed book checksum"
             )
         require_sha256(reconstructed_book_checksum, "reconstructed_book_checksum")
-        if sequence_gap_event_checksum is not None:
-            raise OrderBookDeltaSequenceValidationError(
-                "SYNCED Lot 39 audit cannot carry gap checksum"
-            )
         return
     if validation_state != "BLOCKED_RESYNC_REQUIRED":
         raise OrderBookDeltaSequenceValidationError(
@@ -399,11 +400,6 @@ def _validate_audit_outcome(
         raise OrderBookDeltaSequenceValidationError(
             "RESYNC_REQUIRED Lot 39 audit cannot carry book checksum"
         )
-    if sequence_gap_event_checksum is None:
-        raise OrderBookDeltaSequenceValidationError(
-            "RESYNC_REQUIRED Lot 39 audit requires gap checksum"
-        )
-    require_sha256(sequence_gap_event_checksum, "sequence_gap_event_checksum")
 
 
 @dataclass(frozen=True)
@@ -418,7 +414,7 @@ class OrderBookDeltaSequenceReconstructorStateV1:
     base_snapshot_checksum: str
     delta_fixture_checksum: str
     reconstructed_book: ReconstructedOrderBookV1 | None
-    sequence_gap_event: SequenceGapEventV1 | None
+    sequence_gap_event: SequenceGapEventV1
     metrics: Lot39MetricsV1
     reason_codes: tuple[str, ...]
     safety: dict[str, object]
@@ -458,9 +454,7 @@ class OrderBookDeltaSequenceReconstructorStateV1:
             "reconstructed_book": (
                 None if self.reconstructed_book is None else self.reconstructed_book.to_dict()
             ),
-            "sequence_gap_event": (
-                None if self.sequence_gap_event is None else self.sequence_gap_event.to_dict()
-            ),
+            "sequence_gap_event": self.sequence_gap_event.to_dict(),
             "metrics": self.metrics.to_dict(),
             "reason_codes": list(self.reason_codes),
             "safety": dict(self.safety),
@@ -478,7 +472,7 @@ class OrderBookDeltaSequenceReconstructorAuditV1:
     delta_fixture_checksum: str
     state_output_checksum: str
     reconstructed_book_checksum: str | None
-    sequence_gap_event_checksum: str | None
+    sequence_gap_event_checksum: str
     validation_state: str
     synchronization_state: str
     safety: dict[str, object]
