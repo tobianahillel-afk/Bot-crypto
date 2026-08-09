@@ -72,6 +72,7 @@ jobs:
             scripts/diagnose_exact_chain_until_lot36.py \
             tests/test_lot36_freshness_gap_outage_audit_and_v3_closure.py \
             tests/test_lot36_closure_contract.py \
+            tests/test_lot36_defensive_contracts.py \
             --output-format=concise 2>&1 | tee reports/lot36/ruff.txt
           mypy src/crypto_quant_bot/data_governance 2>&1 | tee reports/lot36/mypy.txt
       - name: Targeted line and branch coverage
@@ -80,6 +81,7 @@ jobs:
           pytest -q \
             tests/test_lot36_freshness_gap_outage_audit_and_v3_closure.py \
             tests/test_lot36_closure_contract.py \
+            tests/test_lot36_defensive_contracts.py \
             --cov=crypto_quant_bot.data_governance.freshness_gap_outage_audit_and_v3_closure \
             --cov=crypto_quant_bot.data_governance.freshness_gap_outage_audit_and_v3_closure_models \
             --cov=crypto_quant_bot.data_governance.freshness_gap_outage_audit_and_v3_closure_validation \
@@ -161,9 +163,9 @@ jobs:
       - name: Full regression and anti-flake
         run: |
           pytest -q
-          pytest -q tests/test_lot36_freshness_gap_outage_audit_and_v3_closure.py tests/test_lot36_closure_contract.py
-          pytest -q tests/test_lot36_freshness_gap_outage_audit_and_v3_closure.py tests/test_lot36_closure_contract.py
-          pytest -q tests/test_lot36_freshness_gap_outage_audit_and_v3_closure.py tests/test_lot36_closure_contract.py
+          pytest -q tests/test_lot36_freshness_gap_outage_audit_and_v3_closure.py tests/test_lot36_closure_contract.py tests/test_lot36_defensive_contracts.py
+          pytest -q tests/test_lot36_freshness_gap_outage_audit_and_v3_closure.py tests/test_lot36_closure_contract.py tests/test_lot36_defensive_contracts.py
+          pytest -q tests/test_lot36_freshness_gap_outage_audit_and_v3_closure.py tests/test_lot36_closure_contract.py tests/test_lot36_defensive_contracts.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
