@@ -37,15 +37,21 @@ def _gate_with_checksum(**updates: object) -> dict[str, Any]:
     return gate
 
 
-def test_gate_rejects_authorization_and_safety_changes(tmp_path: Path) -> None:
+def test_gate_rejects_authorization_and_safety_changes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     gate_path = tmp_path / "data/audit/lot36_v3_entry_gate.json"
-    _write_json(gate_path, _gate_with_checksum(gate_status="BLOCKED"))
+    blocked_gate = _gate_with_checksum(gate_status="BLOCKED")
+    monkeypatch.setattr(closure, "EXPECTED_GATE_CHECKSUM", blocked_gate["output_checksum"])
+    _write_json(gate_path, blocked_gate)
     with pytest.raises(V3ClosureError, match="does not authorize"):
         closure._verify_gate(tmp_path)
 
     unsafe = dict(closure.lot36_safety())
     unsafe["trade_allowed"] = True
-    _write_json(gate_path, _gate_with_checksum(safety=unsafe))
+    unsafe_gate = _gate_with_checksum(safety=unsafe)
+    monkeypatch.setattr(closure, "EXPECTED_GATE_CHECKSUM", unsafe_gate["output_checksum"])
+    _write_json(gate_path, unsafe_gate)
     with pytest.raises(V3ClosureError, match="safety boundary"):
         closure._verify_gate(tmp_path)
 
@@ -207,19 +213,16 @@ def test_build_rejects_lot34_anomaly_replay_divergence(
 def test_write_lot36_artifacts_persists_every_contract(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    outputs = {
-        "state": tmp_path / "state.json",
-        "audit": tmp_path / "audit.json",
-        "quality_states": tmp_path / "quality_states.json",
-        "anomalies": tmp_path / "anomalies.json",
-        "quality_veto": tmp_path / "quality_veto.json",
-        "replay": tmp_path / "replay.json",
-        "manifest": tmp_path / "manifest.json",
-    }
-    monkeypatch.setattr(closure, "_output_paths", lambda _root: outputs)
-    observed = closure.write_lot36_artifacts(ROOT, CODE_COMMIT)
+    state, audit = closure.build_lot36_artifacts(ROOT, CODE_COMMIT)
+    replay = closure.build_replay_evidence(ROOT, CODE_COMMIT)
+    monkeypatch.setattr(closure, "build_lot36_artifacts", lambda *_: (state, audit))
+    monkeypatch.setattr(closure, "build_replay_evidence", lambda *_: replay)
+
+    observed = closure.write_lot36_artifacts(tmp_path, CODE_COMMIT)
+    outputs = closure._output_paths(tmp_path)
     assert set(observed) == set(outputs)
     for name, path in outputs.items():
+        assert observed[name] == str(path.relative_to(tmp_path))
         assert path.exists(), name
         payload = json.loads(path.read_text(encoding="utf-8"))
         assert isinstance(payload, dict)
