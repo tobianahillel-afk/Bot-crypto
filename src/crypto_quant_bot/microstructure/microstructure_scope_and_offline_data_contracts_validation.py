@@ -122,7 +122,12 @@ def validate_runtime_mode(runtime_mode: str) -> None:
 
 
 def validate_contract_schema_path(path: str) -> None:
-    if not path.startswith("contracts/schemas/") or not path.endswith(".schema.json"):
+    parts = path.split("/")
+    if (
+        not path.startswith("contracts/schemas/")
+        or not path.endswith(".schema.json")
+        or ".." in parts
+    ):
         raise MicrostructureScopeValidationError(
             "contract schema must remain under contracts/schemas"
         )
