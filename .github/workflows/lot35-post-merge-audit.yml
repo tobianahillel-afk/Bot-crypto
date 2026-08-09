@@ -1,0 +1,80 @@
+name: Lot 35 independent post-merge audit
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'pyproject.toml'
+      - 'README.md'
+      - 'docs/ROADMAP_V1_TO_V21.md'
+      - 'docs/LOT_35_POST_MERGE_AUDIT.md'
+      - 'docs/LOT35_POST_MERGE_VALIDATION_MATRIX.md'
+      - 'data/audit/roadmap_lifecycle_overlay_lot35.json'
+      - 'reports/lot35/coverage_summary.json'
+      - 'reports/lot35/mutation_summary.json'
+      - 'scripts/validate_lot35_entry_gate.py'
+      - 'scripts/validate_lot35_post_merge.py'
+      - 'scripts/validate_roadmap_documentation.py'
+      - 'tests/test_lot35_post_merge_state.py'
+      - '.github/workflows/lot35-post-merge-audit.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Prove governance-only diff
+        run: |
+          git fetch origin main
+          git diff --quiet origin/main...HEAD -- src/
+      - name: Compile lint type and exact frozen evidence
+        run: |
+          python -m compileall -q src scripts tests
+          ruff check \
+            scripts/validate_lot35_entry_gate.py \
+            scripts/validate_lot35_post_merge.py \
+            scripts/validate_roadmap_documentation.py \
+            tests/test_lot35_post_merge_state.py
+          mypy src/crypto_quant_bot
+          python scripts/validate_lot35_entry_gate.py
+          python scripts/validate_lot35.py
+          python scripts/validate_lot35_no_connectivity.py
+          python scripts/validate_lot35_post_merge.py
+      - name: Architecture roadmap traceability and engineering
+        run: |
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+      - name: Audit tests full regression and anti-flake
+        run: |
+          pytest -q tests/test_lot35_post_merge_state.py
+          pytest -q
+          pytest -q tests/test_lot35_post_merge_state.py
+          pytest -q tests/test_lot35_post_merge_state.py
+          pytest -q tests/test_lot35_post_merge_state.py
+      - name: Security and final validator
+        run: |
+          bandit -q -r src -ll
+          pip-audit -r requirements-dev.lock
+          python scripts/validate_lot35_post_merge.py
