@@ -1,0 +1,128 @@
+name: Lot 36 mutation assurance
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/crypto_quant_bot/data_governance/freshness_gap_outage_audit_and_v3_closure*.py'
+      - 'tests/test_lot36*.py'
+      - '.github/workflows/lot36-mutation-assurance.yml'
+      - 'pyproject.toml'
+      - 'requirements-dev.lock'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mutation:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Baseline Lot36 tests
+        run: pytest -q tests/test_lot36*.py
+      - name: Build isolated mutation workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/lot36-mutation
+          mkdir -p /tmp/lot36-mutation
+          tar --exclude=.git --exclude=.mutmut-cache --exclude=mutants -cf - . | tar -xf - -C /tmp/lot36-mutation
+          cd /tmp/lot36-mutation
+          python - <<'PY'
+          from pathlib import Path
+          import toml
+
+          path = Path('pyproject.toml')
+          config = toml.load(path)
+          tool = config.setdefault('tool', {})
+          existing = dict(tool.get('mutmut', {}))
+          existing['paths_to_mutate'] = [
+              'src/crypto_quant_bot/data_governance/freshness_gap_outage_audit_and_v3_closure.py',
+              'src/crypto_quant_bot/data_governance/freshness_gap_outage_audit_and_v3_closure_models.py',
+              'src/crypto_quant_bot/data_governance/freshness_gap_outage_audit_and_v3_closure_validation.py',
+          ]
+          existing['tests_dir'] = ['tests']
+          existing['pytest_add_cli_args'] = [
+              '-q',
+              'tests/test_lot36_freshness_gap_outage_audit_and_v3_closure.py',
+              'tests/test_lot36_closure_contract.py',
+              'tests/test_lot36_defensive_contracts.py',
+              'tests/test_lot36_branch_coverage.py',
+          ]
+          tool['mutmut'] = existing
+          path.write_text(toml.dumps(config), encoding='utf-8')
+          print(toml.dumps({'tool': {'mutmut': existing}}))
+          PY
+      - name: Run mutation analysis and enforce score
+        env:
+          SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/reports/lot36"
+          cd /tmp/lot36-mutation
+          set +e
+          mutmut run 2>&1 | tee "$GITHUB_WORKSPACE/reports/lot36/mutmut-run.txt"
+          run_status=${PIPESTATUS[0]}
+          mutmut results 2>&1 | tee "$GITHUB_WORKSPACE/reports/lot36/mutmut-results.txt"
+          results_status=${PIPESTATUS[0]}
+          set -e
+          RUN_STATUS="$run_status" RESULTS_STATUS="$results_status" python - <<'PY'
+          from __future__ import annotations
+
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          log_path = Path(os.environ['GITHUB_WORKSPACE']) / 'reports/lot36/mutmut-run.txt'
+          text = log_path.read_text(encoding='utf-8', errors='replace')
+          ansi = re.compile(r'\x1b\[[0-?]*[ -/]*[@-~]')
+          clean = ansi.sub('', text).replace('\r', '\n')
+          candidates = [line.strip() for line in clean.splitlines() if '🎉' in line and '/' in line]
+          if not candidates:
+              raise SystemExit('LOT36_MUTATION_SUMMARY_NOT_FOUND')
+          final = candidates[-1]
+          progress = re.search(r'(\d+)\s*/\s*(\d+)', final)
+          killed_match = re.search(r'🎉\s*(\d+)', final)
+          if progress is None or killed_match is None:
+              raise SystemExit(f'LOT36_MUTATION_SUMMARY_UNPARSABLE: {final}')
+          completed = int(progress.group(1))
+          total = int(progress.group(2))
+          killed = int(killed_match.group(1))
+          if total <= 0 or completed != total or killed > total:
+              raise SystemExit(f'LOT36_MUTATION_COUNTS_INVALID: {final}')
+          score = round(killed * 100.0 / total, 2)
+          payload = {
+              'schema_version': 'lot36-mutation-summary-v1',
+              'status': 'PASS' if score >= 80.0 else 'FAIL',
+              'source_head_sha': os.environ['SOURCE_HEAD_SHA'],
+              'killed_mutants': killed,
+              'total_mutants': total,
+              'mutation_score_percent': score,
+              'minimum_score_percent': 80.0,
+              'mutmut_run_exit_code': int(os.environ['RUN_STATUS']),
+              'mutmut_results_exit_code': int(os.environ['RESULTS_STATUS']),
+          }
+          output = Path(os.environ['GITHUB_WORKSPACE']) / 'reports/lot36/mutation_summary.json'
+          output.write_text(json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+          print(json.dumps(payload, sort_keys=True))
+          if score < 80.0:
+              raise SystemExit('LOT36_MUTATION_SCORE_BELOW_THRESHOLD')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot36-mutation-evidence
+          path: reports/lot36/
