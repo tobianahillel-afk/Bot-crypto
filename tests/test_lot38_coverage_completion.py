@@ -250,10 +250,8 @@ def test_validation_primitives_reject_blank_text_and_nonfinite_output() -> None:
 
 def test_write_lot38_artifacts_persists_exact_four_documents() -> None:
     paths = (STATE_PATH, AUDIT_PATH, SNAPSHOT_PATH, HEALTH_PATH)
-    backups: dict[Path, bytes | None] = {}
     for path in paths:
         target = ROOT / path
-        backups[target] = target.read_bytes() if target.exists() else None
         if target.exists():
             target.unlink()
     try:
@@ -263,9 +261,7 @@ def test_write_lot38_artifacts_persists_exact_four_documents() -> None:
         assert json.loads((ROOT / SNAPSHOT_PATH).read_text(encoding="utf-8")) == state.snapshot.to_dict()
         assert json.loads((ROOT / HEALTH_PATH).read_text(encoding="utf-8")) == state.book_health.to_dict()
     finally:
-        for target, original in backups.items():
-            if original is None:
-                if target.exists():
-                    target.unlink()
-            else:
-                target.write_bytes(original)
+        for path in paths:
+            target = ROOT / path
+            if target.exists():
+                target.unlink()
