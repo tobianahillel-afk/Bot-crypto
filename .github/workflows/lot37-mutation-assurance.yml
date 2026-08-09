@@ -53,16 +53,6 @@ jobs:
           import toml
 
           root = Path('.tmp-lot37-mutants')
-          mutated = {
-              'src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts.py',
-              'src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts_models.py',
-              'src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts_validation.py',
-          }
-          dependency_files = [
-              str(path.relative_to(root))
-              for path in sorted((root / 'src/crypto_quant_bot').rglob('*.py'))
-              if str(path.relative_to(root)) not in mutated
-          ]
           test_paths = (
               'tests/test_lot37_microstructure_scope_and_offline_data_contracts.py '
               'tests/test_lot37_branch_coverage.py'
@@ -82,10 +72,17 @@ jobs:
                       }
                   },
                   'mutmut': {
-                      'paths_to_mutate': sorted(mutated),
+                      'paths_to_mutate': [
+                          'src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts.py',
+                          'src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts_models.py',
+                          'src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts_validation.py',
+                      ],
                       'tests_dir': ['tests/'],
                       'runner': f'python -m pytest -q {test_paths}',
-                      'also_copy': dependency_files + [
+                      'also_copy': [
+                          'src/crypto_quant_bot/__init__.py',
+                          'src/crypto_quant_bot/microstructure/__init__.py',
+                          'src/crypto_quant_bot/data_governance/',
                           'config/',
                           'data/audit/',
                           'contracts/',
