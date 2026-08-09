@@ -40,6 +40,20 @@ def _tampered_gate(tmp_path: Path, payload: dict[str, object]) -> Path:
     return path
 
 
+def _install_tampered_gate(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    tampered: dict[str, object],
+) -> None:
+    path = _tampered_gate(tmp_path, tampered)
+    monkeypatch.setattr(gate_validator, "GATE_PATH", path)
+    monkeypatch.setattr(
+        gate_validator,
+        "EXPECTED_GATE_CHECKSUM",
+        tampered["output_checksum"],
+    )
+
+
 def test_lot38_entry_gate_passes_exact_audited_state() -> None:
     result = validate()
     assert result["status"] == "PASS"
@@ -112,9 +126,7 @@ def test_gate_rejects_future_delta_reconstructor_scope(
     gate = json.loads(GATE_PATH.read_text(encoding="utf-8"))
     tampered = copy.deepcopy(gate)
     tampered["forbidden_scope"].remove("ORDER_BOOK_DELTA_SEQUENCE_RECONSTRUCTION")
-    path = _tampered_gate(tmp_path, tampered)
-    monkeypatch.setattr(gate_validator, "GATE_PATH", path)
-    monkeypatch.setattr(gate_validator, "EXPECTED_GATE_CHECKSUM", tampered["output_checksum"])
+    _install_tampered_gate(monkeypatch, tmp_path, tampered)
     with pytest.raises(Lot38EntryGateError, match="forbidden scope"):
         validate()
 
@@ -125,9 +137,7 @@ def test_gate_rejects_trading_permission(
     gate = json.loads(GATE_PATH.read_text(encoding="utf-8"))
     tampered = copy.deepcopy(gate)
     tampered["safety"]["trade_allowed"] = True
-    path = _tampered_gate(tmp_path, tampered)
-    monkeypatch.setattr(gate_validator, "GATE_PATH", path)
-    monkeypatch.setattr(gate_validator, "EXPECTED_GATE_CHECKSUM", tampered["output_checksum"])
+    _install_tampered_gate(monkeypatch, tmp_path, tampered)
     with pytest.raises(Lot38EntryGateError, match="trade_allowed"):
         validate()
 
@@ -138,8 +148,17 @@ def test_gate_rejects_roadmap_binding_tamper(
     gate = json.loads(GATE_PATH.read_text(encoding="utf-8"))
     tampered = copy.deepcopy(gate)
     tampered["canonical_roadmap"]["source_line"] = 40
-    path = _tampered_gate(tmp_path, tampered)
-    monkeypatch.setattr(gate_validator, "GATE_PATH", path)
-    monkeypatch.setattr(gate_validator, "EXPECTED_GATE_CHECKSUM", tampered["output_checksum"])
+    _install_tampered_gate(monkeypatch, tmp_path, tampered)
     with pytest.raises(Lot38EntryGateError, match="roadmap line binding"):
+        validate()
+
+
+def test_gate_rejects_prerequisite_evidence_tamper(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    gate = json.loads(GATE_PATH.read_text(encoding="utf-8"))
+    tampered = copy.deepcopy(gate)
+    tampered["prerequisites"]["mutation_score_percent"] = 99.99
+    _install_tampered_gate(monkeypatch, tmp_path, tampered)
+    with pytest.raises(Lot38EntryGateError, match="prerequisite evidence"):
         validate()
