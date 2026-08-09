@@ -1,0 +1,25 @@
+{
+  "artifact_digest": "sha256:1ce9b7ac4d87465a441403262e3764cb8bef824cdff0c3eae59bc6bf68dcef68",
+  "artifact_id": 9041434170,
+  "completed_mutants": 1368,
+  "evaluated_mutants": 1368,
+  "killed_mutants": 1098,
+  "methodology": "GitHub Actions isolated mutmut campaign over covered Lot 37 engine, model and validation code; frozen from exact source head artifact",
+  "minimum_score_percent": 80.0,
+  "mutation_score_percent": 80.26,
+  "mutmut_results_exit_code": 0,
+  "mutmut_run_exit_code": 0,
+  "schema_version": "lot37-mutation-summary-v1",
+  "scope": [
+    "microstructure_scope_and_offline_data_contracts.py",
+    "microstructure_scope_and_offline_data_contracts_models.py",
+    "microstructure_scope_and_offline_data_contracts_validation.py"
+  ],
+  "source_head_sha": "59b189e9980772245993a9212b6c8ad5e9a88a00",
+  "status": "PASS",
+  "survived_mutants": 270,
+  "suspicious_mutants": 0,
+  "timeout_mutants": 0,
+  "total_mutants": 1368,
+  "workflow_run_id": 31325582303
+}
