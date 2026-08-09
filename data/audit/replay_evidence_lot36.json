@@ -1,0 +1,11 @@
+{
+  "match": true,
+  "reason_codes": [
+    "LOT36_DETERMINISTIC_REPLAY_MATCH"
+  ],
+  "replay_checksum": "cef50b5191c1f3c78baaa3906c4c5ded59f1dd45dad0271a0071b7056b6af91d",
+  "replay_status": "REPLAY_MATCH",
+  "run1_checksum": "635b5504d21ca8d46faf51bd46639538345b4bcd94437330791b49036ee07592",
+  "run2_checksum": "635b5504d21ca8d46faf51bd46639538345b4bcd94437330791b49036ee07592",
+  "schema_version": "replay-evidence-v1"
+}

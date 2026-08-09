@@ -1,0 +1,25 @@
+{
+  "artifact_digest": "sha256:5b44d075e13ae9569514914689a4427f5898835d475a4d8a351e0fcb626a41ef",
+  "artifact_id": 9036765419,
+  "completed_mutants": 1544,
+  "evaluated_mutants": 1544,
+  "killed_mutants": 1289,
+  "methodology": "GitHub Actions isolated mutmut campaign over covered Lot 36 engine, model and validation code; frozen from exact source head artifact",
+  "minimum_score_percent": 80.0,
+  "mutation_score_percent": 83.48,
+  "mutmut_results_exit_code": 0,
+  "mutmut_run_exit_code": 0,
+  "schema_version": "lot36-mutation-summary-v1",
+  "scope": [
+    "freshness_gap_outage_audit_and_v3_closure.py",
+    "freshness_gap_outage_audit_and_v3_closure_models.py",
+    "freshness_gap_outage_audit_and_v3_closure_validation.py"
+  ],
+  "source_head_sha": "c21b8f242270bd87eebbf7279635ab8bb51b8666",
+  "status": "PASS",
+  "survived_mutants": 255,
+  "suspicious_mutants": 0,
+  "timeout_mutants": 0,
+  "total_mutants": 1544,
+  "workflow_run_id": 31308763592
+}
