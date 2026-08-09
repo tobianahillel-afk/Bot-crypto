@@ -8,13 +8,13 @@ from pathlib import Path
 import pytest
 
 from crypto_quant_bot.microstructure.order_book_l2_snapshot_engine import (
+    CONFIG_PATH,
+    ZERO_SHA256,
     _levels,
     _validate_config,
     _validate_fixture_freshness,
     _validate_fixture_identity,
     _verify_gate,
-    CONFIG_PATH,
-    ZERO_SHA256,
 )
 from crypto_quant_bot.microstructure.order_book_l2_snapshot_engine_models import (
     BookHealthStateV1,
