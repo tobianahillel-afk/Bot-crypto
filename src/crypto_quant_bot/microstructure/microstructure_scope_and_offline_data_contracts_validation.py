@@ -38,12 +38,6 @@ def require_integer(value: Any, field: str, minimum: int = 0) -> int:
     return value
 
 
-def require_boolean(value: Any, field: str) -> bool:
-    if not isinstance(value, bool):
-        raise MicrostructureScopeValidationError(f"{field} must be boolean")
-    return value
-
-
 def require_git_sha(value: str, field: str) -> None:
     if _GIT_SHA.fullmatch(value) is None:
         raise MicrostructureScopeValidationError(f"{field} must be a lowercase git SHA")
@@ -64,12 +58,9 @@ def parse_utc_timestamp(value: str, field: str) -> datetime:
     if not value.endswith("Z"):
         raise MicrostructureScopeValidationError(f"{field} must use UTC Z notation")
     try:
-        parsed = datetime.fromisoformat(value[:-1] + "+00:00")
+        return datetime.fromisoformat(value[:-1] + "+00:00")
     except ValueError as exc:
         raise MicrostructureScopeValidationError(f"{field} is not an ISO timestamp") from exc
-    if parsed.utcoffset() is None:
-        raise MicrostructureScopeValidationError(f"{field} must be timezone-aware")
-    return parsed
 
 
 def duration_us(start: datetime, end: datetime) -> int:
