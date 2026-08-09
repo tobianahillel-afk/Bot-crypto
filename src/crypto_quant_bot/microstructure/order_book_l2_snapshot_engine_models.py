@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import Decimal
+from itertools import pairwise
 from typing import Any
 
 from .order_book_l2_snapshot_engine_validation import (
@@ -90,7 +91,9 @@ class OrderBookLevelV1:
 
     def __post_init__(self) -> None:
         if not self.price.is_finite() or self.price <= 0:
-            raise OrderBookL2SnapshotValidationError("book price must be positive finite Decimal")
+            raise OrderBookL2SnapshotValidationError(
+                "book price must be positive finite Decimal"
+            )
         if not self.quantity.is_finite() or self.quantity < 0:
             raise OrderBookL2SnapshotValidationError(
                 "book quantity must be non-negative finite Decimal"
@@ -125,14 +128,20 @@ class OrderBookSnapshotRawV1:
         ):
             require_text(value, field)
         if self.market_type != "SPOT":
-            raise OrderBookL2SnapshotValidationError("Lot 38 reference contract is SPOT only")
+            raise OrderBookL2SnapshotValidationError(
+                "Lot 38 reference contract is SPOT only"
+            )
         validate_causal_times(self.event_time, self.receive_time, self.receive_time)
         require_integer(self.sequence_id, "sequence_id")
         validate_venue_state(self.venue_state)
         if not self.bids or not self.asks:
-            raise OrderBookL2SnapshotValidationError("raw snapshot requires bid and ask levels")
+            raise OrderBookL2SnapshotValidationError(
+                "raw snapshot requires bid and ask levels"
+            )
         if self.used_for_decision is not False:
-            raise OrderBookL2SnapshotValidationError("Lot 38 raw snapshot cannot be decision data")
+            raise OrderBookL2SnapshotValidationError(
+                "Lot 38 raw snapshot cannot be decision data"
+            )
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -193,7 +202,9 @@ class OrderBookSnapshotV1:
         require_integer(self.sequence_id, "sequence_id")
         validate_venue_state(self.venue_state)
         if not self.bids or not self.asks:
-            raise OrderBookL2SnapshotValidationError("canonical snapshot cannot be empty")
+            raise OrderBookL2SnapshotValidationError(
+                "canonical snapshot cannot be empty"
+            )
 
     def _validate_depths(self) -> None:
         for field, value in (
@@ -210,17 +221,25 @@ class OrderBookSnapshotV1:
         if self.published_ask_depth != len(self.asks):
             raise OrderBookL2SnapshotValidationError("published ask depth mismatch")
         if self.published_bid_depth > self.normalized_bid_depth:
-            raise OrderBookL2SnapshotValidationError("published bid depth exceeds normalized depth")
+            raise OrderBookL2SnapshotValidationError(
+                "published bid depth exceeds normalized depth"
+            )
         if self.published_ask_depth > self.normalized_ask_depth:
-            raise OrderBookL2SnapshotValidationError("published ask depth exceeds normalized depth")
+            raise OrderBookL2SnapshotValidationError(
+                "published ask depth exceeds normalized depth"
+            )
 
     def _validate_ordering(self) -> None:
         bid_prices = tuple(level.price for level in self.bids)
         ask_prices = tuple(level.price for level in self.asks)
-        if any(left <= right for left, right in zip(bid_prices, bid_prices[1:])):
-            raise OrderBookL2SnapshotValidationError("bids must be strictly descending")
-        if any(left >= right for left, right in zip(ask_prices, ask_prices[1:])):
-            raise OrderBookL2SnapshotValidationError("asks must be strictly ascending")
+        if any(left <= right for left, right in pairwise(bid_prices)):
+            raise OrderBookL2SnapshotValidationError(
+                "bids must be strictly descending"
+            )
+        if any(left >= right for left, right in pairwise(ask_prices)):
+            raise OrderBookL2SnapshotValidationError(
+                "asks must be strictly ascending"
+            )
 
     def _validate_book_state(self) -> None:
         best_bid = self.bids[0].price
@@ -284,7 +303,9 @@ class BookHealthStateV1:
         if self.health_status != expected_status:
             raise OrderBookL2SnapshotValidationError("book health status mismatch")
         if self.crossed is not False:
-            raise OrderBookL2SnapshotValidationError("crossed health state cannot be published")
+            raise OrderBookL2SnapshotValidationError(
+                "crossed health state cannot be published"
+            )
         if self.locked != (self.venue_state == "LOCKED"):
             raise OrderBookL2SnapshotValidationError("book health lock flag mismatch")
         if self.sequence_present is not True:
@@ -334,14 +355,21 @@ class Lot38MetricsV1:
         for field, value in (
             ("source_levels_total", self.source_levels_total),
             ("normalized_levels_total", self.normalized_levels_total),
-            ("duplicate_levels_aggregated_total", self.duplicate_levels_aggregated_total),
+            (
+                "duplicate_levels_aggregated_total",
+                self.duplicate_levels_aggregated_total,
+            ),
             ("published_levels_total", self.published_levels_total),
         ):
             require_integer(value, field)
         if self.source_levels_total < self.normalized_levels_total:
-            raise OrderBookL2SnapshotValidationError("normalized levels exceed source levels")
+            raise OrderBookL2SnapshotValidationError(
+                "normalized levels exceed source levels"
+            )
         if self.normalized_levels_total < self.published_levels_total:
-            raise OrderBookL2SnapshotValidationError("published levels exceed normalized levels")
+            raise OrderBookL2SnapshotValidationError(
+                "published levels exceed normalized levels"
+            )
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -349,11 +377,15 @@ class Lot38MetricsV1:
             "lot_38_records_processed_total": 1,
             "lot_38_source_levels_total": self.source_levels_total,
             "lot_38_normalized_levels_total": self.normalized_levels_total,
-            "lot_38_duplicate_levels_aggregated_total": self.duplicate_levels_aggregated_total,
+            "lot_38_duplicate_levels_aggregated_total": (
+                self.duplicate_levels_aggregated_total
+            ),
             "lot_38_published_levels_total": self.published_levels_total,
             "lot_38_validation_failures_total": 0,
             "lot_38_processing_latency_us": None,
-            "latency_measurement_status": "NOT_MEASURED_OFFLINE_DETERMINISTIC_REPLAY",
+            "latency_measurement_status": (
+                "NOT_MEASURED_OFFLINE_DETERMINISTIC_REPLAY"
+            ),
         }
 
 
@@ -376,10 +408,14 @@ class OrderBookL2SnapshotEngineStateV1:
     def __post_init__(self) -> None:
         validate_causal_times(self.event_time, self.receive_time, self.generated_at)
         if self.validation_state != "VALIDATED_OFFLINE_L2_SNAPSHOT_ONLY":
-            raise OrderBookL2SnapshotValidationError("unknown Lot 38 validation state")
+            raise OrderBookL2SnapshotValidationError(
+                "unknown Lot 38 validation state"
+            )
         require_sha256(self.input_fixture_checksum, "input_fixture_checksum")
         if self.lineage.input_fixture_checksum != self.input_fixture_checksum:
-            raise OrderBookL2SnapshotValidationError("state lineage input checksum mismatch")
+            raise OrderBookL2SnapshotValidationError(
+                "state lineage input checksum mismatch"
+            )
         validate_reason_codes(self.reason_codes)
         validate_lot38_safety(self.safety)
         require_sha256(self.output_checksum, "output_checksum")
@@ -434,7 +470,9 @@ class OrderBookL2SnapshotEngineAuditV1:
         ):
             require_sha256(value, field)
         if self.validation_state != "VALIDATED_OFFLINE_L2_SNAPSHOT_ONLY":
-            raise OrderBookL2SnapshotValidationError("unknown Lot 38 audit state")
+            raise OrderBookL2SnapshotValidationError(
+                "unknown Lot 38 audit state"
+            )
         validate_lot38_safety(self.safety)
 
     def payload_without_checksum(self) -> dict[str, Any]:
