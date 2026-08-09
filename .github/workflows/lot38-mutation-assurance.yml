@@ -6,6 +6,18 @@ on:
     paths:
       - 'src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine*.py'
       - 'tests/test_lot38*.py'
+      - 'config/microstructure/order_book_l2_snapshot_engine_v1.json'
+      - 'contracts/schemas/order_book_snapshot_raw_v1.schema.json'
+      - 'contracts/schemas/order_book_snapshot_v1.schema.json'
+      - 'contracts/schemas/book_health_state_v1.schema.json'
+      - 'contracts/schemas/order_book_l2_snapshot_engine_state_v1.schema.json'
+      - 'contracts/schemas/order_book_l2_snapshot_engine_audit_v1.schema.json'
+      - 'reports/lot38/mutation_summary.json'
+      - 'reports/lot_38_order_book_l2_snapshot_engine_report.md'
+      - 'data/audit/order_book_l2_snapshot_engine_lot38.json'
+      - 'data/audit/order_book_l2_snapshot_engine_audit_lot38.json'
+      - 'data/audit/order_book_snapshot_lot38.json'
+      - 'data/audit/book_health_state_lot38.json'
       - '.github/workflows/lot38-mutation-assurance.yml'
       - 'pyproject.toml'
       - 'requirements-dev.lock'
@@ -17,10 +29,13 @@ permissions:
 jobs:
   mutation:
     runs-on: ubuntu-22.04
+    env:
+      SOURCE_HEAD_SHA: b74bea4329d5e5cb7cf2452058b684ea5a5df13c
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
@@ -29,6 +44,24 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
+      - name: Prove frozen Lot 38 mutation source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$SOURCE_HEAD_SHA" HEAD
+          frozen_drift="$(git diff --name-only "$SOURCE_HEAD_SHA"...HEAD -- \
+            src/crypto_quant_bot/microstructure/ \
+            config/microstructure/order_book_l2_snapshot_engine_v1.json \
+            contracts/schemas/order_book_snapshot_raw_v1.schema.json \
+            contracts/schemas/order_book_snapshot_v1.schema.json \
+            contracts/schemas/book_health_state_v1.schema.json \
+            contracts/schemas/order_book_l2_snapshot_engine_state_v1.schema.json \
+            contracts/schemas/order_book_l2_snapshot_engine_audit_v1.schema.json \
+            tests/test_lot38_order_book_l2_snapshot_engine.py \
+            tests/test_lot38_branch_coverage.py \
+            tests/test_lot38_mutation_contracts.py \
+            tests/test_lot38_coverage_completion.py)"
+          test -z "$frozen_drift" || { echo "$frozen_drift"; exit 1; }
       - name: Baseline Lot 38 tests
         shell: bash
         run: |
@@ -118,8 +151,6 @@ jobs:
           (root / 'pyproject.toml').write_text(toml.dumps(config), encoding='utf-8')
           PY
       - name: Run mutation analysis and enforce score
-        env:
-          SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         shell: bash
         run: |
           set -euo pipefail
@@ -200,6 +231,9 @@ jobs:
           if score < 80.0:
               raise SystemExit('LOT38_MUTATION_SCORE_BELOW_THRESHOLD')
           PY
+          if git ls-files --error-unmatch reports/lot38/mutation_summary.json >/dev/null 2>&1; then
+            git diff --exit-code -- reports/lot38/mutation_summary.json
+          fi
       - name: Verify canonical source immutability
         run: |
           rm -rf .tmp-lot38-mutants
