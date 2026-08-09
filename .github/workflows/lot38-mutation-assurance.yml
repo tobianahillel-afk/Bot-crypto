@@ -31,6 +31,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       SOURCE_HEAD_SHA: b74bea4329d5e5cb7cf2452058b684ea5a5df13c
+      PYTHONHASHSEED: '0'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -150,14 +151,14 @@ jobs:
           }
           (root / 'pyproject.toml').write_text(toml.dumps(config), encoding='utf-8')
           PY
-      - name: Run mutation analysis and enforce score
+      - name: Run deterministic mutation analysis and enforce score
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p reports/lot38/mutation
           cd .tmp-lot38-mutants
           set +e
-          mutmut run 2>&1 | tee ../reports/lot38/mutation/run.txt
+          mutmut run --max-children 1 2>&1 | tee ../reports/lot38/mutation/run.txt
           run_status=${PIPESTATUS[0]}
           mutmut results 2>&1 | tee ../reports/lot38/mutation/results.txt
           results_status=${PIPESTATUS[0]}
@@ -211,6 +212,8 @@ jobs:
               'schema_version': 'lot38-mutation-summary-v1',
               'status': 'PASS' if score >= 80.0 else 'FAIL',
               'source_head_sha': os.environ['SOURCE_HEAD_SHA'],
+              'max_children': 1,
+              'python_hash_seed': os.environ['PYTHONHASHSEED'],
               'killed_mutants': killed,
               'timeout_mutants': timeout,
               'suspicious_mutants': suspicious,
