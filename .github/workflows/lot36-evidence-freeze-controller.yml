@@ -178,7 +178,8 @@ jobs:
           cp /tmp/lot36-canonical/reports/lot_36_freshness_gap_outage_audit_and_v3_closure_report.md reports/
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add data/audit/*lot36.json reports/lot36/coverage_summary.json reports/lot36/mutation_summary.json reports/lot_36_freshness_gap_outage_audit_and_v3_closure_report.md
+          git add -f data/audit/*lot36.json
+          git add reports/lot36/coverage_summary.json reports/lot36/mutation_summary.json reports/lot_36_freshness_gap_outage_audit_and_v3_closure_report.md
           git diff --cached --exit-code && exit 0
           git commit -m "Freeze Lot 36 exact-head validation evidence"
           git push origin HEAD:agent/lot36-v3-closure-implementation
