@@ -34,6 +34,7 @@ from .freshness_gap_outage_audit_and_v3_closure_validation import (
     V3ClosureError,
     duration_us,
     lot36_safety,
+    require_basis_points,
 )
 from .market_data_governance_scope_and_source_registry import (
     atomic_write_json,
@@ -43,6 +44,7 @@ from .market_data_governance_scope_and_source_registry import (
 )
 from .market_data_quality_engine import build_lot34_artifacts, detect_anomalies
 from .market_data_quality_engine_models import (
+    DataAnomalyV1,
     DataQualityStateV1,
     DataQualityVetoV1,
     MarketDataQualityEngineStateV1,
@@ -73,7 +75,7 @@ CONFIG_FIELDS = {
     "lot34_config_path",
     "required_lots",
 }
-LOT36_REASON_CODES = (
+COMMON_REASON_CODES = (
     "LOT36_ENTRY_GATE_VERIFIED",
     "CANONICAL_LOT36_ROADMAP_VERIFIED",
     "LOT34_QUALITY_REPLAY_VERIFIED",
@@ -142,7 +144,9 @@ def _verify_canonical_roadmap(root: Path, gate: dict[str, Any]) -> None:
     if any(record.get(field) != value for field, value in expected.items()):
         raise V3ClosureError("canonical Lot 36 roadmap identity changed")
     reference = gate.get("canonical_roadmap")
-    if not isinstance(reference, dict) or reference.get("source_blob_sha") != EXPECTED_ROADMAP_BLOB:
+    if not isinstance(reference, dict):
+        raise V3ClosureError("Lot 36 canonical roadmap binding missing")
+    if reference.get("source_blob_sha") != EXPECTED_ROADMAP_BLOB:
         raise V3ClosureError("Lot 36 gate lost canonical roadmap binding")
 
 
@@ -158,7 +162,8 @@ def _verify_historical_lifecycle(root: Path) -> None:
         raise V3ClosureError("historical Lot 35 lifecycle missing")
     if lot35.get("status") != "IMPLEMENTED_VALIDATED_RECONCILIATION_ONLY":
         raise V3ClosureError("historical Lot 35 status changed")
-    if lots.get("36") != {"implementation_started": False, "status": "PLANNED_LOCKED"}:
+    expected_lock = {"implementation_started": False, "status": "PLANNED_LOCKED"}
+    if lots.get("36") != expected_lock:
         raise V3ClosureError("Lot 36 historical lock changed")
 
 
@@ -217,11 +222,11 @@ def _record_order(record: dict[str, Any]) -> tuple[datetime, int, int, str]:
     )
 
 
-def _group_records(records: list[dict[str, Any]]) -> dict[tuple[str, str, str], list[dict[str, Any]]]:
+def _group_records(
+    records: list[dict[str, Any]],
+) -> dict[tuple[str, str, str], list[dict[str, Any]]]:
     grouped: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
     for record in records:
-        if not isinstance(record, dict):
-            raise V3ClosureError("Lot 36 quality record must be an object")
         parse_utc_timestamp(record.get("available_at"), "available_at")
         grouped.setdefault(_record_key(record), []).append(record)
     if not grouped:
@@ -244,10 +249,10 @@ def _matching_quality_state(
 
 def _interval_counts(
     ordered: list[dict[str, Any]], step_us: int, outage_multiplier: int
-) -> tuple[int, int, int, int]:
+) -> tuple[int, int, int, int, int]:
     unique_times = sorted({_record_order(record)[0] for record in ordered})
     if not unique_times:
-        return 0, 0, 0, 0
+        return 0, 0, 0, 0, 0
     expected = duration_us(unique_times[0], unique_times[-1]) // step_us + 1
     observed = len(unique_times)
     missing = max(expected - observed, 0)
@@ -281,6 +286,13 @@ def _freshness_reason_codes(
     return tuple(reasons)
 
 
+def _latest_record(ordered: list[dict[str, Any]]) -> dict[str, Any]:
+    return max(
+        ordered,
+        key=lambda record: parse_utc_timestamp(record["available_at"], "available_at"),
+    )
+
+
 def _freshness_evidence_for_group(
     key: tuple[str, str, str],
     records: list[dict[str, Any]],
@@ -294,10 +306,11 @@ def _freshness_evidence_for_group(
     step_seconds = timeframe_seconds.get(key[2])
     if not isinstance(step_seconds, int) or step_seconds <= 0:
         raise V3ClosureError(f"timeframe interval missing: {key[2]}")
-    expected, observed, missing, gaps, outages = _interval_counts(
+    counts = _interval_counts(
         ordered, step_seconds * MICROSECONDS_PER_SECOND, outage_multiplier
     )
-    latest = max(ordered, key=lambda record: parse_utc_timestamp(record["available_at"], "available_at"))
+    expected, observed, missing, gaps, outages = counts
+    latest = _latest_record(ordered)
     latest_event = parse_utc_timestamp(latest["event_time"], "event_time")
     latest_available = parse_utc_timestamp(latest["available_at"], "available_at")
     age_us = duration_us(latest_available, reference_time)
@@ -308,24 +321,12 @@ def _freshness_evidence_for_group(
     blocked = bool(missing or gaps or outages or stale or not quality_pass)
     freshness_bps = 0 if stale or quality_state is None else quality_state.freshness_bps
     return FreshnessGapOutageEvidenceV1(
-        source_id=key[0],
-        instrument_id=key[1],
-        timeframe=key[2],
-        record_count=len(records),
-        expected_interval_count=expected,
-        observed_interval_count=observed,
-        missing_interval_count=missing,
-        gap_count=gaps,
-        outage_count=outages,
-        stale_record_count=stale,
-        latest_event_time=latest_event.isoformat().replace("+00:00", "Z"),
-        latest_available_at=latest_available.isoformat().replace("+00:00", "Z"),
-        reference_time=reference_time.isoformat().replace("+00:00", "Z"),
-        freshness_age_us=age_us,
-        max_staleness_us=max_staleness_us,
-        freshness_bps=freshness_bps,
-        status="BLOCKED" if blocked else "PASS",
-        reason_codes=_freshness_reason_codes(missing, gaps, outages, stale, quality_known, quality_pass),
+        key[0], key[1], key[2], len(records), expected, observed, missing, gaps, outages,
+        stale, latest_event.isoformat().replace("+00:00", "Z"),
+        latest_available.isoformat().replace("+00:00", "Z"),
+        reference_time.isoformat().replace("+00:00", "Z"), age_us, max_staleness_us,
+        freshness_bps, "BLOCKED" if blocked else "PASS",
+        _freshness_reason_codes(missing, gaps, outages, stale, quality_known, quality_pass),
     )
 
 
@@ -339,7 +340,7 @@ def audit_freshness_gap_outage(
 ) -> tuple[FreshnessGapOutageEvidenceV1, ...]:
     reference = parse_utc_timestamp(reference_time, "reference_time")
     grouped = _group_records(records)
-    evidence = [
+    return tuple(
         _freshness_evidence_for_group(
             key,
             grouped[key],
@@ -350,17 +351,18 @@ def audit_freshness_gap_outage(
             outage_multiplier,
         )
         for key in sorted(grouped)
-    ]
-    return tuple(evidence)
+    )
 
 
 def _closure_quality_veto(
     quality_states: tuple[DataQualityStateV1, ...],
-    anomalies: tuple[Any, ...],
+    anomalies: tuple[DataAnomalyV1, ...],
     freshness: tuple[FreshnessGapOutageEvidenceV1, ...],
     minimum_quality_bps: int,
 ) -> DataQualityVetoV1:
-    quality_known = bool(quality_states) and all(state.status != "UNKNOWN" for state in quality_states)
+    quality_known = bool(quality_states) and all(
+        state.status != "UNKNOWN" for state in quality_states
+    )
     observed = min((state.quality_score_bps for state in quality_states), default=0)
     blocked = (
         not quality_known
@@ -369,7 +371,11 @@ def _closure_quality_veto(
         or any(item.status != "PASS" for item in freshness)
     )
     blocking_types = tuple(sorted({item.anomaly_type for item in anomalies}))
-    reasons = ("V3_CLOSURE_DATA_QUALITY_BLOCKED",) if blocked else ("V3_CLOSURE_DATA_QUALITY_PASS",)
+    reasons = (
+        ("V3_CLOSURE_DATA_QUALITY_BLOCKED",)
+        if blocked
+        else ("V3_CLOSURE_DATA_QUALITY_PASS",)
+    )
     return DataQualityVetoV1(
         action="BLOCK_ANALYSIS_OR_TRADING" if blocked else "ALLOW_ANALYSIS",
         quality_known=quality_known,
@@ -381,34 +387,30 @@ def _closure_quality_veto(
 
 
 def _build_manifest(ready: bool) -> ClosureManifestV1:
-    payload = {
+    closure_status = (
+        "CANDIDATE_VALIDATED_AWAITING_POST_MERGE_AUDIT" if ready else "BLOCKED"
+    )
+    reason_codes = (
+        "V3_CLOSURE_CANDIDATE_READY" if ready else "V3_CLOSURE_BLOCKED",
+        "POST_MERGE_AUDIT_REQUIRED",
+        "HUMAN_REVIEW_REQUIRED",
+        "LOT37_REMAINS_LOCKED",
+    )
+    payload: dict[str, Any] = {
         "schema_version": "closure-manifest-v1",
         "version_id": "V3_MARKET_DATA_GOVERNANCE",
         "lots_included": list(range(31, 37)),
-        "closure_status": "CANDIDATE_VALIDATED_AWAITING_POST_MERGE_AUDIT" if ready else "BLOCKED",
+        "closure_status": closure_status,
         "v3_closed": False,
         "post_merge_audit_required": True,
         "human_review_required": True,
         "next_lot": 37,
         "next_lot_status": "PLANNED_LOCKED",
-        "reason_codes": [
-            "V3_CLOSURE_CANDIDATE_READY" if ready else "V3_CLOSURE_BLOCKED",
-            "POST_MERGE_AUDIT_REQUIRED",
-            "HUMAN_REVIEW_REQUIRED",
-            "LOT37_REMAINS_LOCKED",
-        ],
+        "reason_codes": list(reason_codes),
     }
     return ClosureManifestV1(
-        version_id=payload["version_id"],
-        lots_included=tuple(payload["lots_included"]),
-        closure_status=payload["closure_status"],
-        v3_closed=False,
-        post_merge_audit_required=True,
-        human_review_required=True,
-        next_lot=37,
-        next_lot_status="PLANNED_LOCKED",
-        reason_codes=tuple(payload["reason_codes"]),
-        manifest_checksum=canonical_checksum(payload),
+        "V3_MARKET_DATA_GOVERNANCE", tuple(range(31, 37)), closure_status, False,
+        True, True, 37, "PLANNED_LOCKED", reason_codes, canonical_checksum(payload)
     )
 
 
@@ -426,14 +428,10 @@ def _build_validation_report(ready: bool) -> LotValidationReportV1:
 
 def _build_lineage(config: dict[str, Any]) -> Lot36LineageEnvelopeV1:
     return Lot36LineageEnvelopeV1(
-        lineage_id=config["lineage_id"],
-        entry_gate_checksum=EXPECTED_GATE_CHECKSUM,
-        canonical_roadmap_blob_sha=EXPECTED_ROADMAP_BLOB,
-        lot34_state_checksum=EXPECTED_LOT34_STATE_CHECKSUM,
-        lot34_audit_checksum=EXPECTED_LOT34_AUDIT_CHECKSUM,
-        lot35_state_checksum=EXPECTED_LOT35_STATE_CHECKSUM,
-        lot35_audit_checksum=EXPECTED_LOT35_AUDIT_CHECKSUM,
-        available_at=config["available_at"],
+        config["lineage_id"], EXPECTED_GATE_CHECKSUM, EXPECTED_ROADMAP_BLOB,
+        EXPECTED_LOT34_STATE_CHECKSUM, EXPECTED_LOT34_AUDIT_CHECKSUM,
+        EXPECTED_LOT35_STATE_CHECKSUM, EXPECTED_LOT35_AUDIT_CHECKSUM,
+        config["available_at"],
     )
 
 
@@ -441,27 +439,91 @@ def _build_metrics(
     records: list[dict[str, Any]],
     freshness: tuple[FreshnessGapOutageEvidenceV1, ...],
     anomaly_count: int,
+    ready: bool,
     config: dict[str, Any],
 ) -> Lot36MetricsV1:
     available = parse_utc_timestamp(config["available_at"], "available_at")
     generated = parse_utc_timestamp(config["generated_at"], "generated_at")
     return Lot36MetricsV1(
-        records_processed_total=len(records),
-        validation_failures_total=0,
-        gap_total=sum(item.gap_count for item in freshness),
-        outage_total=sum(item.outage_count for item in freshness),
-        stale_record_total=sum(item.stale_record_count for item in freshness),
-        anomaly_total=anomaly_count,
-        processing_latency_us=duration_us(available, generated),
+        len(records), 0 if ready else 1,
+        sum(item.gap_count for item in freshness),
+        sum(item.outage_count for item in freshness),
+        sum(item.stale_record_count for item in freshness),
+        anomaly_count, duration_us(available, generated),
     )
 
 
-def _quality_inputs(root: Path, config: dict[str, Any]) -> tuple[dict[str, Any], list[dict[str, Any]]]:
-    quality_config = load_json_object(root / require_text(config["lot34_config_path"], "lot34_config_path"))
+def _quality_inputs(
+    root: Path, config: dict[str, Any]
+) -> tuple[dict[str, Any], list[dict[str, Any]], dict[str, int]]:
+    path = root / require_text(config["lot34_config_path"], "lot34_config_path")
+    quality_config = load_json_object(path)
     records = quality_config.get("records")
-    if not isinstance(records, list) or any(not isinstance(item, dict) for item in records):
+    raw_intervals = quality_config.get("timeframe_seconds")
+    if not isinstance(records, list) or not all(isinstance(item, dict) for item in records):
         raise V3ClosureError("Lot 34 quality records unavailable for closure")
-    return quality_config, records
+    if not isinstance(raw_intervals, dict):
+        raise V3ClosureError("Lot 34 timeframe configuration missing")
+    intervals = {
+        require_identifier(key, "timeframe"): require_integer(value, "interval", minimum=1)
+        for key, value in raw_intervals.items()
+    }
+    return quality_config, [dict(item) for item in records], intervals
+
+
+def _closure_ready(
+    quality_veto: DataQualityVetoV1,
+    lot35_state: CandleTradeBookReconciliationStateV1,
+    freshness: tuple[FreshnessGapOutageEvidenceV1, ...],
+    anomalies: tuple[DataAnomalyV1, ...],
+) -> bool:
+    return (
+        quality_veto.action == "ALLOW_ANALYSIS"
+        and lot35_state.veto.action == "ALLOW_ANALYSIS"
+        and all(item.status == "PASS" for item in freshness)
+        and not anomalies
+    )
+
+
+def _build_state(
+    config: dict[str, Any],
+    code_commit: str,
+    lot34_state: MarketDataQualityEngineStateV1,
+    lot35_state: CandleTradeBookReconciliationStateV1,
+    records: list[dict[str, Any]],
+    freshness: tuple[FreshnessGapOutageEvidenceV1, ...],
+    anomalies: tuple[DataAnomalyV1, ...],
+    quality_veto: DataQualityVetoV1,
+) -> FreshnessGapOutageAuditV3ClosureStateV1:
+    ready = _closure_ready(quality_veto, lot35_state, freshness, anomalies)
+    state = FreshnessGapOutageAuditV3ClosureStateV1(
+        Lot36RunContextV1(config["run_id"], "DATA_GOVERNANCE_ONLY", config["config_version"], code_commit, config["correlation_id"]),
+        _build_lineage(config), config["event_time"], config["available_at"], config["generated_at"],
+        "VALIDATED_V3_CLOSURE_CANDIDATE" if ready else "BLOCKED_V3_CLOSURE",
+        freshness, lot34_state.quality_states, anomalies, quality_veto, lot35_state.veto,
+        _build_validation_report(ready), _build_manifest(ready),
+        _build_metrics(records, freshness, len(anomalies), ready, config),
+        (*COMMON_REASON_CODES, "V3_CLOSURE_CANDIDATE_READY" if ready else "V3_CLOSURE_BLOCKED"),
+        lot36_safety(), "0" * 64,
+    )
+    return replace(state, output_checksum=canonical_checksum(state.payload_without_checksum()))
+
+
+def _build_audit(
+    state: FreshnessGapOutageAuditV3ClosureStateV1,
+    code_commit: str,
+    config_path: Path,
+) -> FreshnessGapOutageAuditV3ClosureAuditV1:
+    audit = FreshnessGapOutageAuditV3ClosureAuditV1(
+        code_commit, state.output_checksum, file_checksum(config_path),
+        state.closure_manifest.manifest_checksum,
+        EXPECTED_LOT34_STATE_CHECKSUM, EXPECTED_LOT34_AUDIT_CHECKSUM,
+        EXPECTED_LOT35_STATE_CHECKSUM, EXPECTED_LOT35_AUDIT_CHECKSUM,
+        len(state.freshness_audits), len(state.anomalies),
+        state.data_quality_veto.action, state.reconciliation_veto.action,
+        state.validation_state, lot36_safety(), "0" * 64,
+    )
+    return replace(audit, audit_checksum=canonical_checksum(audit.payload_without_checksum()))
 
 
 def build_lot36_artifacts(
@@ -474,104 +536,45 @@ def build_lot36_artifacts(
     config = load_json_object(config_path)
     _validate_config(config)
     lot34_state, lot35_state = _replay_previous_lots(root)
-    quality_config, records = _quality_inputs(root, config)
+    quality_config, records, intervals = _quality_inputs(root, config)
     anomalies = detect_anomalies(quality_config)
     if anomalies != lot34_state.anomalies:
         raise V3ClosureError("Lot 34 anomaly replay diverged during V3 closure")
-    timeframe_seconds = quality_config.get("timeframe_seconds")
-    if not isinstance(timeframe_seconds, dict):
-        raise V3ClosureError("Lot 34 timeframe configuration missing")
     freshness = audit_freshness_gap_outage(
-        records,
-        lot34_state.quality_states,
-        timeframe_seconds,
-        config["freshness_reference_time"],
+        records, lot34_state.quality_states, intervals, config["freshness_reference_time"],
         require_integer(config["max_staleness_seconds"], "max_staleness_seconds", minimum=0),
         require_integer(config["outage_interval_multiplier"], "outage_interval_multiplier", minimum=2),
     )
-    quality_veto = _closure_quality_veto(
-        lot34_state.quality_states,
-        anomalies,
-        freshness,
-        require_integer(quality_config["minimum_quality_bps"], "minimum_quality_bps", minimum=0),
-    )
-    ready = quality_veto.action == "ALLOW_ANALYSIS" and lot35_state.veto.action == "ALLOW_ANALYSIS"
-    ready = ready and all(item.status == "PASS" for item in freshness) and not anomalies
-    manifest = _build_manifest(ready)
-    report = _build_validation_report(ready)
-    state = FreshnessGapOutageAuditV3ClosureStateV1(
-        run_context=Lot36RunContextV1(
-            config["run_id"],
-            "DATA_GOVERNANCE_ONLY",
-            config["config_version"],
-            code_commit,
-            config["correlation_id"],
-        ),
-        lineage=_build_lineage(config),
-        event_time=config["event_time"],
-        available_at=config["available_at"],
-        generated_at=config["generated_at"],
-        validation_state="VALIDATED_V3_CLOSURE_CANDIDATE" if ready else "BLOCKED_V3_CLOSURE",
-        freshness_audits=freshness,
-        quality_states=lot34_state.quality_states,
-        anomalies=anomalies,
-        data_quality_veto=quality_veto,
-        reconciliation_veto=lot35_state.veto,
-        validation_report=report,
-        closure_manifest=manifest,
-        metrics=_build_metrics(records, freshness, len(anomalies), config),
-        reason_codes=LOT36_REASON_CODES,
-        safety=lot36_safety(),
-        output_checksum="0" * 64,
-    )
-    state = replace(state, output_checksum=canonical_checksum(state.payload_without_checksum()))
-    audit = FreshnessGapOutageAuditV3ClosureAuditV1(
-        code_commit=code_commit,
-        state_output_checksum=state.output_checksum,
-        config_checksum=file_checksum(config_path),
-        closure_manifest_checksum=manifest.manifest_checksum,
-        lot34_state_checksum=EXPECTED_LOT34_STATE_CHECKSUM,
-        lot34_audit_checksum=EXPECTED_LOT34_AUDIT_CHECKSUM,
-        lot35_state_checksum=EXPECTED_LOT35_STATE_CHECKSUM,
-        lot35_audit_checksum=EXPECTED_LOT35_AUDIT_CHECKSUM,
-        freshness_audit_count=len(freshness),
-        anomaly_count=len(anomalies),
-        data_quality_veto_action=quality_veto.action,
-        reconciliation_veto_action=lot35_state.veto.action,
-        validation_state=state.validation_state,
-        safety=lot36_safety(),
-        audit_checksum="0" * 64,
-    )
-    audit = replace(audit, audit_checksum=canonical_checksum(audit.payload_without_checksum()))
-    return state, audit
+    minimum = require_basis_points(quality_config["minimum_quality_bps"], "minimum_quality_bps")
+    quality_veto = _closure_quality_veto(lot34_state.quality_states, anomalies, freshness, minimum)
+    state = _build_state(config, code_commit, lot34_state, lot35_state, records, freshness, anomalies, quality_veto)
+    return state, _build_audit(state, code_commit, config_path)
 
 
 def build_replay_evidence(root: Path, code_commit: str) -> ReplayEvidenceV1:
     run1, _ = build_lot36_artifacts(root, code_commit)
     run2, _ = build_lot36_artifacts(root, code_commit)
     match = run1.output_checksum == run2.output_checksum
-    payload = {
+    replay_status = "REPLAY_MATCH" if match else "REPLAY_DIVERGENCE"
+    reason_codes = (
+        "LOT36_DETERMINISTIC_REPLAY_MATCH" if match else "LOT36_NON_DETERMINISTIC_REPLAY",
+    )
+    payload: dict[str, Any] = {
         "schema_version": "replay-evidence-v1",
         "run1_checksum": run1.output_checksum,
         "run2_checksum": run2.output_checksum,
-        "replay_status": "REPLAY_MATCH" if match else "REPLAY_DIVERGENCE",
+        "replay_status": replay_status,
         "match": match,
-        "reason_codes": ["LOT36_DETERMINISTIC_REPLAY_MATCH" if match else "LOT36_NON_DETERMINISTIC_REPLAY"],
+        "reason_codes": list(reason_codes),
     }
     return ReplayEvidenceV1(
-        run1_checksum=run1.output_checksum,
-        run2_checksum=run2.output_checksum,
-        replay_status=payload["replay_status"],
-        match=match,
-        reason_codes=tuple(payload["reason_codes"]),
-        replay_checksum=canonical_checksum(payload),
+        run1.output_checksum, run2.output_checksum, replay_status, match,
+        reason_codes, canonical_checksum(payload),
     )
 
 
-def write_lot36_artifacts(root: Path, code_commit: str) -> dict[str, str]:
-    state, audit = build_lot36_artifacts(root, code_commit)
-    replay = build_replay_evidence(root, code_commit)
-    outputs = {
+def _output_paths(root: Path) -> dict[str, Path]:
+    return {
         "state": root / "data/audit/freshness_gap_outage_audit_and_v3_closure_lot36.json",
         "audit": root / "data/audit/freshness_gap_outage_audit_and_v3_closure_audit_lot36.json",
         "quality_states": root / "data/audit/data_quality_states_lot36.json",
@@ -580,6 +583,12 @@ def write_lot36_artifacts(root: Path, code_commit: str) -> dict[str, str]:
         "replay": root / "data/audit/replay_evidence_lot36.json",
         "manifest": root / "data/audit/closure_manifest_lot36.json",
     }
+
+
+def write_lot36_artifacts(root: Path, code_commit: str) -> dict[str, str]:
+    state, audit = build_lot36_artifacts(root, code_commit)
+    replay = build_replay_evidence(root, code_commit)
+    outputs = _output_paths(root)
     atomic_write_json(outputs["state"], state.to_dict())
     atomic_write_json(outputs["audit"], audit.to_dict())
     atomic_write_json(outputs["quality_states"], {"schema_version": "data-quality-state-collection-v1", "records": [item.to_dict() for item in state.quality_states]})
