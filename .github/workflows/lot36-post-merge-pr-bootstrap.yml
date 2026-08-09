@@ -34,6 +34,9 @@ jobs:
           raw = text[start:end]
           prefix = '          '
           code = '\n'.join(line[len(prefix):] if line.startswith(prefix) else line for line in raw.splitlines()) + '\n'
+          gate_marker = "\ngate = ROOT / '.github/workflows/lot36-entry-gate.yml'\n"
+          if gate_marker in code:
+              code = code[:code.index(gate_marker)] + '\n'
           compile(code, '<lot36-audit-builder>', 'exec')
           Path('/tmp/lot36_audit_builder.py').write_text(code, encoding='utf-8')
           PY
