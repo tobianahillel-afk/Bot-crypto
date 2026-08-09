@@ -4,11 +4,15 @@ from __future__ import annotations
 import argparse
 import json
 import subprocess
+import sys
 from pathlib import Path
 
-from crypto_quant_bot.microstructure import write_lot37_artifacts
-
 ROOT = Path(__file__).resolve().parents[1]
+SOURCE_ROOT = ROOT / "src"
+if str(SOURCE_ROOT) not in sys.path:
+    sys.path.insert(0, str(SOURCE_ROOT))
+
+from crypto_quant_bot.microstructure import write_lot37_artifacts  # noqa: E402
 
 
 def current_commit(root: Path) -> str:
