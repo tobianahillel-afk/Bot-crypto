@@ -1,4 +1,4 @@
-# Crypto Quant Bot V3.4-Ops
+# Crypto Quant Bot V3.5-Ops
 
 Plateforme quantitative crypto défensive, déterministe, extensible et auditable.
 
@@ -6,10 +6,10 @@ Plateforme quantitative crypto défensive, déterministe, extensible et auditabl
 
 | Élément | État |
 |---|---|
-| Dernier lot implémenté et validé | **Lot 34 — Market Data Quality Engine** |
-| Version | **0.34.0** |
+| Dernier lot implémenté et validé | **Lot 35 — Candle / Trade / Book Reconciliation** |
+| Version | **0.35.0** |
 | Baseline qualité | **P0 institutionnel fusionné** |
-| Prochain lot planifié | **Lot 35 — Candle / Trade / Book Reconciliation**, `PLANNED_LOCKED` |
+| Prochain lot planifié | **Lot 36**, `PLANNED_LOCKED` |
 | Runtime maximal | `DATA_GOVERNANCE_ONLY` |
 | Trading | **désactivé** |
 | Connectivité exchange | **désactivée** |
@@ -54,6 +54,8 @@ de base, applique une quarantaine non destructive et un veto fail-closed. Les pr
 certifiées sont 98.80% lignes, 97.30% branches et 84.00% mutation. Le raw reste immuable,
 le réseau reste désactivé et aucune capacité de trading n'est ouverte.
 
+Le Lot 35 ajoute la **réconciliation Candle / Trade / Book** offline : deltas exacts en `Decimal`, écarts temporels en microsecondes entières, source de vérité explicite, classification `MATCH/TOLERATED_DIFF/MINOR_DIVERGENCE/CRITICAL_DIVERGENCE`, détection des orphelins et doublons, ordre canonique déterministe et veto fail-closed. La fixture certifiée contient 3 rapports (2 `MATCH`, 1 `TOLERATED_DIFF`) et conserve `ALLOW_ANALYSIS`; aucune connectivité, mutation raw ou capacité de trading/exécution n’est ouverte. Les preuves finales sont 96.43% lignes, 93.75% branches et 83.73% mutation.
+
 ## Vision temporelle
 
 Le système cible un flux de marché canonique unique et continu, plusieurs représentations
@@ -93,7 +95,7 @@ est interdit.
 ## Flux continu et données confirmées
 
 Une barre ouverte peut être observée comme état provisoire, mais elle ne peut pas être
-consommée comme état confirmé. Les Lots 31 à 34 restent dans un périmètre de gouvernance
+consommée comme état confirmé. Les Lots 31 à 35 restent dans un périmètre de gouvernance
 offline : registre de sources, instruments canoniques, temps canonique et qualité des données.
 Le Lot 35 possède la réconciliation candle/trade/book et le Lot 36 la fermeture V3 avec les
 audits de freshness/gap/outage. Les features de carnet, trades, liquidations et order flow
@@ -105,7 +107,7 @@ La roadmap prévoit des prévisions par horizons distincts — initialement 30s,
 1h — avec distributions, quantiles, volatilité, target/stop hit, MAE/MFE, temps avant
 événement et incertitude.
 
-Ces contrats sont `PLANNED_LOCKED_NOT_IMPLEMENTED`. Les Lots 26 à 34 ne produisent aucune
+Ces contrats sont `PLANNED_LOCKED_NOT_IMPLEMENTED`. Les Lots 26 à 35 ne produisent aucune
 prediction, probability, expected return ou direction BUY/SELL.
 
 Les futurs modèles stochastiques devront être sélectionnés par preuve, comparés à des
@@ -195,6 +197,9 @@ python scripts/validate_lot33_no_connectivity.py
 python scripts/validate_lot34.py
 python scripts/validate_lot34_no_connectivity.py
 python scripts/validate_lot34_post_merge.py
+python scripts/validate_lot35.py
+python scripts/validate_lot35_no_connectivity.py
+python scripts/validate_lot35_post_merge.py
 python scripts/validate_roadmap_documentation.py
 python scripts/validate_architecture_boundaries.py
 python scripts/check_no_silent_numeric_coercion.py
@@ -297,6 +302,21 @@ complexité, mutation testing et répétitions anti-flake.
 - Anomalies : `data/audit/data_anomalies_lot34.json`
 - Veto qualité : `data/audit/data_quality_veto_lot34.json`
 - Lifecycle courant : `data/audit/roadmap_lifecycle_overlay_lot34.json`
+
+### Lot 35
+
+- [Gate d’entrée](docs/LOT_35_V3_ENTRY_GATE.md)
+- [Spécification](docs/LOT_35_CANDLE_TRADE_BOOK_RECONCILIATION.md)
+- [Critères d’acceptation](docs/ACCEPTANCE_CRITERIA_LOT_35.md)
+- [Audit post-merge](docs/LOT_35_POST_MERGE_AUDIT.md)
+- [Rapport final](reports/lot_35_candle_trade_book_reconciliation_report.md)
+- État certifié : `data/audit/candle_trade_book_reconciliation_lot35.json`
+- Audit certifié : `data/audit/candle_trade_book_reconciliation_audit_lot35.json`
+- Rapports de réconciliation : `data/audit/reconciliation_reports_lot35.json`
+- Veto réconciliation : `data/audit/reconciliation_veto_lot35.json`
+- Coverage : `reports/lot35/coverage_summary.json`
+- Mutation : `reports/lot35/mutation_summary.json`
+- Lifecycle courant : `data/audit/roadmap_lifecycle_overlay_lot35.json`
 
 ### Architecture future verrouillée
 
