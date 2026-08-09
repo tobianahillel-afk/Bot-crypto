@@ -1,0 +1,29 @@
+{
+  "audit_checksum": "0290637591e1a8c4cd7a9975868932b65afa28fb75d6843340dbeea67a682d20",
+  "code_commit": "b74bea4329d5e5cb7cf2452058b684ea5a5df13c",
+  "config_checksum": "60899c1393e111315395dd0e149f3a468972e9e99ca5a1322b8a97ec786497db",
+  "entry_gate_checksum": "29fe4a5fd14b3bce95e3016fce67e10f94edcca1c2aad60c9fda382f3eb9d6a0",
+  "health_checksum": "58b56f7cf21aa74dd67620b8dd6e19cad11b77412cdcc3103b6d60bd15703837",
+  "input_fixture_checksum": "f3715a14e8f04395b9ca5b514ac01ff8fcf924b82812f3388fdf500d6ecf5ece",
+  "safety": {
+    "analysis_only": true,
+    "approved_size": 0,
+    "execution_allowed": false,
+    "external_connectivity_allowed": false,
+    "market_event_publication_allowed": false,
+    "network_ingestion_allowed": false,
+    "order_routing_allowed": false,
+    "participant_behavior_inference_explicitly_labeled": true,
+    "raw_data_mutation_allowed": false,
+    "real_credentials_allowed": false,
+    "risk_approval_allowed": false,
+    "scenario_score_is_signal": false,
+    "signal_generation_allowed": false,
+    "trade_allowed": false,
+    "used_for_decision": false
+  },
+  "schema_version": "order-book-l2-snapshot-engine-audit-v1",
+  "snapshot_checksum": "0d63ca7ac1ca48b44e58c0b0f1eb8946190eaf2da6745c2bbd2dd8de14f49b16",
+  "state_output_checksum": "7610fc6ea73e49075a1b8611f8344c7b9c8fcf8ab02f55612d914eeac0ccda9b",
+  "validation_state": "VALIDATED_OFFLINE_L2_SNAPSHOT_ONLY"
+}
