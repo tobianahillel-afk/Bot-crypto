@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "microstructure-offline-l2-input-v1.schema.json",
+  "title": "MicrostructureOfflineL2InputV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source_id", "venue", "canonical_instrument_id", "market_type", "event_time", "available_at", "sequence_id", "bids", "asks", "lineage_id", "used_for_decision"],
+  "properties": {
+    "schema_version": {"const": "microstructure-offline-l2-input-v1"},
+    "source_id": {"type": "string", "minLength": 1},
+    "venue": {"type": "string", "minLength": 1},
+    "canonical_instrument_id": {"type": "string", "minLength": 1},
+    "market_type": {"type": "string", "minLength": 1},
+    "event_time": {"type": "string", "minLength": 1},
+    "available_at": {"type": "string", "minLength": 1},
+    "sequence_id": {"type": "integer", "minimum": 0},
+    "bids": {"type": "array", "items": {"$ref": "#/$defs/level"}},
+    "asks": {"type": "array", "items": {"$ref": "#/$defs/level"}},
+    "lineage_id": {"type": "string", "minLength": 1},
+    "used_for_decision": {"const": false}
+  },
+  "$defs": {
+    "level": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["price", "quantity"],
+      "properties": {
+        "price": {"type": "string", "pattern": "^[0-9]+(?:\\.[0-9]+)?$"},
+        "quantity": {"type": "string", "pattern": "^[0-9]+(?:\\.[0-9]+)?$"}
+      }
+    }
+  }
+}
