@@ -13,7 +13,7 @@ lot39_status=PLANNED_LOCKED
 runtime_mode=OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY
 ```
 
-This document is an independent governance-only audit of the merged Lot 38 implementation. It changes no certified Lot 38 production source, contract, schema, configuration or test and does not authorize Lot 39 implementation.
+This document is an independent post-merge audit of the merged Lot 38 implementation. It changes no certified Lot 38 production source, contract, schema or configuration and does not authorize Lot 39 implementation. One post-merge test-harness remediation is included: the persistence coverage test now restores pre-existing frozen audit artifacts after exercising atomic writes instead of deleting those committed artifacts from the shared test workspace. This changes no Lot 38 production behavior, checksum, acceptance threshold or frozen implementation evidence.
 
 ## Certified lineage
 
@@ -102,6 +102,16 @@ Additional final-head workflows:
 - roadmap documentation validation `31340658944`: PASS;
 - Lot 26 historical foundation validation `31340658954`: PASS;
 - Lot 37 historical mutation assurance `31340658950`: PASS.
+
+## Post-merge compatibility remediation
+
+The independent audit identified two historical-CI assumptions that were valid during Lot 37/Lot 38 implementation but invalid after a later release advances:
+
+1. `validate_lot37_post_merge.py` required the *current* `pyproject.toml` version to remain exactly `0.37.0`. It now validates the frozen certified release identity `0.37.0` from immutable Lot 37 lineage/evidence instead of preventing future release bumps.
+2. Lot 38 implementation/mutation workflows required future PRs to retain the original Lot 38 entry-gate base or to rerun a historical mutation campaign against a changing repository. They now attest the merged source/evidence ancestry and exact frozen mutation result without weakening the historical `80%` threshold.
+3. `test_write_lot38_artifacts_persists_exact_four_documents` previously deleted committed frozen Lot 38 artifacts in its cleanup. It now backs up and restores any pre-existing artifacts, making full-suite execution hermetic while preserving the same persistence assertions.
+
+These changes are CI/test-governance remediations only. The production engine, contracts, schemas, config, deterministic outputs and certified quality evidence remain unchanged.
 
 ## Security and semantic boundary
 
