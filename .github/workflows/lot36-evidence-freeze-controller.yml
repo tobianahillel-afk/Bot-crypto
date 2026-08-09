@@ -3,6 +3,8 @@ name: Lot 36 evidence freeze controller
 on:
   push:
     branches: [agent/lot36-evidence-controller]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
