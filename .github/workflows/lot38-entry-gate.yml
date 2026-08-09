@@ -51,6 +51,12 @@ jobs:
           python -m json.tool contracts/schemas/lot38_v4_entry_gate_v1.schema.json >/dev/null
           ruff check scripts/validate_lot38_entry_gate.py tests/test_lot38_v4_entry_gate.py
           mypy src/crypto_quant_bot
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          row = json.loads(Path('data/audit/product_scope_roadmap_lot21.jsonl').read_text(encoding='utf-8').splitlines()[38])
+          print('LOT38_CANONICAL_ROW=' + json.dumps(row, sort_keys=True, ensure_ascii=False))
+          PY
           python -m scripts.validate_lot38_entry_gate
       - name: Architecture roadmap traceability and engineering gates
         run: |
