@@ -2,9 +2,9 @@
 
 ## Status
 
-`EVIDENCE_PENDING_EXACT_SOURCE_HEAD`
+`PASS_FROZEN_IMPLEMENTATION_EVIDENCE`
 
-This report documents the implementation candidate only. It is not final certification and does not authorize Lot 39.
+The Lot 38 implementation candidate has frozen deterministic evidence against the exact certified source head below. This report does **not** authorize Lot 39; Lot 39 remains `PLANNED_LOCKED` until Lot 38 is merged, independently audited post-merge, and a separate Lot 39 entry gate is approved.
 
 ## Authorized base
 
@@ -12,8 +12,11 @@ This report documents the implementation candidate only. It is not final certifi
 - gate checksum: `29fe4a5fd14b3bce95e3016fce67e10f94edcca1c2aad60c9fda382f3eb9d6a0`
 - owner: `MicrostructureDomain`
 - runtime: `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY`
+- certified source head: `b74bea4329d5e5cb7cf2452058b684ea5a5df13c`
 
-## Implemented candidate
+All post-source commits are restricted to CI/evidence/reporting controls. The Lot 38 validation, mutation and frozen-evidence workflows reject drift in the frozen source/config/contracts/tests boundary.
+
+## Implemented scope
 
 The candidate adds:
 
@@ -22,15 +25,15 @@ The candidate adds:
 - immutable dataclasses using `Decimal` for all level values;
 - explicit Lot37-fixture → `OrderBookSnapshotRawV1` mapping;
 - exact duplicate-price aggregation;
-- canonical bid/ask sorting;
-- crossed/explicit-locked validation;
+- canonical bid-descending / ask-ascending ordering;
+- crossed-book rejection and explicit LOCKED equality semantics;
 - configured published-depth capping with source/normalized depth preservation;
 - deterministic sequence anchor, snapshot checksum and health checksum;
 - fail-closed state/audit safety maps;
 - atomic persistence of four artifacts;
-- deterministic replay validator;
+- deterministic replay validation;
 - AST-based no-connectivity validation;
-- behavioral, boundary and mutation-oriented tests.
+- behavioral, boundary, branch-coverage and mutation-oriented tests.
 
 ## Explicitly not implemented
 
@@ -38,15 +41,15 @@ The candidate adds:
 - live data ingestion;
 - delta application or sequence reconstruction;
 - gap repair/resynchronization;
-- Lot40 desynchronization engine;
+- Lot 40 desynchronization engine;
 - spread/depth/imbalance feature engine;
 - order flow, aggressor classification or CVD;
 - liquidity inference, participant intent or game theory;
 - forecast, signal, risk approval, routing, trading or execution.
 
-## Reference evidence target
+## Frozen reference state
 
-For the unchanged Lot37 L2 fixture with published depth 2, the expected reference state is:
+For the unchanged Lot37 L2 fixture with published depth 2:
 
 ```text
 records_processed=1
@@ -61,26 +64,104 @@ published_ask_depth=2
 venue_state=OPEN
 health_status=HEALTHY
 crossed=false
+locked=false
+sequence_present=true
 latency_measurement_status=NOT_MEASURED_OFFLINE_DETERMINISTIC_REPLAY
 ```
 
-## Quality evidence
-
-Not frozen yet. Required before promotion:
+Published reference levels:
 
 ```text
-line_coverage >= 95%
-branch_coverage >= 90%
-mutation_score >= 80%
-anti_flake_repetitions >= 3
-full_regression = PASS
-institutional_gates = PASS
-no_connectivity = PASS
+bids = [(50024.9, 0.8), (50024.8, 1.25)]
+asks = [(50025.1, 0.7), (50025.2, 1.1)]
+sequence_id = 1001
+sequence_anchor = 9d5b399044b6fcdbacd6e30e4a7c975638c039cf1afb6d5c7df3ee5515c6aa24
 ```
 
-The final report must replace this section with the exact certified source head, workflow runs/digests, generated artifact checksums and measured scores. No threshold reduction or mutation exclusion may be used to manufacture PASS.
+## Frozen artifact checksums
 
-## Safety target
+```text
+state_output_checksum = 7610fc6ea73e49075a1b8611f8344c7b9c8fcf8ab02f55612d914eeac0ccda9b
+audit_checksum        = 0290637591e1a8c4cd7a9975868932b65afa28fb75d6843340dbeea67a682d20
+snapshot_checksum     = 0d63ca7ac1ca48b44e58c0b0f1eb8946190eaf2da6745c2bbd2dd8de14f49b16
+health_checksum       = 58b56f7cf21aa74dd67620b8dd6e19cad11b77412cdcc3103b6d60bd15703837
+config_checksum       = 60899c1393e111315395dd0e149f3a468972e9e99ca5a1322b8a97ec786497db
+input_fixture_sha256  = f3715a14e8f04395b9ca5b514ac01ff8fcf924b82812f3388fdf500d6ecf5ece
+```
+
+The committed files are:
+
+- `data/audit/order_book_l2_snapshot_engine_lot38.json`
+- `data/audit/order_book_l2_snapshot_engine_audit_lot38.json`
+- `data/audit/order_book_snapshot_lot38.json`
+- `data/audit/book_health_state_lot38.json`
+- `reports/lot38/coverage_summary.json`
+- `reports/lot38/mutation_summary.json`
+
+## Coverage and validation evidence
+
+Frozen-source validation run:
+
+```text
+workflow_run_id = 31340219343
+artifact_id     = 9045596613
+artifact_digest = sha256:ae5c0772daca0c80e6aadc0df6b4e14b53ffb89ea2144aac3918dcff93f0cf31
+source_head     = b74bea4329d5e5cb7cf2452058b684ea5a5df13c
+line_coverage   = 99.61%
+branch_coverage = 99.35%
+anti_flake      = 3
+status          = PASS
+```
+
+That workflow also passed deterministic generation/replay, exact source ancestry, lint/type/schema checks, roadmap/architecture/traceability/engineering controls, no-connectivity validation, dependency/security checks and the full regression suite.
+
+The committed coverage summary is regenerated by CI and diff-checked against the frozen file.
+
+## Mutation evidence and reproducibility
+
+The original parallel mutation campaign was not accepted as canonical evidence because concurrent mutmut workers could race on tests that exercise the four shared canonical artifact paths. The final campaign is deliberately serialized and hash-seed pinned:
+
+```text
+mutmut_max_children = 1
+PYTHONHASHSEED       = 0
+mutants_total        = 1232
+mutants_evaluated    = 1232
+killed               = 1006
+survived             = 226
+timeout               = 0
+suspicious            = 0
+mutation_score        = 81.66%
+minimum_required      = 80.00%
+status                = PASS
+```
+
+Two consecutive executions against the same frozen source produced byte-identical `mutation_summary.json` files (summary SHA-256 `167e3680de6618f307df24307cfb2c9cbe419b8befd834e76e7be2a9343b93f8`):
+
+```text
+workflow_run_id = 31340219359
+serial_artifact_1 = 9045605823
+serial_digest_1   = sha256:b2cfdf6e354b19cbd62cb6451c7be581eb7c5bd5a1ae7a2935b839563bbaab0a
+serial_artifact_2 = 9045647528
+serial_digest_2   = sha256:ad5f413a4b24bc41c5b89fe0eaaa720e07d9ff3eba521eb3970e20517e8fe441
+```
+
+The artifact ZIP digests differ because workflow-produced logs/metadata differ between executions; the canonical mutation summary itself is byte-identical and is the committed evidence object.
+
+## Frozen evidence attestation
+
+The dedicated `Lot 38 frozen evidence attestation` workflow independently verifies that:
+
+- no `src/` drift occurred after the certified source head;
+- no Lot 38 config/schema/test/acceptance-contract drift occurred after the certified source head;
+- all four canonical artifact checksums recompute exactly;
+- state/audit/snapshot/health reconcile exactly;
+- the gate checksum and runtime boundary remain exact;
+- coverage and mutation summaries match the certified source and thresholds;
+- no-connectivity and institutional governance validators remain PASS.
+
+A successful attestation was obtained on the committed frozen evidence before this report finalization. The final PR head must pass the same attestation again after this report-only change before merge.
+
+## Safety boundary
 
 ```text
 analysis_only=true
@@ -90,6 +171,8 @@ network_ingestion_allowed=false
 real_credentials_allowed=false
 market_event_publication_allowed=false
 raw_data_mutation_allowed=false
+participant_behavior_inference_explicitly_labeled=true
+scenario_score_is_signal=false
 signal_generation_allowed=false
 risk_approval_allowed=false
 order_routing_allowed=false
@@ -98,6 +181,8 @@ execution_allowed=false
 approved_size=0
 ```
 
+No score, snapshot health result or technical PASS grants permission to trade or execute.
+
 ## Promotion rule
 
-The implementation is not mergeable until a single exact source head passes all applicable CI, the generated evidence is frozen against that head, the frozen evidence is independently revalidated with zero subsequent production drift, and no review finding remains unresolved. Lot 39 stays `PLANNED_LOCKED` throughout this process.
+PR #41 may be merged only if its final exact head passes all applicable workflows, including frozen-evidence attestation, Lot 38 validation, deterministic mutation assurance, institutional gates and historical compatibility checks, with no unresolved review finding. After merge, an **independent Lot 38 post-merge audit** is mandatory. Lot 39 remains `PLANNED_LOCKED` until that audit passes and a separate Lot 39 entry gate is approved.
