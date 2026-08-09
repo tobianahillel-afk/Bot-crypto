@@ -1,0 +1,89 @@
+name: Extract canonical Lot 36 record
+
+on:
+  push:
+    branches:
+      - agent/lot36-record-extract
+    paths:
+      - .github/workflows/extract-lot36-record.yml
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Extract Lot 36 from canonical roadmap
+        run: |
+          python - <<'PY'
+          from __future__ import annotations
+
+          import json
+          from pathlib import Path
+
+          source = Path("data/audit/product_scope_roadmap_lot21.jsonl")
+          target = Path("tmp/lot36_canonical_record.json")
+          matches: list[tuple[int, object]] = []
+
+          def has_lot36(value: object) -> bool:
+              if isinstance(value, dict):
+                  for key, item in value.items():
+                      normalized = str(key).lower().replace("-", "_")
+                      if "lot" in normalized and (item == 36 or item == "36"):
+                          return True
+                      if has_lot36(item):
+                          return True
+              elif isinstance(value, list):
+                  return any(has_lot36(item) for item in value)
+              return False
+
+          for lineno, raw_line in enumerate(source.read_text(encoding="utf-8").splitlines(), start=1):
+              if not raw_line.strip():
+                  continue
+              try:
+                  payload = json.loads(raw_line)
+              except json.JSONDecodeError:
+                  continue
+              serialized = json.dumps(payload, ensure_ascii=False)
+              title_hit = "Feature & Dataset Registry" in serialized
+              lot_hit = has_lot36(payload)
+              if title_hit or lot_hit:
+                  matches.append((lineno, payload))
+
+          title_matches = [item for item in matches if "Feature & Dataset Registry" in json.dumps(item[1], ensure_ascii=False)]
+          selected = title_matches if title_matches else matches
+          if len(selected) != 1:
+              raise SystemExit(f"Expected exactly one Lot 36 record, found {len(selected)} candidates: {[line for line, _ in selected]}")
+
+          lineno, payload = selected[0]
+          target.parent.mkdir(parents=True, exist_ok=True)
+          target.write_text(
+              json.dumps(
+                  {
+                      "source_path": str(source),
+                      "source_line": lineno,
+                      "source_blob_sha": "84de51bda788a8d124fb7d344419c4a4b12030b5",
+                      "record": payload,
+                  },
+                  ensure_ascii=False,
+                  indent=2,
+                  sort_keys=True,
+              ) + "\n",
+              encoding="utf-8",
+          )
+          print(target.read_text(encoding="utf-8"))
+          PY
+
+      - name: Commit extracted record on temporary branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tmp/lot36_canonical_record.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: extract canonical Lot 36 roadmap record"
+          git push origin HEAD:agent/lot36-record-extract
