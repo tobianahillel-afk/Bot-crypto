@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import crypto_quant_bot.data_governance.freshness_gap_outage_audit_and_v3_closure as closure
@@ -96,7 +96,7 @@ def test_output_paths_are_exact_and_all_remain_under_audit_directory() -> None:
 
 
 def test_validation_primitives_accept_exact_boundaries() -> None:
-    start = datetime(2026, 8, 9, tzinfo=timezone.utc)
+    start = datetime(2026, 8, 9, tzinfo=UTC)
     assert duration_us(start, start) == 0
     assert duration_us(start, start + timedelta(microseconds=1)) == 1
     assert duration_us(start, start + timedelta(seconds=1)) == 1_000_000
