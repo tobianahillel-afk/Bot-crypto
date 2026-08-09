@@ -180,7 +180,13 @@ def _validate_config(config: dict[str, Any]) -> None:
     require_integer(config.get("max_input_age_us"), "max_input_age_us", minimum=1)
 
 
-def _verify_fixture(root: Path, path_text: str, expected_checksum: str, reference: str, max_age_us: int) -> dict[str, Any]:
+def _verify_fixture(
+    root: Path,
+    path_text: str,
+    expected_checksum: str,
+    reference: str,
+    max_age_us: int,
+) -> dict[str, Any]:
     path = root / path_text
     if file_checksum(path) != expected_checksum:
         raise MicrostructureScopeValidationError(f"offline fixture checksum changed: {path_text}")
@@ -189,8 +195,12 @@ def _verify_fixture(root: Path, path_text: str, expected_checksum: str, referenc
         raise MicrostructureScopeValidationError("offline availability evidence cannot be canonical")
     if fixture.get("used_for_decision") is not False:
         raise MicrostructureScopeValidationError("offline availability evidence cannot be decision data")
-    event = parse_utc_timestamp(require_text(fixture.get("event_time"), "fixture event_time"), "fixture event_time")
-    available = parse_utc_timestamp(require_text(fixture.get("available_at"), "fixture available_at"), "fixture available_at")
+    event = parse_utc_timestamp(
+        require_text(fixture.get("event_time"), "fixture event_time"), "fixture event_time"
+    )
+    available = parse_utc_timestamp(
+        require_text(fixture.get("available_at"), "fixture available_at"), "fixture available_at"
+    )
     reference_time = parse_utc_timestamp(reference, "input_reference_time")
     if not event <= available <= reference_time:
         raise MicrostructureScopeValidationError("offline fixture violates causal availability")
@@ -199,7 +209,9 @@ def _verify_fixture(root: Path, path_text: str, expected_checksum: str, referenc
     return fixture
 
 
-def _verify_offline_inputs(root: Path, config: dict[str, Any], gate: dict[str, Any]) -> tuple[str, str]:
+def _verify_offline_inputs(
+    root: Path, config: dict[str, Any], gate: dict[str, Any]
+) -> tuple[str, str]:
     prerequisites = gate.get("prerequisites")
     if not isinstance(prerequisites, dict):
         raise MicrostructureScopeValidationError("Lot 37 gate prerequisites missing")
@@ -223,7 +235,9 @@ def _verify_offline_inputs(root: Path, config: dict[str, Any], gate: dict[str, A
     return l2_checksum, trade_checksum
 
 
-def _build_contract_registry(root: Path, config: dict[str, Any]) -> MicrostructureScopeOfflineDataContractsContractRegistryV1:
+def _build_contract_registry(
+    root: Path, config: dict[str, Any]
+) -> MicrostructureScopeOfflineDataContractsContractRegistryV1:
     entries = tuple(
         sorted(
             (
@@ -254,7 +268,9 @@ def _build_contract_registry(root: Path, config: dict[str, Any]) -> Microstructu
     )
 
 
-def _build_capability_matrix(config: dict[str, Any]) -> MicrostructureScopeOfflineDataContractsCapabilityMatrixV1:
+def _build_capability_matrix(
+    config: dict[str, Any]
+) -> MicrostructureScopeOfflineDataContractsCapabilityMatrixV1:
     entries = tuple(
         sorted(
             (
@@ -281,7 +297,8 @@ def _build_capability_matrix(config: dict[str, Any]) -> MicrostructureScopeOffli
 
 def _validate_capability_matrix(entries: tuple[CapabilityMatrixEntryV1, ...]) -> None:
     by_id = {item.capability_id: item for item in entries}
-    if set(by_id) != EXPECTED_REQUIRED_CAPABILITIES | set(EXPECTED_FUTURE_LOTS) | EXPECTED_FORBIDDEN_CAPABILITIES:
+    expected = EXPECTED_REQUIRED_CAPABILITIES | set(EXPECTED_FUTURE_LOTS) | EXPECTED_FORBIDDEN_CAPABILITIES
+    if set(by_id) != expected:
         raise MicrostructureScopeValidationError("Lot 37 capability matrix membership changed")
     if any(by_id[name].classification != "REQUIRED" for name in EXPECTED_REQUIRED_CAPABILITIES):
         raise MicrostructureScopeValidationError("Lot 37 required scope capability disabled")
@@ -319,13 +336,102 @@ def _build_metrics(
     public_api: tuple[PublicApiEntryV1, ...],
     config: dict[str, Any],
 ) -> Lot37MetricsV1:
-    counts = {kind: sum(item.classification == kind for item in matrix.entries) for kind in ("REQUIRED", "DISABLED", "FORBIDDEN")}
-    available = parse_utc_timestamp(require_text(config.get("available_at"), "available_at"), "available_at")
-    generated = parse_utc_timestamp(require_text(config.get("generated_at"), "generated_at"), "generated_at")
-    return Lot37MetricsV1(
-        len(registry.entries), len(matrix.entries), counts["REQUIRED"], counts["DISABLED"],
-        counts["FORBIDDEN"], len(public_api), 2, 0, duration_us(available, generated)
+    counts = {
+        kind: sum(item.classification == kind for item in matrix.entries)
+        for kind in ("REQUIRED", "DISABLED", "FORBIDDEN")
+    }
+    available = parse_utc_timestamp(
+        require_text(config.get("available_at"), "available_at"), "available_at"
     )
+    generated = parse_utc_timestamp(
+        require_text(config.get("generated_at"), "generated_at"), "generated_at"
+    )
+    return Lot37MetricsV1(
+        len(registry.entries),
+        len(matrix.entries),
+        counts["REQUIRED"],
+        counts["DISABLED"],
+        counts["FORBIDDEN"],
+        len(public_api),
+        2,
+        0,
+        duration_us(available, generated),
+    )
+
+
+def _build_run_context(config: dict[str, Any], code_commit: str) -> Lot37RunContextV1:
+    return Lot37RunContextV1(
+        require_text(config.get("run_id"), "run_id"),
+        "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+        require_text(config.get("config_version"), "config_version"),
+        code_commit,
+        require_text(config.get("correlation_id"), "correlation_id"),
+    )
+
+
+def _build_lineage(
+    config: dict[str, Any], l2_checksum: str, trade_checksum: str
+) -> Lot37LineageEnvelopeV1:
+    return Lot37LineageEnvelopeV1(
+        require_text(config.get("lineage_id"), "lineage_id"),
+        EXPECTED_GATE_CHECKSUM,
+        EXPECTED_V3_AUDIT_COMMIT,
+        EXPECTED_LOT36_STATE_CHECKSUM,
+        EXPECTED_LOT36_AUDIT_CHECKSUM,
+        l2_checksum,
+        trade_checksum,
+        require_text(config.get("available_at"), "available_at"),
+    )
+
+
+def _build_state(
+    config: dict[str, Any],
+    code_commit: str,
+    l2_checksum: str,
+    trade_checksum: str,
+    registry: MicrostructureScopeOfflineDataContractsContractRegistryV1,
+    matrix: MicrostructureScopeOfflineDataContractsCapabilityMatrixV1,
+    public_api: tuple[PublicApiEntryV1, ...],
+) -> MicrostructureScopeOfflineDataContractsStateV1:
+    state = MicrostructureScopeOfflineDataContractsStateV1(
+        _build_run_context(config, code_commit),
+        _build_lineage(config, l2_checksum, trade_checksum),
+        require_text(config.get("event_time"), "event_time"),
+        require_text(config.get("available_at"), "available_at"),
+        require_text(config.get("generated_at"), "generated_at"),
+        "VALIDATED_OFFLINE_CONTRACT_SCOPE",
+        registry,
+        matrix,
+        public_api,
+        _build_metrics(registry, matrix, public_api, config),
+        COMMON_REASON_CODES,
+        lot37_safety(),
+        "0" * 64,
+    )
+    checksum = canonical_checksum(state.payload_without_checksum())
+    return replace(state, output_checksum=checksum)
+
+
+def _build_audit(
+    config_path: Path,
+    code_commit: str,
+    state: MicrostructureScopeOfflineDataContractsStateV1,
+    registry: MicrostructureScopeOfflineDataContractsContractRegistryV1,
+    matrix: MicrostructureScopeOfflineDataContractsCapabilityMatrixV1,
+) -> MicrostructureScopeOfflineDataContractsAuditV1:
+    audit = MicrostructureScopeOfflineDataContractsAuditV1(
+        code_commit,
+        state.output_checksum,
+        file_checksum(config_path),
+        EXPECTED_GATE_CHECKSUM,
+        canonical_checksum(registry.to_dict()),
+        canonical_checksum(matrix.to_dict()),
+        state.validation_state,
+        lot37_safety(),
+        "0" * 64,
+    )
+    checksum = canonical_checksum(audit.payload_without_checksum())
+    return replace(audit, audit_checksum=checksum)
 
 
 def build_lot37_artifacts(
@@ -340,49 +446,10 @@ def build_lot37_artifacts(
     registry = _build_contract_registry(root, config)
     matrix = _build_capability_matrix(config)
     public_api = _build_public_api(config)
-    state = MicrostructureScopeOfflineDataContractsStateV1(
-        Lot37RunContextV1(
-            require_text(config.get("run_id"), "run_id"),
-            "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
-            require_text(config.get("config_version"), "config_version"),
-            code_commit,
-            require_text(config.get("correlation_id"), "correlation_id"),
-        ),
-        Lot37LineageEnvelopeV1(
-            require_text(config.get("lineage_id"), "lineage_id"),
-            EXPECTED_GATE_CHECKSUM,
-            EXPECTED_V3_AUDIT_COMMIT,
-            EXPECTED_LOT36_STATE_CHECKSUM,
-            EXPECTED_LOT36_AUDIT_CHECKSUM,
-            l2_checksum,
-            trade_checksum,
-            require_text(config.get("available_at"), "available_at"),
-        ),
-        require_text(config.get("event_time"), "event_time"),
-        require_text(config.get("available_at"), "available_at"),
-        require_text(config.get("generated_at"), "generated_at"),
-        "VALIDATED_OFFLINE_CONTRACT_SCOPE",
-        registry,
-        matrix,
-        public_api,
-        _build_metrics(registry, matrix, public_api, config),
-        COMMON_REASON_CODES,
-        lot37_safety(),
-        "0" * 64,
+    state = _build_state(
+        config, code_commit, l2_checksum, trade_checksum, registry, matrix, public_api
     )
-    state = replace(state, output_checksum=canonical_checksum(state.payload_without_checksum()))
-    audit = MicrostructureScopeOfflineDataContractsAuditV1(
-        code_commit,
-        state.output_checksum,
-        file_checksum(config_path),
-        EXPECTED_GATE_CHECKSUM,
-        canonical_checksum(registry.to_dict()),
-        canonical_checksum(matrix.to_dict()),
-        state.validation_state,
-        lot37_safety(),
-        "0" * 64,
-    )
-    return state, replace(audit, audit_checksum=canonical_checksum(audit.payload_without_checksum()))
+    return state, _build_audit(config_path, code_commit, state, registry, matrix)
 
 
 def _output_paths(root: Path) -> dict[str, Path]:
