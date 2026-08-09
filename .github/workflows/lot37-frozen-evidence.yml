@@ -1,0 +1,64 @@
+name: Lot 37 frozen evidence attestation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'data/audit/microstructure_*lot37.json'
+      - 'reports/lot37/**'
+      - 'reports/lot_37_microstructure_scope_and_offline_data_contracts_report.md'
+      - 'scripts/validate_lot37_frozen_evidence.py'
+      - '.github/workflows/lot37-frozen-evidence.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  evidence:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+      - name: Prove evidence-only ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_HEAD=59b189e9980772245993a9212b6c8ad5e9a88a00
+          git merge-base --is-ancestor "$SOURCE_HEAD" HEAD
+          changed_src="$(git diff --name-only "$SOURCE_HEAD"...HEAD -- src/ || true)"
+          test -z "$changed_src" || {
+            echo 'LOT37_SOURCE_CHANGED_AFTER_CERTIFIED_HEAD'
+            echo "$changed_src"
+            exit 1
+          }
+      - name: Validate frozen canonical artifacts
+        run: |
+          python scripts/validate_lot37_frozen_evidence.py
+          python scripts/validate_lot37.py --expected-code-commit 59b189e9980772245993a9212b6c8ad5e9a88a00
+      - name: Validate evidence JSON syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          for path in \
+            data/audit/microstructure_scope_and_offline_data_contracts_lot37.json \
+            data/audit/microstructure_scope_and_offline_data_contracts_audit_lot37.json \
+            data/audit/microstructure_contract_registry_lot37.json \
+            data/audit/microstructure_capability_matrix_lot37.json \
+            reports/lot37/coverage_summary.json \
+            reports/lot37/mutation_summary.json; do
+            python -m json.tool "$path" >/dev/null
+          done
+      - name: Recheck institutional governance
+        run: |
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/validate_traceability_contract.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
