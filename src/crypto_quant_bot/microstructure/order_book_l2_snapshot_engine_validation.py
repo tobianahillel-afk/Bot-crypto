@@ -118,6 +118,20 @@ def validate_reason_codes(reason_codes: tuple[str, ...]) -> None:
             raise OrderBookL2SnapshotValidationError("invalid reason code")
 
 
+def validate_lot38_run_context(
+    run_id: str,
+    runtime_mode: str,
+    config_version: str,
+    code_commit: str,
+    correlation_id: str,
+) -> None:
+    require_text(run_id, "run_id")
+    validate_runtime_mode(runtime_mode)
+    require_text(config_version, "config_version")
+    require_git_sha(code_commit, "code_commit")
+    require_text(correlation_id, "correlation_id")
+
+
 def lot38_safety() -> dict[str, object]:
     return {
         "analysis_only": True,
