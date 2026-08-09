@@ -1,10 +1,7 @@
 from __future__ import annotations
 
 import json
-import subprocess
 from pathlib import Path
-
-import pytest
 
 from scripts.validate_lot38_post_merge import (
     EVIDENCE_HEAD,
@@ -14,32 +11,6 @@ from scripts.validate_lot38_post_merge import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-CERTIFIED_ARTIFACTS = (
-    "data/audit/order_book_l2_snapshot_engine_lot38.json",
-    "data/audit/order_book_l2_snapshot_engine_audit_lot38.json",
-    "data/audit/order_book_snapshot_lot38.json",
-    "data/audit/book_health_state_lot38.json",
-)
-
-
-def _restore_missing_certified_artifacts() -> None:
-    for relative_path in CERTIFIED_ARTIFACTS:
-        path = ROOT / relative_path
-        if path.exists():
-            continue
-        result = subprocess.run(
-            ["git", "show", f"{MERGED_COMMIT}:{relative_path}"],
-            cwd=ROOT,
-            check=True,
-            capture_output=True,
-        )
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(result.stdout)
-
-
-@pytest.fixture(autouse=True)
-def _certified_artifacts_available() -> None:
-    _restore_missing_certified_artifacts()
 
 
 def test_lot38_post_merge_validator_passes() -> None:
