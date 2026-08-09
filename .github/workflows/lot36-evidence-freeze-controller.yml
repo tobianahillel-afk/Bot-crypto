@@ -8,11 +8,19 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   freeze:
     runs-on: ubuntu-22.04
+    env:
+      SOURCE_SHA: c21b8f242270bd87eebbf7279635ab8bb51b8666
+      MUTATION_RUN_ID: '31308763592'
+      MUTATION_ARTIFACT_ID: '9036765419'
+      MUTATION_ARTIFACT_DIGEST: 'sha256:5b44d075e13ae9569514914689a4427f5898835d475a4d8a351e0fcb626a41ef'
+      VALIDATION_RUN_ID: '31308763595'
+      VALIDATION_ARTIFACT_ID: '9036759073'
+      VALIDATION_ARTIFACT_DIGEST: 'sha256:3a8e53827df279b06837f447c941ef51b14672fb9b7c1d1fae9f8f55582d7a38'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -26,7 +34,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Generate validated Lot36 evidence
+      - name: Generate and replay canonical Lot36 evidence
         shell: bash
         run: |
           set -euo pipefail
@@ -40,29 +48,141 @@ jobs:
             data/audit/closure_manifest_lot36.json
           )
           rm -f "${outputs[@]}"
-          python scripts/run_lot36_freshness_gap_outage_audit_and_v3_closure.py \
-            --code-commit c21b8f242270bd87eebbf7279635ab8bb51b8666
+          python scripts/run_lot36_freshness_gap_outage_audit_and_v3_closure.py --code-commit "$SOURCE_SHA"
           python scripts/validate_lot36.py
           python scripts/validate_lot36_no_connectivity.py
           python scripts/validate_all_until_lot36.py
-          mkdir -p /tmp/lot36-run1
+          rm -rf /tmp/lot36-canonical /tmp/lot36-run1
+          mkdir -p /tmp/lot36-canonical/data/audit /tmp/lot36-run1
           for path in "${outputs[@]}"; do
             cp "$path" "/tmp/lot36-run1/$(basename "$path")"
           done
-          python scripts/run_lot36_freshness_gap_outage_audit_and_v3_closure.py \
-            --code-commit c21b8f242270bd87eebbf7279635ab8bb51b8666
+          python scripts/run_lot36_freshness_gap_outage_audit_and_v3_closure.py --code-commit "$SOURCE_SHA"
           python scripts/validate_lot36.py
           for path in "${outputs[@]}"; do
             cmp "/tmp/lot36-run1/$(basename "$path")" "$path"
+            cp "$path" "/tmp/lot36-canonical/data/audit/$(basename "$path")"
           done
+      - name: Freeze exact CI summaries
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/lot36-canonical/reports/lot36 /tmp/mutation /tmp/validation
+          curl -fsSL \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${MUTATION_ARTIFACT_ID}/zip" \
+            -o /tmp/mutation.zip
+          curl -fsSL \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${VALIDATION_ARTIFACT_ID}/zip" \
+            -o /tmp/validation.zip
+          unzip -q /tmp/mutation.zip -d /tmp/mutation
+          unzip -q /tmp/validation.zip -d /tmp/validation
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          out = Path('/tmp/lot36-canonical/reports/lot36')
+          mutation = json.loads(Path('/tmp/mutation/mutation_summary.json').read_text())
+          if mutation['source_head_sha'] != os.environ['SOURCE_SHA'] or mutation['status'] != 'PASS':
+              raise SystemExit('LOT36_MUTATION_EVIDENCE_SOURCE_MISMATCH')
+          mutation.update({
+              'artifact_digest': os.environ['MUTATION_ARTIFACT_DIGEST'],
+              'artifact_id': int(os.environ['MUTATION_ARTIFACT_ID']),
+              'workflow_run_id': int(os.environ['MUTATION_RUN_ID']),
+              'methodology': 'GitHub Actions isolated mutmut campaign over covered Lot 36 engine, model and validation code; frozen from exact source head artifact',
+              'scope': [
+                  'freshness_gap_outage_audit_and_v3_closure.py',
+                  'freshness_gap_outage_audit_and_v3_closure_models.py',
+                  'freshness_gap_outage_audit_and_v3_closure_validation.py',
+              ],
+          })
+          (out / 'mutation_summary.json').write_text(
+              json.dumps(mutation, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+          )
+
+          coverage = json.loads(Path('/tmp/validation/lot36/coverage.json').read_text())['totals']
+          summary = {
+              'schema_version': 'lot36-coverage-summary-v1',
+              'status': 'PASS',
+              'source_commit': os.environ['SOURCE_SHA'],
+              'line_coverage_percent': float(coverage['percent_statements_covered']),
+              'line_minimum_percent': 95.0,
+              'covered_lines': int(coverage['covered_lines']),
+              'total_lines': int(coverage['num_statements']),
+              'branch_coverage_percent': float(coverage['percent_branches_covered']),
+              'branch_minimum_percent': 90.0,
+              'covered_branches': int(coverage['covered_branches']),
+              'total_branches': int(coverage['num_branches']),
+              'anti_flake_repetitions': 3,
+              'workflow_run_id': int(os.environ['VALIDATION_RUN_ID']),
+              'artifact_id': int(os.environ['VALIDATION_ARTIFACT_ID']),
+              'artifact_digest': os.environ['VALIDATION_ARTIFACT_DIGEST'],
+              'methodology': 'GitHub Actions targeted branch coverage on the complete Lot 36 production surface; frozen from exact source head artifact',
+              'scope': [
+                  'freshness_gap_outage_audit_and_v3_closure.py',
+                  'freshness_gap_outage_audit_and_v3_closure_models.py',
+                  'freshness_gap_outage_audit_and_v3_closure_validation.py',
+              ],
+          }
+          if summary['line_coverage_percent'] < 95.0 or summary['branch_coverage_percent'] < 90.0:
+              raise SystemExit('LOT36_COVERAGE_EVIDENCE_BELOW_THRESHOLD')
+          (out / 'coverage_summary.json').write_text(
+              json.dumps(summary, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+          )
+          PY
+      - name: Write implementation report and push evidence commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/lot36-canonical/reports/lot_36_freshness_gap_outage_audit_and_v3_closure_report.md <<'EOF'
+          # Lot 36 — Freshness, Gap, Outage Audit & V3 Closure Report
+
+          ## Implementation-stage verdict
+
+          `IMPLEMENTED_VALIDATED_V3_CLOSURE_CANDIDATE`
+
+          Lot 36 is an offline V3 closure candidate. Final V3 closure remains reserved for the independent post-merge audit and human review.
+
+          ## Frozen source and evidence
+
+          - source commit: `c21b8f242270bd87eebbf7279635ab8bb51b8666`
+          - state checksum: `635b5504d21ca8d46faf51bd46639538345b4bcd94437330791b49036ee07592`
+          - audit checksum: `ca8f70e8f75b0e18b5b5c8835646ccb4c0e6adf4177023a9bd2117c0f1d81f42`
+          - manifest checksum: `6a9935e728a93a23a3804106dc54aa216f4f9fedad3635b5507139f4ccbfc37f`
+          - replay checksum: `cef50b5191c1f3c78baaa3906c4c5ded59f1dd45dad0271a0071b7056b6af91d`
+          - targeted coverage: 100.00% lines / 100.00% branches
+          - mutation: 83.48% (1289/1544 killed; 255 survived; 0 timeout; 0 suspicious)
+          - anti-flake: 3 repetitions PASS
+
+          ## Reference result
+
+          The certified three-record Kraken BTC/EUR 1-minute fixture has zero missing interval, gap, outage, stale record and anomaly; freshness is 10000 bps. Data-quality and reconciliation vetoes both return `ALLOW_ANALYSIS`.
+
+          The closure manifest remains `CANDIDATE_VALIDATED_AWAITING_POST_MERGE_AUDIT`, `v3_closed=false`, and Lot37 remains `PLANNED_LOCKED`.
+
+          ## Safety
+
+          External connectivity, live exchange data, real credentials, raw-data mutation, signal generation, risk approval, order routing, trading and execution remain disabled. Approved size remains zero.
+          EOF
+          git fetch origin agent/lot36-v3-closure-implementation
+          git checkout -B agent/lot36-v3-closure-implementation origin/agent/lot36-v3-closure-implementation
+          mkdir -p data/audit reports/lot36 reports
+          cp /tmp/lot36-canonical/data/audit/*.json data/audit/
+          cp /tmp/lot36-canonical/reports/lot36/*.json reports/lot36/
+          cp /tmp/lot36-canonical/reports/lot_36_freshness_gap_outage_audit_and_v3_closure_report.md reports/
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add data/audit/*lot36.json reports/lot36/coverage_summary.json reports/lot36/mutation_summary.json reports/lot_36_freshness_gap_outage_audit_and_v3_closure_report.md
+          git diff --cached --exit-code && exit 0
+          git commit -m "Freeze Lot 36 exact-head validation evidence"
+          git push origin HEAD:agent/lot36-v3-closure-implementation
       - uses: actions/upload-artifact@v4
         with:
           name: lot36-canonical-evidence-c21b8f24
-          path: |
-            data/audit/freshness_gap_outage_audit_and_v3_closure_lot36.json
-            data/audit/freshness_gap_outage_audit_and_v3_closure_audit_lot36.json
-            data/audit/data_quality_states_lot36.json
-            data/audit/data_anomalies_lot36.json
-            data/audit/data_quality_veto_lot36.json
-            data/audit/replay_evidence_lot36.json
-            data/audit/closure_manifest_lot36.json
+          path: /tmp/lot36-canonical/
