@@ -1,0 +1,429 @@
+name: Prepare Lot 35 post-merge audit PR
+
+on:
+  push:
+    branches: [agent/lot35-audit-prep]
+    paths:
+      - '.github/workflows/lot35-audit-prep.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare-audit:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Pin exact merged implementation baseline
+        run: |
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = "d083d4f27c89759ebed37b2ecacccbe88dccad11"
+          git checkout -B agent/lot35-post-merge-audit origin/main
+      - name: Build independent Lot 35 audit package
+        run: |
+          python - <<'PY'
+          from __future__ import annotations
+          import copy
+          import json
+          import re
+          from pathlib import Path
+
+          ROOT = Path('.')
+          MERGED = 'd083d4f27c89759ebed37b2ecacccbe88dccad11'
+          EVIDENCE = '09701c7d5ebefbeba41143a2838564b09ea5fb3a'
+          IMPLEMENTATION = 'a4501bb0d400c6c1b5cf970fc5aa6456ad8c6ea8'
+          STATE = '8fc7243beffdf985fd6947557b87ab7bd27f9191520eb2d5d9af25d1e7a886b4'
+          AUDIT = '98a88396f5b2e5ffc1cde02435399540ad213f5ec361b33e8a19c08b0fedf1de'
+
+          def load(path: str):
+              return json.loads((ROOT / path).read_text(encoding='utf-8'))
+
+          def dump(path: str, payload: object):
+              target = ROOT / path
+              target.parent.mkdir(parents=True, exist_ok=True)
+              target.write_text(json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+
+          def replace_once(text: str, old: str, new: str, label: str) -> str:
+              if old not in text:
+                  raise SystemExit(f'LOT35_AUDIT_REPLACEMENT_MISSING:{label}')
+              return text.replace(old, new, 1)
+
+          state = load('data/audit/candle_trade_book_reconciliation_lot35.json')
+          audit = load('data/audit/candle_trade_book_reconciliation_audit_lot35.json')
+          if state['run_context']['code_commit'] != IMPLEMENTATION:
+              raise SystemExit('LOT35_IMPLEMENTATION_COMMIT_MISMATCH')
+          if state['output_checksum'] != STATE or audit['audit_checksum'] != AUDIT:
+              raise SystemExit('LOT35_CERTIFIED_CHECKSUM_MISMATCH')
+          if audit['state_output_checksum'] != STATE:
+              raise SystemExit('LOT35_STATE_AUDIT_LINK_MISMATCH')
+          if state['validation_state'] != 'VALIDATED_RECONCILIATION_ONLY':
+              raise SystemExit('LOT35_STATE_NOT_VALIDATED')
+          if state['veto']['action'] != 'ALLOW_ANALYSIS':
+              raise SystemExit('LOT35_REFERENCE_VETO_NOT_ALLOW_ANALYSIS')
+          for payload in (state, audit):
+              if payload['trade_allowed'] is not False or payload['execution_allowed'] is not False:
+                  raise SystemExit('LOT35_EXECUTION_BOUNDARY_CHANGED')
+              if payload['external_connectivity_allowed'] is not False or payload['approved_size'] != 0:
+                  raise SystemExit('LOT35_SAFETY_BOUNDARY_CHANGED')
+
+          coverage = {
+              'schema_version': 'lot35-coverage-summary-v1',
+              'status': 'PASS',
+              'evidence_commit': EVIDENCE,
+              'workflow_run_id': 31284931048,
+              'artifact_id': 9029508289,
+              'artifact_digest': 'sha256:64584097fe4d2136e497149ad6473ff8c9a6ce58ca7eb375187cd8ac5aa4c781',
+              'line_coverage_percent': 96.43,
+              'line_minimum_percent': 95.0,
+              'covered_lines': 486,
+              'total_lines': 504,
+              'branch_coverage_percent': 93.75,
+              'branch_minimum_percent': 90.0,
+              'covered_branches': 120,
+              'total_branches': 128,
+              'anti_flake_repetitions': 3,
+              'methodology': 'GitHub Actions targeted branch coverage on the complete Lot 35 production surface; frozen from exact PR head artifact',
+              'scope': [
+                  'candle_trade_book_reconciliation.py',
+                  'candle_trade_book_reconciliation_models.py',
+                  'candle_trade_book_reconciliation_validation.py',
+              ],
+          }
+          mutation = {
+              'schema_version': 'lot35-mutation-summary-v1',
+              'status': 'PASS',
+              'evidence_commit': EVIDENCE,
+              'workflow_run_id': 31284931041,
+              'artifact_id': 9029508744,
+              'artifact_digest': 'sha256:36a80853e7d3c3bbd4b0255e063ae4ecfe6314b82249f24eb736f8e1dc03bbfc',
+              'mutation_score_percent': 83.73,
+              'minimum_score_percent': 80.0,
+              'killed_mutants': 1029,
+              'evaluated_mutants': 1229,
+              'survived_mutants': 200,
+              'suspicious_mutants': 0,
+              'timeout_mutants': 0,
+              'methodology': 'GitHub Actions isolated mutmut campaign over covered Lot 35 engine, model and validation code; frozen from exact PR head artifact',
+              'scope': [
+                  'candle_trade_book_reconciliation.py',
+                  'candle_trade_book_reconciliation_models.py',
+                  'candle_trade_book_reconciliation_validation.py',
+              ],
+          }
+          dump('reports/lot35/coverage_summary.json', coverage)
+          dump('reports/lot35/mutation_summary.json', mutation)
+
+          previous = load('data/audit/roadmap_lifecycle_overlay_lot34.json')
+          overlay = copy.deepcopy(previous)
+          overlay['previous_overlay'] = 'data/audit/roadmap_lifecycle_overlay_lot34.json'
+          overlay['latest_implemented_lot'] = 35
+          overlay['lots']['35'] = {
+              'acceptance_contract': 'docs/ACCEPTANCE_CRITERIA_LOT_35.md',
+              'audit_artifact': 'data/audit/candle_trade_book_reconciliation_audit_lot35.json',
+              'config': 'config/data_governance/candle_trade_book_reconciliation_v1.json',
+              'execution_allowed': False,
+              'external_connectivity_allowed': False,
+              'implementation_commit': IMPLEMENTATION,
+              'implementation_contract': 'docs/LOT_35_CANDLE_TRADE_BOOK_RECONCILIATION.md',
+              'merged_commit': MERGED,
+              'network_ingestion_allowed': False,
+              'pull_request': 31,
+              'quality_coverage_evidence': 'reports/lot35/coverage_summary.json',
+              'quality_mutation_evidence': 'reports/lot35/mutation_summary.json',
+              'raw_data_mutation_allowed': False,
+              'report': 'reports/lot_35_candle_trade_book_reconciliation_report.md',
+              'reports_collection': 'data/audit/reconciliation_reports_lot35.json',
+              'runner': 'scripts/run_lot35_candle_trade_book_reconciliation.py',
+              'runtime_mode': 'DATA_GOVERNANCE_ONLY',
+              'state_artifact': 'data/audit/candle_trade_book_reconciliation_lot35.json',
+              'status': 'IMPLEMENTED_VALIDATED_RECONCILIATION_ONLY',
+              'trade_allowed': False,
+              'validator': 'scripts/validate_lot35.py',
+              'veto_artifact': 'data/audit/reconciliation_veto_lot35.json',
+          }
+          overlay['lots']['36'] = {'implementation_started': False, 'status': 'PLANNED_LOCKED'}
+          dump('data/audit/roadmap_lifecycle_overlay_lot35.json', overlay)
+
+          pyproject = ROOT / 'pyproject.toml'
+          text = pyproject.read_text(encoding='utf-8')
+          text = replace_once(text, 'version = "0.34.0"', 'version = "0.35.0"', 'pyproject-version')
+          text = replace_once(
+              text,
+              'Crypto Quant Bot V3.4-Ops — Lot 34 validated offline market-data quality governance',
+              'Crypto Quant Bot V3.5-Ops — Lot 35 validated offline candle/trade/book reconciliation',
+              'pyproject-description',
+          )
+          pyproject.write_text(text, encoding='utf-8')
+
+          readme = ROOT / 'README.md'
+          text = readme.read_text(encoding='utf-8')
+          text = replace_once(text, '# Crypto Quant Bot V3.4-Ops', '# Crypto Quant Bot V3.5-Ops', 'readme-title')
+          text = replace_once(
+              text,
+              '| Dernier lot implémenté et validé | **Lot 34 — Market Data Quality Engine** |',
+              '| Dernier lot implémenté et validé | **Lot 35 — Candle / Trade / Book Reconciliation** |',
+              'readme-current-lot',
+          )
+          text = replace_once(text, '| Version | **0.34.0** |', '| Version | **0.35.0** |', 'readme-version')
+          text = replace_once(
+              text,
+              '| Prochain lot planifié | **Lot 35 — Candle / Trade / Book Reconciliation**, `PLANNED_LOCKED` |',
+              '| Prochain lot planifié | **Lot 36**, `PLANNED_LOCKED` |',
+              'readme-next-lot',
+          )
+          lot35_paragraph = (
+              '\nLe Lot 35 ajoute la **réconciliation Candle / Trade / Book** offline : deltas exacts en '
+              '`Decimal`, écarts temporels en microsecondes entières, source de vérité explicite, '
+              'classification `MATCH/TOLERATED_DIFF/MINOR_DIVERGENCE/CRITICAL_DIVERGENCE`, '
+              'détection des orphelins et doublons, ordre canonique déterministe et veto fail-closed. '
+              'La fixture certifiée contient 3 rapports (2 `MATCH`, 1 `TOLERATED_DIFF`) et conserve '
+              '`ALLOW_ANALYSIS`; aucune connectivité, mutation raw ou capacité de trading/exécution '
+              'n’est ouverte. Les preuves finales sont 96.43% lignes, 93.75% branches et 83.73% mutation.\n'
+          )
+          anchor = "le réseau reste désactivé et aucune capacité de trading n'est ouverte.\n"
+          if 'Les preuves finales sont 96.43% lignes' not in text:
+              text = replace_once(text, anchor, anchor + lot35_paragraph, 'readme-lot35-paragraph')
+          text = text.replace('Les Lots 31 à 34 restent', 'Les Lots 31 à 35 restent')
+          text = text.replace('Les Lots 26 à 34 ne produisent', 'Les Lots 26 à 35 ne produisent')
+          validation_anchor = 'python scripts/validate_lot34_post_merge.py\n'
+          validation_add = (
+              validation_anchor
+              + 'python scripts/validate_lot35.py\n'
+              + 'python scripts/validate_lot35_no_connectivity.py\n'
+              + 'python scripts/validate_lot35_post_merge.py\n'
+          )
+          text = replace_once(text, validation_anchor, validation_add, 'readme-validation')
+          section = '''### Lot 35\n\n- [Gate d’entrée](docs/LOT_35_V3_ENTRY_GATE.md)\n- [Spécification](docs/LOT_35_CANDLE_TRADE_BOOK_RECONCILIATION.md)\n- [Critères d’acceptation](docs/ACCEPTANCE_CRITERIA_LOT_35.md)\n- [Audit post-merge](docs/LOT_35_POST_MERGE_AUDIT.md)\n- [Rapport final](reports/lot_35_candle_trade_book_reconciliation_report.md)\n- État certifié : `data/audit/candle_trade_book_reconciliation_lot35.json`\n- Audit certifié : `data/audit/candle_trade_book_reconciliation_audit_lot35.json`\n- Rapports de réconciliation : `data/audit/reconciliation_reports_lot35.json`\n- Veto réconciliation : `data/audit/reconciliation_veto_lot35.json`\n- Coverage : `reports/lot35/coverage_summary.json`\n- Mutation : `reports/lot35/mutation_summary.json`\n- Lifecycle courant : `data/audit/roadmap_lifecycle_overlay_lot35.json`\n\n'''
+          if '### Lot 35\n' not in text:
+              text = replace_once(text, '### Architecture future verrouillée\n', section + '### Architecture future verrouillée\n', 'readme-lot35-section')
+          readme.write_text(text, encoding='utf-8')
+
+          roadmap = ROOT / 'docs/ROADMAP_V1_TO_V21.md'
+          text = roadmap.read_text(encoding='utf-8')
+          text = replace_once(text, 'Projet : **Crypto Quant Bot V3.4-Ops**', 'Projet : **Crypto Quant Bot V3.5-Ops**', 'roadmap-title')
+          text = replace_once(text, "- Dernier lot dont l'implémentation est terminée : **Lot 34**.", "- Dernier lot dont l'implémentation est terminée : **Lot 35**.", 'roadmap-current')
+          text = replace_once(text, '- Version courante : `0.34.0`.', '- Version courante : `0.35.0`.', 'roadmap-version')
+          text = replace_once(
+              text,
+              '- Lot 34 : `IMPLEMENTED_VALIDATED_DATA_QUALITY_ONLY`.',
+              '- Lot 34 : `IMPLEMENTED_VALIDATED_DATA_QUALITY_ONLY`.\n- Lot 35 : `IMPLEMENTED_VALIDATED_RECONCILIATION_ONLY`.',
+              'roadmap-lot35-status',
+          )
+          text = replace_once(text, '- Lots 35–177 : planifiés et verrouillés.', '- Lots 36–177 : planifiés et verrouillés.', 'roadmap-future')
+          text = replace_once(
+              text,
+              '- V3 possède le registre de sources, le registre canonique d\'instruments, la gouvernance temporelle et le quality gate offline, sans connectivité ni ingestion.',
+              '- V3 possède le registre de sources, le registre canonique d\'instruments, la gouvernance temporelle, le quality gate et la réconciliation candle/trade/book offline, sans connectivité ni ingestion.',
+              'roadmap-v3-summary',
+          )
+          text = replace_once(text, 'data/audit/roadmap_lifecycle_overlay_lot34.json', 'data/audit/roadmap_lifecycle_overlay_lot35.json', 'roadmap-overlay')
+          lot35_section = '''## Lot 35\n\n- [Entry gate](LOT_35_V3_ENTRY_GATE.md)\n- [Specification](LOT_35_CANDLE_TRADE_BOOK_RECONCILIATION.md)\n- [Acceptance criteria](ACCEPTANCE_CRITERIA_LOT_35.md)\n- [Post-merge audit](LOT_35_POST_MERGE_AUDIT.md)\n- Configuration : `config/data_governance/candle_trade_book_reconciliation_v1.json`\n- State : `data/audit/candle_trade_book_reconciliation_lot35.json`\n- Audit : `data/audit/candle_trade_book_reconciliation_audit_lot35.json`\n- Reconciliation reports : `data/audit/reconciliation_reports_lot35.json`\n- Reconciliation veto : `data/audit/reconciliation_veto_lot35.json`\n- Report : `reports/lot_35_candle_trade_book_reconciliation_report.md`\n- Coverage evidence : `reports/lot35/coverage_summary.json`\n- Mutation evidence : `reports/lot35/mutation_summary.json`\n- Runner : `scripts/run_lot35_candle_trade_book_reconciliation.py`\n- Validator : `scripts/validate_lot35.py`\n- No-connectivity validator : `scripts/validate_lot35_no_connectivity.py`\n- Post-merge validator : `scripts/validate_lot35_post_merge.py`\n- Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot35.json`\n\n'''
+          if '## Lot 35\n' not in text:
+              text = replace_once(text, '## Séparations obligatoires\n', lot35_section + '## Séparations obligatoires\n', 'roadmap-lot35-section')
+          text = text.replace('Les Lots 26–34 n\'en produisent aucune.', 'Les Lots 26–35 n\'en produisent aucune.')
+          text = replace_once(
+              text,
+              "15. Lot 35 reste verrouillé après l'audit post-merge du Lot 34 jusqu'à un gate d'entrée distinct et une décision humaine explicite.",
+              "15. Lot 36 reste verrouillé après l'audit post-merge du Lot 35 jusqu'à un gate d'entrée distinct et une décision humaine explicite.",
+              'roadmap-progression-lock',
+          )
+          roadmap.write_text(text, encoding='utf-8')
+
+          gate_validator = ROOT / 'scripts/validate_lot35_entry_gate.py'
+          text = gate_validator.read_text(encoding='utf-8')
+          text = text.replace('import tomllib\n', '')
+          text = replace_once(
+              text,
+              '    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]\n    require(project["version"] == "0.34.0", "Lot 35 gate requires project version 0.34.0")\n',
+              '',
+              'lot35-gate-archival-version',
+          )
+          gate_validator.write_text(text, encoding='utf-8')
+
+          roadmap_validator = ROOT / 'scripts/validate_roadmap_documentation.py'
+          text = roadmap_validator.read_text(encoding='utf-8')
+          text = replace_once(text, 'roadmap_lifecycle_overlay_lot34.json', 'roadmap_lifecycle_overlay_lot35.json', 'validator-overlay')
+          release_marker = '}\nPORTFOLIO_RISK_FILES = ['
+          release_add = '''}\nREQUIRED_RELEASE_FILES[35] = [\n    "docs/LOT_35_CANDLE_TRADE_BOOK_RECONCILIATION.md",\n    "docs/LOT_35_POST_MERGE_AUDIT.md",\n    "data/audit/candle_trade_book_reconciliation_lot35.json",\n    "data/audit/candle_trade_book_reconciliation_audit_lot35.json",\n    "data/audit/reconciliation_reports_lot35.json",\n    "data/audit/reconciliation_veto_lot35.json",\n    "reports/lot35/coverage_summary.json",\n    "reports/lot35/mutation_summary.json",\n]\nPORTFOLIO_RISK_FILES = ['''
+          text = replace_once(text, release_marker, release_add, 'validator-release-files')
+          text = replace_once(text, 'overlay.get("latest_implemented_lot") == 34, "lifecycle latest lot must be 34"', 'overlay.get("latest_implemented_lot") == 35, "lifecycle latest lot must be 35"', 'validator-latest')
+          text = replace_once(text, 'overlay.get("previous_overlay") == "data/audit/roadmap_lifecycle_overlay_lot33.json",\n        "Lot 34 lifecycle predecessor mismatch",', 'overlay.get("previous_overlay") == "data/audit/roadmap_lifecycle_overlay_lot34.json",\n        "Lot 35 lifecycle predecessor mismatch",', 'validator-predecessor')
+          text = replace_once(text, '        "34": "IMPLEMENTED_VALIDATED_DATA_QUALITY_ONLY",\n', '        "34": "IMPLEMENTED_VALIDATED_DATA_QUALITY_ONLY",\n        "35": "IMPLEMENTED_VALIDATED_RECONCILIATION_ONLY",\n', 'validator-status')
+          lot35_checks = '''    lot35 = lots["35"]\n    require(lot35.get("merged_commit") == "d083d4f27c89759ebed37b2ecacccbe88dccad11", "Lot 35 merged commit mismatch")\n    require(lot35.get("external_connectivity_allowed") is False, "Lot 35 connectivity enabled")\n    require(lot35.get("network_ingestion_allowed") is False, "Lot 35 ingestion enabled")\n    require(lot35.get("raw_data_mutation_allowed") is False, "Lot 35 raw mutation enabled")\n'''
+          text = replace_once(text, '    require(lot34.get("raw_data_mutation_allowed") is False, "Lot 34 raw mutation enabled")\n', '    require(lot34.get("raw_data_mutation_allowed") is False, "Lot 34 raw mutation enabled")\n' + lot35_checks, 'validator-lot35-lifecycle')
+          old_lock = '''    require(\n        lots.get("35") == {"implementation_started": False, "status": "PLANNED_LOCKED"},\n        "Lot 35 must remain locked before its entry gate",\n    )\n'''
+          new_lock = '''    require(\n        lots.get("36") == {"implementation_started": False, "status": "PLANNED_LOCKED"},\n        "Lot 36 must remain locked before its entry gate",\n    )\n'''
+          text = replace_once(text, old_lock, new_lock, 'validator-next-lock')
+          lot35_validation = '''\n\ndef validate_lot35() -> None:\n    state = load_object(ROOT / "data/audit/candle_trade_book_reconciliation_lot35.json")\n    audit = load_object(ROOT / "data/audit/candle_trade_book_reconciliation_audit_lot35.json")\n    reports = load_object(ROOT / "data/audit/reconciliation_reports_lot35.json")\n    veto = load_object(ROOT / "data/audit/reconciliation_veto_lot35.json")\n    coverage = load_object(ROOT / "reports/lot35/coverage_summary.json")\n    mutation = load_object(ROOT / "reports/lot35/mutation_summary.json")\n    state_checksum = validate_payload_checksum(\n        state, "output_checksum",\n        "8fc7243beffdf985fd6947557b87ab7bd27f9191520eb2d5d9af25d1e7a886b4",\n        "Lot 35 state",\n    )\n    validate_payload_checksum(\n        audit, "audit_checksum",\n        "98a88396f5b2e5ffc1cde02435399540ad213f5ec361b33e8a19c08b0fedf1de",\n        "Lot 35 audit",\n    )\n    require(audit.get("state_output_checksum") == state_checksum, "Lot 35 audit link mismatch")\n    require(state.get("validation_state") == "VALIDATED_RECONCILIATION_ONLY", "Lot 35 state changed")\n    require(audit.get("validation_state") == "VALIDATED_RECONCILIATION_ONLY", "Lot 35 audit state changed")\n    require(reports.get("records") == state.get("reports"), "Lot 35 report collection mismatch")\n    require(veto == state.get("veto"), "Lot 35 veto artifact mismatch")\n    metrics = state.get("metrics")\n    require(isinstance(metrics, dict), "Lot 35 metrics missing")\n    require(metrics.get("lot_35_records_processed_total") == 3, "Lot 35 record count changed")\n    require(metrics.get("lot_35_match_total") == 2, "Lot 35 match count changed")\n    require(metrics.get("lot_35_tolerated_diff_total") == 1, "Lot 35 tolerated count changed")\n    require(metrics.get("lot_35_minor_divergence_total") == 0, "Lot 35 minor count changed")\n    require(metrics.get("lot_35_critical_divergence_total") == 0, "Lot 35 critical count changed")\n    require(state.get("veto", {}).get("action") == "ALLOW_ANALYSIS", "Lot 35 reference veto changed")\n    require(coverage.get("status") == "PASS", "Lot 35 coverage status changed")\n    require(coverage.get("evidence_commit") == "09701c7d5ebefbeba41143a2838564b09ea5fb3a", "Lot 35 coverage evidence commit changed")\n    require(coverage.get("line_coverage_percent") == 96.43, "Lot 35 line coverage changed")\n    require(coverage.get("branch_coverage_percent") == 93.75, "Lot 35 branch coverage changed")\n    require(coverage.get("anti_flake_repetitions") == 3, "Lot 35 anti-flake evidence changed")\n    require(mutation.get("status") == "PASS", "Lot 35 mutation status changed")\n    require(mutation.get("evidence_commit") == "09701c7d5ebefbeba41143a2838564b09ea5fb3a", "Lot 35 mutation evidence commit changed")\n    require(mutation.get("mutation_score_percent") == 83.73, "Lot 35 mutation score changed")\n    require(mutation.get("killed_mutants") == 1029, "Lot 35 killed mutants changed")\n    require(mutation.get("evaluated_mutants") == 1229, "Lot 35 evaluated mutants changed")\n    validate_fail_closed((state, audit), "Lot 35")\n'''
+          text = replace_once(text, '\n\ndef validate_portfolio_risk_standard() -> None:\n', lot35_validation + '\n\ndef validate_portfolio_risk_standard() -> None:\n', 'validator-lot35-function')
+          text = replace_once(text, '        validate_lot34()\n        validate_portfolio_risk_standard()', '        validate_lot34()\n        validate_lot35()\n        validate_portfolio_risk_standard()', 'validator-call-lot35')
+          text = replace_once(text, 'historical_lots=178 lifecycle_latest=34 status=POST_MERGE_AUDITED next_locked=35', 'historical_lots=178 lifecycle_latest=35 status=POST_MERGE_AUDITED next_locked=36', 'validator-summary')
+          roadmap_validator.write_text(text, encoding='utf-8')
+
+          audit_doc = f'''# Lot 35 — Independent Post-Merge Audit\n\n## Verdict\n\n`GO_LOT35_POST_MERGE`\n\n- Exact implementation squash merge: `{MERGED}`\n- Frozen implementation code commit: `{IMPLEMENTATION}`\n- Exact CI evidence head: `{EVIDENCE}`\n- State checksum: `{STATE}`\n- Audit checksum: `{AUDIT}`\n- Line coverage: `96.43%` (minimum `95%`)\n- Branch coverage: `93.75%` (minimum `90%`)\n- Mutation: `83.73%` = `1029 / 1229` killed (minimum `80%`)\n- Anti-flake: `3` repetitions PASS\n- Validation artifact: run `31284931048`, artifact `9029508289`, digest `sha256:64584097fe4d2136e497149ad6473ff8c9a6ce58ca7eb375187cd8ac5aa4c781`\n- Mutation artifact: run `31284931041`, artifact `9029508744`, digest `sha256:36a80853e7d3c3bbd4b0255e063ae4ecfe6314b82249f24eb736f8e1dc03bbfc`\n\nThis audit is governance/release-only and introduces no production `src/` change. Lot 36 remains `PLANNED_LOCKED` with `implementation_started=false`. External connectivity, raw-data mutation, trading and execution remain disabled.\n'''
+          (ROOT / 'docs/LOT_35_POST_MERGE_AUDIT.md').write_text(audit_doc, encoding='utf-8')
+          matrix = f'''# Lot 35 — Post-Merge Validation Matrix\n\n| Control | Evidence | Verdict |\n|---|---|---|\n| Exact implementation merge | `{MERGED}` | PASS |\n| Exact CI evidence head | `{EVIDENCE}` | PASS |\n| State checksum | `{STATE}` | PASS |\n| Audit checksum | `{AUDIT}` | PASS |\n| Line coverage ≥ 95% | 96.43% | PASS |\n| Branch coverage ≥ 90% | 93.75% | PASS |\n| Mutation ≥ 80% | 83.73% (1029/1229) | PASS |\n| Anti-flake | 3 repetitions | PASS |\n| Reference reports | 3 = 2 MATCH + 1 TOLERATED_DIFF | PASS |\n| Reference veto | ALLOW_ANALYSIS | PASS |\n| Runtime | DATA_GOVERNANCE_ONLY | PASS |\n| External connectivity | disabled | PASS |\n| Trading / execution | disabled / disabled | PASS |\n| Lot 36 | PLANNED_LOCKED | PASS |\n'''
+          (ROOT / 'docs/LOT35_POST_MERGE_VALIDATION_MATRIX.md').write_text(matrix, encoding='utf-8')
+
+          validator = f'''#!/usr/bin/env python3\nfrom __future__ import annotations\n\nimport hashlib\nimport json\nimport sys\nimport tomllib\nfrom pathlib import Path\nfrom typing import Any\n\nROOT = Path(__file__).resolve().parents[1]\nMERGED_COMMIT = {MERGED!r}\nIMPLEMENTATION_COMMIT = {IMPLEMENTATION!r}\nEVIDENCE_COMMIT = {EVIDENCE!r}\nEXPECTED_STATE_CHECKSUM = {STATE!r}\nEXPECTED_AUDIT_CHECKSUM = {AUDIT!r}\n\nclass Lot35PostMergeError(RuntimeError):\n    pass\n\ndef require(condition: bool, message: str) -> None:\n    if not condition:\n        raise Lot35PostMergeError(message)\n\ndef load(path: str) -> dict[str, Any]:\n    value = json.loads((ROOT / path).read_text(encoding="utf-8"))\n    require(isinstance(value, dict), f"JSON object required: {{path}}")\n    return value\n\ndef canonical_checksum(payload: object) -> str:\n    return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")).hexdigest()\n\ndef verified(path: str, checksum_field: str, expected: str) -> dict[str, Any]:\n    payload = load(path)\n    body = dict(payload)\n    checksum = body.pop(checksum_field, None)\n    require(checksum == expected, f"{{path}} certified checksum changed")\n    require(canonical_checksum(body) == checksum, f"{{path}} checksum mismatch")\n    return payload\n\ndef validate() -> dict[str, Any]:\n    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]\n    require(project["version"] == "0.35.0", "project version must be 0.35.0")\n    require("Lot 35" in project["description"], "project description must identify Lot 35")\n    previous = load("data/audit/roadmap_lifecycle_overlay_lot34.json")\n    overlay = load("data/audit/roadmap_lifecycle_overlay_lot35.json")\n    require(overlay["previous_overlay"] == "data/audit/roadmap_lifecycle_overlay_lot34.json", "Lot 35 predecessor mismatch")\n    require(overlay["latest_implemented_lot"] == 35, "latest implemented lot must be 35")\n    for lot in range(26, 35):\n        require(overlay["lots"][str(lot)] == previous["lots"][str(lot)], f"Lot {{lot}} lifecycle was rewritten")\n    lot35 = overlay["lots"]["35"]\n    require(lot35["status"] == "IMPLEMENTED_VALIDATED_RECONCILIATION_ONLY", "Lot 35 lifecycle status mismatch")\n    require(lot35["implementation_commit"] == IMPLEMENTATION_COMMIT, "Lot 35 implementation commit mismatch")\n    require(lot35["merged_commit"] == MERGED_COMMIT, "Lot 35 merged commit mismatch")\n    require(lot35["pull_request"] == 31, "Lot 35 PR mismatch")\n    require(lot35["runtime_mode"] == "DATA_GOVERNANCE_ONLY", "Lot 35 runtime mismatch")\n    for field in ("trade_allowed", "execution_allowed", "external_connectivity_allowed", "network_ingestion_allowed", "raw_data_mutation_allowed"):\n        require(lot35[field] is False, f"Lot 35 lifecycle permission enabled: {{field}}")\n    require(overlay["lots"]["36"] == {{"implementation_started": False, "status": "PLANNED_LOCKED"}}, "Lot 36 must remain locked")\n    state = verified("data/audit/candle_trade_book_reconciliation_lot35.json", "output_checksum", EXPECTED_STATE_CHECKSUM)\n    audit = verified("data/audit/candle_trade_book_reconciliation_audit_lot35.json", "audit_checksum", EXPECTED_AUDIT_CHECKSUM)\n    reports = load("data/audit/reconciliation_reports_lot35.json")\n    veto = load("data/audit/reconciliation_veto_lot35.json")\n    require(state["run_context"]["code_commit"] == IMPLEMENTATION_COMMIT, "Lot 35 state code commit changed")\n    require(audit["code_commit"] == IMPLEMENTATION_COMMIT, "Lot 35 audit code commit changed")\n    require(audit["state_output_checksum"] == EXPECTED_STATE_CHECKSUM, "Lot 35 state/audit mismatch")\n    require(reports["records"] == state["reports"], "Lot 35 report collection mismatch")\n    require(veto == state["veto"], "Lot 35 veto artifact mismatch")\n    require(state["metrics"]["lot_35_records_processed_total"] == 3, "Lot 35 record count changed")\n    require(state["metrics"]["lot_35_match_total"] == 2, "Lot 35 match count changed")\n    require(state["metrics"]["lot_35_tolerated_diff_total"] == 1, "Lot 35 tolerated count changed")\n    require(state["metrics"]["lot_35_minor_divergence_total"] == 0, "Lot 35 minor count changed")\n    require(state["metrics"]["lot_35_critical_divergence_total"] == 0, "Lot 35 critical count changed")\n    require(state["veto"]["action"] == "ALLOW_ANALYSIS", "Lot 35 reference veto changed")\n    for payload in (state, audit):\n        require(payload["analysis_only"] is True, "Lot 35 analysis-only changed")\n        require(payload["approved_size"] == 0, "Lot 35 approved size changed")\n        for field in ("external_connectivity_allowed", "network_ingestion_allowed", "real_credentials_allowed", "signal_generation_allowed", "risk_approval_allowed", "order_routing_allowed", "trade_allowed", "execution_allowed"):\n            require(payload[field] is False, f"Lot 35 permission enabled: {{field}}")\n    coverage = load("reports/lot35/coverage_summary.json")\n    mutation = load("reports/lot35/mutation_summary.json")\n    require(coverage["status"] == "PASS" and coverage["evidence_commit"] == EVIDENCE_COMMIT, "Lot 35 coverage evidence provenance changed")\n    require(coverage["workflow_run_id"] == 31284931048 and coverage["artifact_id"] == 9029508289, "Lot 35 coverage Actions provenance changed")\n    require(coverage["artifact_digest"] == "sha256:64584097fe4d2136e497149ad6473ff8c9a6ce58ca7eb375187cd8ac5aa4c781", "Lot 35 coverage artifact digest changed")\n    require(coverage["line_coverage_percent"] == 96.43 and coverage["branch_coverage_percent"] == 93.75, "Lot 35 coverage metrics changed")\n    require(coverage["anti_flake_repetitions"] == 3, "Lot 35 anti-flake evidence changed")\n    require(mutation["status"] == "PASS" and mutation["evidence_commit"] == EVIDENCE_COMMIT, "Lot 35 mutation evidence provenance changed")\n    require(mutation["workflow_run_id"] == 31284931041 and mutation["artifact_id"] == 9029508744, "Lot 35 mutation Actions provenance changed")\n    require(mutation["artifact_digest"] == "sha256:36a80853e7d3c3bbd4b0255e063ae4ecfe6314b82249f24eb736f8e1dc03bbfc", "Lot 35 mutation artifact digest changed")\n    require(mutation["mutation_score_percent"] == 83.73 and mutation["killed_mutants"] == 1029 and mutation["evaluated_mutants"] == 1229, "Lot 35 mutation metrics changed")\n    audit_doc = (ROOT / "docs/LOT_35_POST_MERGE_AUDIT.md").read_text(encoding="utf-8")\n    require("GO_LOT35_POST_MERGE" in audit_doc and MERGED_COMMIT in audit_doc and "0.35.0" in (ROOT / "README.md").read_text(encoding="utf-8"), "Lot 35 audit documentation incomplete")\n    result = {{\n        "schema_version": "lot35-post-merge-validation-v1",\n        "status": "PASS",\n        "verdict": "GO_LOT35_POST_MERGE",\n        "project_version": "0.35.0",\n        "implementation_commit": IMPLEMENTATION_COMMIT,\n        "merged_commit": MERGED_COMMIT,\n        "evidence_commit": EVIDENCE_COMMIT,\n        "state_output_checksum": EXPECTED_STATE_CHECKSUM,\n        "audit_checksum": EXPECTED_AUDIT_CHECKSUM,\n        "line_coverage_percent": 96.43,\n        "branch_coverage_percent": 93.75,\n        "mutation_score_percent": 83.73,\n        "latest_implemented_lot": 35,\n        "next_lot": 36,\n        "next_lot_status": "PLANNED_LOCKED",\n        "trade_allowed": False,\n        "execution_allowed": False,\n        "approved_size": 0,\n    }}\n    result["validation_checksum"] = canonical_checksum(result)\n    return result\n\ndef main() -> int:\n    try:\n        print(json.dumps(validate(), sort_keys=True))\n    except (Lot35PostMergeError, OSError, KeyError, IndexError, TypeError, ValueError, json.JSONDecodeError) as exc:\n        print(f"LOT35 POST-MERGE VALIDATION: FAIL\\n{{exc}}", file=sys.stderr)\n        return 1\n    return 0\n\nif __name__ == "__main__":\n    raise SystemExit(main())\n'''
+          (ROOT / 'scripts/validate_lot35_post_merge.py').write_text(validator, encoding='utf-8')
+
+          tests = '''from __future__ import annotations\n\nimport json\nfrom pathlib import Path\n\nfrom scripts.validate_lot35_post_merge import (\n    AUDIT_CHECKSUM if False else EXPECTED_AUDIT_CHECKSUM,\n)\nfrom scripts.validate_lot35_post_merge import (\n    EVIDENCE_COMMIT,\n    EXPECTED_STATE_CHECKSUM,\n    MERGED_COMMIT,\n    validate,\n)\n\nROOT = Path(__file__).resolve().parents[1]\n\ndef test_lot35_post_merge_validator_passes() -> None:\n    result = validate()\n    assert result["status"] == "PASS"\n    assert result["verdict"] == "GO_LOT35_POST_MERGE"\n    assert result["merged_commit"] == MERGED_COMMIT\n    assert result["evidence_commit"] == EVIDENCE_COMMIT\n    assert result["state_output_checksum"] == EXPECTED_STATE_CHECKSUM\n    assert result["audit_checksum"] == EXPECTED_AUDIT_CHECKSUM\n    assert result["latest_implemented_lot"] == 35\n    assert result["next_lot"] == 36\n    assert result["next_lot_status"] == "PLANNED_LOCKED"\n\ndef test_lot36_remains_exactly_locked() -> None:\n    overlay = json.loads((ROOT / "data/audit/roadmap_lifecycle_overlay_lot35.json").read_text(encoding="utf-8"))\n    assert overlay["lots"]["36"] == {"implementation_started": False, "status": "PLANNED_LOCKED"}\n\ndef test_lot35_audit_changes_no_production_contract() -> None:\n    result = validate()\n    assert result["trade_allowed"] is False\n    assert result["execution_allowed"] is False\n    assert result["approved_size"] == 0\n'''
+          tests = tests.replace('from scripts.validate_lot35_post_merge import (\n    AUDIT_CHECKSUM if False else EXPECTED_AUDIT_CHECKSUM,\n)\n', 'from scripts.validate_lot35_post_merge import EXPECTED_AUDIT_CHECKSUM\n')
+          (ROOT / 'tests/test_lot35_post_merge_state.py').write_text(tests, encoding='utf-8')
+          PY
+      - name: Add independent post-merge audit workflow
+        run: |
+          cat > .github/workflows/lot35-post-merge-audit.yml <<'YAML'
+          name: Lot 35 independent post-merge audit
+
+          on:
+            pull_request:
+              branches: [main]
+              paths:
+                - 'pyproject.toml'
+                - 'README.md'
+                - 'docs/ROADMAP_V1_TO_V21.md'
+                - 'docs/LOT_35_POST_MERGE_AUDIT.md'
+                - 'docs/LOT35_POST_MERGE_VALIDATION_MATRIX.md'
+                - 'data/audit/roadmap_lifecycle_overlay_lot35.json'
+                - 'reports/lot35/coverage_summary.json'
+                - 'reports/lot35/mutation_summary.json'
+                - 'scripts/validate_lot35_entry_gate.py'
+                - 'scripts/validate_lot35_post_merge.py'
+                - 'scripts/validate_roadmap_documentation.py'
+                - 'tests/test_lot35_post_merge_state.py'
+                - '.github/workflows/lot35-post-merge-audit.yml'
+            push:
+              branches: [main]
+            workflow_dispatch:
+
+          permissions:
+            contents: read
+
+          jobs:
+            audit:
+              runs-on: ubuntu-22.04
+              steps:
+                - uses: actions/checkout@v4
+                  with:
+                    fetch-depth: 0
+                - uses: actions/setup-python@v5
+                  with:
+                    python-version: '3.11.9'
+                    cache: pip
+                - name: Install locked toolchain
+                  run: |
+                    python -m pip install --upgrade pip
+                    python -m pip install -r requirements-dev.lock
+                - name: Prove governance-only diff
+                  run: |
+                    git fetch origin main
+                    git diff --quiet origin/main...HEAD -- src/
+                - name: Compile lint type and exact frozen evidence
+                  run: |
+                    python -m compileall -q src scripts tests
+                    ruff check scripts/validate_lot35_entry_gate.py scripts/validate_lot35_post_merge.py scripts/validate_roadmap_documentation.py tests/test_lot35_post_merge_state.py
+                    mypy src/crypto_quant_bot
+                    python scripts/validate_lot35_entry_gate.py
+                    python scripts/validate_lot35.py
+                    python scripts/validate_lot35_no_connectivity.py
+                    python scripts/validate_lot35_post_merge.py
+                - name: Architecture roadmap traceability and engineering
+                  run: |
+                    python scripts/validate_roadmap_documentation.py
+                    python scripts/validate_architecture_boundaries.py
+                    python scripts/validate_domain_architecture.py
+                    python scripts/audit_roadmap_semantics.py
+                    python scripts/validate_traceability_contract.py
+                    python scripts/check_no_silent_numeric_coercion.py
+                    python scripts/quality_inventory.py
+                    python scripts/validate_engineering_deviations.py
+                - name: Audit tests full regression and anti-flake
+                  run: |
+                    pytest -q tests/test_lot35_post_merge_state.py
+                    pytest -q
+                    pytest -q tests/test_lot35_post_merge_state.py
+                    pytest -q tests/test_lot35_post_merge_state.py
+                    pytest -q tests/test_lot35_post_merge_state.py
+                - name: Security and final validator
+                  run: |
+                    bandit -q -r src -ll
+                    pip-audit -r requirements-dev.lock
+                    python scripts/validate_lot35_post_merge.py
+          YAML
+      - name: Preflight generated audit before publishing
+        run: |
+          python -m compileall -q src scripts tests
+          ruff check scripts/validate_lot35_entry_gate.py scripts/validate_lot35_post_merge.py scripts/validate_roadmap_documentation.py tests/test_lot35_post_merge_state.py
+          mypy src/crypto_quant_bot
+          python scripts/validate_lot35_entry_gate.py
+          python scripts/validate_lot35.py
+          python scripts/validate_lot35_no_connectivity.py
+          python scripts/validate_lot35_post_merge.py
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/validate_traceability_contract.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          pytest -q tests/test_lot35_post_merge_state.py
+          pytest -q
+      - name: Commit audit package and open PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            pyproject.toml README.md docs/ROADMAP_V1_TO_V21.md \
+            docs/LOT_35_POST_MERGE_AUDIT.md docs/LOT35_POST_MERGE_VALIDATION_MATRIX.md \
+            data/audit/roadmap_lifecycle_overlay_lot35.json \
+            reports/lot35/coverage_summary.json reports/lot35/mutation_summary.json \
+            scripts/validate_lot35_entry_gate.py scripts/validate_lot35_post_merge.py \
+            scripts/validate_roadmap_documentation.py tests/test_lot35_post_merge_state.py \
+            .github/workflows/lot35-post-merge-audit.yml
+          git commit -m 'Audit merged Lot 35 and advance lifecycle to 0.35.0'
+          git push -f origin HEAD:agent/lot35-post-merge-audit
+          python - <<'PY'
+          import json
+          import os
+          import urllib.request
+          repo = os.environ['REPO']
+          token = os.environ['GH_TOKEN']
+          headers = {
+              'Authorization': f'Bearer {token}',
+              'Accept': 'application/vnd.github+json',
+              'X-GitHub-Api-Version': '2022-11-28',
+              'Content-Type': 'application/json',
+              'User-Agent': 'lot35-audit-prep',
+          }
+          payload = json.dumps({
+              'title': 'Audit Lot 35 post-merge state',
+              'head': 'agent/lot35-post-merge-audit',
+              'base': 'main',
+              'body': 'Independent governance-only audit of Lot 35 bound to squash d083d4f27c89759ebed37b2ecacccbe88dccad11 and exact CI evidence head 09701c7d5ebefbeba41143a2838564b09ea5fb3a. Freezes 96.43% line / 93.75% branch / 83.73% mutation evidence, advances release metadata to 0.35.0, makes the Lot 35 entry gate archival, and keeps Lot 36 PLANNED_LOCKED. No production src/ change.',
+          }).encode()
+          req = urllib.request.Request(
+              f'https://api.github.com/repos/{repo}/pulls',
+              data=payload,
+              method='POST',
+              headers=headers,
+          )
+          with urllib.request.urlopen(req, timeout=60) as response:
+              pr = json.loads(response.read())
+          print(f"AUDIT_PR={pr['number']} HEAD={pr['head']['sha']}")
+          PY
