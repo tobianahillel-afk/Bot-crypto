@@ -21,7 +21,13 @@ Gate-only certification for **Lot 38 — Order Book L2 Snapshot Engine**. No pro
 - owner: `MicrostructureDomain`
 - runtime: `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY`
 
-The validator parses the registry row directly and checks the Lot 38 identity, canonical inputs, outputs and minimum normative processing/test structure.
+The validator parses the registry row directly and checks the exact Lot 38 identity, input strings, output contracts and normative processing/test structure.
+
+Canonical inputs are:
+
+- `RunContextV1 (run_id, runtime_mode, config_version, code_commit, correlation_id)`;
+- `LineageEnvelopeV1 des artefacts produits par les lots préalables`;
+- `OrderBookSnapshotRawV1`.
 
 ## Prerequisite evidence
 
@@ -38,22 +44,18 @@ Lot 37 evidence remains frozen:
 - mutation: `80.26%`
 - anti-flake: `3`
 
-The active Lot 37 L2 input contract and the noncanonical offline fixture are verified without promoting either into live data or decision data.
+The complete prerequisite object is checked exactly. The active Lot 37 L2 input contract and the noncanonical offline fixture are verified without changing their historical role.
 
 ## Authorized result
 
-The gate authorizes implementation of canonical offline snapshot normalization only: ordering, duplicate-price aggregation, negative-quantity rejection, crossed/explicit-locked validation, configured depth capping, source-depth retention, checksum, sequence anchor, book health, deterministic state/audit persistence.
+The gate authorizes only canonical offline snapshot normalization: ordering, duplicate-price aggregation, negative-quantity rejection, crossed/explicit-locked validation, configured depth capping, source-depth retention, checksum, sequence anchor, book health, and deterministic state/audit persistence.
 
-Lot 39 delta/sequence reconstruction and every later V4 analysis capability remain forbidden.
-
-## Safety
-
-All connectivity, credentials, market publication, signal, risk approval, routing, trading and execution permissions remain disabled. `approved_size=0` and `used_for_decision=false`.
+Lot 39 delta/sequence reconstruction and later V4 analysis capabilities remain outside this gate.
 
 ## Gate checksum
 
-`4f82b04a98c542cf01d3047360f2beb54a1d808b4dd0c7160388f454c4506673`
+`29fe4a5fd14b3bce95e3016fce67e10f94edcca1c2aad60c9fda382f3eb9d6a0`
 
 ## Conclusion
 
-`GO_LOT38_IMPLEMENTATION_ENTRY` is valid only if the exact gate branch passes its full CI and is merged without any `src/` change. The implementation must then start from that exact gate merge. Lot 39 remains locked.
+`GO_LOT38_IMPLEMENTATION_ENTRY` is valid only if the exact gate branch passes full CI and is merged without any `src/` change. Lot 39 remains locked.
