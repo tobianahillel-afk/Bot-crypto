@@ -58,9 +58,13 @@ def validate_file(path: Path) -> None:
             raise RuntimeError(f"LOT39_FORBIDDEN_TEXT:{path}:{marker}")
     tree = ast.parse(text, filename=str(path))
     for node in ast.walk(tree):
-        if isinstance(node, (ast.Import, ast.ImportFrom)):
+        if isinstance(node, ast.Import | ast.ImportFrom):
             imported = _import_name(node)
-            if any(imported == root or imported.startswith(root + ".") for root in FORBIDDEN_IMPORT_ROOTS):
+            forbidden = any(
+                imported == root or imported.startswith(root + ".")
+                for root in FORBIDDEN_IMPORT_ROOTS
+            )
+            if forbidden:
                 raise RuntimeError(f"LOT39_FORBIDDEN_IMPORT:{path}:{imported}")
         if isinstance(node, ast.Call):
             func = node.func
