@@ -1,7 +1,7 @@
 [project]
 name = "crypto-quant-bot"
-version = "0.36.0"
-description = "Crypto Quant Bot V3.6-Ops — Lot 36 post-merge audited V3 market-data-governance closure"
+version = "0.37.0"
+description = "Crypto Quant Bot V4.1-Ops — Lot 37 post-merge audited microstructure scope and offline contracts"
 requires-python = "==3.11.*"
 dependencies = []
 

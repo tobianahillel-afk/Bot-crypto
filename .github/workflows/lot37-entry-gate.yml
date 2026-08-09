@@ -32,20 +32,30 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Verify exact audited V3 base and gate-only boundary
+      - name: Prove archived gate ancestry and immutability
         env:
           EVENT_NAME: ${{ github.event_name }}
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         shell: bash
         run: |
           set -euo pipefail
-          EXPECTED_BASE=33fba0abf7463fc54a36282476ee51655ff09919
-          git merge-base --is-ancestor "$EXPECTED_BASE" HEAD
+          V3_AUDITED_BASE=33fba0abf7463fc54a36282476ee51655ff09919
+          GATE_MERGE=b2ec1f8ffa03c9dd48a04fe62f42c4f9986e2167
+          git merge-base --is-ancestor "$V3_AUDITED_BASE" HEAD
+          git merge-base --is-ancestor "$GATE_MERGE" HEAD
+          git diff --quiet "$GATE_MERGE" HEAD -- \
+            data/audit/lot37_v4_entry_gate.json \
+            contracts/schemas/lot37_v4_entry_gate_v1.schema.json \
+            docs/LOT_37_V4_ENTRY_GATE.md \
+            reports/lot_37_v4_entry_gate_report.md \
+            scripts/validate_lot37_entry_gate.py \
+            tests/fixtures/lot37/offline_l2_availability_fixture_v1.json \
+            tests/fixtures/lot37/offline_trade_availability_fixture_v1.json
           if [ "$EVENT_NAME" = "pull_request" ]; then
-            test "$PR_BASE_SHA" = "$EXPECTED_BASE"
+            test -n "$PR_BASE_SHA"
             git diff --quiet "$PR_BASE_SHA"...HEAD -- src/
           fi
-      - name: Compile lint schema fixture and gate validation
+      - name: Compile lint schema fixture and archived gate tests
         run: |
           python -m compileall -q scripts tests
           python -m json.tool data/audit/lot37_v4_entry_gate.json >/dev/null
@@ -53,8 +63,7 @@ jobs:
           python -m json.tool tests/fixtures/lot37/offline_l2_availability_fixture_v1.json >/dev/null
           python -m json.tool tests/fixtures/lot37/offline_trade_availability_fixture_v1.json >/dev/null
           ruff check scripts/validate_lot37_entry_gate.py tests/test_lot37_v4_entry_gate.py
-          python scripts/validate_lot36_post_merge.py
-          python scripts/validate_lot37_entry_gate.py
+          pytest -q tests/test_lot37_v4_entry_gate.py
       - name: Architecture roadmap traceability and engineering gates
         run: |
           python scripts/validate_roadmap_documentation.py
@@ -65,12 +74,9 @@ jobs:
           python scripts/check_no_silent_numeric_coercion.py
           python scripts/quality_inventory.py
           python scripts/validate_engineering_deviations.py
-      - name: Gate tests and full regression
+      - name: Full regression and gate anti-flake
         run: |
-          pytest -q tests/test_lot37_v4_entry_gate.py
           pytest -q
-      - name: Gate anti-flake repetitions
-        run: |
           pytest -q tests/test_lot37_v4_entry_gate.py
           pytest -q tests/test_lot37_v4_entry_gate.py
           pytest -q tests/test_lot37_v4_entry_gate.py

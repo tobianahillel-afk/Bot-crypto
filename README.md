@@ -1,4 +1,4 @@
-# Crypto Quant Bot V3.6-Ops
+# Crypto Quant Bot V4.1-Ops
 
 Plateforme quantitative crypto défensive, déterministe, extensible et auditable.
 
@@ -6,11 +6,11 @@ Plateforme quantitative crypto défensive, déterministe, extensible et auditabl
 
 | Élément | État |
 |---|---|
-| Dernier lot implémenté et validé | **Lot 36 — Freshness, Gap, Outage Audit & V3 Closure** |
-| Version | **0.36.0** |
+| Dernier lot implémenté et validé | **Lot 37 — Microstructure Scope & Offline Data Contracts** |
+| Version | **0.37.0** |
 | Baseline qualité | **P0 institutionnel fusionné** |
-| Prochain lot planifié | **Lot 37 — V4 Microstructure scope/offline contracts**, `PLANNED_LOCKED` |
-| Runtime maximal | `DATA_GOVERNANCE_ONLY` |
+| Prochain lot planifié | **Lot 38 — Order Book L2 Snapshot Engine**, `PLANNED_LOCKED` |
+| Runtime maximal | `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY` |
 | Trading | **désactivé** |
 | Connectivité exchange | **désactivée** |
 
@@ -56,7 +56,9 @@ le réseau reste désactivé et aucune capacité de trading n'est ouverte.
 
 Le Lot 35 ajoute la **réconciliation Candle / Trade / Book** offline : deltas exacts en `Decimal`, écarts temporels en microsecondes entières, source de vérité explicite, classification `MATCH/TOLERATED_DIFF/MINOR_DIVERGENCE/CRITICAL_DIVERGENCE`, détection des orphelins et doublons, ordre canonique déterministe et veto fail-closed. La fixture certifiée contient 3 rapports (2 `MATCH`, 1 `TOLERATED_DIFF`) et conserve `ALLOW_ANALYSIS`; aucune connectivité, mutation raw ou capacité de trading/exécution n’est ouverte. Les preuves finales sont 96.43% lignes, 93.75% branches et 83.73% mutation.
 
-Le Lot 36 clôture **V3 Market Data Governance** après audit post-merge indépendant. Il audite freshness/gaps/outages, rejoue exactement les Lots 34 et 35, vérifie la chaîne Lots 31–36 et conserve un manifest d’implémentation historiquement candidat. La certification post-merge porte la release à `0.36.0`, avec 100.00% lignes, 100.00% branches, 83.48% mutation et replay déterministe. Lot 37 reste verrouillé jusqu’à un gate V4 distinct.
+Le Lot 36 clôture **V3 Market Data Governance** après audit post-merge indépendant. Il audite freshness/gaps/outages, rejoue exactement les Lots 34 et 35, vérifie la chaîne Lots 31–36 et conserve un manifest d’implémentation historiquement candidat. La certification post-merge porte la release à `0.36.0`, avec 100.00% lignes, 100.00% branches, 83.48% mutation et replay déterministe.
+
+Le Lot 37 ouvre **V4 Microstructure / Liquidity / Game Theory** avec une frontière strictement offline : package `MicrostructureDomain`, six contrats versionnés, registre de contrats, matrice de capacités et API publique minimale. Les artefacts sont liés au source head certifié `59b189e9980772245993a9212b6c8ad5e9a88a00`, avec 100.00% lignes, 100.00% branches et 80.26% mutation. Aucune logique Lot38+ n'est activée : carnet L2, deltas, spread/depth/imbalance, order flow, inférence participant, signal, risque, routing, trading et exécution restent verrouillés.
 
 ## Vision temporelle
 
@@ -97,7 +99,7 @@ est interdit.
 ## Flux continu et données confirmées
 
 Une barre ouverte peut être observée comme état provisoire, mais elle ne peut pas être
-consommée comme état confirmé. Les Lots 31 à 36 constituent désormais la chaîne V3 Market Data Governance fermée et auditée : registre de sources, instruments canoniques, temps canonique, qualité, réconciliation et audit freshness/gap/outage. Les features de carnet, trades, liquidations et order flow appartiennent à V4 et restent verrouillées à partir du Lot 37.
+consommée comme état confirmé. Les Lots 31 à 36 constituent la chaîne V3 Market Data Governance fermée et auditée. Le Lot 37 définit uniquement le périmètre, les contrats offline et les capacités V4 ; les moteurs de carnet, trades, liquidations et order flow restent verrouillés à partir du Lot 38.
 
 ## Prévision et modèles stochastiques
 
@@ -105,7 +107,7 @@ La roadmap prévoit des prévisions par horizons distincts — initialement 30s,
 1h — avec distributions, quantiles, volatilité, target/stop hit, MAE/MFE, temps avant
 événement et incertitude.
 
-Ces contrats sont `PLANNED_LOCKED_NOT_IMPLEMENTED`. Les Lots 26 à 36 ne produisent aucune
+Ces contrats sont `PLANNED_LOCKED_NOT_IMPLEMENTED`. Les Lots 26 à 37 ne produisent aucune
 prediction, probability, expected return ou direction BUY/SELL.
 
 Les futurs modèles stochastiques devront être sélectionnés par preuve, comparés à des
@@ -123,6 +125,8 @@ V4 — Lots 37–52 possède :
 - volume clusters, time-at-level, sweeps, fakeouts et traps ;
 - OI, funding, basis et liquidations ;
 - Game Theory et scénarios concurrents.
+
+Le Lot 37 ne fait qu'établir le périmètre et les contrats offline de cette version. Les capacités analytiques ci-dessus restent des lots futurs verrouillés.
 
 Les zones futures sont explicitement typées :
 
@@ -201,6 +205,9 @@ python scripts/validate_lot35_post_merge.py
 python scripts/validate_lot36.py
 python scripts/validate_lot36_no_connectivity.py
 python scripts/validate_lot36_post_merge.py
+python scripts/validate_lot37_frozen_evidence.py
+python scripts/validate_lot37.py --expected-code-commit 59b189e9980772245993a9212b6c8ad5e9a88a00
+python scripts/validate_lot37_post_merge.py
 python scripts/validate_roadmap_documentation.py
 python scripts/validate_architecture_boundaries.py
 python scripts/check_no_silent_numeric_coercion.py
@@ -302,7 +309,7 @@ complexité, mutation testing et répétitions anti-flake.
 - États qualité : `data/audit/data_quality_states_lot34.json`
 - Anomalies : `data/audit/data_anomalies_lot34.json`
 - Veto qualité : `data/audit/data_quality_veto_lot34.json`
-- Lifecycle courant : `data/audit/roadmap_lifecycle_overlay_lot34.json`
+- Lifecycle historique : `data/audit/roadmap_lifecycle_overlay_lot34.json`
 
 ### Lot 35
 
@@ -333,7 +340,23 @@ complexité, mutation testing et répétitions anti-flake.
 - Replay : `data/audit/replay_evidence_lot36.json`
 - Coverage : `reports/lot36/coverage_summary.json`
 - Mutation : `reports/lot36/mutation_summary.json`
-- Lifecycle courant : `data/audit/roadmap_lifecycle_overlay_lot36.json`
+- Lifecycle historique : `data/audit/roadmap_lifecycle_overlay_lot36.json`
+
+### Lot 37
+
+- [Gate d’entrée V4](docs/LOT_37_V4_ENTRY_GATE.md)
+- [Spécification](docs/LOT_37_MICROSTRUCTURE_SCOPE_AND_OFFLINE_DATA_CONTRACTS.md)
+- [Critères d’acceptation](docs/ACCEPTANCE_CRITERIA_LOT_37.md)
+- [Audit post-merge](docs/LOT_37_POST_MERGE_AUDIT.md)
+- [Matrice de validation post-merge](docs/LOT37_POST_MERGE_VALIDATION_MATRIX.md)
+- [Rapport d’implémentation](reports/lot_37_microstructure_scope_and_offline_data_contracts_report.md)
+- État certifié : `data/audit/microstructure_scope_and_offline_data_contracts_lot37.json`
+- Audit certifié : `data/audit/microstructure_scope_and_offline_data_contracts_audit_lot37.json`
+- Registre de contrats : `data/audit/microstructure_contract_registry_lot37.json`
+- Matrice de capacités : `data/audit/microstructure_capability_matrix_lot37.json`
+- Coverage : `reports/lot37/coverage_summary.json`
+- Mutation : `reports/lot37/mutation_summary.json`
+- Lifecycle courant : `data/audit/roadmap_lifecycle_overlay_lot37.json`
 
 ### Architecture future verrouillée
 

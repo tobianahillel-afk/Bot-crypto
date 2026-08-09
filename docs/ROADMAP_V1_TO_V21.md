@@ -1,11 +1,11 @@
 # Roadmap canonique V1 → V21 — Lots 0 à 177
 
-Projet : **Crypto Quant Bot V3.6-Ops**
+Projet : **Crypto Quant Bot V4.1-Ops**
 
 ## État actuel
 
-- Dernier lot dont l'implémentation est terminée et auditée : **Lot 36**.
-- Version courante : `0.36.0`.
+- Dernier lot dont l'implémentation est terminée et auditée : **Lot 37**.
+- Version courante : `0.37.0`.
 - Baseline P0 institutionnelle : fusionnée.
 - Gate transversal P0.6 : fusionné et conservé comme preuve historique.
 - Lot 26 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
@@ -19,12 +19,14 @@ Projet : **Crypto Quant Bot V3.6-Ops**
 - Lot 34 : `IMPLEMENTED_VALIDATED_DATA_QUALITY_ONLY`.
 - Lot 35 : `IMPLEMENTED_VALIDATED_RECONCILIATION_ONLY`.
 - Lot 36 : `IMPLEMENTED_VALIDATED_V3_CLOSURE_ONLY`.
-- Lots 37–177 : planifiés et verrouillés.
+- Lot 37 : `IMPLEMENTED_VALIDATED_OFFLINE_SCOPE_CONTRACTS_ONLY`.
+- Lots 38–177 : planifiés et verrouillés.
 - V2 Market Analysis Offline est fermée pour le périmètre Lots 21–30.
 - V3 Market Data Governance est fermée et auditée pour le périmètre Lots 31–36, sans connectivité ni ingestion.
+- V4 est ouverte au Lot 37 uniquement pour le scope et les contrats offline ; aucun moteur Lot38+ n'est activé.
 - Forecast, alpha, paper, sandbox et capital réel : `NO_GO`.
 
-L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot36.json`. Le registre
+L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot37.json`. Le registre
 `data/audit/product_scope_roadmap_lot21.jsonl` reste une preuve historique immuable.
 
 ## Documents normatifs transverses
@@ -249,6 +251,26 @@ prédictives ou d'exécution sont déjà implémentées.
 - Post-merge validator : `scripts/validate_lot36_post_merge.py`
 - Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot36.json`
 
+## Lot 37
+
+- [Entry gate](LOT_37_V4_ENTRY_GATE.md)
+- [Specification](LOT_37_MICROSTRUCTURE_SCOPE_AND_OFFLINE_DATA_CONTRACTS.md)
+- [Acceptance criteria](ACCEPTANCE_CRITERIA_LOT_37.md)
+- [Post-merge audit](LOT_37_POST_MERGE_AUDIT.md)
+- [Post-merge validation matrix](LOT37_POST_MERGE_VALIDATION_MATRIX.md)
+- Configuration : `config/microstructure/microstructure_scope_offline_data_contracts_v1.json`
+- State : `data/audit/microstructure_scope_and_offline_data_contracts_lot37.json`
+- Audit : `data/audit/microstructure_scope_and_offline_data_contracts_audit_lot37.json`
+- Contract registry : `data/audit/microstructure_contract_registry_lot37.json`
+- Capability matrix : `data/audit/microstructure_capability_matrix_lot37.json`
+- Coverage evidence : `reports/lot37/coverage_summary.json`
+- Mutation evidence : `reports/lot37/mutation_summary.json`
+- Runner : `scripts/run_lot37_microstructure_scope_and_offline_data_contracts.py`
+- Validator : `scripts/validate_lot37.py`
+- Frozen evidence validator : `scripts/validate_lot37_frozen_evidence.py`
+- Post-merge validator : `scripts/validate_lot37_post_merge.py`
+- Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot37.json`
+
 ## Séparations obligatoires
 
 ```text
@@ -261,6 +283,7 @@ CI verte ≠ validation mathématique ≠ preuve statistique ≠ alpha économiq
 agreement score ≠ probability ≠ expected return
 source registry ≠ connector ≠ ingestion ≠ validated market event
 instrument registry ≠ live metadata fetch ≠ market event ≠ signal
+microstructure contract ≠ live book ingestion ≠ signal ≠ execution
 ```
 
 ## Profil temporel Lot 26
@@ -306,7 +329,7 @@ timeframes et n'autorise aucune inférence de rendement futur.
 2. Aucun lot suivant sans rapport final `GO`, validation exacte disponible et revue humaine.
 3. Chaque lot atteint les seuils tests, couverture et mutation applicables.
 4. Toute formule suit le standard mathématique et possède des oracles indépendants.
-5. Toute probabilité requiert une calibration versionnée ; les Lots 26–34 n'en produisent aucune.
+5. Toute probabilité requiert une calibration versionnée ; les Lots 26–37 n'en produisent aucune.
 6. Toute décision ou absence de décision est rejouable et auditable.
 7. Zéro BLOCKER et zéro MAJOR avant promotion.
 8. HFT, options et on-chain ne contournent jamais le core.
@@ -316,4 +339,5 @@ timeframes et n'autorise aucune inférence de rendement futur.
 12. Un statut `PLANNED_LOCKED` ou `AWAITING_EXACT_COMMIT_CI` ne peut être promu sans preuve exacte.
 13. V7, V8, V9, V15 et V17 consomment le snapshot, le sizing et les réservations canoniques ; aucune implémentation locale incompatible n'est autorisée.
 14. Tout ordre augmentant le risque exige une réservation atomique active ; toute moyenne à la baisse implicite est interdite.
-15. Lot 37 reste verrouillé après la fermeture post-merge de V3 au Lot 36 jusqu'à un gate d'entrée V4 distinct et une décision humaine explicite.
+15. Lot 37 est limité au scope, aux contrats offline, au registre/matrice de capacités et à l'API publique du domaine Microstructure ; il n'autorise aucune logique Lot38+.
+16. Lot 38 reste `PLANNED_LOCKED` après l'audit post-merge Lot37 jusqu'à un gate d'entrée distinct et une décision humaine explicite.

@@ -4,19 +4,20 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'pyproject.toml'
-      - 'README.md'
-      - 'docs/ROADMAP_V1_TO_V21.md'
       - 'docs/LOT_36_POST_MERGE_AUDIT.md'
       - 'docs/LOT36_POST_MERGE_VALIDATION_MATRIX.md'
       - 'data/audit/roadmap_lifecycle_overlay_lot36.json'
+      - 'data/audit/freshness_gap_outage_audit_and_v3_closure_lot36.json'
+      - 'data/audit/freshness_gap_outage_audit_and_v3_closure_audit_lot36.json'
+      - 'data/audit/closure_manifest_lot36.json'
+      - 'data/audit/replay_evidence_lot36.json'
       - 'reports/lot36/coverage_summary.json'
       - 'reports/lot36/mutation_summary.json'
-      - 'scripts/validate_lot36_post_merge.py'
-      - 'scripts/validate_roadmap_documentation.py'
+      - 'scripts/validate_lot36.py'
+      - 'scripts/validate_lot36_no_connectivity.py'
+      - 'scripts/validate_all_until_lot36.py'
       - 'tests/test_lot36_post_merge_state.py'
       - '.github/workflows/lot36-post-merge-audit.yml'
-      - '.github/workflows/lot36-entry-gate.yml'
   push:
     branches: [main]
   workflow_dispatch:
@@ -39,39 +40,26 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove exact merged ancestry and governance-only diff
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          PUSH_BEFORE_SHA: ${{ github.event.before }}
+      - name: Prove historical merge ancestry
         shell: bash
         run: |
           set -euo pipefail
-          git fetch origin main
           git merge-base --is-ancestor 87da195283797247505e4fc650214e33e759e21a HEAD
-          if [ "$EVENT_NAME" = "pull_request" ]; then
-            BASE_SHA="$PR_BASE_SHA"
-          elif [ "$EVENT_NAME" = "push" ]; then
-            BASE_SHA="$PUSH_BEFORE_SHA"
-          else
-            BASE_SHA="$(git merge-base origin/main HEAD)"
-          fi
-          test -n "$BASE_SHA"
-          test "$BASE_SHA" != "0000000000000000000000000000000000000000"
-          git cat-file -e "$BASE_SHA^{commit}"
-          git diff --quiet "$BASE_SHA" HEAD -- src/
-      - name: Compile lint type and exact frozen evidence
+          git cat-file -e b3680f5da0a3fd98fdedc31599c829dc60808290^{commit}
+          git cat-file -e 16f3454c6f912f3f00f79836950047b15687abce^{commit}
+      - name: Compile lint type and immutable Lot 36 evidence
         run: |
           python -m compileall -q src scripts tests
           ruff check \
-            scripts/validate_lot36_post_merge.py \
-            scripts/validate_roadmap_documentation.py \
+            scripts/validate_lot36.py \
+            scripts/validate_lot36_no_connectivity.py \
+            scripts/validate_all_until_lot36.py \
             tests/test_lot36_post_merge_state.py
           mypy src/crypto_quant_bot
           python scripts/validate_lot36.py
           python scripts/validate_lot36_no_connectivity.py
           python scripts/validate_all_until_lot36.py
-          python scripts/validate_lot36_post_merge.py
+          pytest -q tests/test_lot36_post_merge_state.py
       - name: Architecture roadmap traceability and engineering
         run: |
           python scripts/validate_roadmap_documentation.py
@@ -82,15 +70,16 @@ jobs:
           python scripts/check_no_silent_numeric_coercion.py
           python scripts/quality_inventory.py
           python scripts/validate_engineering_deviations.py
-      - name: Audit tests full regression and anti-flake
+      - name: Full regression and archived anti-flake
         run: |
-          pytest -q tests/test_lot36_post_merge_state.py
           pytest -q
           pytest -q tests/test_lot36_post_merge_state.py
           pytest -q tests/test_lot36_post_merge_state.py
           pytest -q tests/test_lot36_post_merge_state.py
-      - name: Security and final validator
+      - name: Security and immutable evidence final checks
         run: |
           bandit -q -r src -ll
           pip-audit -r requirements-dev.lock
-          python scripts/validate_lot36_post_merge.py
+          python scripts/validate_lot36.py
+          python scripts/validate_lot36_no_connectivity.py
+          pytest -q tests/test_lot36_post_merge_state.py
