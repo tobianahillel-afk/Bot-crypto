@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "microstructure_scope_offline_data_contracts_contract_registry_v1.schema.json",
+  "title": "MicrostructureScopeOfflineDataContractsContractRegistryV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "registry_id", "registry_version", "entries"],
+  "properties": {
+    "schema_version": {"const": "microstructure-scope-offline-data-contracts-contract-registry-v1"},
+    "registry_id": {"type": "string", "minLength": 1},
+    "registry_version": {"type": "string", "minLength": 1},
+    "entries": {"type": "array", "minItems": 6, "uniqueItems": true, "items": {"$ref": "#/$defs/entry"}}
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "contract_name", "contract_kind", "owner", "schema_path", "producer", "consumer", "status", "enabled_by_lot"],
+      "properties": {
+        "schema_version": {"const": "lot37-contract-registry-entry-v1"},
+        "contract_name": {"type": "string", "minLength": 1},
+        "contract_kind": {"enum": ["INPUT", "OUTPUT"]},
+        "owner": {"const": "MicrostructureDomain"},
+        "schema_path": {"type": "string", "pattern": "^contracts/schemas/.+\\.schema\\.json$"},
+        "producer": {"type": "string", "minLength": 1},
+        "consumer": {"type": "string", "minLength": 1},
+        "status": {"enum": ["ACTIVE_LOT37_CONTRACT", "PLANNED_LOCKED"]},
+        "enabled_by_lot": {"type": "integer", "minimum": 37}
+      }
+    }
+  }
+}
