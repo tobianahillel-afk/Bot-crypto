@@ -28,7 +28,6 @@ from .microstructure_scope_and_offline_data_contracts_validation import (
     duration_us,
     lot37_safety,
     parse_utc_timestamp,
-    require_boolean,
     require_integer,
     require_text,
     validate_causal_times,
