@@ -1,0 +1,17 @@
+{
+  "schema_version": "lot39-order-book-delta-sequence-config-v1",
+  "config_version": "lot39-order-book-delta-sequence-config-v1",
+  "run_id": "lot39-reference-run-001",
+  "correlation_id": "lot39-reference-correlation-001",
+  "lineage_id": "lot39-reference-lineage-001",
+  "generated_at": "2026-08-06T19:18:40.080000Z",
+  "input_reference_time": "2026-08-06T19:18:40.080000Z",
+  "max_input_age_us": 1000000,
+  "entry_gate_path": "data/audit/lot39_v4_entry_gate.json",
+  "lot38_lifecycle_overlay_path": "data/audit/roadmap_lifecycle_overlay_lot38.json",
+  "lot38_state_path": "data/audit/order_book_l2_snapshot_engine_lot38.json",
+  "lot38_audit_path": "data/audit/order_book_l2_snapshot_engine_audit_lot38.json",
+  "lot38_snapshot_path": "data/audit/order_book_snapshot_lot38.json",
+  "lot38_health_path": "data/audit/book_health_state_lot38.json",
+  "delta_fixture_path": "tests/fixtures/lot39/order_book_delta_sequence_fixture_v1.json"
+}
