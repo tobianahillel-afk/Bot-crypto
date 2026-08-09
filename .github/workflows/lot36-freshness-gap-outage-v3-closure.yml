@@ -74,7 +74,9 @@ jobs:
             --output-format=concise 2>&1 | tee reports/lot36/ruff.txt
           mypy src/crypto_quant_bot/data_governance 2>&1 | tee reports/lot36/mypy.txt
       - name: Targeted line and branch coverage
+        shell: bash
         run: |
+          set -o pipefail
           coverage erase
           pytest -q \
             tests/test_lot36*.py \
@@ -83,7 +85,9 @@ jobs:
             --cov=crypto_quant_bot.data_governance.freshness_gap_outage_audit_and_v3_closure_validation \
             --cov-branch \
             --cov-report=json:reports/lot36/coverage.json \
-            --cov-report=term-missing
+            --cov-report=term-missing \
+            --junitxml=reports/lot36/targeted-tests.xml \
+            2>&1 | tee reports/lot36/targeted-tests.txt
           python - <<'PY'
           import json
           from pathlib import Path
