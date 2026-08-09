@@ -1,0 +1,80 @@
+name: Lot 39 V4 implementation entry gate
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'data/audit/lot39_v4_entry_gate.json'
+      - 'contracts/schemas/lot39_v4_entry_gate_v1.schema.json'
+      - 'docs/LOT_39_V4_ENTRY_GATE.md'
+      - 'reports/lot_39_v4_entry_gate_report.md'
+      - 'scripts/validate_lot39_entry_gate.py'
+      - 'tests/test_lot39_v4_entry_gate.py'
+      - '.github/workflows/lot39-entry-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Prove exact audited base and governance-only gate
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_BASE=5d0695f248b1bd4e6af5621f8a3d448cc0430050
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            test "$PR_BASE_SHA" = "$EXPECTED_BASE"
+          fi
+          git merge-base --is-ancestor "$EXPECTED_BASE" HEAD
+          git diff --quiet "$EXPECTED_BASE" HEAD -- src/
+          test ! -e contracts/schemas/order_book_delta_v1.schema.json
+          test ! -e src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor.py
+          test ! -e src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor_models.py
+          test ! -e scripts/run_lot39_order_book_delta_and_sequence_reconstructor.py
+          test ! -e scripts/validate_lot39.py
+      - name: Compile lint type schema and exact gate
+        run: |
+          python -m compileall -q scripts tests
+          python -m json.tool data/audit/lot39_v4_entry_gate.json >/dev/null
+          python -m json.tool contracts/schemas/lot39_v4_entry_gate_v1.schema.json >/dev/null
+          ruff check scripts/validate_lot39_entry_gate.py tests/test_lot39_v4_entry_gate.py
+          mypy src/crypto_quant_bot
+          python -m scripts.validate_lot39_entry_gate
+      - name: Architecture roadmap traceability and engineering gates
+        run: |
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+      - name: Gate tests full regression and anti-flake
+        run: |
+          pytest -q tests/test_lot39_v4_entry_gate.py
+          pytest -q
+          pytest -q tests/test_lot39_v4_entry_gate.py
+          pytest -q tests/test_lot39_v4_entry_gate.py
+          pytest -q tests/test_lot39_v4_entry_gate.py
+      - name: Security and final validator
+        run: |
+          bandit -q -r scripts/validate_lot39_entry_gate.py -ll
+          pip-audit -r requirements-dev.lock
+          python -m scripts.validate_lot39_entry_gate
