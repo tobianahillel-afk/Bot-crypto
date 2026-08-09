@@ -1,0 +1,15 @@
+{
+  "available_at": "2026-08-06T19:20:00.050000Z",
+  "config_version": "lot36-freshness-gap-outage-v3-closure-config-v1",
+  "correlation_id": "lot36-reference-correlation",
+  "event_time": "2026-08-06T19:20:00.000000Z",
+  "freshness_reference_time": "2026-08-06T19:18:00.100000Z",
+  "generated_at": "2026-08-06T19:20:00.100000Z",
+  "lineage_id": "lot36-from-certified-v3-market-data-governance-chain",
+  "lot34_config_path": "config/data_governance/market_data_quality_engine_v1.json",
+  "max_staleness_seconds": 121,
+  "outage_interval_multiplier": 3,
+  "required_lots": [31, 32, 33, 34, 35, 36],
+  "run_id": "lot36-reference-run",
+  "schema_version": "freshness-gap-outage-v3-closure-config-v1"
+}
