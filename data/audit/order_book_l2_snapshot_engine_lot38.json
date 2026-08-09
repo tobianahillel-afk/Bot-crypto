@@ -1,0 +1,122 @@
+{
+  "book_health": {
+    "crossed": false,
+    "health_checksum": "58b56f7cf21aa74dd67620b8dd6e19cad11b77412cdcc3103b6d60bd15703837",
+    "health_status": "HEALTHY",
+    "locked": false,
+    "normalized_ask_depth": 3,
+    "normalized_bid_depth": 3,
+    "published_ask_depth": 2,
+    "published_bid_depth": 2,
+    "reason_codes": [
+      "LOT38_BOOK_OPEN_HEALTHY",
+      "LOT38_SEQUENCE_PRESENT",
+      "LOT39_REMAINS_LOCKED"
+    ],
+    "schema_version": "book-health-state-v1",
+    "sequence_present": true,
+    "source_ask_depth": 3,
+    "source_bid_depth": 3,
+    "venue_state": "OPEN"
+  },
+  "event_time": "2026-08-06T19:18:40.000000Z",
+  "generated_at": "2026-08-06T19:18:40.050000Z",
+  "input_fixture_checksum": "f3715a14e8f04395b9ca5b514ac01ff8fcf924b82812f3388fdf500d6ecf5ece",
+  "lineage": {
+    "available_at": "2026-08-06T19:18:40.050000Z",
+    "entry_gate_checksum": "29fe4a5fd14b3bce95e3016fce67e10f94edcca1c2aad60c9fda382f3eb9d6a0",
+    "input_fixture_checksum": "f3715a14e8f04395b9ca5b514ac01ff8fcf924b82812f3388fdf500d6ecf5ece",
+    "lineage_id": "lot38-reference-lineage-001",
+    "lot37_audit_checksum": "aa2df489e636860c119eb2ed54f7a5f03ede09838dfbd056dae0bb5a8a2a482f",
+    "lot37_capability_matrix_checksum": "f7132fcfdab898af3f733b2715e0836d23e6284f8c0c1f3e7dd92ccf0070f1b4",
+    "lot37_contract_registry_checksum": "129140ffb7e812afd59d0174d318c5e3388d23bc49cc554168bde558bc0bf590",
+    "lot37_state_checksum": "ea960217eb9a2159c4a99c56257a37c43869ffad0da86555fef24eb356e5f8e7",
+    "schema_version": "lot38-lineage-envelope-v1"
+  },
+  "metrics": {
+    "latency_measurement_status": "NOT_MEASURED_OFFLINE_DETERMINISTIC_REPLAY",
+    "lot_38_duplicate_levels_aggregated_total": 0,
+    "lot_38_normalized_levels_total": 6,
+    "lot_38_processing_latency_us": null,
+    "lot_38_published_levels_total": 4,
+    "lot_38_records_processed_total": 1,
+    "lot_38_source_levels_total": 6,
+    "lot_38_validation_failures_total": 0,
+    "schema_version": "lot38-metrics-v1"
+  },
+  "output_checksum": "7610fc6ea73e49075a1b8611f8344c7b9c8fcf8ab02f55612d914eeac0ccda9b",
+  "reason_codes": [
+    "LOT38_OFFLINE_L2_SNAPSHOT_VALIDATED",
+    "CANONICAL_LEVEL_ORDERING_APPLIED",
+    "SOURCE_DEPTH_PRESERVED",
+    "SEQUENCE_ANCHOR_BOUND",
+    "LOT39_REMAINS_LOCKED"
+  ],
+  "receive_time": "2026-08-06T19:18:40.050000Z",
+  "run_context": {
+    "code_commit": "b74bea4329d5e5cb7cf2452058b684ea5a5df13c",
+    "config_version": "lot38-order-book-l2-snapshot-config-v1",
+    "correlation_id": "lot38-reference-correlation-001",
+    "run_id": "lot38-reference-run-001",
+    "runtime_mode": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "schema_version": "lot38-run-context-v1"
+  },
+  "safety": {
+    "analysis_only": true,
+    "approved_size": 0,
+    "execution_allowed": false,
+    "external_connectivity_allowed": false,
+    "market_event_publication_allowed": false,
+    "network_ingestion_allowed": false,
+    "order_routing_allowed": false,
+    "participant_behavior_inference_explicitly_labeled": true,
+    "raw_data_mutation_allowed": false,
+    "real_credentials_allowed": false,
+    "risk_approval_allowed": false,
+    "scenario_score_is_signal": false,
+    "signal_generation_allowed": false,
+    "trade_allowed": false,
+    "used_for_decision": false
+  },
+  "schema_version": "order-book-l2-snapshot-engine-state-v1",
+  "snapshot": {
+    "asks": [
+      {
+        "price": "50025.1",
+        "quantity": "0.7"
+      },
+      {
+        "price": "50025.2",
+        "quantity": "1.1"
+      }
+    ],
+    "bids": [
+      {
+        "price": "50024.9",
+        "quantity": "0.8"
+      },
+      {
+        "price": "50024.8",
+        "quantity": "1.25"
+      }
+    ],
+    "event_time": "2026-08-06T19:18:40.000000Z",
+    "instrument_id": "BTC-EUR-SPOT",
+    "market_type": "SPOT",
+    "normalized_ask_depth": 3,
+    "normalized_bid_depth": 3,
+    "published_ask_depth": 2,
+    "published_bid_depth": 2,
+    "receive_time": "2026-08-06T19:18:40.050000Z",
+    "schema_version": "order-book-snapshot-v1",
+    "sequence_anchor": "9d5b399044b6fcdbacd6e30e4a7c975638c039cf1afb6d5c7df3ee5515c6aa24",
+    "sequence_id": 1001,
+    "snapshot_checksum": "0d63ca7ac1ca48b44e58c0b0f1eb8946190eaf2da6745c2bbd2dd8de14f49b16",
+    "source_ask_depth": 3,
+    "source_bid_depth": 3,
+    "source_id": "kraken-reference-offline-fixture",
+    "venue": "KRAKEN",
+    "venue_state": "OPEN"
+  },
+  "validation_state": "VALIDATED_OFFLINE_L2_SNAPSHOT_ONLY"
+}
