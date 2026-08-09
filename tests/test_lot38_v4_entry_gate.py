@@ -79,11 +79,12 @@ def test_gate_schema_is_strict_on_safety_and_identity() -> None:
     assert schema["properties"]["safety"]["additionalProperties"] is False
     assert schema["properties"]["target_lot"]["const"] == 38
     assert schema["properties"]["next_lot"]["const"] == 39
-    assert schema["properties"]["safety"]["properties"]["trade_allowed"]["const"] is False
-    assert schema["properties"]["safety"]["properties"]["execution_allowed"]["const"] is False
+    safety = schema["properties"]["safety"]["properties"]
+    assert safety["trade_allowed"]["const"] is False
+    assert safety["execution_allowed"]["const"] is False
 
 
-def test_offline_l2_fixture_remains_noncanonical_and_nonde cision() -> None:
+def test_offline_l2_fixture_remains_noncanonical_and_nondecision() -> None:
     validate_offline_l2_fixture()
     fixture = json.loads(
         (ROOT / "tests/fixtures/lot37/offline_l2_availability_fixture_v1.json").read_text(
