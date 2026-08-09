@@ -1,0 +1,202 @@
+name: Lot 36 mutation assurance
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/crypto_quant_bot/data_governance/freshness_gap_outage_audit_and_v3_closure*.py'
+      - 'tests/test_lot36*.py'
+      - '.github/workflows/lot36-mutation-assurance.yml'
+      - 'pyproject.toml'
+      - 'requirements-dev.lock'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mutation:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Baseline Lot36 tests
+        run: pytest -q tests/test_lot36*.py
+      - name: Build isolated mutation workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .tmp-lot36-mutants
+          mkdir -p .tmp-lot36-mutants/tests
+          cp -R src .tmp-lot36-mutants/
+          cp -R config .tmp-lot36-mutants/
+          cp -R data .tmp-lot36-mutants/
+          cp -R contracts .tmp-lot36-mutants/
+          cp \
+            tests/test_lot36_freshness_gap_outage_audit_and_v3_closure.py \
+            tests/test_lot36_closure_contract.py \
+            tests/test_lot36_defensive_contracts.py \
+            tests/test_lot36_branch_coverage.py \
+            tests/test_lot36_mutation_precision.py \
+            .tmp-lot36-mutants/tests/
+          python - <<'PY'
+          from pathlib import Path
+          import toml
+
+          root = Path('.tmp-lot36-mutants')
+          mutated = {
+              'freshness_gap_outage_audit_and_v3_closure.py',
+              'freshness_gap_outage_audit_and_v3_closure_models.py',
+              'freshness_gap_outage_audit_and_v3_closure_validation.py',
+          }
+          data_governance = root / 'src/crypto_quant_bot/data_governance'
+          dependency_files = [
+              'src/crypto_quant_bot/__init__.py',
+              *[
+                  str(path.relative_to(root))
+                  for path in sorted(data_governance.glob('*.py'))
+                  if path.name not in mutated
+              ],
+          ]
+          tests = (
+              'tests/test_lot36_freshness_gap_outage_audit_and_v3_closure.py '
+              'tests/test_lot36_closure_contract.py '
+              'tests/test_lot36_defensive_contracts.py '
+              'tests/test_lot36_branch_coverage.py '
+              'tests/test_lot36_mutation_precision.py'
+          )
+          config = {
+              'project': {
+                  'name': 'crypto-quant-bot-lot36-mutation',
+                  'version': '0.36.0.dev0',
+                  'requires-python': '==3.11.*',
+                  'dependencies': [],
+              },
+              'tool': {
+                  'pytest': {
+                      'ini_options': {
+                          'pythonpath': ['src', '.'],
+                          'addopts': ['--tb=short', '-p', 'no:cacheprovider'],
+                      }
+                  },
+                  'mutmut': {
+                      'paths_to_mutate': [
+                          'src/crypto_quant_bot/data_governance/freshness_gap_outage_audit_and_v3_closure.py',
+                          'src/crypto_quant_bot/data_governance/freshness_gap_outage_audit_and_v3_closure_models.py',
+                          'src/crypto_quant_bot/data_governance/freshness_gap_outage_audit_and_v3_closure_validation.py',
+                      ],
+                      'tests_dir': ['tests/'],
+                      'runner': f'python -m pytest -q {tests}',
+                      'also_copy': dependency_files + ['config/', 'data/audit/', 'contracts/'],
+                      'mutate_only_covered_lines': True,
+                      'timeout_factor': 8.0,
+                      'do_not_mutate_patterns': [r'raise \\w+', r'logger\\.\\w+'],
+                  },
+              },
+          }
+          (root / 'pyproject.toml').write_text(toml.dumps(config), encoding='utf-8')
+          PY
+      - name: Run mutation analysis and enforce score
+        env:
+          SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports/lot36/mutation
+          cd .tmp-lot36-mutants
+          set +e
+          mutmut run 2>&1 | tee ../reports/lot36/mutation/run.txt
+          run_status=${PIPESTATUS[0]}
+          mutmut results 2>&1 | tee ../reports/lot36/mutation/results.txt
+          results_status=${PIPESTATUS[0]}
+          set -e
+          cd ..
+          RUN_STATUS="$run_status" RESULTS_STATUS="$results_status" python - <<'PY'
+          from __future__ import annotations
+
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          path = Path('reports/lot36/mutation/run.txt')
+          if not path.is_file():
+              raise SystemExit('LOT36_MUTATION_RUN_LOG_MISSING')
+          text = path.read_text(encoding='utf-8', errors='replace')
+          text = re.sub(r'\x1b(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', text)
+          text = text.replace('\r', '\n').replace('\ufe0f', '')
+
+          complete_counters = [
+              tuple(map(int, match.groups()))
+              for match in re.finditer(r'(\d+)\s*/\s*(\d+)', text)
+              if match.group(1) == match.group(2) and int(match.group(2)) > 0
+          ]
+          if not complete_counters:
+              raise SystemExit('LOT36_MUTATION_TOTAL_PARSE_ERROR')
+          completed, total = complete_counters[-1]
+
+          metric_patterns = {
+              'killed': re.compile(r'🎉\s*(\d+)'),
+              'timeout': re.compile(r'⏰\s*(\d+)'),
+              'suspicious': re.compile(r'🤔\s*(\d+)'),
+              'survived': re.compile(r'🙁\s*(\d+)'),
+          }
+          metrics: dict[str, int] = {}
+          for name, pattern in metric_patterns.items():
+              matches = list(pattern.finditer(text))
+              if not matches:
+                  raise SystemExit(f'LOT36_MUTATION_{name.upper()}_PARSE_ERROR')
+              metrics[name] = int(matches[-1].group(1))
+
+          killed = metrics['killed']
+          timeout = metrics['timeout']
+          suspicious = metrics['suspicious']
+          survived = metrics['survived']
+          evaluated = killed + timeout + suspicious + survived
+          if evaluated != total:
+              raise SystemExit(
+                  f'LOT36_MUTATION_COUNT_MISMATCH: total={total} evaluated={evaluated}'
+              )
+          score = 100.0 * (killed + timeout) / evaluated
+          payload = {
+              'schema_version': 'lot36-mutation-summary-v1',
+              'status': 'PASS' if score >= 80.0 else 'FAIL',
+              'source_head_sha': os.environ['SOURCE_HEAD_SHA'],
+              'killed_mutants': killed,
+              'timeout_mutants': timeout,
+              'suspicious_mutants': suspicious,
+              'survived_mutants': survived,
+              'evaluated_mutants': evaluated,
+              'completed_mutants': completed,
+              'total_mutants': total,
+              'mutation_score_percent': round(score, 2),
+              'minimum_score_percent': 80.0,
+              'mutmut_run_exit_code': int(os.environ['RUN_STATUS']),
+              'mutmut_results_exit_code': int(os.environ['RESULTS_STATUS']),
+          }
+          output = Path('reports/lot36/mutation_summary.json')
+          output.write_text(json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+          print(json.dumps(payload, sort_keys=True))
+          if score < 80.0:
+              raise SystemExit('LOT36_MUTATION_SCORE_BELOW_THRESHOLD')
+          PY
+      - name: Verify canonical source immutability
+        run: |
+          rm -rf .tmp-lot36-mutants
+          git diff --exit-code -- src/crypto_quant_bot
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot36-mutation-evidence
+          path: |
+            reports/lot36/mutation/
+            reports/lot36/mutation_summary.json

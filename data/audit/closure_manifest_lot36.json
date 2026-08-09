@@ -1,0 +1,25 @@
+{
+  "closure_status": "CANDIDATE_VALIDATED_AWAITING_POST_MERGE_AUDIT",
+  "human_review_required": true,
+  "lots_included": [
+    31,
+    32,
+    33,
+    34,
+    35,
+    36
+  ],
+  "manifest_checksum": "6a9935e728a93a23a3804106dc54aa216f4f9fedad3635b5507139f4ccbfc37f",
+  "next_lot": 37,
+  "next_lot_status": "PLANNED_LOCKED",
+  "post_merge_audit_required": true,
+  "reason_codes": [
+    "V3_CLOSURE_CANDIDATE_READY",
+    "POST_MERGE_AUDIT_REQUIRED",
+    "HUMAN_REVIEW_REQUIRED",
+    "LOT37_REMAINS_LOCKED"
+  ],
+  "schema_version": "closure-manifest-v1",
+  "v3_closed": false,
+  "version_id": "V3_MARKET_DATA_GOVERNANCE"
+}

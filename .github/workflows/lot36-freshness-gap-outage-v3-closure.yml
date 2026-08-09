@@ -1,0 +1,175 @@
+name: Lot 36 freshness gap outage V3 closure validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'config/data_governance/freshness_gap_outage_v3_closure_v1.json'
+      - 'contracts/schemas/*closure*.json'
+      - 'contracts/schemas/freshness_gap_outage_evidence_v1.schema.json'
+      - 'contracts/schemas/lot_validation_report_v1.schema.json'
+      - 'contracts/schemas/replay_evidence_v1.schema.json'
+      - 'src/crypto_quant_bot/data_governance/freshness_gap_outage_audit_and_v3_closure*.py'
+      - 'src/crypto_quant_bot/data_governance/__init__.py'
+      - 'scripts/*lot36*'
+      - 'scripts/run_required_chain_until_lot36.sh'
+      - 'tests/test_lot36*.py'
+      - 'docs/LOT_36_FRESHNESS_GAP_OUTAGE_AUDIT_AND_V3_CLOSURE.md'
+      - 'docs/ACCEPTANCE_CRITERIA_LOT_36.md'
+      - 'reports/lot_36_freshness_gap_outage_audit_and_v3_closure_report.md'
+      - 'data/audit/*lot36.json'
+      - '.github/workflows/lot36-freshness-gap-outage-v3-closure.yml'
+      - 'requirements-dev.lock'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lot36:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Verify merged Lot36 gate ancestry
+        run: |
+          git merge-base --is-ancestor 457e025b1c5303617fa5adceeda108c134c13911 HEAD
+          python scripts/validate_lot36_entry_gate.py
+      - name: Compile lint type and schema checks
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p reports/lot36
+          python -m compileall -q src scripts tests
+          python -m json.tool config/data_governance/freshness_gap_outage_v3_closure_v1.json >/dev/null
+          for schema in \
+            freshness_gap_outage_evidence_v1 \
+            lot_validation_report_v1 \
+            closure_manifest_v1 \
+            replay_evidence_v1 \
+            freshness_gap_outage_audit_v3_closure_state_v1 \
+            freshness_gap_outage_audit_v3_closure_audit_v1; do
+            python -m json.tool "contracts/schemas/${schema}.schema.json" >/dev/null
+          done
+          ruff check \
+            src/crypto_quant_bot/data_governance/freshness_gap_outage_audit_and_v3_closure*.py \
+            src/crypto_quant_bot/data_governance/__init__.py \
+            scripts/run_lot36_freshness_gap_outage_audit_and_v3_closure.py \
+            scripts/validate_lot36.py \
+            scripts/validate_lot36_no_connectivity.py \
+            scripts/validate_all_until_lot36.py \
+            scripts/diagnose_exact_chain_until_lot36.py \
+            tests/test_lot36*.py \
+            --output-format=concise 2>&1 | tee reports/lot36/ruff.txt
+          mypy src/crypto_quant_bot/data_governance 2>&1 | tee reports/lot36/mypy.txt
+      - name: Targeted line and branch coverage
+        shell: bash
+        run: |
+          set -o pipefail
+          coverage erase
+          pytest -q \
+            tests/test_lot36*.py \
+            --cov=crypto_quant_bot.data_governance.freshness_gap_outage_audit_and_v3_closure \
+            --cov=crypto_quant_bot.data_governance.freshness_gap_outage_audit_and_v3_closure_models \
+            --cov=crypto_quant_bot.data_governance.freshness_gap_outage_audit_and_v3_closure_validation \
+            --cov-branch \
+            --cov-report=json:reports/lot36/coverage.json \
+            --cov-report=term-missing \
+            --junitxml=reports/lot36/targeted-tests.xml \
+            2>&1 | tee reports/lot36/targeted-tests.txt
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          totals = json.loads(Path('reports/lot36/coverage.json').read_text())['totals']
+          lines = float(totals['percent_statements_covered'])
+          branches = float(totals['percent_branches_covered'])
+          print(f'Lot36 coverage: lines={lines:.2f}% branches={branches:.2f}%')
+          if lines < 95.0 or branches < 90.0:
+              raise SystemExit('LOT36_CRITICAL_COVERAGE_BELOW_THRESHOLD')
+          PY
+      - name: Generate validate and replay exact closure evidence
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          outputs=(
+            data/audit/freshness_gap_outage_audit_and_v3_closure_lot36.json
+            data/audit/freshness_gap_outage_audit_and_v3_closure_audit_lot36.json
+            data/audit/data_quality_states_lot36.json
+            data/audit/data_anomalies_lot36.json
+            data/audit/data_quality_veto_lot36.json
+            data/audit/replay_evidence_lot36.json
+            data/audit/closure_manifest_lot36.json
+          )
+          mkdir -p /tmp/lot36-committed /tmp/lot36-run1
+          code_commit="$PR_HEAD_SHA"
+          audit_path=data/audit/freshness_gap_outage_audit_and_v3_closure_audit_lot36.json
+          if git ls-files --error-unmatch "$audit_path" >/dev/null 2>&1; then
+            code_commit="$(python -c 'import json; print(json.load(open("data/audit/freshness_gap_outage_audit_and_v3_closure_audit_lot36.json"))["code_commit"])')"
+          fi
+          for path in "${outputs[@]}"; do
+            if git ls-files --error-unmatch "$path" >/dev/null 2>&1; then
+              cp "$path" "/tmp/lot36-committed/$(basename "$path")"
+            fi
+          done
+          python scripts/validate_lot35_post_merge.py
+          python scripts/run_lot36_freshness_gap_outage_audit_and_v3_closure.py --code-commit "$code_commit"
+          python scripts/validate_lot36.py
+          python scripts/validate_lot36_no_connectivity.py
+          python scripts/validate_all_until_lot36.py
+          for path in "${outputs[@]}"; do
+            cp "$path" "/tmp/lot36-run1/$(basename "$path")"
+          done
+          python scripts/run_lot36_freshness_gap_outage_audit_and_v3_closure.py --code-commit "$code_commit"
+          python scripts/validate_lot36.py
+          for path in "${outputs[@]}"; do
+            cmp "/tmp/lot36-run1/$(basename "$path")" "$path"
+            committed="/tmp/lot36-committed/$(basename "$path")"
+            if [ -f "$committed" ]; then
+              cmp "$committed" "$path"
+              git checkout -- "$path"
+            else
+              rm -f "$path"
+            fi
+          done
+      - name: Historical architecture traceability quality and security
+        run: |
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          bandit -q -r \
+            src/crypto_quant_bot/data_governance/freshness_gap_outage_audit_and_v3_closure.py \
+            src/crypto_quant_bot/data_governance/freshness_gap_outage_audit_and_v3_closure_models.py \
+            src/crypto_quant_bot/data_governance/freshness_gap_outage_audit_and_v3_closure_validation.py \
+            -ll
+          pip-audit -r requirements-dev.lock
+      - name: Full regression and anti-flake
+        run: |
+          pytest -q
+          pytest -q tests/test_lot36*.py
+          pytest -q tests/test_lot36*.py
+          pytest -q tests/test_lot36*.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot36-freshness-gap-outage-v3-closure-evidence
+          path: |
+            reports/lot36/
+            reports/lot_36_freshness_gap_outage_audit_and_v3_closure_report.md

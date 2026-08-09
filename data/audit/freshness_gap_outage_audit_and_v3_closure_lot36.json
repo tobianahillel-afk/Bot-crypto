@@ -1,0 +1,170 @@
+{
+  "analysis_only": true,
+  "anomalies": [],
+  "approved_size": 0,
+  "available_at": "2026-08-06T19:20:00.050000Z",
+  "closure_manifest": {
+    "closure_status": "CANDIDATE_VALIDATED_AWAITING_POST_MERGE_AUDIT",
+    "human_review_required": true,
+    "lots_included": [
+      31,
+      32,
+      33,
+      34,
+      35,
+      36
+    ],
+    "manifest_checksum": "6a9935e728a93a23a3804106dc54aa216f4f9fedad3635b5507139f4ccbfc37f",
+    "next_lot": 37,
+    "next_lot_status": "PLANNED_LOCKED",
+    "post_merge_audit_required": true,
+    "reason_codes": [
+      "V3_CLOSURE_CANDIDATE_READY",
+      "POST_MERGE_AUDIT_REQUIRED",
+      "HUMAN_REVIEW_REQUIRED",
+      "LOT37_REMAINS_LOCKED"
+    ],
+    "schema_version": "closure-manifest-v1",
+    "v3_closed": false,
+    "version_id": "V3_MARKET_DATA_GOVERNANCE"
+  },
+  "data_quality_veto": {
+    "action": "ALLOW_ANALYSIS",
+    "blocking_anomaly_types": [],
+    "minimum_quality_bps": 9500,
+    "observed_quality_bps": 10000,
+    "quality_known": true,
+    "reason_codes": [
+      "V3_CLOSURE_DATA_QUALITY_PASS"
+    ],
+    "schema_version": "data-quality-veto-v1"
+  },
+  "event_time": "2026-08-06T19:20:00.000000Z",
+  "execution_allowed": false,
+  "external_connectivity_allowed": false,
+  "freshness_audits": [
+    {
+      "expected_interval_count": 3,
+      "freshness_age_us": 90000,
+      "freshness_bps": 10000,
+      "gap_count": 0,
+      "instrument_id": "btc-eur-spot",
+      "latest_available_at": "2026-08-06T19:18:00.010000Z",
+      "latest_event_time": "2026-08-06T19:17:00Z",
+      "max_staleness_us": 121000000,
+      "missing_interval_count": 0,
+      "observed_interval_count": 3,
+      "outage_count": 0,
+      "reason_codes": [
+        "FRESHNESS_GAP_OUTAGE_PASS"
+      ],
+      "record_count": 3,
+      "reference_time": "2026-08-06T19:18:00.100000Z",
+      "schema_version": "freshness-gap-outage-evidence-v1",
+      "source_id": "kraken-public-spot-metadata",
+      "stale_record_count": 0,
+      "status": "PASS",
+      "timeframe": "1m"
+    }
+  ],
+  "generated_at": "2026-08-06T19:20:00.100000Z",
+  "lineage": {
+    "available_at": "2026-08-06T19:20:00.050000Z",
+    "canonical_roadmap_blob_sha": "84de51bda788a8d124fb7d344419c4a4b12030b5",
+    "entry_gate_checksum": "ccddc668b83267effb6e82827c6a0f1f8d5879803f7d3e5cc6f9cfc745ba78a5",
+    "lineage_id": "lot36-from-certified-v3-market-data-governance-chain",
+    "lot34_audit_checksum": "cd4410a2ea9ef6cdc061caf5115d908d03575e219eb9f4da402bff1712f6c7ce",
+    "lot34_state_checksum": "bc66816383ddf141016ad66796cc5dd4ad3442cd3594d96ad1f7db13d7c6bc01",
+    "lot35_audit_checksum": "98a88396f5b2e5ffc1cde02435399540ad213f5ec361b33e8a19c08b0fedf1de",
+    "lot35_state_checksum": "8fc7243beffdf985fd6947557b87ab7bd27f9191520eb2d5d9af25d1e7a886b4",
+    "schema_version": "lot36-lineage-envelope-v1"
+  },
+  "market_event_publication_allowed": false,
+  "metrics": {
+    "lot_36_anomaly_total": 0,
+    "lot_36_gap_total": 0,
+    "lot_36_outage_total": 0,
+    "lot_36_processing_latency_us": 50000,
+    "lot_36_records_processed_total": 3,
+    "lot_36_stale_record_total": 0,
+    "lot_36_validation_failures_total": 0,
+    "schema_version": "lot36-metrics-v1"
+  },
+  "network_ingestion_allowed": false,
+  "order_routing_allowed": false,
+  "output_checksum": "635b5504d21ca8d46faf51bd46639538345b4bcd94437330791b49036ee07592",
+  "quality_states": [
+    {
+      "anomaly_count": 0,
+      "completeness_bps": 10000,
+      "consistency_bps": 10000,
+      "coverage_bps": 10000,
+      "expected_interval_count": 3,
+      "freshness_bps": 10000,
+      "instrument_id": "btc-eur-spot",
+      "observed_interval_count": 3,
+      "quality_score_bps": 10000,
+      "record_count": 3,
+      "schema_version": "data-quality-state-v1",
+      "source_id": "kraken-public-spot-metadata",
+      "status": "PASS",
+      "timeframe": "1m"
+    }
+  ],
+  "raw_data_mutation_allowed": false,
+  "real_credentials_allowed": false,
+  "reason_codes": [
+    "LOT36_ENTRY_GATE_VERIFIED",
+    "CANONICAL_LOT36_ROADMAP_VERIFIED",
+    "LOT34_QUALITY_REPLAY_VERIFIED",
+    "LOT35_RECONCILIATION_REPLAY_VERIFIED",
+    "FRESHNESS_GAP_OUTAGE_AUDIT_COMPLETED",
+    "V3_CHAIN_CONTINUITY_VERIFIED",
+    "RAW_DATA_IMMUTABILITY_PRESERVED",
+    "EXTERNAL_CONNECTIVITY_DISABLED",
+    "LOT37_REMAINS_LOCKED",
+    "POST_MERGE_AUDIT_REQUIRED_FOR_V3_FINALIZATION",
+    "V3_CLOSURE_CANDIDATE_READY"
+  ],
+  "reconciliation_veto": {
+    "action": "ALLOW_ANALYSIS",
+    "critical_divergence_count": 0,
+    "minor_divergence_count": 0,
+    "reason_codes": [
+      "RECONCILIATION_GATE_PASSED"
+    ],
+    "reconciliation_known": true,
+    "schema_version": "reconciliation-veto-v1"
+  },
+  "risk_approval_allowed": false,
+  "run_context": {
+    "code_commit": "c21b8f242270bd87eebbf7279635ab8bb51b8666",
+    "config_version": "lot36-freshness-gap-outage-v3-closure-config-v1",
+    "correlation_id": "lot36-reference-correlation",
+    "run_id": "lot36-reference-run",
+    "runtime_mode": "DATA_GOVERNANCE_ONLY",
+    "schema_version": "run-context-v1"
+  },
+  "schema_version": "freshness-gap-outage-audit-v3-closure-state-v1",
+  "signal_generation_allowed": false,
+  "trade_allowed": false,
+  "used_for_decision": false,
+  "validation_report": {
+    "closure_candidate_ready": true,
+    "reason_codes": [
+      "LOTS31_35_CERTIFIED_LINEAGE_VERIFIED",
+      "LOT36_CLOSURE_INVARIANTS_PASS"
+    ],
+    "required_validator_count": 6,
+    "schema_version": "lot-validation-report-v1",
+    "validated_lots": [
+      31,
+      32,
+      33,
+      34,
+      35,
+      36
+    ]
+  },
+  "validation_state": "VALIDATED_V3_CLOSURE_CANDIDATE"
+}

@@ -1,0 +1,23 @@
+{
+  "anti_flake_repetitions": 3,
+  "artifact_digest": "sha256:3a8e53827df279b06837f447c941ef51b14672fb9b7c1d1fae9f8f55582d7a38",
+  "artifact_id": 9036759073,
+  "branch_coverage_percent": 100.0,
+  "branch_minimum_percent": 90.0,
+  "covered_branches": 136,
+  "covered_lines": 552,
+  "line_coverage_percent": 100.0,
+  "line_minimum_percent": 95.0,
+  "methodology": "GitHub Actions targeted branch coverage on the complete Lot 36 production surface; frozen from exact source head artifact",
+  "schema_version": "lot36-coverage-summary-v1",
+  "scope": [
+    "freshness_gap_outage_audit_and_v3_closure.py",
+    "freshness_gap_outage_audit_and_v3_closure_models.py",
+    "freshness_gap_outage_audit_and_v3_closure_validation.py"
+  ],
+  "source_commit": "c21b8f242270bd87eebbf7279635ab8bb51b8666",
+  "status": "PASS",
+  "total_branches": 136,
+  "total_lines": 552,
+  "workflow_run_id": 31308763595
+}

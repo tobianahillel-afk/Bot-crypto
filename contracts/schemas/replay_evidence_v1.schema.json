@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "replay_evidence_v1.schema.json",
+  "title": "ReplayEvidenceV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run1_checksum", "run2_checksum", "replay_status", "match", "reason_codes", "replay_checksum"],
+  "properties": {
+    "schema_version": {"const": "replay-evidence-v1"},
+    "run1_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "run2_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "replay_status": {"enum": ["REPLAY_MATCH", "REPLAY_DIVERGENCE", "REPLAY_IMPOSSIBLE"]},
+    "match": {"type": "boolean"},
+    "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "replay_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

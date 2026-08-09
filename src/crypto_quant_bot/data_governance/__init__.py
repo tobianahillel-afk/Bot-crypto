@@ -1,4 +1,4 @@
-"""Public V3 market-data governance API introduced by Lots 31 to 35."""
+"""Public V3 market-data governance API introduced by Lots 31 to 36."""
 
 from .candle_trade_book_reconciliation import (
     build_lot35_artifacts,
@@ -17,6 +17,24 @@ from .candle_trade_book_reconciliation_models import (
     ReconciliationVetoV1,
 )
 from .candle_trade_book_reconciliation_validation import ReconciliationError
+from .freshness_gap_outage_audit_and_v3_closure import (
+    audit_freshness_gap_outage,
+    build_lot36_artifacts,
+    build_replay_evidence,
+    write_lot36_artifacts,
+)
+from .freshness_gap_outage_audit_and_v3_closure_models import (
+    ClosureManifestV1,
+    FreshnessGapOutageAuditV3ClosureAuditV1,
+    FreshnessGapOutageAuditV3ClosureStateV1,
+    FreshnessGapOutageEvidenceV1,
+    Lot36LineageEnvelopeV1,
+    Lot36MetricsV1,
+    Lot36RunContextV1,
+    LotValidationReportV1,
+    ReplayEvidenceV1,
+)
+from .freshness_gap_outage_audit_and_v3_closure_validation import V3ClosureError
 from .instrument_symbol_and_contract_normalization import (
     build_lot32_artifacts,
     normalize_candidate_amounts,
@@ -88,10 +106,14 @@ __all__ = [
     "CanonicalTimeEnvelopeV1",
     "CapabilityMatrixEntryV1",
     "ClockHealthStateV1",
+    "ClosureManifestV1",
     "ContractRegistryEntryV1",
     "DataAnomalyV1",
     "DataQualityStateV1",
     "DataQualityVetoV1",
+    "FreshnessGapOutageAuditV3ClosureAuditV1",
+    "FreshnessGapOutageAuditV3ClosureStateV1",
+    "FreshnessGapOutageEvidenceV1",
     "InstrumentNormalizationError",
     "InstrumentRegistryV1",
     "InstrumentSpecificationV1",
@@ -110,6 +132,10 @@ __all__ = [
     "Lot35LineageEnvelopeV1",
     "Lot35MetricsV1",
     "Lot35RunContextV1",
+    "Lot36LineageEnvelopeV1",
+    "Lot36MetricsV1",
+    "Lot36RunContextV1",
+    "LotValidationReportV1",
     "MarketDataGovernanceScopeSourceRegistryAuditV1",
     "MarketDataGovernanceScopeSourceRegistryStateV1",
     "MarketDataQualityEngineAuditV1",
@@ -121,6 +147,7 @@ __all__ = [
     "ReconciliationReportV1",
     "ReconciliationSnapshotV1",
     "ReconciliationVetoV1",
+    "ReplayEvidenceV1",
     "RunContextV1",
     "SourceRegistryEntryV1",
     "SourceRegistryV1",
@@ -128,13 +155,17 @@ __all__ = [
     "TimestampClockTimezoneGovernanceAuditV1",
     "TimestampClockTimezoneGovernanceStateV1",
     "TimestampGovernanceError",
+    "V3ClosureError",
     "VenueInstrumentAliasV1",
+    "audit_freshness_gap_outage",
     "build_lot31_artifacts",
     "build_lot32_artifacts",
     "build_lot33_artifacts",
     "build_lot34_artifacts",
     "build_lot35_artifacts",
+    "build_lot36_artifacts",
     "build_reconciliation_reports",
+    "build_replay_evidence",
     "canonical_checksum",
     "detect_anomalies",
     "normalize_candidate_amounts",
@@ -144,4 +175,5 @@ __all__ = [
     "persist_lot34_artifacts",
     "persist_lot35_artifacts",
     "quantize_to_increment",
+    "write_lot36_artifacts",
 ]
