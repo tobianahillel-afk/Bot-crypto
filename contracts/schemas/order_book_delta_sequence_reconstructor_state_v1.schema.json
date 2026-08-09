@@ -39,7 +39,7 @@
     "base_snapshot_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "delta_fixture_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "reconstructed_book": {"oneOf": [{"type": "object"}, {"type": "null"}]},
-    "sequence_gap_event": {"oneOf": [{"type": "object"}, {"type": "null"}]},
+    "sequence_gap_event": {"type": "object"},
     "metrics": {"type": "object"},
     "reason_codes": {
       "type": "array",
@@ -57,7 +57,13 @@
         "properties": {
           "validation_state": {"const": "VALIDATED_OFFLINE_DELTA_SEQUENCE_RECONSTRUCTION_ONLY"},
           "reconstructed_book": {"type": "object"},
-          "sequence_gap_event": {"type": "null"}
+          "sequence_gap_event": {
+            "type": "object",
+            "properties": {
+              "gap_detected": {"const": false},
+              "synchronization_state": {"const": "SYNCED"}
+            }
+          }
         }
       }
     },
@@ -67,7 +73,13 @@
         "properties": {
           "validation_state": {"const": "BLOCKED_RESYNC_REQUIRED"},
           "reconstructed_book": {"type": "null"},
-          "sequence_gap_event": {"type": "object"}
+          "sequence_gap_event": {
+            "type": "object",
+            "properties": {
+              "gap_detected": {"const": true},
+              "synchronization_state": {"const": "RESYNC_REQUIRED"}
+            }
+          }
         }
       }
     }
