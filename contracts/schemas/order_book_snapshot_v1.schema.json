@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "order_book_snapshot_v1.schema.json",
+  "title": "OrderBookSnapshotV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source_id", "venue", "instrument_id", "market_type", "event_time", "receive_time", "sequence_id", "sequence_anchor", "venue_state", "bids", "asks", "source_bid_depth", "source_ask_depth", "normalized_bid_depth", "normalized_ask_depth", "published_bid_depth", "published_ask_depth", "snapshot_checksum"],
+  "properties": {
+    "schema_version": {"const": "order-book-snapshot-v1"},
+    "source_id": {"type": "string", "minLength": 1},
+    "venue": {"type": "string", "minLength": 1},
+    "instrument_id": {"type": "string", "minLength": 1},
+    "market_type": {"const": "SPOT"},
+    "event_time": {"type": "string", "minLength": 1},
+    "receive_time": {"type": "string", "minLength": 1},
+    "sequence_id": {"type": "integer", "minimum": 0},
+    "sequence_anchor": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "venue_state": {"enum": ["OPEN", "LOCKED"]},
+    "bids": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/level"}},
+    "asks": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/level"}},
+    "source_bid_depth": {"type": "integer", "minimum": 1},
+    "source_ask_depth": {"type": "integer", "minimum": 1},
+    "normalized_bid_depth": {"type": "integer", "minimum": 1},
+    "normalized_ask_depth": {"type": "integer", "minimum": 1},
+    "published_bid_depth": {"type": "integer", "minimum": 1},
+    "published_ask_depth": {"type": "integer", "minimum": 1},
+    "snapshot_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "level": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["price", "quantity"],
+      "properties": {
+        "price": {"type": "string", "pattern": "^[0-9]+(?:\\.[0-9]+)?$"},
+        "quantity": {"type": "string", "pattern": "^[0-9]+(?:\\.[0-9]+)?$"}
+      }
+    }
+  }
+}
