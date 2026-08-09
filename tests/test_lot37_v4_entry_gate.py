@@ -14,13 +14,18 @@ from scripts.validate_lot37_entry_gate import (
     Lot37EntryGateError,
     canonical_checksum,
     canonical_roadmap_record,
-    validate,
     validate_l2_fixture,
+    validate_lot36_evidence,
+    validate_payload_checksum,
+    validate_prerequisites,
+    validate_roadmap,
+    validate_scope,
     validate_trade_fixture,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
 GATE_PATH = ROOT / "data/audit/lot37_v4_entry_gate.json"
+OVERLAY_PATH = ROOT / "data/audit/roadmap_lifecycle_overlay_lot36.json"
 L2_PATH = ROOT / "tests/fixtures/lot37/offline_l2_availability_fixture_v1.json"
 TRADE_PATH = ROOT / "tests/fixtures/lot37/offline_trade_availability_fixture_v1.json"
 
@@ -32,25 +37,36 @@ def _write_json(path: Path, payload: object) -> None:
     )
 
 
-def test_lot37_entry_gate_passes_exact_certified_state() -> None:
-    result = validate()
-    assert result == {
-        "schema_version": "lot37-entry-gate-validation-v1",
-        "status": "PASS",
-        "gate_status": "GO_LOT37_IMPLEMENTATION_ENTRY",
-        "canonical_title": "Microstructure Scope & Offline Data Contracts",
-        "owner": "MicrostructureDomain",
-        "runtime_mode": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
-        "output_checksum": EXPECTED_GATE_CHECKSUM,
-        "v3_closed": True,
-        "offline_l2_available": True,
-        "offline_trades_available": True,
-        "next_locked_lot": 38,
-        "external_connectivity_allowed": False,
-        "trade_allowed": False,
-        "execution_allowed": False,
-        "approved_size": 0,
+def _validate_archived_gate() -> dict[str, object]:
+    gate = json.loads(GATE_PATH.read_text(encoding="utf-8"))
+    overlay = json.loads(OVERLAY_PATH.read_text(encoding="utf-8"))
+    validate_payload_checksum(gate, "output_checksum", EXPECTED_GATE_CHECKSUM, "Lot 37 gate")
+    validate_roadmap(gate)
+    assert overlay["latest_implemented_lot"] == 36
+    assert overlay["lots"]["37"] == {
+        "implementation_started": False,
+        "status": "PLANNED_LOCKED",
     }
+    lot36 = overlay["lots"]["36"]
+    assert lot36["status"] == "IMPLEMENTED_VALIDATED_V3_CLOSURE_ONLY"
+    assert lot36["v3_closed"] is True
+    quality = validate_lot36_evidence()
+    validate_prerequisites(gate, lot36, quality)
+    validate_scope(gate)
+    return gate
+
+
+def test_lot37_entry_gate_preserves_exact_certified_state() -> None:
+    gate = _validate_archived_gate()
+    assert gate["gate_status"] == "GO_LOT37_IMPLEMENTATION_ENTRY"
+    assert gate["owner"] == "MicrostructureDomain"
+    assert gate["runtime_mode"] == "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY"
+    assert gate["next_lot"] == 38
+    assert gate["next_lot_status"] == "PLANNED_LOCKED"
+    assert gate["safety"]["external_connectivity_allowed"] is False
+    assert gate["safety"]["trade_allowed"] is False
+    assert gate["safety"]["execution_allowed"] is False
+    assert gate["safety"]["approved_size"] == 0
 
 
 def test_gate_checksum_is_canonical_and_tamper_evident() -> None:
@@ -154,9 +170,7 @@ def test_trade_fixture_rejects_duplicate_ids(
         validate_trade_fixture(path)
 
 
-def test_gate_fails_closed_if_scope_is_tampered(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_gate_fails_closed_if_scope_is_tampered(tmp_path: Path) -> None:
     gate = json.loads(GATE_PATH.read_text(encoding="utf-8"))
     tampered = copy.deepcopy(gate)
     tampered["forbidden_scope"].remove("TRADING")
@@ -165,9 +179,5 @@ def test_gate_fails_closed_if_scope_is_tampered(
     tampered["output_checksum"] = canonical_checksum(body)
     path = tmp_path / "gate.json"
     _write_json(path, tampered)
-    monkeypatch.setattr(gate_validator, "GATE_PATH", path)
-    monkeypatch.setattr(
-        gate_validator, "EXPECTED_GATE_CHECKSUM", tampered["output_checksum"]
-    )
     with pytest.raises(Lot37EntryGateError, match="forbidden scope"):
-        validate()
+        validate_scope(tampered)
