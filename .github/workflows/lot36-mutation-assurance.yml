@@ -41,7 +41,12 @@ jobs:
           cp -R config .tmp-lot36-mutants/
           cp -R data .tmp-lot36-mutants/
           cp -R contracts .tmp-lot36-mutants/
-          cp tests/test_lot36*.py .tmp-lot36-mutants/tests/
+          cp \
+            tests/test_lot36_freshness_gap_outage_audit_and_v3_closure.py \
+            tests/test_lot36_closure_contract.py \
+            tests/test_lot36_defensive_contracts.py \
+            tests/test_lot36_branch_coverage.py \
+            .tmp-lot36-mutants/tests/
           python - <<'PY'
           from pathlib import Path
           import toml
