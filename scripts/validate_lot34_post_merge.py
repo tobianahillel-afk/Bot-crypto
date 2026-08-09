@@ -82,7 +82,7 @@ def validate_lifecycle() -> dict[str, Any]:
     )
     require(
         current["lots"]["35"] == {"implementation_started": False, "status": "PLANNED_LOCKED"},
-        "historical Lot 34 overlay no longer records Lot 35 as locked",
+        "Lot 35 must remain locked",
     )
     require(
         "ContinuousMarketStateV1" in current["future_capabilities_locked"],
