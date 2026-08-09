@@ -1,0 +1,142 @@
+{
+  "record": {
+    "acceptance_tests": [
+      "Aucun timestamp ambigu",
+      "Aucun symbole non normalisé",
+      "Anomalies injectées détectées",
+      "Reconstruction déterministe",
+      "Tous les lots de la version sont couverts et leurs gates satisfaits",
+      "Test déterministe run1/run2 avec checksums identiques.",
+      "Test négatif : schéma incompatible rejeté.",
+      "Test négatif : donnée stale/incomplète bloque le résultat.",
+      "Test anti-lookahead ou anti-future-state adapté au domaine.",
+      "Test de sérialisation/désérialisation du contrat de sortie.",
+      "Test d’intégration avec le lot précédent et le gate suivant.",
+      "Validation de continuité de chaîne.",
+      "Mutation test d’un invariant de sécurité qui doit faire échouer la clôture.",
+      "Injection de chaque anomalie.",
+      "Quarantaine sans modification des données raw."
+    ],
+    "definition_of_done": [
+      "Tous les fichiers et contrats listés existent ou sont explicitement marqués non applicables avec justification.",
+      "Les validations unitaires, intégration, négatives, replay et sécurité sont PASS.",
+      "Le rapport de lot contient commandes, résultats, limites connues, checksums et conclusion humaine.",
+      "Le lot suivant reste verrouillé jusqu’au gate de promotion."
+    ],
+    "dependencies": [
+      "Sources marché autorisées",
+      "Métadonnées exchange",
+      "Fixtures OHLCV/trades/book"
+    ],
+    "domain_rules": [
+      "Aucune valeur implicite ne peut transformer UNKNOWN en autorisation.",
+      "Les seuils sont lus depuis une configuration versionnée ; aucun seuil live n’est caché dans le code."
+    ],
+    "expected_artifacts": [
+      "Source registry",
+      "Instrument registry",
+      "Data quality reports",
+      "Gap/outage/freshness evidence",
+      "Rapport de clôture V3_MARKET_DATA_GOVERNANCE"
+    ],
+    "failure_modes": [
+      "Entrée absente, obsolète, hors séquence ou de version incompatible → état BLOCKED/UNKNOWN.",
+      "Divergence entre état calculé et artefact réconcilié → veto et rapport de divergence.",
+      "Exception non classifiée → aucun output valide, incident auditable et arrêt fail-closed.",
+      "Checksum différent → NON_DETERMINISTIC_FAIL.",
+      "Lot antérieur non PASS → closure refusée.",
+      "Qualité inconnue → BLOCK_ANALYSIS_OR_TRADING.",
+      "Correction destructive de raw data → interdite."
+    ],
+    "implementation_files": [
+      "scripts/validate_all_until_lot36.py",
+      "scripts/run_required_chain_until_lot36.sh",
+      "scripts/diagnose_exact_chain_until_lot36.py",
+      "tests/test_lot36_closure_contract.py",
+      "data/audit/closure_manifest_lot36.json",
+      "reports/lot_36_validation_report.md",
+      "docs/ACCEPTANCE_CRITERIA_LOT_36.md",
+      "src/crypto_quant_bot/data_governance/freshness_gap_outage_audit_and_v3_closure.py",
+      "src/crypto_quant_bot/data_governance/freshness_gap_outage_audit_and_v3_closure_models.py",
+      "scripts/run_lot36_freshness_gap_outage_audit_and_v3_closure.py",
+      "scripts/validate_lot36.py",
+      "tests/test_lot36_freshness_gap_outage_audit_and_v3_closure.py",
+      "data/audit/freshness_gap_outage_audit_and_v3_closure_lot36.json",
+      "reports/lot_36_freshness_gap_outage_audit_and_v3_closure_report.md",
+      "docs/LOT_36_FRESHNESS_GAP_OUTAGE_AUDIT_AND_V3_CLOSURE.md"
+    ],
+    "implementation_requirements": [
+      "Définir des contrats canoniques pour sources, instruments, timestamps et qualité.",
+      "Conserver event_time, receive_time, process_time et source_time lorsque disponibles.",
+      "Détecter données manquantes, dupliquées, obsolètes, hors ordre ou incohérentes.",
+      "Réconcilier candles, trades et books avec tolérances documentées.",
+      "Produire un score de qualité, une liste d’anomalies et un veto data_quality."
+    ],
+    "input_contracts": [
+      "RunContextV1 (run_id, runtime_mode, config_version, code_commit, correlation_id)",
+      "LineageEnvelopeV1 des artefacts produits par les lots préalables",
+      "ReplayManifestV1",
+      "Checksums des inputs/configs/code/models"
+    ],
+    "lot_id": "Lot 36",
+    "lot_number": 36,
+    "non_goals": [
+      "Ne pas activer une capability d’une version ultérieure.",
+      "Ne pas déduire une permission de trading à partir d’un score ou d’un succès technique."
+    ],
+    "objective": "Être l’unique propriétaire de « Freshness, Gap, Outage Audit & V3 Closure » dans Market Data Governance, produire FreshnessGapOutageAuditV3ClosureStateV1 et refuser tout état ambigu avant publication. Le lot doit être directement implémentable à partir des contrats, étapes, erreurs, fichiers et tests ci-dessous.",
+    "observability": [
+      "lot_36_records_processed_total",
+      "lot_36_validation_failures_total",
+      "lot_36_processing_latency_ms"
+    ],
+    "output_contracts": [
+      "FreshnessGapOutageAuditV3ClosureStateV1",
+      "FreshnessGapOutageAuditV3ClosureAuditV1",
+      "ReplayEvidenceV1",
+      "LotValidationReportV1",
+      "ClosureManifestV1",
+      "DataQualityStateV1",
+      "DataAnomalyV1",
+      "DataQualityVetoV1"
+    ],
+    "package_boundary": "src/crypto_quant_bot/data_governance",
+    "processing_sequence": [
+      "Valider les gates d’entrée du Lot 36, les versions de schéma et la fraîcheur de chaque dépendance.",
+      "Exécuter la responsabilité « Freshness, Gap, Outage Audit & V3 Closure » dans le composant MarketDataGovernanceDomain sans effet de bord non déclaré.",
+      "Associer à chaque résultat les identifiants de données, features, modèle, configuration, code et replay.",
+      "Persister état, reason_codes, incertitude, veto éventuel, métriques et checksum par écriture atomique.",
+      "Rejouer la chaîne exacte depuis les artefacts immuables et l’ordre canonique event_time/sequence_id.",
+      "Comparer checksums, counts, reason_codes et états finaux entre run1/run2.",
+      "Exécuter les cas négatifs et les recherches de champs/capabilities interdits.",
+      "Figer le manifest de clôture uniquement après PASS de tous les validators et revue humaine.",
+      "Détecter missing intervals, duplicates, out-of-order, stale, invalid OHLC, negative volume, impossible spread et schema drift.",
+      "Calculer coverage, freshness, completeness, consistency et quality_score par source/instrument/timeframe.",
+      "Associer sévérité, intervalle affecté, correction permise et statut quarantined.",
+      "Appliquer data_quality_veto avant analyse, signal et ordre."
+    ],
+    "promotion_gate": "Version fermée uniquement après revue humaine, rapport PASS et invariants transverses validés.",
+    "responsibility": "Être l’unique propriétaire de « Freshness, Gap, Outage Audit & V3 Closure » dans Market Data Governance, produire FreshnessGapOutageAuditV3ClosureStateV1 et refuser tout état ambigu avant publication.",
+    "responsible_component": "MarketDataGovernanceDomain",
+    "runtime_mode": "DATA_GOVERNANCE_ONLY",
+    "safety_invariants": [
+      "schema_version, event_time, generated_at, lineage_id et validation_state sont explicites.",
+      "Toute erreur de contrat, donnée inconnue ou état non réconcilié est fail-closed.",
+      "Aucun secret réel ne figure dans le code, les fixtures, les rapports ou les artefacts.",
+      "Les écritures d’artefacts sont atomiques ; un fichier partiel n’est jamais accepté.",
+      "Aucun secret réel n’est stocké dans les artefacts ou les fixtures.",
+      "Les schémas, versions, timestamps et checksums sont explicites.",
+      "Les erreurs critiques sont fail-closed et produisent un état bloqué, jamais une autorisation implicite.",
+      "Données insuffisantes => BLOCK_ANALYSIS_OR_TRADING",
+      "Aucune connectivité externe avant gate dédié"
+    ],
+    "status": "PLANNED_LOCKED",
+    "title": "Freshness, Gap, Outage Audit & V3 Closure",
+    "version_id": "V3_MARKET_DATA_GOVERNANCE",
+    "version_number": 3,
+    "version_title": "Market Data Governance"
+  },
+  "source_blob_sha": "84de51bda788a8d124fb7d344419c4a4b12030b5",
+  "source_line": 37,
+  "source_path": "data/audit/product_scope_roadmap_lot21.jsonl"
+}
