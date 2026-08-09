@@ -1,0 +1,66 @@
+name: Lot 36 evidence freeze controller
+
+on:
+  push:
+    branches: [agent/lot36-evidence-controller]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  freeze:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: c21b8f242270bd87eebbf7279635ab8bb51b8666
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Generate validated Lot36 evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          outputs=(
+            data/audit/freshness_gap_outage_audit_and_v3_closure_lot36.json
+            data/audit/freshness_gap_outage_audit_and_v3_closure_audit_lot36.json
+            data/audit/data_quality_states_lot36.json
+            data/audit/data_anomalies_lot36.json
+            data/audit/data_quality_veto_lot36.json
+            data/audit/replay_evidence_lot36.json
+            data/audit/closure_manifest_lot36.json
+          )
+          rm -f "${outputs[@]}"
+          python scripts/run_lot36_freshness_gap_outage_audit_and_v3_closure.py \
+            --code-commit c21b8f242270bd87eebbf7279635ab8bb51b8666
+          python scripts/validate_lot36.py
+          python scripts/validate_lot36_no_connectivity.py
+          python scripts/validate_all_until_lot36.py
+          mkdir -p /tmp/lot36-run1
+          for path in "${outputs[@]}"; do
+            cp "$path" "/tmp/lot36-run1/$(basename "$path")"
+          done
+          python scripts/run_lot36_freshness_gap_outage_audit_and_v3_closure.py \
+            --code-commit c21b8f242270bd87eebbf7279635ab8bb51b8666
+          python scripts/validate_lot36.py
+          for path in "${outputs[@]}"; do
+            cmp "/tmp/lot36-run1/$(basename "$path")" "$path"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lot36-canonical-evidence-c21b8f24
+          path: |
+            data/audit/freshness_gap_outage_audit_and_v3_closure_lot36.json
+            data/audit/freshness_gap_outage_audit_and_v3_closure_audit_lot36.json
+            data/audit/data_quality_states_lot36.json
+            data/audit/data_anomalies_lot36.json
+            data/audit/data_quality_veto_lot36.json
+            data/audit/replay_evidence_lot36.json
+            data/audit/closure_manifest_lot36.json
