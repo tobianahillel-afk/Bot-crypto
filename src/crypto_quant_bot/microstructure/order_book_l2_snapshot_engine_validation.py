@@ -49,14 +49,11 @@ def parse_utc_timestamp(value: str, field: str) -> datetime:
     if not value.endswith("Z"):
         raise OrderBookL2SnapshotValidationError(f"{field} must use UTC Z notation")
     try:
-        parsed = datetime.fromisoformat(value[:-1] + "+00:00")
+        return datetime.fromisoformat(value[:-1] + "+00:00")
     except ValueError as exc:
         raise OrderBookL2SnapshotValidationError(
             f"{field} is not an ISO timestamp"
         ) from exc
-    if parsed.utcoffset() is None:
-        raise OrderBookL2SnapshotValidationError(f"{field} must be timezone-aware")
-    return parsed
 
 
 def duration_us(start: datetime, end: datetime) -> int:
