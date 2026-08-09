@@ -31,19 +31,17 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Verify exact audited base and gate-only boundary
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      - name: Verify archived gate lineage and immutable gate artifacts
         shell: bash
         run: |
-          EXPECTED_BASE=d9df26bfa2b294a5ca0b973807af32b39e882dda
-          git merge-base --is-ancestor "$EXPECTED_BASE" HEAD
-          if [ "$EVENT_NAME" = "pull_request" ]; then
-            test "$PR_BASE_SHA" = "$EXPECTED_BASE"
-            git diff --quiet "$PR_BASE_SHA"...HEAD -- src/
-          fi
-      - name: Compile lint schema and gate validation
+          git merge-base --is-ancestor 457e025b1c5303617fa5adceeda108c134c13911 HEAD
+          git diff --quiet 457e025b1c5303617fa5adceeda108c134c13911...HEAD -- \
+            data/audit/lot36_v3_entry_gate.json \
+            contracts/schemas/lot36_v3_entry_gate_v1.schema.json \
+            docs/LOT_36_V3_ENTRY_GATE.md \
+            reports/lot_36_v3_entry_gate_report.md \
+            tests/test_lot36_v3_entry_gate.py
+      - name: Compile lint schema and archived gate validation
         run: |
           python -m compileall -q scripts tests
           python -m json.tool data/audit/lot36_v3_entry_gate.json >/dev/null
@@ -52,7 +50,6 @@ jobs:
           python scripts/validate_lot35_entry_gate.py
           python scripts/validate_lot35.py
           python scripts/validate_lot35_no_connectivity.py
-          python scripts/validate_lot35_post_merge.py
           python scripts/validate_lot36_entry_gate.py
       - name: Architecture roadmap traceability and engineering gates
         run: |

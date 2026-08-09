@@ -12,7 +12,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 ROADMAP_DIR = ROOT / "docs/roadmap"
 REGISTRY = ROOT / "data/audit/product_scope_roadmap_lot21.jsonl"
-OVERLAY = ROOT / "data/audit/roadmap_lifecycle_overlay_lot35.json"
+OVERLAY = ROOT / "data/audit/roadmap_lifecycle_overlay_lot36.json"
 
 VERSION_NAMES = (
     "DEFENSIVE_AUDIT_NO_TRADING", "MARKET_ANALYSIS_OFFLINE",
@@ -92,6 +92,17 @@ REQUIRED_RELEASE_FILES[35] = [
     "data/audit/reconciliation_veto_lot35.json",
     "reports/lot35/coverage_summary.json",
     "reports/lot35/mutation_summary.json",
+]
+REQUIRED_RELEASE_FILES[36] = [
+    "docs/LOT_36_FRESHNESS_GAP_OUTAGE_AUDIT_AND_V3_CLOSURE.md",
+    "docs/LOT_36_POST_MERGE_AUDIT.md",
+    "docs/LOT36_POST_MERGE_VALIDATION_MATRIX.md",
+    "data/audit/freshness_gap_outage_audit_and_v3_closure_lot36.json",
+    "data/audit/freshness_gap_outage_audit_and_v3_closure_audit_lot36.json",
+    "data/audit/closure_manifest_lot36.json",
+    "data/audit/replay_evidence_lot36.json",
+    "reports/lot36/coverage_summary.json",
+    "reports/lot36/mutation_summary.json",
 ]
 PORTFOLIO_RISK_FILES = [
     "docs/CANONICAL_PORTFOLIO_RISK_SIZING_AND_EXIT_STANDARD.md",
@@ -182,10 +193,10 @@ def validate_version_docs() -> None:
 
 def validate_lifecycle() -> None:
     overlay = load_object(OVERLAY)
-    require(overlay.get("latest_implemented_lot") == 35, "lifecycle latest lot must be 35")
+    require(overlay.get("latest_implemented_lot") == 36, "lifecycle latest lot must be 36")
     require(
-        overlay.get("previous_overlay") == "data/audit/roadmap_lifecycle_overlay_lot34.json",
-        "Lot 35 lifecycle predecessor mismatch",
+        overlay.get("previous_overlay") == "data/audit/roadmap_lifecycle_overlay_lot35.json",
+        "Lot 36 lifecycle predecessor mismatch",
     )
     lots = overlay.get("lots")
     require(isinstance(lots, dict), "lifecycle lots missing")
@@ -200,6 +211,7 @@ def validate_lifecycle() -> None:
         "33": "IMPLEMENTED_VALIDATED_TEMPORAL_ONLY",
         "34": "IMPLEMENTED_VALIDATED_DATA_QUALITY_ONLY",
         "35": "IMPLEMENTED_VALIDATED_RECONCILIATION_ONLY",
+        "36": "IMPLEMENTED_VALIDATED_V3_CLOSURE_ONLY",
     }
     for lot_number, status in expected.items():
         entry = lots.get(lot_number)
@@ -227,9 +239,18 @@ def validate_lifecycle() -> None:
     require(lot35.get("external_connectivity_allowed") is False, "Lot 35 connectivity enabled")
     require(lot35.get("network_ingestion_allowed") is False, "Lot 35 ingestion enabled")
     require(lot35.get("raw_data_mutation_allowed") is False, "Lot 35 raw mutation enabled")
+    lot36 = lots["36"]
+    require(lot36.get("merged_commit") == "87da195283797247505e4fc650214e33e759e21a", "Lot 36 merged commit mismatch")
+    require(lot36.get("implementation_commit") == "c21b8f242270bd87eebbf7279635ab8bb51b8666", "Lot 36 implementation commit mismatch")
+    require(lot36.get("evidence_commit") == "b3680f5da0a3fd98fdedc31599c829dc60808290", "Lot 36 evidence commit mismatch")
+    require(lot36.get("exact_ci_commit") == "16f3454c6f912f3f00f79836950047b15687abce", "Lot 36 exact CI commit mismatch")
+    require(lot36.get("external_connectivity_allowed") is False, "Lot 36 connectivity enabled")
+    require(lot36.get("network_ingestion_allowed") is False, "Lot 36 ingestion enabled")
+    require(lot36.get("raw_data_mutation_allowed") is False, "Lot 36 raw mutation enabled")
+    require(lot36.get("v3_closed") is True, "V3 closure missing")
     require(
-        lots.get("36") == {"implementation_started": False, "status": "PLANNED_LOCKED"},
-        "Lot 36 must remain locked before its entry gate",
+        lots.get("37") == {"implementation_started": False, "status": "PLANNED_LOCKED"},
+        "Lot 37 must remain locked before its entry gate",
     )
 
 
@@ -451,6 +472,52 @@ def validate_lot35() -> None:
     validate_fail_closed((state, audit), "Lot 35")
 
 
+def validate_lot36() -> None:
+    state = load_object(ROOT / "data/audit/freshness_gap_outage_audit_and_v3_closure_lot36.json")
+    audit = load_object(ROOT / "data/audit/freshness_gap_outage_audit_and_v3_closure_audit_lot36.json")
+    manifest = load_object(ROOT / "data/audit/closure_manifest_lot36.json")
+    replay = load_object(ROOT / "data/audit/replay_evidence_lot36.json")
+    coverage = load_object(ROOT / "reports/lot36/coverage_summary.json")
+    mutation = load_object(ROOT / "reports/lot36/mutation_summary.json")
+    state_checksum = validate_payload_checksum(
+        state, "output_checksum",
+        "635b5504d21ca8d46faf51bd46639538345b4bcd94437330791b49036ee07592",
+        "Lot 36 state",
+    )
+    validate_payload_checksum(
+        audit, "audit_checksum",
+        "ca8f70e8f75b0e18b5b5c8835646ccb4c0e6adf4177023a9bd2117c0f1d81f42",
+        "Lot 36 audit",
+    )
+    require(audit.get("state_output_checksum") == state_checksum, "Lot 36 audit link mismatch")
+    require(state.get("closure_manifest") == manifest, "Lot 36 manifest mismatch")
+    require(manifest.get("manifest_checksum") == "6a9935e728a93a23a3804106dc54aa216f4f9fedad3635b5507139f4ccbfc37f", "Lot 36 manifest checksum changed")
+    require(manifest.get("v3_closed") is False, "Lot 36 historical candidate manifest changed")
+    require(replay.get("replay_checksum") == "cef50b5191c1f3c78baaa3906c4c5ded59f1dd45dad0271a0071b7056b6af91d", "Lot 36 replay checksum changed")
+    require(replay.get("replay_status") == "REPLAY_MATCH" and replay.get("match") is True, "Lot 36 replay changed")
+    require(state.get("validation_state") == "VALIDATED_V3_CLOSURE_CANDIDATE", "Lot 36 state changed")
+    require(state.get("data_quality_veto", {}).get("action") == "ALLOW_ANALYSIS", "Lot 36 quality veto changed")
+    require(state.get("reconciliation_veto", {}).get("action") == "ALLOW_ANALYSIS", "Lot 36 reconciliation veto changed")
+    metrics = state.get("metrics")
+    require(isinstance(metrics, dict), "Lot 36 metrics missing")
+    require(metrics.get("lot_36_records_processed_total") == 3, "Lot 36 record count changed")
+    require(metrics.get("lot_36_gap_total") == 0, "Lot 36 gap count changed")
+    require(metrics.get("lot_36_outage_total") == 0, "Lot 36 outage count changed")
+    require(metrics.get("lot_36_stale_record_total") == 0, "Lot 36 stale count changed")
+    require(metrics.get("lot_36_anomaly_total") == 0, "Lot 36 anomaly count changed")
+    require(coverage.get("status") == "PASS", "Lot 36 coverage status changed")
+    require(coverage.get("source_commit") == "c21b8f242270bd87eebbf7279635ab8bb51b8666", "Lot 36 coverage source changed")
+    require(coverage.get("line_coverage_percent") == 100.0, "Lot 36 line coverage changed")
+    require(coverage.get("branch_coverage_percent") == 100.0, "Lot 36 branch coverage changed")
+    require(coverage.get("anti_flake_repetitions") == 3, "Lot 36 anti-flake changed")
+    require(mutation.get("status") == "PASS", "Lot 36 mutation status changed")
+    require(mutation.get("source_head_sha") == "c21b8f242270bd87eebbf7279635ab8bb51b8666", "Lot 36 mutation source changed")
+    require(mutation.get("mutation_score_percent") == 83.48, "Lot 36 mutation score changed")
+    require(mutation.get("killed_mutants") == 1289, "Lot 36 killed mutants changed")
+    require(mutation.get("evaluated_mutants") == 1544, "Lot 36 evaluated mutants changed")
+    validate_fail_closed((state, audit), "Lot 36")
+
+
 def validate_portfolio_risk_standard() -> None:
     require_files(PORTFOLIO_RISK_FILES, "portfolio-risk")
     standard = (ROOT / PORTFOLIO_RISK_FILES[0]).read_text(encoding="utf-8")
@@ -488,13 +555,14 @@ def main() -> int:
         validate_lot33()
         validate_lot34()
         validate_lot35()
+        validate_lot36()
         validate_portfolio_risk_standard()
         validate_no_temporary_files()
     except (RoadmapValidationError, OSError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
         print(f"ROADMAP DOCUMENTATION VALIDATION: FAIL\n{exc}", file=sys.stderr)
         return 1
     print("ROADMAP DOCUMENTATION VALIDATION: PASS")
-    print("historical_lots=178 lifecycle_latest=35 status=POST_MERGE_AUDITED next_locked=36")
+    print("historical_lots=178 lifecycle_latest=36 status=V3_POST_MERGE_CLOSED next_locked=37")
     return 0
 
 
