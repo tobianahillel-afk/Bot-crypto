@@ -2,6 +2,7 @@
 
 | Control | Evidence | Verdict |
 |---|---|---|
+| Historical audited release | `0.35.0` | PASS |
 | Exact implementation merge | `d083d4f27c89759ebed37b2ecacccbe88dccad11` | PASS |
 | Exact CI evidence head | `09701c7d5ebefbeba41143a2838564b09ea5fb3a` | PASS |
 | State checksum | `8fc7243beffdf985fd6947557b87ab7bd27f9191520eb2d5d9af25d1e7a886b4` | PASS |
