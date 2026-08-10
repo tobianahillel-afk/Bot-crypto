@@ -40,7 +40,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove frozen Lot 39 mutation source
+      - name: Prove frozen Lot 39 production source
         shell: bash
         run: |
           set -euo pipefail
@@ -56,12 +56,6 @@ jobs:
             contracts/schemas/sequence_gap_event_v1.schema.json \
             contracts/schemas/order_book_delta_sequence_reconstructor_state_v1.schema.json \
             contracts/schemas/order_book_delta_sequence_reconstructor_audit_v1.schema.json \
-            tests/test_lot39_order_book_delta_sequence_reconstructor.py \
-            tests/test_lot39_order_book_delta_and_sequence_reconstructor.py \
-            tests/test_lot39_validation_contracts.py \
-            tests/test_lot39_coverage_completion.py \
-            tests/test_lot39_branch_coverage.py \
-            tests/test_lot39_mutation_contracts.py \
             tests/fixtures/lot39/order_book_delta_sequence_fixture_v1.json
       - name: Baseline Lot 39 tests
         shell: bash
@@ -75,6 +69,7 @@ jobs:
             tests/test_lot39_coverage_completion.py \
             tests/test_lot39_branch_coverage.py \
             tests/test_lot39_mutation_contracts.py \
+            tests/test_lot39_contract_roundtrip.py \
             --junitxml=reports/lot39/mutation/baseline.xml \
             2>&1 | tee reports/lot39/mutation/baseline.txt
       - name: Build isolated mutation workspace
@@ -95,6 +90,7 @@ jobs:
             tests/test_lot39_coverage_completion.py \
             tests/test_lot39_branch_coverage.py \
             tests/test_lot39_mutation_contracts.py \
+            tests/test_lot39_contract_roundtrip.py \
             .tmp-lot39-mutants/tests/
           python - <<'PY'
           from pathlib import Path
@@ -122,7 +118,8 @@ jobs:
               'tests/test_lot39_validation_contracts.py '
               'tests/test_lot39_coverage_completion.py '
               'tests/test_lot39_branch_coverage.py '
-              'tests/test_lot39_mutation_contracts.py'
+              'tests/test_lot39_mutation_contracts.py '
+              'tests/test_lot39_contract_roundtrip.py'
           )
           config = {
               'project': {
