@@ -14,6 +14,8 @@ jobs:
     env:
       PYTHONPATH: src
       MERGED_COMMIT: e2b787905e126a4f8ba19c933d39550ad338ac74
+      POST_MERGE_AUDIT: 5381a773a9d69036b38c57904b2f4a66ffb2f595
+      LOT40_GATE_MERGE: 91df3e378336a791a731cb1561382ba28e6e0978
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,10 +29,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove post-merge ancestry and no production drift
+      - name: Prove historical Lot 39 boundary and authorized Lot 40 transition
         run: |
           set -euo pipefail
-          git merge-base --is-ancestor "$MERGED_COMMIT" HEAD
+          git merge-base --is-ancestor "$MERGED_COMMIT" "$POST_MERGE_AUDIT"
+          git merge-base --is-ancestor "$POST_MERGE_AUDIT" "$LOT40_GATE_MERGE"
+          git merge-base --is-ancestor "$LOT40_GATE_MERGE" HEAD
           git diff --quiet "$MERGED_COMMIT" HEAD -- \
             src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor.py \
             src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor_models.py \
@@ -47,10 +51,16 @@ jobs:
             data/audit/reconstructed_order_book_lot39.json \
             reports/lot39/coverage_summary.json \
             reports/lot39/mutation_summary.json
-          test ! -e src/crypto_quant_bot/microstructure/book_integrity_and_desynchronization_detector.py
-          test ! -e src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py
-          test ! -e scripts/run_lot40_book_integrity_and_desynchronization_detector.py
-          test ! -e scripts/validate_lot40.py
+          for path in \
+            src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py \
+            src/crypto_quant_bot/microstructure/book_integrity_and_desynchronization_detector.py \
+            scripts/run_lot40_book_integrity_desynchronization_detector.py \
+            scripts/validate_lot40.py; do
+            if git cat-file -e "$POST_MERGE_AUDIT:$path" 2>/dev/null; then
+              echo "LOT40_PRESENT_AT_LOT39_POST_MERGE_AUDIT:$path"
+              exit 1
+            fi
+          done
       - name: Compile lint type and exact post-merge validators
         run: |
           python -m compileall -q src scripts tests
