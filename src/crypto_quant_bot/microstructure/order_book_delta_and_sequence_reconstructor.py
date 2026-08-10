@@ -70,7 +70,7 @@ class _BookProgress:
     bids: dict[Decimal, Decimal]
     asks: dict[Decimal, Decimal]
     current_sequence: int
-    previous_event: object
+    previous_event: Any
     deleted: int = 0
     upserted: int = 0
     applied: int = 0
