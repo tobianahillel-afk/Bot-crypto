@@ -347,16 +347,18 @@ def test_gate_identity_and_lifecycle_tamper_stop_reference_build(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    original_gate_checksum = engine.EXPECTED_GATE_CHECKSUM
     _copy_reference_tree(tmp_path)
     gate_path = tmp_path / "data/audit/lot40_v4_entry_gate.json"
     gate = _load(gate_path)
     gate["gate_status"] = "NO_GO"
     _rewrite_checksum(gate, "output_checksum")
+    gate_path.write_text(json.dumps(gate), encoding="utf-8")
     monkeypatch.setattr(engine, "EXPECTED_GATE_CHECKSUM", gate["output_checksum"])
     with pytest.raises(BookIntegrityValidationError, match="gate does not authorize"):
         build_lot40_artifacts(tmp_path, "a" * 40)
 
-    monkeypatch.setattr(engine, "EXPECTED_GATE_CHECKSUM", engine.__dict__["EXPECTED_GATE_CHECKSUM"])
+    monkeypatch.setattr(engine, "EXPECTED_GATE_CHECKSUM", original_gate_checksum)
     _copy_reference_tree(tmp_path)
     lifecycle_path = tmp_path / "data/audit/roadmap_lifecycle_overlay_lot39.json"
     lifecycle = _load(lifecycle_path)
