@@ -11,21 +11,115 @@
   ],
   "properties": {
     "schema_version": {"const": "book-integrity-desynchronization-detector-state-v1"},
-    "run_context": {"type": "object"},
-    "lineage": {"type": "object"},
-    "event_time": {"type": "string", "minLength": 1},
-    "receive_time": {"type": "string", "minLength": 1},
-    "decision_time": {"type": "string", "minLength": 1},
-    "generated_at": {"type": "string", "minLength": 1},
+    "run_context": {"$ref": "#/$defs/run_context"},
+    "lineage": {"$ref": "#/$defs/lineage"},
+    "event_time": {"type": "string", "minLength": 2, "pattern": "Z$"},
+    "receive_time": {"type": "string", "minLength": 2, "pattern": "Z$"},
+    "decision_time": {"type": "string", "minLength": 2, "pattern": "Z$"},
+    "generated_at": {"type": "string", "minLength": 2, "pattern": "Z$"},
     "validation_state": {"const": "VALIDATED_OFFLINE_BOOK_INTEGRITY_ONLY"},
-    "book_integrity": {"type": "object"},
-    "book_health_veto": {"type": "object"},
-    "metrics": {"type": "object"},
+    "book_integrity": {"$ref": "book_integrity_state_v1.schema.json"},
+    "book_health_veto": {"$ref": "book_health_veto_v1.schema.json"},
+    "metrics": {"$ref": "#/$defs/metrics"},
     "reason_codes": {
-      "type": "array", "minItems": 1, "uniqueItems": true,
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
       "items": {"type": "string", "pattern": "^[A-Z0-9_]+$"}
     },
-    "safety": {"type": "object"},
+    "safety": {"$ref": "#/$defs/safety"},
     "output_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "run_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version", "run_id", "runtime_mode", "config_version",
+        "code_commit", "correlation_id"
+      ],
+      "properties": {
+        "schema_version": {"const": "lot40-run-context-v1"},
+        "run_id": {"type": "string", "minLength": 1},
+        "runtime_mode": {"const": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY"},
+        "config_version": {"const": "lot40-book-integrity-config-v1"},
+        "code_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "correlation_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version", "lineage_id", "entry_gate_checksum",
+        "lot39_state_checksum", "lot39_audit_checksum",
+        "lot39_reconstructed_book_checksum", "lot39_delta_fixture_checksum",
+        "available_at"
+      ],
+      "properties": {
+        "schema_version": {"const": "lot40-lineage-envelope-v1"},
+        "lineage_id": {"type": "string", "minLength": 1},
+        "entry_gate_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lot39_state_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lot39_audit_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lot39_reconstructed_book_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lot39_delta_fixture_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "available_at": {"type": "string", "minLength": 2, "pattern": "Z$"}
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version", "lot_40_records_processed_total",
+        "lot_40_health_components_total", "lot_40_health_components_failed_total",
+        "lot_40_critical_components_failed_total", "lot_40_bid_depth_levels",
+        "lot_40_ask_depth_levels", "lot_40_stale_age_us",
+        "lot_40_validation_failures_total", "lot_40_processing_latency_us",
+        "latency_measurement_status"
+      ],
+      "properties": {
+        "schema_version": {"const": "lot40-metrics-v1"},
+        "lot_40_records_processed_total": {"const": 1},
+        "lot_40_health_components_total": {"const": 6},
+        "lot_40_health_components_failed_total": {"type": "integer", "minimum": 0, "maximum": 6},
+        "lot_40_critical_components_failed_total": {"type": "integer", "minimum": 0, "maximum": 4},
+        "lot_40_bid_depth_levels": {"type": "integer", "minimum": 0},
+        "lot_40_ask_depth_levels": {"type": "integer", "minimum": 0},
+        "lot_40_stale_age_us": {"type": "integer", "minimum": 0},
+        "lot_40_validation_failures_total": {"const": 0},
+        "lot_40_processing_latency_us": {"type": ["integer", "null"], "minimum": 0},
+        "latency_measurement_status": {"const": "NOT_MEASURED_OFFLINE_DETERMINISTIC_REPLAY"}
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "analysis_only", "approved_size", "execution_allowed",
+        "external_connectivity_allowed", "market_event_publication_allowed",
+        "network_ingestion_allowed", "order_routing_allowed",
+        "participant_behavior_inference_explicitly_labeled", "raw_data_mutation_allowed",
+        "real_credentials_allowed", "risk_approval_allowed", "scenario_score_is_signal",
+        "signal_generation_allowed", "trade_allowed", "used_for_decision"
+      ],
+      "properties": {
+        "analysis_only": {"const": true},
+        "approved_size": {"const": 0},
+        "execution_allowed": {"const": false},
+        "external_connectivity_allowed": {"const": false},
+        "market_event_publication_allowed": {"const": false},
+        "network_ingestion_allowed": {"const": false},
+        "order_routing_allowed": {"const": false},
+        "participant_behavior_inference_explicitly_labeled": {"const": true},
+        "raw_data_mutation_allowed": {"const": false},
+        "real_credentials_allowed": {"const": false},
+        "risk_approval_allowed": {"const": false},
+        "scenario_score_is_signal": {"const": false},
+        "signal_generation_allowed": {"const": false},
+        "trade_allowed": {"const": false},
+        "used_for_decision": {"const": false}
+      }
+    }
   }
 }
