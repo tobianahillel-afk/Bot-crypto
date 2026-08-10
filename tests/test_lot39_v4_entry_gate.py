@@ -19,6 +19,7 @@ from scripts.validate_lot39_entry_gate import (
 
 ROOT = Path(__file__).resolve().parents[1]
 GATE_PATH = ROOT / "data/audit/lot39_v4_entry_gate.json"
+LOT40_GATE_PATH = ROOT / "data/audit/lot40_v4_entry_gate.json"
 SCHEMA_PATH = ROOT / "contracts/schemas/lot39_v4_entry_gate_v1.schema.json"
 
 
@@ -27,8 +28,9 @@ def _validate_gate_as_historical_record(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    """Keep current Lot 39 implementation from invalidating its historical gate."""
+    """Keep later Lots 39/40 work from invalidating the historical entry gate."""
     monkeypatch.setattr(gate_validator, "LOT39_FORBIDDEN_IMPLEMENTATION_PATHS", ())
+    monkeypatch.setattr(gate_validator, "LOT40_FORBIDDEN_IMPLEMENTATION_PATHS", ())
     monkeypatch.setattr(
         gate_validator,
         "PLANNED_DELTA_SCHEMA_PATH",
@@ -110,14 +112,18 @@ def test_lot39_gate_schema_is_strict_on_identity_safety_and_lot40_lock() -> None
     assert safety["properties"]["approved_size"]["const"] == 0
 
 
-def test_lot39_gate_remains_historical_and_lot40_is_still_absent() -> None:
+def test_lot39_gate_remains_historical_after_lot40_gate() -> None:
     gate = json.loads(GATE_PATH.read_text(encoding="utf-8"))
+    lot40_gate = json.loads(LOT40_GATE_PATH.read_text(encoding="utf-8"))
     assert gate["implementation_started"] is False
     assert gate["gate_status"] == "GO_LOT39_IMPLEMENTATION_ENTRY"
     assert gate["next_lot"] == 40
     assert gate["next_lot_status"] == "PLANNED_LOCKED"
-    for path in gate_validator.LOT40_FORBIDDEN_IMPLEMENTATION_PATHS:
-        assert not path.exists()
+    assert lot40_gate["base_commit"] == "5381a773a9d69036b38c57904b2f4a66ffb2f595"
+    assert lot40_gate["gate_status"] == "GO_LOT40_IMPLEMENTATION_ENTRY"
+    assert lot40_gate["implementation_started"] is False
+    assert lot40_gate["next_lot"] == 41
+    assert lot40_gate["next_lot_status"] == "PLANNED_LOCKED"
 
 
 def test_lot39_gate_rejects_lot40_scope_unlock(
