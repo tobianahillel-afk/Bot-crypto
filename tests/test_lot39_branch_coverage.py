@@ -11,7 +11,6 @@ import crypto_quant_bot.microstructure.order_book_delta_and_sequence_reconstruct
 from crypto_quant_bot.microstructure.order_book_delta_and_sequence_reconstructor_models import (
     Lot39MetricsV1,
     OrderBookDeltaV1,
-    ReconstructedOrderBookV1,
     SequenceGapEventV1,
 )
 from crypto_quant_bot.microstructure.order_book_delta_sequence_reconstructor_validation import (
