@@ -65,27 +65,12 @@ COMPONENT_REASON_CODES = {
 
 def _validate_config(config: dict[str, Any]) -> None:
     expected_fields = {
-        "schema_version",
-        "config_version",
-        "run_id",
-        "correlation_id",
-        "lineage_id",
-        "generated_at",
-        "decision_time",
-        "max_stale_age_us",
-        "minimum_bid_depth_levels",
-        "minimum_ask_depth_levels",
-        "trade_health_threshold",
-        "system_health_threshold",
-        "system_threshold_consequence",
-        "critical_failure_consequence",
-        "component_weights",
-        "entry_gate_path",
-        "lot39_lifecycle_overlay_path",
-        "lot39_state_path",
-        "lot39_audit_path",
-        "lot39_reconstructed_book_path",
-        "lot39_delta_fixture_path",
+        "schema_version", "config_version", "run_id", "correlation_id", "lineage_id",
+        "generated_at", "decision_time", "max_stale_age_us", "minimum_bid_depth_levels",
+        "minimum_ask_depth_levels", "trade_health_threshold", "system_health_threshold",
+        "system_threshold_consequence", "critical_failure_consequence", "component_weights",
+        "entry_gate_path", "lot39_lifecycle_overlay_path", "lot39_state_path",
+        "lot39_audit_path", "lot39_reconstructed_book_path", "lot39_delta_fixture_path",
     }
     if set(config) != expected_fields:
         raise BookIntegrityValidationError("Lot 40 config fields differ from contract")
@@ -113,10 +98,7 @@ def _validate_policy(config: dict[str, Any]) -> None:
     weights = config.get("component_weights")
     if not isinstance(weights, dict) or set(weights) != COMPONENT_NAMES:
         raise BookIntegrityValidationError("Lot 40 component weight set changed")
-    parsed = [
-        decimal_from_text(weights[name], f"weight {name}", allow_zero=False)
-        for name in sorted(weights)
-    ]
+    parsed = [decimal_from_text(weights[name], f"weight {name}", allow_zero=False) for name in sorted(weights)]
     if sum(parsed, Decimal("0")) != Decimal("100"):
         raise BookIntegrityValidationError("Lot 40 component weights must total 100")
 
@@ -129,9 +111,7 @@ def _verify_checksum(payload: dict[str, Any], field: str, expected: str, label: 
 
 
 def _verify_gate(root: Path, config: dict[str, Any]) -> None:
-    gate = load_json_object(
-        root / require_text(config.get("entry_gate_path"), "entry_gate_path")
-    )
+    gate = load_json_object(root / require_text(config.get("entry_gate_path"), "entry_gate_path"))
     body = dict(gate)
     checksum = body.pop("output_checksum", None)
     if checksum != EXPECTED_GATE_CHECKSUM or canonical_checksum(body) != checksum:
@@ -156,7 +136,7 @@ def _load_configured(root: Path, config: dict[str, Any], field: str) -> dict[str
     return load_json_object(root / require_text(config.get(field), field))
 
 
-def _verify_lot39(root: Path, config: dict[str, Any]) -> dict[str, Any]:
+def _verify_lot39_lifecycle(root: Path, config: dict[str, Any]) -> None:
     overlay = _load_configured(root, config, "lot39_lifecycle_overlay_path")
     if overlay.get("latest_implemented_lot") != 39:
         raise BookIntegrityValidationError("Lot 40 requires audited lifecycle latest lot 39")
@@ -164,34 +144,46 @@ def _verify_lot39(root: Path, config: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(lots, dict):
         raise BookIntegrityValidationError("Lot 39 lifecycle lot map missing")
     lot39 = lots.get("39")
-    if not isinstance(lot39, dict) or lot39.get("status") != (
-        "IMPLEMENTED_VALIDATED_OFFLINE_DELTA_SEQUENCE_RECONSTRUCTION_ONLY"
-    ):
+    expected_status = "IMPLEMENTED_VALIDATED_OFFLINE_DELTA_SEQUENCE_RECONSTRUCTION_ONLY"
+    if not isinstance(lot39, dict) or lot39.get("status") != expected_status:
         raise BookIntegrityValidationError("Lot 39 lifecycle status changed")
-    if lots.get("40") != {"implementation_started": False, "status": "PLANNED_LOCKED"}:
+    expected_lot40 = {"implementation_started": False, "status": "PLANNED_LOCKED"}
+    if lots.get("40") != expected_lot40:
         raise BookIntegrityValidationError("historical Lot 40 lifecycle lock changed")
+
+
+def _load_lot39_artifacts(
+    root: Path, config: dict[str, Any]
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     state = _load_configured(root, config, "lot39_state_path")
     audit = _load_configured(root, config, "lot39_audit_path")
     book = _load_configured(root, config, "lot39_reconstructed_book_path")
     _verify_checksum(state, "output_checksum", EXPECTED_LOT39_STATE, "Lot 39 state")
     _verify_checksum(audit, "audit_checksum", EXPECTED_LOT39_AUDIT, "Lot 39 audit")
     _verify_checksum(book, "book_checksum", EXPECTED_LOT39_BOOK, "Lot 39 book")
-    fixture_path = root / require_text(
-        config.get("lot39_delta_fixture_path"), "lot39_delta_fixture_path"
-    )
-    if file_checksum(fixture_path) != EXPECTED_LOT39_FIXTURE:
-        raise BookIntegrityValidationError("Lot 39 delta fixture changed")
+    return state, audit, book
+
+
+def _verify_lot39_links(state: dict[str, Any], audit: dict[str, Any], book: dict[str, Any]) -> None:
     if state.get("reconstructed_book") != book or state.get("sequence_gap_event") is not None:
         raise BookIntegrityValidationError("Lot 39 state/book linkage changed")
-    if (
-        state.get("synchronization_state") != "SYNCED"
-        or audit.get("synchronization_state") != "SYNCED"
-    ):
-        raise BookIntegrityValidationError("Lot 40 requires certified SYNCED Lot 39 book")
+    if state.get("synchronization_state") != "SYNCED":
+        raise BookIntegrityValidationError("Lot 40 requires certified SYNCED Lot 39 state")
+    if audit.get("synchronization_state") != "SYNCED":
+        raise BookIntegrityValidationError("Lot 40 requires certified SYNCED Lot 39 audit")
     if audit.get("state_output_checksum") != EXPECTED_LOT39_STATE:
         raise BookIntegrityValidationError("Lot 39 audit/state linkage changed")
     if audit.get("reconstructed_book_checksum") != EXPECTED_LOT39_BOOK:
         raise BookIntegrityValidationError("Lot 39 audit/book linkage changed")
+
+
+def _verify_lot39(root: Path, config: dict[str, Any]) -> dict[str, Any]:
+    _verify_lot39_lifecycle(root, config)
+    state, audit, book = _load_lot39_artifacts(root, config)
+    fixture_path = root / require_text(config.get("lot39_delta_fixture_path"), "lot39_delta_fixture_path")
+    if file_checksum(fixture_path) != EXPECTED_LOT39_FIXTURE:
+        raise BookIntegrityValidationError("Lot 39 delta fixture changed")
+    _verify_lot39_links(state, audit, book)
     return book
 
 
@@ -199,19 +191,20 @@ def _parse_levels(raw: Any) -> tuple[tuple[tuple[Decimal, Decimal], ...], bool]:
     if not isinstance(raw, list) or not raw:
         return (), False
     parsed: list[tuple[Decimal, Decimal]] = []
-    valid = True
     for level in raw:
         if not isinstance(level, dict) or set(level) != {"price", "quantity"}:
             return (), False
-        try:
-            price = Decimal(level["price"])
-            quantity = Decimal(level["quantity"])
-        except (InvalidOperation, TypeError):
+        price_text, quantity_text = level.get("price"), level.get("quantity")
+        if not isinstance(price_text, str) or not isinstance(quantity_text, str):
             return (), False
-        if not price.is_finite() or not quantity.is_finite() or price <= 0 or quantity < 0:
-            valid = False
+        try:
+            price, quantity = Decimal(price_text), Decimal(quantity_text)
+        except InvalidOperation:
+            return (), False
+        if not price.is_finite() or not quantity.is_finite() or price <= 0 or quantity <= 0:
+            return (), False
         parsed.append((price, quantity))
-    return tuple(parsed), valid
+    return tuple(parsed), True
 
 
 def _strictly_monotonic(
@@ -221,19 +214,19 @@ def _strictly_monotonic(
     if len(set(prices)) != len(prices):
         return False
     pairs = pairwise(prices)
-    if descending:
-        return all(left > right for left, right in pairs)
-    return all(left < right for left, right in pairs)
+    return all(left > right for left, right in pairs) if descending else all(
+        left < right for left, right in pairs
+    )
 
 
 def _sequence_continuous(book: dict[str, Any]) -> bool:
-    base = book.get("base_sequence_id")
-    sequence = book.get("sequence_id")
-    applied = book.get("applied_delta_count")
-    if any(
-        isinstance(value, bool) or not isinstance(value, int)
-        for value in (base, sequence, applied)
-    ):
+    base, sequence, applied = (
+        book.get("base_sequence_id"),
+        book.get("sequence_id"),
+        book.get("applied_delta_count"),
+    )
+    values = (base, sequence, applied)
+    if any(isinstance(value, bool) or not isinstance(value, int) for value in values):
         return False
     assert isinstance(base, int) and isinstance(sequence, int) and isinstance(applied, int)
     return (
@@ -265,11 +258,7 @@ def _stale_age_us(book: dict[str, Any], config: dict[str, Any]) -> int:
     return duration_us(received, decision)
 
 
-def _component(
-    name: str,
-    passed: bool,
-    weight: Decimal,
-) -> BookHealthComponentV1:
+def _component(name: str, passed: bool, weight: Decimal) -> BookHealthComponentV1:
     success_reason, failure_reason = COMPONENT_REASON_CODES[name]
     return BookHealthComponentV1(
         name,
@@ -282,25 +271,17 @@ def _component(
 
 
 def _health_components(
-    book: dict[str, Any],
-    config: dict[str, Any],
-    stale_age: int,
+    book: dict[str, Any], config: dict[str, Any], stale_age: int
 ) -> tuple[BookHealthComponentV1, ...]:
     bids, bids_valid = _parse_levels(book.get("bids"))
     asks, asks_valid = _parse_levels(book.get("asks"))
     levels_valid = bids_valid and asks_valid
-    monotonic = (
-        levels_valid
-        and _strictly_monotonic(bids, descending=True)
-        and _strictly_monotonic(asks, descending=False)
-    )
+    monotonic = levels_valid and _strictly_monotonic(
+        bids, descending=True
+    ) and _strictly_monotonic(asks, descending=False)
     open_uncrossed = levels_valid and bool(bids) and bool(asks) and bids[0][0] < asks[0][0]
-    min_bids = require_integer(
-        config.get("minimum_bid_depth_levels"), "minimum_bid_depth_levels", minimum=1
-    )
-    min_asks = require_integer(
-        config.get("minimum_ask_depth_levels"), "minimum_ask_depth_levels", minimum=1
-    )
+    min_bids = require_integer(config.get("minimum_bid_depth_levels"), "minimum_bid_depth_levels", minimum=1)
+    min_asks = require_integer(config.get("minimum_ask_depth_levels"), "minimum_ask_depth_levels", minimum=1)
     max_age = require_integer(config.get("max_stale_age_us"), "max_stale_age_us", minimum=1)
     passed = {
         "SEQUENCE_CONTINUITY": _sequence_continuous(book),
@@ -313,29 +294,20 @@ def _health_components(
     weights = config.get("component_weights")
     if not isinstance(weights, dict):
         raise BookIntegrityValidationError("Lot 40 component weights missing")
+    order = (
+        "SEQUENCE_CONTINUITY", "CROSSED_LOCKED_STATE", "FRESHNESS",
+        "CHECKSUM_INTEGRITY", "DEPTH_INTEGRITY", "LEVEL_MONOTONICITY",
+    )
     return tuple(
-        _component(
-            name,
-            passed[name],
-            decimal_from_text(weights[name], f"weight {name}", allow_zero=False),
-        )
-        for name in (
-            "SEQUENCE_CONTINUITY",
-            "CROSSED_LOCKED_STATE",
-            "FRESHNESS",
-            "CHECKSUM_INTEGRITY",
-            "DEPTH_INTEGRITY",
-            "LEVEL_MONOTONICITY",
-        )
+        _component(name, passed[name], decimal_from_text(weights[name], f"weight {name}", allow_zero=False))
+        for name in order
     )
 
 
 def _health_status(components: tuple[BookHealthComponentV1, ...]) -> str:
     if any(component.critical and not component.passed for component in components):
         return "CRITICAL"
-    if any(not component.passed for component in components):
-        return "DEGRADED"
-    return "HEALTHY"
+    return "DEGRADED" if any(not component.passed for component in components) else "HEALTHY"
 
 
 def _consequence(
@@ -349,40 +321,39 @@ def _consequence(
         return "BLOCK", True
     if score < system_threshold:
         return "PAUSE", False
-    if score < trade_threshold:
-        return "WAIT", False
-    return "NONE", False
+    return ("WAIT", False) if score < trade_threshold else ("NONE", False)
 
 
-def evaluate_book_integrity(
-    book: dict[str, Any],
-    config: dict[str, Any],
-) -> tuple[BookIntegrityStateV1, BookHealthVetoV1]:
-    _validate_config(config)
+def _evaluation_context(
+    book: dict[str, Any], config: dict[str, Any]
+) -> tuple[str, str, str, str, int, tuple[BookHealthComponentV1, ...]]:
     event_time = require_text(book.get("event_time"), "book event_time")
     receive_time = require_text(book.get("receive_time"), "book receive_time")
     decision_time = require_text(config.get("decision_time"), "decision_time")
     generated_at = require_text(config.get("generated_at"), "generated_at")
     validate_causal_times(event_time, receive_time, decision_time, generated_at)
     stale_age = _stale_age_us(book, config)
-    components = _health_components(book, config, stale_age)
+    return (
+        event_time,
+        receive_time,
+        decision_time,
+        generated_at,
+        stale_age,
+        _health_components(book, config, stale_age),
+    )
+
+
+def _build_integrity(
+    book: dict[str, Any],
+    event_time: str,
+    receive_time: str,
+    decision_time: str,
+    stale_age: int,
+    components: tuple[BookHealthComponentV1, ...],
+) -> BookIntegrityStateV1:
     score = sum((component.score for component in components), Decimal("0"))
-    health_status = _health_status(components)
     bids, _ = _parse_levels(book.get("bids"))
     asks, _ = _parse_levels(book.get("asks"))
-    crossed = bool(bids and asks and bids[0][0] > asks[0][0])
-    locked = bool(bids and asks and bids[0][0] == asks[0][0])
-    checksum_valid = next(
-        component.passed for component in components if component.name == "CHECKSUM_INTEGRITY"
-    )
-    monotonic = next(
-        component.passed for component in components if component.name == "LEVEL_MONOTONICITY"
-    )
-    reason_codes = (
-        "LOT40_BOOK_INTEGRITY_EVALUATED",
-        f"LOT40_HEALTH_{health_status}",
-        "LOT41_REMAINS_LOCKED",
-    )
     integrity = BookIntegrityStateV1(
         source_id=require_text(book.get("source_id"), "source_id"),
         venue=require_text(book.get("venue"), "venue"),
@@ -392,60 +363,57 @@ def evaluate_book_integrity(
         receive_time=receive_time,
         decision_time=decision_time,
         sequence_id=require_integer(book.get("sequence_id"), "sequence_id"),
-        synchronization_state=require_text(
-            book.get("synchronization_state"), "synchronization_state"
-        ),
+        synchronization_state=require_text(book.get("synchronization_state"), "synchronization_state"),
         stale_age_us=stale_age,
         bid_depth_levels=len(bids),
         ask_depth_levels=len(asks),
-        crossed=crossed,
-        locked=locked,
-        checksum_valid=checksum_valid,
-        level_monotonicity_valid=monotonic,
-        health_status=health_status,
+        crossed=bool(bids and asks and bids[0][0] > asks[0][0]),
+        locked=bool(bids and asks and bids[0][0] == asks[0][0]),
+        checksum_valid=next(c.passed for c in components if c.name == "CHECKSUM_INTEGRITY"),
+        level_monotonicity_valid=next(c.passed for c in components if c.name == "LEVEL_MONOTONICITY"),
+        health_status=_health_status(components),
         book_health_score=score,
         components=components,
-        reason_codes=reason_codes,
+        reason_codes=("LOT40_BOOK_INTEGRITY_EVALUATED", f"LOT40_HEALTH_{_health_status(components)}", "LOT41_REMAINS_LOCKED"),
         integrity_checksum=ZERO_SHA256,
     )
-    integrity = replace(
-        integrity,
-        integrity_checksum=canonical_checksum(integrity.payload_without_checksum()),
-    )
-    trade_threshold = decimal_from_text(
-        config.get("trade_health_threshold"), "trade_health_threshold"
-    )
-    system_threshold = decimal_from_text(
-        config.get("system_health_threshold"), "system_health_threshold"
-    )
-    consequence, critical = _consequence(components, score, system_threshold, trade_threshold)
-    veto_reasons = (
-        {
-            "NONE": "LOT40_NO_HEALTH_VETO",
-            "WAIT": "LOT40_TRADE_HEALTH_WAIT",
-            "PAUSE": "LOT40_SYSTEM_HEALTH_PAUSE",
-            "BLOCK": "LOT40_CRITICAL_BOOK_HEALTH_BLOCK",
-        }[consequence],
-        "LOT41_REMAINS_LOCKED",
-    )
+    return replace(integrity, integrity_checksum=canonical_checksum(integrity.payload_without_checksum()))
+
+
+def _build_veto(
+    integrity: BookIntegrityStateV1, config: dict[str, Any]
+) -> BookHealthVetoV1:
+    trade = decimal_from_text(config.get("trade_health_threshold"), "trade_health_threshold")
+    system = decimal_from_text(config.get("system_health_threshold"), "system_health_threshold")
+    consequence, critical = _consequence(integrity.components, integrity.book_health_score, system, trade)
+    reason = {
+        "NONE": "LOT40_NO_HEALTH_VETO",
+        "WAIT": "LOT40_TRADE_HEALTH_WAIT",
+        "PAUSE": "LOT40_SYSTEM_HEALTH_PAUSE",
+        "BLOCK": "LOT40_CRITICAL_BOOK_HEALTH_BLOCK",
+    }[consequence]
     veto = BookHealthVetoV1(
         consequence=consequence,
         veto_active=consequence != "NONE",
         critical_veto_active=critical,
-        trade_health_threshold=trade_threshold,
-        system_health_threshold=system_threshold,
-        critical_failure_consequence=require_text(
-            config.get("critical_failure_consequence"), "critical_failure_consequence"
-        ),
-        system_threshold_consequence=require_text(
-            config.get("system_threshold_consequence"), "system_threshold_consequence"
-        ),
-        book_health_score=score,
-        reason_codes=veto_reasons,
+        trade_health_threshold=trade,
+        system_health_threshold=system,
+        critical_failure_consequence=require_text(config.get("critical_failure_consequence"), "critical_failure_consequence"),
+        system_threshold_consequence=require_text(config.get("system_threshold_consequence"), "system_threshold_consequence"),
+        book_health_score=integrity.book_health_score,
+        reason_codes=(reason, "LOT41_REMAINS_LOCKED"),
         veto_checksum=ZERO_SHA256,
     )
-    veto = replace(veto, veto_checksum=canonical_checksum(veto.payload_without_checksum()))
-    return integrity, veto
+    return replace(veto, veto_checksum=canonical_checksum(veto.payload_without_checksum()))
+
+
+def evaluate_book_integrity(
+    book: dict[str, Any], config: dict[str, Any]
+) -> tuple[BookIntegrityStateV1, BookHealthVetoV1]:
+    _validate_config(config)
+    event, received, decision, _generated, stale_age, components = _evaluation_context(book, config)
+    integrity = _build_integrity(book, event, received, decision, stale_age, components)
+    return integrity, _build_veto(integrity, config)
 
 
 def _build_context(config: dict[str, Any], code_commit: str) -> Lot40RunContextV1:
@@ -477,16 +445,10 @@ def _build_state(
     veto: BookHealthVetoV1,
 ) -> BookIntegrityDesynchronizationDetectorStateV1:
     failed = sum(1 for component in integrity.components if not component.passed)
-    critical_failed = sum(
-        1 for component in integrity.components if component.critical and not component.passed
-    )
+    critical_failed = sum(1 for component in integrity.components if component.critical and not component.passed)
     metrics = Lot40MetricsV1(
-        len(integrity.components),
-        failed,
-        critical_failed,
-        integrity.bid_depth_levels,
-        integrity.ask_depth_levels,
-        integrity.stale_age_us,
+        len(integrity.components), failed, critical_failed,
+        integrity.bid_depth_levels, integrity.ask_depth_levels, integrity.stale_age_us,
     )
     state = BookIntegrityDesynchronizationDetectorStateV1(
         _build_context(config, code_commit),
@@ -499,11 +461,7 @@ def _build_state(
         integrity,
         veto,
         metrics,
-        (
-            "LOT40_OFFLINE_BOOK_INTEGRITY_VALIDATED",
-            f"LOT40_CONSEQUENCE_{veto.consequence}",
-            "LOT41_REMAINS_LOCKED",
-        ),
+        ("LOT40_OFFLINE_BOOK_INTEGRITY_VALIDATED", f"LOT40_CONSEQUENCE_{veto.consequence}", "LOT41_REMAINS_LOCKED"),
         lot40_safety(),
         ZERO_SHA256,
     )
@@ -535,12 +493,8 @@ def _build_audit(
 
 
 def build_lot40_artifacts(
-    root: Path,
-    code_commit: str,
-) -> tuple[
-    BookIntegrityDesynchronizationDetectorStateV1,
-    BookIntegrityDesynchronizationDetectorAuditV1,
-]:
+    root: Path, code_commit: str
+) -> tuple[BookIntegrityDesynchronizationDetectorStateV1, BookIntegrityDesynchronizationDetectorAuditV1]:
     config = load_json_object(root / CONFIG_PATH)
     _validate_config(config)
     _verify_gate(root, config)
@@ -551,12 +505,8 @@ def build_lot40_artifacts(
 
 
 def write_lot40_artifacts(
-    root: Path,
-    code_commit: str,
-) -> tuple[
-    BookIntegrityDesynchronizationDetectorStateV1,
-    BookIntegrityDesynchronizationDetectorAuditV1,
-]:
+    root: Path, code_commit: str
+) -> tuple[BookIntegrityDesynchronizationDetectorStateV1, BookIntegrityDesynchronizationDetectorAuditV1]:
     state, audit = build_lot40_artifacts(root, code_commit)
     atomic_write_json(root / STATE_PATH, state.to_dict())
     atomic_write_json(root / AUDIT_PATH, audit.to_dict())
