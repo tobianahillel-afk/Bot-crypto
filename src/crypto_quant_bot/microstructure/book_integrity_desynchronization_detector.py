@@ -187,23 +187,30 @@ def _verify_lot39(root: Path, config: dict[str, Any]) -> dict[str, Any]:
     return book
 
 
+def _parse_level(level: Any) -> tuple[Decimal, Decimal] | None:
+    if not isinstance(level, dict) or set(level) != {"price", "quantity"}:
+        return None
+    price_text, quantity_text = level.get("price"), level.get("quantity")
+    if not isinstance(price_text, str) or not isinstance(quantity_text, str):
+        return None
+    try:
+        price, quantity = Decimal(price_text), Decimal(quantity_text)
+    except InvalidOperation:
+        return None
+    if not price.is_finite() or not quantity.is_finite() or price <= 0 or quantity <= 0:
+        return None
+    return price, quantity
+
+
 def _parse_levels(raw: Any) -> tuple[tuple[tuple[Decimal, Decimal], ...], bool]:
     if not isinstance(raw, list) or not raw:
         return (), False
     parsed: list[tuple[Decimal, Decimal]] = []
     for level in raw:
-        if not isinstance(level, dict) or set(level) != {"price", "quantity"}:
+        parsed_level = _parse_level(level)
+        if parsed_level is None:
             return (), False
-        price_text, quantity_text = level.get("price"), level.get("quantity")
-        if not isinstance(price_text, str) or not isinstance(quantity_text, str):
-            return (), False
-        try:
-            price, quantity = Decimal(price_text), Decimal(quantity_text)
-        except InvalidOperation:
-            return (), False
-        if not price.is_finite() or not quantity.is_finite() or price <= 0 or quantity <= 0:
-            return (), False
-        parsed.append((price, quantity))
+        parsed.append(parsed_level)
     return tuple(parsed), True
 
 
