@@ -12,6 +12,7 @@ from crypto_quant_bot.microstructure.order_book_delta_and_sequence_reconstructor
 )
 from crypto_quant_bot.microstructure.order_book_delta_sequence_reconstructor_validation import (
     OrderBookDeltaSequenceValidationError,
+    validate_sync_state,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -129,23 +130,27 @@ def test_config_contract_rejects_each_structural_boundary() -> None:
 
     missing = dict(config)
     missing.pop("lineage_id")
-    with pytest.raises(OrderBookDeltaSequenceValidationError, match="fields differ"):
+    with pytest.raises(OrderBookDeltaSequenceValidationError) as exc:
         engine._validate_config(missing)
+    assert str(exc.value) == "Lot 39 config fields differ from contract"
 
-    for field, value, message in (
-        ("schema_version", "bad", "schema changed"),
-        ("config_version", "bad", "version changed"),
-        ("max_input_age_us", 0, "integer"),
-    ):
+    expected_errors = (
+        ("schema_version", "bad", "Lot 39 config schema changed"),
+        ("config_version", "bad", "Lot 39 config version changed"),
+        ("max_input_age_us", 0, "max_input_age_us must be an integer >= 1"),
+    )
+    for field, value, expected_error in expected_errors:
         tampered = dict(config)
         tampered[field] = value
-        with pytest.raises(OrderBookDeltaSequenceValidationError, match=message):
+        with pytest.raises(OrderBookDeltaSequenceValidationError) as exc:
             engine._validate_config(tampered)
+        assert str(exc.value) == expected_error
 
     noncausal = dict(config)
     noncausal["generated_at"] = "2026-08-06T19:18:40.000000Z"
-    with pytest.raises(OrderBookDeltaSequenceValidationError, match="causal"):
+    with pytest.raises(OrderBookDeltaSequenceValidationError) as exc:
         engine._validate_config(noncausal)
+    assert str(exc.value) == "Lot 39 violates causal event/receive/generated ordering"
 
 
 def test_delta_freshness_enforces_future_stale_and_exact_boundary() -> None:
@@ -157,24 +162,25 @@ def test_delta_freshness_enforces_future_stale_and_exact_boundary() -> None:
 
     future_reference = dict(config)
     future_reference["input_reference_time"] = "2026-08-06T19:18:40.059999Z"
-    with pytest.raises(OrderBookDeltaSequenceValidationError, match="stale or future-dated"):
+    with pytest.raises(OrderBookDeltaSequenceValidationError) as exc:
         engine._validate_delta_freshness((first,), future_reference)
+    assert str(exc.value) == "Lot 39 delta is stale or future-dated"
 
     stale_reference = dict(config)
     stale_reference["input_reference_time"] = "2026-08-06T19:18:41.060001Z"
-    with pytest.raises(OrderBookDeltaSequenceValidationError, match="stale or future-dated"):
+    with pytest.raises(OrderBookDeltaSequenceValidationError) as exc:
         engine._validate_delta_freshness((first,), stale_reference)
+    assert str(exc.value) == "Lot 39 delta is stale or future-dated"
 
     exact_boundary = dict(config)
     exact_boundary["input_reference_time"] = "2026-08-06T19:18:41.060000Z"
     engine._validate_delta_freshness((first,), exact_boundary)
 
     exact_receive = replace(first, receive_time="2026-08-06T19:18:40.080000Z")
-    current_reference = dict(config)
-    engine._validate_delta_freshness((exact_receive,), current_reference)
+    engine._validate_delta_freshness((exact_receive,), dict(config))
 
 
-def test_run_context_rejects_every_invalid_identity_field() -> None:
+def test_run_context_diagnostics_are_exact_and_auditable() -> None:
     valid = {
         "run_id": "run",
         "runtime_mode": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
@@ -183,30 +189,42 @@ def test_run_context_rejects_every_invalid_identity_field() -> None:
         "correlation_id": "corr",
     }
     assert Lot39RunContextV1(**valid).to_dict()["code_commit"] == CODE_COMMIT
-    for field, value in (
-        ("run_id", ""),
-        ("runtime_mode", "LIVE"),
-        ("config_version", ""),
-        ("code_commit", "bad"),
-        ("correlation_id", ""),
-    ):
+    cases = (
+        ("run_id", "", "run_id must be non-empty text"),
+        (
+            "runtime_mode",
+            "LIVE",
+            "Lot 39 runtime must be OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+        ),
+        ("config_version", "", "config_version must be non-empty text"),
+        ("code_commit", "bad", "code_commit must be a lowercase git SHA"),
+        ("correlation_id", "", "correlation_id must be non-empty text"),
+    )
+    for field, value, expected_error in cases:
         tampered = dict(valid)
         tampered[field] = value
-        with pytest.raises(OrderBookDeltaSequenceValidationError):
+        with pytest.raises(OrderBookDeltaSequenceValidationError) as exc:
             Lot39RunContextV1(**tampered)
+        assert str(exc.value) == expected_error
+
+    with pytest.raises(OrderBookDeltaSequenceValidationError) as exc:
+        validate_sync_state("UNKNOWN")
+    assert str(exc.value) == "unknown synchronization_state"
 
 
 def test_reconstructed_sequence_requires_exact_checksum_and_positive_advance() -> None:
     state, _ = engine.build_lot39_artifacts(ROOT, CODE_COMMIT)
     book = state.reconstructed_book
     assert book is not None
-    for field, value in (
-        ("base_snapshot_checksum", "bad"),
-        ("sequence_anchor", "bad"),
-        ("book_checksum", "bad"),
-        ("applied_delta_count", 0),
-        ("base_sequence_id", True),
-        ("sequence_id", True),
-    ):
-        with pytest.raises(OrderBookDeltaSequenceValidationError):
+    cases = (
+        ("base_snapshot_checksum", "bad", "base_snapshot_checksum must be a lowercase sha256"),
+        ("sequence_anchor", "bad", "sequence_anchor must be a lowercase sha256"),
+        ("book_checksum", "bad", "book_checksum must be a lowercase sha256"),
+        ("applied_delta_count", 0, "applied_delta_count must be an integer >= 1"),
+        ("base_sequence_id", True, "base_sequence_id must be an integer >= 0"),
+        ("sequence_id", True, "sequence_id must be an integer >= 0"),
+    )
+    for field, value, expected_error in cases:
+        with pytest.raises(OrderBookDeltaSequenceValidationError) as exc:
             replace(book, **{field: value})
+        assert str(exc.value) == expected_error
