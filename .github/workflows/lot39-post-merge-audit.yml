@@ -65,7 +65,7 @@ jobs:
         run: |
           python scripts/validate_domain_architecture.py
           python scripts/validate_roadmap_documentation.py
-          python scripts/validate_decision_traceability.py
+          python scripts/validate_traceability_contract.py
           python scripts/check_no_silent_numeric_coercion.py
           python scripts/quality_inventory.py
           python scripts/validate_engineering_deviations.py
