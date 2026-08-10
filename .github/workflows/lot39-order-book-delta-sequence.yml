@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       PYTHONPATH: src
-      SOURCE_HEAD_SHA: ded6f54da78b7498a9d023a50b05c0f4e7018276
+      SOURCE_HEAD_SHA: df5d0da9f4f5655003808e6540076d0f2de658ba
     steps:
       - uses: actions/checkout@v4
         with:
