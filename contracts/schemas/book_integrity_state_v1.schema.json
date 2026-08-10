@@ -18,9 +18,9 @@
     "venue": {"type": "string", "minLength": 1},
     "instrument_id": {"type": "string", "minLength": 1},
     "market_type": {"const": "SPOT"},
-    "event_time": {"type": "string", "minLength": 1},
-    "receive_time": {"type": "string", "minLength": 1},
-    "decision_time": {"type": "string", "minLength": 1},
+    "event_time": {"type": "string", "minLength": 2, "pattern": "Z$"},
+    "receive_time": {"type": "string", "minLength": 2, "pattern": "Z$"},
+    "decision_time": {"type": "string", "minLength": 2, "pattern": "Z$"},
     "sequence_id": {"type": "integer", "minimum": 0},
     "synchronization_state": {"const": "SYNCED"},
     "stale_age_us": {"type": "integer", "minimum": 0},
@@ -31,28 +31,49 @@
     "checksum_valid": {"type": "boolean"},
     "level_monotonicity_valid": {"type": "boolean"},
     "health_status": {"enum": ["HEALTHY", "DEGRADED", "CRITICAL"]},
-    "book_health_score": {"type": "string", "pattern": "^(?:0|[1-9][0-9]?|100)(?:\\.[0-9]+)?$"},
+    "book_health_score": {"$ref": "#/$defs/score"},
     "components": {
-      "type": "array", "minItems": 6, "maxItems": 6,
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "uniqueItems": true,
       "items": {"$ref": "#/$defs/component"}
     },
     "reason_codes": {
-      "type": "array", "minItems": 1, "uniqueItems": true,
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
       "items": {"type": "string", "pattern": "^[A-Z0-9_]+$"}
     },
     "integrity_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
   },
   "$defs": {
+    "score": {
+      "type": "string",
+      "pattern": "^(?:100(?:\\.0+)?|(?:0|[1-9][0-9]?)(?:\\.[0-9]+)?)$"
+    },
+    "positive_weight": {
+      "type": "string",
+      "pattern": "^(?:100(?:\\.0+)?|(?:[1-9][0-9]?)(?:\\.[0-9]+)?|0\\.(?:0*[1-9][0-9]*))$"
+    },
     "component": {
-      "type": "object", "additionalProperties": false,
-      "required": ["schema_version", "name", "passed", "critical", "weight", "score", "reason_code"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version", "name", "passed", "critical", "weight", "score", "reason_code"
+      ],
       "properties": {
         "schema_version": {"const": "book-health-component-v1"},
-        "name": {"enum": ["SEQUENCE_CONTINUITY", "CROSSED_LOCKED_STATE", "FRESHNESS", "CHECKSUM_INTEGRITY", "DEPTH_INTEGRITY", "LEVEL_MONOTONICITY"]},
+        "name": {
+          "enum": [
+            "SEQUENCE_CONTINUITY", "CROSSED_LOCKED_STATE", "FRESHNESS",
+            "CHECKSUM_INTEGRITY", "DEPTH_INTEGRITY", "LEVEL_MONOTONICITY"
+          ]
+        },
         "passed": {"type": "boolean"},
         "critical": {"type": "boolean"},
-        "weight": {"type": "string", "pattern": "^(?:0|[1-9][0-9]?|100)(?:\\.[0-9]+)?$"},
-        "score": {"type": "string", "pattern": "^(?:0|[1-9][0-9]?|100)(?:\\.[0-9]+)?$"},
+        "weight": {"$ref": "#/$defs/positive_weight"},
+        "score": {"$ref": "#/$defs/score"},
         "reason_code": {"type": "string", "pattern": "^[A-Z0-9_]+$"}
       }
     }
