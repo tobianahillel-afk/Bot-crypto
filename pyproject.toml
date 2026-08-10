@@ -1,7 +1,7 @@
 [project]
 name = "crypto-quant-bot"
-version = "0.39.0"
-description = "Crypto Quant Bot V4.1-Ops — Lot 39 post-merge audited offline delta sequence reconstructor"
+version = "0.40.0"
+description = "Crypto Quant Bot V4.1-Ops — Lot 40 post-merge audited offline book integrity detector"
 requires-python = "==3.11.*"
 dependencies = []
 
