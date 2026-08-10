@@ -1,0 +1,16 @@
+{
+  "book_health_score": "100",
+  "consequence": "NONE",
+  "critical_failure_consequence": "BLOCK",
+  "critical_veto_active": false,
+  "reason_codes": [
+    "LOT40_NO_HEALTH_VETO",
+    "LOT41_REMAINS_LOCKED"
+  ],
+  "schema_version": "book-health-veto-v1",
+  "system_health_threshold": "80",
+  "system_threshold_consequence": "PAUSE",
+  "trade_health_threshold": "90",
+  "veto_active": false,
+  "veto_checksum": "000613129dbce4bfa189f66a9927c442a557556870381de92aa2b8da8a7951fc"
+}
