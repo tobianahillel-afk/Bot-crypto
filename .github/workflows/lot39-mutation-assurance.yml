@@ -1,0 +1,256 @@
+name: Lot 39 mutation assurance
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor*.py'
+      - 'src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor_validation.py'
+      - 'tests/test_lot39*.py'
+      - 'config/microstructure/order_book_delta_sequence_reconstructor_v1.json'
+      - 'contracts/schemas/order_book_delta_v1.schema.json'
+      - 'contracts/schemas/reconstructed_order_book_v1.schema.json'
+      - 'contracts/schemas/sequence_gap_event_v1.schema.json'
+      - 'contracts/schemas/order_book_delta_sequence_reconstructor_state_v1.schema.json'
+      - 'contracts/schemas/order_book_delta_sequence_reconstructor_audit_v1.schema.json'
+      - 'reports/lot39/mutation_summary.json'
+      - '.github/workflows/lot39-mutation-assurance.yml'
+      - 'requirements-dev.lock'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mutation:
+    runs-on: ubuntu-22.04
+    env:
+      SOURCE_HEAD_SHA: 203a2b2d3d69644bd67c0e583df9d0405941def6
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Prove frozen Lot 39 mutation source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 938a0e9cf92ef5bbda02045486afbd9a32dc67ec "$SOURCE_HEAD_SHA"
+          git merge-base --is-ancestor "$SOURCE_HEAD_SHA" HEAD
+          git diff --quiet "$SOURCE_HEAD_SHA" HEAD -- \
+            src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor.py \
+            src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor_models.py \
+            src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor_validation.py \
+            config/microstructure/order_book_delta_sequence_reconstructor_v1.json \
+            contracts/schemas/order_book_delta_v1.schema.json \
+            contracts/schemas/reconstructed_order_book_v1.schema.json \
+            contracts/schemas/sequence_gap_event_v1.schema.json \
+            contracts/schemas/order_book_delta_sequence_reconstructor_state_v1.schema.json \
+            contracts/schemas/order_book_delta_sequence_reconstructor_audit_v1.schema.json \
+            tests/test_lot39_order_book_delta_sequence_reconstructor.py \
+            tests/test_lot39_order_book_delta_and_sequence_reconstructor.py \
+            tests/test_lot39_validation_contracts.py \
+            tests/test_lot39_coverage_completion.py \
+            tests/test_lot39_branch_coverage.py \
+            tests/test_lot39_mutation_contracts.py \
+            tests/fixtures/lot39/order_book_delta_sequence_fixture_v1.json
+      - name: Baseline Lot 39 tests
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p reports/lot39/mutation
+          PYTHONPATH=src pytest -q \
+            tests/test_lot39_order_book_delta_sequence_reconstructor.py \
+            tests/test_lot39_order_book_delta_and_sequence_reconstructor.py \
+            tests/test_lot39_validation_contracts.py \
+            tests/test_lot39_coverage_completion.py \
+            tests/test_lot39_branch_coverage.py \
+            tests/test_lot39_mutation_contracts.py \
+            --junitxml=reports/lot39/mutation/baseline.xml \
+            2>&1 | tee reports/lot39/mutation/baseline.txt
+      - name: Build isolated mutation workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .tmp-lot39-mutants
+          mkdir -p .tmp-lot39-mutants/tests
+          cp -R src .tmp-lot39-mutants/
+          cp -R config .tmp-lot39-mutants/
+          cp -R data .tmp-lot39-mutants/
+          cp -R contracts .tmp-lot39-mutants/
+          cp -R tests/fixtures .tmp-lot39-mutants/tests/
+          cp \
+            tests/test_lot39_order_book_delta_sequence_reconstructor.py \
+            tests/test_lot39_order_book_delta_and_sequence_reconstructor.py \
+            tests/test_lot39_validation_contracts.py \
+            tests/test_lot39_coverage_completion.py \
+            tests/test_lot39_branch_coverage.py \
+            tests/test_lot39_mutation_contracts.py \
+            .tmp-lot39-mutants/tests/
+          python - <<'PY'
+          from pathlib import Path
+          import toml
+
+          root = Path('.tmp-lot39-mutants')
+          mutated = {
+              'order_book_delta_and_sequence_reconstructor.py',
+              'order_book_delta_and_sequence_reconstructor_models.py',
+              'order_book_delta_sequence_reconstructor_validation.py',
+          }
+          microstructure = root / 'src/crypto_quant_bot/microstructure'
+          dependency_files = [
+              'src/crypto_quant_bot/__init__.py',
+              'src/crypto_quant_bot/data_governance/',
+              *[
+                  str(path.relative_to(root))
+                  for path in sorted(microstructure.glob('*.py'))
+                  if path.name not in mutated
+              ],
+          ]
+          tests = (
+              'tests/test_lot39_order_book_delta_sequence_reconstructor.py '
+              'tests/test_lot39_order_book_delta_and_sequence_reconstructor.py '
+              'tests/test_lot39_validation_contracts.py '
+              'tests/test_lot39_coverage_completion.py '
+              'tests/test_lot39_branch_coverage.py '
+              'tests/test_lot39_mutation_contracts.py'
+          )
+          config = {
+              'project': {
+                  'name': 'crypto-quant-bot-lot39-mutation',
+                  'version': '0.39.0.dev0',
+                  'requires-python': '==3.11.*',
+                  'dependencies': [],
+              },
+              'tool': {
+                  'pytest': {
+                      'ini_options': {
+                          'pythonpath': ['src', '.'],
+                          'addopts': ['--tb=short', '-p', 'no:cacheprovider'],
+                      }
+                  },
+                  'mutmut': {
+                      'paths_to_mutate': [
+                          'src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor.py',
+                          'src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor_models.py',
+                          'src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor_validation.py',
+                      ],
+                      'tests_dir': ['tests/'],
+                      'runner': f'python -m pytest -q {tests}',
+                      'also_copy': dependency_files + [
+                          'config/', 'data/audit/', 'contracts/', 'tests/fixtures/'
+                      ],
+                      'mutate_only_covered_lines': True,
+                      'timeout_factor': 8.0,
+                      'do_not_mutate_patterns': [r'raise \\w+', r'logger\\.\\w+'],
+                  },
+              },
+          }
+          (root / 'pyproject.toml').write_text(toml.dumps(config), encoding='utf-8')
+          PY
+      - name: Run deterministic mutation analysis and enforce score
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports/lot39/mutation
+          cd .tmp-lot39-mutants
+          set +e
+          mutmut run --max-children 1 2>&1 | tee ../reports/lot39/mutation/run.txt
+          run_status=${PIPESTATUS[0]}
+          mutmut results 2>&1 | tee ../reports/lot39/mutation/results.txt
+          results_status=${PIPESTATUS[0]}
+          set -e
+          cd ..
+          RUN_STATUS="$run_status" RESULTS_STATUS="$results_status" python - <<'PY'
+          from __future__ import annotations
+
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          path = Path('reports/lot39/mutation/run.txt')
+          if not path.is_file():
+              raise SystemExit('LOT39_MUTATION_RUN_LOG_MISSING')
+          text = path.read_text(encoding='utf-8', errors='replace')
+          text = re.sub(r'\x1b(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', text)
+          text = text.replace('\r', '\n').replace('\ufe0f', '')
+          complete_counters = [
+              tuple(map(int, match.groups()))
+              for match in re.finditer(r'(\d+)\s*/\s*(\d+)', text)
+              if match.group(1) == match.group(2) and int(match.group(2)) > 0
+          ]
+          if not complete_counters:
+              raise SystemExit('LOT39_MUTATION_TOTAL_PARSE_ERROR')
+          completed, total = complete_counters[-1]
+          patterns = {
+              'killed': re.compile(r'🎉\s*(\d+)'),
+              'timeout': re.compile(r'⏰\s*(\d+)'),
+              'suspicious': re.compile(r'🤔\s*(\d+)'),
+              'survived': re.compile(r'🙁\s*(\d+)'),
+          }
+          metrics: dict[str, int] = {}
+          for name, pattern in patterns.items():
+              matches = list(pattern.finditer(text))
+              if not matches:
+                  raise SystemExit(f'LOT39_MUTATION_{name.upper()}_PARSE_ERROR')
+              metrics[name] = int(matches[-1].group(1))
+          killed = metrics['killed']
+          timeout = metrics['timeout']
+          suspicious = metrics['suspicious']
+          survived = metrics['survived']
+          evaluated = killed + timeout + suspicious + survived
+          if evaluated != total:
+              raise SystemExit(
+                  f'LOT39_MUTATION_COUNT_MISMATCH: total={total} evaluated={evaluated}'
+              )
+          score = 100.0 * (killed + timeout) / evaluated
+          payload = {
+              'schema_version': 'lot39-mutation-summary-v1',
+              'status': 'PASS' if score >= 80.0 else 'FAIL',
+              'source_head_sha': os.environ['SOURCE_HEAD_SHA'],
+              'max_children': 1,
+              'python_hash_seed': os.environ['PYTHONHASHSEED'],
+              'killed_mutants': killed,
+              'timeout_mutants': timeout,
+              'suspicious_mutants': suspicious,
+              'survived_mutants': survived,
+              'evaluated_mutants': evaluated,
+              'completed_mutants': completed,
+              'total_mutants': total,
+              'mutation_score_percent': round(score, 2),
+              'minimum_score_percent': 80.0,
+              'mutmut_run_exit_code': int(os.environ['RUN_STATUS']),
+              'mutmut_results_exit_code': int(os.environ['RESULTS_STATUS']),
+          }
+          output = Path('reports/lot39/mutation_summary.json')
+          output.write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+          )
+          print(json.dumps(payload, sort_keys=True))
+          if score < 80.0:
+              raise SystemExit('LOT39_MUTATION_SCORE_BELOW_THRESHOLD')
+          PY
+          if git ls-files --error-unmatch reports/lot39/mutation_summary.json >/dev/null 2>&1; then
+            git diff --exit-code -- reports/lot39/mutation_summary.json
+          fi
+      - name: Verify canonical source immutability
+        run: |
+          rm -rf .tmp-lot39-mutants
+          git diff --exit-code -- src/crypto_quant_bot
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot39-mutation-evidence
+          path: |
+            reports/lot39/mutation/
+            reports/lot39/mutation_summary.json
