@@ -1,0 +1,81 @@
+name: Lot 39 independent post-merge audit
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-22.04
+    env:
+      PYTHONPATH: src
+      MERGED_COMMIT: e2b787905e126a4f8ba19c933d39550ad338ac74
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Prove post-merge ancestry and no production drift
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$MERGED_COMMIT" HEAD
+          git diff --quiet "$MERGED_COMMIT" HEAD -- \
+            src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor.py \
+            src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor_models.py \
+            src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor_validation.py \
+            config/microstructure/order_book_delta_sequence_reconstructor_v1.json \
+            contracts/schemas/order_book_delta_v1.schema.json \
+            contracts/schemas/reconstructed_order_book_v1.schema.json \
+            contracts/schemas/sequence_gap_event_v1.schema.json \
+            contracts/schemas/order_book_delta_sequence_reconstructor_state_v1.schema.json \
+            contracts/schemas/order_book_delta_sequence_reconstructor_audit_v1.schema.json \
+            tests/fixtures/lot39/order_book_delta_sequence_fixture_v1.json \
+            data/audit/order_book_delta_and_sequence_reconstructor_lot39.json \
+            data/audit/order_book_delta_and_sequence_reconstructor_audit_lot39.json \
+            data/audit/reconstructed_order_book_lot39.json \
+            reports/lot39/coverage_summary.json \
+            reports/lot39/mutation_summary.json
+          test ! -e src/crypto_quant_bot/microstructure/book_integrity_and_desynchronization_detector.py
+          test ! -e src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py
+          test ! -e scripts/run_lot40_book_integrity_and_desynchronization_detector.py
+          test ! -e scripts/validate_lot40.py
+      - name: Compile lint type and exact post-merge validators
+        run: |
+          python -m compileall -q src scripts tests
+          python -m json.tool data/audit/roadmap_lifecycle_overlay_lot39.json >/dev/null
+          ruff check scripts/validate_lot39_post_merge.py scripts/validate_lot39_frozen_evidence.py
+          mypy src/crypto_quant_bot
+          python scripts/validate_lot39_frozen_evidence.py
+          python scripts/validate_lot39_post_merge.py
+          python scripts/validate_lot39.py --expected-code-commit 203a2b2d3d69644bd67c0e583df9d0405941def6 --require-persisted
+          python scripts/validate_lot39_no_connectivity.py
+      - name: Architecture roadmap traceability and engineering gates
+        run: |
+          python scripts/validate_domain_architecture.py
+          python scripts/validate_domain_ownership_registry.py
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_decision_traceability.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+      - name: Full regression security and anti-flake
+        run: |
+          pytest -q
+          bandit -q -r src/crypto_quant_bot scripts/validate_lot39_post_merge.py -ll
+          pip-audit -r requirements-dev.lock
+          pytest -q tests/test_lot39_order_book_delta_and_sequence_reconstructor.py tests/test_lot39_contract_roundtrip.py
+          pytest -q tests/test_lot39_order_book_delta_and_sequence_reconstructor.py tests/test_lot39_contract_roundtrip.py
+          pytest -q tests/test_lot39_order_book_delta_and_sequence_reconstructor.py tests/test_lot39_contract_roundtrip.py
+          python scripts/validate_lot39_post_merge.py
