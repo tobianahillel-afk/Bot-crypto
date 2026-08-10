@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 from decimal import Decimal, InvalidOperation
+from itertools import pairwise
 from pathlib import Path
 from typing import Any
 
@@ -112,7 +113,10 @@ def _validate_policy(config: dict[str, Any]) -> None:
     weights = config.get("component_weights")
     if not isinstance(weights, dict) or set(weights) != COMPONENT_NAMES:
         raise BookIntegrityValidationError("Lot 40 component weight set changed")
-    parsed = [decimal_from_text(weights[name], f"weight {name}", allow_zero=False) for name in sorted(weights)]
+    parsed = [
+        decimal_from_text(weights[name], f"weight {name}", allow_zero=False)
+        for name in sorted(weights)
+    ]
     if sum(parsed, Decimal("0")) != Decimal("100"):
         raise BookIntegrityValidationError("Lot 40 component weights must total 100")
 
@@ -125,7 +129,9 @@ def _verify_checksum(payload: dict[str, Any], field: str, expected: str, label: 
 
 
 def _verify_gate(root: Path, config: dict[str, Any]) -> None:
-    gate = load_json_object(root / require_text(config.get("entry_gate_path"), "entry_gate_path"))
+    gate = load_json_object(
+        root / require_text(config.get("entry_gate_path"), "entry_gate_path")
+    )
     body = dict(gate)
     checksum = body.pop("output_checksum", None)
     if checksum != EXPECTED_GATE_CHECKSUM or canonical_checksum(body) != checksum:
@@ -170,12 +176,17 @@ def _verify_lot39(root: Path, config: dict[str, Any]) -> dict[str, Any]:
     _verify_checksum(state, "output_checksum", EXPECTED_LOT39_STATE, "Lot 39 state")
     _verify_checksum(audit, "audit_checksum", EXPECTED_LOT39_AUDIT, "Lot 39 audit")
     _verify_checksum(book, "book_checksum", EXPECTED_LOT39_BOOK, "Lot 39 book")
-    fixture_path = root / require_text(config.get("lot39_delta_fixture_path"), "lot39_delta_fixture_path")
+    fixture_path = root / require_text(
+        config.get("lot39_delta_fixture_path"), "lot39_delta_fixture_path"
+    )
     if file_checksum(fixture_path) != EXPECTED_LOT39_FIXTURE:
         raise BookIntegrityValidationError("Lot 39 delta fixture changed")
     if state.get("reconstructed_book") != book or state.get("sequence_gap_event") is not None:
         raise BookIntegrityValidationError("Lot 39 state/book linkage changed")
-    if state.get("synchronization_state") != "SYNCED" or audit.get("synchronization_state") != "SYNCED":
+    if (
+        state.get("synchronization_state") != "SYNCED"
+        or audit.get("synchronization_state") != "SYNCED"
+    ):
         raise BookIntegrityValidationError("Lot 40 requires certified SYNCED Lot 39 book")
     if audit.get("state_output_checksum") != EXPECTED_LOT39_STATE:
         raise BookIntegrityValidationError("Lot 39 audit/state linkage changed")
@@ -203,11 +214,13 @@ def _parse_levels(raw: Any) -> tuple[tuple[tuple[Decimal, Decimal], ...], bool]:
     return tuple(parsed), valid
 
 
-def _strictly_monotonic(levels: tuple[tuple[Decimal, Decimal], ...], *, descending: bool) -> bool:
+def _strictly_monotonic(
+    levels: tuple[tuple[Decimal, Decimal], ...], *, descending: bool
+) -> bool:
     prices = tuple(price for price, _ in levels)
     if len(set(prices)) != len(prices):
         return False
-    pairs = zip(prices, prices[1:], strict=False)
+    pairs = pairwise(prices)
     if descending:
         return all(left > right for left, right in pairs)
     return all(left < right for left, right in pairs)
@@ -217,7 +230,10 @@ def _sequence_continuous(book: dict[str, Any]) -> bool:
     base = book.get("base_sequence_id")
     sequence = book.get("sequence_id")
     applied = book.get("applied_delta_count")
-    if any(isinstance(value, bool) or not isinstance(value, int) for value in (base, sequence, applied)):
+    if any(
+        isinstance(value, bool) or not isinstance(value, int)
+        for value in (base, sequence, applied)
+    ):
         return False
     assert isinstance(base, int) and isinstance(sequence, int) and isinstance(applied, int)
     return (
@@ -240,8 +256,12 @@ def _checksum_valid(book: dict[str, Any]) -> bool:
 
 
 def _stale_age_us(book: dict[str, Any], config: dict[str, Any]) -> int:
-    received = parse_utc_timestamp(require_text(book.get("receive_time"), "book receive_time"), "book receive_time")
-    decision = parse_utc_timestamp(require_text(config.get("decision_time"), "decision_time"), "decision_time")
+    received = parse_utc_timestamp(
+        require_text(book.get("receive_time"), "book receive_time"), "book receive_time"
+    )
+    decision = parse_utc_timestamp(
+        require_text(config.get("decision_time"), "decision_time"), "decision_time"
+    )
     return duration_us(received, decision)
 
 
@@ -269,10 +289,18 @@ def _health_components(
     bids, bids_valid = _parse_levels(book.get("bids"))
     asks, asks_valid = _parse_levels(book.get("asks"))
     levels_valid = bids_valid and asks_valid
-    monotonic = levels_valid and _strictly_monotonic(bids, descending=True) and _strictly_monotonic(asks, descending=False)
+    monotonic = (
+        levels_valid
+        and _strictly_monotonic(bids, descending=True)
+        and _strictly_monotonic(asks, descending=False)
+    )
     open_uncrossed = levels_valid and bool(bids) and bool(asks) and bids[0][0] < asks[0][0]
-    min_bids = require_integer(config.get("minimum_bid_depth_levels"), "minimum_bid_depth_levels", minimum=1)
-    min_asks = require_integer(config.get("minimum_ask_depth_levels"), "minimum_ask_depth_levels", minimum=1)
+    min_bids = require_integer(
+        config.get("minimum_bid_depth_levels"), "minimum_bid_depth_levels", minimum=1
+    )
+    min_asks = require_integer(
+        config.get("minimum_ask_depth_levels"), "minimum_ask_depth_levels", minimum=1
+    )
     max_age = require_integer(config.get("max_stale_age_us"), "max_stale_age_us", minimum=1)
     passed = {
         "SEQUENCE_CONTINUITY": _sequence_continuous(book),
@@ -286,7 +314,11 @@ def _health_components(
     if not isinstance(weights, dict):
         raise BookIntegrityValidationError("Lot 40 component weights missing")
     return tuple(
-        _component(name, passed[name], decimal_from_text(weights[name], f"weight {name}", allow_zero=False))
+        _component(
+            name,
+            passed[name],
+            decimal_from_text(weights[name], f"weight {name}", allow_zero=False),
+        )
         for name in (
             "SEQUENCE_CONTINUITY",
             "CROSSED_LOCKED_STATE",
@@ -340,8 +372,12 @@ def evaluate_book_integrity(
     asks, _ = _parse_levels(book.get("asks"))
     crossed = bool(bids and asks and bids[0][0] > asks[0][0])
     locked = bool(bids and asks and bids[0][0] == asks[0][0])
-    checksum_valid = next(component.passed for component in components if component.name == "CHECKSUM_INTEGRITY")
-    monotonic = next(component.passed for component in components if component.name == "LEVEL_MONOTONICITY")
+    checksum_valid = next(
+        component.passed for component in components if component.name == "CHECKSUM_INTEGRITY"
+    )
+    monotonic = next(
+        component.passed for component in components if component.name == "LEVEL_MONOTONICITY"
+    )
     reason_codes = (
         "LOT40_BOOK_INTEGRITY_EVALUATED",
         f"LOT40_HEALTH_{health_status}",
@@ -356,7 +392,9 @@ def evaluate_book_integrity(
         receive_time=receive_time,
         decision_time=decision_time,
         sequence_id=require_integer(book.get("sequence_id"), "sequence_id"),
-        synchronization_state=require_text(book.get("synchronization_state"), "synchronization_state"),
+        synchronization_state=require_text(
+            book.get("synchronization_state"), "synchronization_state"
+        ),
         stale_age_us=stale_age,
         bid_depth_levels=len(bids),
         ask_depth_levels=len(asks),
@@ -374,8 +412,12 @@ def evaluate_book_integrity(
         integrity,
         integrity_checksum=canonical_checksum(integrity.payload_without_checksum()),
     )
-    trade_threshold = decimal_from_text(config.get("trade_health_threshold"), "trade_health_threshold")
-    system_threshold = decimal_from_text(config.get("system_health_threshold"), "system_health_threshold")
+    trade_threshold = decimal_from_text(
+        config.get("trade_health_threshold"), "trade_health_threshold"
+    )
+    system_threshold = decimal_from_text(
+        config.get("system_health_threshold"), "system_health_threshold"
+    )
     consequence, critical = _consequence(components, score, system_threshold, trade_threshold)
     veto_reasons = (
         {
