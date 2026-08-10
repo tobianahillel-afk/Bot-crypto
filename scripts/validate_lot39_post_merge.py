@@ -15,6 +15,9 @@ SOURCE_HEAD = "203a2b2d3d69644bd67c0e583df9d0405941def6"
 EVIDENCE_HEAD = "b1bf9605fe20cacca76861e3fc6941ad38ea8f23"
 FINAL_PR_HEAD = "3dc7ec29bb1a4152017854581573c26465ee33a2"
 MERGED_COMMIT = "e2b787905e126a4f8ba19c933d39550ad338ac74"
+POST_MERGE_AUDIT = "5381a773a9d69036b38c57904b2f4a66ffb2f595"
+LOT40_GATE_MERGE = "91df3e378336a791a731cb1561382ba28e6e0978"
+LOT40_GATE_CHECKSUM = "23d9f0bdb71a2ed26cf3ef89e5be6237fd286a38944f9fed4c6b8f18d4106f18"
 VALIDATION_RUN = 31392299867
 VALIDATION_ARTIFACT = 9064203889
 VALIDATION_DIGEST = "sha256:5312bb4008fbf70d95cf50cc4cee4e2e38de12cb8825ae2834d0e425b68181a1"
@@ -39,18 +42,23 @@ def load(path: str) -> dict[str, Any]:
 
 
 def checksum(payload: object) -> str:
-    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+    encoded = json.dumps(
+        payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    ).encode()
     return hashlib.sha256(encoded).hexdigest()
 
 
 def validate_release_and_lifecycle() -> dict[str, Any]:
     project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
-    require(project["version"] == "0.39.0", "project version must be 0.39.0")
-    require("Lot 39" in project["description"], "project description must identify Lot 39")
+    current_version = tuple(int(part) for part in project["version"].split("."))
+    require(current_version >= (0, 39, 0), "project version cannot precede 0.39.0")
     previous = load("data/audit/roadmap_lifecycle_overlay_lot38.json")
     current = load("data/audit/roadmap_lifecycle_overlay_lot39.json")
-    require(current["previous_overlay"] == "data/audit/roadmap_lifecycle_overlay_lot38.json", "Lot39 predecessor mismatch")
-    require(current["latest_implemented_lot"] == 39, "latest implemented lot must be 39")
+    require(
+        current["previous_overlay"] == "data/audit/roadmap_lifecycle_overlay_lot38.json",
+        "Lot39 predecessor mismatch",
+    )
+    require(current["latest_implemented_lot"] == 39, "Lot39 historical overlay latest lot changed")
     require(previous["latest_implemented_lot"] == 38, "Lot38 historical overlay changed")
     lot39 = current["lots"]["39"]
     expected = {
@@ -67,13 +75,24 @@ def validate_release_and_lifecycle() -> dict[str, Any]:
     require(lot39.get("analysis_only") is True, "Lot39 analysis_only changed")
     require(lot39.get("approved_size") == 0, "Lot39 approved_size changed")
     for key in (
-        "used_for_decision", "external_connectivity_allowed", "network_ingestion_allowed",
-        "real_credentials_allowed", "market_event_publication_allowed", "raw_data_mutation_allowed",
-        "scenario_score_is_signal", "signal_generation_allowed", "risk_approval_allowed",
-        "order_routing_allowed", "trade_allowed", "execution_allowed",
+        "used_for_decision",
+        "external_connectivity_allowed",
+        "network_ingestion_allowed",
+        "real_credentials_allowed",
+        "market_event_publication_allowed",
+        "raw_data_mutation_allowed",
+        "scenario_score_is_signal",
+        "signal_generation_allowed",
+        "risk_approval_allowed",
+        "order_routing_allowed",
+        "trade_allowed",
+        "execution_allowed",
     ):
         require(lot39.get(key) is False, f"Lot39 permission enabled: {key}")
-    require(current["lots"]["40"] == {"implementation_started": False, "status": "PLANNED_LOCKED"}, "Lot40 must remain locked")
+    require(
+        current["lots"]["40"] == {"implementation_started": False, "status": "PLANNED_LOCKED"},
+        "historical Lot40 lifecycle lock changed",
+    )
     return current
 
 
@@ -82,24 +101,40 @@ def validate_docs() -> None:
     matrix = (ROOT / "docs/LOT39_POST_MERGE_VALIDATION_MATRIX.md").read_text(encoding="utf-8")
     for text in (audit, matrix):
         for value in (
-            SOURCE_HEAD, EVIDENCE_HEAD, FINAL_PR_HEAD, MERGED_COMMIT,
-            str(VALIDATION_RUN), str(VALIDATION_ARTIFACT), VALIDATION_DIGEST,
-            str(MUTATION_RUN), str(MUTATION_ARTIFACT), MUTATION_DIGEST,
+            SOURCE_HEAD,
+            EVIDENCE_HEAD,
+            FINAL_PR_HEAD,
+            MERGED_COMMIT,
+            str(VALIDATION_RUN),
+            str(VALIDATION_ARTIFACT),
+            VALIDATION_DIGEST,
+            str(MUTATION_RUN),
+            str(MUTATION_ARTIFACT),
+            MUTATION_DIGEST,
         ):
             require(value in text, "post-merge documentation missing exact evidence")
     require("GO_LOT39_POST_MERGE" in audit, "post-merge GO verdict missing")
-    require("PLANNED_LOCKED" in audit and "Lot 40" in audit, "Lot40 lock missing")
+    require("PLANNED_LOCKED" in audit and "Lot 40" in audit, "historical Lot40 lock missing")
 
 
-def validate_lot40_absence() -> None:
-    forbidden = (
-        "src/crypto_quant_bot/microstructure/book_integrity_and_desynchronization_detector.py",
-        "src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py",
-        "scripts/run_lot40_book_integrity_and_desynchronization_detector.py",
-        "scripts/validate_lot40.py",
-    )
-    for path in forbidden:
-        require(not (ROOT / path).exists(), f"Lot40 implementation present: {path}")
+def validate_lot40_transition() -> None:
+    gate = load("data/audit/lot40_v4_entry_gate.json")
+    body = dict(gate)
+    gate_checksum = body.pop("output_checksum", None)
+    require(gate_checksum == LOT40_GATE_CHECKSUM, "Lot40 entry gate checksum changed")
+    require(checksum(body) == gate_checksum, "Lot40 entry gate checksum mismatch")
+    expected = {
+        "base_commit": POST_MERGE_AUDIT,
+        "target_lot": 40,
+        "current_version": "0.39.0",
+        "gate_status": "GO_LOT40_IMPLEMENTATION_ENTRY",
+        "human_decision": "APPROVED_START_LOT40",
+        "implementation_started": False,
+        "next_lot": 41,
+        "next_lot_status": "PLANNED_LOCKED",
+    }
+    for field, value in expected.items():
+        require(gate.get(field) == value, f"Lot40 transition mismatch: {field}")
 
 
 def validate() -> dict[str, object]:
@@ -112,7 +147,7 @@ def validate() -> dict[str, object]:
     require(frozen["mutation_score_percent"] == 81.81, "mutation score changed")
     lifecycle = validate_release_and_lifecycle()
     validate_docs()
-    validate_lot40_absence()
+    validate_lot40_transition()
     result: dict[str, object] = {
         "schema_version": "lot39-post-merge-validation-v1",
         "status": "PASS",
@@ -122,6 +157,8 @@ def validate() -> dict[str, object]:
         "evidence_head": EVIDENCE_HEAD,
         "final_pr_head": FINAL_PR_HEAD,
         "merged_commit": MERGED_COMMIT,
+        "post_merge_audit": POST_MERGE_AUDIT,
+        "lot40_gate_merge": LOT40_GATE_MERGE,
         "line_coverage_percent": frozen["line_coverage_percent"],
         "branch_coverage_percent": frozen["branch_coverage_percent"],
         "mutation_score_percent": frozen["mutation_score_percent"],
@@ -139,7 +176,14 @@ def validate() -> dict[str, object]:
 def main() -> int:
     try:
         print(json.dumps(validate(), sort_keys=True))
-    except (Lot39PostMergeError, OSError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+    except (
+        Lot39PostMergeError,
+        OSError,
+        KeyError,
+        TypeError,
+        ValueError,
+        json.JSONDecodeError,
+    ) as exc:
         print(f"LOT39 POST-MERGE VALIDATION: FAIL\n{exc}", file=sys.stderr)
         return 1
     return 0
