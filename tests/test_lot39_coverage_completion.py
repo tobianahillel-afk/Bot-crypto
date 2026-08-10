@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import json
 from dataclasses import replace
+from decimal import Decimal
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -26,10 +27,7 @@ from crypto_quant_bot.microstructure.order_book_delta_sequence_reconstructor imp
     write_lot39_artifacts,
 )
 from crypto_quant_bot.microstructure.order_book_delta_sequence_reconstructor_models import (
-    BLOCKED_STATE,
     Lot39MetricsV1,
-    OrderBookDeltaV1,
-    ReconstructionOutcome if False else OrderBookDeltaV1,
 )
 from crypto_quant_bot.microstructure.order_book_delta_sequence_reconstructor_validation import (
     OrderBookDeltaSequenceValidationError,
@@ -249,16 +247,15 @@ def test_delta_fixture_loader_rejects_identity_decision_empty_and_staleness(tmp_
         with pytest.raises(OrderBookDeltaSequenceValidationError, match=message):
             _load_deltas(tmp_path, config)
 
-    stale = copy.deepcopy(fixture)
-    stale["deltas"][0]["receive_time"] = "2026-08-06T19:18:30.000000Z"
-    _write_json(tmp_path / "fixture.json", stale)
+    _write_json(tmp_path / "fixture.json", fixture)
+    stale_config = dict(config)
+    stale_config["input_reference_time"] = "2026-08-06T19:18:42.000000Z"
     with pytest.raises(OrderBookDeltaSequenceValidationError, match="stale or future"):
-        _load_deltas(tmp_path, config)
-    future = copy.deepcopy(fixture)
-    future["deltas"][0]["receive_time"] = "2026-08-06T19:18:41.000000Z"
-    _write_json(tmp_path / "fixture.json", future)
+        _load_deltas(tmp_path, stale_config)
+    future_config = dict(config)
+    future_config["input_reference_time"] = "2026-08-06T19:18:39.000000Z"
     with pytest.raises(OrderBookDeltaSequenceValidationError, match="stale or future"):
-        _load_deltas(tmp_path, config)
+        _load_deltas(tmp_path, future_config)
 
 
 def test_delta_identity_and_empty_book_integrity_failures() -> None:
@@ -268,7 +265,9 @@ def test_delta_identity_and_empty_book_integrity_failures() -> None:
         _validate_delta_identity(snapshot, wrong_identity)
     deleting_all_bids = replace(
         deltas[0],
-        bids=tuple(OrderBookLevelV1(level.price, 0) for level in snapshot.bids),
+        bids=tuple(
+            OrderBookLevelV1(level.price, Decimal("0")) for level in snapshot.bids
+        ),
         asks=(),
     )
     outcome = reconstruct_sequence(snapshot, (deleting_all_bids,))
@@ -278,7 +277,7 @@ def test_delta_identity_and_empty_book_integrity_failures() -> None:
 
 
 def test_build_resync_requires_gap_evidence(monkeypatch: pytest.MonkeyPatch) -> None:
-    _, _, _, fixture_checksum = _reference_inputs()
+    _, _, deltas, fixture_checksum = _reference_inputs()
     outcome = engine.ReconstructionOutcome(
         "RESYNC_REQUIRED",
         None,
@@ -286,8 +285,8 @@ def test_build_resync_requires_gap_evidence(monkeypatch: pytest.MonkeyPatch) -> 
         Lot39MetricsV1(1, 0, 0, 0, 1, 1001),
         ("LOT39_RESYNC_REQUIRED",),
     )
-    monkeypatch.setattr(engine, "reconstruct_sequence", lambda snapshot, deltas: outcome)
-    monkeypatch.setattr(engine, "_load_deltas", lambda root, config: (_reference_inputs()[2], fixture_checksum))
+    monkeypatch.setattr(engine, "reconstruct_sequence", lambda snapshot, values: outcome)
+    monkeypatch.setattr(engine, "_load_deltas", lambda root, config: (deltas, fixture_checksum))
     with pytest.raises(OrderBookDeltaSequenceValidationError, match="missing gap evidence"):
         build_lot39_artifacts(ROOT, CODE_COMMIT)
 
@@ -302,7 +301,11 @@ def test_writer_rejects_resync_state_without_gap_event(
         to_dict=lambda: state.to_dict(),
     )
     dummy_audit = SimpleNamespace(to_dict=lambda: audit.to_dict())
-    monkeypatch.setattr(engine, "build_lot39_artifacts", lambda root, code_commit: (dummy_state, dummy_audit))
+    monkeypatch.setattr(
+        engine,
+        "build_lot39_artifacts",
+        lambda root, code_commit: (dummy_state, dummy_audit),
+    )
     monkeypatch.setattr(engine, "STATE_PATH", tmp_path / "state.json")
     monkeypatch.setattr(engine, "AUDIT_PATH", tmp_path / "audit.json")
     monkeypatch.setattr(engine, "BOOK_PATH", tmp_path / "book.json")
