@@ -9,6 +9,7 @@ from pathlib import Path
 
 import pytest
 
+import crypto_quant_bot.microstructure.book_integrity_desynchronization_detector as engine
 from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry import (
     canonical_checksum,
 )
@@ -104,7 +105,7 @@ def test_require_boolean_sha_and_runtime_guards() -> None:
         validate_runtime_mode("LIVE")
 
 
-def test_timestamp_and_duration_guards() -> None:
+def test_timestamp_duration_and_causal_guards() -> None:
     with pytest.raises(BookIntegrityValidationError, match="UTC Z"):
         parse_utc_timestamp("2026-08-06T19:18:40+00:00", "ts")
     with pytest.raises(BookIntegrityValidationError, match="ISO timestamp"):
@@ -114,9 +115,6 @@ def test_timestamp_and_duration_guards() -> None:
     with pytest.raises(BookIntegrityValidationError, match="backwards"):
         duration_us(start, end)
     assert duration_us(end, start) == 1_000_000
-
-
-def test_causal_ordering_guard() -> None:
     with pytest.raises(BookIntegrityValidationError, match="causal"):
         validate_causal_times(
             "2026-08-06T19:18:40.000000Z",
@@ -180,33 +178,22 @@ def test_run_context_and_lineage_contracts_fail_closed() -> None:
         )
 
 
-def test_component_contract_guards_name_weight_and_reason() -> None:
+def test_component_contract_guards_name_weight_score_and_reason() -> None:
     with pytest.raises(BookIntegrityValidationError, match="unknown Lot 40 health component"):
         BookHealthComponentV1(
-            "UNKNOWN",
-            True,
-            False,
-            Decimal("1"),
-            Decimal("1"),
-            "LOT40_UNKNOWN",
+            "UNKNOWN", True, False, Decimal("1"), Decimal("1"), "LOT40_UNKNOWN"
         )
     with pytest.raises(BookIntegrityValidationError, match="weight"):
         BookHealthComponentV1(
-            "FRESHNESS",
-            True,
-            False,
-            Decimal("0"),
-            Decimal("0"),
-            "LOT40_BOOK_FRESH",
+            "FRESHNESS", True, False, Decimal("0"), Decimal("0"), "LOT40_BOOK_FRESH"
+        )
+    with pytest.raises(BookIntegrityValidationError, match="passed weight or zero"):
+        BookHealthComponentV1(
+            "FRESHNESS", True, False, Decimal("15"), Decimal("14"), "LOT40_BOOK_FRESH"
         )
     with pytest.raises(BookIntegrityValidationError, match="invalid reason"):
         BookHealthComponentV1(
-            "FRESHNESS",
-            True,
-            False,
-            Decimal("15"),
-            Decimal("15"),
-            "bad",
+            "FRESHNESS", True, False, Decimal("15"), Decimal("15"), "bad"
         )
 
 
@@ -225,10 +212,9 @@ def test_integrity_model_identity_measurement_and_component_guards() -> None:
         replace(integrity, components=integrity.components[:-1])
 
 
-def test_integrity_model_weight_score_status_and_reason_guards() -> None:
+def test_integrity_model_weight_score_status_reason_and_checksum_guards() -> None:
     state, _ = build_lot40_artifacts(ROOT, "a" * 40)
     integrity = state.book_integrity
-    freshness = next(item for item in integrity.components if item.name == "FRESHNESS")
     modified = tuple(
         replace(item, weight=Decimal("14"), score=Decimal("14"))
         if item.name == "FRESHNESS"
@@ -239,7 +225,6 @@ def test_integrity_model_weight_score_status_and_reason_guards() -> None:
         replace(integrity, components=modified, book_health_score=Decimal("99"))
     with pytest.raises(BookIntegrityValidationError, match="component total mismatch"):
         replace(integrity, book_health_score=Decimal("99"))
-    assert freshness.passed is True
     with pytest.raises(BookIntegrityValidationError, match="status/component mismatch"):
         replace(integrity, health_status="DEGRADED")
     with pytest.raises(BookIntegrityValidationError, match="requires reason"):
@@ -248,7 +233,7 @@ def test_integrity_model_weight_score_status_and_reason_guards() -> None:
         replace(integrity, integrity_checksum="bad")
 
 
-def test_veto_model_threshold_consequence_and_flag_guards() -> None:
+def test_veto_model_threshold_consequence_flag_and_checksum_guards() -> None:
     state, _ = build_lot40_artifacts(ROOT, "a" * 40)
     veto = state.book_health_veto
     with pytest.raises(BookIntegrityValidationError, match="finite"):
@@ -327,26 +312,26 @@ def test_config_schema_version_policy_and_weight_set_are_strict() -> None:
         evaluate_book_integrity(book, config)
 
 
-def test_level_shapes_numeric_values_and_sequence_types_fail_closed() -> None:
-    config = _config()
+def test_level_shapes_and_invalid_numeric_values_are_critical() -> None:
     malformed = _book()
     malformed["bids"] = [{"price": "50024.9"}]
-    integrity, veto = evaluate_book_integrity(malformed, config)
+    integrity, veto = evaluate_book_integrity(malformed, _config())
     assert integrity.health_status == "CRITICAL"
     assert veto.consequence == "BLOCK"
 
     invalid_decimal = _book()
     invalid_decimal["asks"] = [{"price": "bad", "quantity": "1"}]
-    integrity, veto = evaluate_book_integrity(invalid_decimal, config)
+    integrity, veto = evaluate_book_integrity(invalid_decimal, _config())
     assert integrity.health_status == "CRITICAL"
     assert veto.consequence == "BLOCK"
 
-    sequence_bool = _book()
-    sequence_bool["sequence_id"] = True
-    _rewrite_checksum(sequence_bool, "book_checksum")
-    integrity, veto = evaluate_book_integrity(sequence_bool, config)
-    assert integrity.health_status == "CRITICAL"
-    assert veto.consequence == "BLOCK"
+
+def test_invalid_sequence_type_is_rejected_before_publication() -> None:
+    book = _book()
+    book["sequence_id"] = True
+    _rewrite_checksum(book, "book_checksum")
+    with pytest.raises(BookIntegrityValidationError, match="sequence_id must be an integer"):
+        evaluate_book_integrity(book, _config())
 
 
 def test_invalid_checksum_shapes_are_critical_blocks() -> None:
@@ -358,15 +343,20 @@ def test_invalid_checksum_shapes_are_critical_blocks() -> None:
         assert veto.consequence == "BLOCK"
 
 
-def test_gate_and_lifecycle_tamper_stop_reference_build(tmp_path: Path) -> None:
+def test_gate_identity_and_lifecycle_tamper_stop_reference_build(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     _copy_reference_tree(tmp_path)
     gate_path = tmp_path / "data/audit/lot40_v4_entry_gate.json"
     gate = _load(gate_path)
     gate["gate_status"] = "NO_GO"
     _rewrite_checksum(gate, "output_checksum")
+    monkeypatch.setattr(engine, "EXPECTED_GATE_CHECKSUM", gate["output_checksum"])
     with pytest.raises(BookIntegrityValidationError, match="gate does not authorize"):
         build_lot40_artifacts(tmp_path, "a" * 40)
 
+    monkeypatch.setattr(engine, "EXPECTED_GATE_CHECKSUM", engine.__dict__["EXPECTED_GATE_CHECKSUM"])
     _copy_reference_tree(tmp_path)
     lifecycle_path = tmp_path / "data/audit/roadmap_lifecycle_overlay_lot39.json"
     lifecycle = _load(lifecycle_path)
