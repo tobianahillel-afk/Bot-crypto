@@ -31,7 +31,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove immutable historical gate and current Lot 40 lock
+      - name: Prove immutable historical gate and historical Lot 40 lock
         shell: bash
         run: |
           set -euo pipefail
@@ -55,10 +55,17 @@ jobs:
               exit 1
             fi
           done
-          test ! -e src/crypto_quant_bot/microstructure/book_integrity_and_desynchronization_detector.py
-          test ! -e src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py
-          test ! -e scripts/run_lot40_book_integrity_and_desynchronization_detector.py
-          test ! -e scripts/validate_lot40.py
+          for path in \
+            src/crypto_quant_bot/microstructure/book_integrity_and_desynchronization_detector.py \
+            src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py \
+            scripts/run_lot40_book_integrity_and_desynchronization_detector.py \
+            scripts/run_lot40_book_integrity_desynchronization_detector.py \
+            scripts/validate_lot40.py; do
+            if git cat-file -e "$GATE_MERGE:$path" 2>/dev/null; then
+              echo "LOT40_BOUNDARY_VIOLATED_AT_LOT39_GATE:$path"
+              exit 1
+            fi
+          done
       - name: Compile lint type schema and archival gate
         run: |
           python -m compileall -q scripts tests
