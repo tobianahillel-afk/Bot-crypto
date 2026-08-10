@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import shutil
 from dataclasses import replace
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
 
@@ -17,7 +17,6 @@ from crypto_quant_bot.microstructure import build_lot40_artifacts, evaluate_book
 from crypto_quant_bot.microstructure.book_integrity_desynchronization_detector import CONFIG_PATH
 from crypto_quant_bot.microstructure.book_integrity_desynchronization_detector_models import (
     BookHealthComponentV1,
-    BookHealthVetoV1,
     Lot40LineageEnvelopeV1,
     Lot40MetricsV1,
     Lot40RunContextV1,
@@ -110,8 +109,8 @@ def test_timestamp_duration_and_causal_guards() -> None:
         parse_utc_timestamp("2026-08-06T19:18:40+00:00", "ts")
     with pytest.raises(BookIntegrityValidationError, match="ISO timestamp"):
         parse_utc_timestamp("not-a-dateZ", "ts")
-    start = datetime(2026, 8, 6, 19, 18, 41, tzinfo=timezone.utc)
-    end = datetime(2026, 8, 6, 19, 18, 40, tzinfo=timezone.utc)
+    start = datetime(2026, 8, 6, 19, 18, 41, tzinfo=UTC)
+    end = datetime(2026, 8, 6, 19, 18, 40, tzinfo=UTC)
     with pytest.raises(BookIntegrityValidationError, match="backwards"):
         duration_us(start, end)
     assert duration_us(end, start) == 1_000_000
