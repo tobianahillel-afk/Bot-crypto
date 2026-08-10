@@ -7,9 +7,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 FILES = (
+    "src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor.py",
+    "src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor_models.py",
     "src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor.py",
     "src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor_models.py",
     "src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor_validation.py",
+    "scripts/run_lot39_order_book_delta_and_sequence_reconstructor.py",
     "scripts/run_lot39_order_book_delta_sequence_reconstructor.py",
     "scripts/validate_lot39.py",
 )
