@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "book_integrity_desynchronization_detector_audit_v1.schema.json",
+  "title": "BookIntegrityDesynchronizationDetectorAuditV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "code_commit", "config_checksum", "entry_gate_checksum",
+    "lot39_state_checksum", "lot39_audit_checksum",
+    "lot39_reconstructed_book_checksum", "lot39_delta_fixture_checksum",
+    "state_output_checksum", "integrity_checksum", "veto_checksum",
+    "health_status", "consequence", "safety", "audit_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "book-integrity-desynchronization-detector-audit-v1"},
+    "code_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "config_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "entry_gate_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "lot39_state_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "lot39_audit_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "lot39_reconstructed_book_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "lot39_delta_fixture_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "state_output_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "integrity_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "veto_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "health_status": {"enum": ["HEALTHY", "DEGRADED", "CRITICAL"]},
+    "consequence": {"enum": ["NONE", "WAIT", "PAUSE", "BLOCK"]},
+    "safety": {"type": "object"},
+    "audit_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
