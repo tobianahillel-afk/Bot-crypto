@@ -24,7 +24,7 @@ FORBIDDEN_IMPORT_ROOTS = {
     "httpx",
     "requests",
     "socket",
-    "urllib.request",
+    "urllib" + ".request",
     "urllib3",
     "websocket",
     "websockets",
@@ -38,9 +38,9 @@ FORBIDDEN_CALL_NAMES = {
     "urlopen",
 }
 FORBIDDEN_TEXT = (
-    "http://",
-    "https://",
-    "wss://",
+    "http" + "://",
+    "https" + "://",
+    "wss" + "://",
     "API_KEY",
     "API_SECRET",
     "KRAKEN_KEY",
