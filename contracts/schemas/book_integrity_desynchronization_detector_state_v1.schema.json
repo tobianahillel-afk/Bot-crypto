@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "book_integrity_desynchronization_detector_state_v1.schema.json",
+  "title": "BookIntegrityDesynchronizationDetectorStateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "run_context", "lineage", "event_time", "receive_time",
+    "decision_time", "generated_at", "validation_state", "book_integrity",
+    "book_health_veto", "metrics", "reason_codes", "safety", "output_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "book-integrity-desynchronization-detector-state-v1"},
+    "run_context": {"type": "object"},
+    "lineage": {"type": "object"},
+    "event_time": {"type": "string", "minLength": 1},
+    "receive_time": {"type": "string", "minLength": 1},
+    "decision_time": {"type": "string", "minLength": 1},
+    "generated_at": {"type": "string", "minLength": 1},
+    "validation_state": {"const": "VALIDATED_OFFLINE_BOOK_INTEGRITY_ONLY"},
+    "book_integrity": {"type": "object"},
+    "book_health_veto": {"type": "object"},
+    "metrics": {"type": "object"},
+    "reason_codes": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[A-Z0-9_]+$"}
+    },
+    "safety": {"type": "object"},
+    "output_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
