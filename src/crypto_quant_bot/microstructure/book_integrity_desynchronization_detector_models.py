@@ -65,8 +65,11 @@ class Lot40LineageEnvelopeV1:
 
     def __post_init__(self) -> None:
         require_text(self.lineage_id, "lineage_id")
-        for value, field in self._checksums():
-            require_sha256(value, field)
+        checksums = self._checksums()
+        if len(checksums) != 5:
+            raise BookIntegrityValidationError("Lot 40 lineage checksum set changed")
+        for checksum, field in checksums:
+            require_sha256(checksum, field)
         parse_utc_timestamp(self.available_at, "available_at")
 
     def _checksums(self) -> tuple[tuple[str, str], ...]:
@@ -109,7 +112,9 @@ class BookHealthComponentV1:
             raise BookIntegrityValidationError("component weight must be in (0,100]")
         expected_score = self.weight if self.passed else Decimal("0")
         if self.score != expected_score:
-            raise BookIntegrityValidationError("component score must equal passed weight or zero")
+            raise BookIntegrityValidationError(
+                "component score must equal passed weight or zero"
+            )
         validate_reason_codes((self.reason_code,))
 
     def to_dict(self) -> dict[str, Any]:
@@ -124,7 +129,9 @@ class BookHealthComponentV1:
         }
 
 
-def _expected_health_status(components: tuple[BookHealthComponentV1, ...]) -> str:
+def _expected_health_status(
+    components: tuple[BookHealthComponentV1, ...],
+) -> str:
     if any(component.critical and not component.passed for component in components):
         return "CRITICAL"
     if any(not component.passed for component in components):
@@ -179,7 +186,9 @@ class BookIntegrityStateV1:
         )
         require_integer(self.sequence_id, "sequence_id")
         if self.synchronization_state != "SYNCED":
-            raise BookIntegrityValidationError("Lot 40 cannot publish non-SYNCED integrity state")
+            raise BookIntegrityValidationError(
+                "Lot 40 cannot publish non-SYNCED integrity state"
+            )
 
     def _validate_measurements(self) -> None:
         require_integer(self.stale_age_us, "stale_age_us")
@@ -188,7 +197,10 @@ class BookIntegrityStateV1:
         require_boolean(self.crossed, "crossed")
         require_boolean(self.locked, "locked")
         require_boolean(self.checksum_valid, "checksum_valid")
-        require_boolean(self.level_monotonicity_valid, "level_monotonicity_valid")
+        require_boolean(
+            self.level_monotonicity_valid,
+            "level_monotonicity_valid",
+        )
         validate_health_state(self.health_status)
         if not self.book_health_score.is_finite():
             raise BookIntegrityValidationError("book health score must be finite")
@@ -199,15 +211,29 @@ class BookIntegrityStateV1:
         if {component.name for component in self.components} != COMPONENT_NAMES:
             raise BookIntegrityValidationError("Lot 40 health component set changed")
         if len(self.components) != len(COMPONENT_NAMES):
-            raise BookIntegrityValidationError("Lot 40 health components must be unique")
-        total_weight = sum((component.weight for component in self.components), Decimal("0"))
-        total_score = sum((component.score for component in self.components), Decimal("0"))
+            raise BookIntegrityValidationError(
+                "Lot 40 health components must be unique"
+            )
+        total_weight = sum(
+            (component.weight for component in self.components),
+            Decimal("0"),
+        )
+        total_score = sum(
+            (component.score for component in self.components),
+            Decimal("0"),
+        )
         if total_weight != Decimal("100"):
-            raise BookIntegrityValidationError("Lot 40 component weights must total 100")
+            raise BookIntegrityValidationError(
+                "Lot 40 component weights must total 100"
+            )
         if total_score != self.book_health_score:
-            raise BookIntegrityValidationError("book health score/component total mismatch")
+            raise BookIntegrityValidationError(
+                "book health score/component total mismatch"
+            )
         if self.health_status != _expected_health_status(self.components):
-            raise BookIntegrityValidationError("book health status/component mismatch")
+            raise BookIntegrityValidationError(
+                "book health status/component mismatch"
+            )
         validate_reason_codes(self.reason_codes)
 
     def payload_without_checksum(self) -> dict[str, Any]:
@@ -273,15 +299,29 @@ class BookHealthVetoV1:
             self.trade_health_threshold,
         )
         if any(not value.is_finite() for value in values):
-            raise BookIntegrityValidationError("health thresholds and score must be finite")
-        if not Decimal("0") <= self.system_health_threshold <= self.trade_health_threshold <= Decimal("100"):
-            raise BookIntegrityValidationError("invalid Lot 40 health threshold ordering")
+            raise BookIntegrityValidationError(
+                "health thresholds and score must be finite"
+            )
+        valid_thresholds = (
+            Decimal("0")
+            <= self.system_health_threshold
+            <= self.trade_health_threshold
+            <= Decimal("100")
+        )
+        if not valid_thresholds:
+            raise BookIntegrityValidationError(
+                "invalid Lot 40 health threshold ordering"
+            )
         if not Decimal("0") <= self.book_health_score <= Decimal("100"):
             raise BookIntegrityValidationError("veto score must be in [0,100]")
         if self.critical_failure_consequence != "BLOCK":
-            raise BookIntegrityValidationError("critical Lot 40 failures must BLOCK")
+            raise BookIntegrityValidationError(
+                "critical Lot 40 failures must BLOCK"
+            )
         if self.system_threshold_consequence != "PAUSE":
-            raise BookIntegrityValidationError("Lot 40 system threshold must PAUSE")
+            raise BookIntegrityValidationError(
+                "Lot 40 system threshold must PAUSE"
+            )
 
     def _validate_consequence(self) -> None:
         expected = "NONE"
@@ -307,8 +347,12 @@ class BookHealthVetoV1:
             "consequence": self.consequence,
             "veto_active": self.veto_active,
             "critical_veto_active": self.critical_veto_active,
-            "trade_health_threshold": decimal_text(self.trade_health_threshold),
-            "system_health_threshold": decimal_text(self.system_health_threshold),
+            "trade_health_threshold": decimal_text(
+                self.trade_health_threshold
+            ),
+            "system_health_threshold": decimal_text(
+                self.system_health_threshold
+            ),
             "critical_failure_consequence": self.critical_failure_consequence,
             "system_threshold_consequence": self.system_threshold_consequence,
             "book_health_score": decimal_text(self.book_health_score),
@@ -326,18 +370,27 @@ class Lot40MetricsV1:
     ask_depth_levels: int
     stale_age_us: int
     processing_latency_us: int | None = None
-    latency_measurement_status: str = "NOT_MEASURED_OFFLINE_DETERMINISTIC_REPLAY"
+    latency_measurement_status: str = (
+        "NOT_MEASURED_OFFLINE_DETERMINISTIC_REPLAY"
+    )
 
     def __post_init__(self) -> None:
         for value, field in self._integer_fields():
             require_integer(value, field)
         if self.health_components_failed_total > self.health_components_total:
-            raise BookIntegrityValidationError("failed components exceed component total")
+            raise BookIntegrityValidationError(
+                "failed components exceed component total"
+            )
         if self.critical_components_failed_total > self.health_components_failed_total:
-            raise BookIntegrityValidationError("critical failures exceed total failures")
+            raise BookIntegrityValidationError(
+                "critical failures exceed total failures"
+            )
         if self.processing_latency_us is not None:
             require_integer(self.processing_latency_us, "processing_latency_us")
-        require_text(self.latency_measurement_status, "latency_measurement_status")
+        require_text(
+            self.latency_measurement_status,
+            "latency_measurement_status",
+        )
 
     def _integer_fields(self) -> tuple[tuple[int, str], ...]:
         return (
@@ -354,8 +407,12 @@ class Lot40MetricsV1:
             "schema_version": "lot40-metrics-v1",
             "lot_40_records_processed_total": 1,
             "lot_40_health_components_total": self.health_components_total,
-            "lot_40_health_components_failed_total": self.health_components_failed_total,
-            "lot_40_critical_components_failed_total": self.critical_components_failed_total,
+            "lot_40_health_components_failed_total": (
+                self.health_components_failed_total
+            ),
+            "lot_40_critical_components_failed_total": (
+                self.critical_components_failed_total
+            ),
             "lot_40_bid_depth_levels": self.bid_depth_levels,
             "lot_40_ask_depth_levels": self.ask_depth_levels,
             "lot_40_stale_age_us": self.stale_age_us,
@@ -389,9 +446,16 @@ class BookIntegrityDesynchronizationDetectorStateV1:
             self.generated_at,
         )
         if self.validation_state != VALIDATION_STATE:
-            raise BookIntegrityValidationError("unknown Lot 40 validation state")
-        if self.book_integrity.book_health_score != self.book_health_veto.book_health_score:
-            raise BookIntegrityValidationError("Lot 40 integrity/veto score mismatch")
+            raise BookIntegrityValidationError(
+                "unknown Lot 40 validation state"
+            )
+        if (
+            self.book_integrity.book_health_score
+            != self.book_health_veto.book_health_score
+        ):
+            raise BookIntegrityValidationError(
+                "Lot 40 integrity/veto score mismatch"
+            )
         validate_reason_codes(self.reason_codes)
         validate_lot40_safety(self.safety)
         require_sha256(self.output_checksum, "output_checksum")
@@ -403,7 +467,9 @@ class BookIntegrityDesynchronizationDetectorStateV1:
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "schema_version": "book-integrity-desynchronization-detector-state-v1",
+            "schema_version": (
+                "book-integrity-desynchronization-detector-state-v1"
+            ),
             "run_context": self.run_context.to_dict(),
             "lineage": self.lineage.to_dict(),
             "event_time": self.event_time,
@@ -451,8 +517,14 @@ class BookIntegrityDesynchronizationDetectorAuditV1:
             (self.entry_gate_checksum, "entry_gate_checksum"),
             (self.lot39_state_checksum, "lot39_state_checksum"),
             (self.lot39_audit_checksum, "lot39_audit_checksum"),
-            (self.lot39_reconstructed_book_checksum, "lot39_reconstructed_book_checksum"),
-            (self.lot39_delta_fixture_checksum, "lot39_delta_fixture_checksum"),
+            (
+                self.lot39_reconstructed_book_checksum,
+                "lot39_reconstructed_book_checksum",
+            ),
+            (
+                self.lot39_delta_fixture_checksum,
+                "lot39_delta_fixture_checksum",
+            ),
             (self.state_output_checksum, "state_output_checksum"),
             (self.integrity_checksum, "integrity_checksum"),
             (self.veto_checksum, "veto_checksum"),
@@ -466,13 +538,17 @@ class BookIntegrityDesynchronizationDetectorAuditV1:
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "schema_version": "book-integrity-desynchronization-detector-audit-v1",
+            "schema_version": (
+                "book-integrity-desynchronization-detector-audit-v1"
+            ),
             "code_commit": self.code_commit,
             "config_checksum": self.config_checksum,
             "entry_gate_checksum": self.entry_gate_checksum,
             "lot39_state_checksum": self.lot39_state_checksum,
             "lot39_audit_checksum": self.lot39_audit_checksum,
-            "lot39_reconstructed_book_checksum": self.lot39_reconstructed_book_checksum,
+            "lot39_reconstructed_book_checksum": (
+                self.lot39_reconstructed_book_checksum
+            ),
             "lot39_delta_fixture_checksum": self.lot39_delta_fixture_checksum,
             "state_output_checksum": self.state_output_checksum,
             "integrity_checksum": self.integrity_checksum,
