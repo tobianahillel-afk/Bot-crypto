@@ -161,12 +161,12 @@ def test_delta_freshness_enforces_future_stale_and_exact_boundary() -> None:
         engine._validate_delta_freshness((first,), future_reference)
 
     stale_reference = dict(config)
-    stale_reference["input_reference_time"] = "2026-08-06T19:18:40.560001Z"
+    stale_reference["input_reference_time"] = "2026-08-06T19:18:41.060001Z"
     with pytest.raises(OrderBookDeltaSequenceValidationError, match="stale or future-dated"):
         engine._validate_delta_freshness((first,), stale_reference)
 
     exact_boundary = dict(config)
-    exact_boundary["input_reference_time"] = "2026-08-06T19:18:40.560000Z"
+    exact_boundary["input_reference_time"] = "2026-08-06T19:18:41.060000Z"
     engine._validate_delta_freshness((first,), exact_boundary)
 
     exact_receive = replace(first, receive_time="2026-08-06T19:18:40.080000Z")
