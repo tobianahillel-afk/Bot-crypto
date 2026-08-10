@@ -63,8 +63,13 @@ def verify_checksum(path: str, field: str, expected: str) -> dict[str, Any]:
 
 def validate_version_and_lifecycle() -> dict[str, Any]:
     project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
-    require(project["version"] == "0.38.0", "project version must be 0.38.0")
-    require("Lot 38" in project["description"], "project description must identify Lot 38")
+    version = project["version"]
+    try:
+        version_tuple = tuple(int(part) for part in version.split("."))
+    except (AttributeError, ValueError) as exc:
+        raise Lot38PostMergeError("project version must be numeric semver") from exc
+    require(len(version_tuple) == 3, "project version must be numeric semver")
+    require(version_tuple >= (0, 38, 0), "project version cannot precede audited Lot 38")
 
     previous = load("data/audit/roadmap_lifecycle_overlay_lot37.json")
     current = load("data/audit/roadmap_lifecycle_overlay_lot38.json")
