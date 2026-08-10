@@ -19,6 +19,9 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-22.04
+    env:
+      AUDITED_BASE: 5381a773a9d69036b38c57904b2f4a66ffb2f595
+      GATE_MERGE: 91df3e378336a791a731cb1561382ba28e6e0978
     steps:
       - uses: actions/checkout@v4
         with:
@@ -32,17 +35,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove exact audited base and governance-only diff
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      - name: Prove immutable historical gate and authorized successor head
         run: |
           set -euo pipefail
-          BASE=5381a773a9d69036b38c57904b2f4a66ffb2f595
-          git merge-base --is-ancestor "$BASE" HEAD
-          if [ "$EVENT_NAME" = "pull_request" ]; then test "$PR_BASE_SHA" = "$BASE"; fi
-          git diff --name-only "$BASE" HEAD | sort > /tmp/lot40-changed.txt
-          cat > /tmp/lot40-allowed.txt <<'EOF'
+          git merge-base --is-ancestor "$AUDITED_BASE" "$GATE_MERGE"
+          git merge-base --is-ancestor "$GATE_MERGE" HEAD
+          git diff --name-only "$AUDITED_BASE" "$GATE_MERGE" | sort > /tmp/lot40-gate-changed.txt
+          cat > /tmp/lot40-gate-allowed.txt <<'EOF'
           .github/workflows/lot40-entry-gate.yml
           contracts/schemas/lot40_v4_entry_gate_v1.schema.json
           data/audit/lot40_v4_entry_gate.json
@@ -51,42 +50,57 @@ jobs:
           scripts/validate_lot40_entry_gate.py
           tests/test_lot40_v4_entry_gate.py
           EOF
-          sort -o /tmp/lot40-allowed.txt /tmp/lot40-allowed.txt
-          diff -u /tmp/lot40-allowed.txt /tmp/lot40-changed.txt
-          test ! -e src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py
-          test ! -e src/crypto_quant_bot/microstructure/book_integrity_and_desynchronization_detector.py
-          test ! -e scripts/run_lot40_book_integrity_desynchronization_detector.py
-          test ! -e scripts/validate_lot40.py
+          sort -o /tmp/lot40-gate-allowed.txt /tmp/lot40-gate-allowed.txt
+          diff -u /tmp/lot40-gate-allowed.txt /tmp/lot40-gate-changed.txt
+          for path in \
+            src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py \
+            src/crypto_quant_bot/microstructure/book_integrity_and_desynchronization_detector.py \
+            scripts/run_lot40_book_integrity_desynchronization_detector.py \
+            scripts/validate_lot40.py; do
+            if git cat-file -e "$GATE_MERGE:$path" 2>/dev/null; then
+              echo "LOT40_PRESENT_AT_GATE_MERGE:$path"
+              exit 1
+            fi
+          done
           test ! -e src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine.py
           test ! -e scripts/run_lot41_spread_depth_and_imbalance_engine.py
           test ! -e scripts/validate_lot41.py
-      - name: Compile lint type schema and exact gate validation
+      - name: Recreate exact gate worktree
         run: |
+          set -euo pipefail
+          rm -rf /tmp/lot40-gate
+          git worktree add --detach /tmp/lot40-gate "$GATE_MERGE"
+      - name: Compile lint type schema and exact historical gate validation
+        run: |
+          set -euo pipefail
+          cd /tmp/lot40-gate
           python -m compileall -q scripts tests
           python -m json.tool data/audit/lot40_v4_entry_gate.json >/dev/null
           python -m json.tool contracts/schemas/lot40_v4_entry_gate_v1.schema.json >/dev/null
           ruff check scripts/validate_lot40_entry_gate.py tests/test_lot40_v4_entry_gate.py
-          mypy src/crypto_quant_bot
-          python scripts/validate_lot40_entry_gate.py
-      - name: Architecture roadmap traceability and engineering gates
+          PYTHONPATH=src mypy src/crypto_quant_bot
+          PYTHONPATH=src python scripts/validate_lot40_entry_gate.py
+      - name: Historical architecture roadmap traceability and engineering gates
         run: |
-          python scripts/validate_roadmap_documentation.py
-          python scripts/validate_architecture_boundaries.py
-          python scripts/validate_domain_architecture.py
-          python scripts/audit_roadmap_semantics.py
-          python scripts/validate_traceability_contract.py
-          python scripts/check_no_silent_numeric_coercion.py
-          python scripts/quality_inventory.py
-          python scripts/validate_engineering_deviations.py
-      - name: Gate tests full regression and anti-flake
+          set -euo pipefail
+          cd /tmp/lot40-gate
+          PYTHONPATH=src python scripts/validate_roadmap_documentation.py
+          PYTHONPATH=src python scripts/validate_architecture_boundaries.py
+          PYTHONPATH=src python scripts/validate_domain_architecture.py
+          PYTHONPATH=src python scripts/audit_roadmap_semantics.py
+          PYTHONPATH=src python scripts/validate_traceability_contract.py
+          PYTHONPATH=src python scripts/check_no_silent_numeric_coercion.py
+          PYTHONPATH=src python scripts/quality_inventory.py
+          PYTHONPATH=src python scripts/validate_engineering_deviations.py
+      - name: Historical gate tests and anti-flake
         run: |
-          pytest -q tests/test_lot40_v4_entry_gate.py
-          pytest -q
-          pytest -q tests/test_lot40_v4_entry_gate.py
-          pytest -q tests/test_lot40_v4_entry_gate.py
-          pytest -q tests/test_lot40_v4_entry_gate.py
-      - name: Security dependency and final gate validation
+          set -euo pipefail
+          cd /tmp/lot40-gate
+          for repetition in 1 2 3; do PYTHONPATH=src pytest -q tests/test_lot40_v4_entry_gate.py; done
+      - name: Security dependency and final historical gate validation
         run: |
+          set -euo pipefail
+          cd /tmp/lot40-gate
           bandit -q -r scripts/validate_lot40_entry_gate.py -ll
           pip-audit -r requirements-dev.lock
-          python scripts/validate_lot40_entry_gate.py
+          PYTHONPATH=src python scripts/validate_lot40_entry_gate.py
