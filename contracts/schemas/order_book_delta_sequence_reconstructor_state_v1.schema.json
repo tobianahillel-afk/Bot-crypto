@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "order_book_delta_sequence_reconstructor_state_v1.schema.json",
+  "title": "OrderBookDeltaSequenceReconstructorStateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_context",
+    "lineage",
+    "event_time",
+    "receive_time",
+    "generated_at",
+    "validation_state",
+    "synchronization_state",
+    "base_snapshot_checksum",
+    "delta_fixture_checksum",
+    "reconstructed_book",
+    "sequence_gap_event",
+    "metrics",
+    "reason_codes",
+    "safety",
+    "output_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "order-book-delta-sequence-reconstructor-state-v1"},
+    "run_context": {"type": "object"},
+    "lineage": {"type": "object"},
+    "event_time": {"type": "string", "minLength": 1},
+    "receive_time": {"type": "string", "minLength": 1},
+    "generated_at": {"type": "string", "minLength": 1},
+    "validation_state": {
+      "enum": [
+        "VALIDATED_OFFLINE_DELTA_SEQUENCE_RECONSTRUCTION_ONLY",
+        "BLOCKED_RESYNC_REQUIRED"
+      ]
+    },
+    "synchronization_state": {"enum": ["SYNCED", "RESYNC_REQUIRED"]},
+    "base_snapshot_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "delta_fixture_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "reconstructed_book": {"oneOf": [{"type": "object"}, {"type": "null"}]},
+    "sequence_gap_event": {"oneOf": [{"type": "object"}, {"type": "null"}]},
+    "metrics": {"type": "object"},
+    "reason_codes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "safety": {"type": "object"},
+    "output_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"synchronization_state": {"const": "SYNCED"}}},
+      "then": {
+        "properties": {
+          "validation_state": {"const": "VALIDATED_OFFLINE_DELTA_SEQUENCE_RECONSTRUCTION_ONLY"},
+          "reconstructed_book": {"type": "object"},
+          "sequence_gap_event": {"type": "null"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"synchronization_state": {"const": "RESYNC_REQUIRED"}}},
+      "then": {
+        "properties": {
+          "validation_state": {"const": "BLOCKED_RESYNC_REQUIRED"},
+          "reconstructed_book": {"type": "null"},
+          "sequence_gap_event": {
+            "type": "object",
+            "properties": {
+              "gap_detected": {"const": true},
+              "synchronization_state": {"const": "RESYNC_REQUIRED"}
+            }
+          }
+        }
+      }
+    }
+  ]
+}

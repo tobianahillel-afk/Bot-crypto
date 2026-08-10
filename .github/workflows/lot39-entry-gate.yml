@@ -31,31 +31,52 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove exact audited base and governance-only gate
-        env:
-          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      - name: Prove immutable historical gate and current Lot 40 lock
         shell: bash
         run: |
           set -euo pipefail
-          EXPECTED_BASE=5d0695f248b1bd4e6af5621f8a3d448cc0430050
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            test "$PR_BASE_SHA" = "$EXPECTED_BASE"
-          fi
-          git merge-base --is-ancestor "$EXPECTED_BASE" HEAD
-          git diff --quiet "$EXPECTED_BASE" HEAD -- src/
-          test ! -e contracts/schemas/order_book_delta_v1.schema.json
-          test ! -e src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor.py
-          test ! -e src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor_models.py
-          test ! -e scripts/run_lot39_order_book_delta_and_sequence_reconstructor.py
-          test ! -e scripts/validate_lot39.py
-      - name: Compile lint type schema and exact gate
+          GATE_BASE=5d0695f248b1bd4e6af5621f8a3d448cc0430050
+          GATE_MERGE=938a0e9cf92ef5bbda02045486afbd9a32dc67ec
+          git merge-base --is-ancestor "$GATE_BASE" "$GATE_MERGE"
+          git merge-base --is-ancestor "$GATE_MERGE" HEAD
+          git diff --quiet "$GATE_MERGE" HEAD -- \
+            data/audit/lot39_v4_entry_gate.json \
+            contracts/schemas/lot39_v4_entry_gate_v1.schema.json \
+            docs/LOT_39_V4_ENTRY_GATE.md \
+            reports/lot_39_v4_entry_gate_report.md
+          for path in \
+            contracts/schemas/order_book_delta_v1.schema.json \
+            src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor.py \
+            src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor_models.py \
+            scripts/run_lot39_order_book_delta_and_sequence_reconstructor.py \
+            scripts/validate_lot39.py; do
+            if git cat-file -e "$GATE_MERGE:$path" 2>/dev/null; then
+              echo "LOT39_PREIMPLEMENTATION_BOUNDARY_VIOLATED_AT_GATE:$path"
+              exit 1
+            fi
+          done
+          test ! -e src/crypto_quant_bot/microstructure/book_integrity_and_desynchronization_detector.py
+          test ! -e src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py
+          test ! -e scripts/run_lot40_book_integrity_and_desynchronization_detector.py
+          test ! -e scripts/validate_lot40.py
+      - name: Compile lint type schema and archival gate
         run: |
           python -m compileall -q scripts tests
           python -m json.tool data/audit/lot39_v4_entry_gate.json >/dev/null
           python -m json.tool contracts/schemas/lot39_v4_entry_gate_v1.schema.json >/dev/null
           ruff check scripts/validate_lot39_entry_gate.py tests/test_lot39_v4_entry_gate.py
           mypy src/crypto_quant_bot
-          python -m scripts.validate_lot39_entry_gate
+          python - <<'PY'
+          from pathlib import Path
+          import scripts.validate_lot39_entry_gate as validator
+          validator.LOT39_FORBIDDEN_IMPLEMENTATION_PATHS = ()
+          validator.PLANNED_DELTA_SCHEMA_PATH = Path('__historically_absent_order_book_delta_v1.schema.json')
+          result = validator.validate()
+          assert result['status'] == 'PASS'
+          assert result['gate_status'] == 'GO_LOT39_IMPLEMENTATION_ENTRY'
+          assert result['next_locked_lot'] == 40
+          print(result)
+          PY
       - name: Architecture roadmap traceability and engineering gates
         run: |
           python scripts/validate_roadmap_documentation.py
@@ -66,15 +87,21 @@ jobs:
           python scripts/check_no_silent_numeric_coercion.py
           python scripts/quality_inventory.py
           python scripts/validate_engineering_deviations.py
-      - name: Gate tests full regression and anti-flake
+      - name: Historical gate tests full regression and anti-flake
         run: |
           pytest -q tests/test_lot39_v4_entry_gate.py
           pytest -q
           pytest -q tests/test_lot39_v4_entry_gate.py
           pytest -q tests/test_lot39_v4_entry_gate.py
           pytest -q tests/test_lot39_v4_entry_gate.py
-      - name: Security and final validator
+      - name: Security and final archival validation
         run: |
           bandit -q -r scripts/validate_lot39_entry_gate.py -ll
           pip-audit -r requirements-dev.lock
-          python -m scripts.validate_lot39_entry_gate
+          python - <<'PY'
+          from pathlib import Path
+          import scripts.validate_lot39_entry_gate as validator
+          validator.LOT39_FORBIDDEN_IMPLEMENTATION_PATHS = ()
+          validator.PLANNED_DELTA_SCHEMA_PATH = Path('__historically_absent_order_book_delta_v1.schema.json')
+          assert validator.validate()['status'] == 'PASS'
+          PY

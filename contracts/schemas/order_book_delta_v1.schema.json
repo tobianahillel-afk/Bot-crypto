@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "order_book_delta_v1.schema.json",
+  "title": "OrderBookDeltaV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source_id",
+    "venue",
+    "instrument_id",
+    "market_type",
+    "event_time",
+    "receive_time",
+    "sequence_id",
+    "prev_sequence",
+    "bids",
+    "asks",
+    "expected_book_checksum",
+    "used_for_decision"
+  ],
+  "properties": {
+    "schema_version": {"const": "order-book-delta-v1"},
+    "source_id": {"type": "string", "minLength": 1},
+    "venue": {"type": "string", "minLength": 1},
+    "instrument_id": {"type": "string", "minLength": 1},
+    "market_type": {"const": "SPOT"},
+    "event_time": {"type": "string", "minLength": 1},
+    "receive_time": {"type": "string", "minLength": 1},
+    "sequence_id": {"type": "integer", "minimum": 0},
+    "prev_sequence": {"type": "integer", "minimum": 0},
+    "bids": {"type": "array", "items": {"$ref": "#/$defs/level"}},
+    "asks": {"type": "array", "items": {"$ref": "#/$defs/level"}},
+    "expected_book_checksum": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      ]
+    },
+    "used_for_decision": {"const": false}
+  },
+  "allOf": [
+    {
+      "anyOf": [
+        {"properties": {"bids": {"minItems": 1}}},
+        {"properties": {"asks": {"minItems": 1}}}
+      ]
+    }
+  ],
+  "$defs": {
+    "level": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["price", "quantity"],
+      "properties": {
+        "price": {"type": "string", "pattern": "^[0-9]+(?:\\.[0-9]+)?$"},
+        "quantity": {"type": "string", "pattern": "^[0-9]+(?:\\.[0-9]+)?$"}
+      }
+    }
+  }
+}

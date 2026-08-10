@@ -1,0 +1,69 @@
+name: Lot 39 frozen evidence attestation
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  attest:
+    runs-on: ubuntu-22.04
+    env:
+      PYTHONPATH: src
+      SOURCE_HEAD_SHA: 203a2b2d3d69644bd67c0e583df9d0405941def6
+      EVIDENCE_HEAD_SHA: b1bf9605fe20cacca76861e3fc6941ad38ea8f23
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Prove source and evidence ancestry
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 938a0e9cf92ef5bbda02045486afbd9a32dc67ec "$SOURCE_HEAD_SHA"
+          git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA"
+          git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" HEAD
+          git diff --quiet "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA" -- \
+            src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor.py \
+            src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor_models.py \
+            src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor_validation.py \
+            config/microstructure/order_book_delta_sequence_reconstructor_v1.json \
+            contracts/schemas/order_book_delta_v1.schema.json \
+            contracts/schemas/reconstructed_order_book_v1.schema.json \
+            contracts/schemas/sequence_gap_event_v1.schema.json \
+            contracts/schemas/order_book_delta_sequence_reconstructor_state_v1.schema.json \
+            contracts/schemas/order_book_delta_sequence_reconstructor_audit_v1.schema.json \
+            tests/fixtures/lot39/order_book_delta_sequence_fixture_v1.json
+          git diff --quiet "$EVIDENCE_HEAD_SHA" HEAD -- \
+            data/audit/order_book_delta_and_sequence_reconstructor_lot39.json \
+            data/audit/order_book_delta_and_sequence_reconstructor_audit_lot39.json \
+            data/audit/reconstructed_order_book_lot39.json \
+            reports/lot39/coverage_summary.json \
+            reports/lot39/mutation_summary.json
+      - name: Validate frozen evidence and safety
+        run: |
+          python scripts/validate_lot39_frozen_evidence.py
+          python scripts/validate_lot39.py --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
+          python scripts/validate_lot39_no_connectivity.py
+          test ! -e data/audit/sequence_gap_event_lot39.json
+          find src/crypto_quant_bot/microstructure -maxdepth 1 -type f \
+            \( -name '*lot40*' -o -name '*book_integrity*' -o -name '*desynchronization_detector*' \) \
+            | grep -q . && { echo LOT40_ENGINE_PRESENT; exit 1; } || true
+      - name: Immutable evidence smoke and security
+        run: |
+          python -m compileall -q src scripts tests
+          ruff check scripts/validate_lot39_frozen_evidence.py
+          pytest -q tests/test_lot39_order_book_delta_and_sequence_reconstructor.py tests/test_lot39_contract_roundtrip.py
+          bandit -q -r scripts/validate_lot39_frozen_evidence.py -ll
+          python scripts/validate_lot39_frozen_evidence.py

@@ -1,0 +1,91 @@
+{
+  "base_snapshot_checksum": "0d63ca7ac1ca48b44e58c0b0f1eb8946190eaf2da6745c2bbd2dd8de14f49b16",
+  "delta_fixture_checksum": "1e7528a350ca78e21c4832b4af0ef4763e6bbadec82ea0f55a1005502cadff97",
+  "event_time": "2026-08-06T19:18:40.065000Z",
+  "generated_at": "2026-08-06T19:18:40.080000Z",
+  "lineage": {
+    "available_at": "2026-08-06T19:18:40.070000Z",
+    "delta_fixture_checksum": "1e7528a350ca78e21c4832b4af0ef4763e6bbadec82ea0f55a1005502cadff97",
+    "entry_gate_checksum": "250c67574a8add382915c1b8f0b104f801bd91757c829c3d7d336f8e2e22e0ab",
+    "lineage_id": "lot39-reference-lineage-001",
+    "lot38_audit_checksum": "0290637591e1a8c4cd7a9975868932b65afa28fb75d6843340dbeea67a682d20",
+    "lot38_health_checksum": "58b56f7cf21aa74dd67620b8dd6e19cad11b77412cdcc3103b6d60bd15703837",
+    "lot38_snapshot_checksum": "0d63ca7ac1ca48b44e58c0b0f1eb8946190eaf2da6745c2bbd2dd8de14f49b16",
+    "lot38_state_checksum": "7610fc6ea73e49075a1b8611f8344c7b9c8fcf8ab02f55612d914eeac0ccda9b",
+    "schema_version": "lot39-lineage-envelope-v1"
+  },
+  "metrics": {
+    "latency_measurement_status": "NOT_MEASURED_OFFLINE_DETERMINISTIC_REPLAY",
+    "lot_39_deltas_applied_total": 2,
+    "lot_39_deltas_received_total": 2,
+    "lot_39_final_sequence_id": 1003,
+    "lot_39_levels_deleted_total": 1,
+    "lot_39_levels_upserted_total": 4,
+    "lot_39_processing_latency_us": null,
+    "lot_39_sequence_gap_events_total": 0,
+    "schema_version": "lot39-metrics-v1"
+  },
+  "output_checksum": "d21d1c2e2e3ea2a05a4ab156fb4377e865da90808ecdcfbc8161abf99bc796f0",
+  "reason_codes": [
+    "LOT39_OFFLINE_DELTA_SEQUENCE_RECONSTRUCTED",
+    "LOT39_SEQUENCE_CONTIGUOUS",
+    "LOT39_ZERO_QUANTITY_DELETE_APPLIED",
+    "LOT39_SYNCED_BOOK_PUBLISHED",
+    "LOT40_REMAINS_LOCKED"
+  ],
+  "receive_time": "2026-08-06T19:18:40.070000Z",
+  "reconstructed_book": {
+    "applied_delta_count": 2,
+    "asks": [
+      {"price": "50025.1", "quantity": "0.65"},
+      {"price": "50025.2", "quantity": "1.1"},
+      {"price": "50025.3", "quantity": "0.4"}
+    ],
+    "base_sequence_id": 1001,
+    "base_snapshot_checksum": "0d63ca7ac1ca48b44e58c0b0f1eb8946190eaf2da6745c2bbd2dd8de14f49b16",
+    "bids": [
+      {"price": "50024.9", "quantity": "0.9"},
+      {"price": "50024.7", "quantity": "0.5"}
+    ],
+    "book_checksum": "a503d56b312cbb21586712fcf929a0381cbc9adde9c5d70700e1f7166ef58dde",
+    "event_time": "2026-08-06T19:18:40.065000Z",
+    "instrument_id": "BTC-EUR-SPOT",
+    "market_type": "SPOT",
+    "receive_time": "2026-08-06T19:18:40.070000Z",
+    "schema_version": "reconstructed-order-book-v1",
+    "sequence_anchor": "13ccdc94cac0f5408b1494e8bbb4e1b76d5532f7adbad5f4976a1d9266af6396",
+    "sequence_id": 1003,
+    "source_id": "kraken-reference-offline-fixture",
+    "synchronization_state": "SYNCED",
+    "venue": "KRAKEN"
+  },
+  "run_context": {
+    "code_commit": "203a2b2d3d69644bd67c0e583df9d0405941def6",
+    "config_version": "lot39-order-book-delta-sequence-config-v1",
+    "correlation_id": "lot39-reference-correlation-001",
+    "run_id": "lot39-reference-run-001",
+    "runtime_mode": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "schema_version": "lot39-run-context-v1"
+  },
+  "safety": {
+    "analysis_only": true,
+    "approved_size": 0,
+    "execution_allowed": false,
+    "external_connectivity_allowed": false,
+    "market_event_publication_allowed": false,
+    "network_ingestion_allowed": false,
+    "order_routing_allowed": false,
+    "participant_behavior_inference_explicitly_labeled": true,
+    "raw_data_mutation_allowed": false,
+    "real_credentials_allowed": false,
+    "risk_approval_allowed": false,
+    "scenario_score_is_signal": false,
+    "signal_generation_allowed": false,
+    "trade_allowed": false,
+    "used_for_decision": false
+  },
+  "schema_version": "order-book-delta-sequence-reconstructor-state-v1",
+  "sequence_gap_event": null,
+  "synchronization_state": "SYNCED",
+  "validation_state": "VALIDATED_OFFLINE_DELTA_SEQUENCE_RECONSTRUCTION_ONLY"
+}
