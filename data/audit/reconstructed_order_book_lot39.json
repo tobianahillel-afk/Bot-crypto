@@ -1,0 +1,25 @@
+{
+  "applied_delta_count": 2,
+  "asks": [
+    {"price": "50025.1", "quantity": "0.65"},
+    {"price": "50025.2", "quantity": "1.1"},
+    {"price": "50025.3", "quantity": "0.4"}
+  ],
+  "base_sequence_id": 1001,
+  "base_snapshot_checksum": "0d63ca7ac1ca48b44e58c0b0f1eb8946190eaf2da6745c2bbd2dd8de14f49b16",
+  "bids": [
+    {"price": "50024.9", "quantity": "0.9"},
+    {"price": "50024.7", "quantity": "0.5"}
+  ],
+  "book_checksum": "a503d56b312cbb21586712fcf929a0381cbc9adde9c5d70700e1f7166ef58dde",
+  "event_time": "2026-08-06T19:18:40.065000Z",
+  "instrument_id": "BTC-EUR-SPOT",
+  "market_type": "SPOT",
+  "receive_time": "2026-08-06T19:18:40.070000Z",
+  "schema_version": "reconstructed-order-book-v1",
+  "sequence_anchor": "13ccdc94cac0f5408b1494e8bbb4e1b76d5532f7adbad5f4976a1d9266af6396",
+  "sequence_id": 1003,
+  "source_id": "kraken-reference-offline-fixture",
+  "synchronization_state": "SYNCED",
+  "venue": "KRAKEN"
+}
