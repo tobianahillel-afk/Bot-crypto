@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import json
 import shutil
 from decimal import Decimal
@@ -14,6 +13,7 @@ from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_re
 from crypto_quant_bot.microstructure import (
     BookHealthComponentV1,
     BookHealthVetoV1,
+    BookIntegrityStateV1,
     build_lot40_artifacts,
     evaluate_book_integrity,
     write_lot40_artifacts,
@@ -54,9 +54,8 @@ def _rechecksum(book: dict[str, object]) -> dict[str, object]:
     return book
 
 
-def _component(state: object, name: str) -> object:
-    components = getattr(state, "components")
-    return next(component for component in components if component.name == name)
+def _component(state: BookIntegrityStateV1, name: str) -> BookHealthComponentV1:
+    return next(component for component in state.components if component.name == name)
 
 
 def test_reference_book_is_healthy_without_veto() -> None:
