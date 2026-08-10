@@ -25,7 +25,38 @@
     "veto_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "health_status": {"enum": ["HEALTHY", "DEGRADED", "CRITICAL"]},
     "consequence": {"enum": ["NONE", "WAIT", "PAUSE", "BLOCK"]},
-    "safety": {"type": "object"},
+    "safety": {"$ref": "#/$defs/safety"},
     "audit_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "analysis_only", "approved_size", "execution_allowed",
+        "external_connectivity_allowed", "market_event_publication_allowed",
+        "network_ingestion_allowed", "order_routing_allowed",
+        "participant_behavior_inference_explicitly_labeled", "raw_data_mutation_allowed",
+        "real_credentials_allowed", "risk_approval_allowed", "scenario_score_is_signal",
+        "signal_generation_allowed", "trade_allowed", "used_for_decision"
+      ],
+      "properties": {
+        "analysis_only": {"const": true},
+        "approved_size": {"const": 0},
+        "execution_allowed": {"const": false},
+        "external_connectivity_allowed": {"const": false},
+        "market_event_publication_allowed": {"const": false},
+        "network_ingestion_allowed": {"const": false},
+        "order_routing_allowed": {"const": false},
+        "participant_behavior_inference_explicitly_labeled": {"const": true},
+        "raw_data_mutation_allowed": {"const": false},
+        "real_credentials_allowed": {"const": false},
+        "risk_approval_allowed": {"const": false},
+        "scenario_score_is_signal": {"const": false},
+        "signal_generation_allowed": {"const": false},
+        "trade_allowed": {"const": false},
+        "used_for_decision": {"const": false}
+      }
+    }
   }
 }
