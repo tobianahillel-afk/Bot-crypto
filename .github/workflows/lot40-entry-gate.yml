@@ -1,0 +1,92 @@
+name: Lot 40 V4 implementation entry gate
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'data/audit/lot40_v4_entry_gate.json'
+      - 'contracts/schemas/lot40_v4_entry_gate_v1.schema.json'
+      - 'docs/LOT_40_V4_ENTRY_GATE.md'
+      - 'reports/lot_40_v4_entry_gate_report.md'
+      - 'scripts/validate_lot40_entry_gate.py'
+      - 'tests/test_lot40_v4_entry_gate.py'
+      - '.github/workflows/lot40-entry-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Prove exact audited base and governance-only diff
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          BASE=5381a773a9d69036b38c57904b2f4a66ffb2f595
+          git merge-base --is-ancestor "$BASE" HEAD
+          if [ "$EVENT_NAME" = "pull_request" ]; then test "$PR_BASE_SHA" = "$BASE"; fi
+          git diff --name-only "$BASE" HEAD | sort > /tmp/lot40-changed.txt
+          cat > /tmp/lot40-allowed.txt <<'EOF'
+          .github/workflows/lot40-entry-gate.yml
+          contracts/schemas/lot40_v4_entry_gate_v1.schema.json
+          data/audit/lot40_v4_entry_gate.json
+          docs/LOT_40_V4_ENTRY_GATE.md
+          reports/lot_40_v4_entry_gate_report.md
+          scripts/validate_lot40_entry_gate.py
+          tests/test_lot40_v4_entry_gate.py
+          EOF
+          sort -o /tmp/lot40-allowed.txt /tmp/lot40-allowed.txt
+          diff -u /tmp/lot40-allowed.txt /tmp/lot40-changed.txt
+          test ! -e src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py
+          test ! -e src/crypto_quant_bot/microstructure/book_integrity_and_desynchronization_detector.py
+          test ! -e scripts/run_lot40_book_integrity_desynchronization_detector.py
+          test ! -e scripts/validate_lot40.py
+          test ! -e src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine.py
+          test ! -e scripts/run_lot41_spread_depth_and_imbalance_engine.py
+          test ! -e scripts/validate_lot41.py
+      - name: Compile lint type schema and exact gate validation
+        run: |
+          python -m compileall -q scripts tests
+          python -m json.tool data/audit/lot40_v4_entry_gate.json >/dev/null
+          python -m json.tool contracts/schemas/lot40_v4_entry_gate_v1.schema.json >/dev/null
+          ruff check scripts/validate_lot40_entry_gate.py tests/test_lot40_v4_entry_gate.py
+          mypy src/crypto_quant_bot
+          python scripts/validate_lot40_entry_gate.py
+      - name: Architecture roadmap traceability and engineering gates
+        run: |
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+      - name: Gate tests full regression and anti-flake
+        run: |
+          pytest -q tests/test_lot40_v4_entry_gate.py
+          pytest -q
+          pytest -q tests/test_lot40_v4_entry_gate.py
+          pytest -q tests/test_lot40_v4_entry_gate.py
+          pytest -q tests/test_lot40_v4_entry_gate.py
+      - name: Security dependency and final gate validation
+        run: |
+          bandit -q -r scripts/validate_lot40_entry_gate.py -ll
+          pip-audit -r requirements-dev.lock
+          python scripts/validate_lot40_entry_gate.py
