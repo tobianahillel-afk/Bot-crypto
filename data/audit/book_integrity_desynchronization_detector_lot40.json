@@ -1,0 +1,161 @@
+{
+  "book_health_veto": {
+    "book_health_score": "100",
+    "consequence": "NONE",
+    "critical_failure_consequence": "BLOCK",
+    "critical_veto_active": false,
+    "reason_codes": [
+      "LOT40_NO_HEALTH_VETO",
+      "LOT41_REMAINS_LOCKED"
+    ],
+    "schema_version": "book-health-veto-v1",
+    "system_health_threshold": "80",
+    "system_threshold_consequence": "PAUSE",
+    "trade_health_threshold": "90",
+    "veto_active": false,
+    "veto_checksum": "000613129dbce4bfa189f66a9927c442a557556870381de92aa2b8da8a7951fc"
+  },
+  "book_integrity": {
+    "ask_depth_levels": 3,
+    "bid_depth_levels": 2,
+    "book_health_score": "100",
+    "checksum_valid": true,
+    "components": [
+      {
+        "critical": true,
+        "name": "SEQUENCE_CONTINUITY",
+        "passed": true,
+        "reason_code": "LOT40_SEQUENCE_CONTINUITY_OK",
+        "schema_version": "book-health-component-v1",
+        "score": "20",
+        "weight": "20"
+      },
+      {
+        "critical": true,
+        "name": "CROSSED_LOCKED_STATE",
+        "passed": true,
+        "reason_code": "LOT40_BOOK_OPEN_UNCROSSED",
+        "schema_version": "book-health-component-v1",
+        "score": "20",
+        "weight": "20"
+      },
+      {
+        "critical": false,
+        "name": "FRESHNESS",
+        "passed": true,
+        "reason_code": "LOT40_BOOK_FRESH",
+        "schema_version": "book-health-component-v1",
+        "score": "15",
+        "weight": "15"
+      },
+      {
+        "critical": true,
+        "name": "CHECKSUM_INTEGRITY",
+        "passed": true,
+        "reason_code": "LOT40_BOOK_CHECKSUM_VALID",
+        "schema_version": "book-health-component-v1",
+        "score": "20",
+        "weight": "20"
+      },
+      {
+        "critical": false,
+        "name": "DEPTH_INTEGRITY",
+        "passed": true,
+        "reason_code": "LOT40_DEPTH_INTEGRITY_OK",
+        "schema_version": "book-health-component-v1",
+        "score": "20",
+        "weight": "20"
+      },
+      {
+        "critical": true,
+        "name": "LEVEL_MONOTONICITY",
+        "passed": true,
+        "reason_code": "LOT40_LEVEL_MONOTONICITY_OK",
+        "schema_version": "book-health-component-v1",
+        "score": "5",
+        "weight": "5"
+      }
+    ],
+    "crossed": false,
+    "decision_time": "2026-08-06T19:18:40.100000Z",
+    "event_time": "2026-08-06T19:18:40.065000Z",
+    "health_status": "HEALTHY",
+    "instrument_id": "BTC-EUR-SPOT",
+    "integrity_checksum": "35b9941782811766762eea067fea53f7c026fbe9ea8699f911c34d648b409d2a",
+    "level_monotonicity_valid": true,
+    "locked": false,
+    "market_type": "SPOT",
+    "reason_codes": [
+      "LOT40_BOOK_INTEGRITY_EVALUATED",
+      "LOT40_HEALTH_HEALTHY",
+      "LOT41_REMAINS_LOCKED"
+    ],
+    "receive_time": "2026-08-06T19:18:40.070000Z",
+    "schema_version": "book-integrity-state-v1",
+    "sequence_id": 1003,
+    "source_id": "kraken-reference-offline-fixture",
+    "stale_age_us": 30000,
+    "synchronization_state": "SYNCED",
+    "venue": "KRAKEN"
+  },
+  "decision_time": "2026-08-06T19:18:40.100000Z",
+  "event_time": "2026-08-06T19:18:40.065000Z",
+  "generated_at": "2026-08-06T19:18:40.100000Z",
+  "lineage": {
+    "available_at": "2026-08-06T19:18:40.070000Z",
+    "entry_gate_checksum": "23d9f0bdb71a2ed26cf3ef89e5be6237fd286a38944f9fed4c6b8f18d4106f18",
+    "lineage_id": "lot40-reference-lineage-001",
+    "lot39_audit_checksum": "1e29d0b8695a1b8825e1fc91728a6254ad93c689e1f961cfa424e6d5fed8ed41",
+    "lot39_delta_fixture_checksum": "1e7528a350ca78e21c4832b4af0ef4763e6bbadec82ea0f55a1005502cadff97",
+    "lot39_reconstructed_book_checksum": "a503d56b312cbb21586712fcf929a0381cbc9adde9c5d70700e1f7166ef58dde",
+    "lot39_state_checksum": "d21d1c2e2e3ea2a05a4ab156fb4377e865da90808ecdcfbc8161abf99bc796f0",
+    "schema_version": "lot40-lineage-envelope-v1"
+  },
+  "metrics": {
+    "latency_measurement_status": "NOT_MEASURED_OFFLINE_DETERMINISTIC_REPLAY",
+    "lot_40_ask_depth_levels": 3,
+    "lot_40_bid_depth_levels": 2,
+    "lot_40_critical_components_failed_total": 0,
+    "lot_40_health_components_failed_total": 0,
+    "lot_40_health_components_total": 6,
+    "lot_40_processing_latency_us": null,
+    "lot_40_records_processed_total": 1,
+    "lot_40_stale_age_us": 30000,
+    "lot_40_validation_failures_total": 0,
+    "schema_version": "lot40-metrics-v1"
+  },
+  "output_checksum": "e601f60e8fad70c4c445955dda503a3b728614936ca17c964cb2ed9c8a927477",
+  "reason_codes": [
+    "LOT40_OFFLINE_BOOK_INTEGRITY_VALIDATED",
+    "LOT40_CONSEQUENCE_NONE",
+    "LOT41_REMAINS_LOCKED"
+  ],
+  "receive_time": "2026-08-06T19:18:40.070000Z",
+  "run_context": {
+    "code_commit": "b9a18a8aaef858b985c3f75ef2aa8955ec521e9f",
+    "config_version": "lot40-book-integrity-config-v1",
+    "correlation_id": "lot40-reference-correlation-001",
+    "run_id": "lot40-reference-run-001",
+    "runtime_mode": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "schema_version": "lot40-run-context-v1"
+  },
+  "safety": {
+    "analysis_only": true,
+    "approved_size": 0,
+    "execution_allowed": false,
+    "external_connectivity_allowed": false,
+    "market_event_publication_allowed": false,
+    "network_ingestion_allowed": false,
+    "order_routing_allowed": false,
+    "participant_behavior_inference_explicitly_labeled": true,
+    "raw_data_mutation_allowed": false,
+    "real_credentials_allowed": false,
+    "risk_approval_allowed": false,
+    "scenario_score_is_signal": false,
+    "signal_generation_allowed": false,
+    "trade_allowed": false,
+    "used_for_decision": false
+  },
+  "schema_version": "book-integrity-desynchronization-detector-state-v1",
+  "validation_state": "VALIDATED_OFFLINE_BOOK_INTEGRITY_ONLY"
+}
