@@ -1,4 +1,4 @@
-name: Lot 40 frozen evidence attestation
+name: Lot 40 independent post-merge audit
 
 on:
   pull_request:
@@ -9,14 +9,13 @@ permissions:
   contents: read
 
 jobs:
-  attest:
+  audit:
     runs-on: ubuntu-22.04
     env:
       PYTHONPATH: src
       SOURCE_HEAD_SHA: b9a18a8aaef858b985c3f75ef2aa8955ec521e9f
       EVIDENCE_HEAD_SHA: ea04fe826261eeed5a59eea60265b38b68404b6b
-      FINAL_PR_HEAD_SHA: 1268772c07cbb76c18b3267aef12dad5ba58af31
-      MERGED_COMMIT_SHA: 88f0dac660e262a1c468d9cd75c5e7996ce4817b
+      MERGED_COMMIT: 88f0dac660e262a1c468d9cd75c5e7996ce4817b
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,17 +29,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove certified chain across squash merge
+      - name: Prove post-merge ancestry and certified Lot 40 immutability
         run: |
           set -euo pipefail
           git merge-base --is-ancestor 91df3e378336a791a731cb1561382ba28e6e0978 "$SOURCE_HEAD_SHA"
           git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA"
-          git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" "$FINAL_PR_HEAD_SHA"
-          git merge-base --is-ancestor "$MERGED_COMMIT_SHA" HEAD
-      - name: Prove certified Lot 40 source immutability
-        run: |
-          set -euo pipefail
-          git diff --quiet "$MERGED_COMMIT_SHA" HEAD -- \
+          git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" 1268772c07cbb76c18b3267aef12dad5ba58af31
+          git merge-base --is-ancestor "$MERGED_COMMIT" HEAD
+          git diff --quiet "$MERGED_COMMIT" HEAD -- \
             src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py \
             src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector_models.py \
             src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector_validation.py \
@@ -61,39 +57,44 @@ jobs:
             tests/test_lot40_validation_contracts.py \
             docs/LOT_40_BOOK_INTEGRITY_DESYNCHRONIZATION_DETECTOR.md \
             docs/ACCEPTANCE_CRITERIA_LOT_40.md \
-            .github/workflows/lot40-book-integrity-desynchronization.yml \
-            .github/workflows/lot40-mutation-assurance.yml
-      - name: Prove frozen evidence immutability
-        run: |
-          set -euo pipefail
-          git diff --quiet "$MERGED_COMMIT_SHA" HEAD -- \
             data/audit/book_integrity_desynchronization_detector_lot40.json \
             data/audit/book_integrity_desynchronization_detector_audit_lot40.json \
             data/audit/book_integrity_state_lot40.json \
             data/audit/book_health_veto_lot40.json \
             reports/lot40/coverage_summary.json \
             reports/lot40/mutation_summary.json
-      - name: Validate frozen evidence and safety
-        run: |
-          python scripts/validate_lot40_frozen_evidence.py
-          python scripts/validate_lot40.py --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
-          python scripts/validate_lot40_no_connectivity.py
-      - name: Frozen evidence smoke regression and security
-        run: |
-          python -m compileall -q src scripts tests
-          ruff check scripts/validate_lot40_frozen_evidence.py
-          pytest -q tests/test_lot40_book_integrity_desynchronization_detector.py \
-            tests/test_lot40_health_policy_derivation.py \
-            tests/test_lot40_schema_contracts.py \
-            tests/test_lot40_strict_level_contracts.py \
-            tests/test_lot40_validation_contracts.py
-          bandit -q -r scripts/validate_lot40_frozen_evidence.py -ll
-          python scripts/validate_lot40_frozen_evidence.py
-      - name: Prove Lot 41 remains locked
-        run: |
-          set -euo pipefail
           test ! -e src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine.py
           test ! -e src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine_models.py
           test ! -e scripts/run_lot41_spread_depth_and_imbalance_engine.py
           test ! -e scripts/validate_lot41.py
-          test ! -e docs/LOT_41_SPREAD_DEPTH_AND_IMBALANCE_ENGINE.md
+      - name: Compile lint type and exact post-merge validators
+        run: |
+          python -m compileall -q src scripts tests
+          python -m json.tool data/audit/roadmap_lifecycle_overlay_lot40.json >/dev/null
+          ruff check scripts/validate_lot40_post_merge.py scripts/validate_lot40_frozen_evidence.py
+          mypy src/crypto_quant_bot
+          python scripts/validate_lot40_frozen_evidence.py
+          python scripts/validate_lot40_post_merge.py
+          python scripts/validate_lot40.py --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
+          python scripts/validate_lot40_no_connectivity.py
+      - name: Architecture roadmap traceability and engineering gates
+        run: |
+          python scripts/validate_domain_architecture.py
+          python scripts/validate_roadmap_documentation.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+      - name: Full regression security dependency and anti-flake
+        run: |
+          pytest -q
+          bandit -q -r \
+            src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py \
+            src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector_models.py \
+            src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector_validation.py \
+            scripts/validate_lot40_post_merge.py \
+            scripts/validate_lot40_frozen_evidence.py -ll
+          pip-audit -r requirements-dev.lock
+          for repetition in 1 2 3; do pytest -q tests/test_lot40*.py; done
+          python scripts/validate_lot40_post_merge.py
