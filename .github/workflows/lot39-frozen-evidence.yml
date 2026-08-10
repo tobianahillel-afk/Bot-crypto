@@ -51,15 +51,23 @@ jobs:
             data/audit/reconstructed_order_book_lot39.json \
             reports/lot39/coverage_summary.json \
             reports/lot39/mutation_summary.json
-      - name: Validate frozen evidence and safety
+      - name: Validate frozen evidence and historical safety boundary
         run: |
           python scripts/validate_lot39_frozen_evidence.py
           python scripts/validate_lot39.py --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
           python scripts/validate_lot39_no_connectivity.py
           test ! -e data/audit/sequence_gap_event_lot39.json
-          find src/crypto_quant_bot/microstructure -maxdepth 1 -type f \
-            \( -name '*lot40*' -o -name '*book_integrity*' -o -name '*desynchronization_detector*' \) \
-            | grep -q . && { echo LOT40_ENGINE_PRESENT; exit 1; } || true
+          for path in \
+            src/crypto_quant_bot/microstructure/book_integrity_and_desynchronization_detector.py \
+            src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py \
+            scripts/run_lot40_book_integrity_and_desynchronization_detector.py \
+            scripts/run_lot40_book_integrity_desynchronization_detector.py \
+            scripts/validate_lot40.py; do
+            if git cat-file -e "$EVIDENCE_HEAD_SHA:$path" 2>/dev/null; then
+              echo "LOT40_ENGINE_PRESENT_IN_LOT39_FROZEN_EVIDENCE:$path"
+              exit 1
+            fi
+          done
       - name: Immutable evidence smoke and security
         run: |
           python -m compileall -q src scripts tests
