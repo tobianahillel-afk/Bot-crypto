@@ -122,7 +122,7 @@ def test_reordered_time_checksum_and_missing_delete_fail_closed() -> None:
     snapshot, deltas = _inputs()
     earlier = replace(
         deltas[0],
-        event_time="2026-08-06T19:18:40.049999Z",
+        event_time="2026-08-06T19:18:39.999999Z",
         receive_time=deltas[0].receive_time,
     )
     assert "LOT39_REORDERED_EVENT_TIME" in engine.reconstruct_sequence(snapshot, (earlier,)).reason_codes
