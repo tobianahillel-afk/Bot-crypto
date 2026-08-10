@@ -1,0 +1,56 @@
+{
+  "schema_version": "roadmap-lifecycle-overlay-v1",
+  "previous_overlay": "data/audit/roadmap_lifecycle_overlay_lot38.json",
+  "historical_registry": "data/audit/product_scope_roadmap_lot21.jsonl",
+  "latest_implemented_lot": 39,
+  "future_capabilities_locked": [
+    "ContinuousMarketStateV1",
+    "MultiHorizonForecastV1",
+    "ParticipantBehaviorScenarioV1",
+    "TradeIntent",
+    "RiskDecisionV1",
+    "RiskReservationV1",
+    "OrderIntent"
+  ],
+  "lots": {
+    "39": {
+      "status": "IMPLEMENTED_VALIDATED_OFFLINE_DELTA_SEQUENCE_RECONSTRUCTION_ONLY",
+      "implementation_commit": "203a2b2d3d69644bd67c0e583df9d0405941def6",
+      "evidence_commit": "b1bf9605fe20cacca76861e3fc6941ad38ea8f23",
+      "final_pr_head": "3dc7ec29bb1a4152017854581573c26465ee33a2",
+      "merged_commit": "e2b787905e126a4f8ba19c933d39550ad338ac74",
+      "pull_request": 45,
+      "runtime_mode": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+      "implementation_contract": "docs/LOT_39_ORDER_BOOK_DELTA_AND_SEQUENCE_RECONSTRUCTOR.md",
+      "acceptance_contract": "docs/ACCEPTANCE_CRITERIA_LOT_39.md",
+      "state_artifact": "data/audit/order_book_delta_and_sequence_reconstructor_lot39.json",
+      "audit_artifact": "data/audit/order_book_delta_and_sequence_reconstructor_audit_lot39.json",
+      "reconstructed_book_artifact": "data/audit/reconstructed_order_book_lot39.json",
+      "quality_coverage_evidence": "reports/lot39/coverage_summary.json",
+      "quality_mutation_evidence": "reports/lot39/mutation_summary.json",
+      "report": "reports/lot_39_order_book_delta_and_sequence_reconstructor_report.md",
+      "post_merge_audit": "docs/LOT_39_POST_MERGE_AUDIT.md",
+      "runner": "scripts/run_lot39_order_book_delta_and_sequence_reconstructor.py",
+      "validator": "scripts/validate_lot39.py",
+      "analysis_only": true,
+      "used_for_decision": false,
+      "external_connectivity_allowed": false,
+      "network_ingestion_allowed": false,
+      "real_credentials_allowed": false,
+      "market_event_publication_allowed": false,
+      "raw_data_mutation_allowed": false,
+      "participant_behavior_inference_explicitly_labeled": true,
+      "scenario_score_is_signal": false,
+      "signal_generation_allowed": false,
+      "risk_approval_allowed": false,
+      "order_routing_allowed": false,
+      "trade_allowed": false,
+      "execution_allowed": false,
+      "approved_size": 0
+    },
+    "40": {
+      "implementation_started": false,
+      "status": "PLANNED_LOCKED"
+    }
+  }
+}
