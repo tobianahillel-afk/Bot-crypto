@@ -1,0 +1,30 @@
+{
+  "schema_version": "lot40-book-integrity-config-v1",
+  "config_version": "lot40-book-integrity-config-v1",
+  "run_id": "lot40-reference-run-001",
+  "correlation_id": "lot40-reference-correlation-001",
+  "lineage_id": "lot40-reference-lineage-001",
+  "generated_at": "2026-08-06T19:18:40.100000Z",
+  "decision_time": "2026-08-06T19:18:40.100000Z",
+  "max_stale_age_us": 500000,
+  "minimum_bid_depth_levels": 2,
+  "minimum_ask_depth_levels": 2,
+  "trade_health_threshold": "90",
+  "system_health_threshold": "80",
+  "system_threshold_consequence": "PAUSE",
+  "critical_failure_consequence": "BLOCK",
+  "component_weights": {
+    "SEQUENCE_CONTINUITY": "20",
+    "CROSSED_LOCKED_STATE": "20",
+    "FRESHNESS": "15",
+    "CHECKSUM_INTEGRITY": "20",
+    "DEPTH_INTEGRITY": "20",
+    "LEVEL_MONOTONICITY": "5"
+  },
+  "entry_gate_path": "data/audit/lot40_v4_entry_gate.json",
+  "lot39_lifecycle_overlay_path": "data/audit/roadmap_lifecycle_overlay_lot39.json",
+  "lot39_state_path": "data/audit/order_book_delta_and_sequence_reconstructor_lot39.json",
+  "lot39_audit_path": "data/audit/order_book_delta_and_sequence_reconstructor_audit_lot39.json",
+  "lot39_reconstructed_book_path": "data/audit/reconstructed_order_book_lot39.json",
+  "lot39_delta_fixture_path": "tests/fixtures/lot39/order_book_delta_sequence_fixture_v1.json"
+}
