@@ -32,12 +32,9 @@ EXPECTED_ASKS = [
     {"price": "50025.2", "quantity": "1.1"},
     {"price": "50025.3", "quantity": "0.4"},
 ]
-LOT40_FORBIDDEN_PATHS = (
-    "src/crypto_quant_bot/microstructure/book_integrity_and_desynchronization_detector.py",
-    "src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py",
-    "scripts/run_lot40_book_integrity_and_desynchronization_detector.py",
-    "scripts/validate_lot40.py",
-)
+LOT40_GATE_PATH = Path("data/audit/lot40_v4_entry_gate.json")
+LOT40_GATE_CHECKSUM = "23d9f0bdb71a2ed26cf3ef89e5be6237fd286a38944f9fed4c6b8f18d4106f18"
+LOT39_POST_MERGE_AUDIT = "5381a773a9d69036b38c57904b2f4a66ffb2f595"
 
 
 def parser() -> argparse.ArgumentParser:
@@ -48,7 +45,10 @@ def parser() -> argparse.ArgumentParser:
     return value
 
 
-def _verify_canonical_reference(root: Path, code_commit: str) -> tuple[dict[str, Any], dict[str, Any]]:
+def _verify_canonical_reference(
+    root: Path,
+    code_commit: str,
+) -> tuple[dict[str, Any], dict[str, Any]]:
     state, audit = build_lot39_artifacts(root, code_commit)
     state_payload = state.to_dict()
     audit_payload = audit.to_dict()
@@ -79,21 +79,28 @@ def _verify_canonical_reference(root: Path, code_commit: str) -> tuple[dict[str,
     }
     for field, expected in expected_metrics.items():
         if metrics[field] != expected:
-            raise OrderBookDeltaSequenceValidationError(f"canonical Lot 39 metric changed: {field}")
+            raise OrderBookDeltaSequenceValidationError(
+                f"canonical Lot 39 metric changed: {field}"
+            )
     if state.safety != lot39_safety() or audit.safety != lot39_safety():
         raise OrderBookDeltaSequenceValidationError("Lot 39 safety boundary changed")
     if "LOT40_REMAINS_LOCKED" not in state.reason_codes:
-        raise OrderBookDeltaSequenceValidationError("Lot 40 lock reason missing")
+        raise OrderBookDeltaSequenceValidationError("historical Lot 40 lock reason missing")
     if audit.state_output_checksum != state.output_checksum:
         raise OrderBookDeltaSequenceValidationError("Lot 39 state/audit checksum link changed")
     if audit.reconstructed_book_checksum != state.reconstructed_book.book_checksum:
         raise OrderBookDeltaSequenceValidationError("Lot 39 book/audit checksum link changed")
     if audit.sequence_gap_event_checksum is not None:
-        raise OrderBookDeltaSequenceValidationError("healthy Lot 39 audit unexpectedly has gap checksum")
+        raise OrderBookDeltaSequenceValidationError(
+            "healthy Lot 39 audit unexpectedly has gap checksum"
+        )
     return state_payload, audit_payload
 
 
-def _verify_deterministic(root: Path, code_commit: str) -> tuple[dict[str, Any], dict[str, Any]]:
+def _verify_deterministic(
+    root: Path,
+    code_commit: str,
+) -> tuple[dict[str, Any], dict[str, Any]]:
     state1, audit1 = _verify_canonical_reference(root, code_commit)
     state2, audit2 = _verify_canonical_reference(root, code_commit)
     if state1 != state2 or audit1 != audit2:
@@ -111,7 +118,9 @@ def _verify_persisted(root: Path, state: dict[str, Any], audit: dict[str, Any]) 
         if not path.exists():
             raise OrderBookDeltaSequenceValidationError(f"persisted Lot 39 {label} missing")
     if (root / GAP_EVENT_PATH).exists():
-        raise OrderBookDeltaSequenceValidationError("healthy Lot 39 replay must not persist gap event")
+        raise OrderBookDeltaSequenceValidationError(
+            "healthy Lot 39 replay must not persist gap event"
+        )
     persisted_state = load_json_object(paths["state"])
     persisted_audit = load_json_object(paths["audit"])
     persisted_book = load_json_object(paths["book"])
@@ -135,15 +144,31 @@ def _verify_persisted(root: Path, state: dict[str, Any], audit: dict[str, Any]) 
         raise OrderBookDeltaSequenceValidationError("persisted Lot 39 book checksum invalid")
 
 
-def _verify_lot40_absent(root: Path) -> None:
-    for relative in LOT40_FORBIDDEN_PATHS:
-        if (root / relative).exists():
-            raise OrderBookDeltaSequenceValidationError(f"Lot 40 implementation detected: {relative}")
+def _verify_lot40_transition(root: Path) -> None:
+    gate = load_json_object(root / LOT40_GATE_PATH)
+    body = dict(gate)
+    checksum = body.pop("output_checksum", None)
+    if checksum != LOT40_GATE_CHECKSUM or canonical_checksum(body) != checksum:
+        raise OrderBookDeltaSequenceValidationError("Lot 40 entry gate checksum changed")
+    expected = {
+        "base_commit": LOT39_POST_MERGE_AUDIT,
+        "target_lot": 40,
+        "gate_status": "GO_LOT40_IMPLEMENTATION_ENTRY",
+        "human_decision": "APPROVED_START_LOT40",
+        "implementation_started": False,
+        "next_lot": 41,
+        "next_lot_status": "PLANNED_LOCKED",
+    }
+    for field, value in expected.items():
+        if gate.get(field) != value:
+            raise OrderBookDeltaSequenceValidationError(
+                f"Lot 40 authorized transition changed: {field}"
+            )
 
 
 def validate(root: Path, code_commit: str, require_persisted: bool) -> dict[str, Any]:
     state, audit = _verify_deterministic(root, code_commit)
-    _verify_lot40_absent(root)
+    _verify_lot40_transition(root)
     if require_persisted:
         _verify_persisted(root, state, audit)
     book = state["reconstructed_book"]
@@ -162,7 +187,8 @@ def validate(root: Path, code_commit: str, require_persisted: bool) -> dict[str,
         "trade_allowed": False,
         "execution_allowed": False,
         "approved_size": 0,
-        "lot40_status": "PLANNED_LOCKED",
+        "lot40_gate_status": "GO_LOT40_IMPLEMENTATION_ENTRY",
+        "lot41_status": "PLANNED_LOCKED",
     }
     result["validation_checksum"] = canonical_checksum(result)
     return result
@@ -171,9 +197,19 @@ def validate(root: Path, code_commit: str, require_persisted: bool) -> dict[str,
 def main() -> int:
     args = parser().parse_args()
     try:
-        result = validate(args.root.resolve(), args.expected_code_commit, args.require_persisted)
+        result = validate(
+            args.root.resolve(),
+            args.expected_code_commit,
+            args.require_persisted,
+        )
         print(json.dumps(result, sort_keys=True))
-    except (OrderBookDeltaSequenceValidationError, OSError, KeyError, TypeError, ValueError) as exc:
+    except (
+        OrderBookDeltaSequenceValidationError,
+        OSError,
+        KeyError,
+        TypeError,
+        ValueError,
+    ) as exc:
         print(f"LOT39 VALIDATION: FAIL\n{exc}", file=sys.stderr)
         return 1
     return 0
