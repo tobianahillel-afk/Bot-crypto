@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       PYTHONPATH: src
-      SOURCE_HEAD_SHA: 3b00178cc0ad236eca347a363c5dd4f5910253ff
+      SOURCE_HEAD_SHA: 9c6db3a109344da8cee30ff821849fddf5a45295
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,7 +52,7 @@ jobs:
             tests/test_lot39_order_book_delta_sequence_reconstructor.py \
             tests/test_lot39_validation_contracts.py tests/test_lot39_coverage_completion.py \
             tests/test_lot39_branch_coverage.py tests/test_lot39_mutation_contracts.py \
-            tests/fixtures/lot39 \
+            tests/test_lot39_v4_entry_gate.py tests/fixtures/lot39 \
             docs/LOT_39_ORDER_BOOK_DELTA_AND_SEQUENCE_RECONSTRUCTOR.md \
             docs/ACCEPTANCE_CRITERIA_LOT_39.md
           find src/crypto_quant_bot/microstructure -maxdepth 1 -type f \
