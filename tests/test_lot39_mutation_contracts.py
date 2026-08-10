@@ -104,7 +104,7 @@ def test_event_time_equal_is_allowed_but_earlier_is_blocked() -> None:
 
     earlier = replace(
         deltas[0],
-        event_time="2026-08-06T19:18:40.049999Z",
+        event_time="2026-08-06T19:18:39.999999Z",
         receive_time=deltas[0].receive_time,
     )
     blocked = reconstruct_sequence(snapshot, (earlier,))
