@@ -134,6 +134,36 @@ def validate_consequence(value: str) -> None:
         raise BookIntegrityValidationError("unknown book-health consequence")
 
 
+def derive_health_status(component_states: tuple[tuple[bool, bool], ...]) -> str:
+    if any(critical and not passed for critical, passed in component_states):
+        return "CRITICAL"
+    return "DEGRADED" if any(not passed for _, passed in component_states) else "HEALTHY"
+
+
+def derive_health_consequence(
+    *,
+    critical_veto_active: bool,
+    score: Decimal,
+    system_threshold: Decimal,
+    trade_threshold: Decimal,
+    critical_consequence: str,
+    system_consequence: str,
+) -> str:
+    if not score.is_finite() or not system_threshold.is_finite() or not trade_threshold.is_finite():
+        raise BookIntegrityValidationError("book-health policy inputs must be finite")
+    if not Decimal("0") <= score <= Decimal("100"):
+        raise BookIntegrityValidationError("book-health score must be within 0..100")
+    if not Decimal("0") <= system_threshold <= trade_threshold <= Decimal("100"):
+        raise BookIntegrityValidationError("book-health threshold ordering invalid")
+    validate_consequence(critical_consequence)
+    validate_consequence(system_consequence)
+    if critical_veto_active:
+        return critical_consequence
+    if score < system_threshold:
+        return system_consequence
+    return "WAIT" if score < trade_threshold else "NONE"
+
+
 def lot40_safety() -> dict[str, object]:
     return {
         "analysis_only": True,
