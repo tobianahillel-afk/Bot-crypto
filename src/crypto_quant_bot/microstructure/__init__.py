@@ -1,5 +1,20 @@
-"""Public MicrostructureDomain surface introduced by Lots 37 through 39."""
+"""Public MicrostructureDomain surface introduced by Lots 37 through 40."""
 
+from .book_integrity_desynchronization_detector import (
+    build_lot40_artifacts,
+    evaluate_book_integrity,
+    write_lot40_artifacts,
+)
+from .book_integrity_desynchronization_detector_models import (
+    BookHealthComponentV1,
+    BookHealthVetoV1,
+    BookIntegrityDesynchronizationDetectorAuditV1,
+    BookIntegrityDesynchronizationDetectorStateV1,
+    BookIntegrityStateV1,
+    Lot40LineageEnvelopeV1,
+    Lot40MetricsV1,
+    Lot40RunContextV1,
+)
 from .microstructure_scope_and_offline_data_contracts import (
     build_lot37_artifacts,
     write_lot37_artifacts,
@@ -38,10 +53,18 @@ from .order_book_l2_snapshot_engine_models import (
 )
 
 __all__ = [
+    "BookHealthComponentV1",
     "BookHealthStateV1",
+    "BookHealthVetoV1",
+    "BookIntegrityDesynchronizationDetectorAuditV1",
+    "BookIntegrityDesynchronizationDetectorStateV1",
+    "BookIntegrityStateV1",
     "Lot39LineageEnvelopeV1",
     "Lot39MetricsV1",
     "Lot39RunContextV1",
+    "Lot40LineageEnvelopeV1",
+    "Lot40MetricsV1",
+    "Lot40RunContextV1",
     "MicrostructureScopeOfflineDataContractsAuditV1",
     "MicrostructureScopeOfflineDataContractsCapabilityMatrixV1",
     "MicrostructureScopeOfflineDataContractsContractRegistryV1",
@@ -58,8 +81,11 @@ __all__ = [
     "build_lot37_artifacts",
     "build_lot38_artifacts",
     "build_lot39_artifacts",
+    "build_lot40_artifacts",
+    "evaluate_book_integrity",
     "reconstruct_sequence",
     "write_lot37_artifacts",
     "write_lot38_artifacts",
     "write_lot39_artifacts",
+    "write_lot40_artifacts",
 ]
