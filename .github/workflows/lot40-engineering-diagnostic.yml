@@ -1,0 +1,46 @@
+name: Lot 40 engineering diagnostic
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Capture exact engineering inventory and deviation verdict
+        run: |
+          set -o pipefail
+          mkdir -p reports/lot40/engineering
+          python scripts/quality_inventory.py \
+            2>&1 | tee reports/lot40/engineering/quality_inventory.txt
+          inventory_status=${PIPESTATUS[0]}
+          set +e
+          python scripts/validate_engineering_deviations.py \
+            2>&1 | tee reports/lot40/engineering/engineering_deviations.txt
+          deviation_status=${PIPESTATUS[0]}
+          set -e
+          printf '%s\n' "$inventory_status" > reports/lot40/engineering/quality_inventory.exitcode
+          printf '%s\n' "$deviation_status" > reports/lot40/engineering/engineering_deviations.exitcode
+          exit "$deviation_status"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot40-engineering-diagnostic
+          path: reports/lot40/engineering/

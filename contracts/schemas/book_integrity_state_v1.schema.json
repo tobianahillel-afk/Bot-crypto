@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "book_integrity_state_v1.schema.json",
+  "title": "BookIntegrityStateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "source_id", "venue", "instrument_id", "market_type",
+    "event_time", "receive_time", "decision_time", "sequence_id",
+    "synchronization_state", "stale_age_us", "bid_depth_levels",
+    "ask_depth_levels", "crossed", "locked", "checksum_valid",
+    "level_monotonicity_valid", "health_status", "book_health_score",
+    "components", "reason_codes", "integrity_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "book-integrity-state-v1"},
+    "source_id": {"type": "string", "minLength": 1},
+    "venue": {"type": "string", "minLength": 1},
+    "instrument_id": {"type": "string", "minLength": 1},
+    "market_type": {"const": "SPOT"},
+    "event_time": {"type": "string", "minLength": 2, "pattern": "Z$"},
+    "receive_time": {"type": "string", "minLength": 2, "pattern": "Z$"},
+    "decision_time": {"type": "string", "minLength": 2, "pattern": "Z$"},
+    "sequence_id": {"type": "integer", "minimum": 0},
+    "synchronization_state": {"const": "SYNCED"},
+    "stale_age_us": {"type": "integer", "minimum": 0},
+    "bid_depth_levels": {"type": "integer", "minimum": 0},
+    "ask_depth_levels": {"type": "integer", "minimum": 0},
+    "crossed": {"type": "boolean"},
+    "locked": {"type": "boolean"},
+    "checksum_valid": {"type": "boolean"},
+    "level_monotonicity_valid": {"type": "boolean"},
+    "health_status": {"enum": ["HEALTHY", "DEGRADED", "CRITICAL"]},
+    "book_health_score": {"$ref": "#/$defs/score"},
+    "components": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/component"}
+    },
+    "reason_codes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[A-Z0-9_]+$"}
+    },
+    "integrity_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "score": {
+      "type": "string",
+      "pattern": "^(?:100(?:\\.0+)?|(?:0|[1-9][0-9]?)(?:\\.[0-9]+)?)$"
+    },
+    "positive_weight": {
+      "type": "string",
+      "pattern": "^(?:100(?:\\.0+)?|(?:[1-9][0-9]?)(?:\\.[0-9]+)?|0\\.(?:0*[1-9][0-9]*))$"
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version", "name", "passed", "critical", "weight", "score", "reason_code"
+      ],
+      "properties": {
+        "schema_version": {"const": "book-health-component-v1"},
+        "name": {
+          "enum": [
+            "SEQUENCE_CONTINUITY", "CROSSED_LOCKED_STATE", "FRESHNESS",
+            "CHECKSUM_INTEGRITY", "DEPTH_INTEGRITY", "LEVEL_MONOTONICITY"
+          ]
+        },
+        "passed": {"type": "boolean"},
+        "critical": {"type": "boolean"},
+        "weight": {"$ref": "#/$defs/positive_weight"},
+        "score": {"$ref": "#/$defs/score"},
+        "reason_code": {"type": "string", "pattern": "^[A-Z0-9_]+$"}
+      }
+    }
+  }
+}

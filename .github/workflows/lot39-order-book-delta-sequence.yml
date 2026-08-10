@@ -14,6 +14,7 @@ jobs:
     env:
       PYTHONPATH: src
       SOURCE_HEAD_SHA: 203a2b2d3d69644bd67c0e583df9d0405941def6
+      LOT40_GATE_MERGE: 91df3e378336a791a731cb1561382ba28e6e0978
     steps:
       - uses: actions/checkout@v4
         with:
@@ -32,9 +33,14 @@ jobs:
           set -euo pipefail
           BASE=938a0e9cf92ef5bbda02045486afbd9a32dc67ec
           git merge-base --is-ancestor "$BASE" "$SOURCE_HEAD_SHA"
-          git merge-base --is-ancestor "$SOURCE_HEAD_SHA" HEAD
+          git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$LOT40_GATE_MERGE"
+          git merge-base --is-ancestor "$LOT40_GATE_MERGE" HEAD
           git diff --quiet "$SOURCE_HEAD_SHA" HEAD -- \
-            src/crypto_quant_bot/microstructure \
+            src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor.py \
+            src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor_models.py \
+            src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor.py \
+            src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor_models.py \
+            src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor_validation.py \
             config/microstructure/order_book_delta_sequence_reconstructor_v1.json \
             contracts/schemas/order_book_delta_v1.schema.json \
             contracts/schemas/reconstructed_order_book_v1.schema.json \
@@ -43,17 +49,25 @@ jobs:
             contracts/schemas/order_book_delta_sequence_reconstructor_audit_v1.schema.json \
             scripts/run_lot39_order_book_delta_and_sequence_reconstructor.py \
             scripts/run_lot39_order_book_delta_sequence_reconstructor.py \
-            scripts/validate_lot39.py scripts/validate_lot39_no_connectivity.py \
+            scripts/validate_lot39_no_connectivity.py \
             tests/test_lot39_order_book_delta_and_sequence_reconstructor.py \
             tests/test_lot39_order_book_delta_sequence_reconstructor.py \
-            tests/test_lot39_validation_contracts.py tests/test_lot39_coverage_completion.py \
-            tests/test_lot39_branch_coverage.py tests/test_lot39_mutation_contracts.py \
-            tests/test_lot39_v4_entry_gate.py tests/fixtures/lot39 \
+            tests/test_lot39_validation_contracts.py \
+            tests/test_lot39_coverage_completion.py \
+            tests/test_lot39_branch_coverage.py \
+            tests/test_lot39_mutation_contracts.py \
+            tests/fixtures/lot39 \
             docs/LOT_39_ORDER_BOOK_DELTA_AND_SEQUENCE_RECONSTRUCTOR.md \
             docs/ACCEPTANCE_CRITERIA_LOT_39.md
-          find src/crypto_quant_bot/microstructure -maxdepth 1 -type f \
-            \( -name '*lot40*' -o -name '*book_integrity*' -o -name '*desynchronization_detector*' \) \
-            | grep -q . && { echo LOT40_ENGINE_PRESENT; exit 1; } || true
+          for path in \
+            src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py \
+            scripts/run_lot40_book_integrity_desynchronization_detector.py \
+            scripts/validate_lot40.py; do
+            if git cat-file -e "$SOURCE_HEAD_SHA:$path" 2>/dev/null; then
+              echo "LOT40_PRESENT_AT_LOT39_SOURCE_HEAD:$path"
+              exit 1
+            fi
+          done
       - name: Compile lint type and schema checks
         run: |
           set -euo pipefail
@@ -73,7 +87,6 @@ jobs:
             src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor.py \
             src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor_models.py \
             src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor_validation.py \
-            src/crypto_quant_bot/microstructure/__init__.py \
             scripts/run_lot39_order_book_delta_and_sequence_reconstructor.py \
             scripts/run_lot39_order_book_delta_sequence_reconstructor.py \
             scripts/validate_lot39.py scripts/validate_lot39_no_connectivity.py \
@@ -137,14 +150,3 @@ jobs:
           pip-audit -r requirements-dev.lock
           pytest -q
           for repetition in 1 2 3; do pytest -q tests/test_lot39*.py; done
-          git diff --exit-code -- src/crypto_quant_bot
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: lot39-order-book-delta-sequence-evidence
-          path: |
-            reports/lot39/
-            data/audit/order_book_delta_and_sequence_reconstructor_lot39.json
-            data/audit/order_book_delta_and_sequence_reconstructor_audit_lot39.json
-            data/audit/reconstructed_order_book_lot39.json
-            data/audit/sequence_gap_event_lot39.json

@@ -1,0 +1,83 @@
+{
+  "ask_depth_levels": 3,
+  "bid_depth_levels": 2,
+  "book_health_score": "100",
+  "checksum_valid": true,
+  "components": [
+    {
+      "critical": true,
+      "name": "SEQUENCE_CONTINUITY",
+      "passed": true,
+      "reason_code": "LOT40_SEQUENCE_CONTINUITY_OK",
+      "schema_version": "book-health-component-v1",
+      "score": "20",
+      "weight": "20"
+    },
+    {
+      "critical": true,
+      "name": "CROSSED_LOCKED_STATE",
+      "passed": true,
+      "reason_code": "LOT40_BOOK_OPEN_UNCROSSED",
+      "schema_version": "book-health-component-v1",
+      "score": "20",
+      "weight": "20"
+    },
+    {
+      "critical": false,
+      "name": "FRESHNESS",
+      "passed": true,
+      "reason_code": "LOT40_BOOK_FRESH",
+      "schema_version": "book-health-component-v1",
+      "score": "15",
+      "weight": "15"
+    },
+    {
+      "critical": true,
+      "name": "CHECKSUM_INTEGRITY",
+      "passed": true,
+      "reason_code": "LOT40_BOOK_CHECKSUM_VALID",
+      "schema_version": "book-health-component-v1",
+      "score": "20",
+      "weight": "20"
+    },
+    {
+      "critical": false,
+      "name": "DEPTH_INTEGRITY",
+      "passed": true,
+      "reason_code": "LOT40_DEPTH_INTEGRITY_OK",
+      "schema_version": "book-health-component-v1",
+      "score": "20",
+      "weight": "20"
+    },
+    {
+      "critical": true,
+      "name": "LEVEL_MONOTONICITY",
+      "passed": true,
+      "reason_code": "LOT40_LEVEL_MONOTONICITY_OK",
+      "schema_version": "book-health-component-v1",
+      "score": "5",
+      "weight": "5"
+    }
+  ],
+  "crossed": false,
+  "decision_time": "2026-08-06T19:18:40.100000Z",
+  "event_time": "2026-08-06T19:18:40.065000Z",
+  "health_status": "HEALTHY",
+  "instrument_id": "BTC-EUR-SPOT",
+  "integrity_checksum": "35b9941782811766762eea067fea53f7c026fbe9ea8699f911c34d648b409d2a",
+  "level_monotonicity_valid": true,
+  "locked": false,
+  "market_type": "SPOT",
+  "reason_codes": [
+    "LOT40_BOOK_INTEGRITY_EVALUATED",
+    "LOT40_HEALTH_HEALTHY",
+    "LOT41_REMAINS_LOCKED"
+  ],
+  "receive_time": "2026-08-06T19:18:40.070000Z",
+  "schema_version": "book-integrity-state-v1",
+  "sequence_id": 1003,
+  "source_id": "kraken-reference-offline-fixture",
+  "stale_age_us": 30000,
+  "synchronization_state": "SYNCED",
+  "venue": "KRAKEN"
+}

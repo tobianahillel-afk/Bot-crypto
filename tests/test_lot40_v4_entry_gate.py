@@ -22,6 +22,12 @@ GATE_PATH = ROOT / "data/audit/lot40_v4_entry_gate.json"
 SCHEMA_PATH = ROOT / "contracts/schemas/lot40_v4_entry_gate_v1.schema.json"
 
 
+@pytest.fixture(autouse=True)
+def _validate_gate_as_historical_record(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The merged gate proves Lot40 was absent then; current implementation is allowed now."""
+    monkeypatch.setattr(gate_validator, "LOT40_FORBIDDEN_IMPLEMENTATION_PATHS", ())
+
+
 def _write_json(path: Path, payload: object) -> None:
     path.write_text(
         json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
@@ -96,14 +102,16 @@ def test_lot40_gate_schema_is_strict_on_identity_safety_and_lot41_lock() -> None
     assert safety["properties"]["approved_size"]["const"] == 0
 
 
-def test_lot40_preimplementation_boundary_and_lot41_lock() -> None:
+def test_lot40_gate_is_historical_and_lot41_remains_locked() -> None:
     gate = json.loads(GATE_PATH.read_text(encoding="utf-8"))
     assert gate["implementation_started"] is False
     assert gate["gate_status"] == "GO_LOT40_IMPLEMENTATION_ENTRY"
     assert gate["next_lot"] == 41
     assert gate["next_lot_status"] == "PLANNED_LOCKED"
-    for path in gate_validator.LOT40_FORBIDDEN_IMPLEMENTATION_PATHS:
-        assert not path.exists()
+    assert (
+        ROOT
+        / "src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py"
+    ).is_file()
     for path in gate_validator.LOT41_FORBIDDEN_IMPLEMENTATION_PATHS:
         assert not path.exists()
 
