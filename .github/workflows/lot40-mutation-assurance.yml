@@ -1,0 +1,200 @@
+name: Lot 40 mutation assurance
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector*.py'
+      - 'tests/test_lot40*.py'
+      - 'config/microstructure/book_integrity_desynchronization_detector_v1.json'
+      - 'contracts/schemas/book_integrity*.json'
+      - 'contracts/schemas/book_health_veto_v1.schema.json'
+      - 'reports/lot40/mutation_summary.json'
+      - '.github/workflows/lot40-mutation-assurance.yml'
+      - 'requirements-dev.lock'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mutation:
+    runs-on: ubuntu-22.04
+    env:
+      CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Baseline Lot 40 tests
+        run: |
+          set -o pipefail
+          mkdir -p reports/lot40/mutation
+          PYTHONPATH=src pytest -q tests/test_lot40*.py \
+            --junitxml=reports/lot40/mutation/baseline.xml \
+            2>&1 | tee reports/lot40/mutation/baseline.txt
+      - name: Build isolated mutation workspace
+        run: |
+          set -euo pipefail
+          rm -rf .tmp-lot40-mutants
+          mkdir -p .tmp-lot40-mutants/tests
+          cp -R src .tmp-lot40-mutants/
+          cp -R config .tmp-lot40-mutants/
+          cp -R data .tmp-lot40-mutants/
+          cp -R contracts .tmp-lot40-mutants/
+          cp -R tests/fixtures .tmp-lot40-mutants/tests/
+          cp tests/test_lot40*.py .tmp-lot40-mutants/tests/
+          python - <<'PY'
+          from pathlib import Path
+          import toml
+
+          root = Path('.tmp-lot40-mutants')
+          mutated = {
+              'book_integrity_desynchronization_detector.py',
+              'book_integrity_desynchronization_detector_models.py',
+              'book_integrity_desynchronization_detector_validation.py',
+          }
+          microstructure = root / 'src/crypto_quant_bot/microstructure'
+          dependency_files = [
+              'src/crypto_quant_bot/__init__.py',
+              'src/crypto_quant_bot/data_governance/',
+              *[
+                  str(path.relative_to(root))
+                  for path in sorted(microstructure.glob('*.py'))
+                  if path.name not in mutated
+              ],
+          ]
+          tests = ' '.join(str(path) for path in sorted((root / 'tests').glob('test_lot40*.py')))
+          config = {
+              'project': {
+                  'name': 'crypto-quant-bot-lot40-mutation',
+                  'version': '0.40.0.dev0',
+                  'requires-python': '==3.11.*',
+                  'dependencies': [],
+              },
+              'tool': {
+                  'pytest': {
+                      'ini_options': {
+                          'pythonpath': ['src', '.'],
+                          'addopts': ['--tb=short', '-p', 'no:cacheprovider'],
+                      }
+                  },
+                  'mutmut': {
+                      'paths_to_mutate': [
+                          'src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py',
+                          'src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector_models.py',
+                          'src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector_validation.py',
+                      ],
+                      'tests_dir': ['tests/'],
+                      'runner': f'python -m pytest -q {tests}',
+                      'also_copy': dependency_files + [
+                          'config/', 'data/audit/', 'contracts/', 'tests/fixtures/'
+                      ],
+                      'mutate_only_covered_lines': True,
+                      'timeout_factor': 8.0,
+                      'do_not_mutate_patterns': [r'raise \\w+', r'logger\\.\\w+'],
+                  },
+              },
+          }
+          (root / 'pyproject.toml').write_text(toml.dumps(config), encoding='utf-8')
+          PY
+      - name: Run deterministic mutation analysis and enforce score
+        run: |
+          set -euo pipefail
+          mkdir -p reports/lot40/mutation
+          cd .tmp-lot40-mutants
+          set +e
+          mutmut run --max-children 1 2>&1 | tee ../reports/lot40/mutation/run.txt
+          run_status=${PIPESTATUS[0]}
+          mutmut results 2>&1 | tee ../reports/lot40/mutation/results.txt
+          results_status=${PIPESTATUS[0]}
+          set -e
+          cd ..
+          RUN_STATUS="$run_status" RESULTS_STATUS="$results_status" python - <<'PY'
+          from __future__ import annotations
+
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          path = Path('reports/lot40/mutation/run.txt')
+          if not path.is_file():
+              raise SystemExit('LOT40_MUTATION_RUN_LOG_MISSING')
+          text = path.read_text(encoding='utf-8', errors='replace')
+          text = re.sub(r'\x1b(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', text)
+          text = text.replace('\r', '\n').replace('\ufe0f', '')
+          complete = [
+              tuple(map(int, match.groups()))
+              for match in re.finditer(r'(\d+)\s*/\s*(\d+)', text)
+              if match.group(1) == match.group(2) and int(match.group(2)) > 0
+          ]
+          if not complete:
+              raise SystemExit('LOT40_MUTATION_TOTAL_PARSE_ERROR')
+          completed, total = complete[-1]
+          patterns = {
+              'killed': re.compile(r'🎉\s*(\d+)'),
+              'timeout': re.compile(r'⏰\s*(\d+)'),
+              'suspicious': re.compile(r'🤔\s*(\d+)'),
+              'survived': re.compile(r'🙁\s*(\d+)'),
+          }
+          metrics = {}
+          for name, pattern in patterns.items():
+              matches = list(pattern.finditer(text))
+              if not matches:
+                  raise SystemExit(f'LOT40_MUTATION_{name.upper()}_PARSE_ERROR')
+              metrics[name] = int(matches[-1].group(1))
+          killed = metrics['killed']
+          timeout = metrics['timeout']
+          suspicious = metrics['suspicious']
+          survived = metrics['survived']
+          evaluated = killed + timeout + suspicious + survived
+          if evaluated != total:
+              raise SystemExit(f'LOT40_MUTATION_COUNT_MISMATCH:{total}:{evaluated}')
+          score = 100.0 * (killed + timeout) / evaluated
+          payload = {
+              'schema_version': 'lot40-mutation-summary-v1',
+              'status': 'PASS' if score >= 80.0 else 'FAIL',
+              'source_head_sha': os.environ['CANDIDATE_SHA'],
+              'max_children': 1,
+              'python_hash_seed': os.environ['PYTHONHASHSEED'],
+              'killed_mutants': killed,
+              'timeout_mutants': timeout,
+              'suspicious_mutants': suspicious,
+              'survived_mutants': survived,
+              'evaluated_mutants': evaluated,
+              'completed_mutants': completed,
+              'total_mutants': total,
+              'mutation_score_percent': round(score, 2),
+              'minimum_score_percent': 80.0,
+              'mutmut_run_exit_code': int(os.environ['RUN_STATUS']),
+              'mutmut_results_exit_code': int(os.environ['RESULTS_STATUS']),
+          }
+          Path('reports/lot40/mutation_summary.json').write_text(
+              json.dumps(payload, indent=2, sort_keys=True)+'\n', encoding='utf-8'
+          )
+          print(json.dumps(payload, sort_keys=True))
+          if score < 80.0:
+              raise SystemExit('LOT40_MUTATION_SCORE_BELOW_THRESHOLD')
+          PY
+      - name: Verify canonical source immutability
+        run: |
+          rm -rf .tmp-lot40-mutants
+          git diff --exit-code -- src/crypto_quant_bot
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot40-mutation-evidence
+          path: |
+            reports/lot40/mutation/
+            reports/lot40/mutation_summary.json
