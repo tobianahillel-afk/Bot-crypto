@@ -67,11 +67,7 @@ def duration_us(start: datetime, end: datetime) -> int:
     if end < start:
         raise BookIntegrityValidationError("duration cannot run backwards")
     delta = end - start
-    return (
-        delta.days * 86_400_000_000
-        + delta.seconds * MICROSECONDS_PER_SECOND
-        + delta.microseconds
-    )
+    return delta.days * 86_400_000_000 + delta.seconds * MICROSECONDS_PER_SECOND + delta.microseconds
 
 
 def validate_causal_times(
@@ -170,8 +166,8 @@ def validate_run_context(
     code_commit: str,
     correlation_id: str,
 ) -> None:
-    require_text(run_id, "run_id")
+    text_fields = ((run_id, "run_id"), (config_version, "config_version"), (correlation_id, "correlation_id"))
+    for value, field in text_fields:
+        require_text(value, field)
     validate_runtime_mode(runtime_mode)
-    require_text(config_version, "config_version")
     require_git_sha(code_commit, "code_commit")
-    require_text(correlation_id, "correlation_id")
