@@ -78,6 +78,8 @@ jobs:
             scripts/validate_lot39.py \
             scripts/validate_lot39_no_connectivity.py \
             tests/test_lot39_order_book_delta_sequence_reconstructor.py \
+            tests/test_lot39_validation_contracts.py \
+            tests/test_lot39_coverage_completion.py \
             --output-format=concise 2>&1 | tee reports/lot39/ruff.txt
           mypy src/crypto_quant_bot/microstructure 2>&1 | tee reports/lot39/mypy.txt
       - name: Targeted line and branch coverage
@@ -87,7 +89,10 @@ jobs:
         run: |
           set -euo pipefail
           coverage erase
-          pytest -q tests/test_lot39_order_book_delta_sequence_reconstructor.py \
+          pytest -q \
+            tests/test_lot39_order_book_delta_sequence_reconstructor.py \
+            tests/test_lot39_validation_contracts.py \
+            tests/test_lot39_coverage_completion.py \
             --cov=crypto_quant_bot.microstructure.order_book_delta_sequence_reconstructor \
             --cov=crypto_quant_bot.microstructure.order_book_delta_sequence_reconstructor_models \
             --cov=crypto_quant_bot.microstructure.order_book_delta_sequence_reconstructor_validation \
@@ -171,7 +176,10 @@ jobs:
           pip-audit -r requirements-dev.lock
           pytest -q
           for repetition in 1 2 3; do
-            pytest -q tests/test_lot39_order_book_delta_sequence_reconstructor.py
+            pytest -q \
+              tests/test_lot39_order_book_delta_sequence_reconstructor.py \
+              tests/test_lot39_validation_contracts.py \
+              tests/test_lot39_coverage_completion.py
           done
           git diff --exit-code -- src/crypto_quant_bot
       - uses: actions/upload-artifact@v4
