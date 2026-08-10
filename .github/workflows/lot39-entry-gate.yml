@@ -77,6 +77,7 @@ jobs:
           from pathlib import Path
           import scripts.validate_lot39_entry_gate as validator
           validator.LOT39_FORBIDDEN_IMPLEMENTATION_PATHS = ()
+          validator.LOT40_FORBIDDEN_IMPLEMENTATION_PATHS = ()
           validator.PLANNED_DELTA_SCHEMA_PATH = Path('__historically_absent_order_book_delta_v1.schema.json')
           result = validator.validate()
           assert result['status'] == 'PASS'
@@ -109,6 +110,7 @@ jobs:
           from pathlib import Path
           import scripts.validate_lot39_entry_gate as validator
           validator.LOT39_FORBIDDEN_IMPLEMENTATION_PATHS = ()
+          validator.LOT40_FORBIDDEN_IMPLEMENTATION_PATHS = ()
           validator.PLANNED_DELTA_SCHEMA_PATH = Path('__historically_absent_order_book_delta_v1.schema.json')
           assert validator.validate()['status'] == 'PASS'
           PY
