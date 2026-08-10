@@ -54,6 +54,10 @@ jobs:
           cp -R contracts .tmp-lot40-mutants/
           cp -R tests/fixtures .tmp-lot40-mutants/tests/
           cp tests/test_lot40*.py .tmp-lot40-mutants/tests/
+          # The merged entry-gate test is governance-only and is already enforced
+          # by the baseline above plus the dedicated historical gate workflow.
+          # It does not cover any of the three mutated Lot40 production modules.
+          rm -f .tmp-lot40-mutants/tests/test_lot40_v4_entry_gate.py
           python - <<'PY'
           from pathlib import Path
           import toml
