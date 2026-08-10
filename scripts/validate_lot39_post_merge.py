@@ -8,7 +8,7 @@ import tomllib
 from pathlib import Path
 from typing import Any
 
-from scripts.validate_lot39_frozen_evidence import validate as validate_frozen
+from validate_lot39_frozen_evidence import validate as validate_frozen
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_HEAD = "203a2b2d3d69644bd67c0e583df9d0405941def6"
