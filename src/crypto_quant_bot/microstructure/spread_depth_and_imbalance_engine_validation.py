@@ -8,12 +8,13 @@ from .book_integrity_desynchronization_detector_validation import (
     BookIntegrityValidationError,
     decimal_from_text,
     lot40_safety,
-    require_integer as require_integer,
+    require_integer as _require_integer,
     require_text,
     validate_causal_times,
 )
 
 Lot41ValidationError = BookIntegrityValidationError
+require_integer = _require_integer
 RUNTIME_MODE = "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY"
 VALIDATION_STATE = "VALIDATED_OFFLINE_SPREAD_DEPTH_IMBALANCE_ONLY"
 IMBALANCE_DEFINED = "DEFINED"
