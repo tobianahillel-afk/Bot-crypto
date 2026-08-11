@@ -189,6 +189,26 @@ class BookDepletionEventV1:
         }
 
 
+def _validate_slice_means(
+    depletion_events_total: int,
+    recovered_events_total: int,
+    mean_recovered_fraction: Decimal | None,
+    mean_replenishment_time_us: Decimal | None,
+) -> None:
+    if mean_recovered_fraction is not None:
+        validate_ratio(mean_recovered_fraction, "mean_recovered_fraction")
+    if mean_replenishment_time_us is not None:
+        validate_positive(mean_replenishment_time_us, "mean_replenishment_time_us")
+    if recovered_events_total == 0 and mean_replenishment_time_us is not None:
+        raise Lot43ValidationError("mean replenishment time requires recovered events")
+    if recovered_events_total > 0 and mean_replenishment_time_us is None:
+        raise Lot43ValidationError("recovered events require mean replenishment time")
+    if depletion_events_total == 0 and mean_recovered_fraction is not None:
+        raise Lot43ValidationError("empty slice cannot carry mean recovered fraction")
+    if depletion_events_total > 0 and mean_recovered_fraction is None:
+        raise Lot43ValidationError("non-empty slice requires mean recovered fraction")
+
+
 @dataclass(frozen=True, slots=True)
 class BookResilienceSliceV1:
     side: str
@@ -219,18 +239,12 @@ class BookResilienceSliceV1:
             self.expired_events_total,
             self.pending_events_total,
         )
-        if self.mean_recovered_fraction is not None:
-            validate_ratio(self.mean_recovered_fraction, "mean_recovered_fraction")
-        if self.mean_replenishment_time_us is not None:
-            validate_positive(self.mean_replenishment_time_us, "mean_replenishment_time_us")
-        if self.recovered_events_total == 0 and self.mean_replenishment_time_us is not None:
-            raise Lot43ValidationError("mean replenishment time requires recovered events")
-        if self.recovered_events_total > 0 and self.mean_replenishment_time_us is None:
-            raise Lot43ValidationError("recovered events require mean replenishment time")
-        if self.depletion_events_total == 0 and self.mean_recovered_fraction is not None:
-            raise Lot43ValidationError("empty slice cannot carry mean recovered fraction")
-        if self.depletion_events_total > 0 and self.mean_recovered_fraction is None:
-            raise Lot43ValidationError("non-empty slice requires mean recovered fraction")
+        _validate_slice_means(
+            self.depletion_events_total,
+            self.recovered_events_total,
+            self.mean_recovered_fraction,
+            self.mean_replenishment_time_us,
+        )
         validate_resilience_status(self.resilience_status)
         validate_reason_codes(self.reason_codes)
         require_sha256(self.slice_checksum, "slice_checksum")
