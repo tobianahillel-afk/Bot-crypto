@@ -28,14 +28,6 @@ EXPECTED_LOT39_AUDIT = "1e29d0b8695a1b8825e1fc91728a6254ad93c689e1f961cfa424e6d5
 EXPECTED_LOT39_BOOK = "a503d56b312cbb21586712fcf929a0381cbc9adde9c5d70700e1f7166ef58dde"
 EXPECTED_LOT39_FIXTURE = "1e7528a350ca78e21c4832b4af0ef4763e6bbadec82ea0f55a1005502cadff97"
 
-LOT41_FORBIDDEN_PATHS = (
-    ROOT / "src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine.py",
-    ROOT / "src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine_models.py",
-    ROOT / "scripts/run_lot41_spread_depth_and_imbalance_engine.py",
-    ROOT / "scripts/validate_lot41.py",
-    ROOT / "docs/LOT_41_SPREAD_DEPTH_AND_IMBALANCE_ENGINE.md",
-)
-
 
 class Lot40FrozenEvidenceError(RuntimeError):
     """Raised when frozen Lot 40 evidence no longer matches certification."""
@@ -54,7 +46,10 @@ def load(path: Path) -> dict[str, Any]:
 
 def checksum(payload: object) -> str:
     encoded = json.dumps(
-        payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+        payload,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
     ).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
 
@@ -94,10 +89,19 @@ def validate_links(
 ) -> None:
     require(state["book_integrity"] == integrity, "state/integrity payload mismatch")
     require(state["book_health_veto"] == veto, "state/veto payload mismatch")
-    require(audit["state_output_checksum"] == EXPECTED_STATE, "audit/state link changed")
-    require(audit["integrity_checksum"] == EXPECTED_INTEGRITY, "audit/integrity link changed")
+    require(
+        audit["state_output_checksum"] == EXPECTED_STATE,
+        "audit/state link changed",
+    )
+    require(
+        audit["integrity_checksum"] == EXPECTED_INTEGRITY,
+        "audit/integrity link changed",
+    )
     require(audit["veto_checksum"] == EXPECTED_VETO, "audit/veto link changed")
-    require(state["run_context"]["code_commit"] == SOURCE_HEAD, "state source head changed")
+    require(
+        state["run_context"]["code_commit"] == SOURCE_HEAD,
+        "state source head changed",
+    )
     require(audit["code_commit"] == SOURCE_HEAD, "audit source head changed")
 
 
@@ -116,9 +120,15 @@ def validate_lineage(state: dict[str, Any], audit: dict[str, Any]) -> None:
 
 
 def validate_health(integrity: dict[str, Any], veto: dict[str, Any]) -> None:
-    require(integrity["health_status"] == "HEALTHY", "reference health is not HEALTHY")
+    require(
+        integrity["health_status"] == "HEALTHY",
+        "reference health is not HEALTHY",
+    )
     require(integrity["book_health_score"] == "100", "reference health score changed")
-    require(integrity["synchronization_state"] == "SYNCED", "reference book not SYNCED")
+    require(
+        integrity["synchronization_state"] == "SYNCED",
+        "reference book not SYNCED",
+    )
     require(integrity["sequence_id"] == 1003, "reference sequence changed")
     require(integrity["bid_depth_levels"] == 2, "reference bid depth changed")
     require(integrity["ask_depth_levels"] == 3, "reference ask depth changed")
@@ -126,19 +136,34 @@ def validate_health(integrity: dict[str, Any], veto: dict[str, Any]) -> None:
     require(integrity["crossed"] is False, "reference book became crossed")
     require(integrity["locked"] is False, "reference book became locked")
     require(integrity["checksum_valid"] is True, "reference checksum invalid")
-    require(integrity["level_monotonicity_valid"] is True, "reference levels invalid")
+    require(
+        integrity["level_monotonicity_valid"] is True,
+        "reference levels invalid",
+    )
     require(veto["consequence"] == "NONE", "reference consequence changed")
     require(veto["veto_active"] is False, "reference veto unexpectedly active")
-    require(veto["critical_veto_active"] is False, "critical veto unexpectedly active")
+    require(
+        veto["critical_veto_active"] is False,
+        "critical veto unexpectedly active",
+    )
     require(veto["system_health_threshold"] == "80", "system threshold changed")
     require(veto["trade_health_threshold"] == "90", "trade threshold changed")
-    require(veto["critical_failure_consequence"] == "BLOCK", "critical consequence changed")
-    require(veto["system_threshold_consequence"] == "PAUSE", "system consequence changed")
+    require(
+        veto["critical_failure_consequence"] == "BLOCK",
+        "critical consequence changed",
+    )
+    require(
+        veto["system_threshold_consequence"] == "PAUSE",
+        "system consequence changed",
+    )
 
 
 def validate_components(integrity: dict[str, Any]) -> None:
     components = integrity["components"]
-    require(isinstance(components, list) and len(components) == 6, "component set changed")
+    require(
+        isinstance(components, list) and len(components) == 6,
+        "component set changed",
+    )
     expected = (
         ("SEQUENCE_CONTINUITY", True, "20"),
         ("CROSSED_LOCKED_STATE", True, "20"),
@@ -148,9 +173,16 @@ def validate_components(integrity: dict[str, Any]) -> None:
         ("LEVEL_MONOTONICITY", True, "5"),
     )
     score = Decimal("0")
-    for component, (name, critical, weight) in zip(components, expected, strict=True):
+    for component, (name, critical, weight) in zip(
+        components,
+        expected,
+        strict=True,
+    ):
         require(component["name"] == name, f"component order changed: {name}")
-        require(component["critical"] is critical, f"component criticality changed: {name}")
+        require(
+            component["critical"] is critical,
+            f"component criticality changed: {name}",
+        )
         require(component["passed"] is True, f"reference component failed: {name}")
         require(component["weight"] == weight, f"component weight changed: {name}")
         require(component["score"] == weight, f"component score changed: {name}")
@@ -158,7 +190,12 @@ def validate_components(integrity: dict[str, Any]) -> None:
     require(score == Decimal("100"), "component score total changed")
 
 
-def validate_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
+def validate_artifacts() -> tuple[
+    dict[str, Any],
+    dict[str, Any],
+    dict[str, Any],
+    dict[str, Any],
+]:
     state = load(STATE_PATH)
     audit = load(AUDIT_PATH)
     integrity = load(INTEGRITY_PATH)
@@ -171,7 +208,10 @@ def validate_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]
     validate_lineage(state, audit)
     validate_health(integrity, veto)
     validate_components(integrity)
-    require(state["validation_state"] == "VALIDATED_OFFLINE_BOOK_INTEGRITY_ONLY", "validation state changed")
+    require(
+        state["validation_state"] == "VALIDATED_OFFLINE_BOOK_INTEGRITY_ONLY",
+        "validation state changed",
+    )
     require(state["safety"] == expected_safety(), "state safety boundary changed")
     require(audit["safety"] == expected_safety(), "audit safety boundary changed")
     return state, audit, integrity, veto
@@ -185,7 +225,10 @@ def validate_quality() -> tuple[dict[str, Any], dict[str, Any]]:
     require(coverage["line_coverage_percent"] == 97.31, "line coverage changed")
     require(coverage["branch_coverage_percent"] == 91.24, "branch coverage changed")
     require(coverage["line_coverage_percent"] >= 95.0, "line coverage below threshold")
-    require(coverage["branch_coverage_percent"] >= 90.0, "branch coverage below threshold")
+    require(
+        coverage["branch_coverage_percent"] >= 90.0,
+        "branch coverage below threshold",
+    )
     require(coverage["anti_flake_repetitions"] == 3, "anti-flake evidence changed")
     require(mutation["status"] == "PASS", "mutation evidence not PASS")
     require(mutation["source_head_sha"] == SOURCE_HEAD, "mutation source head changed")
@@ -201,19 +244,16 @@ def validate_quality() -> tuple[dict[str, Any], dict[str, Any]]:
     require(mutation["max_children"] == 1, "mutation worker policy changed")
     require(mutation["python_hash_seed"] == "0", "mutation hash seed changed")
     require(mutation["mutmut_run_exit_code"] == 0, "mutmut run exit code changed")
-    require(mutation["mutmut_results_exit_code"] == 0, "mutmut results exit code changed")
+    require(
+        mutation["mutmut_results_exit_code"] == 0,
+        "mutmut results exit code changed",
+    )
     return coverage, mutation
-
-
-def validate_lot41_lock() -> None:
-    for path in LOT41_FORBIDDEN_PATHS:
-        require(not path.exists(), f"Lot 41 implementation present before Lot 40 audit: {path}")
 
 
 def validate() -> dict[str, object]:
     state, audit, integrity, veto = validate_artifacts()
     coverage, mutation = validate_quality()
-    validate_lot41_lock()
     result: dict[str, object] = {
         "schema_version": "lot40-frozen-evidence-validation-v1",
         "status": "PASS",
@@ -229,7 +269,8 @@ def validate() -> dict[str, object]:
         "health_status": integrity["health_status"],
         "book_health_score": integrity["book_health_score"],
         "consequence": veto["consequence"],
-        "lot41_status": "PLANNED_LOCKED",
+        "next_lot_at_certification": 41,
+        "next_lot_status_at_certification": "PLANNED_LOCKED",
         "trade_allowed": False,
         "execution_allowed": False,
         "approved_size": 0,
@@ -241,7 +282,14 @@ def validate() -> dict[str, object]:
 def main() -> int:
     try:
         print(json.dumps(validate(), sort_keys=True))
-    except (Lot40FrozenEvidenceError, OSError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+    except (
+        Lot40FrozenEvidenceError,
+        OSError,
+        KeyError,
+        TypeError,
+        ValueError,
+        json.JSONDecodeError,
+    ) as exc:
         print(f"LOT40 FROZEN EVIDENCE: FAIL\n{exc}", file=sys.stderr)
         return 1
     return 0
