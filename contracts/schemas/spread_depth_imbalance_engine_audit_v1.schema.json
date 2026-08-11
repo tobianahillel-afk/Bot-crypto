@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/contracts/spread_depth_imbalance_engine_audit_v1.schema.json",
+  "title": "SpreadDepthImbalanceEngineAuditV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "validation_state", "run_context", "state_output_checksum", "feature_checksum", "lineage", "validation_checks", "reason_codes", "safety", "audit_checksum"],
+  "properties": {
+    "schema_version": {"const": "spread-depth-imbalance-engine-audit-v1"},
+    "validation_state": {"const": "VALIDATED_OFFLINE_SPREAD_DEPTH_IMBALANCE_ONLY"},
+    "run_context": {"$ref": "spread_depth_imbalance_engine_state_v1.schema.json#/$defs/runContext"},
+    "state_output_checksum": {"$ref": "#/$defs/sha256"},
+    "feature_checksum": {"$ref": "#/$defs/sha256"},
+    "lineage": {"$ref": "spread_depth_imbalance_engine_state_v1.schema.json#/$defs/lineage"},
+    "validation_checks": {"type": "array", "minItems": 5, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z0-9_]+$"}},
+    "safety": {"$ref": "spread_depth_imbalance_engine_state_v1.schema.json#/$defs/safety"},
+    "audit_checksum": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
