@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import datetime, UTC
 from decimal import Decimal, localcontext
 from typing import Any
 
@@ -15,7 +15,7 @@ from .book_integrity_desynchronization_detector_validation import (
     validate_reason_codes as validate_reason_codes,
     validate_run_context as validate_run_context,
 )
-from .spread_depth_and_imbalance_engine_validation import Lot41ValidationError, lot41_safety
+from .spread_depth_and_imbalance_engine_validation import lot41_safety, Lot41ValidationError
 
 RUNTIME_MODE = "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY"
 VALIDATION_STATE = "VALIDATED_OFFLINE_LIQUIDITY_ZONES_WALLS_VOIDS_ONLY"
