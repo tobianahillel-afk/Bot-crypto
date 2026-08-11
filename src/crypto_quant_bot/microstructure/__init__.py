@@ -1,4 +1,4 @@
-"""Public MicrostructureDomain surface introduced by Lots 37 through 41."""
+"""Public MicrostructureDomain surface introduced by Lots 37 through 42."""
 
 from .book_integrity_desynchronization_detector import (
     build_lot40_artifacts,
@@ -14,6 +14,20 @@ from .book_integrity_desynchronization_detector_models import (
     Lot40LineageEnvelopeV1,
     Lot40MetricsV1,
     Lot40RunContextV1,
+)
+from .liquidity_zones_walls_and_voids_engine import (
+    build_lot42_artifacts,
+    write_lot42_artifacts,
+)
+from .liquidity_zones_walls_and_voids_engine_models import (
+    LiquidityVoidV1,
+    LiquidityZoneSetV1,
+    LiquidityZoneV1,
+    LiquidityZonesWallsVoidsEngineAuditV1,
+    LiquidityZonesWallsVoidsEngineStateV1,
+    Lot42LineageEnvelopeV1,
+    Lot42MetricsV1,
+    Lot42RunContextV1,
 )
 from .microstructure_scope_and_offline_data_contracts import (
     build_lot37_artifacts,
@@ -79,6 +93,11 @@ __all__ = [
     "BookQualityBindingV1",
     "CumulativeDepthLevelV1",
     "DepthBandV1",
+    "LiquidityVoidV1",
+    "LiquidityZoneSetV1",
+    "LiquidityZoneV1",
+    "LiquidityZonesWallsVoidsEngineAuditV1",
+    "LiquidityZonesWallsVoidsEngineStateV1",
     "Lot39LineageEnvelopeV1",
     "Lot39MetricsV1",
     "Lot39RunContextV1",
@@ -88,6 +107,9 @@ __all__ = [
     "Lot41LineageEnvelopeV1",
     "Lot41MetricsV1",
     "Lot41RunContextV1",
+    "Lot42LineageEnvelopeV1",
+    "Lot42MetricsV1",
+    "Lot42RunContextV1",
     "MicrostructureScopeOfflineDataContractsAuditV1",
     "MicrostructureScopeOfflineDataContractsCapabilityMatrixV1",
     "MicrostructureScopeOfflineDataContractsContractRegistryV1",
@@ -109,6 +131,7 @@ __all__ = [
     "build_lot39_artifacts",
     "build_lot40_artifacts",
     "build_lot41_artifacts",
+    "build_lot42_artifacts",
     "evaluate_book_integrity",
     "reconstruct_sequence",
     "write_lot37_artifacts",
@@ -116,4 +139,5 @@ __all__ = [
     "write_lot39_artifacts",
     "write_lot40_artifacts",
     "write_lot41_artifacts",
+    "write_lot42_artifacts",
 ]
