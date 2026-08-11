@@ -321,7 +321,7 @@ def test_resilience_slice_becomes_shifted_when_all_events_shift() -> None:
     history = (
         _observation(1, 10, (("100", "10"),), (("102", "10"),)),
         _observation(2, 20, (("100", "2"),), (("102", "10"),)),
-        _observation(3, 30, (("99", "2"),), (("101", "10"),)),
+        _observation(3, 30, (("100", "2"),), (("101", "10"),)),
     )
     result = analyze_book_resilience(history, _policy(mid_shift_min_bps="1"), _time(50))
     bid = next(
