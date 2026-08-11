@@ -286,6 +286,33 @@ def _build_depletion_event(
     return replace(event, event_checksum=canonical_checksum(event.payload_without_checksum()))
 
 
+def _quantity_replenishment_outcome(
+    kind: str,
+    observation: BookObservation,
+    duration: int,
+    gain: Decimal,
+    depleted: Decimal,
+    policy: BookResiliencePolicy,
+) -> Outcome | None:
+    fraction = bounded_recovery_fraction(gain, depleted)
+    if fraction < policy.replenishment_min_recovery_ratio:
+        return None
+    return kind, observation.sequence_id, duration, gain, fraction, ZERO, "REPLENISHED"
+
+
+def _mid_shift_outcome(
+    observation: BookObservation,
+    baseline: BookObservation,
+    side: str,
+    duration: int,
+    policy: BookResiliencePolicy,
+) -> Outcome | None:
+    shift = directional_mid_shift_bps(side, baseline.mid_price, observation.mid_price)
+    if shift < policy.mid_shift_min_bps:
+        return None
+    return "MID_SHIFT", observation.sequence_id, duration, ZERO, ZERO, shift, "MID_SHIFTED"
+
+
 def _observation_outcome(
     observation: BookObservation,
     baseline: BookObservation,
@@ -302,41 +329,22 @@ def _observation_outcome(
         price,
         policy.decimal_precision,
     )
-    same_fraction = bounded_recovery_fraction(same_gain, depleted)
-    if same_fraction >= policy.replenishment_min_recovery_ratio:
-        return (
-            "SAME_PRICE",
-            observation.sequence_id,
-            duration,
-            same_gain,
-            same_fraction,
-            ZERO,
-            "REPLENISHED",
-        )
-    adjacent_gain = _adjacent_gain(baseline, observation, side, price, policy)
-    adjacent_fraction = bounded_recovery_fraction(adjacent_gain, depleted)
-    if adjacent_fraction >= policy.replenishment_min_recovery_ratio:
-        return (
-            "ADJACENT_PRICE",
-            observation.sequence_id,
-            duration,
-            adjacent_gain,
-            adjacent_fraction,
-            ZERO,
-            "REPLENISHED",
-        )
-    shift = directional_mid_shift_bps(side, baseline.mid_price, observation.mid_price)
-    if shift >= policy.mid_shift_min_bps:
-        return (
-            "MID_SHIFT",
-            observation.sequence_id,
-            duration,
-            ZERO,
-            ZERO,
-            shift,
-            "MID_SHIFTED",
-        )
-    return None
+    same = _quantity_replenishment_outcome(
+        "SAME_PRICE", observation, duration, same_gain, depleted, policy
+    )
+    if same is not None:
+        return same
+    adjacent = _quantity_replenishment_outcome(
+        "ADJACENT_PRICE",
+        observation,
+        duration,
+        _adjacent_gain(baseline, observation, side, price, policy),
+        depleted,
+        policy,
+    )
+    if adjacent is not None:
+        return adjacent
+    return _mid_shift_outcome(observation, baseline, side, duration, policy)
 
 
 def _find_first_outcome(
