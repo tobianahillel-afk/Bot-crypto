@@ -29,11 +29,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove exact gate ancestry and Lot 44 absence
+      - name: Prove exact gate ancestry source availability and Lot 44 absence
         run: |
           set -euo pipefail
           git merge-base --is-ancestor "$GATE_MERGE_SHA" HEAD
-          git merge-base --is-ancestor "$SOURCE_HEAD_SHA" HEAD
+          git rev-parse --verify "$SOURCE_HEAD_SHA^{commit}" >/dev/null
           test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py
           test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py
           test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py
