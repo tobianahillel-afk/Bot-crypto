@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass, replace
 from decimal import Decimal, localcontext
 from itertools import pairwise
-from typing import Iterable
 
 from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry import (
     canonical_checksum,
