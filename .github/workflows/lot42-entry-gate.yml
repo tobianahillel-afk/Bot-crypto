@@ -19,6 +19,8 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-22.04
+    env:
+      PYTHONPATH: src
     steps:
       - uses: actions/checkout@v4
         with:
