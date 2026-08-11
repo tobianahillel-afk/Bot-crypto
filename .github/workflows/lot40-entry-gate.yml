@@ -35,7 +35,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove immutable historical gate and authorized successor head
+      - name: Prove immutable historical gate and certification-time locks
         run: |
           set -euo pipefail
           git merge-base --is-ancestor "$AUDITED_BASE" "$GATE_MERGE"
@@ -54,17 +54,18 @@ jobs:
           diff -u /tmp/lot40-gate-allowed.txt /tmp/lot40-gate-changed.txt
           for path in \
             src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py \
-            src/crypto_quant_bot/microstructure/book_integrity_and_desynchronization_detector.py \
+            src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector_models.py \
             scripts/run_lot40_book_integrity_desynchronization_detector.py \
-            scripts/validate_lot40.py; do
+            scripts/validate_lot40.py \
+            src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine.py \
+            src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine_models.py \
+            scripts/run_lot41_spread_depth_and_imbalance_engine.py \
+            scripts/validate_lot41.py; do
             if git cat-file -e "$GATE_MERGE:$path" 2>/dev/null; then
-              echo "LOT40_PRESENT_AT_GATE_MERGE:$path"
+              echo "IMPLEMENTATION_PRESENT_AT_LOT40_GATE_MERGE:$path" >&2
               exit 1
             fi
           done
-          test ! -e src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine.py
-          test ! -e scripts/run_lot41_spread_depth_and_imbalance_engine.py
-          test ! -e scripts/validate_lot41.py
       - name: Recreate exact gate worktree
         run: |
           set -euo pipefail

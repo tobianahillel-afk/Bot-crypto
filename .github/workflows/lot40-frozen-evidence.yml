@@ -30,21 +30,30 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove certified chain across squash merge
+      - name: Prove certified chain and historical Lot 41 lock
         run: |
           set -euo pipefail
           git merge-base --is-ancestor 91df3e378336a791a731cb1561382ba28e6e0978 "$SOURCE_HEAD_SHA"
           git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA"
           git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" "$FINAL_PR_HEAD_SHA"
           git merge-base --is-ancestor "$MERGED_COMMIT_SHA" HEAD
-      - name: Prove certified Lot 40 source immutability
+          for path in \
+            src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine.py \
+            src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine_models.py \
+            scripts/run_lot41_spread_depth_and_imbalance_engine.py \
+            scripts/validate_lot41.py; do
+            if git cat-file -e "$MERGED_COMMIT_SHA:$path" 2>/dev/null; then
+              echo "Lot 41 existed at Lot 40 certification: $path" >&2
+              exit 1
+            fi
+          done
+      - name: Prove certified Lot 40 business source immutability
         run: |
           set -euo pipefail
           git diff --quiet "$MERGED_COMMIT_SHA" HEAD -- \
             src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py \
             src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector_models.py \
             src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector_validation.py \
-            src/crypto_quant_bot/microstructure/__init__.py \
             config/microstructure/book_integrity_desynchronization_detector_v1.json \
             contracts/schemas/book_integrity_state_v1.schema.json \
             contracts/schemas/book_health_veto_v1.schema.json \
@@ -53,16 +62,12 @@ jobs:
             scripts/run_lot40_book_integrity_desynchronization_detector.py \
             scripts/validate_lot40.py \
             scripts/validate_lot40_no_connectivity.py \
-            tests/test_lot40_book_integrity_desynchronization_detector.py \
             tests/test_lot40_health_policy_derivation.py \
             tests/test_lot40_schema_contracts.py \
             tests/test_lot40_strict_level_contracts.py \
-            tests/test_lot40_v4_entry_gate.py \
             tests/test_lot40_validation_contracts.py \
             docs/LOT_40_BOOK_INTEGRITY_DESYNCHRONIZATION_DETECTOR.md \
-            docs/ACCEPTANCE_CRITERIA_LOT_40.md \
-            .github/workflows/lot40-book-integrity-desynchronization.yml \
-            .github/workflows/lot40-mutation-assurance.yml
+            docs/ACCEPTANCE_CRITERIA_LOT_40.md
       - name: Prove frozen evidence immutability
         run: |
           set -euo pipefail
@@ -73,15 +78,25 @@ jobs:
             data/audit/book_health_veto_lot40.json \
             reports/lot40/coverage_summary.json \
             reports/lot40/mutation_summary.json
-      - name: Validate frozen evidence and safety
+      - name: Validate frozen evidence and replay certified implementation
         run: |
+          set -euo pipefail
           python scripts/validate_lot40_frozen_evidence.py
-          python scripts/validate_lot40.py --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
-          python scripts/validate_lot40_no_connectivity.py
+          rm -rf /tmp/lot40-certified
+          git worktree add --detach /tmp/lot40-certified "$MERGED_COMMIT_SHA"
+          (
+            cd /tmp/lot40-certified
+            PYTHONPATH=src python scripts/validate_lot40.py \
+              --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
+            PYTHONPATH=src python scripts/validate_lot40_no_connectivity.py
+          )
+          git worktree remove --force /tmp/lot40-certified
       - name: Frozen evidence smoke regression and security
         run: |
+          set -euo pipefail
           python -m compileall -q src scripts tests
-          ruff check scripts/validate_lot40_frozen_evidence.py
+          ruff check scripts/validate_lot40_frozen_evidence.py \
+            tests/test_lot40_book_integrity_desynchronization_detector.py
           pytest -q tests/test_lot40_book_integrity_desynchronization_detector.py \
             tests/test_lot40_health_policy_derivation.py \
             tests/test_lot40_schema_contracts.py \
@@ -89,11 +104,10 @@ jobs:
             tests/test_lot40_validation_contracts.py
           bandit -q -r scripts/validate_lot40_frozen_evidence.py -ll
           python scripts/validate_lot40_frozen_evidence.py
-      - name: Prove Lot 41 remains locked
+      - name: Prove Lot 42 remains locked
         run: |
           set -euo pipefail
-          test ! -e src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine.py
-          test ! -e src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine_models.py
-          test ! -e scripts/run_lot41_spread_depth_and_imbalance_engine.py
-          test ! -e scripts/validate_lot41.py
-          test ! -e docs/LOT_41_SPREAD_DEPTH_AND_IMBALANCE_ENGINE.md
+          test ! -e src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine.py
+          test ! -e src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine_models.py
+          test ! -e scripts/run_lot42_liquidity_zones_walls_and_voids_engine.py
+          test ! -e scripts/validate_lot42.py

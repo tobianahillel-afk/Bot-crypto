@@ -31,6 +31,7 @@ from crypto_quant_bot.microstructure.book_integrity_desynchronization_detector_v
 
 ROOT = Path(__file__).resolve().parents[1]
 BOOK_PATH = ROOT / "data/audit/reconstructed_order_book_lot39.json"
+LOT40_LIFECYCLE_PATH = ROOT / "data/audit/roadmap_lifecycle_overlay_lot40.json"
 
 
 def _load(path: Path) -> dict[str, object]:
@@ -319,10 +320,12 @@ def test_atomic_persistence_writes_four_linked_artifacts(tmp_path: Path) -> None
     assert persisted_audit["veto_checksum"] == persisted_veto["veto_checksum"]
 
 
-def test_lot41_production_files_remain_absent() -> None:
-    forbidden = (
-        ROOT / "src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine.py",
-        ROOT / "scripts/run_lot41_spread_depth_and_imbalance_engine.py",
-        ROOT / "scripts/validate_lot41.py",
-    )
-    assert all(not path.exists() for path in forbidden)
+def test_lot41_was_locked_in_lot40_certified_lifecycle() -> None:
+    lifecycle = _load(LOT40_LIFECYCLE_PATH)
+    assert lifecycle["latest_implemented_lot"] == 40
+    lots = lifecycle["lots"]
+    assert isinstance(lots, dict)
+    assert lots["41"] == {
+        "implementation_started": False,
+        "status": "PLANNED_LOCKED",
+    }

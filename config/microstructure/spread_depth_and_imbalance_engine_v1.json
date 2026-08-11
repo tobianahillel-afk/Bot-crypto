@@ -1,0 +1,21 @@
+{
+  "schema_version": "lot41-spread-depth-imbalance-config-v1",
+  "config_version": "lot41-spread-depth-imbalance-config-v1",
+  "run_id": "lot41-reference-run-v1",
+  "correlation_id": "microstructure-v4-lot41-reference",
+  "lineage_id": "lot41-reference-lineage-v1",
+  "generated_at": "2026-08-06T19:18:40.100000Z",
+  "decision_time": "2026-08-06T19:18:40.100000Z",
+  "feature_horizon": "BOOK_SNAPSHOT",
+  "calculation_decimal_precision": 50,
+  "depth_bands_bps": ["0.025", "0.05", "0.10"],
+  "required_book_health_status": "HEALTHY",
+  "required_health_consequence": "NONE",
+  "entry_gate_path": "data/audit/lot41_v4_entry_gate.json",
+  "lot40_lifecycle_overlay_path": "data/audit/roadmap_lifecycle_overlay_lot40.json",
+  "lot40_state_path": "data/audit/book_integrity_desynchronization_detector_lot40.json",
+  "lot40_audit_path": "data/audit/book_integrity_desynchronization_detector_audit_lot40.json",
+  "lot40_book_integrity_path": "data/audit/book_integrity_state_lot40.json",
+  "lot40_book_health_veto_path": "data/audit/book_health_veto_lot40.json",
+  "reconstructed_book_path": "data/audit/reconstructed_order_book_lot39.json"
+}

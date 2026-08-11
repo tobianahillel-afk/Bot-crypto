@@ -14,6 +14,8 @@ jobs:
     env:
       PYTHONPATH: src
       GATE_MERGE_SHA: 91df3e378336a791a731cb1561382ba28e6e0978
+      SOURCE_HEAD_SHA: b9a18a8aaef858b985c3f75ef2aa8955ec521e9f
+      MERGED_COMMIT_SHA: 88f0dac660e262a1c468d9cd75c5e7996ce4817b
       CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - uses: actions/checkout@v4
@@ -28,14 +30,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove Lot 40 gate ancestry and Lot 41 absence
+      - name: Prove Lot 40 ancestry and downstream Lot 42 lock
         run: |
           set -euo pipefail
-          git merge-base --is-ancestor "$GATE_MERGE_SHA" HEAD
-          test ! -e src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine.py
-          test ! -e src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine_models.py
-          test ! -e scripts/run_lot41_spread_depth_and_imbalance_engine.py
-          test ! -e scripts/validate_lot41.py
+          git merge-base --is-ancestor "$GATE_MERGE_SHA" "$MERGED_COMMIT_SHA"
+          git merge-base --is-ancestor "$MERGED_COMMIT_SHA" HEAD
+          test ! -e src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine.py
+          test ! -e src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine_models.py
+          test ! -e scripts/run_lot42_liquidity_zones_walls_and_voids_engine.py
+          test ! -e scripts/validate_lot42.py
       - name: Compile lint type schema and no-connectivity checks
         run: |
           set -euo pipefail
@@ -90,24 +93,37 @@ jobs:
           if result['status']!='PASS':
               raise SystemExit('LOT40_CRITICAL_COVERAGE_BELOW_THRESHOLD')
           PY
-      - name: Generate validate and replay deterministic evidence
+      - name: Replay certified generate validate and deterministic evidence
         run: |
           set -euo pipefail
-          outputs=(
-            data/audit/book_integrity_desynchronization_detector_lot40.json
-            data/audit/book_integrity_desynchronization_detector_audit_lot40.json
-            data/audit/book_integrity_state_lot40.json
-            data/audit/book_health_veto_lot40.json
-          )
-          rm -rf /tmp/lot40-run1
+          rm -rf /tmp/lot40-certified /tmp/lot40-run1
+          git worktree add --detach /tmp/lot40-certified "$MERGED_COMMIT_SHA"
           mkdir -p /tmp/lot40-run1
-          python scripts/run_lot40_book_integrity_desynchronization_detector.py --code-commit "$CANDIDATE_SHA"
-          python scripts/validate_lot40.py --expected-code-commit "$CANDIDATE_SHA" --require-persisted
-          python scripts/validate_lot40_no_connectivity.py
-          for path in "${outputs[@]}"; do cp "$path" "/tmp/lot40-run1/$(basename "$path")"; done
-          python scripts/run_lot40_book_integrity_desynchronization_detector.py --code-commit "$CANDIDATE_SHA"
-          python scripts/validate_lot40.py --expected-code-commit "$CANDIDATE_SHA" --require-persisted
-          for path in "${outputs[@]}"; do cmp "/tmp/lot40-run1/$(basename "$path")" "$path"; done
+          (
+            cd /tmp/lot40-certified
+            outputs=(
+              data/audit/book_integrity_desynchronization_detector_lot40.json
+              data/audit/book_integrity_desynchronization_detector_audit_lot40.json
+              data/audit/book_integrity_state_lot40.json
+              data/audit/book_health_veto_lot40.json
+            )
+            PYTHONPATH=src python scripts/run_lot40_book_integrity_desynchronization_detector.py \
+              --code-commit "$SOURCE_HEAD_SHA"
+            PYTHONPATH=src python scripts/validate_lot40.py \
+              --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
+            PYTHONPATH=src python scripts/validate_lot40_no_connectivity.py
+            for path in "${outputs[@]}"; do
+              cp "$path" "/tmp/lot40-run1/$(basename "$path")"
+            done
+            PYTHONPATH=src python scripts/run_lot40_book_integrity_desynchronization_detector.py \
+              --code-commit "$SOURCE_HEAD_SHA"
+            PYTHONPATH=src python scripts/validate_lot40.py \
+              --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
+            for path in "${outputs[@]}"; do
+              cmp "/tmp/lot40-run1/$(basename "$path")" "$path"
+            done
+          )
+          git worktree remove --force /tmp/lot40-certified
       - name: Architecture roadmap traceability engineering and safety
         run: |
           python scripts/validate_roadmap_documentation.py
