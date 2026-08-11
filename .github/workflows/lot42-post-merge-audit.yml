@@ -1,0 +1,140 @@
+name: Lot 42 independent post-merge audit
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-22.04
+    env:
+      PYTHONPATH: src
+      GATE_MERGE_SHA: 7456c5b80b609ee5958d8b6da0effd489faa308c
+      SOURCE_HEAD_SHA: 2d91da1777f1ccbd7f81563dbc74fd3b89eecdf2
+      EVIDENCE_HEAD_SHA: 3655b18a24cafb3383dfeb2709904af59044535f
+      FINAL_PR_HEAD_SHA: 85f0a141d52d448a452ff1493050a3bf31a23dce
+      IMPLEMENTATION_MERGE_SHA: 3a7226b4beeb23bfeee976243efc0057cac69e0e
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Prove exact certified chain and squash equivalence
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$GATE_MERGE_SHA" "$SOURCE_HEAD_SHA"
+          git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA"
+          git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" "$FINAL_PR_HEAD_SHA"
+          git merge-base --is-ancestor "$IMPLEMENTATION_MERGE_SHA" HEAD
+          git diff --quiet "$FINAL_PR_HEAD_SHA" "$IMPLEMENTATION_MERGE_SHA" -- .
+      - name: Prove frozen Lot 42 production source immutability
+        run: |
+          set -euo pipefail
+          git diff --quiet "$SOURCE_HEAD_SHA" HEAD -- \
+            src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_analysis.py \
+            src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine.py \
+            src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine_models.py \
+            src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine_validation.py \
+            config/microstructure/liquidity_zones_walls_and_voids_engine_v1.json \
+            contracts/schemas/liquidity_zone_set_v1.schema.json \
+            contracts/schemas/liquidity_zones_walls_voids_engine_state_v1.schema.json \
+            contracts/schemas/liquidity_zones_walls_voids_engine_audit_v1.schema.json \
+            scripts/run_lot42_liquidity_zones_walls_and_voids_engine.py \
+            scripts/validate_lot42.py \
+            scripts/validate_lot42_no_connectivity.py \
+            tests/test_lot42_fail_closed_contracts.py \
+            tests/test_lot42_liquidity_zones_walls_and_voids_engine.py \
+            tests/test_lot42_schema_contracts.py \
+            docs/LOT_42_LIQUIDITY_ZONES_WALLS_AND_VOIDS_ENGINE.md \
+            docs/ACCEPTANCE_CRITERIA_LOT_42.md
+      - name: Prove frozen Lot 42 evidence immutability
+        run: |
+          set -euo pipefail
+          git diff --quiet "$EVIDENCE_HEAD_SHA" HEAD -- \
+            data/audit/liquidity_zone_set_lot42.json \
+            data/audit/liquidity_zones_walls_and_voids_engine_audit_lot42.json \
+            data/audit/liquidity_zones_walls_and_voids_engine_lot42.json \
+            reports/lot42/coverage_summary.json \
+            reports/lot42/mutation_summary.json
+      - name: Validate frozen evidence release lifecycle and post-merge verdict
+        run: |
+          set -euo pipefail
+          python -m compileall -q src scripts tests
+          python -m json.tool data/audit/roadmap_lifecycle_overlay_lot42.json >/dev/null
+          ruff check scripts/validate_lot42_frozen_evidence.py scripts/validate_lot42_post_merge.py
+          python scripts/validate_lot42_frozen_evidence.py
+          python scripts/validate_lot42_post_merge.py | tee /tmp/lot42-post-merge-validation.json
+      - name: Replay certified Lot 42 source deterministically
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/lot42-post-merge-source /tmp/lot42-post-merge-run1
+          git worktree add --detach /tmp/lot42-post-merge-source "$SOURCE_HEAD_SHA"
+          trap 'git worktree remove --force /tmp/lot42-post-merge-source >/dev/null 2>&1 || true' EXIT
+          mkdir -p /tmp/lot42-post-merge-run1
+          (
+            cd /tmp/lot42-post-merge-source
+            outputs=(
+              data/audit/liquidity_zones_walls_and_voids_engine_lot42.json
+              data/audit/liquidity_zones_walls_and_voids_engine_audit_lot42.json
+              data/audit/liquidity_zone_set_lot42.json
+            )
+            PYTHONPATH=src python scripts/run_lot42_liquidity_zones_walls_and_voids_engine.py \
+              --code-commit "$SOURCE_HEAD_SHA"
+            PYTHONPATH=src python scripts/validate_lot42.py \
+              --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
+            PYTHONPATH=src python scripts/validate_lot42_no_connectivity.py
+            for path in "${outputs[@]}"; do
+              cp "$path" "/tmp/lot42-post-merge-run1/$(basename "$path")"
+            done
+            PYTHONPATH=src python scripts/run_lot42_liquidity_zones_walls_and_voids_engine.py \
+              --code-commit "$SOURCE_HEAD_SHA"
+            PYTHONPATH=src python scripts/validate_lot42.py \
+              --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
+            for path in "${outputs[@]}"; do
+              cmp "/tmp/lot42-post-merge-run1/$(basename "$path")" "$path"
+            done
+            PYTHONPATH=src pytest -q tests/test_lot42*.py
+          )
+          git worktree remove --force /tmp/lot42-post-merge-source
+          trap - EXIT
+      - name: Current architecture security regression and Lot 43 lock
+        run: |
+          set -euo pipefail
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          python scripts/validate_lot42_no_connectivity.py
+          bandit -q -r scripts/validate_lot42_post_merge.py scripts/validate_lot42_frozen_evidence.py -ll
+          pip-audit -r requirements-dev.lock
+          pytest -q
+          for repetition in 1 2 3; do pytest -q tests/test_lot42*.py; done
+          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py
+          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py
+          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_validation.py
+          test ! -e config/microstructure/book_resilience_and_replenishment_engine_v1.json
+          test ! -e scripts/run_lot43_book_resilience_and_replenishment_engine.py
+          test ! -e scripts/validate_lot43.py
+          test ! -e docs/LOT_43_BOOK_RESILIENCE_AND_REPLENISHMENT_ENGINE.md
+          test ! -e docs/ACCEPTANCE_CRITERIA_LOT_43.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot42-post-merge-audit-evidence
+          path: /tmp/lot42-post-merge-validation.json
