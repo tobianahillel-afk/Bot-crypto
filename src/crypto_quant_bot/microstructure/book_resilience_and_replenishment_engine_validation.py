@@ -3,6 +3,7 @@ from __future__ import annotations
 from decimal import Decimal, localcontext
 from typing import Any
 
+from .book_integrity_desynchronization_detector_validation import BookIntegrityValidationError
 from .liquidity_zones_walls_and_voids_engine_validation import (
     ACTIVE,
     PARTICIPANT_INTENT,
@@ -11,18 +12,18 @@ from .liquidity_zones_walls_and_voids_engine_validation import (
     decimal_text,
     lot42_safety,
     parse_utc_timestamp,
-    require_integer,
+    require_integer as _require_integer,
     require_sha256,
     require_text,
     validate_causal_times,
     validate_checksum_fields,
     validate_identity_fields,
-    validate_nonnegative,
-    validate_positive,
+    validate_nonnegative as _validate_nonnegative,
+    validate_positive as _validate_positive,
     validate_reason_codes,
     validate_run_context,
     validate_sequence_ids,
-    validate_side,
+    validate_side as _validate_side,
 )
 
 RUNTIME_MODE = "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY"
@@ -43,6 +44,10 @@ class Lot43ValidationError(Lot42ValidationError):
     """Raised when a Lot 43 contract, invariant, or safety boundary is invalid."""
 
 
+def _translate(exc: Exception) -> Lot43ValidationError:
+    return Lot43ValidationError(str(exc))
+
+
 def lot43_safety() -> dict[str, object]:
     return dict(lot42_safety())
 
@@ -52,18 +57,46 @@ def validate_lot43_safety(value: dict[str, object]) -> None:
         raise Lot43ValidationError("Lot 43 safety boundary changed")
 
 
+def require_integer(value: Any, field: str, minimum: int = 0) -> int:
+    try:
+        return _require_integer(value, field, minimum=minimum)
+    except (Lot42ValidationError, BookIntegrityValidationError) as exc:
+        raise _translate(exc) from exc
+
+
+def validate_nonnegative(value: Decimal, field: str) -> None:
+    try:
+        _validate_nonnegative(value, field)
+    except Lot42ValidationError as exc:
+        raise _translate(exc) from exc
+
+
+def validate_positive(value: Decimal, field: str) -> None:
+    try:
+        _validate_positive(value, field)
+    except Lot42ValidationError as exc:
+        raise _translate(exc) from exc
+
+
+def validate_side(value: str) -> None:
+    try:
+        _validate_side(value)
+    except Lot42ValidationError as exc:
+        raise _translate(exc) from exc
+
+
 def nonnegative_decimal_text(value: Any, field: str) -> Decimal:
     try:
         return decimal_from_text(value, field, allow_zero=True)
-    except Lot42ValidationError as exc:
-        raise Lot43ValidationError(str(exc)) from exc
+    except (Lot42ValidationError, BookIntegrityValidationError) as exc:
+        raise _translate(exc) from exc
 
 
 def positive_decimal_text(value: Any, field: str) -> Decimal:
     try:
         return decimal_from_text(value, field, allow_zero=False)
-    except Lot42ValidationError as exc:
-        raise Lot43ValidationError(str(exc)) from exc
+    except (Lot42ValidationError, BookIntegrityValidationError) as exc:
+        raise _translate(exc) from exc
 
 
 def validate_ratio(value: Decimal, field: str) -> None:
@@ -75,10 +108,7 @@ def validate_horizons(values: tuple[int, ...]) -> None:
     if not values:
         raise Lot43ValidationError("resilience horizons cannot be empty")
     for value in values:
-        try:
-            require_integer(value, "resilience horizon", minimum=1)
-        except Lot42ValidationError as exc:
-            raise Lot43ValidationError(str(exc)) from exc
+        require_integer(value, "resilience horizon", minimum=1)
     if tuple(sorted(values)) != values or len(set(values)) != len(values):
         raise Lot43ValidationError("resilience horizons must be unique and strictly increasing")
 
@@ -111,8 +141,11 @@ def validate_resilience_status(value: str) -> None:
 
 
 def elapsed_us(start: str, end: str) -> int:
-    start_time = parse_utc_timestamp(start, "start_time")
-    end_time = parse_utc_timestamp(end, "end_time")
+    try:
+        start_time = parse_utc_timestamp(start, "start_time")
+        end_time = parse_utc_timestamp(end, "end_time")
+    except (Lot42ValidationError, BookIntegrityValidationError) as exc:
+        raise _translate(exc) from exc
     if end_time <= start_time:
         raise Lot43ValidationError("elapsed-time end must be strictly after start")
     delta = end_time - start_time
@@ -120,8 +153,11 @@ def elapsed_us(start: str, end: str) -> int:
 
 
 def age_us(available_at: str, decision_time: str) -> int:
-    available = parse_utc_timestamp(available_at, "available_at")
-    decision = parse_utc_timestamp(decision_time, "decision_time")
+    try:
+        available = parse_utc_timestamp(available_at, "available_at")
+        decision = parse_utc_timestamp(decision_time, "decision_time")
+    except (Lot42ValidationError, BookIntegrityValidationError) as exc:
+        raise _translate(exc) from exc
     if available > decision:
         raise Lot43ValidationError("available_at cannot exceed decision_time")
     delta = decision - available
@@ -165,10 +201,7 @@ def directional_mid_shift_bps(
 def validate_nullable_positive_integer(value: int | None, field: str) -> None:
     if value is None:
         return
-    try:
-        require_integer(value, field, minimum=1)
-    except Lot42ValidationError as exc:
-        raise Lot43ValidationError(str(exc)) from exc
+    require_integer(value, field, minimum=1)
 
 
 def validate_nullable_nonnegative_decimal(value: Decimal | None, field: str) -> None:
@@ -240,10 +273,7 @@ def validate_slice_counts(
         (pending, "pending_events_total"),
     )
     for value, field in values:
-        try:
-            require_integer(value, field, minimum=0)
-        except Lot42ValidationError as exc:
-            raise Lot43ValidationError(str(exc)) from exc
+        require_integer(value, field, minimum=0)
     if recovered + shifted + expired + pending != events:
         raise Lot43ValidationError("resilience slice outcome counts must partition events")
 
