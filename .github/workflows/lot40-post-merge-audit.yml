@@ -15,6 +15,7 @@ jobs:
       PYTHONPATH: src
       SOURCE_HEAD_SHA: b9a18a8aaef858b985c3f75ef2aa8955ec521e9f
       EVIDENCE_HEAD_SHA: ea04fe826261eeed5a59eea60265b38b68404b6b
+      FINAL_PR_HEAD_SHA: 1268772c07cbb76c18b3267aef12dad5ba58af31
       MERGED_COMMIT: 88f0dac660e262a1c468d9cd75c5e7996ce4817b
     steps:
       - uses: actions/checkout@v4
@@ -34,13 +35,12 @@ jobs:
           set -euo pipefail
           git merge-base --is-ancestor 91df3e378336a791a731cb1561382ba28e6e0978 "$SOURCE_HEAD_SHA"
           git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA"
-          git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" 1268772c07cbb76c18b3267aef12dad5ba58af31
+          git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" "$FINAL_PR_HEAD_SHA"
           git merge-base --is-ancestor "$MERGED_COMMIT" HEAD
           git diff --quiet "$MERGED_COMMIT" HEAD -- \
             src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py \
             src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector_models.py \
             src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector_validation.py \
-            src/crypto_quant_bot/microstructure/__init__.py \
             config/microstructure/book_integrity_desynchronization_detector_v1.json \
             contracts/schemas/book_integrity_state_v1.schema.json \
             contracts/schemas/book_health_veto_v1.schema.json \
@@ -63,10 +63,6 @@ jobs:
             data/audit/book_health_veto_lot40.json \
             reports/lot40/coverage_summary.json \
             reports/lot40/mutation_summary.json
-          test ! -e src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine.py
-          test ! -e src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine_models.py
-          test ! -e scripts/run_lot41_spread_depth_and_imbalance_engine.py
-          test ! -e scripts/validate_lot41.py
       - name: Compile lint type and exact post-merge validators
         run: |
           python -m compileall -q src scripts tests
@@ -98,3 +94,9 @@ jobs:
           pip-audit -r requirements-dev.lock
           for repetition in 1 2 3; do pytest -q tests/test_lot40*.py; done
           python scripts/validate_lot40_post_merge.py
+      - name: Prove Lot 42 remains locked
+        run: |
+          set -euo pipefail
+          test ! -e src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine.py
+          test ! -e scripts/run_lot42_liquidity_zones_walls_and_voids_engine.py
+          test ! -e scripts/validate_lot42.py
