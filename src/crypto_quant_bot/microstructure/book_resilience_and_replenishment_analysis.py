@@ -164,6 +164,21 @@ def _quantity_at(observation: BookObservation, side: str, price: Decimal) -> Dec
     return ZERO
 
 
+def _quantity_gain(
+    baseline: BookObservation,
+    future: BookObservation,
+    side: str,
+    price: Decimal,
+    precision: int,
+) -> Decimal:
+    with localcontext() as context:
+        context.prec = precision
+        return max(
+            _quantity_at(future, side, price) - _quantity_at(baseline, side, price),
+            ZERO,
+        )
+
+
 def _detect_depletions(
     observations: tuple[BookObservation, ...],
     policy: BookResiliencePolicy,
@@ -198,11 +213,11 @@ def _pair_depletions(
     output: list[BookDepletionEventV1] = []
     for level in _levels(previous, side):
         post_quantity = _quantity_at(current, side, level.price)
-        depleted = max(level.quantity - post_quantity, ZERO)
-        if depleted <= 0:
-            continue
         with localcontext() as context:
             context.prec = policy.decimal_precision
+            depleted = max(level.quantity - post_quantity, ZERO)
+            if depleted <= 0:
+                continue
             ratio = depleted / level.quantity
         if depleted < policy.depletion_min_quantity or ratio < policy.depletion_min_ratio:
             continue
@@ -280,9 +295,12 @@ def _observation_outcome(
     policy: BookResiliencePolicy,
     duration: int,
 ) -> Outcome | None:
-    same_gain = max(
-        _quantity_at(observation, side, price) - _quantity_at(baseline, side, price),
-        ZERO,
+    same_gain = _quantity_gain(
+        baseline,
+        observation,
+        side,
+        price,
+        policy.decimal_precision,
     )
     same_fraction = bounded_recovery_fraction(same_gain, depleted)
     if same_fraction >= policy.replenishment_min_recovery_ratio:
@@ -357,20 +375,25 @@ def _adjacent_gain(
 ) -> Decimal:
     prices = {level.price for level in _levels(baseline, side)}
     prices.update(level.price for level in _levels(future, side))
-    gain = ZERO
-    for price in sorted(prices):
-        if price == depleted_price:
-            continue
-        if (
-            bps_distance(price, depleted_price, depleted_price)
-            > policy.adjacent_replenishment_distance_bps
-        ):
-            continue
-        gain += max(
-            _quantity_at(future, side, price) - _quantity_at(baseline, side, price),
-            ZERO,
-        )
-    return gain
+    with localcontext() as context:
+        context.prec = policy.decimal_precision
+        gain = ZERO
+        for price in sorted(prices):
+            if price == depleted_price:
+                continue
+            if (
+                bps_distance(price, depleted_price, depleted_price)
+                > policy.adjacent_replenishment_distance_bps
+            ):
+                continue
+            gain += _quantity_gain(
+                baseline,
+                future,
+                side,
+                price,
+                policy.decimal_precision,
+            )
+        return gain
 
 
 def _no_outcome(
@@ -474,16 +497,16 @@ def _mean_recovered_fraction(
 ) -> Decimal | None:
     if not events:
         return None
-    total = ZERO
-    for event in events:
-        if (
-            event.replenishment_kind in {"SAME_PRICE", "ADJACENT_PRICE"}
-            and event.replenishment_time_us is not None
-            and event.replenishment_time_us <= horizon
-        ):
-            total += event.recovered_fraction
     with localcontext() as context:
         context.prec = precision
+        total = ZERO
+        for event in events:
+            if (
+                event.replenishment_kind in {"SAME_PRICE", "ADJACENT_PRICE"}
+                and event.replenishment_time_us is not None
+                and event.replenishment_time_us <= horizon
+            ):
+                total += event.recovered_fraction
         return total / Decimal(len(events))
 
 
