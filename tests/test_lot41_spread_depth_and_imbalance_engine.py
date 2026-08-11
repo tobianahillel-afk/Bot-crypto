@@ -45,7 +45,7 @@ def test_lot41_reference_values_and_lineage() -> None:
     assert feature["spread_absolute"] == "0.2"
     assert feature["mid_price"] == "50025"
     assert feature["spread_bps"] == "0.03998000999500249875062468766"
-    assert feature["microprice"].startswith("50025.016129032258064516129032")
+    assert feature["microprice"] == "50025.01612903225806451612903"
     assert audit["state_output_checksum"] == state["output_checksum"]
     assert audit["feature_checksum"] == feature["feature_checksum"]
     assert state["book_features"] == feature
