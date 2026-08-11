@@ -22,6 +22,9 @@ from .liquidity_zones_walls_and_voids_engine_validation import (
     validate_sequence_ids,
 )
 from .liquidity_zones_walls_and_voids_engine_validation import (
+    bps_distance as _bps_distance,
+)
+from .liquidity_zones_walls_and_voids_engine_validation import (
     require_integer as _require_integer,
 )
 from .liquidity_zones_walls_and_voids_engine_validation import (
@@ -171,12 +174,10 @@ def age_us(available_at: str, decision_time: str) -> int:
 
 
 def bps_distance(left: Decimal, right: Decimal, reference: Decimal) -> Decimal:
-    validate_positive(left, "left price")
-    validate_positive(right, "right price")
-    validate_positive(reference, "reference price")
-    with localcontext() as context:
-        context.prec = DECIMAL_PRECISION
-        return abs(left - right) / reference * Decimal("10000")
+    try:
+        return _bps_distance(left, right, reference)
+    except Lot42ValidationError as exc:
+        raise _translate(exc) from exc
 
 
 def bounded_recovery_fraction(replenished: Decimal, depleted: Decimal) -> Decimal:
@@ -222,6 +223,52 @@ def validate_nullable_positive_decimal(value: Decimal | None, field: str) -> Non
     validate_positive(value, field)
 
 
+def _validate_quantity_replenishment(
+    *,
+    has_sequence: bool,
+    replenished_quantity: Decimal,
+    recovered_fraction: Decimal,
+    mid_shift_bps: Decimal,
+    max_window_status: str,
+) -> None:
+    if not has_sequence or replenished_quantity <= 0 or recovered_fraction <= 0:
+        raise Lot43ValidationError("quantity replenishment evidence is incomplete")
+    if max_window_status != "REPLENISHED":
+        raise Lot43ValidationError("quantity replenishment requires REPLENISHED status")
+    if mid_shift_bps != 0:
+        raise Lot43ValidationError("quantity replenishment cannot carry mid-shift evidence")
+
+
+def _validate_mid_shift(
+    *,
+    has_sequence: bool,
+    replenished_quantity: Decimal,
+    recovered_fraction: Decimal,
+    mid_shift_bps: Decimal,
+    max_window_status: str,
+) -> None:
+    if not has_sequence or mid_shift_bps <= 0:
+        raise Lot43ValidationError("mid-shift evidence is incomplete")
+    if replenished_quantity != 0 or recovered_fraction != 0:
+        raise Lot43ValidationError("mid shift cannot fabricate quantity recovery")
+    if max_window_status != "MID_SHIFTED":
+        raise Lot43ValidationError("mid shift requires MID_SHIFTED status")
+
+
+def _validate_no_replenishment(
+    *,
+    has_sequence: bool,
+    replenished_quantity: Decimal,
+    recovered_fraction: Decimal,
+    mid_shift_bps: Decimal,
+    max_window_status: str,
+) -> None:
+    if has_sequence or replenished_quantity != 0 or recovered_fraction != 0 or mid_shift_bps != 0:
+        raise Lot43ValidationError("NONE replenishment must carry no recovery evidence")
+    if max_window_status not in {"EXPIRED_NO_REPLENISHMENT", "PENDING_WINDOW"}:
+        raise Lot43ValidationError("NONE replenishment has invalid window status")
+
+
 def validate_event_semantics(
     *,
     replenishment_kind: str,
@@ -240,28 +287,21 @@ def validate_event_semantics(
     validate_ratio(recovered_fraction, "recovered_fraction")
     validate_nonnegative(mid_shift_bps, "mid_shift_bps")
     has_sequence = replenishment_sequence_id is not None
-    has_time = replenishment_time_us is not None
-    if has_sequence != has_time:
+    if has_sequence != (replenishment_time_us is not None):
         raise Lot43ValidationError("replenishment sequence/time presence must match")
+    evidence = {
+        "has_sequence": has_sequence,
+        "replenished_quantity": replenished_quantity,
+        "recovered_fraction": recovered_fraction,
+        "mid_shift_bps": mid_shift_bps,
+        "max_window_status": max_window_status,
+    }
     if replenishment_kind in {"SAME_PRICE", "ADJACENT_PRICE"}:
-        if not has_sequence or replenished_quantity <= 0 or recovered_fraction <= 0:
-            raise Lot43ValidationError("quantity replenishment evidence is incomplete")
-        if max_window_status != "REPLENISHED":
-            raise Lot43ValidationError("quantity replenishment requires REPLENISHED status")
-        if mid_shift_bps != 0:
-            raise Lot43ValidationError("quantity replenishment cannot carry mid-shift evidence")
+        _validate_quantity_replenishment(**evidence)
     elif replenishment_kind == "MID_SHIFT":
-        if not has_sequence or mid_shift_bps <= 0:
-            raise Lot43ValidationError("mid-shift evidence is incomplete")
-        if replenished_quantity != 0 or recovered_fraction != 0:
-            raise Lot43ValidationError("mid shift cannot fabricate quantity recovery")
-        if max_window_status != "MID_SHIFTED":
-            raise Lot43ValidationError("mid shift requires MID_SHIFTED status")
+        _validate_mid_shift(**evidence)
     else:
-        if has_sequence or replenished_quantity != 0 or recovered_fraction != 0 or mid_shift_bps != 0:
-            raise Lot43ValidationError("NONE replenishment must carry no recovery evidence")
-        if max_window_status not in {"EXPIRED_NO_REPLENISHMENT", "PENDING_WINDOW"}:
-            raise Lot43ValidationError("NONE replenishment has invalid window status")
+        _validate_no_replenishment(**evidence)
 
 
 def validate_slice_counts(
