@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/contracts/book_resilience_replenishment_engine_state_v1.schema.json",
+  "title": "BookResilienceReplenishmentEngineStateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "validation_state",
+    "run_context",
+    "lineage",
+    "event_time",
+    "receive_time",
+    "decision_time",
+    "generated_at",
+    "book_resilience",
+    "metrics",
+    "reason_codes",
+    "safety",
+    "output_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "book-resilience-replenishment-engine-state-v1"},
+    "validation_state": {"const": "VALIDATED_OFFLINE_BOOK_RESILIENCE_REPLENISHMENT_ONLY"},
+    "run_context": {"$ref": "#/$defs/runContext"},
+    "lineage": {"$ref": "#/$defs/lineage"},
+    "event_time": {"type": "string", "minLength": 1},
+    "receive_time": {"type": "string", "minLength": 1},
+    "decision_time": {"type": "string", "minLength": 1},
+    "generated_at": {"type": "string", "minLength": 1},
+    "book_resilience": {"$ref": "book_resilience_state_v1.schema.json"},
+    "metrics": {"$ref": "#/$defs/metrics"},
+    "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "safety": {"$ref": "#/$defs/safety"},
+    "output_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "runContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "run_id", "runtime_mode", "config_version", "code_commit", "correlation_id"],
+      "properties": {
+        "schema_version": {"const": "lot43-run-context-v1"},
+        "run_id": {"type": "string", "minLength": 1},
+        "runtime_mode": {"const": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY"},
+        "config_version": {"const": "lot43-book-resilience-replenishment-config-v1"},
+        "code_commit": {"type": "string", "minLength": 7},
+        "correlation_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "lineage_id",
+        "entry_gate_checksum",
+        "lot42_state_checksum",
+        "lot42_audit_checksum",
+        "lot42_zone_set_checksum",
+        "lot39_book_checksum",
+        "lot39_delta_fixture_checksum",
+        "lot38_snapshot_checksum",
+        "config_checksum",
+        "available_at"
+      ],
+      "properties": {
+        "schema_version": {"const": "lot43-lineage-envelope-v1"},
+        "lineage_id": {"type": "string", "minLength": 1},
+        "entry_gate_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lot42_state_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lot42_audit_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lot42_zone_set_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lot39_book_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lot39_delta_fixture_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lot38_snapshot_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "config_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "available_at": {"type": "string", "minLength": 1}
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "lot_43_records_processed_total",
+        "lot_43_observations_total",
+        "lot_43_depletion_events_total",
+        "lot_43_same_price_replenishments_total",
+        "lot_43_adjacent_price_replenishments_total",
+        "lot_43_mid_shift_events_total",
+        "lot_43_expired_max_window_events_total",
+        "lot_43_pending_max_window_events_total",
+        "lot_43_validation_failures_total",
+        "lot_43_processing_latency_us",
+        "latency_measurement_status"
+      ],
+      "properties": {
+        "schema_version": {"const": "lot43-metrics-v1"},
+        "lot_43_records_processed_total": {"const": 1},
+        "lot_43_observations_total": {"type": "integer", "minimum": 1},
+        "lot_43_depletion_events_total": {"type": "integer", "minimum": 0},
+        "lot_43_same_price_replenishments_total": {"type": "integer", "minimum": 0},
+        "lot_43_adjacent_price_replenishments_total": {"type": "integer", "minimum": 0},
+        "lot_43_mid_shift_events_total": {"type": "integer", "minimum": 0},
+        "lot_43_expired_max_window_events_total": {"type": "integer", "minimum": 0},
+        "lot_43_pending_max_window_events_total": {"type": "integer", "minimum": 0},
+        "lot_43_validation_failures_total": {"const": 0},
+        "lot_43_processing_latency_us": {"type": "null"},
+        "latency_measurement_status": {"const": "NOT_MEASURED_OFFLINE_DETERMINISTIC_REPLAY"}
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "analysis_only",
+        "approved_size",
+        "execution_allowed",
+        "external_connectivity_allowed",
+        "market_event_publication_allowed",
+        "network_ingestion_allowed",
+        "order_routing_allowed",
+        "participant_behavior_inference_explicitly_labeled",
+        "raw_data_mutation_allowed",
+        "real_credentials_allowed",
+        "risk_approval_allowed",
+        "scenario_score_is_signal",
+        "signal_generation_allowed",
+        "trade_allowed",
+        "used_for_decision"
+      ],
+      "properties": {
+        "analysis_only": {"const": true},
+        "approved_size": {"const": 0},
+        "execution_allowed": {"const": false},
+        "external_connectivity_allowed": {"const": false},
+        "market_event_publication_allowed": {"const": false},
+        "network_ingestion_allowed": {"const": false},
+        "order_routing_allowed": {"const": false},
+        "participant_behavior_inference_explicitly_labeled": {"const": true},
+        "raw_data_mutation_allowed": {"const": false},
+        "real_credentials_allowed": {"const": false},
+        "risk_approval_allowed": {"const": false},
+        "scenario_score_is_signal": {"const": false},
+        "signal_generation_allowed": {"const": false},
+        "trade_allowed": {"const": false},
+        "used_for_decision": {"const": false}
+      }
+    }
+  }
+}
