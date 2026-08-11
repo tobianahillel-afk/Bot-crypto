@@ -1,0 +1,111 @@
+{
+  "book_quality": {
+    "book_health_score": "100",
+    "consequence": "NONE",
+    "health_status": "HEALTHY",
+    "integrity_checksum": "35b9941782811766762eea067fea53f7c026fbe9ea8699f911c34d648b409d2a",
+    "schema_version": "lot41-book-quality-binding-v1",
+    "sequence_id": 1003,
+    "veto_checksum": "000613129dbce4bfa189f66a9927c442a557556870381de92aa2b8da8a7951fc"
+  },
+  "cumulative_depth": {
+    "asks": [
+      {
+        "cumulative_quantity": "0.65",
+        "distance_bps": "0.01999000499750124937531234383",
+        "price": "50025.1",
+        "quantity": "0.65"
+      },
+      {
+        "cumulative_quantity": "1.75",
+        "distance_bps": "0.03998000999500249875062468766",
+        "price": "50025.2",
+        "quantity": "1.1"
+      },
+      {
+        "cumulative_quantity": "2.15",
+        "distance_bps": "0.05997001499250374812593703148",
+        "price": "50025.3",
+        "quantity": "0.4"
+      }
+    ],
+    "bids": [
+      {
+        "cumulative_quantity": "0.9",
+        "distance_bps": "0.01999000499750124937531234383",
+        "price": "50024.9",
+        "quantity": "0.9"
+      },
+      {
+        "cumulative_quantity": "1.4",
+        "distance_bps": "0.05997001499250374812593703148",
+        "price": "50024.7",
+        "quantity": "0.5"
+      }
+    ]
+  },
+  "decision_time": "2026-08-06T19:18:40.100000Z",
+  "depth_bands": [
+    {
+      "ask_levels_observed": 1,
+      "ask_quantity": "0.65",
+      "band_bps": "0.025",
+      "bid_levels_observed": 1,
+      "bid_quantity": "0.9",
+      "coverage_status": "OBSERVED_LEVELS_ONLY",
+      "imbalance": "0.1612903225806451612903225806",
+      "imbalance_status": "DEFINED",
+      "schema_version": "lot41-depth-band-v1"
+    },
+    {
+      "ask_levels_observed": 2,
+      "ask_quantity": "1.75",
+      "band_bps": "0.05",
+      "bid_levels_observed": 1,
+      "bid_quantity": "0.9",
+      "coverage_status": "OBSERVED_LEVELS_ONLY",
+      "imbalance": "-0.3207547169811320754716981132",
+      "imbalance_status": "DEFINED",
+      "schema_version": "lot41-depth-band-v1"
+    },
+    {
+      "ask_levels_observed": 3,
+      "ask_quantity": "2.15",
+      "band_bps": "0.1",
+      "bid_levels_observed": 2,
+      "bid_quantity": "1.4",
+      "coverage_status": "OBSERVED_LEVELS_ONLY",
+      "imbalance": "-0.2112676056338028169014084507",
+      "imbalance_status": "DEFINED",
+      "schema_version": "lot41-depth-band-v1"
+    }
+  ],
+  "event_time": "2026-08-06T19:18:40.065000Z",
+  "extrapolated": false,
+  "feature_checksum": "77a6f6b92cae8094292bb8a8b553c57a52e4c73d376251c9e55e8221d2376ab5",
+  "horizon": "BOOK_SNAPSHOT",
+  "instrument_id": "BTC-EUR-SPOT",
+  "market_type": "SPOT",
+  "microprice": "50025.01612903225806451612903",
+  "mid_price": "50025",
+  "observed_depth_only": true,
+  "reason_codes": [
+    "LOT41_SPREAD_DEPTH_IMBALANCE_COMPUTED",
+    "LOT41_OBSERVED_DEPTH_ONLY",
+    "LOT42_REMAINS_LOCKED"
+  ],
+  "receive_time": "2026-08-06T19:18:40.070000Z",
+  "schema_version": "book-feature-state-v1",
+  "sequence_id": 1003,
+  "source_id": "kraken-reference-offline-fixture",
+  "spread_absolute": "0.2",
+  "spread_bps": "0.03998000999500249875062468766",
+  "top_of_book": {
+    "best_ask_price": "50025.1",
+    "best_ask_quantity": "0.65",
+    "best_bid_price": "50024.9",
+    "best_bid_quantity": "0.9",
+    "schema_version": "lot41-top-of-book-v1"
+  },
+  "venue": "KRAKEN"
+}
