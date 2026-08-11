@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from typing import Any
 
 from .book_integrity_desynchronization_detector_validation import (
@@ -14,13 +14,8 @@ from .book_integrity_desynchronization_detector_validation import (
     validate_reason_codes,
     validate_run_context,
 )
-from .spread_depth_and_imbalance_engine_validation import (
-    Lot41ValidationError,
-    lot41_safety,
-    parse_book_levels,
-)
+from .spread_depth_and_imbalance_engine_validation import Lot41ValidationError, lot41_safety
 
-Lot42ValidationError = Lot41ValidationError
 RUNTIME_MODE = "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY"
 VALIDATION_STATE = "VALIDATED_OFFLINE_LIQUIDITY_ZONES_WALLS_VOIDS_ONLY"
 DISPLAYED_WALL = "DISPLAYED_WALL"
@@ -34,6 +29,11 @@ PARTICIPANT_INTENT = "NOT_INFERRED"
 SIDES = frozenset({"BID", "ASK"})
 ZONE_CLASSIFICATIONS = frozenset({DISPLAYED_WALL, PERSISTENT_ZONE})
 CONFIDENCE_STATUSES = frozenset({HIGH_CONFIDENCE, LOW_CONFIDENCE, NOT_APPLICABLE})
+DECIMAL_PRECISION = 50
+
+
+class Lot42ValidationError(Lot41ValidationError):
+    """Raised when a Lot 42 contract, invariant or safety boundary is invalid."""
 
 
 def lot42_safety() -> dict[str, object]:
@@ -103,14 +103,17 @@ def age_us(available_at: str, decision_time: str) -> int:
     decision = parse_utc_timestamp(decision_time, "decision_time")
     if available > decision:
         raise Lot42ValidationError("available_at cannot exceed decision_time")
-    return int((decision - available).total_seconds() * 1_000_000)
+    delta = decision - available
+    return ((delta.days * 86_400 + delta.seconds) * 1_000_000) + delta.microseconds
 
 
 def bps_distance(left: Decimal, right: Decimal, reference: Decimal) -> Decimal:
     validate_positive(left, "left price")
     validate_positive(right, "right price")
     validate_positive(reference, "reference price")
-    return abs(left - right) / reference * Decimal("10000")
+    with localcontext() as context:
+        context.prec = DECIMAL_PRECISION
+        return abs(left - right) / reference * Decimal("10000")
 
 
 def validate_identity_fields(values: tuple[tuple[str, str], ...]) -> None:
@@ -149,7 +152,6 @@ __all__ = [
     "decimal_text",
     "lot42_safety",
     "nonnegative_decimal_text",
-    "parse_book_levels",
     "positive_decimal_text",
     "require_integer",
     "require_sha256",
