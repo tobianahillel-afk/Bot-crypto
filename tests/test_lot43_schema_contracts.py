@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 RESILIENCE_SCHEMA = ROOT / "contracts/schemas/book_resilience_state_v1.schema.json"
@@ -13,6 +15,12 @@ def _load(path: Path) -> dict[str, object]:
     value = json.loads(path.read_text(encoding="utf-8"))
     assert isinstance(value, dict)
     return value
+
+
+def _string_pattern(contract: dict[str, Any]) -> str:
+    options = contract["anyOf"]
+    assert {item["type"] for item in options} == {"string", "null"}
+    return next(item["pattern"] for item in options if item["type"] == "string")
 
 
 def test_lot43_all_output_schemas_are_closed() -> None:
@@ -87,6 +95,25 @@ def test_lot43_replenishment_and_resilience_enums_are_closed() -> None:
         "PENDING",
         "PARTIAL",
     }
+
+
+def test_lot43_nullable_mean_decimal_strings_match_runtime_bounds() -> None:
+    schema = _load(RESILIENCE_SCHEMA)
+    definitions = schema["$defs"]
+    resilience_slice = definitions["resilienceSlice"]
+    properties = resilience_slice["properties"]
+    recovery_pattern = _string_pattern(properties["mean_recovered_fraction"])
+    time_pattern = _string_pattern(properties["mean_replenishment_time_us"])
+
+    for value in ("0", "0.33333333333333333333333333333333333333333333333333", "1"):
+        assert re.fullmatch(recovery_pattern, value)
+    for value in ("-0.1", "1.0001", "NaN", "Infinity", "invalid"):
+        assert re.fullmatch(recovery_pattern, value) is None
+
+    for value in ("0.0001", "1", "10000", "10000.5"):
+        assert re.fullmatch(time_pattern, value)
+    for value in ("0", "0.0", "-1", "NaN", "Infinity", "invalid"):
+        assert re.fullmatch(time_pattern, value) is None
 
 
 def test_lot43_audit_schema_links_only_frozen_contracts() -> None:
