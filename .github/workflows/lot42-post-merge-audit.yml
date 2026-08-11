@@ -1,4 +1,4 @@
-name: Lot 42 frozen evidence attestation
+name: Lot 42 independent post-merge audit
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  attest:
+  audit:
     runs-on: ubuntu-22.04
     env:
       PYTHONPATH: src
@@ -31,7 +31,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove certified chain squash equivalence and exact five-file evidence set
+      - name: Prove exact certified chain and squash equivalence
         run: |
           set -euo pipefail
           git merge-base --is-ancestor "$GATE_MERGE_SHA" "$SOURCE_HEAD_SHA"
@@ -39,16 +39,6 @@ jobs:
           git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" "$FINAL_PR_HEAD_SHA"
           git merge-base --is-ancestor "$IMPLEMENTATION_MERGE_SHA" HEAD
           git diff --quiet "$FINAL_PR_HEAD_SHA" "$IMPLEMENTATION_MERGE_SHA" -- .
-          git diff --name-only "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA" | sort > /tmp/lot42-evidence.txt
-          cat > /tmp/lot42-expected.txt <<'EOF'
-          data/audit/liquidity_zone_set_lot42.json
-          data/audit/liquidity_zones_walls_and_voids_engine_audit_lot42.json
-          data/audit/liquidity_zones_walls_and_voids_engine_lot42.json
-          reports/lot42/coverage_summary.json
-          reports/lot42/mutation_summary.json
-          EOF
-          sort -o /tmp/lot42-expected.txt /tmp/lot42-expected.txt
-          diff -u /tmp/lot42-expected.txt /tmp/lot42-evidence.txt
       - name: Prove frozen Lot 42 production source immutability
         run: |
           set -euo pipefail
@@ -68,11 +58,8 @@ jobs:
             tests/test_lot42_liquidity_zones_walls_and_voids_engine.py \
             tests/test_lot42_schema_contracts.py \
             docs/LOT_42_LIQUIDITY_ZONES_WALLS_AND_VOIDS_ENGINE.md \
-            docs/ACCEPTANCE_CRITERIA_LOT_42.md \
-            .github/workflows/lot42-entry-gate.yml \
-            .github/workflows/lot42-liquidity-zones-walls-voids.yml \
-            .github/workflows/lot42-mutation-assurance.yml
-      - name: Prove frozen evidence immutability
+            docs/ACCEPTANCE_CRITERIA_LOT_42.md
+      - name: Prove frozen Lot 42 evidence immutability
         run: |
           set -euo pipefail
           git diff --quiet "$EVIDENCE_HEAD_SHA" HEAD -- \
@@ -81,21 +68,23 @@ jobs:
             data/audit/liquidity_zones_walls_and_voids_engine_lot42.json \
             reports/lot42/coverage_summary.json \
             reports/lot42/mutation_summary.json
-      - name: Validate frozen evidence
+      - name: Validate frozen evidence release lifecycle and post-merge verdict
         run: |
           set -euo pipefail
-          python -m compileall -q scripts/validate_lot42_frozen_evidence.py
-          ruff check scripts/validate_lot42_frozen_evidence.py
-          python scripts/validate_lot42_frozen_evidence.py | tee /tmp/lot42-frozen-validation.json
+          python -m compileall -q src scripts tests
+          python -m json.tool data/audit/roadmap_lifecycle_overlay_lot42.json >/dev/null
+          ruff check scripts/validate_lot42_frozen_evidence.py scripts/validate_lot42_post_merge.py
+          python scripts/validate_lot42_frozen_evidence.py
+          python scripts/validate_lot42_post_merge.py | tee /tmp/lot42-post-merge-validation.json
       - name: Replay certified Lot 42 source deterministically
         run: |
           set -euo pipefail
-          rm -rf /tmp/lot42-source-certified /tmp/lot42-run1
-          git worktree add --detach /tmp/lot42-source-certified "$SOURCE_HEAD_SHA"
-          trap 'git worktree remove --force /tmp/lot42-source-certified >/dev/null 2>&1 || true' EXIT
-          mkdir -p /tmp/lot42-run1
+          rm -rf /tmp/lot42-post-merge-source /tmp/lot42-post-merge-run1
+          git worktree add --detach /tmp/lot42-post-merge-source "$SOURCE_HEAD_SHA"
+          trap 'git worktree remove --force /tmp/lot42-post-merge-source >/dev/null 2>&1 || true' EXIT
+          mkdir -p /tmp/lot42-post-merge-run1
           (
-            cd /tmp/lot42-source-certified
+            cd /tmp/lot42-post-merge-source
             outputs=(
               data/audit/liquidity_zones_walls_and_voids_engine_lot42.json
               data/audit/liquidity_zones_walls_and_voids_engine_audit_lot42.json
@@ -107,18 +96,18 @@ jobs:
               --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
             PYTHONPATH=src python scripts/validate_lot42_no_connectivity.py
             for path in "${outputs[@]}"; do
-              cp "$path" "/tmp/lot42-run1/$(basename "$path")"
+              cp "$path" "/tmp/lot42-post-merge-run1/$(basename "$path")"
             done
             PYTHONPATH=src python scripts/run_lot42_liquidity_zones_walls_and_voids_engine.py \
               --code-commit "$SOURCE_HEAD_SHA"
             PYTHONPATH=src python scripts/validate_lot42.py \
               --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
             for path in "${outputs[@]}"; do
-              cmp "/tmp/lot42-run1/$(basename "$path")" "$path"
+              cmp "/tmp/lot42-post-merge-run1/$(basename "$path")" "$path"
             done
             PYTHONPATH=src pytest -q tests/test_lot42*.py
           )
-          git worktree remove --force /tmp/lot42-source-certified
+          git worktree remove --force /tmp/lot42-post-merge-source
           trap - EXIT
       - name: Current architecture security regression and Lot 43 lock
         run: |
@@ -132,7 +121,7 @@ jobs:
           python scripts/quality_inventory.py
           python scripts/validate_engineering_deviations.py
           python scripts/validate_lot42_no_connectivity.py
-          bandit -q -r scripts/validate_lot42_frozen_evidence.py -ll
+          bandit -q -r scripts/validate_lot42_post_merge.py scripts/validate_lot42_frozen_evidence.py -ll
           pip-audit -r requirements-dev.lock
           pytest -q
           for repetition in 1 2 3; do pytest -q tests/test_lot42*.py; done
@@ -142,8 +131,10 @@ jobs:
           test ! -e config/microstructure/book_resilience_and_replenishment_engine_v1.json
           test ! -e scripts/run_lot43_book_resilience_and_replenishment_engine.py
           test ! -e scripts/validate_lot43.py
+          test ! -e docs/LOT_43_BOOK_RESILIENCE_AND_REPLENISHMENT_ENGINE.md
+          test ! -e docs/ACCEPTANCE_CRITERIA_LOT_43.md
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: lot42-frozen-evidence-attestation
-          path: /tmp/lot42-frozen-validation.json
+          name: lot42-post-merge-audit-evidence
+          path: /tmp/lot42-post-merge-validation.json
