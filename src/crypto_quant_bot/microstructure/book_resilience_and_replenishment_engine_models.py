@@ -189,24 +189,28 @@ class BookDepletionEventV1:
         }
 
 
-def _validate_slice_means(
+def _validate_recovered_fraction_mean(
     depletion_events_total: int,
-    recovered_events_total: int,
     mean_recovered_fraction: Decimal | None,
-    mean_replenishment_time_us: Decimal | None,
 ) -> None:
     if mean_recovered_fraction is not None:
         validate_ratio(mean_recovered_fraction, "mean_recovered_fraction")
+    if depletion_events_total == 0 and mean_recovered_fraction is not None:
+        raise Lot43ValidationError("empty slice cannot carry mean recovered fraction")
+    if depletion_events_total > 0 and mean_recovered_fraction is None:
+        raise Lot43ValidationError("non-empty slice requires mean recovered fraction")
+
+
+def _validate_replenishment_time_mean(
+    recovered_events_total: int,
+    mean_replenishment_time_us: Decimal | None,
+) -> None:
     if mean_replenishment_time_us is not None:
         validate_positive(mean_replenishment_time_us, "mean_replenishment_time_us")
     if recovered_events_total == 0 and mean_replenishment_time_us is not None:
         raise Lot43ValidationError("mean replenishment time requires recovered events")
     if recovered_events_total > 0 and mean_replenishment_time_us is None:
         raise Lot43ValidationError("recovered events require mean replenishment time")
-    if depletion_events_total == 0 and mean_recovered_fraction is not None:
-        raise Lot43ValidationError("empty slice cannot carry mean recovered fraction")
-    if depletion_events_total > 0 and mean_recovered_fraction is None:
-        raise Lot43ValidationError("non-empty slice requires mean recovered fraction")
 
 
 @dataclass(frozen=True, slots=True)
@@ -239,10 +243,12 @@ class BookResilienceSliceV1:
             self.expired_events_total,
             self.pending_events_total,
         )
-        _validate_slice_means(
+        _validate_recovered_fraction_mean(
             self.depletion_events_total,
-            self.recovered_events_total,
             self.mean_recovered_fraction,
+        )
+        _validate_replenishment_time_mean(
+            self.recovered_events_total,
             self.mean_replenishment_time_us,
         )
         validate_resilience_status(self.resilience_status)
