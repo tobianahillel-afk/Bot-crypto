@@ -34,6 +34,7 @@ jobs:
       - name: Prove certified chain squash equivalence and exact five-file evidence set
         run: |
           set -euo pipefail
+          git fetch --no-tags origin refs/pull/51/head:refs/remotes/origin/lot41-pr51-head
           git merge-base --is-ancestor "$GATE_MERGE_SHA" "$SOURCE_HEAD_SHA"
           git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA"
           git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" "$FINAL_PR_HEAD_SHA"
