@@ -1,0 +1,146 @@
+{
+  "decision_time": "2026-08-06T19:18:40.100000Z",
+  "event_time": "2026-08-06T19:18:40.065000Z",
+  "expired_candidates_total": 0,
+  "history_sequence_ids": [
+    1001,
+    1002,
+    1003
+  ],
+  "instrument_id": "BTC-EUR-SPOT",
+  "market_type": "SPOT",
+  "mid_price": "50025",
+  "observed_book_only": true,
+  "participant_intent_inferred": false,
+  "reason_codes": [
+    "LOT42_LIQUIDITY_STRUCTURE_COMPUTED",
+    "LOT42_OBSERVED_HISTORY_ONLY",
+    "LOT42_PARTICIPANT_INTENT_NOT_INFERRED",
+    "LOT43_REMAINS_LOCKED"
+  ],
+  "receive_time": "2026-08-06T19:18:40.070000Z",
+  "schema_version": "liquidity-zone-set-v1",
+  "sequence_id": 1003,
+  "source_id": "kraken-reference-offline-fixture",
+  "venue": "KRAKEN",
+  "voids": [
+    {
+      "classification": "LIQUIDITY_VOID",
+      "distance_to_mid_bps": "0.03998000999500249875062468766",
+      "far_price": "50024.7",
+      "gap_bps": "0.03998000999500249875062468766",
+      "lifecycle_status": "ACTIVE",
+      "near_price": "50024.9",
+      "participant_intent": "NOT_INFERRED",
+      "reason_codes": [
+        "LOT42_LIQUIDITY_VOID_OBSERVED",
+        "LOT42_PARTICIPANT_INTENT_NOT_INFERRED"
+      ],
+      "schema_version": "liquidity-void-v1",
+      "side": "BID",
+      "void_checksum": "7d01d9e7eac0196dc237d5ab2231c9cb798b507554c8a11f4624292fd8e65d98",
+      "void_id": "lot42-1003-bid-void-50024.9-50024.7"
+    }
+  ],
+  "zone_set_checksum": "f5769313ec5f9f6de503b1eb9a40c31262ddf0eba6131f791c070f6557168c89",
+  "zones": [
+    {
+      "anchor_price": "50024.9",
+      "cancellation_rate": "0.3301886792452830188679245283",
+      "cancelled_quantity": "1.75",
+      "classifications": [
+        "DISPLAYED_WALL",
+        "PERSISTENT_ZONE"
+      ],
+      "confidence_status": "HIGH_CONFIDENCE",
+      "distance_to_mid_bps": "0.01999000499750124937531234383",
+      "level_count": 1,
+      "lifecycle_status": "ACTIVE",
+      "lower_price": "50024.9",
+      "notional": "45022.41",
+      "participant_intent": "NOT_INFERRED",
+      "persistence_observations": 3,
+      "persistence_ratio": "1",
+      "quantity": "0.9",
+      "reason_codes": [
+        "LOT42_OBSERVED_LEVEL_CLUSTER",
+        "LOT42_PARTICIPANT_INTENT_NOT_INFERRED",
+        "LOT42_DISPLAYED_WALL",
+        "LOT42_PERSISTENCE_CONFIRMED"
+      ],
+      "replenished_quantity": "0.6",
+      "replenishment_ratio": "0.1132075471698113207547169811",
+      "schema_version": "liquidity-zone-v1",
+      "side": "BID",
+      "total_observations": 3,
+      "upper_price": "50024.9",
+      "zone_checksum": "546877232ea16f6e780423bc917c679244038b9ec7c4f96cd1d3a1af896a63db",
+      "zone_id": "lot42-1003-bid-50024.9-50024.9"
+    },
+    {
+      "anchor_price": "50024.7",
+      "cancellation_rate": "0",
+      "cancelled_quantity": "0",
+      "classifications": [
+        "DISPLAYED_WALL"
+      ],
+      "confidence_status": "LOW_CONFIDENCE",
+      "distance_to_mid_bps": "0.05997001499250374812593703148",
+      "level_count": 1,
+      "lifecycle_status": "ACTIVE",
+      "lower_price": "50024.7",
+      "notional": "25012.35",
+      "participant_intent": "NOT_INFERRED",
+      "persistence_observations": 1,
+      "persistence_ratio": "0.3333333333333333333333333333",
+      "quantity": "0.5",
+      "reason_codes": [
+        "LOT42_OBSERVED_LEVEL_CLUSTER",
+        "LOT42_PARTICIPANT_INTENT_NOT_INFERRED",
+        "LOT42_DISPLAYED_WALL",
+        "LOT42_WALL_LOW_CONFIDENCE"
+      ],
+      "replenished_quantity": "0.5",
+      "replenishment_ratio": "1",
+      "schema_version": "liquidity-zone-v1",
+      "side": "BID",
+      "total_observations": 3,
+      "upper_price": "50024.7",
+      "zone_checksum": "fe8ed9f9732d506906278a98b1a559703f7236e4a425e9a003bc739d4ad97b93",
+      "zone_id": "lot42-1003-bid-50024.7-50024.7"
+    },
+    {
+      "anchor_price": "50025.18837209302325581395349",
+      "cancellation_rate": "0.01265822784810126582278481013",
+      "cancelled_quantity": "0.05",
+      "classifications": [
+        "DISPLAYED_WALL",
+        "PERSISTENT_ZONE"
+      ],
+      "confidence_status": "HIGH_CONFIDENCE",
+      "distance_to_mid_bps": "0.03765559080924653952093720582",
+      "level_count": 3,
+      "lifecycle_status": "ACTIVE",
+      "lower_price": "50025.1",
+      "notional": "107554.155",
+      "participant_intent": "NOT_INFERRED",
+      "persistence_observations": 3,
+      "persistence_ratio": "1",
+      "quantity": "2.15",
+      "reason_codes": [
+        "LOT42_OBSERVED_LEVEL_CLUSTER",
+        "LOT42_PARTICIPANT_INTENT_NOT_INFERRED",
+        "LOT42_DISPLAYED_WALL",
+        "LOT42_PERSISTENCE_CONFIRMED"
+      ],
+      "replenished_quantity": "0.4",
+      "replenishment_ratio": "0.101265822784810126582278481",
+      "schema_version": "liquidity-zone-v1",
+      "side": "ASK",
+      "total_observations": 3,
+      "upper_price": "50025.3",
+      "zone_checksum": "72d5678dfd5ce58ea214a98292c979c2b58f78088b94304dbba36f9574f76ffd",
+      "zone_id": "lot42-1003-ask-50025.1-50025.3"
+    }
+  ]
+}
