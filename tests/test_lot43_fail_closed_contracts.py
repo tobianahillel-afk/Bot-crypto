@@ -225,7 +225,7 @@ def test_slice_rejects_invalid_mean_semantics() -> None:
     )
     with pytest.raises(Lot43ValidationError, match="requires recovered"):
         replace(base, mean_replenishment_time_us=Decimal("10"))
-    with pytest.raises(Lot43ValidationError, match="requires mean"):
+    with pytest.raises(Lot43ValidationError, match="require mean"):
         replace(
             base,
             recovered_events_total=1,
