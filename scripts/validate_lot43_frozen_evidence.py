@@ -15,15 +15,15 @@ from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_re
     load_json_object,
 )
 
-SOURCE_HEAD = "39a4ad7996d6b301ca18ee90a2f294cdb837e7a6"
-EVIDENCE_HEAD = "42d7283a6d2c05e8ccf4b669219f98dd6ed8548d"
+SOURCE_HEAD = "fe13635f3cacc8361045e0d82dcc7c15aebe6ce5"
+EVIDENCE_HEAD = "c9007a1147da9b653e23f71e715c847630ecb067"
 GATE_MERGE = "ed8845e0e56151348fe57c0e9bceaf4646ea49aa"
-VALIDATION_RUN = 31538162104
-VALIDATION_ARTIFACT = 9119678913
-VALIDATION_DIGEST = "sha256:2956197628423aa70c51f7eae0a281df8a433a5d80d88cb013b2c5f8845c57de"
-MUTATION_RUN = 31538162178
-MUTATION_ARTIFACT = 9119744801
-MUTATION_DIGEST = "sha256:8439d9759cb09c870a86a97b3d3ab6e2bc9b9091776903fd7604abcfca80c000"
+VALIDATION_RUN = 31543747379
+VALIDATION_ARTIFACT = 9121721155
+VALIDATION_DIGEST = "sha256:69092546fe8066e7ec276128d69cb6f0a102f9b87012a971c6a5209a46f28efe"
+MUTATION_RUN = 31543747382
+MUTATION_ARTIFACT = 9121791492
+MUTATION_DIGEST = "sha256:1fe808bd8029740d18392320c9584c80316cbdca93493b609681c414bbf89fe9"
 
 STATE_PATH = ROOT / "data/audit/book_resilience_and_replenishment_engine_lot43.json"
 AUDIT_PATH = ROOT / "data/audit/book_resilience_and_replenishment_engine_audit_lot43.json"
@@ -31,8 +31,8 @@ RESILIENCE_PATH = ROOT / "data/audit/book_resilience_state_lot43.json"
 COVERAGE_PATH = ROOT / "reports/lot43/coverage_summary.json"
 MUTATION_PATH = ROOT / "reports/lot43/mutation_summary.json"
 
-EXPECTED_STATE = "781b7e5a4eb44e5c04726a9a4cc039cf48dcf4c93a54c3230b904914dde505b5"
-EXPECTED_AUDIT = "91798c37e7ca1f018a97781165a15de6992cc09e48fc5da8f3eccfc7306cc426"
+EXPECTED_STATE = "eec52f97cd6f89fdfadaefd0f208d1919dd33df382a6182f1539456ea8b23b39"
+EXPECTED_AUDIT = "27c893f4160a4eab366314c06dc61fd3ba2b2d7f786eac725a01d0e59c730e95"
 EXPECTED_RESILIENCE = "ff314e1eecd40bca822b471f0239fdb8abb294375a8964a738131b71cba4b36e"
 EXPECTED_GATE = "4034c86061234a627dafde6122439c3b697fb2d53a1b95ba4e58f77a71089e6d"
 EXPECTED_CONFIG = "a170aab2e8f71dd6f6420a308edd7aa22f6200a25f39ac1eacefb7ac1aa431a1"
@@ -45,11 +45,11 @@ EXPECTED_LOT38_SNAPSHOT = "0d63ca7ac1ca48b44e58c0b0f1eb8946190eaf2da6745c2bbd2dd
 VALIDATION_STATE = "VALIDATED_OFFLINE_BOOK_RESILIENCE_REPLENISHMENT_ONLY"
 
 EXPECTED_FILE_SHA256 = {
-    STATE_PATH: "2e57f0afbd15792925bcc985eb7a5b5453d85419b959dbe5a2fcfca31fd9b21f",
-    AUDIT_PATH: "6d1dc125885234420ee007c53b7ba7b6b702f945eb6afc403c53eb60f0fed1ec",
+    STATE_PATH: "765424c4be1392dd3bf3b3437ebe150b32c50c0df5de56e2e6a9c8ef11a09faf",
+    AUDIT_PATH: "4a4a24314eb498acd6595052d6bb189442bc59a99759bcbd7fe4da008956441a",
     RESILIENCE_PATH: "b0dc74447c54ee84bb3da36a78cf3f48edb4ed54352c6837bed3823a2c898240",
-    COVERAGE_PATH: "b0e148fae8a97b9830c5e0b8799609214a942283742733903b3333fa5aed5a8f",
-    MUTATION_PATH: "3dc8ad1706ab4a9bcbabc24bc42baa260b4e5c77e82d80fda996ef7561c30254",
+    COVERAGE_PATH: "555e41417712e6640a31b71406b916e253929a5b1b4ffb4ed0f7966741ad4c2b",
+    MUTATION_PATH: "494041b82f5a785f5583148504de6a4b579d2ea45765ab98a79eab20b1eee407",
 }
 
 LOT44_FORBIDDEN = (
@@ -111,7 +111,7 @@ def _expected_safety() -> dict[str, object]:
     }
 
 
-def _validate_lineage(state: dict[str, Any], audit: dict[str, Any]) -> None:
+def _verify_lineage(state: dict[str, Any], audit: dict[str, Any]) -> None:
     expected = {
         "entry_gate_checksum": EXPECTED_GATE,
         "config_checksum": EXPECTED_CONFIG,
@@ -128,13 +128,16 @@ def _validate_lineage(state: dict[str, Any], audit: dict[str, Any]) -> None:
     require(state["lineage"] == audit["lineage"], "Lot 43 state/audit lineage diverged")
 
 
-def _validate_reference(resilience: dict[str, Any], state: dict[str, Any]) -> None:
+def _verify_reference_header(resilience: dict[str, Any]) -> None:
     require(resilience["sequence_id"] == 1003, "reference sequence changed")
     require(resilience["history_sequence_ids"] == [1001, 1002, 1003], "reference history changed")
     require(resilience["observed_book_only"] is True, "observed-book-only changed")
     require(resilience["participant_intent_inferred"] is False, "participant intent inference enabled")
     require(resilience["volatility_measure_bps"] == "0", "reference volatility changed")
     require(resilience["volatility_regime"] == "QUIET", "reference volatility regime changed")
+
+
+def _verify_reference_event(resilience: dict[str, Any]) -> None:
     events = resilience["depletion_events"]
     require(len(events) == 1, "reference depletion event count changed")
     event = events[0]
@@ -143,24 +146,21 @@ def _validate_reference(resilience: dict[str, Any], state: dict[str, Any]) -> No
     require(event["previous_quantity"] == "1.25", "reference previous quantity changed")
     require(event["post_depletion_quantity"] == "0", "reference post quantity changed")
     require(event["replenishment_kind"] == "NONE", "reference replenishment kind changed")
-    require(
-        event["max_window_status"] == "EXPIRED_NO_REPLENISHMENT",
-        "reference window status changed",
-    )
+    require(event["max_window_status"] == "EXPIRED_NO_REPLENISHMENT", "reference window status changed")
     require(event["participant_intent"] == "NOT_INFERRED", "reference participant intent changed")
+
+
+def _verify_reference_slices(resilience: dict[str, Any]) -> None:
     slices = resilience["resilience_slices"]
     bid = [item for item in slices if item["side"] == "BID"]
     ask = [item for item in slices if item["side"] == "ASK"]
     require([item["horizon_us"] for item in bid] == [10000, 25000], "BID horizons changed")
-    require(
-        [item["resilience_status"] for item in bid] == ["FRAGILE", "FRAGILE"],
-        "BID resilience changed",
-    )
+    require([item["resilience_status"] for item in bid] == ["FRAGILE", "FRAGILE"], "BID resilience changed")
     require([item["horizon_us"] for item in ask] == [10000, 25000], "ASK horizons changed")
-    require(
-        [item["resilience_status"] for item in ask] == ["NO_EVENTS", "NO_EVENTS"],
-        "ASK resilience changed",
-    )
+    require([item["resilience_status"] for item in ask] == ["NO_EVENTS", "NO_EVENTS"], "ASK resilience changed")
+
+
+def _verify_reference_metrics(state: dict[str, Any]) -> None:
     metrics = state["metrics"]
     require(metrics["lot_43_observations_total"] == 3, "observation count changed")
     require(metrics["lot_43_depletion_events_total"] == 1, "depletion metric changed")
@@ -170,7 +170,14 @@ def _validate_reference(resilience: dict[str, Any], state: dict[str, Any]) -> No
     require(metrics["lot_43_mid_shift_events_total"] == 0, "mid-shift metric changed")
 
 
-def _validate_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+def _verify_reference(resilience: dict[str, Any], state: dict[str, Any]) -> None:
+    _verify_reference_header(resilience)
+    _verify_reference_event(resilience)
+    _verify_reference_slices(resilience)
+    _verify_reference_metrics(state)
+
+
+def _verify_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     _verify_files()
     state = load_json_object(STATE_PATH)
     audit = load_json_object(AUDIT_PATH)
@@ -186,14 +193,12 @@ def _validate_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any
     require(audit["run_context"]["code_commit"] == SOURCE_HEAD, "audit source head changed")
     require(state["safety"] == _expected_safety(), "state safety boundary changed")
     require(audit["safety"] == _expected_safety(), "audit safety boundary changed")
-    _validate_lineage(state, audit)
-    _validate_reference(resilience, state)
+    _verify_lineage(state, audit)
+    _verify_reference(resilience, state)
     return state, audit, resilience
 
 
-def _validate_quality() -> tuple[dict[str, Any], dict[str, Any]]:
-    coverage = load_json_object(COVERAGE_PATH)
-    mutation = load_json_object(MUTATION_PATH)
+def _verify_coverage(coverage: dict[str, Any]) -> None:
     require(coverage["status"] == "PASS", "coverage evidence not PASS")
     require(coverage["source_head_sha"] == SOURCE_HEAD, "coverage source head changed")
     require(coverage["line_coverage_percent"] == 98.82, "line coverage changed")
@@ -201,12 +206,15 @@ def _validate_quality() -> tuple[dict[str, Any], dict[str, Any]]:
     require(coverage["line_coverage_percent"] >= 95.0, "line coverage below threshold")
     require(coverage["branch_coverage_percent"] >= 90.0, "branch coverage below threshold")
     require(coverage["anti_flake_repetitions"] == 3, "anti-flake evidence changed")
+
+
+def _verify_mutation(mutation: dict[str, Any]) -> None:
     require(mutation["status"] == "PASS", "mutation evidence not PASS")
     require(mutation["source_head_sha"] == SOURCE_HEAD, "mutation source head changed")
-    require(mutation["mutation_score_percent"] == 81.79, "mutation score changed")
+    require(mutation["mutation_score_percent"] == 81.83, "mutation score changed")
     require(mutation["mutation_score_percent"] >= 80.0, "mutation below threshold")
-    require(mutation["killed_mutants"] == 2075, "mutation killed count changed")
-    require(mutation["survived_mutants"] == 462, "mutation survivor count changed")
+    require(mutation["killed_mutants"] == 2076, "mutation killed count changed")
+    require(mutation["survived_mutants"] == 461, "mutation survivor count changed")
     require(mutation["evaluated_mutants"] == 2537, "mutation evaluated count changed")
     require(mutation["completed_mutants"] == 2537, "mutation completed count changed")
     require(mutation["total_mutants"] == 2537, "mutation total changed")
@@ -216,18 +224,25 @@ def _validate_quality() -> tuple[dict[str, Any], dict[str, Any]]:
     require(mutation["python_hash_seed"] == "0", "mutation hash seed changed")
     require(mutation["mutmut_run_exit_code"] == 0, "mutmut run failed")
     require(mutation["mutmut_results_exit_code"] == 0, "mutmut results failed")
+
+
+def _verify_quality() -> tuple[dict[str, Any], dict[str, Any]]:
+    coverage = load_json_object(COVERAGE_PATH)
+    mutation = load_json_object(MUTATION_PATH)
+    _verify_coverage(coverage)
+    _verify_mutation(mutation)
     return coverage, mutation
 
 
-def _validate_lot44_lock() -> None:
+def _verify_lot44_lock() -> None:
     for path in LOT44_FORBIDDEN:
         require(not path.exists(), f"Lot 44 must remain locked: {path}")
 
 
 def validate() -> dict[str, object]:
-    state, audit, resilience = _validate_artifacts()
-    coverage, mutation = _validate_quality()
-    _validate_lot44_lock()
+    state, audit, resilience = _verify_artifacts()
+    coverage, mutation = _verify_quality()
+    _verify_lot44_lock()
     result: dict[str, object] = {
         "schema_version": "lot43-frozen-evidence-validation-v1",
         "status": "PASS",
