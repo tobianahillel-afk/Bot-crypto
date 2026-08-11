@@ -1,0 +1,109 @@
+name: Lot 43 frozen evidence attestation
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  attest:
+    runs-on: ubuntu-22.04
+    env:
+      PYTHONPATH: src
+      SOURCE_HEAD_SHA: c0dae9a04f0c8464003b039aba4660c223afe2a8
+      EVIDENCE_HEAD_SHA: 711b80410210b50f000bd243212276d399fdb7e4
+      GATE_MERGE_SHA: ed8845e0e56151348fe57c0e9bceaf4646ea49aa
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Prove source evidence and gate ancestry
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$GATE_MERGE_SHA" "$SOURCE_HEAD_SHA"
+          git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA"
+          git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" HEAD
+      - name: Prove source to evidence diff is exactly five frozen files
+        run: |
+          set -euo pipefail
+          expected="$RUNNER_TEMP/lot43-expected-evidence.txt"
+          actual="$RUNNER_TEMP/lot43-actual-evidence.txt"
+          cat >"$expected" <<'EOF'
+          data/audit/book_resilience_and_replenishment_engine_audit_lot43.json
+          data/audit/book_resilience_and_replenishment_engine_lot43.json
+          data/audit/book_resilience_state_lot43.json
+          reports/lot43/coverage_summary.json
+          reports/lot43/mutation_summary.json
+          EOF
+          git diff --name-only "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA" | sort >"$actual"
+          diff -u "$expected" "$actual"
+      - name: Prove Lot 43 production source immutable after source head
+        run: |
+          set -euo pipefail
+          git diff --quiet "$SOURCE_HEAD_SHA" HEAD -- \
+            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_analysis.py \
+            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py \
+            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py \
+            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_validation.py \
+            config/microstructure/book_resilience_and_replenishment_engine_v1.json \
+            contracts/schemas/book_resilience_state_v1.schema.json \
+            contracts/schemas/book_resilience_replenishment_engine_state_v1.schema.json \
+            contracts/schemas/book_resilience_replenishment_engine_audit_v1.schema.json \
+            scripts/run_lot43_book_resilience_and_replenishment_engine.py \
+            scripts/validate_lot43.py \
+            scripts/validate_lot43_no_connectivity.py \
+            tests/test_lot43_book_resilience_and_replenishment_engine.py \
+            tests/test_lot43_edge_contracts.py \
+            tests/test_lot43_fail_closed_contracts.py \
+            tests/test_lot43_mutation_contracts.py \
+            tests/test_lot43_schema_contracts.py \
+            docs/LOT_43_BOOK_RESILIENCE_AND_REPLENISHMENT_ENGINE.md \
+            docs/ACCEPTANCE_CRITERIA_LOT_43.md
+      - name: Validate frozen Lot 43 artifacts
+        run: |
+          set -euo pipefail
+          python -m json.tool data/audit/book_resilience_and_replenishment_engine_lot43.json >/dev/null
+          python -m json.tool data/audit/book_resilience_and_replenishment_engine_audit_lot43.json >/dev/null
+          python -m json.tool data/audit/book_resilience_state_lot43.json >/dev/null
+          python -m json.tool reports/lot43/coverage_summary.json >/dev/null
+          python -m json.tool reports/lot43/mutation_summary.json >/dev/null
+          ruff check scripts/validate_lot43_frozen_evidence.py
+          python scripts/validate_lot43_frozen_evidence.py
+      - name: Prove Lot 44 remains absent
+        run: |
+          set -euo pipefail
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py
+          test ! -e config/microstructure/trades_and_aggressor_classification_schema_v1.json
+          test ! -e scripts/run_lot44_trades_and_aggressor_classification_schema.py
+          test ! -e scripts/validate_lot44.py
+          test ! -e tests/test_lot44_trades_and_aggressor_classification_schema.py
+          test ! -e docs/LOT_44_TRADES_AND_AGGRESSOR_CLASSIFICATION_SCHEMA.md
+          test ! -e docs/ACCEPTANCE_CRITERIA_LOT_44.md
+      - name: Architecture roadmap engineering and security
+        run: |
+          set -euo pipefail
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          python scripts/validate_lot43_no_connectivity.py
+          bandit -q -r scripts/validate_lot43_frozen_evidence.py -ll
+          pip-audit -r requirements-dev.lock
