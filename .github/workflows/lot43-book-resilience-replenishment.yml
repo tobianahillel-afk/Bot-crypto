@@ -14,12 +14,12 @@ jobs:
     env:
       PYTHONPATH: src
       GATE_MERGE_SHA: ed8845e0e56151348fe57c0e9bceaf4646ea49aa
-      CANDIDATE_SHA: c0dae9a04f0c8464003b039aba4660c223afe2a8
+      CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: c0dae9a04f0c8464003b039aba4660c223afe2a8
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
@@ -28,7 +28,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove exact frozen source and gate ancestry
+      - name: Prove exact candidate source and gate ancestry
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
