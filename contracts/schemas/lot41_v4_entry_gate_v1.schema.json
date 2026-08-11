@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/contracts/lot41_v4_entry_gate_v1.schema.json",
+  "title": "Lot41V4EntryGateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "target_lot", "base_commit", "current_version", "gate_status",
+    "human_decision", "implementation_started", "owner", "runtime_mode", "canonical_roadmap",
+    "prerequisites", "required_inputs", "required_outputs", "allowed_scope", "forbidden_scope",
+    "quality_gates", "safety", "next_lot", "next_lot_status", "output_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "lot41-v4-entry-gate-v1"},
+    "target_lot": {"const": 41},
+    "base_commit": {"const": "20975b505c7f8b527751fb5d3bce034c6e55dcc2"},
+    "current_version": {"const": "0.40.0"},
+    "gate_status": {"const": "GO_LOT41_IMPLEMENTATION_ENTRY"},
+    "human_decision": {"const": "APPROVED_START_LOT41"},
+    "implementation_started": {"const": false},
+    "owner": {"const": "MicrostructureDomain"},
+    "runtime_mode": {"const": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY"},
+    "canonical_roadmap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_path", "source_line", "source_blob_sha", "lot_id", "title", "version_id"],
+      "properties": {
+        "source_path": {"const": "data/audit/product_scope_roadmap_lot21.jsonl"},
+        "source_line": {"const": 42},
+        "source_blob_sha": {"const": "84de51bda788a8d124fb7d344419c4a4b12030b5"},
+        "lot_id": {"const": "Lot 41"},
+        "title": {"const": "Spread, Depth & Imbalance Engine"},
+        "version_id": {"const": "V4_MICROSTRUCTURE_LIQUIDITY"}
+      }
+    },
+    "prerequisites": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "anti_flake_repetitions", "branch_coverage_percent", "latest_implemented_lot",
+        "line_coverage_percent", "lot40_audit_checksum", "lot40_book_health_score",
+        "lot40_book_health_veto_checksum", "lot40_book_integrity_checksum", "lot40_evidence_head",
+        "lot40_final_pr_head", "lot40_health_consequence", "lot40_health_status",
+        "lot40_implementation_merge", "lot40_post_merge_audit_merge_commit", "lot40_post_merge_verdict",
+        "lot40_source_head", "lot40_state_checksum", "lot40_status", "lot41_capability_status",
+        "mutation_score_percent", "reference_reconstructed_sequence_id"
+      ],
+      "properties": {
+        "anti_flake_repetitions": {"const": 3},
+        "branch_coverage_percent": {"const": 91.24},
+        "latest_implemented_lot": {"const": 40},
+        "line_coverage_percent": {"const": 97.31},
+        "lot40_audit_checksum": {"const": "978e910d326e6895b652e256f980bc33203092157334ebe3824ebbf31da1632c"},
+        "lot40_book_health_score": {"const": "100"},
+        "lot40_book_health_veto_checksum": {"const": "000613129dbce4bfa189f66a9927c442a557556870381de92aa2b8da8a7951fc"},
+        "lot40_book_integrity_checksum": {"const": "35b9941782811766762eea067fea53f7c026fbe9ea8699f911c34d648b409d2a"},
+        "lot40_evidence_head": {"const": "ea04fe826261eeed5a59eea60265b38b68404b6b"},
+        "lot40_final_pr_head": {"const": "1268772c07cbb76c18b3267aef12dad5ba58af31"},
+        "lot40_health_consequence": {"const": "NONE"},
+        "lot40_health_status": {"const": "HEALTHY"},
+        "lot40_implementation_merge": {"const": "88f0dac660e262a1c468d9cd75c5e7996ce4817b"},
+        "lot40_post_merge_audit_merge_commit": {"const": "20975b505c7f8b527751fb5d3bce034c6e55dcc2"},
+        "lot40_post_merge_verdict": {"const": "GO_LOT40_POST_MERGE"},
+        "lot40_source_head": {"const": "b9a18a8aaef858b985c3f75ef2aa8955ec521e9f"},
+        "lot40_state_checksum": {"const": "e601f60e8fad70c4c445955dda503a3b728614936ca17c964cb2ed9c8a927477"},
+        "lot40_status": {"const": "IMPLEMENTED_VALIDATED_OFFLINE_BOOK_INTEGRITY_ONLY"},
+        "lot41_capability_status": {"const": "PLANNED_LOCKED"},
+        "mutation_score_percent": {"const": 82.32},
+        "reference_reconstructed_sequence_id": {"const": 1003}
+      }
+    },
+    "required_inputs": {
+      "type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "required_outputs": {
+      "type": "array", "minItems": 3, "maxItems": 3, "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "allowed_scope": {
+      "type": "array", "minItems": 16, "maxItems": 16, "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "forbidden_scope": {
+      "type": "array", "minItems": 23, "maxItems": 23, "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "quality_gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["line_coverage_min_percent", "branch_coverage_min_percent", "mutation_score_min_percent", "anti_flake_repetitions"],
+      "properties": {
+        "line_coverage_min_percent": {"const": 95},
+        "branch_coverage_min_percent": {"const": 90},
+        "mutation_score_min_percent": {"const": 80},
+        "anti_flake_repetitions": {"const": 3}
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "analysis_only", "used_for_decision", "external_connectivity_allowed", "network_ingestion_allowed",
+        "real_credentials_allowed", "market_event_publication_allowed", "raw_data_mutation_allowed",
+        "participant_behavior_inference_explicitly_labeled", "scenario_score_is_signal",
+        "signal_generation_allowed", "risk_approval_allowed", "order_routing_allowed", "trade_allowed",
+        "execution_allowed", "approved_size"
+      ],
+      "properties": {
+        "analysis_only": {"const": true},
+        "used_for_decision": {"const": false},
+        "external_connectivity_allowed": {"const": false},
+        "network_ingestion_allowed": {"const": false},
+        "real_credentials_allowed": {"const": false},
+        "market_event_publication_allowed": {"const": false},
+        "raw_data_mutation_allowed": {"const": false},
+        "participant_behavior_inference_explicitly_labeled": {"const": true},
+        "scenario_score_is_signal": {"const": false},
+        "signal_generation_allowed": {"const": false},
+        "risk_approval_allowed": {"const": false},
+        "order_routing_allowed": {"const": false},
+        "trade_allowed": {"const": false},
+        "execution_allowed": {"const": false},
+        "approved_size": {"const": 0}
+      }
+    },
+    "next_lot": {"const": 42},
+    "next_lot_status": {"const": "PLANNED_LOCKED"},
+    "output_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
