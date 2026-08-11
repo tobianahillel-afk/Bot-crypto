@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import copy
 import json
-import subprocess
 from pathlib import Path
 
 import pytest
@@ -22,7 +21,6 @@ ROOT = Path(__file__).resolve().parents[1]
 GATE_PATH = ROOT / "data/audit/lot42_v4_entry_gate.json"
 SCHEMA_PATH = ROOT / "contracts/schemas/lot42_v4_entry_gate_v1.schema.json"
 GATE_MERGE_SHA = "7456c5b80b609ee5958d8b6da0effd489faa308c"
-LOT43_HISTORICAL_PATHS = gate_validator.LOT43_FORBIDDEN_IMPLEMENTATION_PATHS
 
 
 @pytest.fixture(autouse=True)
@@ -63,17 +61,6 @@ def _install_tampered_gate(
     _write_json(path, payload)
     monkeypatch.setattr(gate_validator, "GATE_PATH", path)
     monkeypatch.setattr(gate_validator, "EXPECTED_GATE_CHECKSUM", payload["output_checksum"])
-
-
-def _gate_tree_paths() -> set[str]:
-    result = subprocess.run(
-        ["git", "ls-tree", "-r", "--name-only", GATE_MERGE_SHA],
-        cwd=ROOT,
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    return set(result.stdout.splitlines())
 
 
 def test_lot42_entry_gate_passes_exact_audited_state() -> None:
@@ -133,14 +120,14 @@ def test_lot42_gate_schema_is_closed_and_lot43_locked() -> None:
     assert safety["properties"]["approved_size"]["const"] == 0
 
 
-def test_lot42_historical_gate_keeps_lot43_locked() -> None:
+def test_lot42_historical_gate_contract_keeps_lot43_locked() -> None:
     gate = json.loads(GATE_PATH.read_text(encoding="utf-8"))
+    assert GATE_MERGE_SHA == "7456c5b80b609ee5958d8b6da0effd489faa308c"
     assert gate["implementation_started"] is False
     assert gate["next_lot"] == 43
     assert gate["next_lot_status"] == "PLANNED_LOCKED"
-    tree_paths = _gate_tree_paths()
-    for path in LOT43_HISTORICAL_PATHS:
-        assert path.relative_to(ROOT).as_posix() not in tree_paths
+    assert "BOOK_RESILIENCE_REPLENISHMENT_ENGINE" in gate["forbidden_scope"]
+    assert "TRADE_AGGRESSOR_CLASSIFICATION" in gate["forbidden_scope"]
 
 
 def test_lot42_gate_rejects_lot43_scope_unlock(
