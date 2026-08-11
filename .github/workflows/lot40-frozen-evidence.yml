@@ -104,10 +104,12 @@ jobs:
             tests/test_lot40_validation_contracts.py
           bandit -q -r scripts/validate_lot40_frozen_evidence.py -ll
           python scripts/validate_lot40_frozen_evidence.py
-      - name: Prove Lot 43 remains locked
+      - name: Prove Lot 44 remains locked
         run: |
           set -euo pipefail
-          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py
-          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py
-          test ! -e scripts/run_lot43_book_resilience_and_replenishment_engine.py
-          test ! -e scripts/validate_lot43.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py
+          test ! -e config/microstructure/trades_and_aggressor_classification_schema_v1.json
+          test ! -e scripts/run_lot44_trades_and_aggressor_classification_schema.py
+          test ! -e scripts/validate_lot44.py
