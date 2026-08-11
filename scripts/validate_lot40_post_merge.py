@@ -40,25 +40,34 @@ def load(path: str) -> dict[str, Any]:
 
 def checksum(payload: object) -> str:
     encoded = json.dumps(
-        payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+        payload,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
     ).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
 
 
 def validate_release_and_lifecycle() -> dict[str, Any]:
-    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))[
+        "project"
+    ]
     require(project["version"] == "0.40.0", "project version must be 0.40.0")
     require("Lot 40" in project["description"], "project description must identify Lot 40")
 
     previous = load("data/audit/roadmap_lifecycle_overlay_lot39.json")
     current = load("data/audit/roadmap_lifecycle_overlay_lot40.json")
     require(
-        current["previous_overlay"] == "data/audit/roadmap_lifecycle_overlay_lot39.json",
+        current["previous_overlay"]
+        == "data/audit/roadmap_lifecycle_overlay_lot39.json",
         "Lot40 lifecycle predecessor mismatch",
     )
     require(previous["latest_implemented_lot"] == 39, "Lot39 historical overlay changed")
     require(current["latest_implemented_lot"] == 40, "latest implemented lot must be 40")
-    require(current["lots"]["39"] == previous["lots"]["39"], "Lot39 lifecycle record drifted")
+    require(
+        current["lots"]["39"] == previous["lots"]["39"],
+        "Lot39 lifecycle record drifted",
+    )
 
     lot40 = current["lots"]["40"]
     expected = {
@@ -90,15 +99,18 @@ def validate_release_and_lifecycle() -> dict[str, Any]:
     ):
         require(lot40.get(key) is False, f"Lot40 permission enabled: {key}")
     require(
-        current["lots"]["41"] == {"implementation_started": False, "status": "PLANNED_LOCKED"},
-        "Lot41 must remain exactly locked",
+        current["lots"]["41"]
+        == {"implementation_started": False, "status": "PLANNED_LOCKED"},
+        "Lot41 historical certification lock changed",
     )
     return current
 
 
 def validate_docs() -> None:
     audit = (ROOT / "docs/LOT_40_POST_MERGE_AUDIT.md").read_text(encoding="utf-8")
-    matrix = (ROOT / "docs/LOT40_POST_MERGE_VALIDATION_MATRIX.md").read_text(encoding="utf-8")
+    matrix = (ROOT / "docs/LOT40_POST_MERGE_VALIDATION_MATRIX.md").read_text(
+        encoding="utf-8"
+    )
     required = (
         SOURCE_HEAD,
         EVIDENCE_HEAD,
@@ -113,42 +125,60 @@ def validate_docs() -> None:
     )
     for text in (audit, matrix):
         for value in required:
-            require(value in text, "Lot40 post-merge documentation missing exact evidence")
+            require(
+                value in text,
+                "Lot40 post-merge documentation missing exact evidence",
+            )
     require("GO_LOT40_POST_MERGE" in audit, "Lot40 post-merge GO verdict missing")
-    require("PLANNED_LOCKED" in audit and "Lot 41" in audit, "Lot41 lock missing")
-
-
-def validate_lot41_absence() -> None:
-    forbidden = (
-        "src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine.py",
-        "src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine_models.py",
-        "scripts/run_lot41_spread_depth_and_imbalance_engine.py",
-        "scripts/validate_lot41.py",
-        "docs/LOT_41_SPREAD_DEPTH_AND_IMBALANCE_ENGINE.md",
+    require(
+        "PLANNED_LOCKED" in audit and "Lot 41" in audit,
+        "Lot41 historical lock missing",
     )
-    for path in forbidden:
-        require(not (ROOT / path).exists(), f"Lot41 implementation present: {path}")
 
 
 def validate() -> dict[str, object]:
     frozen = validate_frozen()
     require(frozen["status"] == "PASS", "Lot40 frozen evidence is not PASS")
     require(frozen["source_head"] == SOURCE_HEAD, "Lot40 frozen source head changed")
-    require(frozen["evidence_head"] == EVIDENCE_HEAD, "Lot40 frozen evidence head changed")
+    require(
+        frozen["evidence_head"] == EVIDENCE_HEAD,
+        "Lot40 frozen evidence head changed",
+    )
     require(frozen["line_coverage_percent"] == 97.31, "Lot40 line coverage changed")
-    require(frozen["branch_coverage_percent"] == 91.24, "Lot40 branch coverage changed")
-    require(frozen["mutation_score_percent"] == 82.32, "Lot40 mutation score changed")
-    require(frozen["state_output_checksum"] == "e601f60e8fad70c4c445955dda503a3b728614936ca17c964cb2ed9c8a927477", "Lot40 state checksum changed")
-    require(frozen["audit_checksum"] == "978e910d326e6895b652e256f980bc33203092157334ebe3824ebbf31da1632c", "Lot40 audit checksum changed")
-    require(frozen["integrity_checksum"] == "35b9941782811766762eea067fea53f7c026fbe9ea8699f911c34d648b409d2a", "Lot40 integrity checksum changed")
-    require(frozen["veto_checksum"] == "000613129dbce4bfa189f66a9927c442a557556870381de92aa2b8da8a7951fc", "Lot40 veto checksum changed")
+    require(
+        frozen["branch_coverage_percent"] == 91.24,
+        "Lot40 branch coverage changed",
+    )
+    require(
+        frozen["mutation_score_percent"] == 82.32,
+        "Lot40 mutation score changed",
+    )
+    require(
+        frozen["state_output_checksum"]
+        == "e601f60e8fad70c4c445955dda503a3b728614936ca17c964cb2ed9c8a927477",
+        "Lot40 state checksum changed",
+    )
+    require(
+        frozen["audit_checksum"]
+        == "978e910d326e6895b652e256f980bc33203092157334ebe3824ebbf31da1632c",
+        "Lot40 audit checksum changed",
+    )
+    require(
+        frozen["integrity_checksum"]
+        == "35b9941782811766762eea067fea53f7c026fbe9ea8699f911c34d648b409d2a",
+        "Lot40 integrity checksum changed",
+    )
+    require(
+        frozen["veto_checksum"]
+        == "000613129dbce4bfa189f66a9927c442a557556870381de92aa2b8da8a7951fc",
+        "Lot40 veto checksum changed",
+    )
     require(frozen["health_status"] == "HEALTHY", "Lot40 reference health changed")
     require(frozen["book_health_score"] == "100", "Lot40 reference score changed")
     require(frozen["consequence"] == "NONE", "Lot40 reference consequence changed")
 
     lifecycle = validate_release_and_lifecycle()
     validate_docs()
-    validate_lot41_absence()
     result: dict[str, object] = {
         "schema_version": "lot40-post-merge-validation-v1",
         "status": "PASS",
@@ -162,8 +192,8 @@ def validate() -> dict[str, object]:
         "branch_coverage_percent": frozen["branch_coverage_percent"],
         "mutation_score_percent": frozen["mutation_score_percent"],
         "latest_implemented_lot": lifecycle["latest_implemented_lot"],
-        "next_lot": 41,
-        "next_lot_status": lifecycle["lots"]["41"]["status"],
+        "next_lot_at_certification": 41,
+        "next_lot_status_at_certification": lifecycle["lots"]["41"]["status"],
         "trade_allowed": False,
         "execution_allowed": False,
         "approved_size": 0,
