@@ -20,13 +20,13 @@ jobs:
   mutation:
     runs-on: ubuntu-22.04
     env:
-      CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      CANDIDATE_SHA: c0dae9a04f0c8464003b039aba4660c223afe2a8
       PYTHONHASHSEED: '0'
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: c0dae9a04f0c8464003b039aba4660c223afe2a8
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
@@ -35,6 +35,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
+      - name: Prove exact frozen source
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
       - name: Baseline Lot 43 tests
         run: |
           set -o pipefail
