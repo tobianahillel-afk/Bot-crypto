@@ -11,6 +11,7 @@ from .book_resilience_and_replenishment_engine_validation import (
     RUNTIME_MODE,
     VALIDATION_STATE,
     Lot43ValidationError,
+    bounded_recovery_fraction,
     decimal_text,
     require_integer,
     require_sha256,
@@ -107,6 +108,35 @@ class Lot43LineageEnvelopeV1:
         }
 
 
+def _validate_depletion_arithmetic(
+    previous_quantity: Decimal,
+    post_quantity: Decimal,
+    depleted_quantity: Decimal,
+    depletion_ratio: Decimal,
+) -> None:
+    with localcontext() as context:
+        context.prec = DECIMAL_PRECISION
+        expected_depleted = previous_quantity - post_quantity
+        expected_ratio = depleted_quantity / previous_quantity
+    if depleted_quantity != expected_depleted:
+        raise Lot43ValidationError("depleted quantity/count mismatch")
+    if depletion_ratio != expected_ratio:
+        raise Lot43ValidationError("depletion ratio/count mismatch")
+
+
+def _validate_recovery_arithmetic(
+    replenishment_kind: str,
+    replenished_quantity: Decimal,
+    depleted_quantity: Decimal,
+    recovered_fraction: Decimal,
+) -> None:
+    if replenishment_kind not in {"SAME_PRICE", "ADJACENT_PRICE"}:
+        return
+    expected_fraction = bounded_recovery_fraction(replenished_quantity, depleted_quantity)
+    if recovered_fraction != expected_fraction:
+        raise Lot43ValidationError("recovered fraction/quantity mismatch")
+
+
 @dataclass(frozen=True, slots=True)
 class BookDepletionEventV1:
     event_id: str
@@ -141,13 +171,12 @@ class BookDepletionEventV1:
         require_integer(self.depletion_sequence_id, "depletion_sequence_id", minimum=1)
         require_text(self.depletion_event_time, "depletion_event_time")
         require_text(self.depletion_receive_time, "depletion_receive_time")
-        if self.depleted_quantity != self.previous_quantity - self.post_depletion_quantity:
-            raise Lot43ValidationError("depleted quantity/count mismatch")
-        with localcontext() as context:
-            context.prec = DECIMAL_PRECISION
-            expected_ratio = self.depleted_quantity / self.previous_quantity
-        if self.depletion_ratio != expected_ratio:
-            raise Lot43ValidationError("depletion ratio/count mismatch")
+        _validate_depletion_arithmetic(
+            self.previous_quantity,
+            self.post_depletion_quantity,
+            self.depleted_quantity,
+            self.depletion_ratio,
+        )
         validate_event_semantics(
             replenishment_kind=self.replenishment_kind,
             replenishment_sequence_id=self.replenishment_sequence_id,
@@ -156,6 +185,12 @@ class BookDepletionEventV1:
             recovered_fraction=self.recovered_fraction,
             mid_shift_bps=self.directional_mid_shift_bps,
             max_window_status=self.max_window_status,
+        )
+        _validate_recovery_arithmetic(
+            self.replenishment_kind,
+            self.replenished_quantity,
+            self.depleted_quantity,
+            self.recovered_fraction,
         )
         if self.participant_intent != PARTICIPANT_INTENT:
             raise Lot43ValidationError("participant intent must remain NOT_INFERRED")
