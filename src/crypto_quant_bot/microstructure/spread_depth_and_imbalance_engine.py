@@ -11,6 +11,7 @@ from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_re
     load_json_object,
 )
 
+from .book_integrity_desynchronization_detector_validation import require_integer
 from .spread_depth_and_imbalance_engine_models import (
     BookFeatureStateV1,
     BookQualityBindingV1,
@@ -29,7 +30,6 @@ from .spread_depth_and_imbalance_engine_validation import (
     parse_book_levels,
     parse_depth_bands,
     positive_decimal_text,
-    require_integer,
     require_text,
     symmetric_imbalance,
     validate_book_open,
