@@ -7,10 +7,13 @@ from types import SimpleNamespace
 
 import pytest
 
-import crypto_quant_bot.microstructure.book_resilience_and_replenishment_engine as engine
 import crypto_quant_bot.microstructure.book_resilience_and_replenishment_analysis as analysis
+import crypto_quant_bot.microstructure.book_resilience_and_replenishment_engine as engine
 from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry import (
     load_json_object,
+)
+from crypto_quant_bot.microstructure.book_integrity_desynchronization_detector_validation import (
+    BookIntegrityValidationError,
 )
 from crypto_quant_bot.microstructure.book_resilience_and_replenishment_engine_models import (
     BookResilienceReplenishmentEngineAuditV1,
@@ -265,7 +268,7 @@ def test_delta_parser_rejects_non_object_and_bad_optional_checksum() -> None:
     fixture = load_json_object(ROOT / "tests/fixtures/lot39/order_book_delta_sequence_fixture_v1.json")
     raw = copy.deepcopy(fixture["deltas"][0])
     raw["expected_book_checksum"] = "not-a-sha"
-    with pytest.raises(Exception):
+    with pytest.raises(BookIntegrityValidationError):
         engine._delta_from_payload(raw, 0)
 
     raw = copy.deepcopy(fixture["deltas"][0])
