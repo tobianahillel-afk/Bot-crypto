@@ -268,10 +268,10 @@ def test_decrease_below_ratio_threshold_is_not_depletion() -> None:
 
 def test_no_future_observation_can_remain_pending() -> None:
     history = (
-        _observation(1, 10, (("100", "10"),), (("102", "10"),)),
-        _observation(2, 20, (("100", "2"),), (("102", "10"),)),
+        _observation(1, 10_000, (("100", "10"),), (("102", "10"),)),
+        _observation(2, 20_000, (("100", "2"),), (("102", "10"),)),
     )
-    result = analyze_book_resilience(history, _policy(), _time(30))
+    result = analyze_book_resilience(history, _policy(), _time(30_000))
     event = result.depletion_events[0]
     assert event.max_window_status == "PENDING_WINDOW"
     by_horizon = {item.horizon_us: item for item in result.resilience_slices if item.side == "BID"}
@@ -307,7 +307,11 @@ def test_resilience_slice_becomes_resilient_when_all_events_recover() -> None:
         _observation(3, 30, (("100", "10"),), (("102", "10"),)),
     )
     result = analyze_book_resilience(history, _policy(), _time(50))
-    bid = next(item for item in result.resilience_slices if item.side == "BID" and item.horizon_us == 10_000)
+    bid = next(
+        item
+        for item in result.resilience_slices
+        if item.side == "BID" and item.horizon_us == 10_000
+    )
     assert bid.resilience_status == "RESILIENT"
     assert bid.mean_recovered_fraction == Decimal("1")
     assert bid.mean_replenishment_time_us == Decimal("10")
@@ -320,7 +324,11 @@ def test_resilience_slice_becomes_shifted_when_all_events_shift() -> None:
         _observation(3, 30, (("99", "2"),), (("101", "10"),)),
     )
     result = analyze_book_resilience(history, _policy(mid_shift_min_bps="1"), _time(50))
-    bid = next(item for item in result.resilience_slices if item.side == "BID" and item.horizon_us == 10_000)
+    bid = next(
+        item
+        for item in result.resilience_slices
+        if item.side == "BID" and item.horizon_us == 10_000
+    )
     assert bid.resilience_status == "SHIFTED"
 
 
@@ -334,8 +342,22 @@ def test_volatility_conditioning_has_quiet_normal_and_stressed_buckets() -> None
         _observation(1, 10, (("100", "1"),), (("102", "1"),)),
         _observation(2, 20, (("100.01", "1"),), (("102.01", "1"),)),
     )
-    assert analyze_book_resilience(moving, _policy(quiet_max="0.05", stressed_min="5"), _time(30)).volatility_regime == "NORMAL"
-    assert analyze_book_resilience(moving, _policy(quiet_max="0.001", stressed_min="0.5"), _time(30)).volatility_regime == "STRESSED"
+    assert (
+        analyze_book_resilience(
+            moving,
+            _policy(quiet_max="0.05", stressed_min="5"),
+            _time(30),
+        ).volatility_regime
+        == "NORMAL"
+    )
+    assert (
+        analyze_book_resilience(
+            moving,
+            _policy(quiet_max="0.001", stressed_min="0.5"),
+            _time(30),
+        ).volatility_regime
+        == "STRESSED"
+    )
 
 
 def test_atomic_persistence_roundtrip(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
