@@ -145,8 +145,18 @@
         "mid_shift_events_total": {"type": "integer", "minimum": 0},
         "expired_events_total": {"type": "integer", "minimum": 0},
         "pending_events_total": {"type": "integer", "minimum": 0},
-        "mean_recovered_fraction": {"type": ["string", "null"]},
-        "mean_replenishment_time_us": {"type": ["string", "null"]},
+        "mean_recovered_fraction": {
+          "anyOf": [
+            {"type": "null"},
+            {"type": "string", "pattern": "^(?:0(?:\\.[0-9]+)?|1(?:\\.0+)?)$"}
+          ]
+        },
+        "mean_replenishment_time_us": {
+          "anyOf": [
+            {"type": "null"},
+            {"type": "string", "pattern": "^(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)$"}
+          ]
+        },
         "resilience_status": {"enum": ["NO_EVENTS", "RESILIENT", "FRAGILE", "SHIFTED", "PENDING", "PARTIAL"]},
         "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
         "slice_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
