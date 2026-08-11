@@ -28,6 +28,9 @@ from crypto_quant_bot.microstructure.book_resilience_and_replenishment_engine_va
     validate_regime_thresholds,
     validate_slice_counts,
 )
+from crypto_quant_bot.microstructure.liquidity_zones_walls_and_voids_engine_validation import (
+    Lot42ValidationError,
+)
 
 ZERO_SHA256 = "0" * 64
 
@@ -91,7 +94,7 @@ def test_volatility_thresholds_must_be_ordered() -> None:
     validate_regime_thresholds(Decimal("0.05"), Decimal("0.5"))
     with pytest.raises(Lot43ValidationError, match="below"):
         validate_regime_thresholds(Decimal("0.5"), Decimal("0.5"))
-    with pytest.raises(Exception):
+    with pytest.raises(Lot42ValidationError):
         validate_regime_thresholds(Decimal("-1"), Decimal("0.5"))
 
 
@@ -106,7 +109,7 @@ def test_decimal_text_parser_rejects_numeric_coercion() -> None:
 def test_recovery_fraction_is_bounded_and_not_probability() -> None:
     assert bounded_recovery_fraction(Decimal("4"), Decimal("8")) == Decimal("0.5")
     assert bounded_recovery_fraction(Decimal("12"), Decimal("8")) == Decimal("1")
-    with pytest.raises(Exception):
+    with pytest.raises(Lot42ValidationError):
         bounded_recovery_fraction(Decimal("1"), Decimal("0"))
 
 
