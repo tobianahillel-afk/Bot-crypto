@@ -24,7 +24,7 @@ SCHEMA_PATH = ROOT / "contracts/schemas/lot41_v4_entry_gate_v1.schema.json"
 
 @pytest.fixture(autouse=True)
 def _isolate_historical_gate(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Replay immutable gate facts without requiring Lot 41 absence after gate merge."""
+    """Replay immutable gate facts without requiring later-lot files to remain absent."""
     monkeypatch.setattr(
         gate_validator,
         "validate_lot40_post_merge",
@@ -38,6 +38,7 @@ def _isolate_historical_gate(monkeypatch: pytest.MonkeyPatch) -> None:
         },
     )
     monkeypatch.setattr(gate_validator, "LOT41_FORBIDDEN_IMPLEMENTATION_PATHS", ())
+    monkeypatch.setattr(gate_validator, "LOT42_FORBIDDEN_IMPLEMENTATION_PATHS", ())
 
 
 def _write_json(path: Path, payload: object) -> None:
@@ -123,8 +124,7 @@ def test_lot41_historical_gate_keeps_lot42_locked() -> None:
     assert gate["implementation_started"] is False
     assert gate["next_lot"] == 42
     assert gate["next_lot_status"] == "PLANNED_LOCKED"
-    for path in gate_validator.LOT42_FORBIDDEN_IMPLEMENTATION_PATHS:
-        assert not path.exists()
+    assert "LIQUIDITY_ZONE_WALL_VOID_INFERENCE" in gate["forbidden_scope"]
 
 
 def test_lot41_gate_rejects_lot42_scope_unlock(
