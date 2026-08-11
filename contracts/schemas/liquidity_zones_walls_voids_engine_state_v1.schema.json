@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/contracts/liquidity_zones_walls_voids_engine_state_v1.schema.json",
+  "title": "LiquidityZonesWallsVoidsEngineStateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "validation_state",
+    "run_context",
+    "lineage",
+    "event_time",
+    "receive_time",
+    "decision_time",
+    "generated_at",
+    "liquidity_zones",
+    "metrics",
+    "reason_codes",
+    "safety",
+    "output_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "liquidity-zones-walls-voids-engine-state-v1"},
+    "validation_state": {"const": "VALIDATED_OFFLINE_LIQUIDITY_ZONES_WALLS_VOIDS_ONLY"},
+    "run_context": {"$ref": "#/$defs/runContext"},
+    "lineage": {"$ref": "#/$defs/lineage"},
+    "event_time": {"type": "string", "pattern": "Z$"},
+    "receive_time": {"type": "string", "pattern": "Z$"},
+    "decision_time": {"type": "string", "pattern": "Z$"},
+    "generated_at": {"type": "string", "pattern": "Z$"},
+    "liquidity_zones": {"$ref": "liquidity_zone_set_v1.schema.json"},
+    "metrics": {"$ref": "#/$defs/metrics"},
+    "reason_codes": {"$ref": "#/$defs/reasonCodes"},
+    "safety": {"$ref": "#/$defs/safety"},
+    "output_checksum": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "gitSha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "reasonCodes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[A-Z0-9_]+$"}
+    },
+    "runContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "run_id",
+        "runtime_mode",
+        "config_version",
+        "code_commit",
+        "correlation_id"
+      ],
+      "properties": {
+        "schema_version": {"const": "lot42-run-context-v1"},
+        "run_id": {"type": "string", "minLength": 1},
+        "runtime_mode": {"const": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY"},
+        "config_version": {"const": "lot42-liquidity-zones-walls-voids-config-v1"},
+        "code_commit": {"$ref": "#/$defs/gitSha"},
+        "correlation_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "lineage_id",
+        "entry_gate_checksum",
+        "lot41_state_checksum",
+        "lot41_audit_checksum",
+        "lot41_feature_checksum",
+        "lot39_book_checksum",
+        "lot39_delta_fixture_checksum",
+        "lot38_snapshot_checksum",
+        "config_checksum",
+        "available_at"
+      ],
+      "properties": {
+        "schema_version": {"const": "lot42-lineage-envelope-v1"},
+        "lineage_id": {"type": "string", "minLength": 1},
+        "entry_gate_checksum": {"$ref": "#/$defs/sha256"},
+        "lot41_state_checksum": {"$ref": "#/$defs/sha256"},
+        "lot41_audit_checksum": {"$ref": "#/$defs/sha256"},
+        "lot41_feature_checksum": {"$ref": "#/$defs/sha256"},
+        "lot39_book_checksum": {"$ref": "#/$defs/sha256"},
+        "lot39_delta_fixture_checksum": {"$ref": "#/$defs/sha256"},
+        "lot38_snapshot_checksum": {"$ref": "#/$defs/sha256"},
+        "config_checksum": {"$ref": "#/$defs/sha256"},
+        "available_at": {"type": "string", "pattern": "Z$"}
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "lot_42_records_processed_total",
+        "lot_42_observations_total",
+        "lot_42_active_zones_total",
+        "lot_42_displayed_walls_total",
+        "lot_42_persistent_zones_total",
+        "lot_42_low_confidence_walls_total",
+        "lot_42_liquidity_voids_total",
+        "lot_42_expired_candidates_total",
+        "lot_42_validation_failures_total",
+        "lot_42_processing_latency_us",
+        "latency_measurement_status"
+      ],
+      "properties": {
+        "schema_version": {"const": "lot42-metrics-v1"},
+        "lot_42_records_processed_total": {"const": 1},
+        "lot_42_observations_total": {"type": "integer", "minimum": 1},
+        "lot_42_active_zones_total": {"type": "integer", "minimum": 0},
+        "lot_42_displayed_walls_total": {"type": "integer", "minimum": 0},
+        "lot_42_persistent_zones_total": {"type": "integer", "minimum": 0},
+        "lot_42_low_confidence_walls_total": {"type": "integer", "minimum": 0},
+        "lot_42_liquidity_voids_total": {"type": "integer", "minimum": 0},
+        "lot_42_expired_candidates_total": {"type": "integer", "minimum": 0},
+        "lot_42_validation_failures_total": {"const": 0},
+        "lot_42_processing_latency_us": {"type": "null"},
+        "latency_measurement_status": {
+          "const": "NOT_MEASURED_OFFLINE_DETERMINISTIC_REPLAY"
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "analysis_only",
+        "approved_size",
+        "execution_allowed",
+        "external_connectivity_allowed",
+        "market_event_publication_allowed",
+        "network_ingestion_allowed",
+        "order_routing_allowed",
+        "participant_behavior_inference_explicitly_labeled",
+        "raw_data_mutation_allowed",
+        "real_credentials_allowed",
+        "risk_approval_allowed",
+        "scenario_score_is_signal",
+        "signal_generation_allowed",
+        "trade_allowed",
+        "used_for_decision"
+      ],
+      "properties": {
+        "analysis_only": {"const": true},
+        "approved_size": {"const": 0},
+        "execution_allowed": {"const": false},
+        "external_connectivity_allowed": {"const": false},
+        "market_event_publication_allowed": {"const": false},
+        "network_ingestion_allowed": {"const": false},
+        "order_routing_allowed": {"const": false},
+        "participant_behavior_inference_explicitly_labeled": {"const": true},
+        "raw_data_mutation_allowed": {"const": false},
+        "real_credentials_allowed": {"const": false},
+        "risk_approval_allowed": {"const": false},
+        "scenario_score_is_signal": {"const": false},
+        "signal_generation_allowed": {"const": false},
+        "trade_allowed": {"const": false},
+        "used_for_decision": {"const": false}
+      }
+    }
+  }
+}
