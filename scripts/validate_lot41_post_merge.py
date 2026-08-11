@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 import tomllib
 from pathlib import Path
 from typing import Any
 
-from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry import (
-    canonical_checksum,
-    load_json_object,
-)
 from validate_lot41_frozen_evidence import validate as validate_frozen
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -52,14 +49,23 @@ def require(condition: bool, message: str) -> None:
         raise Lot41PostMergeError(message)
 
 
-def _project() -> dict[str, Any]:
-    payload = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
-    project = payload.get("project")
-    require(isinstance(project, dict), "project metadata missing")
-    return project
+def load(path: Path) -> dict[str, Any]:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    require(isinstance(value, dict), f"JSON object required: {path}")
+    return value
 
 
-def _expected_safety() -> dict[str, object]:
+def checksum(payload: object) -> str:
+    encoded = json.dumps(
+        payload,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def expected_safety() -> dict[str, object]:
     return {
         "analysis_only": True,
         "used_for_decision": False,
@@ -79,16 +85,24 @@ def _expected_safety() -> dict[str, object]:
     }
 
 
-def _validate_release() -> None:
-    project = _project()
+def validate_release() -> None:
+    metadata = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    project = metadata.get("project")
+    require(isinstance(project, dict), "project metadata missing")
     require(project.get("version") == "0.41.0", "project version must be 0.41.0")
     description = project.get("description")
-    require(isinstance(description, str) and "Lot 41" in description, "release description must identify Lot 41")
+    require(
+        isinstance(description, str) and "Lot 41" in description,
+        "release description must identify Lot 41",
+    )
     report = IMPLEMENTATION_REPORT.read_text(encoding="utf-8")
-    require("PASS_FROZEN_IMPLEMENTATION_EVIDENCE" in report, "frozen implementation verdict missing")
+    require(
+        "PASS_FROZEN_IMPLEMENTATION_EVIDENCE" in report,
+        "frozen implementation verdict missing",
+    )
 
 
-def _validate_lot41_record(record: dict[str, Any]) -> None:
+def validate_lot41_record(record: dict[str, Any]) -> None:
     expected = {
         "status": "IMPLEMENTED_VALIDATED_OFFLINE_SPREAD_DEPTH_IMBALANCE_ONLY",
         "implementation_commit": SOURCE_HEAD,
@@ -111,23 +125,29 @@ def _validate_lot41_record(record: dict[str, Any]) -> None:
     }
     for field, value in expected.items():
         require(record.get(field) == value, f"Lot41 lifecycle mismatch: {field}")
-    for field, value in _expected_safety().items():
+    for field, value in expected_safety().items():
         require(record.get(field) == value, f"Lot41 safety mismatch: {field}")
 
 
-def _validate_lifecycle() -> dict[str, Any]:
-    previous = load_json_object(PREVIOUS_OVERLAY)
-    current = load_json_object(CURRENT_OVERLAY)
+def validate_lifecycle() -> dict[str, Any]:
+    previous = load(PREVIOUS_OVERLAY)
+    current = load(CURRENT_OVERLAY)
     require(previous.get("latest_implemented_lot") == 40, "Lot40 historical overlay changed")
-    require(current.get("previous_overlay") == str(PREVIOUS_OVERLAY.relative_to(ROOT)), "Lot41 lifecycle predecessor mismatch")
+    require(
+        current.get("previous_overlay") == str(PREVIOUS_OVERLAY.relative_to(ROOT)),
+        "Lot41 lifecycle predecessor mismatch",
+    )
     require(current.get("latest_implemented_lot") == 41, "latest implemented lot must be 41")
     previous_lots = previous.get("lots")
     current_lots = current.get("lots")
-    require(isinstance(previous_lots, dict) and isinstance(current_lots, dict), "lifecycle lot map missing")
+    require(
+        isinstance(previous_lots, dict) and isinstance(current_lots, dict),
+        "lifecycle lot map missing",
+    )
     require(current_lots.get("40") == previous_lots.get("40"), "Lot40 lifecycle record drifted")
     lot41 = current_lots.get("41")
     require(isinstance(lot41, dict), "Lot41 lifecycle record missing")
-    _validate_lot41_record(lot41)
+    validate_lot41_record(lot41)
     require(
         current_lots.get("42") == {"implementation_started": False, "status": "PLANNED_LOCKED"},
         "Lot42 lifecycle lock changed",
@@ -135,7 +155,7 @@ def _validate_lifecycle() -> dict[str, Any]:
     return current
 
 
-def _validate_frozen() -> dict[str, object]:
+def validate_frozen() -> dict[str, object]:
     frozen = validate_frozen()
     expected = {
         "status": "PASS",
@@ -159,7 +179,7 @@ def _validate_frozen() -> dict[str, object]:
     return frozen
 
 
-def _validate_docs() -> None:
+def validate_docs() -> None:
     audit = AUDIT_DOC.read_text(encoding="utf-8")
     matrix = MATRIX_DOC.read_text(encoding="utf-8")
     exact_values = (
@@ -182,20 +202,23 @@ def _validate_docs() -> None:
         for value in exact_values:
             require(value in text, "post-merge documentation missing exact evidence")
     require("GO_LOT41_POST_MERGE" in audit, "Lot41 post-merge GO verdict missing")
-    require("Lot 42" in audit and "PLANNED_LOCKED" in audit, "Lot42 lock missing from audit")
+    require(
+        "Lot 42" in audit and "PLANNED_LOCKED" in audit,
+        "Lot42 lock missing from audit",
+    )
 
 
-def _validate_lot42_absence() -> None:
+def validate_lot42_absence() -> None:
     for path in LOT42_FORBIDDEN:
         require(not path.exists(), f"Lot42 implementation must remain absent: {path}")
 
 
 def validate() -> dict[str, object]:
-    _validate_release()
-    frozen = _validate_frozen()
-    lifecycle = _validate_lifecycle()
-    _validate_docs()
-    _validate_lot42_absence()
+    validate_release()
+    frozen = validate_frozen()
+    lifecycle = validate_lifecycle()
+    validate_docs()
+    validate_lot42_absence()
     result: dict[str, object] = {
         "schema_version": "lot41-post-merge-validation-v1",
         "status": "PASS",
@@ -216,14 +239,21 @@ def validate() -> dict[str, object]:
         "execution_allowed": False,
         "approved_size": 0,
     }
-    result["validation_checksum"] = canonical_checksum(result)
+    result["validation_checksum"] = checksum(result)
     return result
 
 
 def main() -> int:
     try:
         print(json.dumps(validate(), sort_keys=True))
-    except (Lot41PostMergeError, OSError, KeyError, TypeError, ValueError) as exc:
+    except (
+        Lot41PostMergeError,
+        OSError,
+        KeyError,
+        TypeError,
+        ValueError,
+        json.JSONDecodeError,
+    ) as exc:
         print(f"LOT41 POST-MERGE VALIDATION: FAIL\n{exc}", file=sys.stderr)
         return 1
     return 0
