@@ -7,13 +7,13 @@ from typing import Any
 from .book_integrity_desynchronization_detector_validation import (
     BookIntegrityValidationError,
     decimal_from_text,
-    decimal_text,
+    decimal_text as decimal_text,
     require_integer,
     require_sha256,
     require_text,
-    validate_causal_times,
-    validate_reason_codes,
-    validate_run_context,
+    validate_causal_times as validate_causal_times,
+    validate_reason_codes as validate_reason_codes,
+    validate_run_context as validate_run_context,
 )
 from .spread_depth_and_imbalance_engine_validation import Lot41ValidationError, lot41_safety
 
