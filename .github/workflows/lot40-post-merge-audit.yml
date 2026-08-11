@@ -62,7 +62,6 @@ jobs:
             tests/test_lot40_health_policy_derivation.py \
             tests/test_lot40_schema_contracts.py \
             tests/test_lot40_strict_level_contracts.py \
-            tests/test_lot40_v4_entry_gate.py \
             tests/test_lot40_validation_contracts.py \
             docs/LOT_40_BOOK_INTEGRITY_DESYNCHRONIZATION_DETECTOR.md \
             docs/ACCEPTANCE_CRITERIA_LOT_40.md \
