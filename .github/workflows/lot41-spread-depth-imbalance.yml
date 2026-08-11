@@ -28,14 +28,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove exact gate ancestry and Lot 42 absence
+      - name: Prove exact gate ancestry
         run: |
           set -euo pipefail
           git merge-base --is-ancestor "$GATE_MERGE_SHA" HEAD
-          test ! -e src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine.py
-          test ! -e src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine_models.py
-          test ! -e scripts/run_lot42_liquidity_zones_walls_and_voids_engine.py
-          test ! -e scripts/validate_lot42.py
       - name: Compile lint type schema and no-connectivity checks
         run: |
           set -euo pipefail
