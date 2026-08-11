@@ -1,21 +1,29 @@
 from __future__ import annotations
 
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from decimal import Decimal, localcontext
 from typing import Any
 
 from .book_integrity_desynchronization_detector_validation import (
     BookIntegrityValidationError,
     decimal_from_text,
-    decimal_text as decimal_text,
     require_integer,
     require_sha256,
     require_text,
+)
+from .book_integrity_desynchronization_detector_validation import (
+    decimal_text as decimal_text,
+)
+from .book_integrity_desynchronization_detector_validation import (
     validate_causal_times as validate_causal_times,
+)
+from .book_integrity_desynchronization_detector_validation import (
     validate_reason_codes as validate_reason_codes,
+)
+from .book_integrity_desynchronization_detector_validation import (
     validate_run_context as validate_run_context,
 )
-from .spread_depth_and_imbalance_engine_validation import lot41_safety, Lot41ValidationError
+from .spread_depth_and_imbalance_engine_validation import Lot41ValidationError, lot41_safety
 
 RUNTIME_MODE = "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY"
 VALIDATION_STATE = "VALIDATED_OFFLINE_LIQUIDITY_ZONES_WALLS_VOIDS_ONLY"
