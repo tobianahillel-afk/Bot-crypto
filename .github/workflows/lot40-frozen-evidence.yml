@@ -62,7 +62,6 @@ jobs:
             scripts/run_lot40_book_integrity_desynchronization_detector.py \
             scripts/validate_lot40.py \
             scripts/validate_lot40_no_connectivity.py \
-            tests/test_lot40_book_integrity_desynchronization_detector.py \
             tests/test_lot40_health_policy_derivation.py \
             tests/test_lot40_schema_contracts.py \
             tests/test_lot40_strict_level_contracts.py \
@@ -95,8 +94,10 @@ jobs:
           git worktree remove --force /tmp/lot40-certified
       - name: Frozen evidence smoke regression and security
         run: |
+          set -euo pipefail
           python -m compileall -q src scripts tests
-          ruff check scripts/validate_lot40_frozen_evidence.py
+          ruff check scripts/validate_lot40_frozen_evidence.py \
+            tests/test_lot40_book_integrity_desynchronization_detector.py
           pytest -q tests/test_lot40_book_integrity_desynchronization_detector.py \
             tests/test_lot40_health_policy_derivation.py \
             tests/test_lot40_schema_contracts.py \
