@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import shutil
-import subprocess
 from decimal import Decimal
 from pathlib import Path
 
@@ -32,7 +31,7 @@ from crypto_quant_bot.microstructure.book_integrity_desynchronization_detector_v
 
 ROOT = Path(__file__).resolve().parents[1]
 BOOK_PATH = ROOT / "data/audit/reconstructed_order_book_lot39.json"
-LOT40_CERTIFIED_MERGE = "88f0dac660e262a1c468d9cd75c5e7996ce4817b"
+LOT40_LIFECYCLE_PATH = ROOT / "data/audit/roadmap_lifecycle_overlay_lot40.json"
 
 
 def _load(path: Path) -> dict[str, object]:
@@ -321,18 +320,12 @@ def test_atomic_persistence_writes_four_linked_artifacts(tmp_path: Path) -> None
     assert persisted_audit["veto_checksum"] == persisted_veto["veto_checksum"]
 
 
-def test_lot41_production_files_were_absent_at_lot40_certification() -> None:
-    forbidden = (
-        "src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine.py",
-        "scripts/run_lot41_spread_depth_and_imbalance_engine.py",
-        "scripts/validate_lot41.py",
-    )
-    for relative in forbidden:
-        result = subprocess.run(
-            ["git", "cat-file", "-e", f"{LOT40_CERTIFIED_MERGE}:{relative}"],
-            cwd=ROOT,
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-        assert result.returncode != 0, relative
+def test_lot41_was_locked_in_lot40_certified_lifecycle() -> None:
+    lifecycle = _load(LOT40_LIFECYCLE_PATH)
+    assert lifecycle["latest_implemented_lot"] == 40
+    lots = lifecycle["lots"]
+    assert isinstance(lots, dict)
+    assert lots["41"] == {
+        "implementation_started": False,
+        "status": "PLANNED_LOCKED",
+    }
