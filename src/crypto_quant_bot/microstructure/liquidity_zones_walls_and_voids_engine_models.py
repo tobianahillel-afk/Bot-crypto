@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from typing import Any
 
 from .liquidity_zones_walls_and_voids_engine_validation import (
@@ -12,6 +12,7 @@ from .liquidity_zones_walls_and_voids_engine_validation import (
     PARTICIPANT_INTENT,
     RUNTIME_MODE,
     VALIDATION_STATE,
+    Lot42ValidationError,
     decimal_text,
     require_integer,
     require_sha256,
@@ -148,12 +149,12 @@ class LiquidityZoneV1:
             validate_positive(value, field)
         for value, field in (
             (self.replenished_quantity, "replenished_quantity"),
-            (self.replenishment_ratio, "replenishment_ratio"),
             (self.cancelled_quantity, "cancelled_quantity"),
             (self.distance_to_mid_bps, "distance_to_mid_bps"),
         ):
             validate_nonnegative(value, field)
         validate_ratio(self.persistence_ratio, "persistence_ratio")
+        validate_ratio(self.replenishment_ratio, "replenishment_ratio")
         validate_ratio(self.cancellation_rate, "cancellation_rate")
 
     def _validate_semantics(self) -> None:
@@ -161,18 +162,20 @@ class LiquidityZoneV1:
         require_integer(self.persistence_observations, "persistence_observations", minimum=1)
         require_integer(self.total_observations, "total_observations", minimum=1)
         if self.persistence_observations > self.total_observations:
-            raise ValueError("persistence observations exceed total observations")
-        expected_ratio = Decimal(self.persistence_observations) / Decimal(self.total_observations)
+            raise Lot42ValidationError("persistence observations exceed total observations")
+        with localcontext() as context:
+            context.prec = 50
+            expected_ratio = Decimal(self.persistence_observations) / Decimal(self.total_observations)
         if self.persistence_ratio != expected_ratio:
-            raise ValueError("persistence ratio/count mismatch")
+            raise Lot42ValidationError("persistence ratio/count mismatch")
         if self.lower_price > self.anchor_price or self.anchor_price > self.upper_price:
-            raise ValueError("zone anchor outside price bounds")
+            raise Lot42ValidationError("zone anchor outside price bounds")
         validate_classifications(self.classifications)
         validate_confidence(self.confidence_status)
         if self.lifecycle_status != ACTIVE or self.participant_intent != PARTICIPANT_INTENT:
-            raise ValueError("Lot 42 active-zone lifecycle or intent changed")
+            raise Lot42ValidationError("Lot 42 active-zone lifecycle or intent changed")
         if DISPLAYED_WALL not in self.classifications and self.confidence_status != NOT_APPLICABLE:
-            raise ValueError("non-wall zone confidence must be not applicable")
+            raise Lot42ValidationError("non-wall zone confidence must be not applicable")
 
     def payload_without_checksum(self) -> dict[str, Any]:
         payload = self.to_dict()
@@ -229,9 +232,9 @@ class LiquidityVoidV1:
         validate_positive(self.gap_bps, "gap_bps")
         validate_nonnegative(self.distance_to_mid_bps, "distance_to_mid_bps")
         if self.classification != LIQUIDITY_VOID:
-            raise ValueError("void classification changed")
+            raise Lot42ValidationError("void classification changed")
         if self.lifecycle_status != ACTIVE or self.participant_intent != PARTICIPANT_INTENT:
-            raise ValueError("Lot 42 void lifecycle or intent changed")
+            raise Lot42ValidationError("Lot 42 void lifecycle or intent changed")
         validate_reason_codes(self.reason_codes)
         require_sha256(self.void_checksum, "void_checksum")
 
@@ -280,11 +283,9 @@ class LiquidityZoneSetV1:
         require_integer(self.sequence_id, "sequence_id", minimum=1)
         validate_positive(self.mid_price, "mid_price")
         validate_sequence_ids(self.history_sequence_ids)
-        require_integer(self.expired_candidates_total, "expired_candidates_total")
+        require_integer(self.expired_candidates_total, "expired_candidates_total", minimum=0)
         if self.sequence_id != self.history_sequence_ids[-1]:
-            raise ValueError("zone-set sequence must be latest history sequence")
-        if not self.zones:
-            raise ValueError("Lot 42 requires at least one active liquidity zone")
+            raise Lot42ValidationError("zone-set sequence must be latest history sequence")
         validate_reason_codes(self.reason_codes)
         require_sha256(self.zone_set_checksum, "zone_set_checksum")
 
@@ -348,11 +349,13 @@ class Lot42MetricsV1:
             (self.expired_candidates_total, "expired_candidates_total"),
         )
         for value, field in values:
-            require_integer(value, field)
+            require_integer(value, field, minimum=0)
+        if self.observations_total == 0:
+            raise Lot42ValidationError("Lot 42 metrics require at least one observation")
         if self.displayed_walls_total > self.active_zones_total:
-            raise ValueError("wall count exceeds active zones")
+            raise Lot42ValidationError("wall count exceeds active zones")
         if self.persistent_zones_total > self.active_zones_total:
-            raise ValueError("persistent count exceeds active zones")
+            raise Lot42ValidationError("persistent count exceeds active zones")
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -431,7 +434,7 @@ class LiquidityZonesWallsVoidsEngineAuditV1:
             )
         )
         if not self.validation_checks or len(set(self.validation_checks)) != len(self.validation_checks):
-            raise ValueError("audit validation checks must be non-empty and unique")
+            raise Lot42ValidationError("audit validation checks must be non-empty and unique")
         validate_reason_codes(self.reason_codes)
         validate_lot42_safety(self.safety)
 
