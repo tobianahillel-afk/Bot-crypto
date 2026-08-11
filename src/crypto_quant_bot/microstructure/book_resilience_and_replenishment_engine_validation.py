@@ -47,6 +47,9 @@ MAX_WINDOW_STATUSES = frozenset(
 RESILIENCE_STATUSES = frozenset(
     {"NO_EVENTS", "RESILIENT", "FRAGILE", "SHIFTED", "PENDING", "PARTIAL"}
 )
+STRICTLY_POSITIVE_DECIMAL_FIELDS = frozenset(
+    {"adjacent_replenishment_distance_bps", "mid_shift_min_bps"}
+)
 
 
 class Lot43ValidationError(Lot42ValidationError):
@@ -74,6 +77,9 @@ def require_integer(value: Any, field: str, minimum: int = 0) -> int:
 
 
 def validate_nonnegative(value: Decimal, field: str) -> None:
+    if field in STRICTLY_POSITIVE_DECIMAL_FIELDS:
+        validate_positive(value, field)
+        return
     try:
         _validate_nonnegative(value, field)
     except Lot42ValidationError as exc:
@@ -96,7 +102,11 @@ def validate_side(value: str) -> None:
 
 def nonnegative_decimal_text(value: Any, field: str) -> Decimal:
     try:
-        return decimal_from_text(value, field, allow_zero=True)
+        return decimal_from_text(
+            value,
+            field,
+            allow_zero=field not in STRICTLY_POSITIVE_DECIMAL_FIELDS,
+        )
     except (Lot42ValidationError, BookIntegrityValidationError) as exc:
         raise _translate(exc) from exc
 
