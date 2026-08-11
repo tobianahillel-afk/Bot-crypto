@@ -44,34 +44,38 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p reports/lot42
-          python -m compileall -q src scripts tests
-          for path in \
-            config/microstructure/liquidity_zones_walls_and_voids_engine_v1.json \
-            contracts/schemas/liquidity_zone_set_v1.schema.json \
-            contracts/schemas/liquidity_zones_walls_voids_engine_state_v1.schema.json \
-            contracts/schemas/liquidity_zones_walls_voids_engine_audit_v1.schema.json; do
-            python -m json.tool "$path" >/dev/null
-          done
-          ruff check \
-            src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine.py \
-            src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine_models.py \
-            src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine_validation.py \
-            src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_analysis.py \
-            src/crypto_quant_bot/microstructure/__init__.py \
-            scripts/run_lot42_liquidity_zones_walls_and_voids_engine.py \
-            scripts/validate_lot42.py scripts/validate_lot42_no_connectivity.py \
-            tests/test_lot42*.py
-          mypy src/crypto_quant_bot/microstructure
-          python scripts/validate_lot42_no_connectivity.py
+          {
+            python -m compileall -q src scripts tests
+            for path in \
+              config/microstructure/liquidity_zones_walls_and_voids_engine_v1.json \
+              contracts/schemas/liquidity_zone_set_v1.schema.json \
+              contracts/schemas/liquidity_zones_walls_voids_engine_state_v1.schema.json \
+              contracts/schemas/liquidity_zones_walls_voids_engine_audit_v1.schema.json; do
+              python -m json.tool "$path" >/dev/null
+            done
+            ruff check \
+              src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine.py \
+              src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine_models.py \
+              src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine_validation.py \
+              src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_analysis.py \
+              src/crypto_quant_bot/microstructure/__init__.py \
+              scripts/run_lot42_liquidity_zones_walls_and_voids_engine.py \
+              scripts/validate_lot42.py scripts/validate_lot42_no_connectivity.py \
+              tests/test_lot42*.py
+            mypy src/crypto_quant_bot/microstructure
+            python scripts/validate_lot42_no_connectivity.py
+          } 2>&1 | tee reports/lot42/static_checks.txt
       - name: Targeted line and branch coverage
         run: |
+          set -euo pipefail
           coverage erase
           pytest -q tests/test_lot42*.py \
             --cov=crypto_quant_bot.microstructure.liquidity_zones_walls_and_voids_engine \
             --cov=crypto_quant_bot.microstructure.liquidity_zones_walls_and_voids_engine_models \
             --cov=crypto_quant_bot.microstructure.liquidity_zones_walls_and_voids_engine_validation \
             --cov=crypto_quant_bot.microstructure.liquidity_zones_walls_and_voids_analysis \
-            --cov-branch --cov-report=json:reports/lot42/coverage.json --cov-report=term-missing
+            --cov-branch --cov-report=json:reports/lot42/coverage.json --cov-report=term-missing \
+            2>&1 | tee reports/lot42/targeted_coverage.txt
           python - <<'PY'
           import json, os
           from pathlib import Path
