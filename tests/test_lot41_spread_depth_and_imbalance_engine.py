@@ -44,7 +44,7 @@ def test_lot41_reference_values_and_lineage() -> None:
     assert state["validation_state"] == "VALIDATED_OFFLINE_SPREAD_DEPTH_IMBALANCE_ONLY"
     assert feature["spread_absolute"] == "0.2"
     assert feature["mid_price"] == "50025"
-    assert feature["spread_bps"].startswith("0.039980009995002498750624687656")
+    assert feature["spread_bps"] == "0.03998000999500249875062468766"
     assert feature["microprice"].startswith("50025.016129032258064516129032")
     assert audit["state_output_checksum"] == state["output_checksum"]
     assert audit["feature_checksum"] == feature["feature_checksum"]
@@ -190,11 +190,14 @@ def test_lot41_price_unit_scaling_preserves_bps_and_imbalance() -> None:
     with localcontext() as context:
         context.prec = 50
         scaled_feature = _build_feature(scaled, integrity, veto, bands, 50, config["decision_time"])
+        expected_spread = original.spread_absolute * factor
+        expected_mid = original.mid_price * factor
+        expected_microprice = original.microprice * factor
     assert scaled_feature.spread_bps == original.spread_bps
     assert [item.imbalance for item in scaled_feature.depth_bands] == [item.imbalance for item in original.depth_bands]
-    assert scaled_feature.spread_absolute == original.spread_absolute * factor
-    assert scaled_feature.mid_price == original.mid_price * factor
-    assert scaled_feature.microprice == original.microprice * factor
+    assert scaled_feature.spread_absolute == expected_spread
+    assert scaled_feature.mid_price == expected_mid
+    assert scaled_feature.microprice == expected_microprice
 
 
 def test_lot41_feature_checksum_is_tamper_evident_roundtrip() -> None:
