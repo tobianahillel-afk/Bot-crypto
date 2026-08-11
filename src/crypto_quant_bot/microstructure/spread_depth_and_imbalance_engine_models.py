@@ -162,8 +162,6 @@ class DepthBandV1:
         expected = (self.bid_quantity - self.ask_quantity) / denominator
         if self.imbalance != expected or self.imbalance_status != IMBALANCE_DEFINED:
             raise Lot41ValidationError("depth/imbalance mismatch")
-        if not Decimal("-1") <= expected <= Decimal("1"):
-            raise Lot41ValidationError("imbalance escaped [-1,1]")
 
     def to_dict(self) -> dict[str, Any]:
         return {
