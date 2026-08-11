@@ -1,0 +1,18 @@
+{
+  "completed_mutants": 2251,
+  "evaluated_mutants": 2251,
+  "killed_mutants": 1803,
+  "max_children": 1,
+  "minimum_score_percent": 80.0,
+  "mutation_score_percent": 80.1,
+  "mutmut_results_exit_code": 0,
+  "mutmut_run_exit_code": 0,
+  "python_hash_seed": "0",
+  "schema_version": "lot42-mutation-summary-v1",
+  "source_head_sha": "2d91da1777f1ccbd7f81563dbc74fd3b89eecdf2",
+  "status": "PASS",
+  "survived_mutants": 448,
+  "suspicious_mutants": 0,
+  "timeout_mutants": 0,
+  "total_mutants": 2251
+}

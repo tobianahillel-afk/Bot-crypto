@@ -14,6 +14,9 @@ jobs:
     env:
       PYTHONPATH: src
       GATE_MERGE_SHA: 75822f8ea7c6f67f73649d2f43be6efba840ab67
+      SOURCE_HEAD_SHA: 14c0d8da1b02d076b3c43a07a34ac96c673018b0
+      FINAL_PR_HEAD_SHA: 89ae244db77f16f31d226a7494d78b65b904dcd9
+      IMPLEMENTATION_MERGE_SHA: a253ce35c97303e8b8c65707c07597e996b3a832
       CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - uses: actions/checkout@v4
@@ -28,14 +31,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove exact gate ancestry and Lot 42 absence
+      - name: Prove exact gate source final-head and squash ancestry
         run: |
           set -euo pipefail
-          git merge-base --is-ancestor "$GATE_MERGE_SHA" HEAD
-          test ! -e src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine.py
-          test ! -e src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine_models.py
-          test ! -e scripts/run_lot42_liquidity_zones_walls_and_voids_engine.py
-          test ! -e scripts/validate_lot42.py
+          git merge-base --is-ancestor "$GATE_MERGE_SHA" "$SOURCE_HEAD_SHA"
+          git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$FINAL_PR_HEAD_SHA"
+          git merge-base --is-ancestor "$IMPLEMENTATION_MERGE_SHA" HEAD
+          git diff --quiet "$FINAL_PR_HEAD_SHA" "$IMPLEMENTATION_MERGE_SHA" -- .
       - name: Compile lint type schema and no-connectivity checks
         run: |
           set -euo pipefail
@@ -89,23 +91,38 @@ jobs:
           if result['status']!='PASS':
               raise SystemExit('LOT41_CRITICAL_COVERAGE_BELOW_THRESHOLD')
           PY
-      - name: Generate validate and replay deterministic evidence
+      - name: Replay certified source generate validate and deterministic evidence
         run: |
           set -euo pipefail
-          outputs=(
-            data/audit/spread_depth_and_imbalance_engine_lot41.json
-            data/audit/spread_depth_and_imbalance_engine_audit_lot41.json
-            data/audit/book_feature_state_lot41.json
-          )
-          rm -rf /tmp/lot41-run1
+          rm -rf /tmp/lot41-source-certified /tmp/lot41-run1
+          git worktree add --detach /tmp/lot41-source-certified "$SOURCE_HEAD_SHA"
+          trap 'git worktree remove --force /tmp/lot41-source-certified >/dev/null 2>&1 || true' EXIT
           mkdir -p /tmp/lot41-run1
-          python scripts/run_lot41_spread_depth_and_imbalance_engine.py --code-commit "$CANDIDATE_SHA"
-          python scripts/validate_lot41.py --expected-code-commit "$CANDIDATE_SHA" --require-persisted
-          python scripts/validate_lot41_no_connectivity.py
-          for path in "${outputs[@]}"; do cp "$path" "/tmp/lot41-run1/$(basename "$path")"; done
-          python scripts/run_lot41_spread_depth_and_imbalance_engine.py --code-commit "$CANDIDATE_SHA"
-          python scripts/validate_lot41.py --expected-code-commit "$CANDIDATE_SHA" --require-persisted
-          for path in "${outputs[@]}"; do cmp "/tmp/lot41-run1/$(basename "$path")" "$path"; done
+          (
+            cd /tmp/lot41-source-certified
+            outputs=(
+              data/audit/spread_depth_and_imbalance_engine_lot41.json
+              data/audit/spread_depth_and_imbalance_engine_audit_lot41.json
+              data/audit/book_feature_state_lot41.json
+            )
+            PYTHONPATH=src python scripts/run_lot41_spread_depth_and_imbalance_engine.py \
+              --code-commit "$SOURCE_HEAD_SHA"
+            PYTHONPATH=src python scripts/validate_lot41.py \
+              --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
+            PYTHONPATH=src python scripts/validate_lot41_no_connectivity.py
+            for path in "${outputs[@]}"; do
+              cp "$path" "/tmp/lot41-run1/$(basename "$path")"
+            done
+            PYTHONPATH=src python scripts/run_lot41_spread_depth_and_imbalance_engine.py \
+              --code-commit "$SOURCE_HEAD_SHA"
+            PYTHONPATH=src python scripts/validate_lot41.py \
+              --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
+            for path in "${outputs[@]}"; do
+              cmp "/tmp/lot41-run1/$(basename "$path")" "$path"
+            done
+          )
+          git worktree remove --force /tmp/lot41-source-certified
+          trap - EXIT
       - name: Architecture roadmap traceability engineering and safety
         run: |
           python scripts/validate_roadmap_documentation.py
@@ -117,6 +134,10 @@ jobs:
           python scripts/quality_inventory.py
           python scripts/validate_engineering_deviations.py
           python scripts/validate_lot41_no_connectivity.py
+          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py
+          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py
+          test ! -e scripts/run_lot43_book_resilience_and_replenishment_engine.py
+          test ! -e scripts/validate_lot43.py
       - name: Security dependency regression and anti-flake
         run: |
           bandit -q -r \

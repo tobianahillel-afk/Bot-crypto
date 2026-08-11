@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/contracts/liquidity_zone_set_v1.schema.json",
+  "title": "LiquidityZoneSetV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source_id",
+    "venue",
+    "instrument_id",
+    "market_type",
+    "event_time",
+    "receive_time",
+    "decision_time",
+    "sequence_id",
+    "mid_price",
+    "history_sequence_ids",
+    "zones",
+    "voids",
+    "expired_candidates_total",
+    "observed_book_only",
+    "participant_intent_inferred",
+    "reason_codes",
+    "zone_set_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "liquidity-zone-set-v1"},
+    "source_id": {"type": "string", "minLength": 1},
+    "venue": {"type": "string", "minLength": 1},
+    "instrument_id": {"type": "string", "minLength": 1},
+    "market_type": {"const": "SPOT"},
+    "event_time": {"type": "string", "pattern": "Z$"},
+    "receive_time": {"type": "string", "pattern": "Z$"},
+    "decision_time": {"type": "string", "pattern": "Z$"},
+    "sequence_id": {"type": "integer", "minimum": 1},
+    "mid_price": {"$ref": "#/$defs/positiveDecimal"},
+    "history_sequence_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "integer", "minimum": 1}
+    },
+    "zones": {"type": "array", "items": {"$ref": "#/$defs/zone"}},
+    "voids": {"type": "array", "items": {"$ref": "#/$defs/void"}},
+    "expired_candidates_total": {"type": "integer", "minimum": 0},
+    "observed_book_only": {"const": true},
+    "participant_intent_inferred": {"const": false},
+    "reason_codes": {"$ref": "#/$defs/reasonCodes"},
+    "zone_set_checksum": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "positiveDecimal": {
+      "type": "string",
+      "pattern": "^(?:0*[1-9][0-9]*(?:\\.[0-9]+)?|0+\\.[0-9]*[1-9][0-9]*)$"
+    },
+    "nonNegativeDecimal": {
+      "type": "string",
+      "pattern": "^(?:0|0*[0-9]+(?:\\.[0-9]+)?)$"
+    },
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "reasonCodes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[A-Z0-9_]+$"}
+    },
+    "zone": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "zone_id",
+        "side",
+        "lower_price",
+        "upper_price",
+        "anchor_price",
+        "level_count",
+        "quantity",
+        "notional",
+        "persistence_observations",
+        "total_observations",
+        "persistence_ratio",
+        "replenished_quantity",
+        "replenishment_ratio",
+        "cancelled_quantity",
+        "cancellation_rate",
+        "distance_to_mid_bps",
+        "classifications",
+        "confidence_status",
+        "lifecycle_status",
+        "participant_intent",
+        "reason_codes",
+        "zone_checksum"
+      ],
+      "properties": {
+        "schema_version": {"const": "liquidity-zone-v1"},
+        "zone_id": {"type": "string", "minLength": 1},
+        "side": {"enum": ["BID", "ASK"]},
+        "lower_price": {"$ref": "#/$defs/positiveDecimal"},
+        "upper_price": {"$ref": "#/$defs/positiveDecimal"},
+        "anchor_price": {"$ref": "#/$defs/positiveDecimal"},
+        "level_count": {"type": "integer", "minimum": 1},
+        "quantity": {"$ref": "#/$defs/positiveDecimal"},
+        "notional": {"$ref": "#/$defs/positiveDecimal"},
+        "persistence_observations": {"type": "integer", "minimum": 1},
+        "total_observations": {"type": "integer", "minimum": 1},
+        "persistence_ratio": {"$ref": "#/$defs/nonNegativeDecimal"},
+        "replenished_quantity": {"$ref": "#/$defs/nonNegativeDecimal"},
+        "replenishment_ratio": {"$ref": "#/$defs/nonNegativeDecimal"},
+        "cancelled_quantity": {"$ref": "#/$defs/nonNegativeDecimal"},
+        "cancellation_rate": {"$ref": "#/$defs/nonNegativeDecimal"},
+        "distance_to_mid_bps": {"$ref": "#/$defs/nonNegativeDecimal"},
+        "classifications": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"enum": ["DISPLAYED_WALL", "PERSISTENT_ZONE"]}
+        },
+        "confidence_status": {
+          "enum": ["HIGH_CONFIDENCE", "LOW_CONFIDENCE", "NOT_APPLICABLE"]
+        },
+        "lifecycle_status": {"const": "ACTIVE"},
+        "participant_intent": {"const": "NOT_INFERRED"},
+        "reason_codes": {"$ref": "#/$defs/reasonCodes"},
+        "zone_checksum": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "void": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "void_id",
+        "side",
+        "near_price",
+        "far_price",
+        "gap_bps",
+        "distance_to_mid_bps",
+        "classification",
+        "lifecycle_status",
+        "participant_intent",
+        "reason_codes",
+        "void_checksum"
+      ],
+      "properties": {
+        "schema_version": {"const": "liquidity-void-v1"},
+        "void_id": {"type": "string", "minLength": 1},
+        "side": {"enum": ["BID", "ASK"]},
+        "near_price": {"$ref": "#/$defs/positiveDecimal"},
+        "far_price": {"$ref": "#/$defs/positiveDecimal"},
+        "gap_bps": {"$ref": "#/$defs/positiveDecimal"},
+        "distance_to_mid_bps": {"$ref": "#/$defs/nonNegativeDecimal"},
+        "classification": {"const": "LIQUIDITY_VOID"},
+        "lifecycle_status": {"const": "ACTIVE"},
+        "participant_intent": {"const": "NOT_INFERRED"},
+        "reason_codes": {"$ref": "#/$defs/reasonCodes"},
+        "void_checksum": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

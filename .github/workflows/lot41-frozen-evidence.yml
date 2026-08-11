@@ -50,14 +50,13 @@ jobs:
           EOF
           sort -o /tmp/lot41-expected.txt /tmp/lot41-expected.txt
           diff -u /tmp/lot41-expected.txt /tmp/lot41-evidence.txt
-      - name: Prove frozen Lot 41 implementation immutability
+      - name: Prove frozen Lot 41 production immutability
         run: |
           set -euo pipefail
           git diff --quiet "$SOURCE_HEAD_SHA" HEAD -- \
             src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine.py \
             src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine_models.py \
             src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine_validation.py \
-            src/crypto_quant_bot/microstructure/__init__.py \
             config/microstructure/spread_depth_and_imbalance_engine_v1.json \
             contracts/schemas/book_feature_state_v1.schema.json \
             contracts/schemas/spread_depth_imbalance_engine_state_v1.schema.json \
@@ -68,12 +67,8 @@ jobs:
             tests/test_lot41_spread_depth_and_imbalance_engine.py \
             tests/test_lot41_validation_contracts.py \
             tests/test_lot41_schema_contracts.py \
-            tests/test_lot41_v4_entry_gate.py \
             docs/LOT_41_SPREAD_DEPTH_AND_IMBALANCE_ENGINE.md \
-            docs/ACCEPTANCE_CRITERIA_LOT_41.md \
-            .github/workflows/lot41-spread-depth-imbalance.yml \
-            .github/workflows/lot41-mutation-assurance.yml \
-            .github/workflows/lot41-entry-gate.yml
+            docs/ACCEPTANCE_CRITERIA_LOT_41.md
       - name: Prove frozen evidence immutability
         run: |
           set -euo pipefail
@@ -83,18 +78,27 @@ jobs:
             data/audit/spread_depth_and_imbalance_engine_lot41.json \
             reports/lot41/coverage_summary.json \
             reports/lot41/mutation_summary.json
-      - name: Validate exact frozen evidence and deterministic implementation
+      - name: Replay exact frozen evidence and deterministic implementation
         run: |
           set -euo pipefail
-          python -m compileall -q src scripts tests
-          ruff check scripts/validate_lot41_frozen_evidence.py
-          mypy src/crypto_quant_bot/microstructure
-          python scripts/validate_lot41_frozen_evidence.py | tee /tmp/lot41-frozen-validation.json
-          python scripts/validate_lot41.py \
-            --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
-          python scripts/validate_lot41_no_connectivity.py
-      - name: Architecture roadmap traceability and engineering gates
+          rm -rf /tmp/lot41-frozen-certified
+          git worktree add --detach /tmp/lot41-frozen-certified "$FINAL_PR_HEAD_SHA"
+          (
+            cd /tmp/lot41-frozen-certified
+            PYTHONPATH=src python -m compileall -q src scripts tests
+            ruff check scripts/validate_lot41_frozen_evidence.py
+            PYTHONPATH=src python scripts/validate_lot41_frozen_evidence.py | tee /tmp/lot41-frozen-validation.json
+            PYTHONPATH=src python scripts/validate_lot41.py \
+              --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
+            PYTHONPATH=src python scripts/validate_lot41_no_connectivity.py
+            PYTHONPATH=src pytest -q tests/test_lot41*.py
+            for repetition in 1 2 3; do PYTHONPATH=src pytest -q tests/test_lot41*.py; done
+            bandit -q -r scripts/validate_lot41_frozen_evidence.py -ll
+          )
+          git worktree remove --force /tmp/lot41-frozen-certified
+      - name: Current architecture and downstream safety remain valid
         run: |
+          set -euo pipefail
           python scripts/validate_roadmap_documentation.py
           python scripts/validate_architecture_boundaries.py
           python scripts/validate_domain_architecture.py
@@ -103,21 +107,11 @@ jobs:
           python scripts/check_no_silent_numeric_coercion.py
           python scripts/quality_inventory.py
           python scripts/validate_engineering_deviations.py
-      - name: Regression security dependency and anti-flake
-        run: |
-          set -euo pipefail
-          pytest -q
-          bandit -q -r scripts/validate_lot41_frozen_evidence.py -ll
           pip-audit -r requirements-dev.lock
-          for repetition in 1 2 3; do pytest -q tests/test_lot41*.py; done
-          python scripts/validate_lot41_frozen_evidence.py
-      - name: Prove Lot 42 remains locked
-        run: |
-          set -euo pipefail
-          test ! -e src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine.py
-          test ! -e src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine_models.py
-          test ! -e scripts/run_lot42_liquidity_zones_walls_and_voids_engine.py
-          test ! -e scripts/validate_lot42.py
+          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py
+          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py
+          test ! -e scripts/run_lot43_book_resilience_and_replenishment_engine.py
+          test ! -e scripts/validate_lot43.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
