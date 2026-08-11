@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import copy
 import json
+from collections.abc import Callable
 from decimal import Decimal
 from pathlib import Path
-from typing import Callable
 
 import pytest
 
