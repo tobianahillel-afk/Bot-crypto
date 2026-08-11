@@ -255,7 +255,7 @@ def _candidate_pairs(
     mid: Decimal,
     max_distance: Decimal,
 ) -> tuple[tuple[Decimal, int, int], ...]:
-    pairs = []
+    pairs: list[tuple[Decimal, int, int]] = []
     for current_index, current_cluster in enumerate(current):
         for observed_index, observed_cluster in enumerate(observed):
             distance = bps_distance(
