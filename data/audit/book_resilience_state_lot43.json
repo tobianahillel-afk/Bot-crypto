@@ -1,0 +1,139 @@
+{
+  "decision_time": "2026-08-06T19:18:40.100000Z",
+  "depletion_events": [
+    {
+      "depleted_price": "50024.8",
+      "depleted_quantity": "1.25",
+      "depletion_event_time": "2026-08-06T19:18:40.065000Z",
+      "depletion_ratio": "1",
+      "depletion_receive_time": "2026-08-06T19:18:40.070000Z",
+      "depletion_sequence_id": 1003,
+      "directional_mid_shift_bps": "0",
+      "event_checksum": "07cf13d70e0dc9f04fd53c72153af7107ae72032ab37b392340bf60beded5c67",
+      "event_id": "lot43-1003-bid-50024.8",
+      "max_window_status": "EXPIRED_NO_REPLENISHMENT",
+      "participant_intent": "NOT_INFERRED",
+      "post_depletion_quantity": "0",
+      "previous_quantity": "1.25",
+      "reason_codes": [
+        "LOT43_DEPLETION_OBSERVED",
+        "LOT43_PARTICIPANT_INTENT_NOT_INFERRED",
+        "LOT43_NO_REPLENISHMENT_WITHIN_MAX_WINDOW"
+      ],
+      "recovered_fraction": "0",
+      "replenished_quantity": "0",
+      "replenishment_kind": "NONE",
+      "replenishment_sequence_id": null,
+      "replenishment_time_us": null,
+      "schema_version": "book-depletion-event-v1",
+      "side": "BID"
+    }
+  ],
+  "event_time": "2026-08-06T19:18:40.065000Z",
+  "history_sequence_ids": [
+    1001,
+    1002,
+    1003
+  ],
+  "instrument_id": "BTC-EUR-SPOT",
+  "market_type": "SPOT",
+  "observed_book_only": true,
+  "participant_intent_inferred": false,
+  "reason_codes": [
+    "LOT43_BOOK_RESILIENCE_COMPUTED",
+    "LOT43_CERTIFIED_OBSERVATION_HISTORY_ONLY",
+    "LOT43_PARTICIPANT_INTENT_NOT_INFERRED",
+    "LOT44_REMAINS_LOCKED"
+  ],
+  "receive_time": "2026-08-06T19:18:40.070000Z",
+  "resilience_checksum": "ff314e1eecd40bca822b471f0239fdb8abb294375a8964a738131b71cba4b36e",
+  "resilience_slices": [
+    {
+      "depletion_events_total": 1,
+      "expired_events_total": 1,
+      "horizon_us": 10000,
+      "mean_recovered_fraction": "0",
+      "mean_replenishment_time_us": null,
+      "mid_shift_events_total": 0,
+      "pending_events_total": 0,
+      "reason_codes": [
+        "LOT43_RESILIENCE_SLICE_COMPUTED",
+        "LOT43_VOLATILITY_REGIME_QUIET"
+      ],
+      "recovered_events_total": 0,
+      "resilience_status": "FRAGILE",
+      "schema_version": "book-resilience-slice-v1",
+      "side": "BID",
+      "slice_checksum": "57259821912118ee523565b04e40c1e76f1b7d652bc3967db48dfda0c1174e6f",
+      "volatility_method": "OBSERVED_BOOK_MID_MAX_ABS_MOVE_BPS",
+      "volatility_regime": "QUIET"
+    },
+    {
+      "depletion_events_total": 1,
+      "expired_events_total": 1,
+      "horizon_us": 25000,
+      "mean_recovered_fraction": "0",
+      "mean_replenishment_time_us": null,
+      "mid_shift_events_total": 0,
+      "pending_events_total": 0,
+      "reason_codes": [
+        "LOT43_RESILIENCE_SLICE_COMPUTED",
+        "LOT43_VOLATILITY_REGIME_QUIET"
+      ],
+      "recovered_events_total": 0,
+      "resilience_status": "FRAGILE",
+      "schema_version": "book-resilience-slice-v1",
+      "side": "BID",
+      "slice_checksum": "f882222e3c9129ce25bae765d87a458a6a1c4d6a0d405d4b37331d1230005ee4",
+      "volatility_method": "OBSERVED_BOOK_MID_MAX_ABS_MOVE_BPS",
+      "volatility_regime": "QUIET"
+    },
+    {
+      "depletion_events_total": 0,
+      "expired_events_total": 0,
+      "horizon_us": 10000,
+      "mean_recovered_fraction": null,
+      "mean_replenishment_time_us": null,
+      "mid_shift_events_total": 0,
+      "pending_events_total": 0,
+      "reason_codes": [
+        "LOT43_RESILIENCE_SLICE_COMPUTED",
+        "LOT43_VOLATILITY_REGIME_QUIET"
+      ],
+      "recovered_events_total": 0,
+      "resilience_status": "NO_EVENTS",
+      "schema_version": "book-resilience-slice-v1",
+      "side": "ASK",
+      "slice_checksum": "a58abdb9b666c11f07c08c2534fe021240070491ceaf909bc88eed73183bfe0c",
+      "volatility_method": "OBSERVED_BOOK_MID_MAX_ABS_MOVE_BPS",
+      "volatility_regime": "QUIET"
+    },
+    {
+      "depletion_events_total": 0,
+      "expired_events_total": 0,
+      "horizon_us": 25000,
+      "mean_recovered_fraction": null,
+      "mean_replenishment_time_us": null,
+      "mid_shift_events_total": 0,
+      "pending_events_total": 0,
+      "reason_codes": [
+        "LOT43_RESILIENCE_SLICE_COMPUTED",
+        "LOT43_VOLATILITY_REGIME_QUIET"
+      ],
+      "recovered_events_total": 0,
+      "resilience_status": "NO_EVENTS",
+      "schema_version": "book-resilience-slice-v1",
+      "side": "ASK",
+      "slice_checksum": "85f24c822ecaf44c7f94f6f2fa008e7c0c0708ad2a1a6d0b928287b0342d3f52",
+      "volatility_method": "OBSERVED_BOOK_MID_MAX_ABS_MOVE_BPS",
+      "volatility_regime": "QUIET"
+    }
+  ],
+  "schema_version": "book-resilience-state-v1",
+  "sequence_id": 1003,
+  "source_id": "kraken-reference-offline-fixture",
+  "venue": "KRAKEN",
+  "volatility_measure_bps": "0",
+  "volatility_method": "OBSERVED_BOOK_MID_MAX_ABS_MOVE_BPS",
+  "volatility_regime": "QUIET"
+}
