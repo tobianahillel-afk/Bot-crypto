@@ -15,6 +15,9 @@ from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_re
     canonical_checksum,
     load_json_object,
 )
+from crypto_quant_bot.microstructure.book_integrity_desynchronization_detector_validation import (
+    BookIntegrityValidationError,
+)
 from crypto_quant_bot.microstructure.liquidity_zones_walls_and_voids_analysis import (
     BookObservation,
     LiquidityAnalysisPolicy,
@@ -164,7 +167,7 @@ def test_lot42_time_validation_fails_closed() -> None:
 def test_lot42_sequence_validation_rejects_empty_duplicate_and_ordering() -> None:
     with pytest.raises(Lot42ValidationError):
         validate_sequence_ids(())
-    with pytest.raises(Exception):
+    with pytest.raises(BookIntegrityValidationError):
         validate_sequence_ids((0,))
     with pytest.raises(Lot42ValidationError):
         validate_sequence_ids((1, 1))
@@ -206,7 +209,7 @@ def test_lot42_model_invariants_fail_closed() -> None:
         replace(liquidity_void, lifecycle_status="EXPIRED")
     with pytest.raises(Lot42ValidationError):
         replace(zone_set, sequence_id=zone_set.sequence_id + 1)
-    with pytest.raises(Exception):
+    with pytest.raises(BookIntegrityValidationError):
         replace(zone_set, expired_candidates_total=-1)
     with pytest.raises(Lot42ValidationError):
         replace(state, safety={})
@@ -224,19 +227,19 @@ def test_lot42_metrics_invariants_fail_closed() -> None:
 
 
 def test_lot42_void_constructor_rejects_invalid_side_and_intent() -> None:
-    common = dict(
-        void_id="void",
-        side="BID",
-        near_price=Decimal("100"),
-        far_price=Decimal("99"),
-        gap_bps=Decimal("10"),
-        distance_to_mid_bps=Decimal("1"),
-        classification=LIQUIDITY_VOID,
-        lifecycle_status=ACTIVE,
-        participant_intent=PARTICIPANT_INTENT,
-        reason_codes=("LOT42_VOID",),
-        void_checksum=ZERO_SHA256,
-    )
+    common = {
+        "void_id": "void",
+        "side": "BID",
+        "near_price": Decimal("100"),
+        "far_price": Decimal("99"),
+        "gap_bps": Decimal("10"),
+        "distance_to_mid_bps": Decimal("1"),
+        "classification": LIQUIDITY_VOID,
+        "lifecycle_status": ACTIVE,
+        "participant_intent": PARTICIPANT_INTENT,
+        "reason_codes": ("LOT42_VOID",),
+        "void_checksum": ZERO_SHA256,
+    }
     LiquidityVoidV1(**common)
     with pytest.raises(Lot42ValidationError):
         LiquidityVoidV1(**{**common, "side": "BOTH"})
@@ -272,7 +275,7 @@ def test_lot42_history_policy_rejects_insufficient_or_invalid_evidence() -> None
     changed_identity = (_observation(1), _observation(2, source="other"))
     with pytest.raises(Lot42ValidationError, match="identity changed"):
         analyze_observations(changed_identity, _policy())
-    with pytest.raises(Lot42ValidationError, match="persistence"):
+    with pytest.raises(Lot42ValidationError, match="persistent"):
         analyze_observations(
             (_observation(1), _observation(2)),
             _policy(persistent_min_ratio=Decimal("2")),
@@ -355,7 +358,7 @@ def test_lot42_engine_checksum_and_gate_semantics_fail_closed(
         engine._verify_checksum({"value": 1, "checksum": ZERO_SHA256}, "checksum", ZERO_SHA256, "test")
     gate = load_json_object(ROOT / "data/audit/lot42_v4_entry_gate.json")
     config = load_json_object(ROOT / CONFIG_PATH)
-    gate["trade_allowed"] = True
+    gate["human_decision"] = "DENIED_START_LOT42"
     body = dict(gate)
     body.pop("output_checksum", None)
     gate["output_checksum"] = canonical_checksum(body)
