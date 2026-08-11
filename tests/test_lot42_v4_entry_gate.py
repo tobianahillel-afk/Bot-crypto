@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import json
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -20,11 +21,13 @@ from scripts.validate_lot42_entry_gate import (
 ROOT = Path(__file__).resolve().parents[1]
 GATE_PATH = ROOT / "data/audit/lot42_v4_entry_gate.json"
 SCHEMA_PATH = ROOT / "contracts/schemas/lot42_v4_entry_gate_v1.schema.json"
+GATE_MERGE_SHA = "7456c5b80b609ee5958d8b6da0effd489faa308c"
+LOT43_HISTORICAL_PATHS = gate_validator.LOT43_FORBIDDEN_IMPLEMENTATION_PATHS
 
 
 @pytest.fixture(autouse=True)
 def _isolate_historical_gate(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Replay immutable gate facts without requiring Lot 42 absence after gate merge."""
+    """Replay immutable gate facts without requiring historical absence on today's tree."""
     monkeypatch.setattr(
         gate_validator,
         "validate_lot41_post_merge",
@@ -38,6 +41,7 @@ def _isolate_historical_gate(monkeypatch: pytest.MonkeyPatch) -> None:
         },
     )
     monkeypatch.setattr(gate_validator, "LOT42_FORBIDDEN_IMPLEMENTATION_PATHS", ())
+    monkeypatch.setattr(gate_validator, "LOT43_FORBIDDEN_IMPLEMENTATION_PATHS", ())
 
 
 def _write_json(path: Path, payload: object) -> None:
@@ -59,6 +63,17 @@ def _install_tampered_gate(
     _write_json(path, payload)
     monkeypatch.setattr(gate_validator, "GATE_PATH", path)
     monkeypatch.setattr(gate_validator, "EXPECTED_GATE_CHECKSUM", payload["output_checksum"])
+
+
+def _gate_tree_paths() -> set[str]:
+    result = subprocess.run(
+        ["git", "ls-tree", "-r", "--name-only", GATE_MERGE_SHA],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return set(result.stdout.splitlines())
 
 
 def test_lot42_entry_gate_passes_exact_audited_state() -> None:
@@ -123,8 +138,9 @@ def test_lot42_historical_gate_keeps_lot43_locked() -> None:
     assert gate["implementation_started"] is False
     assert gate["next_lot"] == 43
     assert gate["next_lot_status"] == "PLANNED_LOCKED"
-    for path in gate_validator.LOT43_FORBIDDEN_IMPLEMENTATION_PATHS:
-        assert not path.exists()
+    tree_paths = _gate_tree_paths()
+    for path in LOT43_HISTORICAL_PATHS:
+        assert path.relative_to(ROOT).as_posix() not in tree_paths
 
 
 def test_lot42_gate_rejects_lot43_scope_unlock(
