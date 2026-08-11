@@ -76,6 +76,17 @@ class BookResilienceAnalysisResult:
     resilience_slices: tuple[BookResilienceSliceV1, ...]
 
 
+@dataclass(frozen=True, slots=True)
+class DepletionCandidate:
+    baseline: BookObservation
+    side: str
+    price: Decimal
+    previous_quantity: Decimal
+    post_quantity: Decimal
+    depleted: Decimal
+    ratio: Decimal
+
+
 def analyze_book_resilience(
     observations: tuple[BookObservation, ...],
     policy: BookResiliencePolicy,
@@ -195,17 +206,20 @@ def _pair_depletions(
             ratio = depleted / level.quantity
         if depleted < policy.depletion_min_quantity or ratio < policy.depletion_min_ratio:
             continue
+        candidate = DepletionCandidate(
+            current,
+            side,
+            level.price,
+            level.quantity,
+            post_quantity,
+            depleted,
+            ratio,
+        )
         output.append(
             _build_depletion_event(
                 observations,
                 current_index,
-                current,
-                side,
-                level.price,
-                level.quantity,
-                post_quantity,
-                depleted,
-                ratio,
+                candidate,
                 policy,
                 decision_time,
             )
@@ -216,35 +230,30 @@ def _pair_depletions(
 def _build_depletion_event(
     observations: tuple[BookObservation, ...],
     current_index: int,
-    baseline: BookObservation,
-    side: str,
-    price: Decimal,
-    previous_quantity: Decimal,
-    post_quantity: Decimal,
-    depleted: Decimal,
-    ratio: Decimal,
+    candidate: DepletionCandidate,
     policy: BookResiliencePolicy,
     decision_time: str,
 ) -> BookDepletionEventV1:
+    baseline = candidate.baseline
     outcome: Outcome | None = _find_first_outcome(
         observations[current_index + 1 :],
         baseline,
-        side,
-        price,
-        depleted,
+        candidate.side,
+        candidate.price,
+        candidate.depleted,
         policy,
     )
     if outcome is None:
         outcome = _no_outcome(baseline, policy, decision_time)
     kind, sequence_id, time_us, replenished, recovered, shift, status = outcome
     event = BookDepletionEventV1(
-        f"lot43-{baseline.sequence_id}-{side.lower()}-{price}",
-        side,
-        price,
-        previous_quantity,
-        post_quantity,
-        depleted,
-        ratio,
+        f"lot43-{baseline.sequence_id}-{candidate.side.lower()}-{candidate.price}",
+        candidate.side,
+        candidate.price,
+        candidate.previous_quantity,
+        candidate.post_quantity,
+        candidate.depleted,
+        candidate.ratio,
         baseline.sequence_id,
         baseline.event_time,
         baseline.receive_time,
@@ -262,6 +271,56 @@ def _build_depletion_event(
     return replace(event, event_checksum=canonical_checksum(event.payload_without_checksum()))
 
 
+def _observation_outcome(
+    observation: BookObservation,
+    baseline: BookObservation,
+    side: str,
+    price: Decimal,
+    depleted: Decimal,
+    policy: BookResiliencePolicy,
+    duration: int,
+) -> Outcome | None:
+    same_gain = max(
+        _quantity_at(observation, side, price) - _quantity_at(baseline, side, price),
+        ZERO,
+    )
+    same_fraction = bounded_recovery_fraction(same_gain, depleted)
+    if same_fraction >= policy.replenishment_min_recovery_ratio:
+        return (
+            "SAME_PRICE",
+            observation.sequence_id,
+            duration,
+            same_gain,
+            same_fraction,
+            ZERO,
+            "REPLENISHED",
+        )
+    adjacent_gain = _adjacent_gain(baseline, observation, side, price, policy)
+    adjacent_fraction = bounded_recovery_fraction(adjacent_gain, depleted)
+    if adjacent_fraction >= policy.replenishment_min_recovery_ratio:
+        return (
+            "ADJACENT_PRICE",
+            observation.sequence_id,
+            duration,
+            adjacent_gain,
+            adjacent_fraction,
+            ZERO,
+            "REPLENISHED",
+        )
+    shift = directional_mid_shift_bps(side, baseline.mid_price, observation.mid_price)
+    if shift >= policy.mid_shift_min_bps:
+        return (
+            "MID_SHIFT",
+            observation.sequence_id,
+            duration,
+            ZERO,
+            ZERO,
+            shift,
+            "MID_SHIFTED",
+        )
+    return None
+
+
 def _find_first_outcome(
     future: tuple[BookObservation, ...],
     baseline: BookObservation,
@@ -275,44 +334,17 @@ def _find_first_outcome(
         duration = elapsed_us(baseline.receive_time, observation.receive_time)
         if duration > maximum:
             break
-        same_gain = max(
-            _quantity_at(observation, side, price) - _quantity_at(baseline, side, price),
-            ZERO,
+        outcome = _observation_outcome(
+            observation,
+            baseline,
+            side,
+            price,
+            depleted,
+            policy,
+            duration,
         )
-        same_fraction = bounded_recovery_fraction(same_gain, depleted)
-        if same_fraction >= policy.replenishment_min_recovery_ratio:
-            return (
-                "SAME_PRICE",
-                observation.sequence_id,
-                duration,
-                same_gain,
-                same_fraction,
-                ZERO,
-                "REPLENISHED",
-            )
-        adjacent_gain = _adjacent_gain(baseline, observation, side, price, policy)
-        adjacent_fraction = bounded_recovery_fraction(adjacent_gain, depleted)
-        if adjacent_fraction >= policy.replenishment_min_recovery_ratio:
-            return (
-                "ADJACENT_PRICE",
-                observation.sequence_id,
-                duration,
-                adjacent_gain,
-                adjacent_fraction,
-                ZERO,
-                "REPLENISHED",
-            )
-        shift = directional_mid_shift_bps(side, baseline.mid_price, observation.mid_price)
-        if shift >= policy.mid_shift_min_bps:
-            return (
-                "MID_SHIFT",
-                observation.sequence_id,
-                duration,
-                ZERO,
-                ZERO,
-                shift,
-                "MID_SHIFTED",
-            )
+        if outcome is not None:
+            return outcome
     return None
 
 
