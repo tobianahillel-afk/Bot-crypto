@@ -27,9 +27,11 @@ from .book_resilience_and_replenishment_engine_validation import (
     validate_regime_thresholds,
 )
 from .liquidity_zones_walls_and_voids_analysis import BookObservation
+from .order_book_l2_snapshot_engine_models import OrderBookLevelV1
 
 ZERO_SHA256 = "0" * 64
 ZERO = Decimal("0")
+Outcome = tuple[str, int | None, int | None, Decimal, Decimal, Decimal, str]
 
 
 @dataclass(frozen=True, slots=True)
@@ -120,7 +122,11 @@ def _volatility_measure(
     with localcontext() as context:
         context.prec = precision
         for previous, current in pairwise(observations):
-            moves.append(abs(current.mid_price - previous.mid_price) / previous.mid_price * Decimal("10000"))
+            moves.append(
+                abs(current.mid_price - previous.mid_price)
+                / previous.mid_price
+                * Decimal("10000")
+            )
     return max(moves, default=ZERO)
 
 
@@ -132,7 +138,7 @@ def _volatility_regime(measure: Decimal, policy: BookResiliencePolicy) -> str:
     return "NORMAL"
 
 
-def _levels(observation: BookObservation, side: str) -> tuple[object, ...]:
+def _levels(observation: BookObservation, side: str) -> tuple[OrderBookLevelV1, ...]:
     if side == "BID":
         return observation.bids
     if side == "ASK":
@@ -220,7 +226,7 @@ def _build_depletion_event(
     policy: BookResiliencePolicy,
     decision_time: str,
 ) -> BookDepletionEventV1:
-    outcome = _find_first_outcome(
+    outcome: Outcome | None = _find_first_outcome(
         observations[current_index + 1 :],
         baseline,
         side,
@@ -263,7 +269,7 @@ def _find_first_outcome(
     price: Decimal,
     depleted: Decimal,
     policy: BookResiliencePolicy,
-) -> tuple[str, int, int, Decimal, Decimal, Decimal, str] | None:
+) -> Outcome | None:
     maximum = policy.resilience_horizons_us[-1]
     for observation in future:
         duration = elapsed_us(baseline.receive_time, observation.receive_time)
@@ -323,9 +329,15 @@ def _adjacent_gain(
     for price in sorted(prices):
         if price == depleted_price:
             continue
-        if bps_distance(price, depleted_price, depleted_price) > policy.adjacent_replenishment_distance_bps:
+        if (
+            bps_distance(price, depleted_price, depleted_price)
+            > policy.adjacent_replenishment_distance_bps
+        ):
             continue
-        gain += max(_quantity_at(future, side, price) - _quantity_at(baseline, side, price), ZERO)
+        gain += max(
+            _quantity_at(future, side, price) - _quantity_at(baseline, side, price),
+            ZERO,
+        )
     return gain
 
 
@@ -333,7 +345,7 @@ def _no_outcome(
     baseline: BookObservation,
     policy: BookResiliencePolicy,
     decision_time: str,
-) -> tuple[str, None, None, Decimal, Decimal, Decimal, str]:
+) -> Outcome:
     status = (
         "EXPIRED_NO_REPLENISHMENT"
         if age_us(baseline.receive_time, decision_time) >= policy.resilience_horizons_us[-1]
@@ -473,7 +485,11 @@ def _resilience_status(
 ) -> str:
     if events == 0:
         return "NO_EVENTS"
-    if recovered == events and mean_fraction is not None and mean_fraction >= policy.replenishment_min_recovery_ratio:
+    if (
+        recovered == events
+        and mean_fraction is not None
+        and mean_fraction >= policy.replenishment_min_recovery_ratio
+    ):
         return "RESILIENT"
     if expired == events:
         return "FRAGILE"
