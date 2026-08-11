@@ -16,6 +16,8 @@ jobs:
       GATE_MERGE_SHA: 75822f8ea7c6f67f73649d2f43be6efba840ab67
       SOURCE_HEAD_SHA: 14c0d8da1b02d076b3c43a07a34ac96c673018b0
       EVIDENCE_HEAD_SHA: 7ada0ca6c4d439505ef453b988dedd4aa96c1a32
+      FINAL_PR_HEAD_SHA: 89ae244db77f16f31d226a7494d78b65b904dcd9
+      MERGED_COMMIT_SHA: a253ce35c97303e8b8c65707c07597e996b3a832
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,12 +31,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove certified chain and exact five-file evidence set
+      - name: Prove certified chain squash equivalence and exact five-file evidence set
         run: |
           set -euo pipefail
           git merge-base --is-ancestor "$GATE_MERGE_SHA" "$SOURCE_HEAD_SHA"
           git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA"
-          git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" HEAD
+          git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" "$FINAL_PR_HEAD_SHA"
+          git merge-base --is-ancestor "$MERGED_COMMIT_SHA" HEAD
+          git diff --quiet "$FINAL_PR_HEAD_SHA" "$MERGED_COMMIT_SHA" -- .
           git diff --name-only "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA" | sort > /tmp/lot41-evidence.txt
           cat > /tmp/lot41-expected.txt <<'EOF'
           data/audit/book_feature_state_lot41.json
