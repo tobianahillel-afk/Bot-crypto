@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from itertools import pairwise
 from typing import Any
 
 from .book_integrity_desynchronization_detector_validation import (
@@ -59,9 +60,9 @@ def validate_level_order(levels: tuple[tuple[Decimal, Decimal], ...], side: str)
     if len(set(prices)) != len(prices):
         raise Lot41ValidationError(f"{side} prices must be unique")
     if side == "bids":
-        ordered = all(left > right for left, right in zip(prices, prices[1:], strict=False))
+        ordered = all(left > right for left, right in pairwise(prices))
     elif side == "asks":
-        ordered = all(left < right for left, right in zip(prices, prices[1:], strict=False))
+        ordered = all(left < right for left, right in pairwise(prices))
     else:
         raise Lot41ValidationError("unknown book side")
     if not ordered and len(prices) > 1:
@@ -74,7 +75,7 @@ def parse_depth_bands(raw: Any) -> tuple[Decimal, ...]:
     bands = tuple(positive_decimal_text(value, "depth band bps") for value in raw)
     if len(set(bands)) != len(bands):
         raise Lot41ValidationError("depth bands must be unique")
-    if any(left >= right for left, right in zip(bands, bands[1:], strict=False)):
+    if any(left >= right for left, right in pairwise(bands)):
         raise Lot41ValidationError("depth bands must be strictly increasing")
     return bands
 
@@ -117,30 +118,3 @@ def symmetric_imbalance(bid_depth: Decimal, ask_depth: Decimal) -> tuple[Decimal
 def validate_book_open(best_bid: Decimal, best_ask: Decimal) -> None:
     if best_bid >= best_ask:
         raise Lot41ValidationError("Lot 41 refuses crossed or locked book")
-
-
-__all__ = [
-    "COVERAGE_STATUS",
-    "IMBALANCE_DEFINED",
-    "IMBALANCE_UNDEFINED",
-    "Lot41ValidationError",
-    "RUNTIME_MODE",
-    "VALIDATION_STATE",
-    "decimal_text",
-    "lot41_safety",
-    "parse_book_levels",
-    "parse_depth_bands",
-    "parse_utc_timestamp",
-    "require_boolean",
-    "require_git_sha",
-    "require_integer",
-    "require_sha256",
-    "require_text",
-    "symmetric_imbalance",
-    "validate_book_open",
-    "validate_lot41_safety",
-    "validate_reason_codes",
-    "validate_reference_identity",
-    "validate_reference_times",
-    "validate_run_context",
-]
