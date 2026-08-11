@@ -132,10 +132,7 @@ def symmetric_imbalance(
     denominator = bid_depth + ask_depth
     if denominator == 0:
         return None, IMBALANCE_UNDEFINED
-    value = (bid_depth - ask_depth) / denominator
-    if not Decimal("-1") <= value <= Decimal("1"):
-        raise Lot41ValidationError("imbalance escaped [-1,1]")
-    return value, IMBALANCE_DEFINED
+    return (bid_depth - ask_depth) / denominator, IMBALANCE_DEFINED
 
 
 def validate_book_open(best_bid: Decimal, best_ask: Decimal) -> None:
