@@ -13,8 +13,8 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       PYTHONPATH: src
-      SOURCE_HEAD_SHA: c0dae9a04f0c8464003b039aba4660c223afe2a8
-      EVIDENCE_HEAD_SHA: 711b80410210b50f000bd243212276d399fdb7e4
+      SOURCE_HEAD_SHA: 39a4ad7996d6b301ca18ee90a2f294cdb837e7a6
+      EVIDENCE_HEAD_SHA: 42d7283a6d2c05e8ccf4b669219f98dd6ed8548d
       GATE_MERGE_SHA: ed8845e0e56151348fe57c0e9bceaf4646ea49aa
       CERTIFIED_PR_REF: refs/pull/57/head
     steps:
@@ -52,20 +52,29 @@ jobs:
           done < <(git rev-list --first-parent HEAD)
           test -n "$matched_commit"
           git merge-base --is-ancestor "$GATE_MERGE_SHA" "$matched_commit"
-      - name: Prove source to evidence diff is exactly five frozen files
+      - name: Prove exact review-fix evidence delta and carried-forward resilience artifact
         run: |
           set -euo pipefail
-          expected="$RUNNER_TEMP/lot43-expected-evidence.txt"
-          actual="$RUNNER_TEMP/lot43-actual-evidence.txt"
+          expected="$RUNNER_TEMP/lot43-expected-evidence-delta.txt"
+          actual="$RUNNER_TEMP/lot43-actual-evidence-delta.txt"
           cat >"$expected" <<'EOF'
           data/audit/book_resilience_and_replenishment_engine_audit_lot43.json
           data/audit/book_resilience_and_replenishment_engine_lot43.json
-          data/audit/book_resilience_state_lot43.json
           reports/lot43/coverage_summary.json
           reports/lot43/mutation_summary.json
           EOF
           git diff --name-only "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA" | sort >"$actual"
           diff -u "$expected" "$actual"
+          git diff --quiet "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA" -- \
+            data/audit/book_resilience_state_lot43.json
+          for path in \
+            data/audit/book_resilience_and_replenishment_engine_audit_lot43.json \
+            data/audit/book_resilience_and_replenishment_engine_lot43.json \
+            data/audit/book_resilience_state_lot43.json \
+            reports/lot43/coverage_summary.json \
+            reports/lot43/mutation_summary.json; do
+            git cat-file -e "$EVIDENCE_HEAD_SHA:$path"
+          done
       - name: Prove Lot 43 production source immutable after source head
         run: |
           set -euo pipefail
