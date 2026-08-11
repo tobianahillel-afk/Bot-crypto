@@ -23,10 +23,14 @@ from crypto_quant_bot.microstructure.book_resilience_and_replenishment_engine_mo
 )
 from crypto_quant_bot.microstructure.book_resilience_and_replenishment_engine_validation import (
     Lot43ValidationError,
+    age_us,
+    bps_distance,
     validate_max_window_status,
+    validate_nonnegative,
     validate_nullable_nonnegative_decimal,
     validate_nullable_positive_decimal,
     validate_nullable_positive_integer,
+    validate_positive,
     validate_replenishment_kind,
     validate_resilience_status,
     validate_volatility_regime,
@@ -221,14 +225,36 @@ def test_lot42_linkage_safety_and_observed_only_boundaries(
         lambda local: local[str(config["lot42_state_path"])]["safety"].__setitem__("trade_allowed", True),
         "safety boundary",
     )
-    run_with(
-        lambda local: local[str(config["lot42_zone_set_path"])].__setitem__("observed_book_only", False),
-        "observed-book-only",
-    )
-    run_with(
-        lambda local: local[str(config["lot42_zone_set_path"])].__setitem__("participant_intent_inferred", True),
-        "participant-intent",
-    )
+
+    def disable_observed_book(local: dict[str, object]) -> None:
+        zone = local[str(config["lot42_zone_set_path"])]
+        state = local[str(config["lot42_state_path"])]
+        zone["observed_book_only"] = False  # type: ignore[index]
+        state["liquidity_zones"]["observed_book_only"] = False  # type: ignore[index]
+
+    def enable_intent(local: dict[str, object]) -> None:
+        zone = local[str(config["lot42_zone_set_path"])]
+        state = local[str(config["lot42_state_path"])]
+        zone["participant_intent_inferred"] = True  # type: ignore[index]
+        state["liquidity_zones"]["participant_intent_inferred"] = True  # type: ignore[index]
+
+    run_with(disable_observed_book, "observed-book-only")
+    run_with(enable_intent, "participant-intent")
+
+
+def test_lot42_config_checksum_is_fail_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    config = _config()
+    paths = {
+        str(config["lot42_state_path"]): load_json_object(ROOT / str(config["lot42_state_path"])),
+        str(config["lot42_audit_path"]): load_json_object(ROOT / str(config["lot42_audit_path"])),
+        str(config["lot42_zone_set_path"]): load_json_object(ROOT / str(config["lot42_zone_set_path"])),
+        str(config["lot42_config_path"]): load_json_object(ROOT / str(config["lot42_config_path"])),
+    }
+    monkeypatch.setattr(engine, "_verify_checksum", lambda *args: None)
+    monkeypatch.setattr(engine, "load_json_object", lambda path: paths[str(path.relative_to(ROOT))])
+    monkeypatch.setattr(engine, "canonical_checksum", lambda payload: "0" * 64)
+    with pytest.raises(Lot43ValidationError, match="config checksum"):
+        engine._verify_lot42(ROOT, config)
 
 
 def test_snapshot_and_level_parsers_reject_invalid_shapes_and_values() -> None:
@@ -257,8 +283,45 @@ def test_snapshot_and_level_parsers_reject_invalid_shapes_and_values() -> None:
 
     missing_source = dict(snapshot)
     missing_source["source_id"] = ""
-    with pytest.raises(Lot43ValidationError):
+    with pytest.raises(BookIntegrityValidationError, match="snapshot source_id"):
         engine._snapshot_from_payload(missing_source)
+
+
+def test_lot38_snapshot_requires_mapping(monkeypatch: pytest.MonkeyPatch) -> None:
+    config = _config()
+    monkeypatch.setattr(engine, "_verify_checksum", lambda *args: None)
+    monkeypatch.setattr(engine, "load_json_object", lambda path: {"snapshot": []})
+    with pytest.raises(Lot43ValidationError, match="canonical snapshot missing"):
+        engine._verify_lot38_snapshot(ROOT, config)
+
+
+def test_delta_fixture_contract_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    config = _config()
+    fixture = load_json_object(ROOT / "tests/fixtures/lot39/order_book_delta_sequence_fixture_v1.json")
+
+    monkeypatch.setattr(engine, "file_checksum", lambda path: "0" * 64)
+    with pytest.raises(Lot43ValidationError, match="file checksum"):
+        engine._load_deltas(ROOT, config)
+
+    monkeypatch.setattr(engine, "file_checksum", lambda path: engine.EXPECTED_DELTA_FIXTURE)
+
+    bad_schema = copy.deepcopy(fixture)
+    bad_schema["schema_version"] = "future"
+    monkeypatch.setattr(engine, "load_json_object", lambda path: bad_schema)
+    with pytest.raises(Lot43ValidationError, match="fixture schema"):
+        engine._load_deltas(ROOT, config)
+
+    bad_boundary = copy.deepcopy(fixture)
+    bad_boundary["fixture_only"] = False
+    monkeypatch.setattr(engine, "load_json_object", lambda path: bad_boundary)
+    with pytest.raises(Lot43ValidationError, match="fixture boundary"):
+        engine._load_deltas(ROOT, config)
+
+    empty = copy.deepcopy(fixture)
+    empty["deltas"] = []
+    monkeypatch.setattr(engine, "load_json_object", lambda path: empty)
+    with pytest.raises(Lot43ValidationError, match="fixture is empty"):
+        engine._load_deltas(ROOT, config)
 
 
 def test_delta_parser_rejects_non_object_and_bad_optional_checksum() -> None:
@@ -275,6 +338,23 @@ def test_delta_parser_rejects_non_object_and_bad_optional_checksum() -> None:
     raw["expected_book_checksum"] = "1" * 64
     parsed = engine._delta_from_payload(raw, 0)
     assert parsed.expected_book_checksum == "1" * 64
+
+
+def test_lot39_replay_divergence_is_fail_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    config = _config()
+    book = load_json_object(ROOT / str(config["lot39_reconstructed_book_path"]))
+    state38 = load_json_object(ROOT / str(config["lot38_state_path"]))
+    snapshot = engine._snapshot_from_payload(state38["snapshot"])
+    deltas = engine._load_deltas(ROOT, config)
+    monkeypatch.setattr(engine, "_verify_checksum", lambda *args: None)
+    monkeypatch.setattr(engine, "load_json_object", lambda path: book)
+    monkeypatch.setattr(
+        engine,
+        "reconstruct_sequence",
+        lambda snapshot, deltas: SimpleNamespace(reconstructed_book=None),
+    )
+    with pytest.raises(Lot43ValidationError, match="replay diverges"):
+        engine._verify_lot39_book(ROOT, config, snapshot, deltas)
 
 
 def test_identity_and_time_reject_mismatch_and_staleness() -> None:
@@ -329,6 +409,15 @@ def test_validation_enums_nullable_helpers_and_model_guards() -> None:
     validate_nullable_nonnegative_decimal(Decimal("0"), "value")
     validate_nullable_positive_decimal(Decimal("1"), "value")
 
+    with pytest.raises(Lot43ValidationError):
+        validate_nonnegative(Decimal("-1"), "value")
+    with pytest.raises(Lot43ValidationError):
+        validate_positive(Decimal("0"), "value")
+    with pytest.raises(Lot43ValidationError):
+        bps_distance(Decimal("0"), Decimal("1"), Decimal("1"))
+    with pytest.raises(Lot43ValidationError):
+        age_us("not-a-time", "2026-08-06T19:18:40.000010Z")
+
     with pytest.raises(Lot43ValidationError, match="volatility method"):
         _reference_slice(volatility_method="OTHER")
     with pytest.raises(Lot43ValidationError, match="empty slice"):
@@ -367,7 +456,7 @@ def test_audit_rejects_empty_or_duplicate_validation_checks() -> None:
         )
 
 
-def test_analysis_history_rejects_short_duplicate_identity_and_time() -> None:
+def test_analysis_history_rejects_short_duplicate_identity_time_and_side() -> None:
     first = _observation(1, "2026-08-06T19:18:40.000010Z")
     second = _observation(2, "2026-08-06T19:18:40.000020Z")
     policy = analysis.BookResiliencePolicy(
@@ -401,6 +490,8 @@ def test_analysis_history_rejects_short_duplicate_identity_and_time() -> None:
             policy,
             "2026-08-06T19:18:40.000030Z",
         )
+    with pytest.raises(Lot43ValidationError, match="unknown Lot 43 book side"):
+        analysis._levels(first, "UNKNOWN")
     assert analysis.analyze_book_resilience(
         (first, second), policy, "2026-08-06T19:18:40.000030Z"
     ).observations == (first, second)
