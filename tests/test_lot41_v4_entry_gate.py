@@ -22,6 +22,23 @@ GATE_PATH = ROOT / "data/audit/lot41_v4_entry_gate.json"
 SCHEMA_PATH = ROOT / "contracts/schemas/lot41_v4_entry_gate_v1.schema.json"
 
 
+@pytest.fixture(autouse=True)
+def _isolate_certified_lot40_audit(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep unit tests independent from workflows regenerating Lot 40 outputs."""
+    monkeypatch.setattr(
+        gate_validator,
+        "validate_lot40_post_merge",
+        lambda: {
+            "status": "PASS",
+            "verdict": "GO_LOT40_POST_MERGE",
+            "project_version": "0.40.0",
+            "latest_implemented_lot": 40,
+            "next_lot": 41,
+            "next_lot_status": "PLANNED_LOCKED",
+        },
+    )
+
+
 def _write_json(path: Path, payload: object) -> None:
     path.write_text(
         json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
