@@ -69,8 +69,7 @@ jobs:
             reports/lot41/mutation_summary.json \
             .github/workflows/lot41-entry-gate.yml \
             .github/workflows/lot41-spread-depth-imbalance.yml \
-            .github/workflows/lot41-mutation-assurance.yml \
-            .github/workflows/lot41-frozen-evidence.yml
+            .github/workflows/lot41-mutation-assurance.yml
       - name: Compile lint type lifecycle and exact validators
         run: |
           set -euo pipefail
