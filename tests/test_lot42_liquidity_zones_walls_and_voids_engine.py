@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import copy
 import json
-from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
+from typing import Callable
 
 import pytest
 
@@ -44,6 +44,8 @@ def _build() -> tuple[dict[str, object], dict[str, object], dict[str, object]]:
 
 def _policy(
     *,
+    cluster_distance_bps: str = "1",
+    history_match_distance_bps: str = "2",
     wall_min_notional: str = "50",
     persistent_min_observations: int = 2,
     persistent_min_ratio: str = "0.5",
@@ -52,8 +54,8 @@ def _policy(
 ) -> LiquidityAnalysisPolicy:
     return LiquidityAnalysisPolicy(
         50,
-        Decimal("1"),
-        Decimal("2"),
+        Decimal(cluster_distance_bps),
+        Decimal(history_match_distance_bps),
         Decimal(wall_min_notional),
         persistent_min_observations,
         Decimal(persistent_min_ratio),
@@ -83,7 +85,7 @@ def _observation(
 def _temporary_config(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
-    mutate,
+    mutate: Callable[[dict[str, object]], None],
 ) -> dict[str, object]:
     config = load_json_object(ROOT / CONFIG_PATH)
     mutate(config)
@@ -147,10 +149,11 @@ def test_lot42_run_is_deterministic_and_all_checksums_are_canonical() -> None:
         checksum = body.pop(field)
         assert canonical_checksum(body) == checksum
     zone_set = first[2]
-    for item, field in [
+    checked = [
         *((zone, "zone_checksum") for zone in zone_set["zones"]),
         *((void, "void_checksum") for void in zone_set["voids"]),
-    ]:
+    ]
+    for item, field in checked:
         body = dict(item)
         checksum = body.pop(field)
         assert canonical_checksum(body) == checksum
@@ -213,12 +216,15 @@ def test_lot42_top_of_book_may_change_without_changing_market_identity() -> None
         _observation(1, (("100", "2"),), (("102", "2"),)),
         _observation(2, (("101", "2"),), (("103", "2"),)),
     )
-    result = analyze_observations(history, _policy(history_match_distance_bps="2"))
+    result = analyze_observations(
+        history,
+        _policy(history_match_distance_bps="100"),
+    )
     assert result.observations[-1].mid_price == Decimal("102")
 
 
 def test_lot42_stale_current_feature_is_fail_closed(
-    monkeypatch: pytest.MonPatch,
+    monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
     def mutate(config: dict[str, object]) -> None:
@@ -265,6 +271,7 @@ def test_lot42_empty_detected_zone_set_is_valid_when_evidence_supports_none() ->
         _observation(2, (("90", "1"),), (("112", "1"),)),
     )
     policy = _policy(
+        history_match_distance_bps="1",
         wall_min_notional="1000000",
         persistent_min_observations=2,
         persistent_min_ratio="1",
