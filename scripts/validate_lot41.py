@@ -49,8 +49,14 @@ def _verify_reference(feature: dict[str, Any]) -> None:
     require(feature["sequence_id"] == 1003, "Lot 41 reference sequence changed")
     require(feature["spread_absolute"] == "0.2", "Lot 41 reference spread changed")
     require(feature["mid_price"] == "50025", "Lot 41 reference mid changed")
-    require(feature["spread_bps"].startswith("0.039980009995002498750624687656"), "spread bps changed")
-    require(feature["microprice"].startswith("50025.016129032258064516129032"), "microprice changed")
+    require(
+        feature["spread_bps"] == "0.03998000999500249875062468766",
+        "spread bps changed",
+    )
+    require(
+        feature["microprice"] == "50025.01612903225806451612903",
+        "microprice changed",
+    )
     bands = feature["depth_bands"]
     require([item["band_bps"] for item in bands] == ["0.025", "0.05", "0.1"], "bands changed")
     require([item["bid_quantity"] for item in bands] == ["0.9", "0.9", "1.4"], "bid depth changed")
