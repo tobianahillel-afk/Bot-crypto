@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from typing import Any
 
 from .book_resilience_and_replenishment_engine_validation import (
+    DECIMAL_PRECISION,
     PARTICIPANT_INTENT,
     REGIME_METHOD,
     RUNTIME_MODE,
@@ -142,7 +143,10 @@ class BookDepletionEventV1:
         require_text(self.depletion_receive_time, "depletion_receive_time")
         if self.depleted_quantity != self.previous_quantity - self.post_depletion_quantity:
             raise Lot43ValidationError("depleted quantity/count mismatch")
-        if self.depletion_ratio != self.depleted_quantity / self.previous_quantity:
+        with localcontext() as context:
+            context.prec = DECIMAL_PRECISION
+            expected_ratio = self.depleted_quantity / self.previous_quantity
+        if self.depletion_ratio != expected_ratio:
             raise Lot43ValidationError("depletion ratio/count mismatch")
         validate_event_semantics(
             replenishment_kind=self.replenishment_kind,
