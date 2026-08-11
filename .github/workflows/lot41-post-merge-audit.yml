@@ -1,0 +1,116 @@
+name: Lot 41 independent post-merge audit
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-22.04
+    env:
+      PYTHONPATH: src
+      GATE_MERGE_SHA: 75822f8ea7c6f67f73649d2f43be6efba840ab67
+      SOURCE_HEAD_SHA: 14c0d8da1b02d076b3c43a07a34ac96c673018b0
+      EVIDENCE_HEAD_SHA: 7ada0ca6c4d439505ef453b988dedd4aa96c1a32
+      FINAL_PR_HEAD_SHA: 89ae244db77f16f31d226a7494d78b65b904dcd9
+      MERGED_COMMIT_SHA: a253ce35c97303e8b8c65707c07597e996b3a832
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Prove merge chain and exact squash tree equivalence
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$GATE_MERGE_SHA" "$SOURCE_HEAD_SHA"
+          git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA"
+          git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" "$FINAL_PR_HEAD_SHA"
+          git merge-base --is-ancestor "$MERGED_COMMIT_SHA" HEAD
+          git diff --quiet "$FINAL_PR_HEAD_SHA" "$MERGED_COMMIT_SHA" -- .
+      - name: Prove frozen Lot 41 implementation and evidence immutability
+        run: |
+          set -euo pipefail
+          git diff --quiet "$MERGED_COMMIT_SHA" HEAD -- \
+            src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine.py \
+            src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine_models.py \
+            src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine_validation.py \
+            src/crypto_quant_bot/microstructure/__init__.py \
+            config/microstructure/spread_depth_and_imbalance_engine_v1.json \
+            contracts/schemas/book_feature_state_v1.schema.json \
+            contracts/schemas/spread_depth_imbalance_engine_state_v1.schema.json \
+            contracts/schemas/spread_depth_imbalance_engine_audit_v1.schema.json \
+            scripts/run_lot41_spread_depth_and_imbalance_engine.py \
+            scripts/validate_lot41.py \
+            scripts/validate_lot41_no_connectivity.py \
+            scripts/validate_lot41_frozen_evidence.py \
+            tests/test_lot41_spread_depth_and_imbalance_engine.py \
+            tests/test_lot41_validation_contracts.py \
+            tests/test_lot41_schema_contracts.py \
+            tests/test_lot41_v4_entry_gate.py \
+            docs/LOT_41_SPREAD_DEPTH_AND_IMBALANCE_ENGINE.md \
+            docs/ACCEPTANCE_CRITERIA_LOT_41.md \
+            reports/lot_41_spread_depth_and_imbalance_engine_report.md \
+            data/audit/book_feature_state_lot41.json \
+            data/audit/spread_depth_and_imbalance_engine_audit_lot41.json \
+            data/audit/spread_depth_and_imbalance_engine_lot41.json \
+            reports/lot41/coverage_summary.json \
+            reports/lot41/mutation_summary.json \
+            .github/workflows/lot41-entry-gate.yml \
+            .github/workflows/lot41-spread-depth-imbalance.yml \
+            .github/workflows/lot41-mutation-assurance.yml \
+            .github/workflows/lot41-frozen-evidence.yml
+      - name: Compile lint type lifecycle and exact validators
+        run: |
+          set -euo pipefail
+          python -m compileall -q src scripts tests
+          python -m json.tool data/audit/roadmap_lifecycle_overlay_lot41.json >/dev/null
+          ruff check scripts/validate_lot41_post_merge.py \
+            scripts/validate_lot41_frozen_evidence.py
+          mypy src/crypto_quant_bot
+          python scripts/validate_lot41_frozen_evidence.py
+          python scripts/validate_lot41.py \
+            --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
+          python scripts/validate_lot41_no_connectivity.py
+          python scripts/validate_lot41_post_merge.py | tee /tmp/lot41-post-merge-validation.json
+      - name: Architecture roadmap traceability and engineering gates
+        run: |
+          python scripts/validate_domain_architecture.py
+          python scripts/validate_roadmap_documentation.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+      - name: Full regression security dependency and anti-flake
+        run: |
+          set -euo pipefail
+          pytest -q
+          bandit -q -r scripts/validate_lot41_post_merge.py \
+            scripts/validate_lot41_frozen_evidence.py -ll
+          pip-audit -r requirements-dev.lock
+          for repetition in 1 2 3; do pytest -q tests/test_lot41*.py; done
+          python scripts/validate_lot41_post_merge.py
+      - name: Prove Lot 42 remains locked
+        run: |
+          set -euo pipefail
+          test ! -e src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine.py
+          test ! -e src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine_models.py
+          test ! -e scripts/run_lot42_liquidity_zones_walls_and_voids_engine.py
+          test ! -e scripts/validate_lot42.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot41-post-merge-audit-evidence
+          path: /tmp/lot41-post-merge-validation.json
