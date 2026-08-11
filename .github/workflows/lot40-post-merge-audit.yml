@@ -75,14 +75,22 @@ jobs:
             reports/lot40/mutation_summary.json
       - name: Compile lint type and exact post-merge validators
         run: |
+          set -euo pipefail
           python -m compileall -q src scripts tests
           python -m json.tool data/audit/roadmap_lifecycle_overlay_lot40.json >/dev/null
           ruff check scripts/validate_lot40_post_merge.py scripts/validate_lot40_frozen_evidence.py
           mypy src/crypto_quant_bot
           python scripts/validate_lot40_frozen_evidence.py
           python scripts/validate_lot40_post_merge.py
-          python scripts/validate_lot40.py --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
-          python scripts/validate_lot40_no_connectivity.py
+          rm -rf /tmp/lot40-certified
+          git worktree add --detach /tmp/lot40-certified "$MERGED_COMMIT"
+          (
+            cd /tmp/lot40-certified
+            PYTHONPATH=src python scripts/validate_lot40.py \
+              --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
+            PYTHONPATH=src python scripts/validate_lot40_no_connectivity.py
+          )
+          git worktree remove --force /tmp/lot40-certified
       - name: Architecture roadmap traceability and engineering gates
         run: |
           python scripts/validate_domain_architecture.py
