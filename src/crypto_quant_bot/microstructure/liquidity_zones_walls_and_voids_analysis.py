@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from decimal import Decimal, localcontext
+from itertools import pairwise
 from typing import Iterable
 
 from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry import (
@@ -42,6 +43,10 @@ class LiquidityAnalysisPolicy:
 
 @dataclass(frozen=True, slots=True)
 class BookObservation:
+    source_id: str
+    venue: str
+    instrument_id: str
+    market_type: str
     sequence_id: int
     event_time: str
     receive_time: str
@@ -87,13 +92,27 @@ def reconstruct_observation_history(
             raise Lot42ValidationError("Lot 42 history reconstruction requires SYNCED prefixes")
         book = outcome.reconstructed_book
         observations.append(
-            BookObservation(book.sequence_id, book.event_time, book.receive_time, book.bids, book.asks)
+            BookObservation(
+                book.source_id,
+                book.venue,
+                book.instrument_id,
+                book.market_type,
+                book.sequence_id,
+                book.event_time,
+                book.receive_time,
+                book.bids,
+                book.asks,
+            )
         )
     return tuple(observations)
 
 
 def _observation_from_snapshot(snapshot: OrderBookSnapshotV1) -> BookObservation:
     return BookObservation(
+        snapshot.source_id,
+        snapshot.venue,
+        snapshot.instrument_id,
+        snapshot.market_type,
         snapshot.sequence_id,
         snapshot.event_time,
         snapshot.receive_time,
@@ -149,9 +168,8 @@ def analyze_observations(
     bid_zones = _build_side_zones(current, bid_history, policy)
     ask_zones = _build_side_zones(current, ask_history, policy)
     voids = _detect_voids(current, policy)
-    expired = _expired_wall_candidates(bid_history, policy) + _expired_wall_candidates(
-        ask_history, policy
-    )
+    expired = _expired_wall_candidates(bid_history, current.mid_price, policy)
+    expired += _expired_wall_candidates(ask_history, current.mid_price, policy)
     return LiquidityAnalysisResult(observations, bid_zones + ask_zones, voids, expired)
 
 
@@ -173,8 +191,13 @@ def _validate_policy_and_history(
         raise Lot42ValidationError("wall cancellation threshold cannot be negative")
 
 
-def _observation_identity(observation: BookObservation) -> tuple[Decimal, Decimal]:
-    return observation.bids[0].price, observation.asks[0].price
+def _observation_identity(observation: BookObservation) -> tuple[str, str, str, str]:
+    return (
+        observation.source_id,
+        observation.venue,
+        observation.instrument_id,
+        observation.market_type,
+    )
 
 
 def _cluster_history(
@@ -235,7 +258,11 @@ def _candidate_pairs(
     pairs = []
     for current_index, current_cluster in enumerate(current):
         for observed_index, observed_cluster in enumerate(observed):
-            distance = bps_distance(current_cluster.anchor_price, observed_cluster.anchor_price, mid)
+            distance = bps_distance(
+                current_cluster.anchor_price,
+                observed_cluster.anchor_price,
+                mid,
+            )
             if distance <= max_distance:
                 pairs.append((distance, current_index, observed_index))
     return tuple(sorted(pairs, key=lambda item: (item[0], item[1], item[2])))
@@ -250,7 +277,8 @@ def _build_zone(
     persistence_count = sum(value is not None for value in history_quantities)
     persistence_ratio = _ratio(persistence_count, len(history_quantities), policy.decimal_precision)
     replenished, replenishment_ratio, cancelled, cancellation_rate = _flow_metrics(
-        history_quantities, policy.decimal_precision
+        history_quantities,
+        policy.decimal_precision,
     )
     classifications = _classifications(cluster, persistence_count, persistence_ratio, policy)
     if not classifications:
@@ -300,7 +328,7 @@ def _flow_metrics(
     replenished = Decimal("0")
     cancelled = Decimal("0")
     base = Decimal("0")
-    for previous_raw, current_raw in zip(values, values[1:], strict=True):
+    for previous_raw, current_raw in pairwise(values):
         previous = previous_raw or Decimal("0")
         current = current_raw or Decimal("0")
         base += max(previous, current)
@@ -364,7 +392,7 @@ def _detect_voids(
 ) -> tuple[LiquidityVoidV1, ...]:
     output: list[LiquidityVoidV1] = []
     for side, levels in (("BID", current.bids), ("ASK", current.asks)):
-        for near, far in zip(levels, levels[1:], strict=True):
+        for near, far in pairwise(levels):
             gap = bps_distance(near.price, far.price, current.mid_price)
             if gap >= policy.void_min_gap_bps:
                 output.append(_build_void(current, side, near.price, far.price, gap))
@@ -398,6 +426,7 @@ def _build_void(
 
 def _expired_wall_candidates(
     history: tuple[tuple[PriceCluster, ...], ...],
+    mid: Decimal,
     policy: LiquidityAnalysisPolicy,
 ) -> int:
     if len(history) < 2:
@@ -406,7 +435,6 @@ def _expired_wall_candidates(
     previous = history[-2]
     if not current or not previous:
         return sum(cluster.notional >= policy.wall_min_notional for cluster in previous)
-    mid = (current[0].anchor_price + previous[0].anchor_price) / Decimal("2")
     pairs = _candidate_pairs(current, previous, mid, policy.history_match_distance_bps)
     matched_previous = {observed_index for _, _, observed_index in pairs}
     return sum(
