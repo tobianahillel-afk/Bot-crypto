@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal, localcontext
 from typing import Any
 
@@ -100,7 +100,7 @@ def parse_utc_timestamp(value: str, field: str) -> datetime:
         parsed = datetime.fromisoformat(value[:-1] + "+00:00")
     except ValueError as exc:
         raise Lot42ValidationError(f"{field} must be valid ISO-8601 UTC") from exc
-    if parsed.tzinfo != timezone.utc:
+    if parsed.tzinfo != UTC:
         raise Lot42ValidationError(f"{field} must be UTC")
     return parsed
 
@@ -140,40 +140,3 @@ def validate_sequence_ids(values: tuple[int, ...]) -> None:
 def validate_checksum_fields(values: tuple[tuple[str, str], ...]) -> None:
     for value, field in values:
         require_sha256(value, field)
-
-
-__all__ = [
-    "ACTIVE",
-    "DISPLAYED_WALL",
-    "HIGH_CONFIDENCE",
-    "LIQUIDITY_VOID",
-    "LOW_CONFIDENCE",
-    "Lot42ValidationError",
-    "NOT_APPLICABLE",
-    "PARTICIPANT_INTENT",
-    "PERSISTENT_ZONE",
-    "RUNTIME_MODE",
-    "VALIDATION_STATE",
-    "age_us",
-    "bps_distance",
-    "decimal_text",
-    "lot42_safety",
-    "nonnegative_decimal_text",
-    "positive_decimal_text",
-    "require_integer",
-    "require_sha256",
-    "require_text",
-    "validate_causal_times",
-    "validate_checksum_fields",
-    "validate_classifications",
-    "validate_confidence",
-    "validate_identity_fields",
-    "validate_lot42_safety",
-    "validate_nonnegative",
-    "validate_positive",
-    "validate_ratio",
-    "validate_reason_codes",
-    "validate_run_context",
-    "validate_sequence_ids",
-    "validate_side",
-]
