@@ -16,6 +16,7 @@ jobs:
       SOURCE_HEAD_SHA: c0dae9a04f0c8464003b039aba4660c223afe2a8
       EVIDENCE_HEAD_SHA: 711b80410210b50f000bd243212276d399fdb7e4
       GATE_MERGE_SHA: ed8845e0e56151348fe57c0e9bceaf4646ea49aa
+      CERTIFIED_PR_REF: refs/pull/57/head
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,12 +30,28 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove source evidence and gate ancestry
+      - name: Prove source evidence gate and squash-safe implementation lineage
         run: |
           set -euo pipefail
+          certified_pr_head=refs/remotes/origin/lot43-pr57-head
+          git fetch --no-tags origin "$CERTIFIED_PR_REF:$certified_pr_head"
           git merge-base --is-ancestor "$GATE_MERGE_SHA" "$SOURCE_HEAD_SHA"
           git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA"
-          git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" HEAD
+          git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" "$certified_pr_head"
+          git merge-base --is-ancestor "$GATE_MERGE_SHA" HEAD
+          if git merge-base --is-ancestor "$certified_pr_head" HEAD; then
+            exit 0
+          fi
+          certified_tree="$(git rev-parse "$certified_pr_head^{tree}")"
+          matched_commit=""
+          while IFS= read -r commit; do
+            if [ "$(git rev-parse "$commit^{tree}")" = "$certified_tree" ]; then
+              matched_commit="$commit"
+              break
+            fi
+          done < <(git rev-list --first-parent HEAD)
+          test -n "$matched_commit"
+          git merge-base --is-ancestor "$GATE_MERGE_SHA" "$matched_commit"
       - name: Prove source to evidence diff is exactly five frozen files
         run: |
           set -euo pipefail
@@ -68,9 +85,19 @@ jobs:
             tests/test_lot43_edge_contracts.py \
             tests/test_lot43_fail_closed_contracts.py \
             tests/test_lot43_mutation_contracts.py \
+            tests/test_lot43_review_regressions.py \
             tests/test_lot43_schema_contracts.py \
             docs/LOT_43_BOOK_RESILIENCE_AND_REPLENISHMENT_ENGINE.md \
             docs/ACCEPTANCE_CRITERIA_LOT_43.md
+      - name: Prove frozen evidence immutable after evidence head
+        run: |
+          set -euo pipefail
+          git diff --quiet "$EVIDENCE_HEAD_SHA" HEAD -- \
+            data/audit/book_resilience_and_replenishment_engine_audit_lot43.json \
+            data/audit/book_resilience_and_replenishment_engine_lot43.json \
+            data/audit/book_resilience_state_lot43.json \
+            reports/lot43/coverage_summary.json \
+            reports/lot43/mutation_summary.json
       - name: Validate frozen Lot 43 artifacts
         run: |
           set -euo pipefail
