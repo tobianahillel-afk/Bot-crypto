@@ -289,19 +289,30 @@ def validate_event_semantics(
     has_sequence = replenishment_sequence_id is not None
     if has_sequence != (replenishment_time_us is not None):
         raise Lot43ValidationError("replenishment sequence/time presence must match")
-    evidence = {
-        "has_sequence": has_sequence,
-        "replenished_quantity": replenished_quantity,
-        "recovered_fraction": recovered_fraction,
-        "mid_shift_bps": mid_shift_bps,
-        "max_window_status": max_window_status,
-    }
     if replenishment_kind in {"SAME_PRICE", "ADJACENT_PRICE"}:
-        _validate_quantity_replenishment(**evidence)
+        _validate_quantity_replenishment(
+            has_sequence=has_sequence,
+            replenished_quantity=replenished_quantity,
+            recovered_fraction=recovered_fraction,
+            mid_shift_bps=mid_shift_bps,
+            max_window_status=max_window_status,
+        )
     elif replenishment_kind == "MID_SHIFT":
-        _validate_mid_shift(**evidence)
+        _validate_mid_shift(
+            has_sequence=has_sequence,
+            replenished_quantity=replenished_quantity,
+            recovered_fraction=recovered_fraction,
+            mid_shift_bps=mid_shift_bps,
+            max_window_status=max_window_status,
+        )
     else:
-        _validate_no_replenishment(**evidence)
+        _validate_no_replenishment(
+            has_sequence=has_sequence,
+            replenished_quantity=replenished_quantity,
+            recovered_fraction=recovered_fraction,
+            mid_shift_bps=mid_shift_bps,
+            max_window_status=max_window_status,
+        )
 
 
 def validate_slice_counts(
