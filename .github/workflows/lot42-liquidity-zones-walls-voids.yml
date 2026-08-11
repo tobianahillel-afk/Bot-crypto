@@ -28,18 +28,18 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove exact gate ancestry and Lot 43 absence
+      - name: Prove exact gate ancestry and Lot 44 absence
         run: |
           set -euo pipefail
           git merge-base --is-ancestor "$GATE_MERGE_SHA" HEAD
-          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py
-          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py
-          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_validation.py
-          test ! -e config/microstructure/book_resilience_and_replenishment_engine_v1.json
-          test ! -e scripts/run_lot43_book_resilience_and_replenishment_engine.py
-          test ! -e scripts/validate_lot43.py
-          test ! -e docs/LOT_43_BOOK_RESILIENCE_AND_REPLENISHMENT_ENGINE.md
-          test ! -e docs/ACCEPTANCE_CRITERIA_LOT_43.md
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py
+          test ! -e config/microstructure/trades_and_aggressor_classification_schema_v1.json
+          test ! -e scripts/run_lot44_trades_and_aggressor_classification_schema.py
+          test ! -e scripts/validate_lot44.py
+          test ! -e docs/LOT_44_TRADES_AND_AGGRESSOR_CLASSIFICATION_SCHEMA.md
+          test ! -e docs/ACCEPTANCE_CRITERIA_LOT_44.md
       - name: Compile lint type schema and no-connectivity checks
         run: |
           set -euo pipefail
