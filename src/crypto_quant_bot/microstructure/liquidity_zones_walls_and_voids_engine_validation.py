@@ -5,6 +5,7 @@ from decimal import Decimal, localcontext
 from typing import Any
 
 from .book_integrity_desynchronization_detector_validation import (
+    BookIntegrityValidationError,
     decimal_from_text,
     decimal_text,
     require_integer,
@@ -46,11 +47,17 @@ def validate_lot42_safety(value: dict[str, object]) -> None:
 
 
 def nonnegative_decimal_text(value: Any, field: str) -> Decimal:
-    return decimal_from_text(value, field, allow_zero=True)
+    try:
+        return decimal_from_text(value, field, allow_zero=True)
+    except BookIntegrityValidationError as exc:
+        raise Lot42ValidationError(str(exc)) from exc
 
 
 def positive_decimal_text(value: Any, field: str) -> Decimal:
-    return decimal_from_text(value, field, allow_zero=False)
+    try:
+        return decimal_from_text(value, field, allow_zero=False)
+    except BookIntegrityValidationError as exc:
+        raise Lot42ValidationError(str(exc)) from exc
 
 
 def validate_ratio(value: Decimal, field: str) -> None:
