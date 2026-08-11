@@ -13,8 +13,8 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       PYTHONPATH: src
-      SOURCE_HEAD_SHA: 39a4ad7996d6b301ca18ee90a2f294cdb837e7a6
-      EVIDENCE_HEAD_SHA: 42d7283a6d2c05e8ccf4b669219f98dd6ed8548d
+      SOURCE_HEAD_SHA: fe13635f3cacc8361045e0d82dcc7c15aebe6ce5
+      EVIDENCE_HEAD_SHA: c9007a1147da9b653e23f71e715c847630ecb067
       GATE_MERGE_SHA: ed8845e0e56151348fe57c0e9bceaf4646ea49aa
       CERTIFIED_PR_REF: refs/pull/57/head
     steps:
@@ -52,7 +52,7 @@ jobs:
           done < <(git rev-list --first-parent HEAD)
           test -n "$matched_commit"
           git merge-base --is-ancestor "$GATE_MERGE_SHA" "$matched_commit"
-      - name: Prove exact review-fix evidence delta and carried-forward resilience artifact
+      - name: Prove exact precision-fix evidence delta and carried-forward resilience artifact
         run: |
           set -euo pipefail
           expected="$RUNNER_TEMP/lot43-expected-evidence-delta.txt"
