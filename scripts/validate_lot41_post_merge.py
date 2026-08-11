@@ -8,7 +8,7 @@ import tomllib
 from pathlib import Path
 from typing import Any
 
-from validate_lot41_frozen_evidence import validate as validate_frozen
+from validate_lot41_frozen_evidence import validate as validate_frozen_evidence
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_HEAD = "14c0d8da1b02d076b3c43a07a34ac96c673018b0"
@@ -156,7 +156,7 @@ def validate_lifecycle() -> dict[str, Any]:
 
 
 def validate_frozen() -> dict[str, object]:
-    frozen = validate_frozen()
+    frozen = validate_frozen_evidence()
     expected = {
         "status": "PASS",
         "source_head": SOURCE_HEAD,
@@ -246,14 +246,7 @@ def validate() -> dict[str, object]:
 def main() -> int:
     try:
         print(json.dumps(validate(), sort_keys=True))
-    except (
-        Lot41PostMergeError,
-        OSError,
-        KeyError,
-        TypeError,
-        ValueError,
-        json.JSONDecodeError,
-    ) as exc:
+    except (Lot41PostMergeError, OSError, KeyError, TypeError, ValueError) as exc:
         print(f"LOT41 POST-MERGE VALIDATION: FAIL\n{exc}", file=sys.stderr)
         return 1
     return 0
