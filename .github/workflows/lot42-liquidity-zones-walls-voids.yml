@@ -44,6 +44,11 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p reports/lot42
+          target=src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine_validation.py
+          cp "$target" /tmp/lot42_validation.py
+          ruff check /tmp/lot42_validation.py --fix --config pyproject.toml >/tmp/lot42_ruff_fix.log 2>&1 || true
+          diff -u "$target" /tmp/lot42_validation.py > reports/lot42/ruff_import_fix.diff || true
+          cat /tmp/lot42_ruff_fix.log > reports/lot42/ruff_fix.log
           {
             python -m compileall -q src scripts tests
             for path in \
