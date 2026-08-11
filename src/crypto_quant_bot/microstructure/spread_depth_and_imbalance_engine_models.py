@@ -2,8 +2,17 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import Decimal
+from itertools import pairwise
 from typing import Any
 
+from .book_integrity_desynchronization_detector_validation import (
+    decimal_text,
+    require_integer,
+    require_sha256,
+    require_text,
+    validate_reason_codes,
+    validate_run_context,
+)
 from .spread_depth_and_imbalance_engine_validation import (
     COVERAGE_STATUS,
     IMBALANCE_DEFINED,
@@ -11,14 +20,7 @@ from .spread_depth_and_imbalance_engine_validation import (
     RUNTIME_MODE,
     VALIDATION_STATE,
     Lot41ValidationError,
-    decimal_text,
-    require_boolean,
-    require_integer,
-    require_sha256,
-    require_text,
     validate_lot41_safety,
-    validate_reason_codes,
-    validate_run_context,
 )
 
 
@@ -31,7 +33,11 @@ class Lot41RunContextV1:
 
     def __post_init__(self) -> None:
         validate_run_context(
-            self.run_id, RUNTIME_MODE, self.config_version, self.code_commit, self.correlation_id
+            self.run_id,
+            RUNTIME_MODE,
+            self.config_version,
+            self.code_commit,
+            self.correlation_id,
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -104,7 +110,9 @@ class TopOfBookV1:
             self.best_ask_quantity,
         )
         if any(not value.is_finite() or value <= 0 for value in values):
-            raise Lot41ValidationError("top-of-book values must be finite and positive")
+            raise Lot41ValidationError(
+                "top-of-book values must be finite and positive"
+            )
         if self.best_bid_price >= self.best_ask_price:
             raise Lot41ValidationError("top-of-book must be open and uncrossed")
 
@@ -131,8 +139,11 @@ class DepthBandV1:
     def __post_init__(self) -> None:
         if not self.band_bps.is_finite() or self.band_bps <= 0:
             raise Lot41ValidationError("depth band must be finite and positive")
-        if any(not value.is_finite() or value < 0 for value in (self.bid_quantity, self.ask_quantity)):
-            raise Lot41ValidationError("depth quantities must be finite and non-negative")
+        quantities = (self.bid_quantity, self.ask_quantity)
+        if any(not value.is_finite() or value < 0 for value in quantities):
+            raise Lot41ValidationError(
+                "depth quantities must be finite and non-negative"
+            )
         require_integer(self.bid_levels_observed, "bid_levels_observed")
         require_integer(self.ask_levels_observed, "ask_levels_observed")
         self._validate_imbalance()
@@ -140,8 +151,13 @@ class DepthBandV1:
     def _validate_imbalance(self) -> None:
         denominator = self.bid_quantity + self.ask_quantity
         if denominator == 0:
-            if self.imbalance is not None or self.imbalance_status != IMBALANCE_UNDEFINED:
-                raise Lot41ValidationError("zero depth requires undefined imbalance")
+            if (
+                self.imbalance is not None
+                or self.imbalance_status != IMBALANCE_UNDEFINED
+            ):
+                raise Lot41ValidationError(
+                    "zero depth requires undefined imbalance"
+                )
             return
         expected = (self.bid_quantity - self.ask_quantity) / denominator
         if self.imbalance != expected or self.imbalance_status != IMBALANCE_DEFINED:
@@ -157,7 +173,11 @@ class DepthBandV1:
             "ask_quantity": decimal_text(self.ask_quantity),
             "bid_levels_observed": self.bid_levels_observed,
             "ask_levels_observed": self.ask_levels_observed,
-            "imbalance": None if self.imbalance is None else decimal_text(self.imbalance),
+            "imbalance": (
+                None
+                if self.imbalance is None
+                else decimal_text(self.imbalance)
+            ),
             "imbalance_status": self.imbalance_status,
             "coverage_status": COVERAGE_STATUS,
         }
@@ -171,15 +191,20 @@ class CumulativeDepthLevelV1:
     distance_bps: Decimal
 
     def __post_init__(self) -> None:
-        if any(not value.is_finite() for value in self._values()):
+        values = (
+            self.price,
+            self.quantity,
+            self.cumulative_quantity,
+            self.distance_bps,
+        )
+        if any(not value.is_finite() for value in values):
             raise Lot41ValidationError("cumulative depth values must be finite")
         if self.price <= 0 or self.quantity <= 0 or self.cumulative_quantity <= 0:
-            raise Lot41ValidationError("cumulative price/quantities must be positive")
+            raise Lot41ValidationError(
+                "cumulative price/quantities must be positive"
+            )
         if self.distance_bps < 0:
             raise Lot41ValidationError("distance_bps cannot be negative")
-
-    def _values(self) -> tuple[Decimal, ...]:
-        return self.price, self.quantity, self.cumulative_quantity, self.distance_bps
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -200,10 +225,15 @@ class BookQualityBindingV1:
     veto_checksum: str
 
     def __post_init__(self) -> None:
-        if self.health_status != "HEALTHY" or self.book_health_score != Decimal("100"):
+        if (
+            self.health_status != "HEALTHY"
+            or self.book_health_score != Decimal("100")
+        ):
             raise Lot41ValidationError("Lot 41 requires certified healthy book")
         if self.consequence != "NONE":
-            raise Lot41ValidationError("Lot 41 refuses active book-health consequence")
+            raise Lot41ValidationError(
+                "Lot 41 refuses active book-health consequence"
+            )
         require_integer(self.sequence_id, "sequence_id", minimum=1)
         require_sha256(self.integrity_checksum, "integrity_checksum")
         require_sha256(self.veto_checksum, "veto_checksum")
@@ -255,22 +285,42 @@ class BookFeatureStateV1:
 
     def _identity_fields(self) -> tuple[tuple[str, str], ...]:
         return (
-            (self.source_id, "source_id"), (self.venue, "venue"),
-            (self.instrument_id, "instrument_id"), (self.event_time, "event_time"),
-            (self.receive_time, "receive_time"), (self.decision_time, "decision_time"),
+            (self.source_id, "source_id"),
+            (self.venue, "venue"),
+            (self.instrument_id, "instrument_id"),
+            (self.event_time, "event_time"),
+            (self.receive_time, "receive_time"),
+            (self.decision_time, "decision_time"),
         )
 
     def _validate_features(self) -> None:
-        values = (self.spread_absolute, self.spread_bps, self.mid_price, self.microprice)
+        values = (
+            self.spread_absolute,
+            self.spread_bps,
+            self.mid_price,
+            self.microprice,
+        )
         if any(not value.is_finite() or value <= 0 for value in values):
-            raise Lot41ValidationError("spread/mid/microprice must be finite and positive")
-        if not self.depth_bands or not self.cumulative_bids or not self.cumulative_asks:
-            raise Lot41ValidationError("Lot 41 requires bilateral observed depth")
+            raise Lot41ValidationError(
+                "spread/mid/microprice must be finite and positive"
+            )
+        if (
+            not self.depth_bands
+            or not self.cumulative_bids
+            or not self.cumulative_asks
+        ):
+            raise Lot41ValidationError(
+                "Lot 41 requires bilateral observed depth"
+            )
         bands = tuple(item.band_bps for item in self.depth_bands)
-        if any(left >= right for left, right in zip(bands, bands[1:], strict=False)):
-            raise Lot41ValidationError("published depth bands are not increasing")
+        if any(left >= right for left, right in pairwise(bands)):
+            raise Lot41ValidationError(
+                "published depth bands are not increasing"
+            )
         if self.book_quality.sequence_id != self.sequence_id:
-            raise Lot41ValidationError("book quality/feature sequence mismatch")
+            raise Lot41ValidationError(
+                "book quality/feature sequence mismatch"
+            )
 
     def payload_without_checksum(self) -> dict[str, Any]:
         payload = self.to_dict()
@@ -315,15 +365,18 @@ class Lot41MetricsV1:
     ask_levels_observed: int
 
     def __post_init__(self) -> None:
-        for value, field in (
+        fields = (
             (self.depth_bands_total, "depth_bands_total"),
             (self.undefined_imbalance_total, "undefined_imbalance_total"),
             (self.bid_levels_observed, "bid_levels_observed"),
             (self.ask_levels_observed, "ask_levels_observed"),
-        ):
+        )
+        for value, field in fields:
             require_integer(value, field)
         if self.undefined_imbalance_total > self.depth_bands_total:
-            raise Lot41ValidationError("undefined imbalance count exceeds band count")
+            raise Lot41ValidationError(
+                "undefined imbalance count exceeds band count"
+            )
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -335,7 +388,9 @@ class Lot41MetricsV1:
             "lot_41_ask_levels_observed": self.ask_levels_observed,
             "lot_41_validation_failures_total": 0,
             "lot_41_processing_latency_us": None,
-            "latency_measurement_status": "NOT_MEASURED_OFFLINE_DETERMINISTIC_REPLAY",
+            "latency_measurement_status": (
+                "NOT_MEASURED_OFFLINE_DETERMINISTIC_REPLAY"
+            ),
         }
 
 
@@ -391,14 +446,17 @@ class SpreadDepthImbalanceEngineAuditV1:
     audit_checksum: str
 
     def __post_init__(self) -> None:
-        for value, field in (
+        checksums = (
             (self.state_output_checksum, "state_output_checksum"),
             (self.feature_checksum, "feature_checksum"),
             (self.audit_checksum, "audit_checksum"),
-        ):
+        )
+        for value, field in checksums:
             require_sha256(value, field)
         if not self.validation_checks:
-            raise Lot41ValidationError("Lot 41 audit requires validation checks")
+            raise Lot41ValidationError(
+                "Lot 41 audit requires validation checks"
+            )
         for value in self.validation_checks:
             require_text(value, "validation_check")
         validate_reason_codes(self.reason_codes)
