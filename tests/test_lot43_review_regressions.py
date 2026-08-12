@@ -288,7 +288,7 @@ def test_resilience_state_rejects_slice_totals_that_disagree_with_events() -> No
         mean_replenishment_time_us=None,
         resilience_status="NO_EVENTS",
     )
-    with pytest.raises(Lot43ValidationError, match="slice depletion total"):
+    with pytest.raises(Lot43ValidationError, match="slice aggregation must match published events"):
         replace(
             resilience,
             resilience_slices=(inconsistent_slice, *resilience.resilience_slices[1:]),
