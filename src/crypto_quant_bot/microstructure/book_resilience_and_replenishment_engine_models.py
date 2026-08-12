@@ -427,6 +427,49 @@ def _event_horizon_outcome(
     return "PENDING"
 
 
+def _recovered_events(
+    events: tuple[BookDepletionEventV1, ...],
+    outcomes: tuple[str, ...],
+) -> tuple[BookDepletionEventV1, ...]:
+    return tuple(
+        event
+        for event, outcome in zip(events, outcomes, strict=True)
+        if outcome == "RECOVERED"
+    )
+
+
+def _mean_slice_recovered_fraction(
+    events: tuple[BookDepletionEventV1, ...],
+    recovered_events: tuple[BookDepletionEventV1, ...],
+) -> Decimal | None:
+    if not events:
+        return None
+    with localcontext() as context:
+        context.prec = DECIMAL_PRECISION
+        total = sum(
+            (event.recovered_fraction for event in recovered_events),
+            Decimal("0"),
+        )
+        return total / Decimal(len(events))
+
+
+def _mean_slice_replenishment_time(
+    recovered_events: tuple[BookDepletionEventV1, ...],
+) -> Decimal | None:
+    if not recovered_events:
+        return None
+    times = tuple(
+        event.replenishment_time_us
+        for event in recovered_events
+        if event.replenishment_time_us is not None
+    )
+    if len(times) != len(recovered_events):
+        raise Lot43ValidationError("recovered event missing replenishment time")
+    with localcontext() as context:
+        context.prec = DECIMAL_PRECISION
+        return Decimal(sum(times)) / Decimal(len(times))
+
+
 def _expected_slice_aggregation(
     events: tuple[BookDepletionEventV1, ...],
     horizon_us: int,
@@ -435,30 +478,16 @@ def _expected_slice_aggregation(
     outcomes = tuple(
         _event_horizon_outcome(event, horizon_us, decision_time) for event in events
     )
-    recovered = sum(outcome == "RECOVERED" for outcome in outcomes)
-    shifted = sum(outcome == "SHIFTED" for outcome in outcomes)
-    expired = sum(outcome == "EXPIRED" for outcome in outcomes)
-    pending = sum(outcome == "PENDING" for outcome in outcomes)
-    with localcontext() as context:
-        context.prec = DECIMAL_PRECISION
-        mean_fraction = None
-        if events:
-            total_fraction = Decimal("0")
-            for event, outcome in zip(events, outcomes, strict=True):
-                if outcome == "RECOVERED":
-                    total_fraction += event.recovered_fraction
-            mean_fraction = total_fraction / Decimal(len(events))
-        recovered_times = tuple(
-            event.replenishment_time_us
-            for event, outcome in zip(events, outcomes, strict=True)
-            if outcome == "RECOVERED" and event.replenishment_time_us is not None
-        )
-        mean_time = (
-            None
-            if not recovered_times
-            else Decimal(sum(recovered_times)) / Decimal(len(recovered_times))
-        )
-    return len(events), recovered, shifted, expired, pending, mean_fraction, mean_time
+    recovered_events = _recovered_events(events, outcomes)
+    return (
+        len(events),
+        len(recovered_events),
+        sum(outcome == "SHIFTED" for outcome in outcomes),
+        sum(outcome == "EXPIRED" for outcome in outcomes),
+        sum(outcome == "PENDING" for outcome in outcomes),
+        _mean_slice_recovered_fraction(events, recovered_events),
+        _mean_slice_replenishment_time(recovered_events),
+    )
 
 
 def _validate_slice_matrix(slices: tuple[BookResilienceSliceV1, ...]) -> None:
