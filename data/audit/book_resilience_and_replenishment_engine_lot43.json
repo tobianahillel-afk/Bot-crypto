@@ -168,7 +168,7 @@
     "lot_43_validation_failures_total": 0,
     "schema_version": "lot43-metrics-v1"
   },
-  "output_checksum": "a32a0ed7cb563548bc29a47499e0663c6c9a24dc2952a4178d0a6a58104692be",
+  "output_checksum": "9a61916a2f597b3efb8e38b8104d3af74550d02cf175d7efde39763f07cb267b",
   "reason_codes": [
     "LOT43_OFFLINE_BOOK_RESILIENCE_VALIDATED",
     "LOT43_CANONICAL_LOT39_REPLAY_BOUND",
@@ -177,7 +177,7 @@
   ],
   "receive_time": "2026-08-06T19:18:40.070000Z",
   "run_context": {
-    "code_commit": "8d2f99fcd7f654d18079ff8ea24f90e57cfc4086",
+    "code_commit": "ad01a0ffbe3e97d8418922293d68613a88a1b148",
     "config_version": "lot43-book-resilience-replenishment-config-v1",
     "correlation_id": "microstructure-v4-lot43-reference",
     "run_id": "lot43-reference-run-v1",
