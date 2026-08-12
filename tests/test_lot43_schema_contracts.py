@@ -44,6 +44,16 @@ def test_lot43_resilience_nested_contracts_are_closed() -> None:
     assert resilience_slice["properties"]["volatility_method"]["const"] == "OBSERVED_BOOK_MID_MAX_ABS_MOVE_BPS"
 
 
+def test_lot43_resilience_schema_declares_horizon_set() -> None:
+    schema = _load(RESILIENCE_SCHEMA)
+    assert "resilience_horizons_us" in schema["required"]
+    horizons = schema["properties"]["resilience_horizons_us"]
+    assert horizons["type"] == "array"
+    assert horizons["minItems"] == 1
+    assert horizons["uniqueItems"] is True
+    assert horizons["items"] == {"type": "integer", "minimum": 1}
+
+
 def test_lot43_state_schema_keeps_runtime_and_safety_closed() -> None:
     schema = _load(STATE_SCHEMA)
     definitions = schema["$defs"]
