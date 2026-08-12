@@ -1,18 +1,18 @@
 {
-  "completed_mutants": 2690,
-  "evaluated_mutants": 2690,
-  "killed_mutants": 2217,
+  "completed_mutants": 2794,
+  "evaluated_mutants": 2794,
+  "killed_mutants": 2301,
   "max_children": 1,
   "minimum_score_percent": 80.0,
-  "mutation_score_percent": 82.42,
+  "mutation_score_percent": 82.36,
   "mutmut_results_exit_code": 0,
   "mutmut_run_exit_code": 0,
   "python_hash_seed": "0",
   "schema_version": "lot43-mutation-summary-v1",
-  "source_head_sha": "dccea5dcd03414064ead4e6979d53df98dfdda6f",
+  "source_head_sha": "7091abf50bd5237636da7ffcb520e05dca558173",
   "status": "PASS",
-  "survived_mutants": 473,
+  "survived_mutants": 493,
   "suspicious_mutants": 0,
   "timeout_mutants": 0,
-  "total_mutants": 2690
+  "total_mutants": 2794
 }
