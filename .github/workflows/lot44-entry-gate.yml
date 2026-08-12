@@ -1,0 +1,131 @@
+name: Lot 44 V4 implementation entry gate
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-22.04
+    env:
+      PYTHONPATH: src
+      BASE_COMMIT_SHA: 7a207a16e7aa543f9f7c241828f8ea5ae9ed0407
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Locate exact governance-only Lot 44 gate transition
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$BASE_COMMIT_SHA" HEAD
+          cat > /tmp/lot44-gate-paths.txt <<'EOF'
+          .github/workflows/lot43-entry-gate.yml
+          .github/workflows/lot43-frozen-evidence.yml
+          .github/workflows/lot43-post-merge-audit.yml
+          .github/workflows/lot44-entry-gate.yml
+          contracts/schemas/lot44_v4_entry_gate_v1.schema.json
+          data/audit/lot44_v4_entry_gate.json
+          docs/LOT_44_V4_ENTRY_GATE.md
+          reports/lot_44_v4_entry_gate_report.md
+          scripts/validate_lot44_entry_gate.py
+          tests/test_lot44_v4_entry_gate.py
+          EOF
+          sort -o /tmp/lot44-gate-paths.txt /tmp/lot44-gate-paths.txt
+          gate_commit=""
+          while read -r candidate; do
+            git diff --name-only "$BASE_COMMIT_SHA" "$candidate" | sort > /tmp/candidate-paths.txt
+            if diff -q /tmp/lot44-gate-paths.txt /tmp/candidate-paths.txt >/dev/null; then
+              gate_commit="$candidate"
+              break
+            fi
+          done < <(git rev-list --first-parent --reverse "$BASE_COMMIT_SHA..HEAD")
+          test -n "$gate_commit"
+          echo "$gate_commit" | tee /tmp/lot44-gate-commit.txt
+          while read -r path; do
+            git diff --quiet "$gate_commit" HEAD -- "$path"
+          done < /tmp/lot44-gate-paths.txt
+      - name: Replay gate at certified governance transition
+        run: |
+          set -euo pipefail
+          gate_commit="$(cat /tmp/lot44-gate-commit.txt)"
+          rm -rf /tmp/lot44-gate-certified
+          git worktree add --detach /tmp/lot44-gate-certified "$gate_commit"
+          trap 'git worktree remove --force /tmp/lot44-gate-certified >/dev/null 2>&1 || true' EXIT
+          (
+            cd /tmp/lot44-gate-certified
+            PYTHONPATH=src python scripts/validate_lot44_entry_gate.py
+            PYTHONPATH=src pytest -q tests/test_lot44_v4_entry_gate.py
+            test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py
+            test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py
+            test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py
+            test ! -e config/microstructure/trades_and_aggressor_classification_schema_v1.json
+            test ! -e scripts/run_lot44_trades_and_aggressor_classification_schema.py
+            test ! -e scripts/validate_lot44.py
+            test ! -e src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py
+            test ! -e scripts/run_lot45_order_flow_delta_and_cvd_engine.py
+          )
+          git worktree remove --force /tmp/lot44-gate-certified
+          trap - EXIT
+      - name: Validate immutable gate contracts on current tree
+        run: |
+          set -euo pipefail
+          python -m compileall -q scripts tests
+          python -m json.tool data/audit/lot44_v4_entry_gate.json >/dev/null
+          python -m json.tool contracts/schemas/lot44_v4_entry_gate_v1.schema.json >/dev/null
+          ruff check scripts/validate_lot44_entry_gate.py tests/test_lot44_v4_entry_gate.py
+          pytest -q tests/test_lot44_v4_entry_gate.py
+      - name: Re-prove Lot 43 post-merge prerequisite
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/lot43-post-merge-base
+          git worktree add --detach /tmp/lot43-post-merge-base "$BASE_COMMIT_SHA"
+          trap 'git worktree remove --force /tmp/lot43-post-merge-base >/dev/null 2>&1 || true' EXIT
+          (
+            cd /tmp/lot43-post-merge-base
+            PYTHONPATH=src python scripts/validate_lot43_post_merge.py               | tee /tmp/lot43-post-merge-for-lot44.json
+          )
+          grep -F '"verdict": "GO_LOT43_POST_MERGE"' /tmp/lot43-post-merge-for-lot44.json
+          git worktree remove --force /tmp/lot43-post-merge-base
+          trap - EXIT
+      - name: Architecture roadmap traceability and engineering controls
+        run: |
+          set -euo pipefail
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+      - name: Security dependency full regression and anti-flake
+        run: |
+          set -euo pipefail
+          bandit -q -r scripts/validate_lot44_entry_gate.py -ll
+          pip-audit -r requirements-dev.lock
+          pytest -q
+          for repetition in 1 2 3; do pytest -q tests/test_lot44_v4_entry_gate.py; done
+      - name: Re-prove downstream Lot 45 lock
+        run: |
+          set -euo pipefail
+          test ! -e src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py
+          test ! -e src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py
+          test ! -e config/microstructure/order_flow_delta_and_cvd_engine_v1.json
+          test ! -e scripts/run_lot45_order_flow_delta_and_cvd_engine.py
+          test ! -e scripts/validate_lot45.py
+          test ! -e tests/test_lot45_order_flow_delta_and_cvd_engine.py
+          test ! -e docs/LOT_45_ORDER_FLOW_DELTA_AND_CVD_ENGINE.md
+          test ! -e docs/ACCEPTANCE_CRITERIA_LOT_45.md
