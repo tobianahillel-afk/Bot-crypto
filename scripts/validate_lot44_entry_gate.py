@@ -223,7 +223,7 @@ def validate_roadmap(gate: dict[str, Any]) -> None:
 
 def validate_next_roadmap_lock() -> None:
     lot45 = roadmap_record(46)
-    expected = {
+    expected45 = {
         "lot_id": "Lot 45",
         "lot_number": 45,
         "title": "Order Flow, Delta & CVD Engine",
@@ -231,8 +231,24 @@ def validate_next_roadmap_lock() -> None:
         "responsible_component": "MicrostructureDomain",
         "runtime_mode": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
     }
-    for field, value in expected.items():
+    for field, value in expected45.items():
         require(lot45.get(field) == value, f"canonical Lot 45 field changed: {field}")
+
+    lot46 = roadmap_record(47)
+    expected46 = {
+        "lot_id": "Lot 46",
+        "lot_number": 46,
+        "title": "Trade Classification Confidence Engine",
+        "status": "PLANNED_LOCKED",
+        "responsible_component": "MicrostructureDomain",
+        "runtime_mode": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    }
+    for field, value in expected46.items():
+        require(lot46.get(field) == value, f"canonical Lot 46 field changed: {field}")
+    implementation_files = lot46.get("implementation_files")
+    require(isinstance(implementation_files, list), "Lot 46 implementation file list missing")
+    require(len(implementation_files) == 9, "Lot 46 implementation file list changed")
+    require(all(isinstance(path, str) and path for path in implementation_files), "Lot 46 implementation file list invalid")
 
 
 def validate_previous_release() -> None:
@@ -304,6 +320,12 @@ def validate_governance_only() -> None:
         require(not path.exists(), f"Lot 44 implementation must not exist before gate merge: {path}")
     for path in LOT45_FORBIDDEN_IMPLEMENTATION_PATHS:
         require(not path.exists(), f"Lot 45 implementation must remain locked: {path}")
+    lot46_files = roadmap_record(47).get("implementation_files")
+    require(isinstance(lot46_files, list), "Lot 46 implementation file list missing")
+    for relative in lot46_files:
+        require(isinstance(relative, str) and relative, "Lot 46 implementation file path invalid")
+        path = ROOT / relative
+        require(not path.exists(), f"Lot 46 implementation must remain locked: {path}")
 
 
 def validate_docs() -> None:
@@ -317,6 +339,7 @@ def validate_docs() -> None:
         "0.43.0",
         "GO_LOT43_POST_MERGE",
         "Lot 45",
+        "Lot 46",
         "PLANNED_LOCKED",
         "98.07",
         "96.88",
@@ -346,6 +369,7 @@ def validate() -> dict[str, object]:
         "output_checksum": gate_payload["output_checksum"],
         "target_lot": 44,
         "next_locked_lot": 45,
+        "future_locked_lot": 46,
         "next_lot_status": "PLANNED_LOCKED",
         "trade_allowed": False,
         "execution_allowed": False,
