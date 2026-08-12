@@ -296,22 +296,14 @@ def _expected_resilience_status(
 
 
 def _validate_resilience_status_consistency(
-    events: int,
-    recovered: int,
-    shifted: int,
-    expired: int,
-    pending: int,
+    outcome_counts: tuple[int, int, int, int, int],
     mean_recovered_fraction: Decimal | None,
     replenishment_min_recovery_ratio: Decimal,
     status: str,
 ) -> None:
     validate_resilience_status(status)
     expected = _expected_resilience_status(
-        events,
-        recovered,
-        shifted,
-        expired,
-        pending,
+        *outcome_counts,
         mean_recovered_fraction,
         replenishment_min_recovery_ratio,
     )
@@ -369,11 +361,13 @@ class BookResilienceSliceV1:
             self.mean_replenishment_time_us,
         )
         _validate_resilience_status_consistency(
-            self.depletion_events_total,
-            self.recovered_events_total,
-            self.mid_shift_events_total,
-            self.expired_events_total,
-            self.pending_events_total,
+            (
+                self.depletion_events_total,
+                self.recovered_events_total,
+                self.mid_shift_events_total,
+                self.expired_events_total,
+                self.pending_events_total,
+            ),
             self.mean_recovered_fraction,
             self.replenishment_min_recovery_ratio,
             self.resilience_status,
