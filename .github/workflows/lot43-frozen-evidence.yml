@@ -14,8 +14,9 @@ jobs:
     env:
       PYTHONPATH: src
       GATE_MERGE_SHA: ed8845e0e56151348fe57c0e9bceaf4646ea49aa
-      SOURCE_HEAD_SHA: db91a6700fb7b76133ad896714af6ed82da7c5da
-      EVIDENCE_HEAD_SHA: 849933f49ec0290a4852b6616f5034f807fcc318
+      SOURCE_HEAD_SHA: dccea5dcd03414064ead4e6979d53df98dfdda6f
+      CERTIFICATION_ANCHOR_SHA: f9ea774f9f59b4fc7af55dcb911e085797c42a34
+      EVIDENCE_HEAD_SHA: c58321c9817117623adcff9949348b4b4624d483
     steps:
       - uses: actions/checkout@v4
         with:
@@ -28,31 +29,45 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove frozen source and evidence lineage
+      - name: Prove source certification anchor and evidence lineage
         run: |
           set -euo pipefail
           git merge-base --is-ancestor "$GATE_MERGE_SHA" "$SOURCE_HEAD_SHA"
+          git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$CERTIFICATION_ANCHOR_SHA"
+          git merge-base --is-ancestor "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA"
           git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" HEAD
-          test "$(git rev-list --count "$SOURCE_HEAD_SHA..$EVIDENCE_HEAD_SHA")" = "1"
+          test "$(git rev-list --count "$SOURCE_HEAD_SHA..$CERTIFICATION_ANCHOR_SHA")" = "1"
+          test "$(git rev-list --count "$CERTIFICATION_ANCHOR_SHA..$EVIDENCE_HEAD_SHA")" = "1"
           python - <<'PY'
           import os
           import subprocess
 
           source = os.environ['SOURCE_HEAD_SHA']
+          anchor = os.environ['CERTIFICATION_ANCHOR_SHA']
           evidence = os.environ['EVIDENCE_HEAD_SHA']
-          actual = subprocess.check_output(
-              ['git', 'diff', '--name-only', source, evidence], text=True
+          anchor_delta = subprocess.check_output(
+              ['git', 'diff', '--name-only', source, anchor], text=True
           ).splitlines()
-          expected = [
+          expected_anchor = [
+              '.github/workflows/lot43-book-resilience-replenishment.yml',
+              '.github/workflows/lot43-mutation-assurance.yml',
+          ]
+          if sorted(anchor_delta) != sorted(expected_anchor):
+              raise SystemExit(f'LOT43_CERTIFICATION_ANCHOR_DIFF_CHANGED:{anchor_delta}')
+          evidence_delta = subprocess.check_output(
+              ['git', 'diff', '--name-only', anchor, evidence], text=True
+          ).splitlines()
+          expected_evidence = [
               'data/audit/book_resilience_and_replenishment_engine_audit_lot43.json',
               'data/audit/book_resilience_and_replenishment_engine_lot43.json',
-              'data/audit/book_resilience_state_lot43.json',
               'reports/lot43/coverage_summary.json',
               'reports/lot43/mutation_summary.json',
           ]
-          if sorted(actual) != sorted(expected):
-              raise SystemExit(f'LOT43_EVIDENCE_DIFF_CHANGED:{actual}')
+          if sorted(evidence_delta) != sorted(expected_evidence):
+              raise SystemExit(f'LOT43_EVIDENCE_DIFF_CHANGED:{evidence_delta}')
           PY
+          git diff --quiet "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA" -- \
+            data/audit/book_resilience_state_lot43.json
       - name: Prove frozen Lot 43 production source immutability
         run: |
           set -euo pipefail
@@ -73,6 +88,7 @@ jobs:
             tests/test_lot43_schema_contracts.py \
             tests/test_lot43_edge_contracts.py \
             tests/test_lot43_mutation_contracts.py \
+            tests/test_lot43_review_regressions.py \
             tests/test_lot43_v4_entry_gate.py \
             tests/test_lot43_semantic_consistency.py \
             docs/LOT_43_BOOK_RESILIENCE_AND_REPLENISHMENT_ENGINE.md \

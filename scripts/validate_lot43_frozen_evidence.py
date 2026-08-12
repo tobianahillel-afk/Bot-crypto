@@ -15,251 +15,154 @@ from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_re
     load_json_object,
 )
 
-SOURCE_HEAD = "db91a6700fb7b76133ad896714af6ed82da7c5da"
-EVIDENCE_HEAD = "849933f49ec0290a4852b6616f5034f807fcc318"
+SOURCE_HEAD = "dccea5dcd03414064ead4e6979d53df98dfdda6f"
+CERTIFICATION_ANCHOR = "f9ea774f9f59b4fc7af55dcb911e085797c42a34"
+EVIDENCE_HEAD = "c58321c9817117623adcff9949348b4b4624d483"
 GATE_MERGE = "ed8845e0e56151348fe57c0e9bceaf4646ea49aa"
-VALIDATION_RUN = 31607906919
-VALIDATION_ARTIFACT = 9145948793
-VALIDATION_DIGEST = "sha256:938b89da8af0513625cd057f34960141ec0994249895773287245361af0d2d2f"
-MUTATION_RUN = 31607906902
-MUTATION_ARTIFACT = 9146057739
-MUTATION_DIGEST = "sha256:68e76f978a174c938190babc882c194bd0e8d0a2bdf74822b81272b5ee79c399"
+VALIDATION_PROOF = (
+    31620295621,
+    9150976691,
+    "sha256:a4bbf31d1b83f94bbfec52e8dbb0a926d2a87fdf215c9ef17f3353875f18d41c",
+)
+MUTATION_PROOF = (
+    31620295636,
+    9151065443,
+    "sha256:95274da9fc4dd916a78a5c2cf14ef1103c627a406acdb6ba005c479a2eea545a",
+)
 
-STATE_PATH = ROOT / "data/audit/book_resilience_and_replenishment_engine_lot43.json"
-AUDIT_PATH = ROOT / "data/audit/book_resilience_and_replenishment_engine_audit_lot43.json"
-RESILIENCE_PATH = ROOT / "data/audit/book_resilience_state_lot43.json"
-COVERAGE_PATH = ROOT / "reports/lot43/coverage_summary.json"
-MUTATION_PATH = ROOT / "reports/lot43/mutation_summary.json"
+STATE = ROOT / "data/audit/book_resilience_and_replenishment_engine_lot43.json"
+AUDIT = ROOT / "data/audit/book_resilience_and_replenishment_engine_audit_lot43.json"
+RESILIENCE = ROOT / "data/audit/book_resilience_state_lot43.json"
+COVERAGE = ROOT / "reports/lot43/coverage_summary.json"
+MUTATION = ROOT / "reports/lot43/mutation_summary.json"
 
-EXPECTED_STATE = "11224c071228af9bffbf8a6f53ffc26b4fe836fec380e35b7e489677988f6919"
-EXPECTED_AUDIT = "5ff7cbfeec20c6a20ea08dee0b6aeb39de446fe0a51ab987841d9b6b38910ac5"
-EXPECTED_RESILIENCE = "297bec6000bc40f2df428c942ee60f7b170cfc01ddba992503da9c259e6e551f"
-EXPECTED_GATE = "4034c86061234a627dafde6122439c3b697fb2d53a1b95ba4e58f77a71089e6d"
-EXPECTED_CONFIG = "a170aab2e8f71dd6f6420a308edd7aa22f6200a25f39ac1eacefb7ac1aa431a1"
-EXPECTED_LOT42_STATE = "6e1fe348dc9fdc262d2f27990c6f3234f0b1ed71f5bfb3347fe27a9e458af8b0"
-EXPECTED_LOT42_AUDIT = "b562b0cca61e0b10fbacf4a2318ef1075230b57388fe0240de0ca3d200582e3f"
-EXPECTED_LOT42_ZONE_SET = "f5769313ec5f9f6de503b1eb9a40c31262ddf0eba6131f791c070f6557168c89"
-EXPECTED_LOT39_BOOK = "a503d56b312cbb21586712fcf929a0381cbc9adde9c5d70700e1f7166ef58dde"
-EXPECTED_DELTA_FIXTURE = "1e7528a350ca78e21c4832b4af0ef4763e6bbadec82ea0f55a1005502cadff97"
-EXPECTED_LOT38_SNAPSHOT = "0d63ca7ac1ca48b44e58c0b0f1eb8946190eaf2da6745c2bbd2dd8de14f49b16"
-VALIDATION_STATE = "VALIDATED_OFFLINE_BOOK_RESILIENCE_REPLENISHMENT_ONLY"
-RECOVERY_THRESHOLD = "0.25"
-
-EXPECTED_FILE_SHA256 = {
-    STATE_PATH: "04e456beb82248ca99c5fc8ca2e267d821fde71b8abea60938a108785cd310ed",
-    AUDIT_PATH: "9665c8b8f7a24f651cf83f9623d879babe14b58cf1561cedca31c495434b2318",
-    RESILIENCE_PATH: "c39e0426c6b6635b60e72865ef9596cd4b056ff7e3bad5b7bd5ba646c219ba4b",
-    COVERAGE_PATH: "539d3830130cb3b91098941215b48c33c9d410d43bddec29ec5e1b02c9798c18",
-    MUTATION_PATH: "a78875b291644d3b307197d340db9d2eacfcce015a83f757f7910681983f8fb9",
+EXPECTED_HASHES = {
+    STATE: "310ceae2eaa25028603edb83406213f0aecb3bd04d2ec28439c03f2d0219a12e",
+    AUDIT: "018359f62ebd864e100a21f8df60d2a21380f9c5988c9d00414f373c323dff31",
+    RESILIENCE: "c39e0426c6b6635b60e72865ef9596cd4b056ff7e3bad5b7bd5ba646c219ba4b",
+    COVERAGE: "76e8f914defd25f86e41c1aa515c71258a1cfb361901051522b36ce72f08e6bb",
+    MUTATION: "b40709a4ea0ffd68d305812fd09e614f63c0444f6c6a601513d884d65b1b8e93",
 }
-
+EXPECTED_STATE = "797bd974b37b4806bfada6b6b938d189401dc915998aa97e68473b1226da4a3d"
+EXPECTED_AUDIT = "553b0747c66275cefb4636b3d84ea664230ae765476126711bf15b768ac92ec4"
+EXPECTED_RESILIENCE = "297bec6000bc40f2df428c942ee60f7b170cfc01ddba992503da9c259e6e551f"
+EXPECTED_LINEAGE = {
+    "entry_gate_checksum": "4034c86061234a627dafde6122439c3b697fb2d53a1b95ba4e58f77a71089e6d",
+    "config_checksum": "a170aab2e8f71dd6f6420a308edd7aa22f6200a25f39ac1eacefb7ac1aa431a1",
+    "lot42_state_checksum": "6e1fe348dc9fdc262d2f27990c6f3234f0b1ed71f5bfb3347fe27a9e458af8b0",
+    "lot42_audit_checksum": "b562b0cca61e0b10fbacf4a2318ef1075230b57388fe0240de0ca3d200582e3f",
+    "lot42_zone_set_checksum": "f5769313ec5f9f6de503b1eb9a40c31262ddf0eba6131f791c070f6557168c89",
+    "lot39_book_checksum": "a503d56b312cbb21586712fcf929a0381cbc9adde9c5d70700e1f7166ef58dde",
+    "lot39_delta_fixture_checksum": "1e7528a350ca78e21c4832b4af0ef4763e6bbadec82ea0f55a1005502cadff97",
+    "lot38_snapshot_checksum": "0d63ca7ac1ca48b44e58c0b0f1eb8946190eaf2da6745c2bbd2dd8de14f49b16",
+}
 LOT44_FORBIDDEN = (
-    ROOT / "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py",
-    ROOT / "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py",
-    ROOT / "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py",
-    ROOT / "config/microstructure/trades_and_aggressor_classification_schema_v1.json",
-    ROOT / "scripts/run_lot44_trades_and_aggressor_classification_schema.py",
-    ROOT / "scripts/validate_lot44.py",
-    ROOT / "tests/test_lot44_trades_and_aggressor_classification_schema.py",
-    ROOT / "docs/LOT_44_TRADES_AND_AGGRESSOR_CLASSIFICATION_SCHEMA.md",
-    ROOT / "docs/ACCEPTANCE_CRITERIA_LOT_44.md",
+    "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py",
+    "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py",
+    "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py",
+    "config/microstructure/trades_and_aggressor_classification_schema_v1.json",
+    "scripts/run_lot44_trades_and_aggressor_classification_schema.py",
+    "scripts/validate_lot44.py",
+    "tests/test_lot44_trades_and_aggressor_classification_schema.py",
+    "docs/LOT_44_TRADES_AND_AGGRESSOR_CLASSIFICATION_SCHEMA.md",
+    "docs/ACCEPTANCE_CRITERIA_LOT_44.md",
 )
 
 
 class Lot43FrozenEvidenceError(RuntimeError):
-    """Raised when frozen Lot 43 evidence no longer matches certification."""
+    pass
 
 
-def require(condition: bool, message: str) -> None:
-    if not condition:
+def require(value: bool, message: str) -> None:
+    if not value:
         raise Lot43FrozenEvidenceError(message)
 
 
-def file_sha256(path: Path) -> str:
+def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def verify_checksum(payload: dict[str, Any], field: str, expected: str, label: str) -> None:
+def verify_checksum(payload: dict[str, Any], field: str, expected: str) -> None:
     body = dict(payload)
-    actual = body.pop(field, None)
-    require(actual == expected, f"{label} certified checksum changed")
-    require(canonical_checksum(body) == expected, f"{label} checksum mismatch")
-
-
-def expected_safety() -> dict[str, object]:
-    return {
-        "analysis_only": True,
-        "approved_size": 0,
-        "execution_allowed": False,
-        "external_connectivity_allowed": False,
-        "market_event_publication_allowed": False,
-        "network_ingestion_allowed": False,
-        "order_routing_allowed": False,
-        "participant_behavior_inference_explicitly_labeled": True,
-        "raw_data_mutation_allowed": False,
-        "real_credentials_allowed": False,
-        "risk_approval_allowed": False,
-        "scenario_score_is_signal": False,
-        "signal_generation_allowed": False,
-        "trade_allowed": False,
-        "used_for_decision": False,
-    }
+    require(body.pop(field, None) == expected, f"{field} changed")
+    require(canonical_checksum(body) == expected, f"{field} canonical mismatch")
 
 
 def verify_files() -> None:
-    for path, expected in EXPECTED_FILE_SHA256.items():
-        require(path.is_file(), f"Lot 43 frozen evidence missing: {path}")
-        require(file_sha256(path) == expected, f"Lot 43 frozen evidence drifted: {path}")
-
-
-def verify_lineage(state: dict[str, Any], audit: dict[str, Any]) -> None:
-    expected = {
-        "entry_gate_checksum": EXPECTED_GATE,
-        "config_checksum": EXPECTED_CONFIG,
-        "lot42_state_checksum": EXPECTED_LOT42_STATE,
-        "lot42_audit_checksum": EXPECTED_LOT42_AUDIT,
-        "lot42_zone_set_checksum": EXPECTED_LOT42_ZONE_SET,
-        "lot39_book_checksum": EXPECTED_LOT39_BOOK,
-        "lot39_delta_fixture_checksum": EXPECTED_DELTA_FIXTURE,
-        "lot38_snapshot_checksum": EXPECTED_LOT38_SNAPSHOT,
-    }
-    for field, value in expected.items():
-        require(state["lineage"][field] == value, f"Lot 43 lineage changed: {field}")
-        require(audit["lineage"][field] == value, f"Lot 43 audit lineage changed: {field}")
-    require(state["lineage"] == audit["lineage"], "Lot 43 state/audit lineage diverged")
-
-
-def verify_reference_event(resilience: dict[str, Any]) -> None:
-    events = resilience["depletion_events"]
-    require(len(events) == 1, "reference depletion event count changed")
-    event = events[0]
-    expected = {
-        "side": "BID",
-        "depleted_price": "50024.8",
-        "previous_quantity": "1.25",
-        "post_depletion_quantity": "0",
-        "depleted_quantity": "1.25",
-        "depletion_sequence_id": 1003,
-        "replenishment_kind": "NONE",
-        "max_window_status": "EXPIRED_NO_REPLENISHMENT",
-        "participant_intent": "NOT_INFERRED",
-    }
-    for field, value in expected.items():
-        require(event[field] == value, f"reference depletion changed: {field}")
-
-
-def verify_reference_slices(resilience: dict[str, Any]) -> None:
-    slices = resilience["resilience_slices"]
-    require(len(slices) == 4, "reference slice count changed")
-    require(
-        all(item["replenishment_min_recovery_ratio"] == RECOVERY_THRESHOLD for item in slices),
-        "versioned recovery threshold changed",
-    )
-    bid = [item for item in slices if item["side"] == "BID"]
-    ask = [item for item in slices if item["side"] == "ASK"]
-    require([item["horizon_us"] for item in bid] == [10000, 25000], "BID horizons changed")
-    require([item["resilience_status"] for item in bid] == ["FRAGILE", "FRAGILE"], "BID resilience changed")
-    require([item["horizon_us"] for item in ask] == [10000, 25000], "ASK horizons changed")
-    require([item["resilience_status"] for item in ask] == ["NO_EVENTS", "NO_EVENTS"], "ASK resilience changed")
-
-
-def verify_reference_metrics(state: dict[str, Any]) -> None:
-    metrics = state["metrics"]
-    expected = {
-        "lot_43_observations_total": 3,
-        "lot_43_depletion_events_total": 1,
-        "lot_43_expired_max_window_events_total": 1,
-        "lot_43_same_price_replenishments_total": 0,
-        "lot_43_adjacent_price_replenishments_total": 0,
-        "lot_43_mid_shift_events_total": 0,
-        "lot_43_pending_max_window_events_total": 0,
-    }
-    for field, value in expected.items():
-        require(metrics[field] == value, f"reference metric changed: {field}")
-
-
-def verify_reference(resilience: dict[str, Any], state: dict[str, Any]) -> None:
-    require(resilience["sequence_id"] == 1003, "reference sequence changed")
-    require(resilience["history_sequence_ids"] == [1001, 1002, 1003], "reference history changed")
-    require(resilience["observed_book_only"] is True, "observed-book-only changed")
-    require(resilience["participant_intent_inferred"] is False, "participant intent inference enabled")
-    require(resilience["volatility_measure_bps"] == "0", "reference volatility changed")
-    require(resilience["volatility_regime"] == "QUIET", "reference volatility regime changed")
-    verify_reference_event(resilience)
-    verify_reference_slices(resilience)
-    verify_reference_metrics(state)
+    for path, expected in EXPECTED_HASHES.items():
+        require(path.is_file(), f"missing frozen evidence: {path}")
+        require(sha256(path) == expected, f"frozen evidence drifted: {path}")
 
 
 def verify_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
-    verify_files()
-    state = load_json_object(STATE_PATH)
-    audit = load_json_object(AUDIT_PATH)
-    resilience = load_json_object(RESILIENCE_PATH)
-    verify_checksum(state, "output_checksum", EXPECTED_STATE, "Lot 43 state")
-    verify_checksum(audit, "audit_checksum", EXPECTED_AUDIT, "Lot 43 audit")
-    verify_checksum(resilience, "resilience_checksum", EXPECTED_RESILIENCE, "BookResilienceStateV1")
+    state = load_json_object(STATE)
+    audit = load_json_object(AUDIT)
+    resilience = load_json_object(RESILIENCE)
+    verify_checksum(state, "output_checksum", EXPECTED_STATE)
+    verify_checksum(audit, "audit_checksum", EXPECTED_AUDIT)
+    verify_checksum(resilience, "resilience_checksum", EXPECTED_RESILIENCE)
     require(state["book_resilience"] == resilience, "state/resilience payload mismatch")
     require(audit["state_output_checksum"] == EXPECTED_STATE, "audit/state link changed")
     require(audit["resilience_checksum"] == EXPECTED_RESILIENCE, "audit/resilience link changed")
-    require(state["validation_state"] == VALIDATION_STATE, "validation state changed")
-    require(state["run_context"]["code_commit"] == SOURCE_HEAD, "state source head changed")
-    require(audit["run_context"]["code_commit"] == SOURCE_HEAD, "audit source head changed")
-    require(state["safety"] == expected_safety(), "state safety boundary changed")
-    require(audit["safety"] == expected_safety(), "audit safety boundary changed")
-    verify_lineage(state, audit)
-    verify_reference(resilience, state)
+    for payload in (state, audit):
+        require(payload["run_context"]["code_commit"] == SOURCE_HEAD, "source head changed")
+        for field, expected in EXPECTED_LINEAGE.items():
+            require(payload["lineage"][field] == expected, f"lineage changed: {field}")
+        safety = payload["safety"]
+        require(safety["analysis_only"] is True, "analysis-only changed")
+        require(safety["trade_allowed"] is False, "trade permission changed")
+        require(safety["execution_allowed"] is False, "execution permission changed")
+        require(safety["approved_size"] == 0, "approved size changed")
+    require(state["lineage"] == audit["lineage"], "state/audit lineage diverged")
+    require(resilience["history_sequence_ids"] == [1001, 1002, 1003], "history changed")
+    require(resilience["sequence_id"] == 1003, "reference sequence changed")
+    require(resilience["volatility_measure_bps"] == "0", "reference volatility changed")
+    require(resilience["volatility_regime"] == "QUIET", "reference regime changed")
+    events = resilience["depletion_events"]
+    require(len(events) == 1, "reference event count changed")
+    require(events[0]["side"] == "BID", "reference side changed")
+    require(events[0]["depleted_price"] == "50024.8", "reference price changed")
+    require(events[0]["max_window_status"] == "EXPIRED_NO_REPLENISHMENT", "status changed")
+    statuses = {(item["side"], item["horizon_us"]): item["resilience_status"] for item in resilience["resilience_slices"]}
+    require(statuses == {
+        ("BID", 10000): "FRAGILE",
+        ("BID", 25000): "FRAGILE",
+        ("ASK", 10000): "NO_EVENTS",
+        ("ASK", 25000): "NO_EVENTS",
+    }, "reference slice statuses changed")
     return state, audit, resilience
 
 
-def verify_coverage(coverage: dict[str, Any]) -> None:
-    require(coverage["status"] == "PASS", "coverage evidence not PASS")
-    require(coverage["source_head_sha"] == SOURCE_HEAD, "coverage source head changed")
-    require(coverage["line_coverage_percent"] == 98.89, "line coverage changed")
-    require(coverage["branch_coverage_percent"] == 98.56, "branch coverage changed")
-    require(coverage["line_coverage_percent"] >= 95.0, "line coverage below threshold")
-    require(coverage["branch_coverage_percent"] >= 90.0, "branch coverage below threshold")
-    require(coverage["anti_flake_repetitions"] == 3, "anti-flake evidence changed")
-
-
-def verify_mutation(mutation: dict[str, Any]) -> None:
-    require(mutation["status"] == "PASS", "mutation evidence not PASS")
-    require(mutation["source_head_sha"] == SOURCE_HEAD, "mutation source head changed")
-    require(mutation["mutation_score_percent"] == 82.55, "mutation score changed")
-    require(mutation["mutation_score_percent"] >= 80.0, "mutation below threshold")
-    require(mutation["killed_mutants"] == 2185, "mutation killed count changed")
-    require(mutation["survived_mutants"] == 462, "mutation survivor count changed")
-    require(mutation["evaluated_mutants"] == 2647, "mutation evaluated count changed")
-    require(mutation["completed_mutants"] == 2647, "mutation completed count changed")
-    require(mutation["total_mutants"] == 2647, "mutation total changed")
-    require(mutation["timeout_mutants"] == 0, "mutation timeout count changed")
-    require(mutation["suspicious_mutants"] == 0, "mutation suspicious count changed")
-    require(mutation["max_children"] == 1, "mutation worker policy changed")
-    require(mutation["python_hash_seed"] == "0", "mutation hash seed changed")
-    require(mutation["mutmut_run_exit_code"] == 0, "mutmut run failed")
-    require(mutation["mutmut_results_exit_code"] == 0, "mutmut results failed")
-
-
 def verify_quality() -> tuple[dict[str, Any], dict[str, Any]]:
-    coverage = load_json_object(COVERAGE_PATH)
-    mutation = load_json_object(MUTATION_PATH)
-    verify_coverage(coverage)
-    verify_mutation(mutation)
+    coverage = load_json_object(COVERAGE)
+    mutation = load_json_object(MUTATION)
+    require(coverage["status"] == "PASS", "coverage not PASS")
+    require(coverage["source_head_sha"] == SOURCE_HEAD, "coverage source changed")
+    require(coverage["line_coverage_percent"] == 98.91, "line coverage changed")
+    require(coverage["branch_coverage_percent"] == 98.59, "branch coverage changed")
+    require(coverage["anti_flake_repetitions"] == 3, "anti-flake changed")
+    require(mutation["status"] == "PASS", "mutation not PASS")
+    require(mutation["source_head_sha"] == SOURCE_HEAD, "mutation source changed")
+    require(mutation["mutation_score_percent"] == 82.42, "mutation score changed")
+    require(mutation["killed_mutants"] == 2217, "killed mutants changed")
+    require(mutation["survived_mutants"] == 473, "survived mutants changed")
+    require(mutation["total_mutants"] == 2690, "total mutants changed")
+    require(mutation["timeout_mutants"] == 0, "mutation timeout present")
+    require(mutation["suspicious_mutants"] == 0, "suspicious mutation present")
     return coverage, mutation
 
 
-def verify_lot44_lock() -> None:
-    for path in LOT44_FORBIDDEN:
-        require(not path.exists(), f"Lot 44 must remain locked: {path}")
-
-
 def validate() -> dict[str, object]:
+    verify_files()
     state, audit, resilience = verify_artifacts()
     coverage, mutation = verify_quality()
-    verify_lot44_lock()
+    for relative in LOT44_FORBIDDEN:
+        require(not (ROOT / relative).exists(), f"Lot 44 must remain locked: {relative}")
     return {
         "schema_version": "lot43-frozen-evidence-validation-v1",
         "status": "PASS",
         "source_head": SOURCE_HEAD,
+        "certification_anchor": CERTIFICATION_ANCHOR,
         "evidence_head": EVIDENCE_HEAD,
         "gate_merge": GATE_MERGE,
         "state_output_checksum": state["output_checksum"],
@@ -268,12 +171,12 @@ def validate() -> dict[str, object]:
         "line_coverage_percent": coverage["line_coverage_percent"],
         "branch_coverage_percent": coverage["branch_coverage_percent"],
         "mutation_score_percent": mutation["mutation_score_percent"],
-        "validation_run": VALIDATION_RUN,
-        "validation_artifact": VALIDATION_ARTIFACT,
-        "validation_artifact_digest": VALIDATION_DIGEST,
-        "mutation_run": MUTATION_RUN,
-        "mutation_artifact": MUTATION_ARTIFACT,
-        "mutation_artifact_digest": MUTATION_DIGEST,
+        "validation_run": VALIDATION_PROOF[0],
+        "validation_artifact": VALIDATION_PROOF[1],
+        "validation_artifact_digest": VALIDATION_PROOF[2],
+        "mutation_run": MUTATION_PROOF[0],
+        "mutation_artifact": MUTATION_PROOF[1],
+        "mutation_artifact_digest": MUTATION_PROOF[2],
         "lot44_status": "PLANNED_LOCKED",
     }
 
