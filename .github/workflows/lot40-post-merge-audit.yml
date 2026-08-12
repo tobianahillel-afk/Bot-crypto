@@ -3,6 +3,17 @@ name: Lot 40 independent post-merge audit
 on:
   pull_request:
     branches: [main]
+    paths:
+      - '.github/workflows/lot40-post-merge-audit.yml'
+      - 'src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector*.py'
+      - 'config/microstructure/book_integrity_desynchronization_detector_v1.json'
+      - 'contracts/schemas/book_integrity*.schema.json'
+      - 'contracts/schemas/book_health_veto_v1.schema.json'
+      - 'scripts/*lot40*'
+      - 'tests/test_lot40*.py'
+      - 'docs/*LOT_40*'
+      - 'data/audit/*lot40.json'
+      - 'reports/lot40/**'
   workflow_dispatch:
 
 permissions:
