@@ -32,6 +32,14 @@ jobs:
           set -euo pipefail
           git merge-base --is-ancestor "$BASE_COMMIT_SHA" HEAD
           cat > /tmp/lot44-gate-paths.txt <<'EOF'
+          .github/workflows/lot40-frozen-evidence.yml
+          .github/workflows/lot40-post-merge-audit.yml
+          .github/workflows/lot41-spread-depth-imbalance.yml
+          .github/workflows/lot41-frozen-evidence.yml
+          .github/workflows/lot41-post-merge-audit.yml
+          .github/workflows/lot42-liquidity-zones-walls-voids.yml
+          .github/workflows/lot42-frozen-evidence.yml
+          .github/workflows/lot42-post-merge-audit.yml
           .github/workflows/lot43-entry-gate.yml
           .github/workflows/lot43-frozen-evidence.yml
           .github/workflows/lot43-post-merge-audit.yml
