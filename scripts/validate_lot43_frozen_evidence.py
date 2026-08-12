@@ -16,19 +16,19 @@ from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_re
 )
 
 GATE_MERGE = "ed8845e0e56151348fe57c0e9bceaf4646ea49aa"
-PRIOR_FINAL_HEAD = "23a8f4f5b4757fe2db0b8e48f435a1ed023ce2fb"
-SOURCE_HEAD = "7091abf50bd5237636da7ffcb520e05dca558173"
-CERTIFICATION_ANCHOR = "022b4a849bdf74dd69108f992c17d53810434daf"
-EVIDENCE_HEAD = "c220796c832486c189e155e13e0a834a2846c2f9"
+PRIOR_FINAL_HEAD = "271e789d43700cf66e1f77597120a6042d8c8f18"
+SOURCE_HEAD = "6d2106d8a6e320d33dbbefb57320e7da1cd3afbe"
+CERTIFICATION_ANCHOR = "19c6dced6b5482df87579f3505eb665336352fc0"
+EVIDENCE_HEAD = "5f4a5172b34081fc0b364d300c5bb1bc5d4f0520"
 VALIDATION_PROOF = (
-    31627874726,
-    9153928933,
-    "sha256:d69f942674d33ac6e8ee978058e256ab978ae3be97f605a97007d4d8bceb8a56",
+    31631419882,
+    9155343144,
+    "sha256:72785d9e3e3cb727c4808c991cf535d96451795d5036aebe2daaac3dc11cc51f",
 )
 MUTATION_PROOF = (
-    31627874723,
-    9154057705,
-    "sha256:1e599e1ffa54ef6654932e075cd3fab3933f565e670f8e3eccefe0ccc960847b",
+    31631419946,
+    9155440853,
+    "sha256:6c22e1db9b71010784463433150605f8a53d2ba8692756a73248767accb64eb6",
 )
 
 STATE = ROOT / "data/audit/book_resilience_and_replenishment_engine_lot43.json"
@@ -38,15 +38,15 @@ COVERAGE = ROOT / "reports/lot43/coverage_summary.json"
 MUTATION = ROOT / "reports/lot43/mutation_summary.json"
 
 EXPECTED_HASHES = {
-    STATE: "442265b71fcff824165b5c7b638d91680dbc1008ed29fbe91fa8b4c0390e199c",
-    AUDIT: "0ae532c5e625c2c3d780715963bd2a23e4a53b44f7e4f266865bbab5deb80082",
-    RESILIENCE: "c39e0426c6b6635b60e72865ef9596cd4b056ff7e3bad5b7bd5ba646c219ba4b",
-    COVERAGE: "62961e54e7b56d149407eb5d5a5eaee49c0770ac6f860115a6c6ecc42d38dadd",
-    MUTATION: "e032a464dc464b785fbaaa4297334e48b2fdad0a5262be666a6bb2bfa9fa48c0",
+    STATE: "368788196f6e8f0ab2288dd93ee4b1424d8d1b824dd1cc74fae8f88eee29f7aa",
+    AUDIT: "6b28835cde86260717b9a4cd66fe415535c578b2246b4bbe5c8fe5ef8ee267dc",
+    RESILIENCE: "c03f3ded2661b589feb559efe5146c9555bf5830a29eab99a8c516024cb9b1d1",
+    COVERAGE: "69047ac495566c21f9aa353a1ac7ac8d105b46f2c0fc18b97902a73c81edf1a6",
+    MUTATION: "c183923865a87626148018042265050ba26e19fa6fa06cf1961bd8a84f26cbf4",
 }
-EXPECTED_STATE = "88330d2d330449ce5ed63741171c1bbb10cd65c92622dc3cdd66877c37b18520"
-EXPECTED_AUDIT = "dca5c5fbcf54555d0e606cc368d616743ec72a2392ff2162b1ff05975388cfca"
-EXPECTED_RESILIENCE = "297bec6000bc40f2df428c942ee60f7b170cfc01ddba992503da9c259e6e551f"
+EXPECTED_STATE = "3bbfed4861caa42ee6c181d58b802fa4bd843d2465c16adc3916eca5d01870e6"
+EXPECTED_AUDIT = "f92e582367f54487f575d695e35d5d88d92a30fa0736246e60b23fe9677f0539"
+EXPECTED_RESILIENCE = "598c08bf863e8fed65e3045081b774a80500c8129a0eb71a6c865e74c1bf8ddb"
 EXPECTED_LINEAGE = {
     "entry_gate_checksum": "4034c86061234a627dafde6122439c3b697fb2d53a1b95ba4e58f77a71089e6d",
     "config_checksum": "a170aab2e8f71dd6f6420a308edd7aa22f6200a25f39ac1eacefb7ac1aa431a1",
@@ -139,6 +139,7 @@ def _verify_links(
 def _verify_reference(resilience: dict[str, Any]) -> None:
     require(resilience["history_sequence_ids"] == [1001, 1002, 1003], "history changed")
     require(resilience["sequence_id"] == 1003, "sequence changed")
+    require(resilience["resilience_horizons_us"] == [10000, 25000], "horizon set changed")
     require(resilience["volatility_measure_bps"] == "0", "volatility changed")
     require(resilience["volatility_regime"] == "QUIET", "regime changed")
     require(resilience["participant_intent_inferred"] is False, "intent inference enabled")
@@ -170,16 +171,16 @@ def _verify_reference(resilience: dict[str, Any]) -> None:
 def _verify_quality(coverage: dict[str, Any], mutation: dict[str, Any]) -> None:
     require(coverage["status"] == "PASS", "coverage not PASS")
     require(coverage["source_head_sha"] == SOURCE_HEAD, "coverage source changed")
-    require(coverage["line_coverage_percent"] == 97.82, "line coverage changed")
-    require(coverage["branch_coverage_percent"] == 96.08, "branch coverage changed")
+    require(coverage["line_coverage_percent"] == 97.73, "line coverage changed")
+    require(coverage["branch_coverage_percent"] == 95.48, "branch coverage changed")
     require(coverage["anti_flake_repetitions"] == 3, "anti-flake changed")
     require(mutation["status"] == "PASS", "mutation not PASS")
     require(mutation["source_head_sha"] == SOURCE_HEAD, "mutation source changed")
-    require(mutation["mutation_score_percent"] == 82.36, "mutation score changed")
-    require(mutation["killed_mutants"] == 2301, "killed mutants changed")
+    require(mutation["mutation_score_percent"] == 82.4, "mutation score changed")
+    require(mutation["killed_mutants"] == 2308, "killed mutants changed")
     require(mutation["survived_mutants"] == 493, "survived mutants changed")
-    require(mutation["total_mutants"] == 2794, "total mutants changed")
-    require(mutation["evaluated_mutants"] == 2794, "evaluated mutants changed")
+    require(mutation["total_mutants"] == 2801, "total mutants changed")
+    require(mutation["evaluated_mutants"] == 2801, "evaluated mutants changed")
     require(mutation["timeout_mutants"] == 0, "mutation timeout present")
     require(mutation["suspicious_mutants"] == 0, "suspicious mutation present")
 
@@ -196,7 +197,7 @@ def validate() -> dict[str, object]:
     _verify_quality(coverage, mutation)
     _verify_downstream_lock()
     return {
-        "schema_version": "lot43-frozen-evidence-validation-v3",
+        "schema_version": "lot43-frozen-evidence-validation-v4",
         "status": "PASS",
         "gate_merge": GATE_MERGE,
         "prior_final_head": PRIOR_FINAL_HEAD,
@@ -206,6 +207,7 @@ def validate() -> dict[str, object]:
         "state_output_checksum": EXPECTED_STATE,
         "audit_checksum": EXPECTED_AUDIT,
         "resilience_checksum": EXPECTED_RESILIENCE,
+        "resilience_horizons_us": resilience["resilience_horizons_us"],
         "line_coverage_percent": coverage["line_coverage_percent"],
         "branch_coverage_percent": coverage["branch_coverage_percent"],
         "mutation_score_percent": mutation["mutation_score_percent"],
