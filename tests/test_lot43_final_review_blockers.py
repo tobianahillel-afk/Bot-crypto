@@ -61,6 +61,19 @@ def test_state_requires_non_empty_complete_side_by_horizon_matrix() -> None:
         replace(resilience, resilience_slices=bid_only)
 
 
+def test_state_requires_every_configured_horizon_even_when_both_sides_are_omitted() -> None:
+    resilience = _reference_resilience()
+    assert resilience.resilience_horizons_us == (10_000, 25_000)
+    assert resilience.to_dict()["resilience_horizons_us"] == [10_000, 25_000]
+    first_horizon_only = tuple(
+        item for item in resilience.resilience_slices if item.horizon_us == 10_000
+    )
+    with pytest.raises(Lot43ValidationError, match="complete BID/ASK slice matrix"):
+        replace(resilience, resilience_slices=first_horizon_only)
+    with pytest.raises(Lot43ValidationError, match="horizons cannot be empty"):
+        replace(resilience, resilience_horizons_us=())
+
+
 def test_state_rejects_duplicate_side_horizon_slice_keys() -> None:
     resilience = _reference_resilience()
     duplicated = (*resilience.resilience_slices, resilience.resilience_slices[0])
@@ -85,3 +98,19 @@ def test_state_rejects_slice_regime_or_threshold_divergence() -> None:
             resilience,
             resilience_slices=(wrong_threshold, *resilience.resilience_slices[1:]),
         )
+
+
+def test_state_rejects_replenishment_evidence_after_decision_time() -> None:
+    resilience = _reference_resilience()
+    event = resilience.depletion_events[0]
+    future_evidence = replace(
+        event,
+        replenishment_kind="SAME_PRICE",
+        replenishment_sequence_id=1004,
+        replenishment_time_us=40_000,
+        replenished_quantity=Decimal("1.25"),
+        recovered_fraction=Decimal("1"),
+        max_window_status="REPLENISHED",
+    )
+    with pytest.raises(Lot43ValidationError, match="evidence cannot exceed decision_time"):
+        replace(resilience, depletion_events=(future_evidence,))
