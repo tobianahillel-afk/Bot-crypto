@@ -76,6 +76,7 @@ def _reference_slice(**changes: object) -> BookResilienceSliceV1:
         "mid_shift_events_total": 0,
         "expired_events_total": 1,
         "pending_events_total": 0,
+        "replenishment_min_recovery_ratio": Decimal("0.25"),
         "mean_recovered_fraction": Decimal("0"),
         "mean_replenishment_time_us": None,
         "resilience_status": "FRAGILE",

@@ -222,6 +222,7 @@ def test_slice_rejects_invalid_mean_semantics() -> None:
         "FRAGILE",
         ("LOT43_TEST",),
         ZERO_SHA256,
+        replenishment_min_recovery_ratio=Decimal("0.25"),
     )
     with pytest.raises(Lot43ValidationError, match="requires recovered"):
         replace(base, mean_replenishment_time_us=Decimal("10"))

@@ -178,6 +178,7 @@
         "mid_shift_events_total",
         "expired_events_total",
         "pending_events_total",
+        "replenishment_min_recovery_ratio",
         "mean_recovered_fraction",
         "mean_replenishment_time_us",
         "resilience_status",
@@ -195,6 +196,7 @@
         "mid_shift_events_total": {"type": "integer", "minimum": 0},
         "expired_events_total": {"type": "integer", "minimum": 0},
         "pending_events_total": {"type": "integer", "minimum": 0},
+        "replenishment_min_recovery_ratio": {"type": "string", "pattern": "^(?:0\\.[0-9]*[1-9][0-9]*|1(?:\\.0+)?)$"},
         "mean_recovered_fraction": {
           "anyOf": [
             {"type": "null"},

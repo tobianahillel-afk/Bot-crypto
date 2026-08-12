@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field as dataclass_field
 from decimal import Decimal, localcontext
 from typing import Any
 
@@ -141,7 +141,10 @@ def _validate_replenishment_sequence(
     depletion_sequence_id: int,
     replenishment_sequence_id: int | None,
 ) -> None:
-    if replenishment_sequence_id is not None and replenishment_sequence_id <= depletion_sequence_id:
+    if (
+        replenishment_sequence_id is not None
+        and replenishment_sequence_id <= depletion_sequence_id
+    ):
         raise Lot43ValidationError(
             "replenishment sequence must be strictly after depletion sequence"
         )
@@ -338,7 +341,7 @@ class BookResilienceSliceV1:
     resilience_status: str
     reason_codes: tuple[str, ...]
     slice_checksum: str
-    replenishment_min_recovery_ratio: Decimal = field(kw_only=True)
+    replenishment_min_recovery_ratio: Decimal = dataclass_field(kw_only=True)
 
     def __post_init__(self) -> None:
         validate_side(self.side)
@@ -357,6 +360,10 @@ class BookResilienceSliceV1:
             self.replenishment_min_recovery_ratio,
             "replenishment_min_recovery_ratio",
         )
+        if self.replenishment_min_recovery_ratio <= 0:
+            raise Lot43ValidationError(
+                "replenishment_min_recovery_ratio must be strictly positive"
+            )
         _validate_recovered_fraction_mean(
             self.depletion_events_total,
             self.mean_recovered_fraction,
