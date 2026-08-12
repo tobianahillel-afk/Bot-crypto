@@ -71,8 +71,8 @@ Lot 43 is accepted only on an exact frozen source head that satisfies every appl
 53. BID mid shift is downward; ASK mid shift is upward.
 54. Mid shift does not fabricate replenished quantity.
 55. Mid-shift recovered fraction remains zero.
-56. Observations after the maximum horizon or evidence whose implied receive time exceeds `decision_time` cannot count as replenishment.
-57. First qualifying future outcome is deterministic.
+56. Observations after the maximum horizon or evidence whose implied receive time exceeds `decision_time` cannot count as replenishment; `max_window_status` must equal the outcome recomputed at the largest declared horizon.
+57. First qualifying future outcome is deterministic, and every depletion/replenishment sequence referenced by an event belongs to `history_sequence_ids`.
 58. No future observation means no replenishment evidence.
 59. Participant intent on every event remains `NOT_INFERRED`.
 

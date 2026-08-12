@@ -189,7 +189,7 @@ For each configured horizon `H` and depletion event:
 - otherwise, if age at decision `>=H` -> expired;
 - otherwise -> pending.
 
-This is evaluated independently per horizon. Horizons are never voted together. The state publishes the authoritative configured horizon tuple as `resilience_horizons_us`, and the slice matrix must be exactly `BID/ASK × resilience_horizons_us`.
+This is evaluated independently per horizon. Horizons are never voted together. The state publishes the authoritative configured horizon tuple as `resilience_horizons_us`, and the slice matrix must be exactly `BID/ASK × resilience_horizons_us`. Every event sequence referenced by the state must exist in `history_sequence_ids`; the event `max_window_status` must equal the outcome recomputed at the largest declared horizon; quantity-recovery events must meet the single published `replenishment_min_recovery_ratio`.
 
 ### 6.8 Recovered fraction
 

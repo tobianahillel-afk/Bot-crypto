@@ -488,6 +488,24 @@ def _validate_slice_matrix(
         raise Lot43ValidationError("resilience requires a complete BID/ASK slice matrix for each declared horizon")
 
 
+def _validate_event_state_bindings(events: tuple[BookDepletionEventV1, ...], history_sequence_ids: tuple[int, ...], declared_horizons: tuple[int, ...], slices: tuple[BookResilienceSliceV1, ...], decision_time: str) -> None:
+    history = set(history_sequence_ids)
+    thresholds = {item.replenishment_min_recovery_ratio for item in slices}
+    threshold = next(iter(thresholds)) if len(thresholds) == 1 else None
+    statuses = {"RECOVERED": "REPLENISHED", "SHIFTED": "MID_SHIFTED", "EXPIRED": "EXPIRED_NO_REPLENISHMENT", "PENDING": "PENDING_WINDOW"}
+    maximum = declared_horizons[-1]
+    for event in events:
+        if event.depletion_sequence_id not in history:
+            raise Lot43ValidationError("depletion sequence must belong to published history")
+        if event.replenishment_sequence_id is not None and event.replenishment_sequence_id not in history:
+            raise Lot43ValidationError("replenishment sequence must belong to published history")
+        outcome = _event_horizon_outcome(event, maximum, decision_time)
+        if event.max_window_status != statuses[outcome]:
+            raise Lot43ValidationError("max window status must match declared maximum horizon")
+        if threshold is not None and event.replenishment_kind in {"SAME_PRICE", "ADJACENT_PRICE"} and event.recovered_fraction < threshold:
+            raise Lot43ValidationError("recovered fraction below published recovery threshold")
+
+
 def _validate_slice_event_consistency(
     events: tuple[BookDepletionEventV1, ...],
     slices: tuple[BookResilienceSliceV1, ...],
@@ -558,6 +576,10 @@ class BookResilienceStateV1:
         if self.volatility_method != REGIME_METHOD:
             raise Lot43ValidationError("volatility method changed")
         validate_horizons(self.resilience_horizons_us)
+        _validate_event_state_bindings(
+            self.depletion_events, self.history_sequence_ids, self.resilience_horizons_us,
+            self.resilience_slices, self.decision_time,
+        )
         _validate_slice_event_consistency(
             self.depletion_events,
             self.resilience_slices,

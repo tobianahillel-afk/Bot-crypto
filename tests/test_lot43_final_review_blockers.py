@@ -113,4 +113,55 @@ def test_state_rejects_replenishment_evidence_after_decision_time() -> None:
         max_window_status="REPLENISHED",
     )
     with pytest.raises(Lot43ValidationError, match="evidence cannot exceed decision_time"):
-        replace(resilience, depletion_events=(future_evidence,))
+        replace(
+            resilience,
+            sequence_id=1004,
+            history_sequence_ids=(*resilience.history_sequence_ids, 1004),
+            depletion_events=(future_evidence,),
+        )
+
+
+def test_state_binds_event_sequences_to_published_history() -> None:
+    resilience = _reference_resilience()
+    event = resilience.depletion_events[0]
+    with pytest.raises(Lot43ValidationError, match="depletion sequence must belong"):
+        replace(resilience, depletion_events=(replace(event, depletion_sequence_id=999),))
+    recovery = replace(
+        event, replenishment_kind="SAME_PRICE", replenishment_sequence_id=1004,
+        replenishment_time_us=10_000, replenished_quantity=Decimal("1.25"),
+        recovered_fraction=Decimal("1"), max_window_status="REPLENISHED",
+    )
+    with pytest.raises(Lot43ValidationError, match="replenishment sequence must belong"):
+        replace(resilience, depletion_events=(recovery,))
+
+
+def test_state_rejects_outcome_beyond_declared_maximum_horizon() -> None:
+    resilience = _reference_resilience()
+    event = replace(
+        resilience.depletion_events[0], replenishment_kind="SAME_PRICE",
+        replenishment_sequence_id=1004, replenishment_time_us=25_001,
+        replenished_quantity=Decimal("1.25"), recovered_fraction=Decimal("1"),
+        max_window_status="REPLENISHED",
+    )
+    with pytest.raises(Lot43ValidationError, match="max window status must match"):
+        replace(
+            resilience, sequence_id=1004,
+            history_sequence_ids=(*resilience.history_sequence_ids, 1004),
+            depletion_events=(event,),
+        )
+
+
+def test_state_rejects_direct_recovery_below_published_threshold() -> None:
+    resilience = _reference_resilience()
+    event = replace(
+        resilience.depletion_events[0], replenishment_kind="SAME_PRICE",
+        replenishment_sequence_id=1004, replenishment_time_us=10_000,
+        replenished_quantity=Decimal("0.2"), recovered_fraction=Decimal("0.16"),
+        max_window_status="REPLENISHED",
+    )
+    with pytest.raises(Lot43ValidationError, match="below published recovery threshold"):
+        replace(
+            resilience, sequence_id=1004,
+            history_sequence_ids=(*resilience.history_sequence_ids, 1004),
+            depletion_events=(event,),
+        )
