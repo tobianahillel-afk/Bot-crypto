@@ -12,6 +12,7 @@ from crypto_quant_bot.microstructure.book_resilience_and_replenishment_engine_mo
 from crypto_quant_bot.microstructure.book_resilience_and_replenishment_engine_validation import (
     DECIMAL_PRECISION,
     Lot43ValidationError,
+    directional_mid_shift_bps,
     nonnegative_decimal_text,
 )
 from crypto_quant_bot.microstructure.liquidity_zones_walls_and_voids_analysis import (
@@ -47,6 +48,25 @@ def _observation(sequence: int, receive_time: str, bid_quantity: str) -> BookObs
         receive_time,
         (OrderBookLevelV1(Decimal("100"), Decimal(bid_quantity)),),
         (OrderBookLevelV1(Decimal("102"), Decimal("1")),),
+    )
+
+
+def _priced_observation(
+    sequence: int,
+    receive_time: str,
+    bids: tuple[tuple[str, str], ...],
+    asks: tuple[tuple[str, str], ...],
+) -> BookObservation:
+    return BookObservation(
+        "source",
+        "OFFLINE",
+        "TEST-SPOT",
+        "SPOT",
+        sequence,
+        "2026-08-06T19:18:40.000001Z",
+        receive_time,
+        tuple(OrderBookLevelV1(Decimal(price), Decimal(quantity)) for price, quantity in bids),
+        tuple(OrderBookLevelV1(Decimal(price), Decimal(quantity)) for price, quantity in asks),
     )
 
 
@@ -165,3 +185,54 @@ def test_recovered_fraction_must_match_replenished_and_depleted_quantities() -> 
             ("LOT43_TEST_RECOVERY_ARITHMETIC",),
             "0" * 64,
         )
+
+
+def test_directional_mid_shift_subtraction_uses_certified_precision() -> None:
+    baseline_mid = Decimal("100.12345678901234567890123456789012345678")
+    future_mid = Decimal("99.01234567890123456789012345678901234567")
+    with localcontext() as context:
+        context.prec = DECIMAL_PRECISION
+        expected = (baseline_mid - future_mid) / baseline_mid * Decimal("10000")
+    assert directional_mid_shift_bps("BID", baseline_mid, future_mid) == expected
+
+
+def test_mid_shift_caller_evaluates_book_midpoints_at_certified_precision() -> None:
+    depleted_price = "100.00000000000000000000000000000000000001"
+    resting_bid = "99.99999999999999999999999999999999999990"
+    old_ask = "100.00000000000000000000000000000000000030"
+    new_ask = "100.00000000000000000000000000000000000010"
+    observations = (
+        _priced_observation(
+            1,
+            "2026-08-06T19:18:40.050000Z",
+            ((depleted_price, "1"), (resting_bid, "2")),
+            ((old_ask, "2"),),
+        ),
+        _priced_observation(
+            2,
+            "2026-08-06T19:18:40.060000Z",
+            ((resting_bid, "2"),),
+            ((old_ask, "2"),),
+        ),
+        _priced_observation(
+            3,
+            "2026-08-06T19:18:40.070000Z",
+            ((resting_bid, "2"),),
+            ((new_ask, "2"), (old_ask, "2")),
+        ),
+    )
+    with localcontext() as context:
+        context.prec = DECIMAL_PRECISION
+        baseline_mid = observations[1].mid_price
+        future_mid = observations[2].mid_price
+        exact_shift = (baseline_mid - future_mid) / baseline_mid * Decimal("10000")
+        threshold = exact_shift / Decimal("2")
+    assert exact_shift > 0
+    result = analyze_book_resilience(
+        observations,
+        _policy(adjacent_bps=Decimal("0.05"), mid_shift_bps=threshold),
+        "2026-08-06T19:18:40.100000Z",
+    )
+    event = next(item for item in result.depletion_events if item.depleted_price == Decimal(depleted_price))
+    assert event.replenishment_kind == "MID_SHIFT"
+    assert event.directional_mid_shift_bps == exact_shift

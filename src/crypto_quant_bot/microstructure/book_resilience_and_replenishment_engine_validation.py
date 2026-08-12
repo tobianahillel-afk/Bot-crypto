@@ -206,12 +206,12 @@ def directional_mid_shift_bps(
     validate_side(side)
     validate_positive(baseline_mid, "baseline_mid")
     validate_positive(future_mid, "future_mid")
-    if side == "BID":
-        move = max(baseline_mid - future_mid, Decimal("0"))
-    else:
-        move = max(future_mid - baseline_mid, Decimal("0"))
     with localcontext() as context:
         context.prec = DECIMAL_PRECISION
+        if side == "BID":
+            move = max(baseline_mid - future_mid, Decimal("0"))
+        else:
+            move = max(future_mid - baseline_mid, Decimal("0"))
         return move / baseline_mid * Decimal("10000")
 
 

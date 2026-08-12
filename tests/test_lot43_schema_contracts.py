@@ -116,6 +116,21 @@ def test_lot43_nullable_mean_decimal_strings_match_runtime_bounds() -> None:
         assert re.fullmatch(time_pattern, value) is None
 
 
+def test_lot43_depletion_schema_matches_runtime_positive_fields() -> None:
+    schema = _load(RESILIENCE_SCHEMA)
+    event = schema["$defs"]["depletionEvent"]
+    properties = event["properties"]
+    for field in ("depleted_price", "previous_quantity", "depleted_quantity"):
+        pattern = properties[field]["pattern"]
+        for value in ("0.0001", "1", "1.25", "100"):
+            assert re.fullmatch(pattern, value)
+        for value in ("0", "0.0", "-1", "NaN", "invalid"):
+            assert re.fullmatch(pattern, value) is None
+    post_pattern = properties["post_depletion_quantity"]["pattern"]
+    assert re.fullmatch(post_pattern, "0")
+    assert re.fullmatch(post_pattern, "0.0")
+
+
 def test_lot43_audit_schema_links_only_frozen_contracts() -> None:
     schema = _load(AUDIT_SCHEMA)
     properties = schema["properties"]

@@ -307,7 +307,11 @@ def _mid_shift_outcome(
     duration: int,
     policy: BookResiliencePolicy,
 ) -> Outcome | None:
-    shift = directional_mid_shift_bps(side, baseline.mid_price, observation.mid_price)
+    with localcontext() as context:
+        context.prec = policy.decimal_precision
+        baseline_mid = baseline.mid_price
+        future_mid = observation.mid_price
+    shift = directional_mid_shift_bps(side, baseline_mid, future_mid)
     if shift < policy.mid_shift_min_bps:
         return None
     return "MID_SHIFT", observation.sequence_id, duration, ZERO, ZERO, shift, "MID_SHIFTED"
