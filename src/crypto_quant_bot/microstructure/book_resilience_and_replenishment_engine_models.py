@@ -142,13 +142,8 @@ def _validate_replenishment_sequence(
     depletion_sequence_id: int,
     replenishment_sequence_id: int | None,
 ) -> None:
-    if (
-        replenishment_sequence_id is not None
-        and replenishment_sequence_id <= depletion_sequence_id
-    ):
-        raise Lot43ValidationError(
-            "replenishment sequence must be strictly after depletion sequence"
-        )
+    if replenishment_sequence_id is not None and replenishment_sequence_id <= depletion_sequence_id:
+        raise Lot43ValidationError("replenishment sequence must be strictly after depletion sequence")
 
 
 @dataclass(frozen=True, slots=True)
@@ -308,9 +303,7 @@ def _validate_resilience_status_consistency(
         replenishment_min_recovery_ratio,
     )
     if status != expected:
-        raise Lot43ValidationError(
-            f"resilience status/count/threshold mismatch: expected {expected}, got {status}"
-        )
+        raise Lot43ValidationError(f"resilience status/count/threshold mismatch: expected {expected}, got {status}")
 
 
 @dataclass(frozen=True, slots=True)
@@ -344,14 +337,9 @@ class BookResilienceSliceV1:
             self.expired_events_total,
             self.pending_events_total,
         )
-        validate_ratio(
-            self.replenishment_min_recovery_ratio,
-            "replenishment_min_recovery_ratio",
-        )
+        validate_ratio(self.replenishment_min_recovery_ratio, "replenishment_min_recovery_ratio")
         if self.replenishment_min_recovery_ratio <= 0:
-            raise Lot43ValidationError(
-                "replenishment_min_recovery_ratio must be strictly positive"
-            )
+            raise Lot43ValidationError("replenishment_min_recovery_ratio must be strictly positive")
         _validate_recovered_fraction_mean(
             self.depletion_events_total,
             self.mean_recovered_fraction,
@@ -420,9 +408,7 @@ def _event_horizon_outcome(
     age_at_decision = age_us(event.depletion_receive_time, decision_time)
     if elapsed is not None:
         if elapsed > age_at_decision:
-            raise Lot43ValidationError(
-                "replenishment evidence cannot exceed decision_time"
-            )
+            raise Lot43ValidationError("replenishment evidence cannot exceed decision_time")
         if elapsed <= horizon_us:
             if event.replenishment_kind in {"SAME_PRICE", "ADJACENT_PRICE"}:
                 return "RECOVERED"
@@ -437,11 +423,7 @@ def _recovered_events(
     events: tuple[BookDepletionEventV1, ...],
     outcomes: tuple[str, ...],
 ) -> tuple[BookDepletionEventV1, ...]:
-    return tuple(
-        event
-        for event, outcome in zip(events, outcomes, strict=True)
-        if outcome == "RECOVERED"
-    )
+    return tuple(event for event, outcome in zip(events, outcomes, strict=True) if outcome == "RECOVERED")
 
 
 def _mean_slice_recovered_fraction(
@@ -452,10 +434,7 @@ def _mean_slice_recovered_fraction(
         return None
     with localcontext() as context:
         context.prec = DECIMAL_PRECISION
-        total = sum(
-            (event.recovered_fraction for event in recovered_events),
-            Decimal("0"),
-        )
+        total = sum((event.recovered_fraction for event in recovered_events), Decimal("0"))
         return total / Decimal(len(events))
 
 
@@ -481,9 +460,7 @@ def _expected_slice_aggregation(
     horizon_us: int,
     decision_time: str,
 ) -> tuple[int, int, int, int, int, Decimal | None, Decimal | None]:
-    outcomes = tuple(
-        _event_horizon_outcome(event, horizon_us, decision_time) for event in events
-    )
+    outcomes = tuple(_event_horizon_outcome(event, horizon_us, decision_time) for event in events)
     recovered_events = _recovered_events(events, outcomes)
     return (
         len(events),
@@ -506,15 +483,9 @@ def _validate_slice_matrix(
     keys = tuple((item.side, item.horizon_us) for item in slices)
     if len(set(keys)) != len(keys):
         raise Lot43ValidationError("resilience slice keys must be unique")
-    expected = {
-        (side, horizon)
-        for side in ("BID", "ASK")
-        for horizon in declared_horizons
-    }
+    expected = {(side, horizon) for side in ("BID", "ASK") for horizon in declared_horizons}
     if set(keys) != expected:
-        raise Lot43ValidationError(
-            "resilience requires a complete BID/ASK slice matrix for each declared horizon"
-        )
+        raise Lot43ValidationError("resilience requires a complete BID/ASK slice matrix for each declared horizon")
 
 
 def _validate_slice_event_consistency(
@@ -527,14 +498,10 @@ def _validate_slice_event_consistency(
     _validate_slice_matrix(slices, declared_horizons)
     thresholds = {item.replenishment_min_recovery_ratio for item in slices}
     if len(thresholds) != 1:
-        raise Lot43ValidationError(
-            "resilience slice recovery threshold must be consistent across the matrix"
-        )
+        raise Lot43ValidationError("resilience slice recovery threshold must be consistent across the matrix")
     for resilience_slice in slices:
         if resilience_slice.volatility_regime != volatility_regime:
-            raise Lot43ValidationError(
-                "resilience slice volatility regime must match published state"
-            )
+            raise Lot43ValidationError("resilience slice volatility regime must match published state")
         side_events = tuple(event for event in events if event.side == resilience_slice.side)
         expected = _expected_slice_aggregation(
             side_events,
@@ -551,9 +518,7 @@ def _validate_slice_event_consistency(
             resilience_slice.mean_replenishment_time_us,
         )
         if actual != expected:
-            raise Lot43ValidationError(
-                "resilience slice aggregation must match published events"
-            )
+            raise Lot43ValidationError("resilience slice aggregation must match published events")
 
 
 @dataclass(frozen=True, slots=True)
@@ -719,9 +684,7 @@ def _validate_metrics_against_resilience(
         metrics.pending_max_window_events_total,
     )
     if actual != expected:
-        raise Lot43ValidationError(
-            "Lot 43 metrics must match embedded resilience state"
-        )
+        raise Lot43ValidationError("Lot 43 metrics must match embedded resilience state")
 
 
 @dataclass(frozen=True, slots=True)
@@ -784,9 +747,7 @@ class BookResilienceReplenishmentEngineAuditV1:
                 (self.audit_checksum, "audit_checksum"),
             )
         )
-        if not self.validation_checks or len(set(self.validation_checks)) != len(
-            self.validation_checks
-        ):
+        if not self.validation_checks or len(set(self.validation_checks)) != len(self.validation_checks):
             raise Lot43ValidationError("audit validation checks must be non-empty and unique")
         validate_reason_codes(self.reason_codes)
         validate_lot43_safety(self.safety)
