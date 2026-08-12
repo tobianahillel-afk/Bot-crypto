@@ -47,7 +47,11 @@
       "LOT44_REMAINS_LOCKED"
     ],
     "receive_time": "2026-08-06T19:18:40.070000Z",
-    "resilience_checksum": "297bec6000bc40f2df428c942ee60f7b170cfc01ddba992503da9c259e6e551f",
+    "resilience_checksum": "598c08bf863e8fed65e3045081b774a80500c8129a0eb71a6c865e74c1bf8ddb",
+    "resilience_horizons_us": [
+      10000,
+      25000
+    ],
     "resilience_slices": [
       {
         "depletion_events_total": 1,
@@ -172,7 +176,7 @@
     "lot_43_validation_failures_total": 0,
     "schema_version": "lot43-metrics-v1"
   },
-  "output_checksum": "88330d2d330449ce5ed63741171c1bbb10cd65c92622dc3cdd66877c37b18520",
+  "output_checksum": "3bbfed4861caa42ee6c181d58b802fa4bd843d2465c16adc3916eca5d01870e6",
   "reason_codes": [
     "LOT43_OFFLINE_BOOK_RESILIENCE_VALIDATED",
     "LOT43_CANONICAL_LOT39_REPLAY_BOUND",
@@ -181,7 +185,7 @@
   ],
   "receive_time": "2026-08-06T19:18:40.070000Z",
   "run_context": {
-    "code_commit": "7091abf50bd5237636da7ffcb520e05dca558173",
+    "code_commit": "6d2106d8a6e320d33dbbefb57320e7da1cd3afbe",
     "config_version": "lot43-book-resilience-replenishment-config-v1",
     "correlation_id": "microstructure-v4-lot43-reference",
     "run_id": "lot43-reference-run-v1",
