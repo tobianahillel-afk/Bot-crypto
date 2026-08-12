@@ -46,7 +46,11 @@
     "LOT44_REMAINS_LOCKED"
   ],
   "receive_time": "2026-08-06T19:18:40.070000Z",
-  "resilience_checksum": "297bec6000bc40f2df428c942ee60f7b170cfc01ddba992503da9c259e6e551f",
+  "resilience_checksum": "598c08bf863e8fed65e3045081b774a80500c8129a0eb71a6c865e74c1bf8ddb",
+  "resilience_horizons_us": [
+    10000,
+    25000
+  ],
   "resilience_slices": [
     {
       "depletion_events_total": 1,
