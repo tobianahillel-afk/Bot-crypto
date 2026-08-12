@@ -20,7 +20,7 @@ The current release is `0.43.0`. The transition is governance-only: the seven Lo
 - runtime: `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY`
 - canonical status before gate merge: `PLANNED_LOCKED`
 
-The next roadmap row, Lot 45 — **Order Flow, Delta & CVD Engine** — remains `PLANNED_LOCKED`.
+The next roadmap row, Lot 45 — **Order Flow, Delta & CVD Engine** — remains `PLANNED_LOCKED`. Roadmap line 47, Lot 46 — **Trade Classification Confidence Engine** — is also bound and remains `PLANNED_LOCKED`; its canonical nine implementation files are required to be physically absent by both the validator and CI gate.
 
 ## Prerequisite closure
 
@@ -88,6 +88,8 @@ The gate does not authorize Lot 45+ or execution authority. In particular it for
 - risk approval, order routing, trading, or execution;
 - live data, network ingestion, real credentials, external connectivity.
 
+The Lot 46 prohibition is enforced structurally, not only by prose: the immutable roadmap line 47 is validated as `PLANNED_LOCKED`, its exact nine `implementation_files` entries are required, and every one of those paths must be absent at gate certification and on the current gate head.
+
 ## Safety boundary
 
 The gate preserves:
@@ -112,7 +114,7 @@ approved_size=0
 
 ## Governance-only proof
 
-Before gate merge, all Lot 44 implementation paths and all Lot 45 implementation paths must be physically absent. The exact governance transition is **18 paths**: seven new Lot 44 gate artifacts plus eleven workflow-archival/path-scope changes across Lots 40–43.
+Before gate merge, all Lot 44 implementation paths, all Lot 45 implementation paths and all canonical Lot 46 confidence-engine implementation paths must be physically absent. The exact governance transition is **18 paths**: seven new Lot 44 gate artifacts plus eleven workflow-archival/path-scope changes across Lots 40–43.
 
 The eleven archived workflows are:
 
@@ -121,7 +123,7 @@ The eleven archived workflows are:
 - Lot 42 source validation, frozen evidence and post-merge audit;
 - Lot 43 entry gate, frozen evidence and post-merge audit.
 
-These workflows keep their historical certification logic. Path scoping only prevents closed predecessor lots from executing current-head `Lot 44 absent` assertions on the future Lot 44 implementation that this gate authorizes. Lot 43 source validation itself remains safe because it checks out the frozen Lot 43 source rather than the future current head.
+These workflows keep their historical certification logic. Path scoping only prevents closed predecessor lots from executing current-head `Lot 44 absent` assertions on the future Lot 44 implementation that this gate authorizes. The Lot 41 post-merge path filter explicitly includes its root-level frozen report `reports/lot_41_spread_depth_and_imbalance_engine_report.md`, matching the report already protected by its immutability check. Lot 43 source validation itself remains safe because it checks out the frozen Lot 43 source rather than the future current head.
 
 Canonical gate checksum:
 
@@ -133,5 +135,6 @@ After this gate merges:
 
 - Lot 44 implementation may start in a separate implementation branch/PR under the exact authorized scope;
 - Lot 45 remains `PLANNED_LOCKED`;
-- no Lot 45 implementation is authorized;
+- Lot 46 Trade Classification Confidence Engine remains `PLANNED_LOCKED` and physically absent;
+- no Lot 45 or Lot 46 implementation is authorized;
 - this gate itself contains no Lot 44 business implementation.
