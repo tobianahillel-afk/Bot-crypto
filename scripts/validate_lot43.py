@@ -57,6 +57,7 @@ def _verify_checksum(payload: dict[str, Any], field: str, label: str) -> None:
 def _verify_reference(resilience: dict[str, Any]) -> None:
     require(resilience["sequence_id"] == 1003, "Lot 43 reference sequence changed")
     require(resilience["history_sequence_ids"] == [1001, 1002, 1003], "history changed")
+    require(resilience["resilience_horizons_us"] == [10000, 25000], "horizon set changed")
     require(resilience["volatility_measure_bps"] == "0", "volatility measure changed")
     require(resilience["volatility_regime"] == "QUIET", "volatility regime changed")
     require(resilience["volatility_method"] == "OBSERVED_BOOK_MID_MAX_ABS_MOVE_BPS", "method changed")
