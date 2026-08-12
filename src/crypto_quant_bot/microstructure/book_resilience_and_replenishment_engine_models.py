@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal, localcontext
 from typing import Any
 
@@ -137,6 +137,16 @@ def _validate_recovery_arithmetic(
         raise Lot43ValidationError("recovered fraction/quantity mismatch")
 
 
+def _validate_replenishment_sequence(
+    depletion_sequence_id: int,
+    replenishment_sequence_id: int | None,
+) -> None:
+    if replenishment_sequence_id is not None and replenishment_sequence_id <= depletion_sequence_id:
+        raise Lot43ValidationError(
+            "replenishment sequence must be strictly after depletion sequence"
+        )
+
+
 @dataclass(frozen=True, slots=True)
 class BookDepletionEventV1:
     event_id: str
@@ -169,8 +179,12 @@ class BookDepletionEventV1:
         validate_positive(self.depleted_quantity, "depleted_quantity")
         validate_ratio(self.depletion_ratio, "depletion_ratio")
         require_integer(self.depletion_sequence_id, "depletion_sequence_id", minimum=1)
-        require_text(self.depletion_event_time, "depletion_event_time")
-        require_text(self.depletion_receive_time, "depletion_receive_time")
+        validate_causal_times(
+            self.depletion_event_time,
+            self.depletion_receive_time,
+            self.depletion_receive_time,
+            self.depletion_receive_time,
+        )
         _validate_depletion_arithmetic(
             self.previous_quantity,
             self.post_depletion_quantity,
@@ -185,6 +199,10 @@ class BookDepletionEventV1:
             recovered_fraction=self.recovered_fraction,
             mid_shift_bps=self.directional_mid_shift_bps,
             max_window_status=self.max_window_status,
+        )
+        _validate_replenishment_sequence(
+            self.depletion_sequence_id,
+            self.replenishment_sequence_id,
         )
         _validate_recovery_arithmetic(
             self.replenishment_kind,
@@ -258,10 +276,16 @@ def _expected_resilience_status(
     shifted: int,
     expired: int,
     pending: int,
+    mean_recovered_fraction: Decimal | None,
+    replenishment_min_recovery_ratio: Decimal,
 ) -> str:
     if events == 0:
         return "NO_EVENTS"
-    if recovered == events:
+    if (
+        recovered == events
+        and mean_recovered_fraction is not None
+        and mean_recovered_fraction >= replenishment_min_recovery_ratio
+    ):
         return "RESILIENT"
     if expired == events:
         return "FRAGILE"
@@ -278,13 +302,23 @@ def _validate_resilience_status_consistency(
     shifted: int,
     expired: int,
     pending: int,
+    mean_recovered_fraction: Decimal | None,
+    replenishment_min_recovery_ratio: Decimal,
     status: str,
 ) -> None:
     validate_resilience_status(status)
-    expected = _expected_resilience_status(events, recovered, shifted, expired, pending)
+    expected = _expected_resilience_status(
+        events,
+        recovered,
+        shifted,
+        expired,
+        pending,
+        mean_recovered_fraction,
+        replenishment_min_recovery_ratio,
+    )
     if status != expected:
         raise Lot43ValidationError(
-            f"resilience status/count mismatch: expected {expected}, got {status}"
+            f"resilience status/count/threshold mismatch: expected {expected}, got {status}"
         )
 
 
@@ -304,6 +338,7 @@ class BookResilienceSliceV1:
     resilience_status: str
     reason_codes: tuple[str, ...]
     slice_checksum: str
+    replenishment_min_recovery_ratio: Decimal = field(kw_only=True)
 
     def __post_init__(self) -> None:
         validate_side(self.side)
@@ -317,6 +352,10 @@ class BookResilienceSliceV1:
             self.mid_shift_events_total,
             self.expired_events_total,
             self.pending_events_total,
+        )
+        validate_ratio(
+            self.replenishment_min_recovery_ratio,
+            "replenishment_min_recovery_ratio",
         )
         _validate_recovered_fraction_mean(
             self.depletion_events_total,
@@ -332,6 +371,8 @@ class BookResilienceSliceV1:
             self.mid_shift_events_total,
             self.expired_events_total,
             self.pending_events_total,
+            self.mean_recovered_fraction,
+            self.replenishment_min_recovery_ratio,
             self.resilience_status,
         )
         validate_reason_codes(self.reason_codes)
@@ -354,6 +395,9 @@ class BookResilienceSliceV1:
             "mid_shift_events_total": self.mid_shift_events_total,
             "expired_events_total": self.expired_events_total,
             "pending_events_total": self.pending_events_total,
+            "replenishment_min_recovery_ratio": decimal_text(
+                self.replenishment_min_recovery_ratio
+            ),
             "mean_recovered_fraction": (
                 None
                 if self.mean_recovered_fraction is None
