@@ -354,6 +354,7 @@ def _build_resilience_state(
     zone_set: dict[str, Any],
     config: dict[str, Any],
     analysis: Any,
+    policy: BookResiliencePolicy,
 ) -> BookResilienceStateV1:
     current = analysis.observations[-1]
     state = BookResilienceStateV1(
@@ -378,6 +379,7 @@ def _build_resilience_state(
             "LOT44_REMAINS_LOCKED",
         ),
         ZERO_SHA256,
+        resilience_horizons_us=policy.resilience_horizons_us,
     )
     return replace(state, resilience_checksum=canonical_checksum(state.payload_without_checksum()))
 
@@ -420,7 +422,7 @@ def build_lot43_artifacts(
         policy,
         require_text(config.get("decision_time"), "decision_time"),
     )
-    resilience = _build_resilience_state(zone_set, config, analysis)
+    resilience = _build_resilience_state(zone_set, config, analysis, policy)
     run_context = Lot43RunContextV1(
         require_text(config.get("run_id"), "run_id"),
         require_text(config.get("config_version"), "config_version"),
