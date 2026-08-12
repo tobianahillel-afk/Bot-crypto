@@ -417,12 +417,18 @@ def _event_horizon_outcome(
     decision_time: str,
 ) -> str:
     elapsed = event.replenishment_time_us
-    if elapsed is not None and elapsed <= horizon_us:
-        if event.replenishment_kind in {"SAME_PRICE", "ADJACENT_PRICE"}:
-            return "RECOVERED"
-        if event.replenishment_kind == "MID_SHIFT":
-            return "SHIFTED"
-    if age_us(event.depletion_receive_time, decision_time) >= horizon_us:
+    age_at_decision = age_us(event.depletion_receive_time, decision_time)
+    if elapsed is not None:
+        if elapsed > age_at_decision:
+            raise Lot43ValidationError(
+                "replenishment evidence cannot exceed decision_time"
+            )
+        if elapsed <= horizon_us:
+            if event.replenishment_kind in {"SAME_PRICE", "ADJACENT_PRICE"}:
+                return "RECOVERED"
+            if event.replenishment_kind == "MID_SHIFT":
+                return "SHIFTED"
+    if age_at_decision >= horizon_us:
         return "EXPIRED"
     return "PENDING"
 
@@ -490,15 +496,21 @@ def _expected_slice_aggregation(
     )
 
 
-def _validate_slice_matrix(slices: tuple[BookResilienceSliceV1, ...]) -> None:
+def _validate_slice_matrix(
+    slices: tuple[BookResilienceSliceV1, ...],
+    declared_horizons: tuple[int, ...],
+) -> None:
+    validate_horizons(declared_horizons)
     if not slices:
         raise Lot43ValidationError("resilience slice matrix must be non-empty")
     keys = tuple((item.side, item.horizon_us) for item in slices)
     if len(set(keys)) != len(keys):
         raise Lot43ValidationError("resilience slice keys must be unique")
-    horizons = tuple(sorted({item.horizon_us for item in slices}))
-    validate_horizons(horizons)
-    expected = {(side, horizon) for side in ("BID", "ASK") for horizon in horizons}
+    expected = {
+        (side, horizon)
+        for side in ("BID", "ASK")
+        for horizon in declared_horizons
+    }
     if set(keys) != expected:
         raise Lot43ValidationError(
             "resilience requires a complete BID/ASK slice matrix for each declared horizon"
@@ -508,10 +520,11 @@ def _validate_slice_matrix(slices: tuple[BookResilienceSliceV1, ...]) -> None:
 def _validate_slice_event_consistency(
     events: tuple[BookDepletionEventV1, ...],
     slices: tuple[BookResilienceSliceV1, ...],
+    declared_horizons: tuple[int, ...],
     decision_time: str,
     volatility_regime: str,
 ) -> None:
-    _validate_slice_matrix(slices)
+    _validate_slice_matrix(slices, declared_horizons)
     thresholds = {item.replenishment_min_recovery_ratio for item in slices}
     if len(thresholds) != 1:
         raise Lot43ValidationError(
@@ -561,6 +574,7 @@ class BookResilienceStateV1:
     resilience_slices: tuple[BookResilienceSliceV1, ...]
     reason_codes: tuple[str, ...]
     resilience_checksum: str
+    resilience_horizons_us: tuple[int, ...] = field(kw_only=True, default=())
 
     def __post_init__(self) -> None:
         validate_identity_fields(self._identity_fields())
@@ -578,9 +592,11 @@ class BookResilienceStateV1:
         validate_volatility_regime(self.volatility_regime)
         if self.volatility_method != REGIME_METHOD:
             raise Lot43ValidationError("volatility method changed")
+        validate_horizons(self.resilience_horizons_us)
         _validate_slice_event_consistency(
             self.depletion_events,
             self.resilience_slices,
+            self.resilience_horizons_us,
             self.decision_time,
             self.volatility_regime,
         )
@@ -615,6 +631,7 @@ class BookResilienceStateV1:
             "decision_time": self.decision_time,
             "sequence_id": self.sequence_id,
             "history_sequence_ids": list(self.history_sequence_ids),
+            "resilience_horizons_us": list(self.resilience_horizons_us),
             "volatility_measure_bps": decimal_text(self.volatility_measure_bps),
             "volatility_regime": self.volatility_regime,
             "volatility_method": self.volatility_method,
