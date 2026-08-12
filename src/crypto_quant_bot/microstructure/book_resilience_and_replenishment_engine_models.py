@@ -411,18 +411,106 @@ class BookResilienceSliceV1:
         }
 
 
-def _validate_slice_event_totals(
+def _event_horizon_outcome(
+    event: BookDepletionEventV1,
+    horizon_us: int,
+    decision_time: str,
+) -> str:
+    elapsed = event.replenishment_time_us
+    if elapsed is not None and elapsed <= horizon_us:
+        if event.replenishment_kind in {"SAME_PRICE", "ADJACENT_PRICE"}:
+            return "RECOVERED"
+        if event.replenishment_kind == "MID_SHIFT":
+            return "SHIFTED"
+    if age_us(event.depletion_receive_time, decision_time) >= horizon_us:
+        return "EXPIRED"
+    return "PENDING"
+
+
+def _expected_slice_aggregation(
+    events: tuple[BookDepletionEventV1, ...],
+    horizon_us: int,
+    decision_time: str,
+) -> tuple[int, int, int, int, int, Decimal | None, Decimal | None]:
+    outcomes = tuple(
+        _event_horizon_outcome(event, horizon_us, decision_time) for event in events
+    )
+    recovered = sum(outcome == "RECOVERED" for outcome in outcomes)
+    shifted = sum(outcome == "SHIFTED" for outcome in outcomes)
+    expired = sum(outcome == "EXPIRED" for outcome in outcomes)
+    pending = sum(outcome == "PENDING" for outcome in outcomes)
+    with localcontext() as context:
+        context.prec = DECIMAL_PRECISION
+        mean_fraction = None
+        if events:
+            total_fraction = Decimal("0")
+            for event, outcome in zip(events, outcomes, strict=True):
+                if outcome == "RECOVERED":
+                    total_fraction += event.recovered_fraction
+            mean_fraction = total_fraction / Decimal(len(events))
+        recovered_times = tuple(
+            event.replenishment_time_us
+            for event, outcome in zip(events, outcomes, strict=True)
+            if outcome == "RECOVERED" and event.replenishment_time_us is not None
+        )
+        mean_time = (
+            None
+            if not recovered_times
+            else Decimal(sum(recovered_times)) / Decimal(len(recovered_times))
+        )
+    return len(events), recovered, shifted, expired, pending, mean_fraction, mean_time
+
+
+def _validate_slice_matrix(slices: tuple[BookResilienceSliceV1, ...]) -> None:
+    if not slices:
+        raise Lot43ValidationError("resilience slice matrix must be non-empty")
+    keys = tuple((item.side, item.horizon_us) for item in slices)
+    if len(set(keys)) != len(keys):
+        raise Lot43ValidationError("resilience slice keys must be unique")
+    horizons = tuple(sorted({item.horizon_us for item in slices}))
+    validate_horizons(horizons)
+    expected = {(side, horizon) for side in ("BID", "ASK") for horizon in horizons}
+    if set(keys) != expected:
+        raise Lot43ValidationError(
+            "resilience requires a complete BID/ASK slice matrix for each declared horizon"
+        )
+
+
+def _validate_slice_event_consistency(
     events: tuple[BookDepletionEventV1, ...],
     slices: tuple[BookResilienceSliceV1, ...],
+    decision_time: str,
+    volatility_regime: str,
 ) -> None:
-    event_totals = {
-        side: sum(event.side == side for event in events)
-        for side in ("BID", "ASK")
-    }
+    _validate_slice_matrix(slices)
+    thresholds = {item.replenishment_min_recovery_ratio for item in slices}
+    if len(thresholds) != 1:
+        raise Lot43ValidationError(
+            "resilience slice recovery threshold must be consistent across the matrix"
+        )
     for resilience_slice in slices:
-        if resilience_slice.depletion_events_total != event_totals[resilience_slice.side]:
+        if resilience_slice.volatility_regime != volatility_regime:
             raise Lot43ValidationError(
-                "resilience slice depletion total must match published events"
+                "resilience slice volatility regime must match published state"
+            )
+        side_events = tuple(event for event in events if event.side == resilience_slice.side)
+        expected = _expected_slice_aggregation(
+            side_events,
+            resilience_slice.horizon_us,
+            decision_time,
+        )
+        actual = (
+            resilience_slice.depletion_events_total,
+            resilience_slice.recovered_events_total,
+            resilience_slice.mid_shift_events_total,
+            resilience_slice.expired_events_total,
+            resilience_slice.pending_events_total,
+            resilience_slice.mean_recovered_fraction,
+            resilience_slice.mean_replenishment_time_us,
+        )
+        if actual != expected:
+            raise Lot43ValidationError(
+                "resilience slice aggregation must match published events"
             )
 
 
@@ -461,10 +549,12 @@ class BookResilienceStateV1:
         validate_volatility_regime(self.volatility_regime)
         if self.volatility_method != REGIME_METHOD:
             raise Lot43ValidationError("volatility method changed")
-        horizons = tuple(sorted({item.horizon_us for item in self.resilience_slices}))
-        if horizons:
-            validate_horizons(horizons)
-        _validate_slice_event_totals(self.depletion_events, self.resilience_slices)
+        _validate_slice_event_consistency(
+            self.depletion_events,
+            self.resilience_slices,
+            self.decision_time,
+            self.volatility_regime,
+        )
         validate_reason_codes(self.reason_codes)
         require_sha256(self.resilience_checksum, "resilience_checksum")
 
