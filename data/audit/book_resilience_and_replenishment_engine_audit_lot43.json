@@ -1,5 +1,5 @@
 {
-  "audit_checksum": "553b0747c66275cefb4636b3d84ea664230ae765476126711bf15b768ac92ec4",
+  "audit_checksum": "dca5c5fbcf54555d0e606cc368d616743ec72a2392ff2162b1ff05975388cfca",
   "lineage": {
     "available_at": "2026-08-06T19:18:40.070000Z",
     "config_checksum": "a170aab2e8f71dd6f6420a308edd7aa22f6200a25f39ac1eacefb7ac1aa431a1",
@@ -21,7 +21,7 @@
   ],
   "resilience_checksum": "297bec6000bc40f2df428c942ee60f7b170cfc01ddba992503da9c259e6e551f",
   "run_context": {
-    "code_commit": "dccea5dcd03414064ead4e6979d53df98dfdda6f",
+    "code_commit": "7091abf50bd5237636da7ffcb520e05dca558173",
     "config_version": "lot43-book-resilience-replenishment-config-v1",
     "correlation_id": "microstructure-v4-lot43-reference",
     "run_id": "lot43-reference-run-v1",
@@ -46,7 +46,7 @@
     "used_for_decision": false
   },
   "schema_version": "book-resilience-replenishment-engine-audit-v1",
-  "state_output_checksum": "797bd974b37b4806bfada6b6b938d189401dc915998aa97e68473b1226da4a3d",
+  "state_output_checksum": "88330d2d330449ce5ed63741171c1bbb10cd65c92622dc3cdd66877c37b18520",
   "validation_checks": [
     "entry_gate_verified",
     "lot42_frozen_lineage_verified",
