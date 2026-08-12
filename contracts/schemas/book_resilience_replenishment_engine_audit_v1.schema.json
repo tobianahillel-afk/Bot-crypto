@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/contracts/book_resilience_replenishment_engine_audit_v1.schema.json",
+  "title": "BookResilienceReplenishmentEngineAuditV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_context",
+    "state_output_checksum",
+    "resilience_checksum",
+    "lineage",
+    "validation_checks",
+    "reason_codes",
+    "safety",
+    "audit_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "book-resilience-replenishment-engine-audit-v1"},
+    "run_context": {"$ref": "book_resilience_replenishment_engine_state_v1.schema.json#/$defs/runContext"},
+    "state_output_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "resilience_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "lineage": {"$ref": "book_resilience_replenishment_engine_state_v1.schema.json#/$defs/lineage"},
+    "validation_checks": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "safety": {"$ref": "book_resilience_replenishment_engine_state_v1.schema.json#/$defs/safety"},
+    "audit_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

@@ -68,10 +68,7 @@ jobs:
             tests/test_lot42_liquidity_zones_walls_and_voids_engine.py \
             tests/test_lot42_schema_contracts.py \
             docs/LOT_42_LIQUIDITY_ZONES_WALLS_AND_VOIDS_ENGINE.md \
-            docs/ACCEPTANCE_CRITERIA_LOT_42.md \
-            .github/workflows/lot42-entry-gate.yml \
-            .github/workflows/lot42-liquidity-zones-walls-voids.yml \
-            .github/workflows/lot42-mutation-assurance.yml
+            docs/ACCEPTANCE_CRITERIA_LOT_42.md
       - name: Prove frozen evidence immutability
         run: |
           set -euo pipefail
@@ -81,12 +78,20 @@ jobs:
             data/audit/liquidity_zones_walls_and_voids_engine_lot42.json \
             reports/lot42/coverage_summary.json \
             reports/lot42/mutation_summary.json
-      - name: Validate frozen evidence
+      - name: Replay exact Lot 42 frozen evidence attestation
         run: |
           set -euo pipefail
-          python -m compileall -q scripts/validate_lot42_frozen_evidence.py
-          ruff check scripts/validate_lot42_frozen_evidence.py
-          python scripts/validate_lot42_frozen_evidence.py | tee /tmp/lot42-frozen-validation.json
+          rm -rf /tmp/lot42-frozen-certified
+          git worktree add --detach /tmp/lot42-frozen-certified "$FINAL_PR_HEAD_SHA"
+          trap 'git worktree remove --force /tmp/lot42-frozen-certified >/dev/null 2>&1 || true' EXIT
+          (
+            cd /tmp/lot42-frozen-certified
+            PYTHONPATH=src python -m compileall -q scripts/validate_lot42_frozen_evidence.py
+            ruff check scripts/validate_lot42_frozen_evidence.py
+            PYTHONPATH=src python scripts/validate_lot42_frozen_evidence.py | tee /tmp/lot42-frozen-validation.json
+          )
+          git worktree remove --force /tmp/lot42-frozen-certified
+          trap - EXIT
       - name: Replay certified Lot 42 source deterministically
         run: |
           set -euo pipefail
@@ -120,7 +125,7 @@ jobs:
           )
           git worktree remove --force /tmp/lot42-source-certified
           trap - EXIT
-      - name: Current architecture security regression and Lot 43 lock
+      - name: Current architecture security regression and Lot 44 lock
         run: |
           set -euo pipefail
           python scripts/validate_roadmap_documentation.py
@@ -136,12 +141,12 @@ jobs:
           pip-audit -r requirements-dev.lock
           pytest -q
           for repetition in 1 2 3; do pytest -q tests/test_lot42*.py; done
-          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py
-          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py
-          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_validation.py
-          test ! -e config/microstructure/book_resilience_and_replenishment_engine_v1.json
-          test ! -e scripts/run_lot43_book_resilience_and_replenishment_engine.py
-          test ! -e scripts/validate_lot43.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py
+          test ! -e config/microstructure/trades_and_aggressor_classification_schema_v1.json
+          test ! -e scripts/run_lot44_trades_and_aggressor_classification_schema.py
+          test ! -e scripts/validate_lot44.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

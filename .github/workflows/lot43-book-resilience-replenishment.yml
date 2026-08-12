@@ -1,0 +1,149 @@
+name: Lot 43 book resilience replenishment validation
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lot43:
+    runs-on: ubuntu-22.04
+    env:
+      PYTHONPATH: src
+      GATE_MERGE_SHA: ed8845e0e56151348fe57c0e9bceaf4646ea49aa
+      CANDIDATE_SHA: d45f40aec90b26dd1278ec2f49b405fa5b2ed94e
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: d45f40aec90b26dd1278ec2f49b405fa5b2ed94e
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Prove exact frozen source and gate ancestry
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          git merge-base --is-ancestor "$GATE_MERGE_SHA" "$CANDIDATE_SHA"
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py
+          test ! -e config/microstructure/trades_and_aggressor_classification_schema_v1.json
+          test ! -e scripts/run_lot44_trades_and_aggressor_classification_schema.py
+          test ! -e scripts/validate_lot44.py
+          test ! -e docs/LOT_44_TRADES_AND_AGGRESSOR_CLASSIFICATION_SCHEMA.md
+          test ! -e docs/ACCEPTANCE_CRITERIA_LOT_44.md
+      - name: Compile lint type schema and no-connectivity checks
+        run: |
+          set -euo pipefail
+          mkdir -p reports/lot43
+          {
+            python -m compileall -q src scripts tests
+            for path in \
+              config/microstructure/book_resilience_and_replenishment_engine_v1.json \
+              contracts/schemas/book_resilience_state_v1.schema.json \
+              contracts/schemas/book_resilience_replenishment_engine_state_v1.schema.json \
+              contracts/schemas/book_resilience_replenishment_engine_audit_v1.schema.json; do
+              python -m json.tool "$path" >/dev/null
+            done
+            ruff check \
+              src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py \
+              src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py \
+              src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_validation.py \
+              src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_analysis.py \
+              scripts/run_lot43_book_resilience_and_replenishment_engine.py \
+              scripts/validate_lot43.py scripts/validate_lot43_no_connectivity.py \
+              tests/test_lot43*.py
+            mypy src/crypto_quant_bot/microstructure
+            python scripts/validate_lot43_no_connectivity.py
+          } 2>&1 | tee reports/lot43/static_checks.txt
+      - name: Targeted line and branch coverage
+        run: |
+          set -euo pipefail
+          coverage erase
+          pytest -q tests/test_lot43*.py \
+            --cov=crypto_quant_bot.microstructure.book_resilience_and_replenishment_engine \
+            --cov=crypto_quant_bot.microstructure.book_resilience_and_replenishment_engine_models \
+            --cov=crypto_quant_bot.microstructure.book_resilience_and_replenishment_engine_validation \
+            --cov=crypto_quant_bot.microstructure.book_resilience_and_replenishment_analysis \
+            --cov-branch --cov-report=json:reports/lot43/coverage.json --cov-report=term-missing \
+            2>&1 | tee reports/lot43/targeted_coverage.txt
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          totals=json.loads(Path('reports/lot43/coverage.json').read_text())['totals']
+          lines=float(totals['percent_statements_covered'])
+          branches=float(totals['percent_branches_covered'])
+          result={
+              'schema_version':'lot43-coverage-summary-v1',
+              'status':'PASS' if lines>=95 and branches>=90 else 'FAIL',
+              'source_head_sha':os.environ['CANDIDATE_SHA'],
+              'line_coverage_percent':round(lines,2),
+              'branch_coverage_percent':round(branches,2),
+              'line_coverage_min_percent':95.0,
+              'branch_coverage_min_percent':90.0,
+              'anti_flake_repetitions':3,
+          }
+          Path('reports/lot43/coverage_summary.json').write_text(
+              json.dumps(result,indent=2,sort_keys=True)+'\n', encoding='utf-8'
+          )
+          print(json.dumps(result,sort_keys=True))
+          if result['status']!='PASS':
+              raise SystemExit('LOT43_CRITICAL_COVERAGE_BELOW_THRESHOLD')
+          PY
+      - name: Generate validate and replay deterministic evidence
+        run: |
+          set -euo pipefail
+          outputs=(
+            data/audit/book_resilience_and_replenishment_engine_lot43.json
+            data/audit/book_resilience_and_replenishment_engine_audit_lot43.json
+            data/audit/book_resilience_state_lot43.json
+          )
+          rm -rf /tmp/lot43-run1
+          mkdir -p /tmp/lot43-run1
+          python scripts/run_lot43_book_resilience_and_replenishment_engine.py --code-commit "$CANDIDATE_SHA"
+          python scripts/validate_lot43.py --expected-code-commit "$CANDIDATE_SHA" --require-persisted
+          python scripts/validate_lot43_no_connectivity.py
+          for path in "${outputs[@]}"; do cp "$path" "/tmp/lot43-run1/$(basename "$path")"; done
+          python scripts/run_lot43_book_resilience_and_replenishment_engine.py --code-commit "$CANDIDATE_SHA"
+          python scripts/validate_lot43.py --expected-code-commit "$CANDIDATE_SHA" --require-persisted
+          for path in "${outputs[@]}"; do cmp "/tmp/lot43-run1/$(basename "$path")" "$path"; done
+      - name: Architecture roadmap traceability engineering and safety
+        run: |
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          python scripts/validate_lot43_no_connectivity.py
+      - name: Security dependency regression and anti-flake
+        run: |
+          bandit -q -r \
+            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py \
+            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py \
+            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_validation.py \
+            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_analysis.py \
+            scripts/validate_lot43.py -ll
+          pip-audit -r requirements-dev.lock
+          pytest -q
+          for repetition in 1 2 3; do pytest -q tests/test_lot43*.py; done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot43-book-resilience-replenishment-evidence
+          path: |
+            reports/lot43/
+            data/audit/book_resilience_and_replenishment_engine_lot43.json
+            data/audit/book_resilience_and_replenishment_engine_audit_lot43.json
+            data/audit/book_resilience_state_lot43.json

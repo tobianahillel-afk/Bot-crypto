@@ -18,6 +18,7 @@ jobs:
       EVIDENCE_HEAD_SHA: 3655b18a24cafb3383dfeb2709904af59044535f
       FINAL_PR_HEAD_SHA: 85f0a141d52d448a452ff1493050a3bf31a23dce
       IMPLEMENTATION_MERGE_SHA: 3a7226b4beeb23bfeee976243efc0057cac69e0e
+      LOT42_AUDIT_MERGE_SHA: 2438622734e597cdcbada6b926e3c05d9e4cf8bc
     steps:
       - uses: actions/checkout@v4
         with:
@@ -37,7 +38,8 @@ jobs:
           git merge-base --is-ancestor "$GATE_MERGE_SHA" "$SOURCE_HEAD_SHA"
           git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA"
           git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" "$FINAL_PR_HEAD_SHA"
-          git merge-base --is-ancestor "$IMPLEMENTATION_MERGE_SHA" HEAD
+          git merge-base --is-ancestor "$IMPLEMENTATION_MERGE_SHA" "$LOT42_AUDIT_MERGE_SHA"
+          git merge-base --is-ancestor "$LOT42_AUDIT_MERGE_SHA" HEAD
           git diff --quiet "$FINAL_PR_HEAD_SHA" "$IMPLEMENTATION_MERGE_SHA" -- .
       - name: Prove frozen Lot 42 production source immutability
         run: |
@@ -68,14 +70,21 @@ jobs:
             data/audit/liquidity_zones_walls_and_voids_engine_lot42.json \
             reports/lot42/coverage_summary.json \
             reports/lot42/mutation_summary.json
-      - name: Validate frozen evidence release lifecycle and post-merge verdict
+      - name: Replay exact Lot 42 post-merge verdict
         run: |
           set -euo pipefail
-          python -m compileall -q src scripts tests
-          python -m json.tool data/audit/roadmap_lifecycle_overlay_lot42.json >/dev/null
-          ruff check scripts/validate_lot42_frozen_evidence.py scripts/validate_lot42_post_merge.py
-          python scripts/validate_lot42_frozen_evidence.py
-          python scripts/validate_lot42_post_merge.py | tee /tmp/lot42-post-merge-validation.json
+          rm -rf /tmp/lot42-post-merge-audited
+          git worktree add --detach /tmp/lot42-post-merge-audited "$LOT42_AUDIT_MERGE_SHA"
+          trap 'git worktree remove --force /tmp/lot42-post-merge-audited >/dev/null 2>&1 || true' EXIT
+          (
+            cd /tmp/lot42-post-merge-audited
+            PYTHONPATH=src python -m compileall -q src scripts tests
+            ruff check scripts/validate_lot42_frozen_evidence.py scripts/validate_lot42_post_merge.py
+            PYTHONPATH=src python scripts/validate_lot42_frozen_evidence.py
+            PYTHONPATH=src python scripts/validate_lot42_post_merge.py | tee /tmp/lot42-post-merge-validation.json
+          )
+          git worktree remove --force /tmp/lot42-post-merge-audited
+          trap - EXIT
       - name: Replay certified Lot 42 source deterministically
         run: |
           set -euo pipefail
@@ -109,7 +118,7 @@ jobs:
           )
           git worktree remove --force /tmp/lot42-post-merge-source
           trap - EXIT
-      - name: Current architecture security regression and Lot 43 lock
+      - name: Current architecture security regression and Lot 44 lock
         run: |
           set -euo pipefail
           python scripts/validate_roadmap_documentation.py
@@ -125,14 +134,12 @@ jobs:
           pip-audit -r requirements-dev.lock
           pytest -q
           for repetition in 1 2 3; do pytest -q tests/test_lot42*.py; done
-          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py
-          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py
-          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_validation.py
-          test ! -e config/microstructure/book_resilience_and_replenishment_engine_v1.json
-          test ! -e scripts/run_lot43_book_resilience_and_replenishment_engine.py
-          test ! -e scripts/validate_lot43.py
-          test ! -e docs/LOT_43_BOOK_RESILIENCE_AND_REPLENISHMENT_ENGINE.md
-          test ! -e docs/ACCEPTANCE_CRITERIA_LOT_43.md
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py
+          test ! -e config/microstructure/trades_and_aggressor_classification_schema_v1.json
+          test ! -e scripts/run_lot44_trades_and_aggressor_classification_schema.py
+          test ! -e scripts/validate_lot44.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

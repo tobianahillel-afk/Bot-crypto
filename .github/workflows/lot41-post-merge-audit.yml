@@ -97,10 +97,12 @@ jobs:
           python scripts/quality_inventory.py
           python scripts/validate_engineering_deviations.py
           pip-audit -r requirements-dev.lock
-          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py
-          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py
-          test ! -e scripts/run_lot43_book_resilience_and_replenishment_engine.py
-          test ! -e scripts/validate_lot43.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py
+          test ! -e config/microstructure/trades_and_aggressor_classification_schema_v1.json
+          test ! -e scripts/run_lot44_trades_and_aggressor_classification_schema.py
+          test ! -e scripts/validate_lot44.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -1,0 +1,31 @@
+{
+  "adjacent_replenishment_distance_bps": "0.05",
+  "calculation_decimal_precision": 50,
+  "config_version": "lot43-book-resilience-replenishment-config-v1",
+  "correlation_id": "microstructure-v4-lot43-reference",
+  "decision_time": "2026-08-06T19:18:40.100000Z",
+  "depletion_min_quantity": "0.1",
+  "depletion_min_ratio": "0.25",
+  "entry_gate_path": "data/audit/lot43_v4_entry_gate.json",
+  "generated_at": "2026-08-06T19:18:40.100000Z",
+  "lineage_id": "lot43-reference-lineage-v1",
+  "lot38_state_path": "data/audit/order_book_l2_snapshot_engine_lot38.json",
+  "lot39_delta_fixture_path": "tests/fixtures/lot39/order_book_delta_sequence_fixture_v1.json",
+  "lot39_reconstructed_book_path": "data/audit/reconstructed_order_book_lot39.json",
+  "lot42_audit_path": "data/audit/liquidity_zones_walls_and_voids_engine_audit_lot42.json",
+  "lot42_config_path": "config/microstructure/liquidity_zones_walls_and_voids_engine_v1.json",
+  "lot42_lifecycle_overlay_path": "data/audit/roadmap_lifecycle_overlay_lot42.json",
+  "lot42_state_path": "data/audit/liquidity_zones_walls_and_voids_engine_lot42.json",
+  "lot42_zone_set_path": "data/audit/liquidity_zone_set_lot42.json",
+  "max_input_age_us": 50000,
+  "mid_shift_min_bps": "0.05",
+  "quiet_max_mid_move_bps": "0.05",
+  "replenishment_min_recovery_ratio": "0.25",
+  "resilience_horizons_us": [
+    10000,
+    25000
+  ],
+  "run_id": "lot43-reference-run-v1",
+  "schema_version": "lot43-book-resilience-replenishment-config-v1",
+  "stressed_min_mid_move_bps": "0.5"
+}

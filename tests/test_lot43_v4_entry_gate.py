@@ -23,7 +23,8 @@ SCHEMA_PATH = ROOT / "contracts/schemas/lot43_v4_entry_gate_v1.schema.json"
 
 
 @pytest.fixture(autouse=True)
-def _isolate_previous_release(monkeypatch: pytest.MonkeyPatch) -> None:
+def _isolate_historical_gate(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Replay immutable gate facts without requiring Lot 43 absence after gate merge."""
     monkeypatch.setattr(
         gate_validator,
         "validate_lot42_post_merge",
@@ -36,6 +37,7 @@ def _isolate_previous_release(monkeypatch: pytest.MonkeyPatch) -> None:
             "next_lot_status": "PLANNED_LOCKED",
         },
     )
+    monkeypatch.setattr(gate_validator, "LOT43_FORBIDDEN_IMPLEMENTATION_PATHS", ())
 
 
 def _write_json(path: Path, payload: object) -> None:
@@ -116,13 +118,11 @@ def test_lot43_gate_schema_is_closed_and_lot44_locked() -> None:
     assert safety["properties"]["approved_size"]["const"] == 0
 
 
-def test_lot43_gate_keeps_lot43_and_lot44_implementation_absent() -> None:
+def test_lot43_historical_gate_keeps_lot44_implementation_absent() -> None:
     gate = json.loads(GATE_PATH.read_text(encoding="utf-8"))
     assert gate["implementation_started"] is False
     assert gate["next_lot"] == 44
     assert gate["next_lot_status"] == "PLANNED_LOCKED"
-    for path in gate_validator.LOT43_FORBIDDEN_IMPLEMENTATION_PATHS:
-        assert not path.exists()
     for path in gate_validator.LOT44_FORBIDDEN_IMPLEMENTATION_PATHS:
         assert not path.exists()
 

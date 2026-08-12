@@ -21,6 +21,8 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       PYTHONPATH: src
+      GATE_FINAL_HEAD_SHA: 98868a022cbfb21839478b487957b7d2e8504b7c
+      GATE_MERGE_SHA: 7456c5b80b609ee5958d8b6da0effd489faa308c
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,29 +36,46 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove immutable gate ancestry and Lot 43 lock
+      - name: Prove certified gate squash and replay historical absence
         run: |
           set -euo pipefail
-          GATE_MERGE=7456c5b80b609ee5958d8b6da0effd489faa308c
-          git merge-base --is-ancestor "$GATE_MERGE" HEAD
-          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py
-          test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py
-          test ! -e config/microstructure/book_resilience_and_replenishment_engine_v1.json
-          test ! -e scripts/run_lot43_book_resilience_and_replenishment_engine.py
-          test ! -e scripts/validate_lot43.py
-      - name: Replay exact merged entry gate
-        run: |
-          set -euo pipefail
-          GATE_MERGE=7456c5b80b609ee5958d8b6da0effd489faa308c
-          git worktree add --detach /tmp/lot42-gate "$GATE_MERGE"
+          git merge-base --is-ancestor "$GATE_MERGE_SHA" HEAD
+          git diff --quiet "$GATE_FINAL_HEAD_SHA" "$GATE_MERGE_SHA"
+          rm -rf /tmp/lot42-gate-certified
+          git worktree add --detach /tmp/lot42-gate-certified "$GATE_MERGE_SHA"
+          trap 'git worktree remove --force /tmp/lot42-gate-certified >/dev/null 2>&1 || true' EXIT
           (
-            cd /tmp/lot42-gate
-            python scripts/validate_lot42_entry_gate.py
-            pytest -q tests/test_lot42_v4_entry_gate.py
+            cd /tmp/lot42-gate-certified
+            PYTHONPATH=src python scripts/validate_lot42_entry_gate.py
+            PYTHONPATH=src pytest -q tests/test_lot42_v4_entry_gate.py
+            test ! -e src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine.py
+            test ! -e src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine_models.py
+            test ! -e config/microstructure/liquidity_zones_walls_and_voids_engine_v1.json
+            test ! -e scripts/run_lot42_liquidity_zones_walls_and_voids_engine.py
+            test ! -e scripts/validate_lot42.py
+            test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py
+            test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py
+            test ! -e config/microstructure/book_resilience_and_replenishment_engine_v1.json
+            test ! -e scripts/run_lot43_book_resilience_and_replenishment_engine.py
+            test ! -e scripts/validate_lot43.py
           )
-          git worktree remove /tmp/lot42-gate --force
-      - name: Validate historical gate contract on current head
+          git worktree remove --force /tmp/lot42-gate-certified
+          trap - EXIT
+      - name: Prove Lot 44 implementation remains absent on current head
         run: |
+          set -euo pipefail
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py
+          test ! -e config/microstructure/trades_and_aggressor_classification_schema_v1.json
+          test ! -e scripts/run_lot44_trades_and_aggressor_classification_schema.py
+          test ! -e scripts/validate_lot44.py
+          test ! -e tests/test_lot44_trades_and_aggressor_classification_schema.py
+          test ! -e docs/LOT_44_TRADES_AND_AGGRESSOR_CLASSIFICATION_SCHEMA.md
+          test ! -e docs/ACCEPTANCE_CRITERIA_LOT_44.md
+      - name: Validate historical gate contract on current source tree
+        run: |
+          set -euo pipefail
           python -m compileall -q scripts tests
           python -m json.tool data/audit/lot42_v4_entry_gate.json >/dev/null
           python -m json.tool contracts/schemas/lot42_v4_entry_gate_v1.schema.json >/dev/null
@@ -64,6 +83,7 @@ jobs:
           pytest -q tests/test_lot42_v4_entry_gate.py
       - name: Architecture roadmap traceability engineering and security
         run: |
+          set -euo pipefail
           python scripts/validate_roadmap_documentation.py
           python scripts/validate_architecture_boundaries.py
           python scripts/validate_domain_architecture.py

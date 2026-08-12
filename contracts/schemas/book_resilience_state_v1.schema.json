@@ -1,0 +1,225 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crypto-quant-bot.local/contracts/book_resilience_state_v1.schema.json",
+  "title": "BookResilienceStateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source_id",
+    "venue",
+    "instrument_id",
+    "market_type",
+    "event_time",
+    "receive_time",
+    "decision_time",
+    "sequence_id",
+    "history_sequence_ids",
+    "resilience_horizons_us",
+    "volatility_measure_bps",
+    "volatility_regime",
+    "volatility_method",
+    "depletion_events",
+    "resilience_slices",
+    "observed_book_only",
+    "participant_intent_inferred",
+    "reason_codes",
+    "resilience_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "book-resilience-state-v1"},
+    "source_id": {"type": "string", "minLength": 1},
+    "venue": {"type": "string", "minLength": 1},
+    "instrument_id": {"type": "string", "minLength": 1},
+    "market_type": {"type": "string", "minLength": 1},
+    "event_time": {"type": "string", "minLength": 1},
+    "receive_time": {"type": "string", "minLength": 1},
+    "decision_time": {"type": "string", "minLength": 1},
+    "sequence_id": {"type": "integer", "minimum": 1},
+    "history_sequence_ids": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {"type": "integer", "minimum": 1}
+    },
+    "resilience_horizons_us": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "integer", "minimum": 1}
+    },
+    "volatility_measure_bps": {"type": "string", "pattern": "^[0-9]+(?:\\.[0-9]+)?$"},
+    "volatility_regime": {"enum": ["QUIET", "NORMAL", "STRESSED"]},
+    "volatility_method": {"const": "OBSERVED_BOOK_MID_MAX_ABS_MOVE_BPS"},
+    "depletion_events": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/depletionEvent"}
+    },
+    "resilience_slices": {
+      "type": "array",
+      "minItems": 2,
+      "items": {"$ref": "#/$defs/resilienceSlice"}
+    },
+    "observed_book_only": {"const": true},
+    "participant_intent_inferred": {"const": false},
+    "reason_codes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "resilience_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "depletionEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "event_id",
+        "side",
+        "depleted_price",
+        "previous_quantity",
+        "post_depletion_quantity",
+        "depleted_quantity",
+        "depletion_ratio",
+        "depletion_sequence_id",
+        "depletion_event_time",
+        "depletion_receive_time",
+        "replenishment_kind",
+        "replenishment_sequence_id",
+        "replenishment_time_us",
+        "replenished_quantity",
+        "recovered_fraction",
+        "directional_mid_shift_bps",
+        "max_window_status",
+        "participant_intent",
+        "reason_codes",
+        "event_checksum"
+      ],
+      "properties": {
+        "schema_version": {"const": "book-depletion-event-v1"},
+        "event_id": {"type": "string", "minLength": 1},
+        "side": {"enum": ["BID", "ASK"]},
+        "depleted_price": {"type": "string", "pattern": "^(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)$"},
+        "previous_quantity": {"type": "string", "pattern": "^(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)$"},
+        "post_depletion_quantity": {"type": "string", "pattern": "^[0-9]+(?:\\.[0-9]+)?$"},
+        "depleted_quantity": {"type": "string", "pattern": "^(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)$"},
+        "depletion_ratio": {"type": "string", "pattern": "^(?:0(?:\\.[0-9]+)?|1(?:\\.0+)?)$"},
+        "depletion_sequence_id": {"type": "integer", "minimum": 1},
+        "depletion_event_time": {"type": "string", "minLength": 1},
+        "depletion_receive_time": {"type": "string", "minLength": 1},
+        "replenishment_kind": {"enum": ["NONE", "SAME_PRICE", "ADJACENT_PRICE", "MID_SHIFT"]},
+        "replenishment_sequence_id": {"type": ["integer", "null"], "minimum": 1},
+        "replenishment_time_us": {"type": ["integer", "null"], "minimum": 1},
+        "replenished_quantity": {"type": "string", "pattern": "^[0-9]+(?:\\.[0-9]+)?$"},
+        "recovered_fraction": {"type": "string", "pattern": "^(?:0(?:\\.[0-9]+)?|1(?:\\.0+)?)$"},
+        "directional_mid_shift_bps": {"type": "string", "pattern": "^[0-9]+(?:\\.[0-9]+)?$"},
+        "max_window_status": {"enum": ["REPLENISHED", "MID_SHIFTED", "EXPIRED_NO_REPLENISHMENT", "PENDING_WINDOW"]},
+        "participant_intent": {"const": "NOT_INFERRED"},
+        "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "event_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {"replenishment_kind": {"const": "NONE"}},
+            "required": ["replenishment_kind"]
+          },
+          "then": {
+            "properties": {
+              "replenishment_sequence_id": {"type": "null"},
+              "replenishment_time_us": {"type": "null"},
+              "replenished_quantity": {"const": "0"},
+              "recovered_fraction": {"const": "0"},
+              "directional_mid_shift_bps": {"const": "0"},
+              "max_window_status": {"enum": ["EXPIRED_NO_REPLENISHMENT", "PENDING_WINDOW"]}
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {"replenishment_kind": {"enum": ["SAME_PRICE", "ADJACENT_PRICE"]}},
+            "required": ["replenishment_kind"]
+          },
+          "then": {
+            "properties": {
+              "replenishment_sequence_id": {"type": "integer", "minimum": 1},
+              "replenishment_time_us": {"type": "integer", "minimum": 1},
+              "replenished_quantity": {"type": "string", "pattern": "^(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)$"},
+              "recovered_fraction": {"type": "string", "pattern": "^(?:0\\.[0-9]*[1-9][0-9]*|1(?:\\.0+)?)$"},
+              "directional_mid_shift_bps": {"const": "0"},
+              "max_window_status": {"const": "REPLENISHED"}
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {"replenishment_kind": {"const": "MID_SHIFT"}},
+            "required": ["replenishment_kind"]
+          },
+          "then": {
+            "properties": {
+              "replenishment_sequence_id": {"type": "integer", "minimum": 1},
+              "replenishment_time_us": {"type": "integer", "minimum": 1},
+              "replenished_quantity": {"const": "0"},
+              "recovered_fraction": {"const": "0"},
+              "directional_mid_shift_bps": {"type": "string", "pattern": "^(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)$"},
+              "max_window_status": {"const": "MID_SHIFTED"}
+            }
+          }
+        }
+      ]
+    },
+    "resilienceSlice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "side",
+        "horizon_us",
+        "volatility_regime",
+        "volatility_method",
+        "depletion_events_total",
+        "recovered_events_total",
+        "mid_shift_events_total",
+        "expired_events_total",
+        "pending_events_total",
+        "replenishment_min_recovery_ratio",
+        "mean_recovered_fraction",
+        "mean_replenishment_time_us",
+        "resilience_status",
+        "reason_codes",
+        "slice_checksum"
+      ],
+      "properties": {
+        "schema_version": {"const": "book-resilience-slice-v1"},
+        "side": {"enum": ["BID", "ASK"]},
+        "horizon_us": {"type": "integer", "minimum": 1},
+        "volatility_regime": {"enum": ["QUIET", "NORMAL", "STRESSED"]},
+        "volatility_method": {"const": "OBSERVED_BOOK_MID_MAX_ABS_MOVE_BPS"},
+        "depletion_events_total": {"type": "integer", "minimum": 0},
+        "recovered_events_total": {"type": "integer", "minimum": 0},
+        "mid_shift_events_total": {"type": "integer", "minimum": 0},
+        "expired_events_total": {"type": "integer", "minimum": 0},
+        "pending_events_total": {"type": "integer", "minimum": 0},
+        "replenishment_min_recovery_ratio": {"type": "string", "pattern": "^(?:0\\.[0-9]*[1-9][0-9]*|1(?:\\.0+)?)$"},
+        "mean_recovered_fraction": {
+          "anyOf": [
+            {"type": "null"},
+            {"type": "string", "pattern": "^(?:0(?:\\.[0-9]+)?|1(?:\\.0+)?)$"}
+          ]
+        },
+        "mean_replenishment_time_us": {
+          "anyOf": [
+            {"type": "null"},
+            {"type": "string", "pattern": "^(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)$"}
+          ]
+        },
+        "resilience_status": {"enum": ["NO_EVENTS", "RESILIENT", "FRAGILE", "SHIFTED", "PENDING", "PARTIAL"]},
+        "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "slice_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  }
+}

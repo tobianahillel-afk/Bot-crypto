@@ -1,0 +1,214 @@
+{
+  "book_resilience": {
+    "decision_time": "2026-08-06T19:18:40.100000Z",
+    "depletion_events": [
+      {
+        "depleted_price": "50024.8",
+        "depleted_quantity": "1.25",
+        "depletion_event_time": "2026-08-06T19:18:40.065000Z",
+        "depletion_ratio": "1",
+        "depletion_receive_time": "2026-08-06T19:18:40.070000Z",
+        "depletion_sequence_id": 1003,
+        "directional_mid_shift_bps": "0",
+        "event_checksum": "07cf13d70e0dc9f04fd53c72153af7107ae72032ab37b392340bf60beded5c67",
+        "event_id": "lot43-1003-bid-50024.8",
+        "max_window_status": "EXPIRED_NO_REPLENISHMENT",
+        "participant_intent": "NOT_INFERRED",
+        "post_depletion_quantity": "0",
+        "previous_quantity": "1.25",
+        "reason_codes": [
+          "LOT43_DEPLETION_OBSERVED",
+          "LOT43_PARTICIPANT_INTENT_NOT_INFERRED",
+          "LOT43_NO_REPLENISHMENT_WITHIN_MAX_WINDOW"
+        ],
+        "recovered_fraction": "0",
+        "replenished_quantity": "0",
+        "replenishment_kind": "NONE",
+        "replenishment_sequence_id": null,
+        "replenishment_time_us": null,
+        "schema_version": "book-depletion-event-v1",
+        "side": "BID"
+      }
+    ],
+    "event_time": "2026-08-06T19:18:40.065000Z",
+    "history_sequence_ids": [
+      1001,
+      1002,
+      1003
+    ],
+    "instrument_id": "BTC-EUR-SPOT",
+    "market_type": "SPOT",
+    "observed_book_only": true,
+    "participant_intent_inferred": false,
+    "reason_codes": [
+      "LOT43_BOOK_RESILIENCE_COMPUTED",
+      "LOT43_CERTIFIED_OBSERVATION_HISTORY_ONLY",
+      "LOT43_PARTICIPANT_INTENT_NOT_INFERRED",
+      "LOT44_REMAINS_LOCKED"
+    ],
+    "receive_time": "2026-08-06T19:18:40.070000Z",
+    "resilience_checksum": "598c08bf863e8fed65e3045081b774a80500c8129a0eb71a6c865e74c1bf8ddb",
+    "resilience_horizons_us": [
+      10000,
+      25000
+    ],
+    "resilience_slices": [
+      {
+        "depletion_events_total": 1,
+        "expired_events_total": 1,
+        "horizon_us": 10000,
+        "mean_recovered_fraction": "0",
+        "mean_replenishment_time_us": null,
+        "mid_shift_events_total": 0,
+        "pending_events_total": 0,
+        "reason_codes": [
+          "LOT43_RESILIENCE_SLICE_COMPUTED",
+          "LOT43_VOLATILITY_REGIME_QUIET"
+        ],
+        "recovered_events_total": 0,
+        "replenishment_min_recovery_ratio": "0.25",
+        "resilience_status": "FRAGILE",
+        "schema_version": "book-resilience-slice-v1",
+        "side": "BID",
+        "slice_checksum": "de30acbb18931b6bcc98088694c4fc5e26e770f45f4c560e9cb22ee01b5469a8",
+        "volatility_method": "OBSERVED_BOOK_MID_MAX_ABS_MOVE_BPS",
+        "volatility_regime": "QUIET"
+      },
+      {
+        "depletion_events_total": 1,
+        "expired_events_total": 1,
+        "horizon_us": 25000,
+        "mean_recovered_fraction": "0",
+        "mean_replenishment_time_us": null,
+        "mid_shift_events_total": 0,
+        "pending_events_total": 0,
+        "reason_codes": [
+          "LOT43_RESILIENCE_SLICE_COMPUTED",
+          "LOT43_VOLATILITY_REGIME_QUIET"
+        ],
+        "recovered_events_total": 0,
+        "replenishment_min_recovery_ratio": "0.25",
+        "resilience_status": "FRAGILE",
+        "schema_version": "book-resilience-slice-v1",
+        "side": "BID",
+        "slice_checksum": "5bafdbc68c66f2746745e1612e4cad7f4df4bba0a25e9a9936c51d0df321adc7",
+        "volatility_method": "OBSERVED_BOOK_MID_MAX_ABS_MOVE_BPS",
+        "volatility_regime": "QUIET"
+      },
+      {
+        "depletion_events_total": 0,
+        "expired_events_total": 0,
+        "horizon_us": 10000,
+        "mean_recovered_fraction": null,
+        "mean_replenishment_time_us": null,
+        "mid_shift_events_total": 0,
+        "pending_events_total": 0,
+        "reason_codes": [
+          "LOT43_RESILIENCE_SLICE_COMPUTED",
+          "LOT43_VOLATILITY_REGIME_QUIET"
+        ],
+        "recovered_events_total": 0,
+        "replenishment_min_recovery_ratio": "0.25",
+        "resilience_status": "NO_EVENTS",
+        "schema_version": "book-resilience-slice-v1",
+        "side": "ASK",
+        "slice_checksum": "0d11d1bfba50d05993aa8f3ffc76668f98401b5e1495d8deaf6d1774635f4697",
+        "volatility_method": "OBSERVED_BOOK_MID_MAX_ABS_MOVE_BPS",
+        "volatility_regime": "QUIET"
+      },
+      {
+        "depletion_events_total": 0,
+        "expired_events_total": 0,
+        "horizon_us": 25000,
+        "mean_recovered_fraction": null,
+        "mean_replenishment_time_us": null,
+        "mid_shift_events_total": 0,
+        "pending_events_total": 0,
+        "reason_codes": [
+          "LOT43_RESILIENCE_SLICE_COMPUTED",
+          "LOT43_VOLATILITY_REGIME_QUIET"
+        ],
+        "recovered_events_total": 0,
+        "replenishment_min_recovery_ratio": "0.25",
+        "resilience_status": "NO_EVENTS",
+        "schema_version": "book-resilience-slice-v1",
+        "side": "ASK",
+        "slice_checksum": "da9d007f9e026d468c670f61bce0154d1a1d4dcef6e9ba35049ff81461f2b63b",
+        "volatility_method": "OBSERVED_BOOK_MID_MAX_ABS_MOVE_BPS",
+        "volatility_regime": "QUIET"
+      }
+    ],
+    "schema_version": "book-resilience-state-v1",
+    "sequence_id": 1003,
+    "source_id": "kraken-reference-offline-fixture",
+    "venue": "KRAKEN",
+    "volatility_measure_bps": "0",
+    "volatility_method": "OBSERVED_BOOK_MID_MAX_ABS_MOVE_BPS",
+    "volatility_regime": "QUIET"
+  },
+  "decision_time": "2026-08-06T19:18:40.100000Z",
+  "event_time": "2026-08-06T19:18:40.065000Z",
+  "generated_at": "2026-08-06T19:18:40.100000Z",
+  "lineage": {
+    "available_at": "2026-08-06T19:18:40.070000Z",
+    "config_checksum": "a170aab2e8f71dd6f6420a308edd7aa22f6200a25f39ac1eacefb7ac1aa431a1",
+    "entry_gate_checksum": "4034c86061234a627dafde6122439c3b697fb2d53a1b95ba4e58f77a71089e6d",
+    "lineage_id": "lot43-reference-lineage-v1",
+    "lot38_snapshot_checksum": "0d63ca7ac1ca48b44e58c0b0f1eb8946190eaf2da6745c2bbd2dd8de14f49b16",
+    "lot39_book_checksum": "a503d56b312cbb21586712fcf929a0381cbc9adde9c5d70700e1f7166ef58dde",
+    "lot39_delta_fixture_checksum": "1e7528a350ca78e21c4832b4af0ef4763e6bbadec82ea0f55a1005502cadff97",
+    "lot42_audit_checksum": "b562b0cca61e0b10fbacf4a2318ef1075230b57388fe0240de0ca3d200582e3f",
+    "lot42_state_checksum": "6e1fe348dc9fdc262d2f27990c6f3234f0b1ed71f5bfb3347fe27a9e458af8b0",
+    "lot42_zone_set_checksum": "f5769313ec5f9f6de503b1eb9a40c31262ddf0eba6131f791c070f6557168c89",
+    "schema_version": "lot43-lineage-envelope-v1"
+  },
+  "metrics": {
+    "latency_measurement_status": "NOT_MEASURED_OFFLINE_DETERMINISTIC_REPLAY",
+    "lot_43_adjacent_price_replenishments_total": 0,
+    "lot_43_depletion_events_total": 1,
+    "lot_43_expired_max_window_events_total": 1,
+    "lot_43_mid_shift_events_total": 0,
+    "lot_43_observations_total": 3,
+    "lot_43_pending_max_window_events_total": 0,
+    "lot_43_processing_latency_us": null,
+    "lot_43_records_processed_total": 1,
+    "lot_43_same_price_replenishments_total": 0,
+    "lot_43_validation_failures_total": 0,
+    "schema_version": "lot43-metrics-v1"
+  },
+  "output_checksum": "30671ea4add13eaa23f22556ea227dc7300d69f1ea3153e0486cd4e50c7bd3f6",
+  "reason_codes": [
+    "LOT43_OFFLINE_BOOK_RESILIENCE_VALIDATED",
+    "LOT43_CANONICAL_LOT39_REPLAY_BOUND",
+    "LOT43_NO_PARTICIPANT_INTENT_AUTHORITY",
+    "LOT44_REMAINS_LOCKED"
+  ],
+  "receive_time": "2026-08-06T19:18:40.070000Z",
+  "run_context": {
+    "code_commit": "d45f40aec90b26dd1278ec2f49b405fa5b2ed94e",
+    "config_version": "lot43-book-resilience-replenishment-config-v1",
+    "correlation_id": "microstructure-v4-lot43-reference",
+    "run_id": "lot43-reference-run-v1",
+    "runtime_mode": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "schema_version": "lot43-run-context-v1"
+  },
+  "safety": {
+    "analysis_only": true,
+    "approved_size": 0,
+    "execution_allowed": false,
+    "external_connectivity_allowed": false,
+    "market_event_publication_allowed": false,
+    "network_ingestion_allowed": false,
+    "order_routing_allowed": false,
+    "participant_behavior_inference_explicitly_labeled": true,
+    "raw_data_mutation_allowed": false,
+    "real_credentials_allowed": false,
+    "risk_approval_allowed": false,
+    "scenario_score_is_signal": false,
+    "signal_generation_allowed": false,
+    "trade_allowed": false,
+    "used_for_decision": false
+  },
+  "schema_version": "book-resilience-replenishment-engine-state-v1",
+  "validation_state": "VALIDATED_OFFLINE_BOOK_RESILIENCE_REPLENISHMENT_ONLY"
+}
