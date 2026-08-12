@@ -9,19 +9,17 @@ permissions:
   contents: read
 
 jobs:
-  attest:
+  frozen-evidence:
     runs-on: ubuntu-22.04
     env:
       PYTHONPATH: src
-      SOURCE_HEAD_SHA: ad01a0ffbe3e97d8418922293d68613a88a1b148
-      EVIDENCE_HEAD_SHA: 238362d14a75063461750a1d74beffbcc1e45d79
       GATE_MERGE_SHA: ed8845e0e56151348fe57c0e9bceaf4646ea49aa
-      CERTIFIED_PR_REF: refs/pull/57/head
+      SOURCE_HEAD_SHA: db91a6700fb7b76133ad896714af6ed82da7c5da
+      EVIDENCE_HEAD_SHA: 849933f49ec0290a4852b6616f5034f807fcc318
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
@@ -30,107 +28,104 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove source evidence gate and squash-safe implementation lineage
+      - name: Prove frozen source and evidence lineage
         run: |
           set -euo pipefail
-          certified_pr_head=refs/remotes/origin/lot43-pr57-head
-          git fetch --no-tags origin "$CERTIFIED_PR_REF:$certified_pr_head"
           git merge-base --is-ancestor "$GATE_MERGE_SHA" "$SOURCE_HEAD_SHA"
-          git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA"
-          git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" "$certified_pr_head"
-          git merge-base --is-ancestor "$GATE_MERGE_SHA" HEAD
-          if git merge-base --is-ancestor "$certified_pr_head" HEAD; then
-            exit 0
-          fi
-          certified_tree="$(git rev-parse "$certified_pr_head^{tree}")"
-          matched_commit=""
-          while IFS= read -r commit; do
-            if [ "$(git rev-parse "$commit^{tree}")" = "$certified_tree" ]; then
-              matched_commit="$commit"
-              break
-            fi
-          done < <(git rev-list --first-parent HEAD)
-          test -n "$matched_commit"
-          git merge-base --is-ancestor "$GATE_MERGE_SHA" "$matched_commit"
-      - name: Prove exact semantic-hardening evidence delta and carried-forward resilience artifact
+          git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" HEAD
+          test "$(git rev-list --count "$SOURCE_HEAD_SHA..$EVIDENCE_HEAD_SHA")" = "1"
+          python - <<'PY'
+          import os
+          import subprocess
+
+          source = os.environ['SOURCE_HEAD_SHA']
+          evidence = os.environ['EVIDENCE_HEAD_SHA']
+          actual = subprocess.check_output(
+              ['git', 'diff', '--name-only', source, evidence], text=True
+          ).splitlines()
+          expected = [
+              'data/audit/book_resilience_and_replenishment_engine_audit_lot43.json',
+              'data/audit/book_resilience_and_replenishment_engine_lot43.json',
+              'data/audit/book_resilience_state_lot43.json',
+              'reports/lot43/coverage_summary.json',
+              'reports/lot43/mutation_summary.json',
+          ]
+          if sorted(actual) != sorted(expected):
+              raise SystemExit(f'LOT43_EVIDENCE_DIFF_CHANGED:{actual}')
+          PY
+      - name: Prove frozen Lot 43 production source immutability
         run: |
           set -euo pipefail
-          expected="$RUNNER_TEMP/lot43-expected-evidence-delta.txt"
-          actual="$RUNNER_TEMP/lot43-actual-evidence-delta.txt"
-          cat >"$expected" <<'EOF'
-          data/audit/book_resilience_and_replenishment_engine_audit_lot43.json
-          data/audit/book_resilience_and_replenishment_engine_lot43.json
-          reports/lot43/coverage_summary.json
-          reports/lot43/mutation_summary.json
-          EOF
-          git diff --name-only "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA" | sort >"$actual"
-          diff -u "$expected" "$actual"
-          git diff --quiet "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA" -- \
-            data/audit/book_resilience_state_lot43.json
-          for path in \
-            data/audit/book_resilience_and_replenishment_engine_audit_lot43.json \
-            data/audit/book_resilience_and_replenishment_engine_lot43.json \
-            data/audit/book_resilience_state_lot43.json \
-            reports/lot43/coverage_summary.json \
-            reports/lot43/mutation_summary.json; do
-            git cat-file -e "$EVIDENCE_HEAD_SHA:$path"
-          done
-      - name: Prove Lot 43 production source immutable after source head
-        run: |
-          set -euo pipefail
-          git diff --quiet "$SOURCE_HEAD_SHA" HEAD -- \
-            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_analysis.py \
-            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py \
-            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py \
-            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_validation.py \
+          git diff --exit-code "$SOURCE_HEAD_SHA" HEAD -- \
             config/microstructure/book_resilience_and_replenishment_engine_v1.json \
             contracts/schemas/book_resilience_state_v1.schema.json \
             contracts/schemas/book_resilience_replenishment_engine_state_v1.schema.json \
             contracts/schemas/book_resilience_replenishment_engine_audit_v1.schema.json \
+            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py \
+            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py \
+            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_validation.py \
+            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_analysis.py \
             scripts/run_lot43_book_resilience_and_replenishment_engine.py \
             scripts/validate_lot43.py \
             scripts/validate_lot43_no_connectivity.py \
             tests/test_lot43_book_resilience_and_replenishment_engine.py \
-            tests/test_lot43_edge_contracts.py \
             tests/test_lot43_fail_closed_contracts.py \
-            tests/test_lot43_mutation_contracts.py \
-            tests/test_lot43_review_regressions.py \
             tests/test_lot43_schema_contracts.py \
+            tests/test_lot43_edge_contracts.py \
+            tests/test_lot43_mutation_contracts.py \
+            tests/test_lot43_v4_entry_gate.py \
             tests/test_lot43_semantic_consistency.py \
             docs/LOT_43_BOOK_RESILIENCE_AND_REPLENISHMENT_ENGINE.md \
             docs/ACCEPTANCE_CRITERIA_LOT_43.md
-      - name: Prove frozen evidence immutable after evidence head
+      - name: Prove frozen evidence immutability after evidence head
         run: |
           set -euo pipefail
-          git diff --quiet "$EVIDENCE_HEAD_SHA" HEAD -- \
-            data/audit/book_resilience_and_replenishment_engine_audit_lot43.json \
+          git diff --exit-code "$EVIDENCE_HEAD_SHA" HEAD -- \
             data/audit/book_resilience_and_replenishment_engine_lot43.json \
+            data/audit/book_resilience_and_replenishment_engine_audit_lot43.json \
             data/audit/book_resilience_state_lot43.json \
             reports/lot43/coverage_summary.json \
             reports/lot43/mutation_summary.json
-      - name: Validate frozen Lot 43 artifacts
+      - name: Prove source and mutation workflows certify frozen source
         run: |
           set -euo pipefail
-          python -m json.tool data/audit/book_resilience_and_replenishment_engine_lot43.json >/dev/null
-          python -m json.tool data/audit/book_resilience_and_replenishment_engine_audit_lot43.json >/dev/null
-          python -m json.tool data/audit/book_resilience_state_lot43.json >/dev/null
-          python -m json.tool reports/lot43/coverage_summary.json >/dev/null
-          python -m json.tool reports/lot43/mutation_summary.json >/dev/null
+          grep -F "CANDIDATE_SHA: $SOURCE_HEAD_SHA" .github/workflows/lot43-book-resilience-replenishment.yml
+          grep -F "ref: $SOURCE_HEAD_SHA" .github/workflows/lot43-book-resilience-replenishment.yml
+          grep -F "CANDIDATE_SHA: $SOURCE_HEAD_SHA" .github/workflows/lot43-mutation-assurance.yml
+          grep -F "ref: $SOURCE_HEAD_SHA" .github/workflows/lot43-mutation-assurance.yml
+      - name: Validate exact frozen evidence
+        run: |
+          set -euo pipefail
+          python -m compileall -q scripts/validate_lot43_frozen_evidence.py
           ruff check scripts/validate_lot43_frozen_evidence.py
-          python scripts/validate_lot43_frozen_evidence.py
-      - name: Prove Lot 44 remains absent
+          python scripts/validate_lot43_frozen_evidence.py | tee /tmp/lot43-frozen-validation.json
+      - name: Replay frozen source deterministically
         run: |
           set -euo pipefail
-          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py
-          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py
-          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py
-          test ! -e config/microstructure/trades_and_aggressor_classification_schema_v1.json
-          test ! -e scripts/run_lot44_trades_and_aggressor_classification_schema.py
-          test ! -e scripts/validate_lot44.py
-          test ! -e tests/test_lot44_trades_and_aggressor_classification_schema.py
-          test ! -e docs/LOT_44_TRADES_AND_AGGRESSOR_CLASSIFICATION_SCHEMA.md
-          test ! -e docs/ACCEPTANCE_CRITERIA_LOT_44.md
-      - name: Architecture roadmap engineering security and regression
+          rm -rf /tmp/lot43-source-certified /tmp/lot43-run1
+          mkdir -p /tmp/lot43-run1
+          git worktree add --detach /tmp/lot43-source-certified "$SOURCE_HEAD_SHA"
+          trap 'git worktree remove --force /tmp/lot43-source-certified >/dev/null 2>&1 || true' EXIT
+          (
+            cd /tmp/lot43-source-certified
+            PYTHONPATH=src python scripts/run_lot43_book_resilience_and_replenishment_engine.py --code-commit "$SOURCE_HEAD_SHA"
+            PYTHONPATH=src python scripts/validate_lot43.py --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
+            PYTHONPATH=src python scripts/validate_lot43_no_connectivity.py
+            cp data/audit/book_resilience_and_replenishment_engine_lot43.json /tmp/lot43-run1/
+            cp data/audit/book_resilience_and_replenishment_engine_audit_lot43.json /tmp/lot43-run1/
+            cp data/audit/book_resilience_state_lot43.json /tmp/lot43-run1/
+            PYTHONPATH=src python scripts/run_lot43_book_resilience_and_replenishment_engine.py --code-commit "$SOURCE_HEAD_SHA"
+            PYTHONPATH=src python scripts/validate_lot43.py --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
+            cmp /tmp/lot43-run1/book_resilience_and_replenishment_engine_lot43.json data/audit/book_resilience_and_replenishment_engine_lot43.json
+            cmp /tmp/lot43-run1/book_resilience_and_replenishment_engine_audit_lot43.json data/audit/book_resilience_and_replenishment_engine_audit_lot43.json
+            cmp /tmp/lot43-run1/book_resilience_state_lot43.json data/audit/book_resilience_state_lot43.json
+            cmp data/audit/book_resilience_and_replenishment_engine_lot43.json "$GITHUB_WORKSPACE/data/audit/book_resilience_and_replenishment_engine_lot43.json"
+            cmp data/audit/book_resilience_and_replenishment_engine_audit_lot43.json "$GITHUB_WORKSPACE/data/audit/book_resilience_and_replenishment_engine_audit_lot43.json"
+            cmp data/audit/book_resilience_state_lot43.json "$GITHUB_WORKSPACE/data/audit/book_resilience_state_lot43.json"
+          )
+          git worktree remove --force /tmp/lot43-source-certified
+          trap - EXIT
+      - name: Current architecture security regression and Lot 44 lock
         run: |
           set -euo pipefail
           python scripts/validate_roadmap_documentation.py
@@ -142,6 +137,32 @@ jobs:
           python scripts/quality_inventory.py
           python scripts/validate_engineering_deviations.py
           python scripts/validate_lot43_no_connectivity.py
-          bandit -q -r scripts/validate_lot43_frozen_evidence.py -ll
+          bandit -q -r \
+            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py \
+            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py \
+            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_validation.py \
+            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_analysis.py \
+            scripts/validate_lot43.py scripts/validate_lot43_frozen_evidence.py -ll
           pip-audit -r requirements-dev.lock
           pytest -q
+          for repetition in 1 2 3; do pytest -q tests/test_lot43*.py; done
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py
+          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py
+          test ! -e config/microstructure/trades_and_aggressor_classification_schema_v1.json
+          test ! -e scripts/run_lot44_trades_and_aggressor_classification_schema.py
+          test ! -e scripts/validate_lot44.py
+          test ! -e tests/test_lot44_trades_and_aggressor_classification_schema.py
+          test ! -e docs/LOT_44_TRADES_AND_AGGRESSOR_CLASSIFICATION_SCHEMA.md
+          test ! -e docs/ACCEPTANCE_CRITERIA_LOT_44.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot43-frozen-evidence
+          path: |
+            /tmp/lot43-frozen-validation.json
+            data/audit/book_resilience_and_replenishment_engine_lot43.json
+            data/audit/book_resilience_and_replenishment_engine_audit_lot43.json
+            data/audit/book_resilience_state_lot43.json
+            reports/lot43/coverage_summary.json
+            reports/lot43/mutation_summary.json
