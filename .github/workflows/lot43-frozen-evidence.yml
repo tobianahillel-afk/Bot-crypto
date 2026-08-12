@@ -14,11 +14,11 @@ jobs:
     env:
       PYTHONPATH: src
       GATE_MERGE_SHA: ed8845e0e56151348fe57c0e9bceaf4646ea49aa
-      PRIOR_FINAL_HEAD_SHA: 23a8f4f5b4757fe2db0b8e48f435a1ed023ce2fb
-      SOURCE_HEAD_SHA: 7091abf50bd5237636da7ffcb520e05dca558173
-      CERTIFICATION_ANCHOR_SHA: 022b4a849bdf74dd69108f992c17d53810434daf
-      EVIDENCE_HEAD_SHA: c220796c832486c189e155e13e0a834a2846c2f9
-      CERTIFIED_CONTENT_HEAD_SHA: 84ef5d05149e95cd50def6f286308dc16c346d1d
+      PRIOR_FINAL_HEAD_SHA: 18c7d305fe67d0adce927d04dc778d7ce458be23
+      SOURCE_HEAD_SHA: d45f40aec90b26dd1278ec2f49b405fa5b2ed94e
+      CERTIFICATION_ANCHOR_SHA: 2b04ea3470f404a57c7a2778b3dccacd889d1fcc
+      EVIDENCE_HEAD_SHA: 76c0670d7933f29965306993ff217647def0f0d4
+      CERTIFIED_CONTENT_HEAD_SHA: fd5cbe23d22dcd34d85e97c79667d7d98d1ddaff
     steps:
       - uses: actions/checkout@v4
         with:
@@ -40,7 +40,7 @@ jobs:
           git merge-base --is-ancestor "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA"
           git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" "$CERTIFIED_CONTENT_HEAD_SHA"
           test "$(git rev-list --count "$SOURCE_HEAD_SHA..$CERTIFICATION_ANCHOR_SHA")" = "2"
-          test "$(git rev-list --count "$CERTIFICATION_ANCHOR_SHA..$EVIDENCE_HEAD_SHA")" = "4"
+          test "$(git rev-list --count "$CERTIFICATION_ANCHOR_SHA..$EVIDENCE_HEAD_SHA")" = "5"
           test "$(git rev-list --count "$EVIDENCE_HEAD_SHA..$CERTIFIED_CONTENT_HEAD_SHA")" = "1"
           python - <<'PY'
           import os
