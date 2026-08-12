@@ -139,7 +139,7 @@ def test_depletion_event_requires_utc_causal_timestamps() -> None:
         _event(depletion_event_time="not-a-time")
     with pytest.raises(Lot43ValidationError):
         _event(depletion_receive_time="2026-08-06T19:18:40.000020+00:00")
-    with pytest.raises(Lot43ValidationError, match="causal"):
+    with pytest.raises(Lot43ValidationError, match="cannot exceed"):
         _event(
             depletion_event_time="2026-08-06T19:18:40.000021Z",
             depletion_receive_time="2026-08-06T19:18:40.000020Z",
