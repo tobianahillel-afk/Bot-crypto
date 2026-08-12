@@ -15,15 +15,15 @@ from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_re
     load_json_object,
 )
 
-SOURCE_HEAD = "7193288022900d46b3f4058b9333f2a058d6ac6e"
-EVIDENCE_HEAD = "1e0b6be22488b0fd91d5ef1340bfe4625b96485b"
+SOURCE_HEAD = "8d2f99fcd7f654d18079ff8ea24f90e57cfc4086"
+EVIDENCE_HEAD = "f05abfbf42577380ef536f0f4bf7865b342d8441"
 GATE_MERGE = "ed8845e0e56151348fe57c0e9bceaf4646ea49aa"
-VALIDATION_RUN = 31546321595
-VALIDATION_ARTIFACT = 9122643224
-VALIDATION_DIGEST = "sha256:07cce00ae769659046b65409acc76950ec5204295a2b9bfc702a7436b6c1c637"
-MUTATION_RUN = 31546321668
-MUTATION_ARTIFACT = 9122707232
-MUTATION_DIGEST = "sha256:79e354aae2511f4edbb6135c30bebaf815a697fc30238ae7f3e2097fce310395"
+VALIDATION_RUN = 31587576809
+VALIDATION_ARTIFACT = 9137794604
+VALIDATION_DIGEST = "sha256:271a229b4da2ce5043f8966ed18a7908eeb477c8df3af9290259fde746796d2a"
+MUTATION_RUN = 31587576843
+MUTATION_ARTIFACT = 9137870947
+MUTATION_DIGEST = "sha256:8cd93c6019961e16c8e8cc862fdf8984cac11d1613a9d4bb156989f828f06dc0"
 
 STATE_PATH = ROOT / "data/audit/book_resilience_and_replenishment_engine_lot43.json"
 AUDIT_PATH = ROOT / "data/audit/book_resilience_and_replenishment_engine_audit_lot43.json"
@@ -31,8 +31,8 @@ RESILIENCE_PATH = ROOT / "data/audit/book_resilience_state_lot43.json"
 COVERAGE_PATH = ROOT / "reports/lot43/coverage_summary.json"
 MUTATION_PATH = ROOT / "reports/lot43/mutation_summary.json"
 
-EXPECTED_STATE = "18183ba147e4cff53a427a8d2c2f7507352b04de750f036ac2581a58a1f376b3"
-EXPECTED_AUDIT = "93db90b45a26ebb1a4db73a0819068219ea687cb4dea337806d76ca3b8647aa5"
+EXPECTED_STATE = "a32a0ed7cb563548bc29a47499e0663c6c9a24dc2952a4178d0a6a58104692be"
+EXPECTED_AUDIT = "4b7aeb4d0613dfc4f03fe162dbd7e547ffbce85893182593ca2cae570810baf0"
 EXPECTED_RESILIENCE = "ff314e1eecd40bca822b471f0239fdb8abb294375a8964a738131b71cba4b36e"
 EXPECTED_GATE = "4034c86061234a627dafde6122439c3b697fb2d53a1b95ba4e58f77a71089e6d"
 EXPECTED_CONFIG = "a170aab2e8f71dd6f6420a308edd7aa22f6200a25f39ac1eacefb7ac1aa431a1"
@@ -45,11 +45,11 @@ EXPECTED_LOT38_SNAPSHOT = "0d63ca7ac1ca48b44e58c0b0f1eb8946190eaf2da6745c2bbd2dd
 VALIDATION_STATE = "VALIDATED_OFFLINE_BOOK_RESILIENCE_REPLENISHMENT_ONLY"
 
 EXPECTED_FILE_SHA256 = {
-    STATE_PATH: "1ece07267db21d65bb79339ae5d9817fe8714bcf43de3ed1ba57e921c7790a7b",
-    AUDIT_PATH: "018ce4044f214d15e1e0d6c05f40b77b5f2a84a17494b2945e312387dae038ab",
+    STATE_PATH: "40c5a708cc650b2bd7b46714a59064c8332013b3b5eac50a3bc7ebb9ebb35e7e",
+    AUDIT_PATH: "e32c390059d7d18a880c271a8949f46ad5a4b13d486028fc708e2dfbbb07eecb",
     RESILIENCE_PATH: "b0dc74447c54ee84bb3da36a78cf3f48edb4ed54352c6837bed3823a2c898240",
-    COVERAGE_PATH: "5a5dad5f57f62cedc9120e0f2b56faa9123726ab095a49519e8e7c5253e8282d",
-    MUTATION_PATH: "171754890e1d5762a9aa94595bff05a57ac70433d2f0e35da88c4c4d9fc032e0",
+    COVERAGE_PATH: "0123ace5799648026eac0f25690d60a1d90972b750544d2a0ff51b1f16685f12",
+    MUTATION_PATH: "b13abd10a66a06c401af7af0133024cd34e37217c78af92b9ab86cbafd46fd34",
 }
 
 LOT44_FORBIDDEN = (
@@ -128,34 +128,48 @@ def verify_lineage(state: dict[str, Any], audit: dict[str, Any]) -> None:
     require(state["lineage"] == audit["lineage"], "Lot 43 state/audit lineage diverged")
 
 
-def verify_reference(resilience: dict[str, Any], state: dict[str, Any]) -> None:
+def verify_reference_header(resilience: dict[str, Any]) -> None:
     require(resilience["sequence_id"] == 1003, "reference sequence changed")
     require(resilience["history_sequence_ids"] == [1001, 1002, 1003], "reference history changed")
     require(resilience["observed_book_only"] is True, "observed-book-only changed")
     require(resilience["participant_intent_inferred"] is False, "participant intent inference enabled")
     require(resilience["volatility_measure_bps"] == "0", "reference volatility changed")
     require(resilience["volatility_regime"] == "QUIET", "reference volatility regime changed")
+
+
+def verify_reference_event(resilience: dict[str, Any]) -> None:
     events = resilience["depletion_events"]
     require(len(events) == 1, "reference depletion event count changed")
     event = events[0]
     require(event["side"] == "BID" and event["depleted_price"] == "50024.8", "reference depletion changed")
-    require(event["previous_quantity"] == "1.25" and event["post_depletion_quantity"] == "0", "reference quantities changed")
+    require(event["previous_quantity"] == "1.25", "reference previous quantity changed")
+    require(event["post_depletion_quantity"] == "0", "reference post quantity changed")
     require(event["replenishment_kind"] == "NONE", "reference replenishment changed")
     require(event["max_window_status"] == "EXPIRED_NO_REPLENISHMENT", "reference window status changed")
     require(event["participant_intent"] == "NOT_INFERRED", "reference participant intent changed")
+
+
+def verify_reference_slices(resilience: dict[str, Any]) -> None:
     bid = [item for item in resilience["resilience_slices"] if item["side"] == "BID"]
     ask = [item for item in resilience["resilience_slices"] if item["side"] == "ASK"]
     require([item["horizon_us"] for item in bid] == [10000, 25000], "BID horizons changed")
     require([item["resilience_status"] for item in bid] == ["FRAGILE", "FRAGILE"], "BID resilience changed")
     require([item["horizon_us"] for item in ask] == [10000, 25000], "ASK horizons changed")
     require([item["resilience_status"] for item in ask] == ["NO_EVENTS", "NO_EVENTS"], "ASK resilience changed")
+
+
+def verify_reference_metrics(state: dict[str, Any]) -> None:
     metrics = state["metrics"]
-    require(metrics["lot_43_observations_total"] == 3, "observation count changed")
-    require(metrics["lot_43_depletion_events_total"] == 1, "depletion count changed")
-    require(metrics["lot_43_expired_max_window_events_total"] == 1, "expiry count changed")
-    require(metrics["lot_43_same_price_replenishments_total"] == 0, "same-price count changed")
-    require(metrics["lot_43_adjacent_price_replenishments_total"] == 0, "adjacent count changed")
-    require(metrics["lot_43_mid_shift_events_total"] == 0, "mid-shift count changed")
+    expected = {
+        "lot_43_observations_total": 3,
+        "lot_43_depletion_events_total": 1,
+        "lot_43_expired_max_window_events_total": 1,
+        "lot_43_same_price_replenishments_total": 0,
+        "lot_43_adjacent_price_replenishments_total": 0,
+        "lot_43_mid_shift_events_total": 0,
+    }
+    for field, value in expected.items():
+        require(metrics[field] == value, f"reference metric changed: {field}")
 
 
 def verify_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
@@ -175,32 +189,46 @@ def verify_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     require(state["safety"] == expected_safety(), "state safety boundary changed")
     require(audit["safety"] == expected_safety(), "audit safety boundary changed")
     verify_lineage(state, audit)
-    verify_reference(resilience, state)
+    verify_reference_header(resilience)
+    verify_reference_event(resilience)
+    verify_reference_slices(resilience)
+    verify_reference_metrics(state)
     return state, audit, resilience
+
+
+def verify_coverage(coverage: dict[str, Any]) -> None:
+    require(coverage["status"] == "PASS", "coverage evidence not PASS")
+    require(coverage["source_head_sha"] == SOURCE_HEAD, "coverage source head changed")
+    require(coverage["line_coverage_percent"] == 98.86, "line coverage changed")
+    require(coverage["branch_coverage_percent"] == 98.46, "branch coverage changed")
+    require(coverage["line_coverage_percent"] >= 95.0, "line coverage below threshold")
+    require(coverage["branch_coverage_percent"] >= 90.0, "branch coverage below threshold")
+    require(coverage["anti_flake_repetitions"] == 3, "anti-flake evidence changed")
+
+
+def verify_mutation(mutation: dict[str, Any]) -> None:
+    require(mutation["status"] == "PASS", "mutation evidence not PASS")
+    require(mutation["source_head_sha"] == SOURCE_HEAD, "mutation source head changed")
+    require(mutation["mutation_score_percent"] == 82.28, "mutation score changed")
+    require(mutation["mutation_score_percent"] >= 80.0, "mutation below threshold")
+    require(mutation["killed_mutants"] == 2140, "mutation killed count changed")
+    require(mutation["survived_mutants"] == 461, "mutation survivor count changed")
+    require(mutation["evaluated_mutants"] == 2601, "mutation evaluated count changed")
+    require(mutation["completed_mutants"] == 2601, "mutation completed count changed")
+    require(mutation["total_mutants"] == 2601, "mutation total changed")
+    require(mutation["timeout_mutants"] == 0, "mutation timeout count changed")
+    require(mutation["suspicious_mutants"] == 0, "mutation suspicious count changed")
+    require(mutation["max_children"] == 1, "mutation worker policy changed")
+    require(mutation["python_hash_seed"] == "0", "mutation hash seed changed")
+    require(mutation["mutmut_run_exit_code"] == 0, "mutmut run failed")
+    require(mutation["mutmut_results_exit_code"] == 0, "mutmut results failed")
 
 
 def verify_quality() -> tuple[dict[str, Any], dict[str, Any]]:
     coverage = load_json_object(COVERAGE_PATH)
     mutation = load_json_object(MUTATION_PATH)
-    require(coverage["status"] == "PASS" and coverage["source_head_sha"] == SOURCE_HEAD, "coverage evidence changed")
-    require(coverage["line_coverage_percent"] == 98.85, "line coverage changed")
-    require(coverage["branch_coverage_percent"] == 98.46, "branch coverage changed")
-    require(coverage["line_coverage_percent"] >= 95.0, "line coverage below threshold")
-    require(coverage["branch_coverage_percent"] >= 90.0, "branch coverage below threshold")
-    require(coverage["anti_flake_repetitions"] == 3, "anti-flake evidence changed")
-    require(mutation["status"] == "PASS" and mutation["source_head_sha"] == SOURCE_HEAD, "mutation evidence changed")
-    require(mutation["mutation_score_percent"] == 82.26, "mutation score changed")
-    require(mutation["mutation_score_percent"] >= 80.0, "mutation below threshold")
-    require(mutation["killed_mutants"] == 2137, "mutation killed count changed")
-    require(mutation["survived_mutants"] == 461, "mutation survivor count changed")
-    require(mutation["evaluated_mutants"] == 2598, "mutation evaluated count changed")
-    require(mutation["completed_mutants"] == 2598, "mutation completed count changed")
-    require(mutation["total_mutants"] == 2598, "mutation total changed")
-    require(mutation["timeout_mutants"] == 0, "mutation timeout count changed")
-    require(mutation["suspicious_mutants"] == 0, "mutation suspicious count changed")
-    require(mutation["max_children"] == 1 and mutation["python_hash_seed"] == "0", "mutation determinism policy changed")
-    require(mutation["mutmut_run_exit_code"] == 0, "mutmut run failed")
-    require(mutation["mutmut_results_exit_code"] == 0, "mutmut results failed")
+    verify_coverage(coverage)
+    verify_mutation(mutation)
     return coverage, mutation
 
 
