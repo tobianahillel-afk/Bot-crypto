@@ -61,6 +61,7 @@ def test_exact_gate_passes() -> None:
     assert result["output_checksum"] == EXPECTED_GATE_CHECKSUM
     assert result["target_lot"] == 44
     assert result["next_locked_lot"] == 45
+    assert result["future_locked_lot"] == 46
     assert result["trade_allowed"] is False
     assert result["execution_allowed"] is False
     assert result["approved_size"] == 0
@@ -79,12 +80,15 @@ def test_checksum_is_canonical_and_tamper_evident() -> None:
 def test_canonical_roadmap_rows_are_exact() -> None:
     lot44 = roadmap_record(45)
     lot45 = roadmap_record(46)
+    lot46 = roadmap_record(47)
     assert lot44["title"] == "Trades & Aggressor Classification Schema"
     assert lot44["status"] == "PLANNED_LOCKED"
     assert set(lot44["input_contracts"]) == EXPECTED_INPUTS
     assert set(lot44["output_contracts"]) == EXPECTED_OUTPUTS
     assert lot45["title"] == "Order Flow, Delta & CVD Engine"
     assert lot45["status"] == "PLANNED_LOCKED"
+    assert lot46["title"] == "Trade Classification Confidence Engine"
+    assert lot46["status"] == "PLANNED_LOCKED"
 
 
 def test_schema_is_closed_and_safety_locked() -> None:
@@ -113,6 +117,14 @@ def test_scope_distinguishes_lot44_confidence_state_from_lot46_engine() -> None:
 def test_lot45_implementation_remains_absent() -> None:
     for path in gate_validator.LOT45_FORBIDDEN_IMPLEMENTATION_PATHS:
         assert not path.exists()
+
+
+def test_lot46_implementation_remains_absent_from_canonical_roadmap() -> None:
+    lot46 = roadmap_record(47)
+    implementation_files = lot46["implementation_files"]
+    assert len(implementation_files) == 9
+    for relative in implementation_files:
+        assert not (ROOT / relative).exists()
 
 
 @pytest.mark.parametrize(
