@@ -411,6 +411,21 @@ class BookResilienceSliceV1:
         }
 
 
+def _validate_slice_event_totals(
+    events: tuple[BookDepletionEventV1, ...],
+    slices: tuple[BookResilienceSliceV1, ...],
+) -> None:
+    event_totals = {
+        side: sum(event.side == side for event in events)
+        for side in ("BID", "ASK")
+    }
+    for resilience_slice in slices:
+        if resilience_slice.depletion_events_total != event_totals[resilience_slice.side]:
+            raise Lot43ValidationError(
+                "resilience slice depletion total must match published events"
+            )
+
+
 @dataclass(frozen=True, slots=True)
 class BookResilienceStateV1:
     source_id: str
@@ -449,6 +464,7 @@ class BookResilienceStateV1:
         horizons = tuple(sorted({item.horizon_us for item in self.resilience_slices}))
         if horizons:
             validate_horizons(horizons)
+        _validate_slice_event_totals(self.depletion_events, self.resilience_slices)
         validate_reason_codes(self.reason_codes)
         require_sha256(self.resilience_checksum, "resilience_checksum")
 
@@ -543,6 +559,35 @@ class Lot43MetricsV1:
         }
 
 
+def _validate_metrics_against_resilience(
+    metrics: Lot43MetricsV1,
+    resilience: BookResilienceStateV1,
+) -> None:
+    events = resilience.depletion_events
+    expected = (
+        len(resilience.history_sequence_ids),
+        len(events),
+        sum(event.replenishment_kind == "SAME_PRICE" for event in events),
+        sum(event.replenishment_kind == "ADJACENT_PRICE" for event in events),
+        sum(event.replenishment_kind == "MID_SHIFT" for event in events),
+        sum(event.max_window_status == "EXPIRED_NO_REPLENISHMENT" for event in events),
+        sum(event.max_window_status == "PENDING_WINDOW" for event in events),
+    )
+    actual = (
+        metrics.observations_total,
+        metrics.depletion_events_total,
+        metrics.same_price_replenishments_total,
+        metrics.adjacent_price_replenishments_total,
+        metrics.mid_shift_events_total,
+        metrics.expired_max_window_events_total,
+        metrics.pending_max_window_events_total,
+    )
+    if actual != expected:
+        raise Lot43ValidationError(
+            "Lot 43 metrics must match embedded resilience state"
+        )
+
+
 @dataclass(frozen=True, slots=True)
 class BookResilienceReplenishmentEngineStateV1:
     run_context: Lot43RunContextV1
@@ -556,6 +601,7 @@ class BookResilienceReplenishmentEngineStateV1:
 
     def __post_init__(self) -> None:
         require_text(self.generated_at, "generated_at")
+        _validate_metrics_against_resilience(self.metrics, self.book_resilience)
         validate_reason_codes(self.reason_codes)
         validate_lot43_safety(self.safety)
         require_sha256(self.output_checksum, "output_checksum")

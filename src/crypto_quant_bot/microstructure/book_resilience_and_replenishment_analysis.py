@@ -113,6 +113,7 @@ def _validate_observation_history(
     if any(_identity(item) != identity for item in observations[1:]):
         raise Lot43ValidationError("Lot 43 observation identity changed")
     for observation in observations:
+        age_us(observation.event_time, observation.receive_time)
         age_us(observation.receive_time, decision_time)
     for previous, current in pairwise(observations):
         if elapsed_us(previous.receive_time, current.receive_time) <= 0:

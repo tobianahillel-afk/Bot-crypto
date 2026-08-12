@@ -1,10 +1,15 @@
+from dataclasses import replace
 from decimal import Decimal, localcontext
+from pathlib import Path
 
 import pytest
 
 from crypto_quant_bot.microstructure.book_resilience_and_replenishment_analysis import (
     BookResiliencePolicy,
     analyze_book_resilience,
+)
+from crypto_quant_bot.microstructure.book_resilience_and_replenishment_engine import (
+    build_lot43_artifacts,
 )
 from crypto_quant_bot.microstructure.book_resilience_and_replenishment_engine_models import (
     BookDepletionEventV1,
@@ -21,6 +26,9 @@ from crypto_quant_bot.microstructure.liquidity_zones_walls_and_voids_analysis im
 from crypto_quant_bot.microstructure.order_book_l2_snapshot_engine_models import (
     OrderBookLevelV1,
 )
+
+ROOT = Path(__file__).resolve().parents[1]
+CODE_COMMIT = "c" * 40
 
 
 def _policy(*, adjacent_bps: Decimal, mid_shift_bps: Decimal) -> BookResiliencePolicy:
@@ -236,3 +244,67 @@ def test_mid_shift_caller_evaluates_book_midpoints_at_certified_precision() -> N
     event = next(item for item in result.depletion_events if item.depleted_price == Decimal(depleted_price))
     assert event.replenishment_kind == "MID_SHIFT"
     assert event.directional_mid_shift_bps == exact_shift
+
+
+@pytest.mark.parametrize(
+    "event_time",
+    ("not-a-time", "2026-08-06T19:18:40.060000Z"),
+)
+def test_analysis_rejects_invalid_or_post_receive_event_time(event_time: str) -> None:
+    observations = (
+        BookObservation(
+            "source",
+            "OFFLINE",
+            "TEST-SPOT",
+            "SPOT",
+            1,
+            event_time,
+            "2026-08-06T19:18:40.050000Z",
+            (OrderBookLevelV1(Decimal("100"), Decimal("3")),),
+            (OrderBookLevelV1(Decimal("102"), Decimal("1")),),
+        ),
+        _observation(2, "2026-08-06T19:18:40.070000Z", "2"),
+    )
+    with pytest.raises(Lot43ValidationError):
+        analyze_book_resilience(
+            observations,
+            _reference_policy(),
+            "2026-08-06T19:18:40.100000Z",
+        )
+
+
+def test_resilience_state_rejects_slice_totals_that_disagree_with_events() -> None:
+    state, _, _ = build_lot43_artifacts(ROOT, CODE_COMMIT)
+    resilience = state.book_resilience
+    first_slice = resilience.resilience_slices[0]
+    inconsistent_slice = replace(
+        first_slice,
+        depletion_events_total=0,
+        recovered_events_total=0,
+        mid_shift_events_total=0,
+        expired_events_total=0,
+        pending_events_total=0,
+        mean_recovered_fraction=None,
+        mean_replenishment_time_us=None,
+        resilience_status="NO_EVENTS",
+    )
+    with pytest.raises(Lot43ValidationError, match="slice depletion total"):
+        replace(
+            resilience,
+            resilience_slices=(inconsistent_slice, *resilience.resilience_slices[1:]),
+        )
+
+
+def test_engine_state_rejects_metrics_that_disagree_with_resilience() -> None:
+    state, _, _ = build_lot43_artifacts(ROOT, CODE_COMMIT)
+    inconsistent_metrics = replace(
+        state.metrics,
+        depletion_events_total=0,
+        same_price_replenishments_total=0,
+        adjacent_price_replenishments_total=0,
+        mid_shift_events_total=0,
+        expired_max_window_events_total=0,
+        pending_max_window_events_total=0,
+    )
+    with pytest.raises(Lot43ValidationError, match="metrics must match embedded resilience state"):
+        replace(state, metrics=inconsistent_metrics)
