@@ -252,6 +252,42 @@ def _validate_replenishment_time_mean(
         raise Lot43ValidationError("recovered events require mean replenishment time")
 
 
+def _expected_resilience_status(
+    events: int,
+    recovered: int,
+    shifted: int,
+    expired: int,
+    pending: int,
+) -> str:
+    if events == 0:
+        return "NO_EVENTS"
+    if recovered == events:
+        return "RESILIENT"
+    if expired == events:
+        return "FRAGILE"
+    if shifted == events:
+        return "SHIFTED"
+    if pending == events:
+        return "PENDING"
+    return "PARTIAL"
+
+
+def _validate_resilience_status_consistency(
+    events: int,
+    recovered: int,
+    shifted: int,
+    expired: int,
+    pending: int,
+    status: str,
+) -> None:
+    validate_resilience_status(status)
+    expected = _expected_resilience_status(events, recovered, shifted, expired, pending)
+    if status != expected:
+        raise Lot43ValidationError(
+            f"resilience status/count mismatch: expected {expected}, got {status}"
+        )
+
+
 @dataclass(frozen=True, slots=True)
 class BookResilienceSliceV1:
     side: str
@@ -290,7 +326,14 @@ class BookResilienceSliceV1:
             self.recovered_events_total,
             self.mean_replenishment_time_us,
         )
-        validate_resilience_status(self.resilience_status)
+        _validate_resilience_status_consistency(
+            self.depletion_events_total,
+            self.recovered_events_total,
+            self.mid_shift_events_total,
+            self.expired_events_total,
+            self.pending_events_total,
+            self.resilience_status,
+        )
         validate_reason_codes(self.reason_codes)
         require_sha256(self.slice_checksum, "slice_checksum")
 

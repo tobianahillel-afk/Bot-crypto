@@ -112,7 +112,57 @@
         "participant_intent": {"const": "NOT_INFERRED"},
         "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
         "event_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {"replenishment_kind": {"const": "NONE"}},
+            "required": ["replenishment_kind"]
+          },
+          "then": {
+            "properties": {
+              "replenishment_sequence_id": {"type": "null"},
+              "replenishment_time_us": {"type": "null"},
+              "replenished_quantity": {"const": "0"},
+              "recovered_fraction": {"const": "0"},
+              "directional_mid_shift_bps": {"const": "0"},
+              "max_window_status": {"enum": ["EXPIRED_NO_REPLENISHMENT", "PENDING_WINDOW"]}
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {"replenishment_kind": {"enum": ["SAME_PRICE", "ADJACENT_PRICE"]}},
+            "required": ["replenishment_kind"]
+          },
+          "then": {
+            "properties": {
+              "replenishment_sequence_id": {"type": "integer", "minimum": 1},
+              "replenishment_time_us": {"type": "integer", "minimum": 1},
+              "replenished_quantity": {"type": "string", "pattern": "^(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)$"},
+              "recovered_fraction": {"type": "string", "pattern": "^(?:0\\.[0-9]*[1-9][0-9]*|1(?:\\.0+)?)$"},
+              "directional_mid_shift_bps": {"const": "0"},
+              "max_window_status": {"const": "REPLENISHED"}
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {"replenishment_kind": {"const": "MID_SHIFT"}},
+            "required": ["replenishment_kind"]
+          },
+          "then": {
+            "properties": {
+              "replenishment_sequence_id": {"type": "integer", "minimum": 1},
+              "replenishment_time_us": {"type": "integer", "minimum": 1},
+              "replenished_quantity": {"const": "0"},
+              "recovered_fraction": {"const": "0"},
+              "directional_mid_shift_bps": {"type": "string", "pattern": "^(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)$"},
+              "max_window_status": {"const": "MID_SHIFTED"}
+            }
+          }
+        }
+      ]
     },
     "resilienceSlice": {
       "type": "object",
