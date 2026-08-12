@@ -44,9 +44,11 @@ Future Lot 44 implementation must meet at least:
 
 ## Governance proof
 
-The gate transition is governance-only and limited to 10 paths: seven Lot 44 gate artifacts plus three Lot 43 workflow-archival/path-scope changes. Lot 44 implementation paths must be absent in the certified gate state. Lot 45 implementation paths remain absent and `PLANNED_LOCKED`.
+The gate transition is governance-only and limited to **18 paths**: seven Lot 44 gate artifacts plus eleven historical workflow-archival/path-scope changes across Lots 40–43. Lot 44 implementation paths must be absent in the certified gate state. Lot 45 implementation paths remain absent and `PLANNED_LOCKED`.
 
-Historical Lot 43 workflows are transitioned to archival/path-scoped behavior so the already-closed Lot 43 cannot accidentally veto the Lot 44 implementation that this gate later authorizes.
+The eleven archived predecessor workflows are Lot 40 frozen/post-merge, Lot 41 source/frozen/post-merge, Lot 42 source/frozen/post-merge, and Lot 43 entry-gate/frozen/post-merge. Their historical proof logic remains intact; path scoping prevents already-closed lots from imposing current-head `Lot 44 absent` assertions on the future authorized Lot 44 implementation.
+
+`tests/test_lot43_v4_entry_gate.py` already isolates its historical gate by monkeypatching `LOT44_FORBIDDEN_IMPLEMENTATION_PATHS=()`, so the repository-wide test suite does not use that historical test to veto a later Lot 44 implementation.
 
 Gate checksum:
 
@@ -58,4 +60,4 @@ Gate checksum:
 
 ## Final decision
 
-**`GO_LOT44_IMPLEMENTATION_ENTRY`** if and only if the checksum, canonical roadmap binding, Lot 43 post-merge evidence, physical absence checks, schema, docs, tests, architecture/security/full-regression gates and downstream Lot 45 lock all pass.
+**`GO_LOT44_IMPLEMENTATION_ENTRY`** if and only if the checksum, canonical roadmap binding, Lot 43 post-merge evidence, exact 18-path governance transition, physical absence checks, schema, docs, tests, architecture/security/full-regression gates and downstream Lot 45 lock all pass.
