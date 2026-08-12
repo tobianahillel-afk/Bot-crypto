@@ -76,7 +76,7 @@ The slice is self-descriptive: direct model validation can reproduce the same `R
 
 ### `BookResilienceStateV1`
 
-The published Lot 43 analytical state containing identity/time/sequence information, reconstructed history IDs, the local observed-book volatility measurement, all depletion events and all resilience slices.
+The published Lot 43 analytical state containing identity/time/sequence information, reconstructed history IDs, the exact configured `resilience_horizons_us` set, the local observed-book volatility measurement, all depletion events and all resilience slices. Direct construction must contain exactly one `BID` and one `ASK` slice for every declared horizon; omitting both sides for a configured horizon is invalid and fails closed.
 
 ### Engine state/audit
 
@@ -163,6 +163,12 @@ Elapsed time is based on certified `receive_time`, not wall-clock time:
 
 It must be strictly positive. If no qualifying recovery or mid shift is observed, the value is `null`, never zero. A replenishment observation must also have `replenishment_sequence_id > depletion_sequence_id`.
 
+For any published recovery or mid-shift evidence:
+
+`replenishment_time_us <= decision_time - depletion_receive_time`
+
+Evidence whose implied receive time is after the injected `decision_time` is future evidence and fails closed, even if its elapsed time would otherwise fit a configured resilience horizon.
+
 ### 6.6 Maximum-window status
 
 Let `H_max` be the largest configured resilience horizon and `decision_time` the injected deterministic decision time.
@@ -183,7 +189,7 @@ For each configured horizon `H` and depletion event:
 - otherwise, if age at decision `>=H` -> expired;
 - otherwise -> pending.
 
-This is evaluated independently per horizon. Horizons are never voted together.
+This is evaluated independently per horizon. Horizons are never voted together. The state publishes the authoritative configured horizon tuple as `resilience_horizons_us`, and the slice matrix must be exactly `BID/ASK × resilience_horizons_us`.
 
 ### 6.8 Recovered fraction
 
@@ -266,6 +272,7 @@ No future certified observation exists after seq1003. With horizons `10,000us` a
 Expected reference result:
 
 - observations: `3`;
+- declared resilience horizons: `[10,000us, 25,000us]`;
 - depletion events: `1`;
 - same-price replenishments: `0`;
 - adjacent-price replenishments: `0`;
@@ -289,10 +296,12 @@ Fail closed on:
 - non-increasing sequence history;
 - malformed, non-UTC or non-causal timestamps;
 - invalid decimal text, non-finite values or negative quantities;
-- duplicate/unsorted horizons;
+- duplicate/unsorted/empty declared horizons;
+- incomplete or duplicate `BID/ASK × resilience_horizons_us` slice matrix;
 - invalid ratio/threshold domains;
 - ambiguous identity changes;
 - replenishment timestamp before/at depletion;
+- replenishment evidence whose implied receive time exceeds `decision_time`;
 - replenishment sequence not strictly greater than depletion sequence;
 - Lot 44 implementation presence.
 
