@@ -10,7 +10,8 @@ Target: **Lot 44 — Trades & Aggressor Classification Schema**
 Owner: `MicrostructureDomain`  
 Runtime: `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY`  
 Implementation started: `false`  
-Next lot: **Lot 45 — Order Flow, Delta & CVD Engine** — `PLANNED_LOCKED`
+Next lot: **Lot 45 — Order Flow, Delta & CVD Engine** — `PLANNED_LOCKED`  
+Future confidence-engine lot: **Lot 46 — Trade Classification Confidence Engine** — `PLANNED_LOCKED`
 
 ## Lot 43 prerequisite
 
@@ -33,6 +34,8 @@ The gate permits quote-test-first aggressor classification, policy-controlled ti
 
 It explicitly forbids Order Flow/Delta/CVD, the Lot 46 Trade Classification Confidence Engine, hidden-liquidity/absorption, future quote backfill, unknown-volume suppression, participant intent as fact, signal/risk/routing/trading/execution, network/live/credential capability.
 
+The Lot 46 prohibition is fail-closed in the working tree: immutable roadmap line 47 must remain `PLANNED_LOCKED`, must publish exactly its canonical 9 `implementation_files`, and every one of those paths must remain physically absent in both gate validation and CI. This keeps descriptive `AggressorConfidenceStateV1` in Lot 44 distinct from the future Lot 46 confidence engine.
+
 ## Quality gate
 
 Future Lot 44 implementation must meet at least:
@@ -44,9 +47,11 @@ Future Lot 44 implementation must meet at least:
 
 ## Governance proof
 
-The gate transition is governance-only and limited to **18 paths**: seven Lot 44 gate artifacts plus eleven historical workflow-archival/path-scope changes across Lots 40–43. Lot 44 implementation paths must be absent in the certified gate state. Lot 45 implementation paths remain absent and `PLANNED_LOCKED`.
+The gate transition is governance-only and limited to **18 paths**: seven Lot 44 gate artifacts plus eleven historical workflow-archival/path-scope changes across Lots 40–43. Lot 44 implementation paths must be absent in the certified gate state. Lot 45 and canonical Lot 46 implementation paths remain absent and `PLANNED_LOCKED`.
 
 The eleven archived predecessor workflows are Lot 40 frozen/post-merge, Lot 41 source/frozen/post-merge, Lot 42 source/frozen/post-merge, and Lot 43 entry-gate/frozen/post-merge. Their historical proof logic remains intact; path scoping prevents already-closed lots from imposing current-head `Lot 44 absent` assertions on the future authorized Lot 44 implementation.
+
+The Lot 41 post-merge audit path filter includes `reports/lot_41_spread_depth_and_imbalance_engine_report.md`, exactly matching the root-level report protected by its historical immutability diff. This prevents that frozen report from drifting without triggering its audit workflow.
 
 `tests/test_lot43_v4_entry_gate.py` already isolates its historical gate by monkeypatching `LOT44_FORBIDDEN_IMPLEMENTATION_PATHS=()`, so the repository-wide test suite does not use that historical test to veto a later Lot 44 implementation.
 
@@ -60,4 +65,4 @@ Gate checksum:
 
 ## Final decision
 
-**`GO_LOT44_IMPLEMENTATION_ENTRY`** if and only if the checksum, canonical roadmap binding, Lot 43 post-merge evidence, exact 18-path governance transition, physical absence checks, schema, docs, tests, architecture/security/full-regression gates and downstream Lot 45 lock all pass.
+**`GO_LOT44_IMPLEMENTATION_ENTRY`** if and only if the checksum, canonical roadmap binding, Lot 43 post-merge evidence, exact 18-path governance transition, physical Lot 44/Lot 45/Lot 46 absence checks, schema, docs, tests, architecture/security/full-regression gates and downstream locks all pass.
