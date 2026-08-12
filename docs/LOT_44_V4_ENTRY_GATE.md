@@ -6,7 +6,7 @@
 
 This governance gate authorizes a future implementation PR for **Lot 44 — Trades & Aggressor Classification Schema** after the merged Lot 43 post-merge audit `7a207a16e7aa543f9f7c241828f8ea5ae9ed0407`.
 
-The current release is `0.43.0`. The transition is governance-only: the seven Lot 44 gate artifacts plus three Lot 43 workflow-archival changes. `implementation_started=false`. No Lot 44 business implementation file is created by this gate.
+The current release is `0.43.0`. The transition is governance-only: the seven Lot 44 gate artifacts plus eleven historical workflow-archival changes across Lots 40–43. `implementation_started=false`. No Lot 44 business implementation file is created by this gate.
 
 ## Canonical roadmap binding
 
@@ -112,7 +112,16 @@ approved_size=0
 
 ## Governance-only proof
 
-Before gate merge, all Lot 44 implementation paths and all Lot 45 implementation paths must be physically absent. The exact governance transition is 10 paths: seven new Lot 44 gate artifacts plus path-scoping of the Lot 43 entry-gate, frozen-evidence and post-merge-audit workflows. This preserves Lot 43 evidence while preventing a closed historical gate from vetoing the later Lot 44 implementation it has authorized.
+Before gate merge, all Lot 44 implementation paths and all Lot 45 implementation paths must be physically absent. The exact governance transition is **18 paths**: seven new Lot 44 gate artifacts plus eleven workflow-archival/path-scope changes across Lots 40–43.
+
+The eleven archived workflows are:
+
+- Lot 40 frozen evidence and post-merge audit;
+- Lot 41 source validation, frozen evidence and post-merge audit;
+- Lot 42 source validation, frozen evidence and post-merge audit;
+- Lot 43 entry gate, frozen evidence and post-merge audit.
+
+These workflows keep their historical certification logic. Path scoping only prevents closed predecessor lots from executing current-head `Lot 44 absent` assertions on the future Lot 44 implementation that this gate authorizes. Lot 43 source validation itself remains safe because it checks out the frozen Lot 43 source rather than the future current head.
 
 Canonical gate checksum:
 
