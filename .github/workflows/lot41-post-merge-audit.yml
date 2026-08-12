@@ -14,6 +14,7 @@ on:
       - 'docs/*LOT_41*'
       - 'data/audit/*lot41.json'
       - 'reports/lot41/**'
+      - 'reports/lot_41_spread_depth_and_imbalance_engine_report.md'
   workflow_dispatch:
 
 permissions:
