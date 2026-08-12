@@ -84,6 +84,15 @@ jobs:
             test ! -e scripts/validate_lot44.py
             test ! -e src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py
             test ! -e scripts/run_lot45_order_flow_delta_and_cvd_engine.py
+            test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine.py
+            test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine_models.py
+            test ! -e scripts/run_lot46_trade_classification_confidence_engine.py
+            test ! -e scripts/validate_lot46.py
+            test ! -e tests/test_lot46_trade_classification_confidence_engine.py
+            test ! -e data/audit/trade_classification_confidence_engine_lot46.json
+            test ! -e reports/lot_46_trade_classification_confidence_engine_report.md
+            test ! -e docs/LOT_46_TRADE_CLASSIFICATION_CONFIDENCE_ENGINE.md
+            test ! -e docs/ACCEPTANCE_CRITERIA_LOT_46.md
           )
           git worktree remove --force /tmp/lot44-gate-certified
           trap - EXIT
@@ -127,7 +136,7 @@ jobs:
           pip-audit -r requirements-dev.lock
           pytest -q
           for repetition in 1 2 3; do pytest -q tests/test_lot44_v4_entry_gate.py; done
-      - name: Re-prove downstream Lot 45 lock
+      - name: Re-prove downstream Lot 45 and Lot 46 locks
         run: |
           set -euo pipefail
           test ! -e src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py
@@ -138,3 +147,12 @@ jobs:
           test ! -e tests/test_lot45_order_flow_delta_and_cvd_engine.py
           test ! -e docs/LOT_45_ORDER_FLOW_DELTA_AND_CVD_ENGINE.md
           test ! -e docs/ACCEPTANCE_CRITERIA_LOT_45.md
+          test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine.py
+          test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine_models.py
+          test ! -e scripts/run_lot46_trade_classification_confidence_engine.py
+          test ! -e scripts/validate_lot46.py
+          test ! -e tests/test_lot46_trade_classification_confidence_engine.py
+          test ! -e data/audit/trade_classification_confidence_engine_lot46.json
+          test ! -e reports/lot_46_trade_classification_confidence_engine_report.md
+          test ! -e docs/LOT_46_TRADE_CLASSIFICATION_CONFIDENCE_ENGINE.md
+          test ! -e docs/ACCEPTANCE_CRITERIA_LOT_46.md
