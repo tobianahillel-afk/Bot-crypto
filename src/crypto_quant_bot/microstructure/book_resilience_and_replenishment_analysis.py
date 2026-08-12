@@ -92,7 +92,7 @@ def analyze_book_resilience(
     policy: BookResiliencePolicy,
     decision_time: str,
 ) -> BookResilienceAnalysisResult:
-    _validate_observation_history(observations)
+    _validate_observation_history(observations, decision_time)
     measure = _volatility_measure(observations, policy.decimal_precision)
     regime = _volatility_regime(measure, policy)
     events = _detect_depletions(observations, policy, decision_time)
@@ -100,7 +100,10 @@ def analyze_book_resilience(
     return BookResilienceAnalysisResult(observations, measure, regime, events, slices)
 
 
-def _validate_observation_history(observations: tuple[BookObservation, ...]) -> None:
+def _validate_observation_history(
+    observations: tuple[BookObservation, ...],
+    decision_time: str,
+) -> None:
     if len(observations) < 2:
         raise Lot43ValidationError("Lot 43 requires at least two certified observations")
     sequences = tuple(item.sequence_id for item in observations)
@@ -109,6 +112,8 @@ def _validate_observation_history(observations: tuple[BookObservation, ...]) -> 
     identity = _identity(observations[0])
     if any(_identity(item) != identity for item in observations[1:]):
         raise Lot43ValidationError("Lot 43 observation identity changed")
+    for observation in observations:
+        age_us(observation.receive_time, decision_time)
     for previous, current in pairwise(observations):
         if elapsed_us(previous.receive_time, current.receive_time) <= 0:
             raise Lot43ValidationError("Lot 43 receive times must strictly increase")
@@ -486,6 +491,7 @@ def _build_slice(
         status,
         ("LOT43_RESILIENCE_SLICE_COMPUTED", f"LOT43_VOLATILITY_REGIME_{regime}"),
         ZERO_SHA256,
+        replenishment_min_recovery_ratio=policy.replenishment_min_recovery_ratio,
     )
     return replace(
         resilience_slice,
