@@ -201,7 +201,7 @@
     "real_credentials_allowed": false,
     "risk_approval_allowed": false,
     "scenario_score_is_signal": false,
-    "signal_generation_alowed": false,
+    "signal_generation_allowed": false,
     "trade_allowed": false,
     "used_for_decision": false
   },
