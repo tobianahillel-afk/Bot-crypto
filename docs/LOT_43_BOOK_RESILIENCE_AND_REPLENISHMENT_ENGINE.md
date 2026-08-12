@@ -35,7 +35,7 @@ Lot 43 binds to:
 - frozen Lot 39 reconstructed book and delta fixture;
 - deterministic decision time from versioned Lot 43 config.
 
-The observation history is reconstructed through the already-certified Lot 39/Lot 42 path. No external ingestion is introduced.
+The observation history is reconstructed through the already-certified Lot 39/Lot 42 path. No external ingestion is introduced. Every certified observation used by Lot 43 must have `receive_time <= decision_time`; observations newer than the injected decision boundary fail closed before volatility or outcome computation.
 
 ## 5. Output contracts
 
@@ -55,6 +55,8 @@ A deterministic observed depletion record containing:
 - explicit participant intent `NOT_INFERRED`;
 - reason codes and checksum.
 
+Depletion timestamps are UTC `Z` timestamps with `depletion_event_time <= depletion_receive_time`. When a replenishment sequence exists, it must be strictly greater than the depletion sequence.
+
 ### `BookResilienceSliceV1`
 
 A side/horizon/volatility-bucket aggregation containing:
@@ -64,10 +66,13 @@ A side/horizon/volatility-bucket aggregation containing:
 - volatility bucket and method;
 - depletion event count;
 - recovered, mid-shifted, expired and pending counts;
+- versioned `replenishment_min_recovery_ratio` used to derive the descriptive status;
 - mean recovered fraction or `null` when there are no events;
 - mean observed replenishment time in microseconds or `null` when no quantity recovery exists;
 - descriptive resilience status;
 - reason codes and checksum.
+
+The slice is self-descriptive: direct model validation can reproduce the same `RESILIENT` threshold decision as the analysis without hardcoding a policy value.
 
 ### `BookResilienceStateV1`
 
@@ -156,7 +161,7 @@ Elapsed time is based on certified `receive_time`, not wall-clock time:
 
 `replenishment_time_us = receive_time_replenishment - receive_time_depletion`
 
-It must be strictly positive. If no qualifying recovery or mid shift is observed, the value is `null`, never zero.
+It must be strictly positive. If no qualifying recovery or mid shift is observed, the value is `null`, never zero. A replenishment observation must also have `replenishment_sequence_id > depletion_sequence_id`.
 
 ### 6.6 Maximum-window status
 
@@ -197,13 +202,14 @@ For each `side x horizon`:
 - `mid_shift_events_total` = qualifying structural shifts within horizon;
 - `expired_events_total` = closed horizons without qualifying outcome;
 - `pending_events_total` = horizons not yet closed;
+- `replenishment_min_recovery_ratio` = strictly positive versioned threshold used by this slice;
 - `mean_recovered_fraction` = arithmetic mean over all depletion events, counting non-recovered events as `0`; `null` if no depletion events exist;
 - `mean_replenishment_time_us` = arithmetic mean over quantity-recovered events only; `null` if no quantity recovery exists.
 
 Descriptive `resilience_status` is deterministic:
 
 - no depletion events -> `NO_EVENTS`;
-- all events quantity-recovered and mean recovered fraction >= configured minimum -> `RESILIENT`;
+- all events quantity-recovered and mean recovered fraction >= the slice's versioned `replenishment_min_recovery_ratio` -> `RESILIENT`;
 - all events expired with no recovery/shift -> `FRAGILE`;
 - all resolved outcomes are mid shifts with no quantity recovery and no pending event -> `SHIFTED`;
 - pending events with no resolved event -> `PENDING`;
@@ -278,14 +284,16 @@ Fail closed on:
 - checksum drift;
 - non-healthy/unlinked Lot 42 predecessor evidence;
 - stale input beyond configured age;
+- any observation with `receive_time > decision_time`;
 - non-bilateral/crossed observations;
 - non-increasing sequence history;
-- non-causal timestamps;
+- malformed, non-UTC or non-causal timestamps;
 - invalid decimal text, non-finite values or negative quantities;
 - duplicate/unsorted horizons;
 - invalid ratio/threshold domains;
 - ambiguous identity changes;
 - replenishment timestamp before/at depletion;
+- replenishment sequence not strictly greater than depletion sequence;
 - Lot 44 implementation presence.
 
 No error path converts missing data into successful replenishment.
