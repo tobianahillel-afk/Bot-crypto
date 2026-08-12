@@ -51,7 +51,7 @@ jobs:
               gate_commit="$candidate"
               break
             fi
-          done < <(git rev-list --first-parent --reverse "$BASE_COMMIT_SHA..HEAD")
+          done < <(git rev-list --first-parent "$BASE_COMMIT_SHA..HEAD")
           test -n "$gate_commit"
           echo "$gate_commit" | tee /tmp/lot44-gate-commit.txt
           while read -r path; do
@@ -95,7 +95,8 @@ jobs:
           trap 'git worktree remove --force /tmp/lot43-post-merge-base >/dev/null 2>&1 || true' EXIT
           (
             cd /tmp/lot43-post-merge-base
-            PYTHONPATH=src python scripts/validate_lot43_post_merge.py               | tee /tmp/lot43-post-merge-for-lot44.json
+            PYTHONPATH=src python scripts/validate_lot43_post_merge.py \
+              | tee /tmp/lot43-post-merge-for-lot44.json
           )
           grep -F '"verdict": "GO_LOT43_POST_MERGE"' /tmp/lot43-post-merge-for-lot44.json
           git worktree remove --force /tmp/lot43-post-merge-base
