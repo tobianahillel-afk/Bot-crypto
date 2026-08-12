@@ -14,11 +14,11 @@ jobs:
     env:
       PYTHONPATH: src
       GATE_MERGE_SHA: ed8845e0e56151348fe57c0e9bceaf4646ea49aa
-      SOURCE_HEAD_SHA: dccea5dcd03414064ead4e6979d53df98dfdda6f
-      CERTIFICATION_ANCHOR_SHA: f9ea774f9f59b4fc7af55dcb911e085797c42a34
-      FAILED_EVIDENCE_HEAD_SHA: c58321c9817117623adcff9949348b4b4624d483
-      FAILED_GOVERNANCE_HEAD_SHA: 96f48b95e0eee5657346073a7c71009689848f98
-      EVIDENCE_HEAD_SHA: 8d44c66f21447117a988ff0d555ff9407af1a25f
+      PRIOR_FINAL_HEAD_SHA: 23a8f4f5b4757fe2db0b8e48f435a1ed023ce2fb
+      SOURCE_HEAD_SHA: 7091abf50bd5237636da7ffcb520e05dca558173
+      CERTIFICATION_ANCHOR_SHA: 022b4a849bdf74dd69108f992c17d53810434daf
+      EVIDENCE_HEAD_SHA: c220796c832486c189e155e13e0a834a2846c2f9
+      CERTIFIED_CONTENT_HEAD_SHA: 84ef5d05149e95cd50def6f286308dc16c346d1d
     steps:
       - uses: actions/checkout@v4
         with:
@@ -31,19 +31,17 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove certified source and corrective evidence provenance
+      - name: Prove certified source evidence and validator provenance
         run: |
           set -euo pipefail
-          git merge-base --is-ancestor "$GATE_MERGE_SHA" "$SOURCE_HEAD_SHA"
+          git merge-base --is-ancestor "$GATE_MERGE_SHA" "$PRIOR_FINAL_HEAD_SHA"
+          git merge-base --is-ancestor "$PRIOR_FINAL_HEAD_SHA" "$SOURCE_HEAD_SHA"
           git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$CERTIFICATION_ANCHOR_SHA"
-          git merge-base --is-ancestor "$CERTIFICATION_ANCHOR_SHA" "$FAILED_EVIDENCE_HEAD_SHA"
-          git merge-base --is-ancestor "$FAILED_EVIDENCE_HEAD_SHA" "$FAILED_GOVERNANCE_HEAD_SHA"
-          git merge-base --is-ancestor "$FAILED_GOVERNANCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA"
-          git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" HEAD
-          test "$(git rev-list --count "$SOURCE_HEAD_SHA..$CERTIFICATION_ANCHOR_SHA")" = "1"
-          test "$(git rev-list --count "$CERTIFICATION_ANCHOR_SHA..$FAILED_EVIDENCE_HEAD_SHA")" = "1"
-          test "$(git rev-list --count "$FAILED_EVIDENCE_HEAD_SHA..$FAILED_GOVERNANCE_HEAD_SHA")" = "1"
-          test "$(git rev-list --count "$FAILED_GOVERNANCE_HEAD_SHA..$EVIDENCE_HEAD_SHA")" = "1"
+          git merge-base --is-ancestor "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA"
+          git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" "$CERTIFIED_CONTENT_HEAD_SHA"
+          test "$(git rev-list --count "$SOURCE_HEAD_SHA..$CERTIFICATION_ANCHOR_SHA")" = "2"
+          test "$(git rev-list --count "$CERTIFICATION_ANCHOR_SHA..$EVIDENCE_HEAD_SHA")" = "4"
+          test "$(git rev-list --count "$EVIDENCE_HEAD_SHA..$CERTIFIED_CONTENT_HEAD_SHA")" = "1"
           python - <<'PY'
           import os
           import subprocess
@@ -55,26 +53,21 @@ jobs:
 
           source = os.environ['SOURCE_HEAD_SHA']
           anchor = os.environ['CERTIFICATION_ANCHOR_SHA']
-          failed_evidence = os.environ['FAILED_EVIDENCE_HEAD_SHA']
-          failed_governance = os.environ['FAILED_GOVERNANCE_HEAD_SHA']
           evidence = os.environ['EVIDENCE_HEAD_SHA']
+          content = os.environ['CERTIFIED_CONTENT_HEAD_SHA']
           expected = {
               (source, anchor): [
                   '.github/workflows/lot43-book-resilience-replenishment.yml',
                   '.github/workflows/lot43-mutation-assurance.yml',
               ],
-              (anchor, failed_evidence): [
+              (anchor, evidence): [
                   'data/audit/book_resilience_and_replenishment_engine_audit_lot43.json',
                   'data/audit/book_resilience_and_replenishment_engine_lot43.json',
                   'reports/lot43/coverage_summary.json',
                   'reports/lot43/mutation_summary.json',
               ],
-              (failed_evidence, failed_governance): [
-                  '.github/workflows/lot43-frozen-evidence.yml',
+              (evidence, content): [
                   'scripts/validate_lot43_frozen_evidence.py',
-              ],
-              (failed_governance, evidence): [
-                  'data/audit/book_resilience_and_replenishment_engine_lot43.json',
               ],
           }
           for (base, head), expected_paths in expected.items():
@@ -86,6 +79,55 @@ jobs:
           PY
           git diff --quiet "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA" -- \
             data/audit/book_resilience_state_lot43.json
+      - name: Prove pre-merge ancestry or squash-equivalent implementation merge
+        run: |
+          set -euo pipefail
+          certified_paths=(
+            .github/workflows/lot43-book-resilience-replenishment.yml
+            .github/workflows/lot43-mutation-assurance.yml
+            config/microstructure/book_resilience_and_replenishment_engine_v1.json
+            contracts/schemas/book_resilience_state_v1.schema.json
+            contracts/schemas/book_resilience_replenishment_engine_state_v1.schema.json
+            contracts/schemas/book_resilience_replenishment_engine_audit_v1.schema.json
+            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py
+            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py
+            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_validation.py
+            src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_analysis.py
+            scripts/run_lot43_book_resilience_and_replenishment_engine.py
+            scripts/validate_lot43.py
+            scripts/validate_lot43_no_connectivity.py
+            scripts/validate_lot43_frozen_evidence.py
+            tests/test_lot43_book_resilience_and_replenishment_engine.py
+            tests/test_lot43_fail_closed_contracts.py
+            tests/test_lot43_schema_contracts.py
+            tests/test_lot43_edge_contracts.py
+            tests/test_lot43_mutation_contracts.py
+            tests/test_lot43_review_regressions.py
+            tests/test_lot43_final_review_blockers.py
+            tests/test_lot43_v4_entry_gate.py
+            tests/test_lot43_semantic_consistency.py
+            docs/LOT_43_BOOK_RESILIENCE_AND_REPLENISHMENT_ENGINE.md
+            docs/ACCEPTANCE_CRITERIA_LOT_43.md
+            data/audit/book_resilience_and_replenishment_engine_lot43.json
+            data/audit/book_resilience_and_replenishment_engine_audit_lot43.json
+            data/audit/book_resilience_state_lot43.json
+            reports/lot43/coverage_summary.json
+            reports/lot43/mutation_summary.json
+          )
+          if git merge-base --is-ancestor "$CERTIFIED_CONTENT_HEAD_SHA" HEAD; then
+            echo "LOT43_PRE_MERGE_CERTIFIED_HISTORY"
+          else
+            squash_match=""
+            while read -r candidate; do
+              if git diff --quiet "$CERTIFIED_CONTENT_HEAD_SHA" "$candidate" -- "${certified_paths[@]}"; then
+                squash_match="$candidate"
+                break
+              fi
+            done < <(git rev-list --first-parent --reverse "$GATE_MERGE_SHA..HEAD")
+            test -n "$squash_match"
+            git merge-base --is-ancestor "$squash_match" HEAD
+            echo "LOT43_SQUASH_EQUIVALENT_IMPLEMENTATION_MERGE=$squash_match"
+          fi
       - name: Prove frozen Lot 43 production source immutability
         run: |
           set -euo pipefail
@@ -107,11 +149,12 @@ jobs:
             tests/test_lot43_edge_contracts.py \
             tests/test_lot43_mutation_contracts.py \
             tests/test_lot43_review_regressions.py \
+            tests/test_lot43_final_review_blockers.py \
             tests/test_lot43_v4_entry_gate.py \
             tests/test_lot43_semantic_consistency.py \
             docs/LOT_43_BOOK_RESILIENCE_AND_REPLENISHMENT_ENGINE.md \
             docs/ACCEPTANCE_CRITERIA_LOT_43.md
-      - name: Prove corrected frozen evidence immutability
+      - name: Prove frozen evidence immutability
         run: |
           set -euo pipefail
           git diff --exit-code "$EVIDENCE_HEAD_SHA" HEAD -- \
