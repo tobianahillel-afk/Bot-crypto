@@ -16,7 +16,9 @@ jobs:
       GATE_MERGE_SHA: ed8845e0e56151348fe57c0e9bceaf4646ea49aa
       SOURCE_HEAD_SHA: dccea5dcd03414064ead4e6979d53df98dfdda6f
       CERTIFICATION_ANCHOR_SHA: f9ea774f9f59b4fc7af55dcb911e085797c42a34
-      EVIDENCE_HEAD_SHA: c58321c9817117623adcff9949348b4b4624d483
+      FAILED_EVIDENCE_HEAD_SHA: c58321c9817117623adcff9949348b4b4624d483
+      FAILED_GOVERNANCE_HEAD_SHA: 96f48b95e0eee5657346073a7c71009689848f98
+      EVIDENCE_HEAD_SHA: 8d44c66f21447117a988ff0d555ff9407af1a25f
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,42 +31,58 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove source certification anchor and evidence lineage
+      - name: Prove certified source and corrective evidence provenance
         run: |
           set -euo pipefail
           git merge-base --is-ancestor "$GATE_MERGE_SHA" "$SOURCE_HEAD_SHA"
           git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$CERTIFICATION_ANCHOR_SHA"
-          git merge-base --is-ancestor "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA"
+          git merge-base --is-ancestor "$CERTIFICATION_ANCHOR_SHA" "$FAILED_EVIDENCE_HEAD_SHA"
+          git merge-base --is-ancestor "$FAILED_EVIDENCE_HEAD_SHA" "$FAILED_GOVERNANCE_HEAD_SHA"
+          git merge-base --is-ancestor "$FAILED_GOVERNANCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA"
           git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" HEAD
           test "$(git rev-list --count "$SOURCE_HEAD_SHA..$CERTIFICATION_ANCHOR_SHA")" = "1"
-          test "$(git rev-list --count "$CERTIFICATION_ANCHOR_SHA..$EVIDENCE_HEAD_SHA")" = "1"
+          test "$(git rev-list --count "$CERTIFICATION_ANCHOR_SHA..$FAILED_EVIDENCE_HEAD_SHA")" = "1"
+          test "$(git rev-list --count "$FAILED_EVIDENCE_HEAD_SHA..$FAILED_GOVERNANCE_HEAD_SHA")" = "1"
+          test "$(git rev-list --count "$FAILED_GOVERNANCE_HEAD_SHA..$EVIDENCE_HEAD_SHA")" = "1"
           python - <<'PY'
           import os
           import subprocess
 
+          def changed(base: str, head: str) -> list[str]:
+              return subprocess.check_output(
+                  ['git', 'diff', '--name-only', base, head], text=True
+              ).splitlines()
+
           source = os.environ['SOURCE_HEAD_SHA']
           anchor = os.environ['CERTIFICATION_ANCHOR_SHA']
+          failed_evidence = os.environ['FAILED_EVIDENCE_HEAD_SHA']
+          failed_governance = os.environ['FAILED_GOVERNANCE_HEAD_SHA']
           evidence = os.environ['EVIDENCE_HEAD_SHA']
-          anchor_delta = subprocess.check_output(
-              ['git', 'diff', '--name-only', source, anchor], text=True
-          ).splitlines()
-          expected_anchor = [
-              '.github/workflows/lot43-book-resilience-replenishment.yml',
-              '.github/workflows/lot43-mutation-assurance.yml',
-          ]
-          if sorted(anchor_delta) != sorted(expected_anchor):
-              raise SystemExit(f'LOT43_CERTIFICATION_ANCHOR_DIFF_CHANGED:{anchor_delta}')
-          evidence_delta = subprocess.check_output(
-              ['git', 'diff', '--name-only', anchor, evidence], text=True
-          ).splitlines()
-          expected_evidence = [
-              'data/audit/book_resilience_and_replenishment_engine_audit_lot43.json',
-              'data/audit/book_resilience_and_replenishment_engine_lot43.json',
-              'reports/lot43/coverage_summary.json',
-              'reports/lot43/mutation_summary.json',
-          ]
-          if sorted(evidence_delta) != sorted(expected_evidence):
-              raise SystemExit(f'LOT43_EVIDENCE_DIFF_CHANGED:{evidence_delta}')
+          expected = {
+              (source, anchor): [
+                  '.github/workflows/lot43-book-resilience-replenishment.yml',
+                  '.github/workflows/lot43-mutation-assurance.yml',
+              ],
+              (anchor, failed_evidence): [
+                  'data/audit/book_resilience_and_replenishment_engine_audit_lot43.json',
+                  'data/audit/book_resilience_and_replenishment_engine_lot43.json',
+                  'reports/lot43/coverage_summary.json',
+                  'reports/lot43/mutation_summary.json',
+              ],
+              (failed_evidence, failed_governance): [
+                  '.github/workflows/lot43-frozen-evidence.yml',
+                  'scripts/validate_lot43_frozen_evidence.py',
+              ],
+              (failed_governance, evidence): [
+                  'data/audit/book_resilience_and_replenishment_engine_lot43.json',
+              ],
+          }
+          for (base, head), expected_paths in expected.items():
+              actual = changed(base, head)
+              if sorted(actual) != sorted(expected_paths):
+                  raise SystemExit(
+                      f'LOT43_PROVENANCE_DIFF_CHANGED:{base[:8]}:{head[:8]}:{actual}'
+                  )
           PY
           git diff --quiet "$SOURCE_HEAD_SHA" "$EVIDENCE_HEAD_SHA" -- \
             data/audit/book_resilience_state_lot43.json
@@ -93,7 +111,7 @@ jobs:
             tests/test_lot43_semantic_consistency.py \
             docs/LOT_43_BOOK_RESILIENCE_AND_REPLENISHMENT_ENGINE.md \
             docs/ACCEPTANCE_CRITERIA_LOT_43.md
-      - name: Prove frozen evidence immutability after evidence head
+      - name: Prove corrected frozen evidence immutability
         run: |
           set -euo pipefail
           git diff --exit-code "$EVIDENCE_HEAD_SHA" HEAD -- \
