@@ -1,0 +1,101 @@
+name: Lot 43 final hardening apply
+
+on:
+  push:
+    branches: [agent/lot43-book-resilience-replenishment-engine]
+    paths:
+      - '.github/workflows/lot43-final-hardening-apply.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  harden:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/lot43-book-resilience-replenishment-engine
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Apply final fail-closed invariants
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          models = Path('src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py')
+          text = models.read_text()
+          marker = '\n\ndef _validate_slice_event_consistency(\n'
+          helper = '''\n\ndef _validate_event_state_bindings(events: tuple[BookDepletionEventV1, ...], history_sequence_ids: tuple[int, ...], declared_horizons: tuple[int, ...], slices: tuple[BookResilienceSliceV1, ...], decision_time: str) -> None:\n    history = set(history_sequence_ids)\n    thresholds = {item.replenishment_min_recovery_ratio for item in slices}\n    threshold = next(iter(thresholds)) if len(thresholds) == 1 else None\n    statuses = {"RECOVERED": "REPLENISHED", "SHIFTED": "MID_SHIFTED", "EXPIRED": "EXPIRED_NO_REPLENISHMENT", "PENDING": "PENDING_WINDOW"}\n    maximum = declared_horizons[-1]\n    for event in events:\n        if event.depletion_sequence_id not in history:\n            raise Lot43ValidationError("depletion sequence must belong to published history")\n        if event.replenishment_sequence_id is not None and event.replenishment_sequence_id not in history:\n            raise Lot43ValidationError("replenishment sequence must belong to published history")\n        outcome = _event_horizon_outcome(event, maximum, decision_time)\n        if event.max_window_status != statuses[outcome]:\n            raise Lot43ValidationError("max window status must match declared maximum horizon")\n        if threshold is not None and event.replenishment_kind in {"SAME_PRICE", "ADJACENT_PRICE"} and event.recovered_fraction < threshold:\n            raise Lot43ValidationError("recovered fraction below published recovery threshold")\n'''
+          if helper.strip() not in text:
+              if marker not in text:
+                  raise SystemExit('models insertion marker missing')
+              text = text.replace(marker, helper + marker, 1)
+          old = '''        _validate_slice_event_consistency(\n            self.depletion_events,\n            self.resilience_slices,\n            self.resilience_horizons_us,\n            self.decision_time,\n            self.volatility_regime,\n        )\n        validate_reason_codes(self.reason_codes)\n'''
+          new = '''        _validate_event_state_bindings(\n            self.depletion_events, self.history_sequence_ids, self.resilience_horizons_us,\n            self.resilience_slices, self.decision_time,\n        )\n        _validate_slice_event_consistency(\n            self.depletion_events,\n            self.resilience_slices,\n            self.resilience_horizons_us,\n            self.decision_time,\n            self.volatility_regime,\n        )\n        validate_reason_codes(self.reason_codes)\n'''
+          if old not in text:
+              raise SystemExit('models state-call marker missing')
+          models.write_text(text.replace(old, new, 1))
+
+          tests = Path('tests/test_lot43_final_review_blockers.py')
+          t = tests.read_text()
+          old_test = '''    with pytest.raises(Lot43ValidationError, match="evidence cannot exceed decision_time"):\n        replace(resilience, depletion_events=(future_evidence,))\n'''
+          new_test = '''    with pytest.raises(Lot43ValidationError, match="evidence cannot exceed decision_time"):\n        replace(\n            resilience,\n            sequence_id=1004,\n            history_sequence_ids=(*resilience.history_sequence_ids, 1004),\n            depletion_events=(future_evidence,),\n        )\n'''
+          if old_test not in t:
+              raise SystemExit('future evidence test marker missing')
+          t = t.replace(old_test, new_test, 1)
+          extra = '''\n\ndef test_state_binds_event_sequences_to_published_history() -> None:\n    resilience = _reference_resilience()\n    event = resilience.depletion_events[0]\n    with pytest.raises(Lot43ValidationError, match="depletion sequence must belong"):\n        replace(resilience, depletion_events=(replace(event, depletion_sequence_id=999),))\n    recovery = replace(\n        event, replenishment_kind="SAME_PRICE", replenishment_sequence_id=1004,\n        replenishment_time_us=10_000, replenished_quantity=Decimal("1.25"),\n        recovered_fraction=Decimal("1"), max_window_status="REPLENISHED",\n    )\n    with pytest.raises(Lot43ValidationError, match="replenishment sequence must belong"):\n        replace(resilience, depletion_events=(recovery,))\n\n\ndef test_state_rejects_outcome_beyond_declared_maximum_horizon() -> None:\n    resilience = _reference_resilience()\n    event = replace(\n        resilience.depletion_events[0], replenishment_kind="SAME_PRICE",\n        replenishment_sequence_id=1004, replenishment_time_us=25_001,\n        replenished_quantity=Decimal("1.25"), recovered_fraction=Decimal("1"),\n        max_window_status="REPLENISHED",\n    )\n    with pytest.raises(Lot43ValidationError, match="max window status must match"):\n        replace(\n            resilience, sequence_id=1004,\n            history_sequence_ids=(*resilience.history_sequence_ids, 1004),\n            depletion_events=(event,),\n        )\n\n\ndef test_state_rejects_direct_recovery_below_published_threshold() -> None:\n    resilience = _reference_resilience()\n    event = replace(\n        resilience.depletion_events[0], replenishment_kind="SAME_PRICE",\n        replenishment_sequence_id=1004, replenishment_time_us=10_000,\n        replenished_quantity=Decimal("0.2"), recovered_fraction=Decimal("0.16"),\n        max_window_status="REPLENISHED",\n    )\n    with pytest.raises(Lot43ValidationError, match="below published recovery threshold"):\n        replace(\n            resilience, sequence_id=1004,\n            history_sequence_ids=(*resilience.history_sequence_ids, 1004),\n            depletion_events=(event,),\n        )\n'''
+          if 'test_state_binds_event_sequences_to_published_history' not in t:
+              t += extra
+          tests.write_text(t)
+
+          acceptance = Path('docs/ACCEPTANCE_CRITERIA_LOT_43.md')
+          a = acceptance.read_text()
+          a = a.replace(
+              '56. Observations after the maximum horizon or evidence whose implied receive time exceeds `decision_time` cannot count as replenishment.',
+              '56. Observations after the maximum horizon or evidence whose implied receive time exceeds `decision_time` cannot count as replenishment; `max_window_status` must equal the outcome recomputed at the largest declared horizon.',
+          )
+          a = a.replace(
+              '57. First qualifying future outcome is deterministic.',
+              '57. First qualifying future outcome is deterministic, and every depletion/replenishment sequence referenced by an event belongs to `history_sequence_ids`.',
+          )
+          a = a.replace(
+              '70. `RESILIENT` means all events recovered and the mean recovered fraction meets the configured minimum recovery ratio.',
+              '70. `RESILIENT` means all events recovered and the mean recovered fraction meets the configured minimum recovery ratio; every direct quantity-recovery event must itself meet that published ratio.',
+          )
+          acceptance.write_text(a)
+
+          spec = Path('docs/LOT_43_BOOK_RESILIENCE_AND_REPLENISHMENT_ENGINE.md')
+          s = spec.read_text()
+          anchor = 'The state publishes the authoritative configured horizon tuple as `resilience_horizons_us`, and the slice matrix must be exactly `BID/ASK × resilience_horizons_us`.'
+          addition = anchor + ' Every event sequence referenced by the state must exist in `history_sequence_ids`; the event `max_window_status` must equal the outcome recomputed at the largest declared horizon; quantity-recovery events must meet the single published `replenishment_min_recovery_ratio`.'
+          if anchor not in s:
+              raise SystemExit('spec anchor missing')
+          spec.write_text(s.replace(anchor, addition, 1))
+          PY
+      - name: Validate focused hardening
+        run: |
+          ruff check src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py tests/test_lot43_final_review_blockers.py
+          mypy src/crypto_quant_bot/microstructure
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          pytest -q tests/test_lot43_final_review_blockers.py
+          pytest -q tests/test_lot43*.py
+      - name: Commit hardening and remove temporary workflow
+        run: |
+          git config user.name 'lot43-hardening-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git rm .github/workflows/lot43-final-hardening-apply.yml
+          git add src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py \
+                  tests/test_lot43_final_review_blockers.py \
+                  docs/ACCEPTANCE_CRITERIA_LOT_43.md \
+                  docs/LOT_43_BOOK_RESILIENCE_AND_REPLENISHMENT_ENGINE.md
+          git commit -m 'fix(lot43): bind certified event outcomes to state history'
+          git push origin HEAD:agent/lot43-book-resilience-replenishment-engine
