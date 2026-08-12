@@ -20,13 +20,13 @@ jobs:
   mutation:
     runs-on: ubuntu-22.04
     env:
-      CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      CANDIDATE_SHA: ad01a0ffbe3e97d8418922293d68613a88a1b148
       PYTHONHASHSEED: '0'
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ad01a0ffbe3e97d8418922293d68613a88a1b148
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
@@ -35,7 +35,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove exact candidate source
+      - name: Prove exact frozen source
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
@@ -194,7 +194,7 @@ jobs:
               'mutation_score_percent': round(score, 2),
               'minimum_score_percent': 80.0,
               'mutmut_run_exit_code': int(os.environ['RUN_STATUS']),
-              'mutmut_results_exit_code': int(os.environ['RESULTS_STATUS'],),
+              'mutmut_results_exit_code': int(os.environ['RESULTS_STATUS']),
           }
           Path('reports/lot43/mutation_summary.json').write_text(
               json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8'

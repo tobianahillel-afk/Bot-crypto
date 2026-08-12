@@ -13,8 +13,8 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       PYTHONPATH: src
-      SOURCE_HEAD_SHA: 8d2f99fcd7f654d18079ff8ea24f90e57cfc4086
-      EVIDENCE_HEAD_SHA: f05abfbf42577380ef536f0f4bf7865b342d8441
+      SOURCE_HEAD_SHA: ad01a0ffbe3e97d8418922293d68613a88a1b148
+      EVIDENCE_HEAD_SHA: 238362d14a75063461750a1d74beffbcc1e45d79
       GATE_MERGE_SHA: ed8845e0e56151348fe57c0e9bceaf4646ea49aa
       CERTIFIED_PR_REF: refs/pull/57/head
     steps:
@@ -52,7 +52,7 @@ jobs:
           done < <(git rev-list --first-parent HEAD)
           test -n "$matched_commit"
           git merge-base --is-ancestor "$GATE_MERGE_SHA" "$matched_commit"
-      - name: Prove exact arithmetic-hardening evidence delta and carried-forward resilience artifact
+      - name: Prove exact semantic-hardening evidence delta and carried-forward resilience artifact
         run: |
           set -euo pipefail
           expected="$RUNNER_TEMP/lot43-expected-evidence-delta.txt"
@@ -96,6 +96,7 @@ jobs:
             tests/test_lot43_mutation_contracts.py \
             tests/test_lot43_review_regressions.py \
             tests/test_lot43_schema_contracts.py \
+            tests/test_lot43_semantic_consistency.py \
             docs/LOT_43_BOOK_RESILIENCE_AND_REPLENISHMENT_ENGINE.md \
             docs/ACCEPTANCE_CRITERIA_LOT_43.md
       - name: Prove frozen evidence immutable after evidence head
@@ -129,7 +130,7 @@ jobs:
           test ! -e tests/test_lot44_trades_and_aggressor_classification_schema.py
           test ! -e docs/LOT_44_TRADES_AND_AGGRESSOR_CLASSIFICATION_SCHEMA.md
           test ! -e docs/ACCEPTANCE_CRITERIA_LOT_44.md
-      - name: Architecture roadmap engineering and security
+      - name: Architecture roadmap engineering security and regression
         run: |
           set -euo pipefail
           python scripts/validate_roadmap_documentation.py
@@ -143,3 +144,4 @@ jobs:
           python scripts/validate_lot43_no_connectivity.py
           bandit -q -r scripts/validate_lot43_frozen_evidence.py -ll
           pip-audit -r requirements-dev.lock
+          pytest -q
