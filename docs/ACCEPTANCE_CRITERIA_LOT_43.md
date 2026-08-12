@@ -39,7 +39,7 @@ Lot 43 is accepted only on an exact frozen source head that satisfies every appl
 27. Replenishment time uses receive-time differences in integer microseconds.
 28. Replenishment elapsed time must be strictly positive when present.
 29. Missing replenishment time is `null`, never zero fallback.
-30. Horizons are positive, unique and strictly increasing.
+30. Horizons are positive, unique and strictly increasing, and the exact configured set is published as `resilience_horizons_us`.
 31. Ratio thresholds lie in `[0,1]`.
 32. Quiet/stressed volatility thresholds are non-negative and strictly ordered.
 33. Adjacent distance and mid-shift thresholds are positive.
@@ -71,14 +71,14 @@ Lot 43 is accepted only on an exact frozen source head that satisfies every appl
 53. BID mid shift is downward; ASK mid shift is upward.
 54. Mid shift does not fabricate replenished quantity.
 55. Mid-shift recovered fraction remains zero.
-56. Observations after the maximum horizon cannot count as replenishment.
+56. Observations after the maximum horizon or evidence whose implied receive time exceeds `decision_time` cannot count as replenishment.
 57. First qualifying future outcome is deterministic.
 58. No future observation means no replenishment evidence.
 59. Participant intent on every event remains `NOT_INFERRED`.
 
 ## Horizon and resilience
 
-60. Every configured horizon is evaluated independently.
+60. Every configured horizon is evaluated independently and the published slice matrix contains exactly one BID and one ASK slice for every value in `resilience_horizons_us`.
 61. Quantity recovery within horizon counts as recovered.
 62. Mid shift within horizon counts separately as shifted.
 63. Closed horizon without qualifying outcome counts as expired.
@@ -139,7 +139,7 @@ Lot 43 is accepted only on an exact frozen source head that satisfies every appl
 109. Output code commit equals exact frozen source head.
 110. Reason codes are stable and closed by validation.
 111. State/audit/resilience linkage is exact.
-112. Metrics match published event/slice counts.
+112. Metrics and every side/horizon slice aggregation match the published depletion events and declared horizon set.
 113. No wall-clock timestamp enters deterministic output.
 114. Replay divergence blocks certification.
 
@@ -156,7 +156,7 @@ Lot 43 is accepted only on an exact frozen source head that satisfies every appl
 123. Invalid config shape/version fails closed.
 124. Invalid gate/lifecycle/checksum fails closed.
 125. Stale predecessor evidence fails closed.
-126. Malformed observation/history fails closed.
+126. Malformed observation/history, incomplete horizon matrices and post-decision replenishment evidence fail closed.
 
 ## Quality gates
 
