@@ -1,5 +1,5 @@
 {
-  "audit_checksum": "dca5c5fbcf54555d0e606cc368d616743ec72a2392ff2162b1ff05975388cfca",
+  "audit_checksum": "f92e582367f54487f575d695e35d5d88d92a30fa0736246e60b23fe9677f0539",
   "lineage": {
     "available_at": "2026-08-06T19:18:40.070000Z",
     "config_checksum": "a170aab2e8f71dd6f6420a308edd7aa22f6200a25f39ac1eacefb7ac1aa431a1",
@@ -19,9 +19,9 @@
     "LOT43_NO_EXECUTION_AUTHORITY",
     "LOT44_REMAINS_LOCKED"
   ],
-  "resilience_checksum": "297bec6000bc40f2df428c942ee60f7b170cfc01ddba992503da9c259e6e551f",
+  "resilience_checksum": "598c08bf863e8fed65e3045081b774a80500c8129a0eb71a6c865e74c1bf8ddb",
   "run_context": {
-    "code_commit": "7091abf50bd5237636da7ffcb520e05dca558173",
+    "code_commit": "6d2106d8a6e320d33dbbefb57320e7da1cd3afbe",
     "config_version": "lot43-book-resilience-replenishment-config-v1",
     "correlation_id": "microstructure-v4-lot43-reference",
     "run_id": "lot43-reference-run-v1",
@@ -46,7 +46,7 @@
     "used_for_decision": false
   },
   "schema_version": "book-resilience-replenishment-engine-audit-v1",
-  "state_output_checksum": "88330d2d330449ce5ed63741171c1bbb10cd65c92622dc3cdd66877c37b18520",
+  "state_output_checksum": "3bbfed4861caa42ee6c181d58b802fa4bd843d2465c16adc3916eca5d01870e6",
   "validation_checks": [
     "entry_gate_verified",
     "lot42_frozen_lineage_verified",
