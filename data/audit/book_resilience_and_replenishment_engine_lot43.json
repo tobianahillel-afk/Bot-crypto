@@ -47,7 +47,7 @@
       "LOT44_REMAINS_LOCKED"
     ],
     "receive_time": "2026-08-06T19:18:40.070000Z",
-    "resilience_checksum": "ff314e1eecd40bca822b471f0239fdb8abb294375a8964a738131b71cba4b36e",
+    "resilience_checksum": "297bec6000bc40f2df428c942ee60f7b170cfc01ddba992503da9c259e6e551f",
     "resilience_slices": [
       {
         "depletion_events_total": 1,
@@ -62,10 +62,11 @@
           "LOT43_VOLATILITY_REGIME_QUIET"
         ],
         "recovered_events_total": 0,
+        "replenishment_min_recovery_ratio": "0.25",
         "resilience_status": "FRAGILE",
         "schema_version": "book-resilience-slice-v1",
         "side": "BID",
-        "slice_checksum": "57259821912118ee523565b04e40c1e76f1b7d652bc3967db48dfda0c1174e6f",
+        "slice_checksum": "de30acbb18931b6bcc98088694c4fc5e26e770f45f4c560e9cb22ee01b5469a8",
         "volatility_method": "OBSERVED_BOOK_MID_MAX_ABS_MOVE_BPS",
         "volatility_regime": "QUIET"
       },
@@ -82,10 +83,11 @@
           "LOT43_VOLATILITY_REGIME_QUIET"
         ],
         "recovered_events_total": 0,
+        "replenishment_min_recovery_ratio": "0.25",
         "resilience_status": "FRAGILE",
         "schema_version": "book-resilience-slice-v1",
         "side": "BID",
-        "slice_checksum": "f882222e3c9129ce25bae765d87a458a6a1c4d6a0d405d4b37331d1230005ee4",
+        "slice_checksum": "5bafdbc68c66f2746745e1612e4cad7f4df4bba0a25e9a9936c51d0df321adc7",
         "volatility_method": "OBSERVED_BOOK_MID_MAX_ABS_MOVE_BPS",
         "volatility_regime": "QUIET"
       },
@@ -102,10 +104,11 @@
           "LOT43_VOLATILITY_REGIME_QUIET"
         ],
         "recovered_events_total": 0,
+        "replenishment_min_recovery_ratio": "0.25",
         "resilience_status": "NO_EVENTS",
         "schema_version": "book-resilience-slice-v1",
         "side": "ASK",
-        "slice_checksum": "a58abdb9b666c11f07c08c2534fe021240070491ceaf909bc88eed73183bfe0c",
+        "slice_checksum": "0d11d1bfba50d05993aa8f3ffc76668f98401b5e1495d8deaf6d1774635f4697",
         "volatility_method": "OBSERVED_BOOK_MID_MAX_ABS_MOVE_BPS",
         "volatility_regime": "QUIET"
       },
@@ -122,10 +125,11 @@
           "LOT43_VOLATILITY_REGIME_QUIET"
         ],
         "recovered_events_total": 0,
+        "replenishment_min_recovery_ratio": "0.25",
         "resilience_status": "NO_EVENTS",
         "schema_version": "book-resilience-slice-v1",
         "side": "ASK",
-        "slice_checksum": "85f24c822ecaf44c7f94f6f2fa008e7c0c0708ad2a1a6d0b928287b0342d3f52",
+        "slice_checksum": "da9d007f9e026d468c670f61bce0154d1a1d4dcef6e9ba35049ff81461f2b63b",
         "volatility_method": "OBSERVED_BOOK_MID_MAX_ABS_MOVE_BPS",
         "volatility_regime": "QUIET"
       }
@@ -168,7 +172,7 @@
     "lot_43_validation_failures_total": 0,
     "schema_version": "lot43-metrics-v1"
   },
-  "output_checksum": "9a61916a2f597b3efb8e38b8104d3af74550d02cf175d7efde39763f07cb267b",
+  "output_checksum": "11224c071228af9bffbf8a6f53ffc26b4fe836fec380e35b7e489677988f6919",
   "reason_codes": [
     "LOT43_OFFLINE_BOOK_RESILIENCE_VALIDATED",
     "LOT43_CANONICAL_LOT39_REPLAY_BOUND",
@@ -177,7 +181,7 @@
   ],
   "receive_time": "2026-08-06T19:18:40.070000Z",
   "run_context": {
-    "code_commit": "ad01a0ffbe3e97d8418922293d68613a88a1b148",
+    "code_commit": "db91a6700fb7b76133ad896714af6ed82da7c5da",
     "config_version": "lot43-book-resilience-replenishment-config-v1",
     "correlation_id": "microstructure-v4-lot43-reference",
     "run_id": "lot43-reference-run-v1",
