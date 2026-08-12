@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field as dataclass_field
+from dataclasses import dataclass, field
 from decimal import Decimal, localcontext
 from typing import Any
 
@@ -11,6 +11,7 @@ from .book_resilience_and_replenishment_engine_validation import (
     RUNTIME_MODE,
     VALIDATION_STATE,
     Lot43ValidationError,
+    age_us,
     bounded_recovery_fraction,
     decimal_text,
     require_integer,
@@ -182,12 +183,7 @@ class BookDepletionEventV1:
         validate_positive(self.depleted_quantity, "depleted_quantity")
         validate_ratio(self.depletion_ratio, "depletion_ratio")
         require_integer(self.depletion_sequence_id, "depletion_sequence_id", minimum=1)
-        validate_causal_times(
-            self.depletion_event_time,
-            self.depletion_receive_time,
-            self.depletion_receive_time,
-            self.depletion_receive_time,
-        )
+        age_us(self.depletion_event_time, self.depletion_receive_time)
         _validate_depletion_arithmetic(
             self.previous_quantity,
             self.post_depletion_quantity,
@@ -341,7 +337,7 @@ class BookResilienceSliceV1:
     resilience_status: str
     reason_codes: tuple[str, ...]
     slice_checksum: str
-    replenishment_min_recovery_ratio: Decimal = dataclass_field(kw_only=True)
+    replenishment_min_recovery_ratio: Decimal = field(kw_only=True)
 
     def __post_init__(self) -> None:
         validate_side(self.side)
@@ -522,8 +518,8 @@ class Lot43MetricsV1:
             (self.expired_max_window_events_total, "expired_max_window_events_total"),
             (self.pending_max_window_events_total, "pending_max_window_events_total"),
         )
-        for value, field in values:
-            require_integer(value, field, minimum=0)
+        for value, field_name in values:
+            require_integer(value, field_name, minimum=0)
         if self.observations_total == 0:
             raise Lot43ValidationError("Lot 43 metrics require observations")
         outcomes = (

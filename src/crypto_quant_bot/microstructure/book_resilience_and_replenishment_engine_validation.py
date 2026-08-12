@@ -14,7 +14,7 @@ from .liquidity_zones_walls_and_voids_engine_validation import (
     parse_utc_timestamp,
     require_sha256,
     require_text,
-    validate_causal_times as _validate_causal_times,
+    validate_causal_times,
     validate_checksum_fields,
     validate_identity_fields,
     validate_reason_codes,
@@ -97,18 +97,6 @@ def validate_side(value: str) -> None:
     try:
         _validate_side(value)
     except Lot42ValidationError as exc:
-        raise _translate(exc) from exc
-
-
-def validate_causal_times(
-    event_time: str,
-    receive_time: str,
-    decision_time: str,
-    generated_at: str,
-) -> None:
-    try:
-        _validate_causal_times(event_time, receive_time, decision_time, generated_at)
-    except (Lot42ValidationError, BookIntegrityValidationError) as exc:
         raise _translate(exc) from exc
 
 
