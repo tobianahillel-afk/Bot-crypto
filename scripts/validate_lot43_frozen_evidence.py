@@ -15,21 +15,20 @@ from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_re
     load_json_object,
 )
 
-SOURCE_HEAD = "dccea5dcd03414064ead4e6979d53df98dfdda6f"
-CERTIFICATION_ANCHOR = "f9ea774f9f59b4fc7af55dcb911e085797c42a34"
-FAILED_EVIDENCE_HEAD = "c58321c9817117623adcff9949348b4b4624d483"
-FAILED_GOVERNANCE_HEAD = "96f48b95e0eee5657346073a7c71009689848f98"
-EVIDENCE_HEAD = "8d44c66f21447117a988ff0d555ff9407af1a25f"
 GATE_MERGE = "ed8845e0e56151348fe57c0e9bceaf4646ea49aa"
+PRIOR_FINAL_HEAD = "23a8f4f5b4757fe2db0b8e48f435a1ed023ce2fb"
+SOURCE_HEAD = "7091abf50bd5237636da7ffcb520e05dca558173"
+CERTIFICATION_ANCHOR = "022b4a849bdf74dd69108f992c17d53810434daf"
+EVIDENCE_HEAD = "c220796c832486c189e155e13e0a834a2846c2f9"
 VALIDATION_PROOF = (
-    31620295621,
-    9150976691,
-    "sha256:a4bbf31d1b83f94bbfec52e8dbb0a926d2a87fdf215c9ef17f3353875f18d41c",
+    31627874726,
+    9153928933,
+    "sha256:d69f942674d33ac6e8ee978058e256ab978ae3be97f605a97007d4d8bceb8a56",
 )
 MUTATION_PROOF = (
-    31620295636,
-    9151065443,
-    "sha256:95274da9fc4dd916a78a5c2cf14ef1103c627a406acdb6ba005c479a2eea545a",
+    31627874723,
+    9154057705,
+    "sha256:1e599e1ffa54ef6654932e075cd3fab3933f565e670f8e3eccefe0ccc960847b",
 )
 
 STATE = ROOT / "data/audit/book_resilience_and_replenishment_engine_lot43.json"
@@ -39,14 +38,14 @@ COVERAGE = ROOT / "reports/lot43/coverage_summary.json"
 MUTATION = ROOT / "reports/lot43/mutation_summary.json"
 
 EXPECTED_HASHES = {
-    STATE: "310ceae2eaa25028603edb83406213f0aecb3bd04d2ec28439c03f2d0219a12e",
-    AUDIT: "018359f62ebd864e100a21f8df60d2a21380f9c5988c9d00414f373c323dff31",
+    STATE: "442265b71fcff824165b5c7b638d91680dbc1008ed29fbe91fa8b4c0390e199c",
+    AUDIT: "0ae532c5e625c2c3d780715963bd2a23e4a53b44f7e4f266865bbab5deb80082",
     RESILIENCE: "c39e0426c6b6635b60e72865ef9596cd4b056ff7e3bad5b7bd5ba646c219ba4b",
-    COVERAGE: "76e8f914defd25f86e41c1aa515c71258a1cfb361901051522b36ce72f08e6bb",
-    MUTATION: "b40709a4ea0ffd68d305812fd09e614f63c0444f6c6a601513d884d65b1b8e93",
+    COVERAGE: "62961e54e7b56d149407eb5d5a5eaee49c0770ac6f860115a6c6ecc42d38dadd",
+    MUTATION: "e032a464dc464b785fbaaa4297334e48b2fdad0a5262be666a6bb2bfa9fa48c0",
 }
-EXPECTED_STATE = "797bd974b37b4806bfada6b6b938d189401dc915998aa97e68473b1226da4a3d"
-EXPECTED_AUDIT = "553b0747c66275cefb4636b3d84ea664230ae765476126711bf15b768ac92ec4"
+EXPECTED_STATE = "88330d2d330449ce5ed63741171c1bbb10cd65c92622dc3cdd66877c37b18520"
+EXPECTED_AUDIT = "dca5c5fbcf54555d0e606cc368d616743ec72a2392ff2162b1ff05975388cfca"
 EXPECTED_RESILIENCE = "297bec6000bc40f2df428c942ee60f7b170cfc01ddba992503da9c259e6e551f"
 EXPECTED_LINEAGE = {
     "entry_gate_checksum": "4034c86061234a627dafde6122439c3b697fb2d53a1b95ba4e58f77a71089e6d",
@@ -108,17 +107,20 @@ def verify_canonical(payload: dict[str, Any], field: str, expected: str) -> None
     require(canonical_checksum(body) == expected, f"{field} canonical mismatch")
 
 
-def validate() -> dict[str, object]:
+def _load_frozen() -> tuple[dict[str, Any], ...]:
     for path, expected in EXPECTED_HASHES.items():
         require(path.is_file(), f"missing frozen evidence: {path}")
         require(file_sha256(path) == expected, f"frozen evidence drifted: {path}")
+    return tuple(
+        load_json_object(path) for path in (STATE, AUDIT, RESILIENCE, COVERAGE, MUTATION)
+    )
 
-    state = load_json_object(STATE)
-    audit = load_json_object(AUDIT)
-    resilience = load_json_object(RESILIENCE)
-    coverage = load_json_object(COVERAGE)
-    mutation = load_json_object(MUTATION)
 
+def _verify_links(
+    state: dict[str, Any],
+    audit: dict[str, Any],
+    resilience: dict[str, Any],
+) -> None:
     verify_canonical(state, "output_checksum", EXPECTED_STATE)
     verify_canonical(audit, "audit_checksum", EXPECTED_AUDIT)
     verify_canonical(resilience, "resilience_checksum", EXPECTED_RESILIENCE)
@@ -133,6 +135,8 @@ def validate() -> dict[str, object]:
     for field, expected in EXPECTED_LINEAGE.items():
         require(state["lineage"][field] == expected, f"lineage changed: {field}")
 
+
+def _verify_reference(resilience: dict[str, Any]) -> None:
     require(resilience["history_sequence_ids"] == [1001, 1002, 1003], "history changed")
     require(resilience["sequence_id"] == 1003, "sequence changed")
     require(resilience["volatility_measure_bps"] == "0", "volatility changed")
@@ -143,45 +147,61 @@ def validate() -> dict[str, object]:
     require(events[0]["side"] == "BID", "reference side changed")
     require(events[0]["depleted_price"] == "50024.8", "reference price changed")
     require(events[0]["max_window_status"] == "EXPIRED_NO_REPLENISHMENT", "reference status changed")
-    statuses = {
-        (item["side"], item["horizon_us"]): item["resilience_status"]
+    expected_slices = {
+        ("BID", 10000): (1, 0, 0, 1, 0, "FRAGILE"),
+        ("BID", 25000): (1, 0, 0, 1, 0, "FRAGILE"),
+        ("ASK", 10000): (0, 0, 0, 0, 0, "NO_EVENTS"),
+        ("ASK", 25000): (0, 0, 0, 0, 0, "NO_EVENTS"),
+    }
+    actual = {
+        (item["side"], item["horizon_us"]): (
+            item["depletion_events_total"],
+            item["recovered_events_total"],
+            item["mid_shift_events_total"],
+            item["expired_events_total"],
+            item["pending_events_total"],
+            item["resilience_status"],
+        )
         for item in resilience["resilience_slices"]
     }
-    require(
-        statuses == {
-            ("BID", 10000): "FRAGILE",
-            ("BID", 25000): "FRAGILE",
-            ("ASK", 10000): "NO_EVENTS",
-            ("ASK", 25000): "NO_EVENTS",
-        },
-        "reference slice statuses changed",
-    )
+    require(actual == expected_slices, "reference slice matrix changed")
 
+
+def _verify_quality(coverage: dict[str, Any], mutation: dict[str, Any]) -> None:
     require(coverage["status"] == "PASS", "coverage not PASS")
     require(coverage["source_head_sha"] == SOURCE_HEAD, "coverage source changed")
-    require(coverage["line_coverage_percent"] == 98.91, "line coverage changed")
-    require(coverage["branch_coverage_percent"] == 98.59, "branch coverage changed")
+    require(coverage["line_coverage_percent"] == 97.82, "line coverage changed")
+    require(coverage["branch_coverage_percent"] == 96.08, "branch coverage changed")
     require(coverage["anti_flake_repetitions"] == 3, "anti-flake changed")
     require(mutation["status"] == "PASS", "mutation not PASS")
     require(mutation["source_head_sha"] == SOURCE_HEAD, "mutation source changed")
-    require(mutation["mutation_score_percent"] == 82.42, "mutation score changed")
-    require(mutation["killed_mutants"] == 2217, "killed mutants changed")
-    require(mutation["survived_mutants"] == 473, "survived mutants changed")
-    require(mutation["total_mutants"] == 2690, "total mutants changed")
+    require(mutation["mutation_score_percent"] == 82.36, "mutation score changed")
+    require(mutation["killed_mutants"] == 2301, "killed mutants changed")
+    require(mutation["survived_mutants"] == 493, "survived mutants changed")
+    require(mutation["total_mutants"] == 2794, "total mutants changed")
+    require(mutation["evaluated_mutants"] == 2794, "evaluated mutants changed")
     require(mutation["timeout_mutants"] == 0, "mutation timeout present")
     require(mutation["suspicious_mutants"] == 0, "suspicious mutation present")
 
+
+def _verify_downstream_lock() -> None:
     for relative in LOT44_FORBIDDEN:
         require(not (ROOT / relative).exists(), f"Lot 44 must remain locked: {relative}")
 
+
+def validate() -> dict[str, object]:
+    state, audit, resilience, coverage, mutation = _load_frozen()
+    _verify_links(state, audit, resilience)
+    _verify_reference(resilience)
+    _verify_quality(coverage, mutation)
+    _verify_downstream_lock()
     return {
-        "schema_version": "lot43-frozen-evidence-validation-v2",
+        "schema_version": "lot43-frozen-evidence-validation-v3",
         "status": "PASS",
         "gate_merge": GATE_MERGE,
+        "prior_final_head": PRIOR_FINAL_HEAD,
         "source_head": SOURCE_HEAD,
         "certification_anchor": CERTIFICATION_ANCHOR,
-        "failed_evidence_candidate": FAILED_EVIDENCE_HEAD,
-        "failed_governance_candidate": FAILED_GOVERNANCE_HEAD,
         "evidence_head": EVIDENCE_HEAD,
         "state_output_checksum": EXPECTED_STATE,
         "audit_checksum": EXPECTED_AUDIT,
