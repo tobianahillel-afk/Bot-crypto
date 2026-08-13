@@ -443,6 +443,7 @@ class TradesAggressorClassificationSchemaStateV1:
     output_checksum: str
 
     def __post_init__(self) -> None:
+        object.__setattr__(self, "classified_trades", tuple(self.classified_trades))
         validate_causal_times(self.event_time, self.receive_time, self.generated_at)
         require(
             self.validation_state == "VALIDATED_OFFLINE_AGGRESSOR_CLASSIFICATION_ONLY",
