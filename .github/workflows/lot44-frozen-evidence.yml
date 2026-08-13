@@ -38,9 +38,9 @@ jobs:
     env:
       PYTHONPATH: src
       GATE_MERGE_SHA: 6bbf4fcc5543f2599378bcab93263e2c8cebcec6
-      SOURCE_HEAD_SHA: 39c975e1b9777eec2d5616d7c11ff4be65898e7d
-      CERTIFICATION_ANCHOR_SHA: 275ef9e4806e3d1bbe85c5cd678280456ef3a67b
-      EVIDENCE_HEAD_SHA: e5748d3924434f2bb73ec5f174315edca4840509
+      SOURCE_HEAD_SHA: 2f6779fa2be6dbb78fac1a824d470e66cf2ffa9f
+      CERTIFICATION_ANCHOR_SHA: 95c855ede9cccc77dc89d2ce176e531f5dcd4ee1
+      EVIDENCE_HEAD_SHA: 20118feab2ddba2a67a467b28f33eee22520ab25
     steps:
       - uses: actions/checkout@v4
         with:
@@ -54,7 +54,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove certified source certification and corrective evidence chain
+      - name: Prove final source certification and evidence chain
         run: |
           set -euo pipefail
           git merge-base --is-ancestor "$GATE_MERGE_SHA" "$SOURCE_HEAD_SHA"
@@ -62,7 +62,7 @@ jobs:
           git merge-base --is-ancestor "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA"
           git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" HEAD
           test "$(git rev-list --count "$SOURCE_HEAD_SHA..$CERTIFICATION_ANCHOR_SHA")" = "2"
-          test "$(git rev-list --count "$CERTIFICATION_ANCHOR_SHA..$EVIDENCE_HEAD_SHA")" = "4"
+          test "$(git rev-list --count "$CERTIFICATION_ANCHOR_SHA..$EVIDENCE_HEAD_SHA")" = "5"
           git diff --name-only "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA" | sort > /tmp/lot44-evidence.txt
           printf '%s\n' \
             data/audit/trades_and_aggressor_classification_schema_audit_lot44.json \
@@ -72,7 +72,7 @@ jobs:
           diff -u /tmp/lot44-evidence-expected.txt /tmp/lot44-evidence.txt
           git diff --quiet "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA" -- \
             data/audit/aggressor_confidence_state_lot44.json
-      - name: Prove frozen Lot 44 production source immutability
+      - name: Prove final Lot 44 source immutability
         run: |
           set -euo pipefail
           git diff --quiet "$SOURCE_HEAD_SHA" HEAD -- \
@@ -96,7 +96,7 @@ jobs:
           git diff --quiet "$CERTIFICATION_ANCHOR_SHA" HEAD -- \
             .github/workflows/lot44-trades-aggressor-classification.yml \
             .github/workflows/lot44-mutation-assurance.yml
-      - name: Prove frozen evidence immutability
+      - name: Prove final frozen evidence immutability
         run: |
           set -euo pipefail
           git diff --quiet "$EVIDENCE_HEAD_SHA" HEAD -- \
@@ -105,14 +105,14 @@ jobs:
             data/audit/trades_and_aggressor_classification_schema_lot44.json \
             reports/lot44/coverage_summary.json \
             reports/lot44/mutation_summary.json
-      - name: Validate current frozen evidence contract
+      - name: Validate final frozen evidence contract
         run: |
           set -euo pipefail
           python -m compileall -q scripts/validate_lot44_frozen_evidence.py
           ruff check scripts/validate_lot44_frozen_evidence.py
           python scripts/validate_lot44_frozen_evidence.py \
             | tee /tmp/lot44-frozen-validation.json
-      - name: Replay certified Lot 44 source deterministically
+      - name: Replay final Lot 44 source deterministically
         run: |
           set -euo pipefail
           rm -rf /tmp/lot44-source-certified /tmp/lot44-run1 /tmp/lot44-frozen-expected
@@ -152,7 +152,7 @@ jobs:
           )
           git worktree remove --force /tmp/lot44-source-certified
           trap - EXIT
-      - name: Current architecture security and regression
+      - name: Current architecture security regression and downstream locks
         run: |
           set -euo pipefail
           python scripts/validate_roadmap_documentation.py
@@ -173,6 +173,10 @@ jobs:
               tests/test_lot44_schema_contracts.py \
               tests/test_lot44_causal_guards.py
           done
+          test ! -e src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py
+          test ! -e scripts/run_lot45_order_flow_delta_and_cvd_engine.py
+          test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine.py
+          test ! -e scripts/run_lot46_trade_classification_confidence_engine.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
