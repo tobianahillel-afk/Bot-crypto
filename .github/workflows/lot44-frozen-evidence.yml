@@ -38,11 +38,11 @@ jobs:
     env:
       PYTHONPATH: src
       GATE_MERGE_SHA: 6bbf4fcc5543f2599378bcab93263e2c8cebcec6
-      SOURCE_HEAD_SHA: fe11756c449fccc9cccf7013feac2997024721c9
-      QUALITY_RETRIGGER_SHA: fe11756c449fccc9cccf7013feac2997024721c9
-      CERTIFICATION_ANCHOR_SHA: 9015895b9af447c70fa94e0f1c2b1f488d98a5bb
-      EVIDENCE_HEAD_SHA: d2e17da18c0e6c30fb9a908d187981e125de1fc9
-      VALIDATOR_HEAD_SHA: 9e0927af4bdd9829712b69fc85a439027caba4e5
+      SOURCE_HEAD_SHA: d3cc4cf916ecea5166716746143a593f01b1d051
+      QUALITY_RETRIGGER_SHA: d3cc4cf916ecea5166716746143a593f01b1d051
+      CERTIFICATION_ANCHOR_SHA: 720b6f895672b650a7c7df96cdf68524479ae3f4
+      EVIDENCE_HEAD_SHA: 8ca3edadb7e811bad428575cfe236b20dd5ed62f
+      VALIDATOR_HEAD_SHA: 888fbf696432bec1a5f9d3e4f9c09279ed569325
     steps:
       - uses: actions/checkout@v4
         with:
@@ -116,7 +116,7 @@ jobs:
             data/audit/trades_and_aggressor_classification_schema_lot44.json \
             reports/lot44/coverage_summary.json reports/lot44/mutation_summary.json
           git diff --quiet "$VALIDATOR_HEAD_SHA" HEAD -- scripts/validate_lot44_frozen_evidence.py
-      - name: Validate final frozen evidence v6
+      - name: Validate final frozen evidence v7
         run: |
           set -euo pipefail
           python -m compileall -q scripts/validate_lot44_frozen_evidence.py
