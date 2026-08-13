@@ -6,7 +6,7 @@
 
 This governance gate authorizes a future implementation PR for **Lot 44 — Trades & Aggressor Classification Schema** after the merged Lot 43 post-merge audit `7a207a16e7aa543f9f7c241828f8ea5ae9ed0407`.
 
-The current release is `0.43.0`. The transition is governance-only: the seven Lot 44 gate artifacts plus eleven historical workflow-archival changes across Lots 40–43. `implementation_started=false`. No Lot 44 business implementation file is created by this gate.
+The current release is `0.43.0`. The transition is governance-only: seven Lot 44 gate artifacts, eleven historical workflow-archival changes across Lots 40–43, and one governed migration of the historical Lot 43 entry-gate test. `implementation_started=false`. No Lot 44 business implementation file is created by this gate.
 
 ## Canonical roadmap binding
 
@@ -114,7 +114,9 @@ approved_size=0
 
 ## Governance-only proof
 
-Before gate merge, all Lot 44 implementation paths, all Lot 45 implementation paths and all canonical Lot 46 confidence-engine implementation paths must be physically absent. The exact governance transition is **18 paths**: seven new Lot 44 gate artifacts plus eleven workflow-archival/path-scope changes across Lots 40–43.
+Before gate merge, all Lot 44 implementation paths, all Lot 45 implementation paths and all canonical Lot 46 confidence-engine implementation paths must be physically absent. The exact governance transition is **19 paths**: seven new Lot 44 gate artifacts, eleven workflow archival/path-scope changes across Lots 40–43, plus `tests/test_lot43_v4_entry_gate.py` as an explicit historical-governance migration.
+
+The historical Lot 43 test migration neutralizes current-tree `LOT43_FORBIDDEN_IMPLEMENTATION_PATHS` and `LOT44_FORBIDDEN_IMPLEMENTATION_PATHS` only inside its replay fixture. Its original certified behavior is still exercised in detached historical worktrees by the Lot 43 workflows. The Lot 44 gate also tests that the current historical-test fixture contains the explicit Lot 44 isolation, so the transition cannot regress silently.
 
 The eleven archived workflows are:
 
@@ -123,7 +125,7 @@ The eleven archived workflows are:
 - Lot 42 source validation, frozen evidence and post-merge audit;
 - Lot 43 entry gate, frozen evidence and post-merge audit.
 
-These workflows keep their historical certification logic. Path scoping only prevents closed predecessor lots from executing current-head `Lot 44 absent` assertions on the future Lot 44 implementation that this gate authorizes. The Lot 41 post-merge path filter explicitly includes its root-level frozen report `reports/lot_41_spread_depth_and_imbalance_engine_report.md`, matching the report already protected by its immutability check. Lot 43 source validation itself remains safe because it checks out the frozen Lot 43 source rather than the future current head.
+These workflows keep their historical certification logic. Path scoping only prevents closed predecessor lots from executing current-head `Lot 44 absent` assertions on the future Lot 44 implementation that this gate authorizes. Lot 43 entry/frozen/post-merge proofs continue to replay their certified historical states; the governance-migrated test is no longer classified as immutable Lot 43 production source on the current tree. The Lot 41 post-merge path filter explicitly includes its root-level frozen report `reports/lot_41_spread_depth_and_imbalance_engine_report.md`, matching the report already protected by its immutability check. Lot 43 source validation itself remains safe because it checks out the frozen Lot 43 source rather than the future current head.
 
 Canonical gate checksum:
 
