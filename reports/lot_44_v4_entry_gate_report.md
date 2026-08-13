@@ -47,13 +47,13 @@ Future Lot 44 implementation must meet at least:
 
 ## Governance proof
 
-The gate transition is governance-only and limited to **18 paths**: seven Lot 44 gate artifacts plus eleven historical workflow-archival/path-scope changes across Lots 40–43. Lot 44 implementation paths must be absent in the certified gate state. Lot 45 and canonical Lot 46 implementation paths remain absent and `PLANNED_LOCKED`.
+The gate transition is governance-only and limited to **19 paths**: seven Lot 44 gate artifacts, eleven historical workflow archival/path-scope changes across Lots 40–43, and the governed migration of `tests/test_lot43_v4_entry_gate.py`. Lot 44 implementation paths must be absent in the certified gate state. Lot 45 and canonical Lot 46 implementation paths remain absent and `PLANNED_LOCKED`.
 
 The eleven archived predecessor workflows are Lot 40 frozen/post-merge, Lot 41 source/frozen/post-merge, Lot 42 source/frozen/post-merge, and Lot 43 entry-gate/frozen/post-merge. Their historical proof logic remains intact; path scoping prevents already-closed lots from imposing current-head `Lot 44 absent` assertions on the future authorized Lot 44 implementation.
 
 The Lot 41 post-merge audit path filter includes `reports/lot_41_spread_depth_and_imbalance_engine_report.md`, exactly matching the root-level report protected by its historical immutability diff. This prevents that frozen report from drifting without triggering its audit workflow.
 
-`tests/test_lot43_v4_entry_gate.py` already isolates its historical gate by monkeypatching `LOT44_FORBIDDEN_IMPLEMENTATION_PATHS=()`, so the repository-wide test suite does not use that historical test to veto a later Lot 44 implementation.
+`tests/test_lot43_v4_entry_gate.py` is now explicitly governance-migrated: its autouse fixture neutralizes both `LOT43_FORBIDDEN_IMPLEMENTATION_PATHS` and `LOT44_FORBIDDEN_IMPLEMENTATION_PATHS` on the current tree. The certified historical test remains exercised in detached historical worktrees, while the Lot 44 gate has a focused test that requires the current Lot 44 isolation to remain present. The Lot 43 frozen/post-merge workflows therefore no longer classify this governance test as immutable Lot 43 production source.
 
 Gate checksum:
 
@@ -65,4 +65,4 @@ Gate checksum:
 
 ## Final decision
 
-**`GO_LOT44_IMPLEMENTATION_ENTRY`** if and only if the checksum, canonical roadmap binding, Lot 43 post-merge evidence, exact 18-path governance transition, physical Lot 44/Lot 45/Lot 46 absence checks, schema, docs, tests, architecture/security/full-regression gates and downstream locks all pass.
+**`GO_LOT44_IMPLEMENTATION_ENTRY`** if and only if the checksum, canonical roadmap binding, Lot 43 post-merge evidence, exact 19-path governance transition, historical-test migration, physical Lot 44/Lot 45/Lot 46 absence checks, schema, docs, tests, architecture/security/full-regression gates and downstream locks all pass.
