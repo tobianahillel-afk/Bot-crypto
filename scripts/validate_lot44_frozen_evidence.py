@@ -17,24 +17,29 @@ from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_re
 )
 
 GATE_MERGE = "6bbf4fcc5543f2599378bcab93263e2c8cebcec6"
-SOURCE_HEAD = "0bffb5c0716f1ef4744fd4be93bd17ed4db76046"
-QUALITY_RETRIGGER = "c767bc7d5b690c5db2979c1a031d97bbdc2d7638"
-CERTIFICATION_ANCHOR = "cfa6707a54b75e7632179fd34437395b877b8c3a"
-EVIDENCE_HEAD = "c1eb766be5219931016536dd5bc5f89ebb02fc6c"
+SOURCE_HEAD = "bfe9f67ea4fc3daffc14d238aff61f298dbd1bef"
+CERTIFICATION_ANCHOR = "078ba09fceab15e4ff9329b7e02ca6e900c3a300"
+EVIDENCE_HEAD = "a53e4283e932eaed70f3f16dab33969cabc66dd3"
 SUPERSEDED_FROZEN_HEADS = (
     "e2141fb19fd9d200ada823ebcc14df26f81f5506",
     "9f8d088836776ed7319bc4d94daeed797322ca14",
     "c3a8d67478a662c4e446d52a998011d2860752ab",
+    "63b0a2993d5d3194a95409be13d5ced21891e2aa",
 )
 VALIDATION_PROOF = (
-    31701904453,
-    9181602371,
-    "sha256:7604ac5776e40c8671650a2cebaff009a83f10369f72fac3664f454c23b42876",
+    31732555017,
+    9193827444,
+    "sha256:f0977f307b3af66fbf903a9e6933d771e0235b008fbfc6a9e97b36c0f067184c",
 )
 MUTATION_PROOF = (
-    31701904346,
-    9181660982,
-    "sha256:400a15d95caaeea2aa5b7289eb17f1c35714179cf579a7e7a22104f99ac2518e",
+    31732554965,
+    9193874864,
+    "sha256:fb80a6da259d3e5e1fb90a38c348297f194e84fd441d59d8536bb3570a64ddf0",
+)
+QUALITY_PROOF = (
+    31732555053,
+    9193906564,
+    "sha256:0e6a1b122ddda2bb020a9a412cc888005b3a37c4a036b7a459df63b304775322",
 )
 
 STATE = ROOT / "data/audit/trades_and_aggressor_classification_schema_lot44.json"
@@ -44,14 +49,14 @@ COVERAGE = ROOT / "reports/lot44/coverage_summary.json"
 MUTATION = ROOT / "reports/lot44/mutation_summary.json"
 
 EXPECTED_HASHES = {
-    STATE: "760492a3fd321cf93ee4852d17a918daff044a7435794429128f9809e3c0698f",
-    AUDIT: "03a2946fa89710173f969d6a5e3ee9f44387fc70656cc16025533e0fd58556bf",
+    STATE: "e890d803b9bec3b166f6f679e614235fdbed6c9252e52f5afea132d560d000ec",
+    AUDIT: "a932d3bf1235375b96900553d40254c70a3337725f37f9d41043ef508e0b8195",
     CONFIDENCE: "20c5d82709d8fa2ef03e789bc691472b9015d2fe657dec7751ae0a6076cfd027",
-    COVERAGE: "7bd5c4afc06ac6861c2c54115361b6215cbb8af87d407f3363e6582d5959cade",
-    MUTATION: "5ec3daf52e4c9d199d6ad446e80ad242b5553c8c8e6c02863accb9a84e0fce4c",
+    COVERAGE: "b453cea2fd2b295e973ee943e730dfb220fcbff7e368d81fa5eac26901b7cb7e",
+    MUTATION: "dde4646a7f82f4f208800a57dba52963a02be8450c09b15e592a9b0282d29d7c",
 }
-EXPECTED_STATE = "7740407fdb250ad130ca7962524431f6dd07ea1dd1d8242ac6568c1539e41c28"
-EXPECTED_AUDIT = "c42a23187c199e38f17e5b98fa8b506884c5f964bd49aa7669b9ebec89f485a7"
+EXPECTED_STATE = "2a750ad4959c2d86459a8a6169398835ee310783e371dde3dc621298fabfe158"
+EXPECTED_AUDIT = "34de6e66e8184ef3eded76ca13689c1e450a2f3a0dede7939d37f9b6812e186e"
 EXPECTED_CONFIDENCE = "7cb11e078d7f0d9ed0858229d8c6fe31a7cf653a238b280b05dbdd84d1250f05"
 EXPECTED_LINEAGE = {
     "entry_gate_checksum": "100d21ea18cfd7d9fe275ac0bea162c76a0bb7e5f85e319b543b4053e3c4d5ef",
@@ -238,11 +243,10 @@ def validate() -> dict[str, object]:
     _verify_quality(coverage, mutation)
     _verify_downstream_lock()
     return {
-        "schema_version": "lot44-frozen-evidence-validation-v4",
+        "schema_version": "lot44-frozen-evidence-validation-v5",
         "status": "PASS",
         "gate_merge": GATE_MERGE,
         "source_head": SOURCE_HEAD,
-        "quality_retrigger_same_tree": QUALITY_RETRIGGER,
         "certification_anchor": CERTIFICATION_ANCHOR,
         "evidence_head": EVIDENCE_HEAD,
         "superseded_frozen_heads": list(SUPERSEDED_FROZEN_HEADS),
@@ -258,6 +262,9 @@ def validate() -> dict[str, object]:
         "mutation_run": MUTATION_PROOF[0],
         "mutation_artifact": MUTATION_PROOF[1],
         "mutation_artifact_digest": MUTATION_PROOF[2],
+        "quality_run": QUALITY_PROOF[0],
+        "quality_artifact": QUALITY_PROOF[1],
+        "quality_artifact_digest": QUALITY_PROOF[2],
         "review_hardening": {
             "causal_event_and_receive_time": True,
             "tick_history_identity_match": True,
@@ -266,6 +273,7 @@ def validate() -> dict[str, object]:
             "confidence_v1_constants_exact": True,
             "signed_zero_normalized": True,
             "confidence_version_exact": True,
+            "runtime_confidence_identifier_models_exact": True,
             "safety_mapping_immutable": True,
         },
         "lot45_status": "PLANNED_LOCKED",
