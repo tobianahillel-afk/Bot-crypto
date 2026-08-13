@@ -9,7 +9,7 @@
   "mutmut_run_exit_code": 0,
   "python_hash_seed": "0",
   "schema_version": "lot44-mutation-summary-v1",
-  "source_head_sha": "0bffb5c0716f1ef4744fd4be93bd17ed4db76046",
+  "source_head_sha": "bfe9f67ea4fc3daffc14d238aff61f298dbd1bef",
   "status": "PASS",
   "survived_mutants": 308,
   "suspicious_mutants": 0,
