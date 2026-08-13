@@ -90,7 +90,13 @@ def _validate_config_identity(config: dict[str, Any]) -> None:
         config.get("config_version") == expected_version,
         "Lot 44 config version changed",
     )
-    require_text(config.get("confidence_version"), "confidence_version")
+    confidence_version = require_text(
+        config.get("confidence_version"), "confidence_version"
+    )
+    require(
+        confidence_version == "lot44-aggressor-confidence-v1",
+        "Lot 44 confidence version changed",
+    )
     parse_utc_timestamp(config.get("generated_at"), "generated_at")
     require_integer(config.get("max_quote_age_us"), "max_quote_age_us", minimum=1)
 

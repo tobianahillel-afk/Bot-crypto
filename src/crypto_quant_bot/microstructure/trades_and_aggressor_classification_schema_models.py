@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from decimal import Decimal
+from types import MappingProxyType
 from typing import Any
 
 from .trades_and_aggressor_classification_schema_validation import (
@@ -360,7 +362,7 @@ class TradesAggressorClassificationSchemaStateV1:
     confidence_state: AggressorConfidenceStateV1
     metrics: Lot44MetricsV1
     reason_codes: tuple[str, ...]
-    safety: dict[str, object]
+    safety: Mapping[str, object]
     output_checksum: str
 
     def __post_init__(self) -> None:
@@ -381,6 +383,7 @@ class TradesAggressorClassificationSchemaStateV1:
         )
         require_reason_codes(self.reason_codes)
         validate_safety(self.safety)
+        object.__setattr__(self, "safety", MappingProxyType(dict(self.safety)))
         require_sha256(self.output_checksum, "output_checksum")
 
     def payload_without_checksum(self) -> dict[str, Any]:
@@ -415,7 +418,7 @@ class TradesAggressorClassificationSchemaAuditV1:
     trade_fixture_checksum: str
     order_book_snapshot_checksum: str
     validation_state: str
-    safety: dict[str, object]
+    safety: Mapping[str, object]
     audit_checksum: str
 
     def __post_init__(self) -> None:
@@ -434,6 +437,7 @@ class TradesAggressorClassificationSchemaAuditV1:
             "audit validation state changed",
         )
         validate_safety(self.safety)
+        object.__setattr__(self, "safety", MappingProxyType(dict(self.safety)))
 
     def payload_without_checksum(self) -> dict[str, Any]:
         payload = self.to_dict()

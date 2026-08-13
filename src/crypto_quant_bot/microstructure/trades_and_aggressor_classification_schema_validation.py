@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 from typing import Any
@@ -80,6 +81,8 @@ def decimal_from_text(
 
 def decimal_text(value: Decimal) -> str:
     require(value.is_finite(), "decimal must be finite")
+    if value == 0:
+        return "0"
     text = format(value, "f")
     if "." in text:
         text = text.rstrip("0").rstrip(".")
@@ -161,7 +164,7 @@ def lot44_safety() -> dict[str, object]:
     }
 
 
-def validate_safety(value: dict[str, object]) -> None:
+def validate_safety(value: Mapping[str, object]) -> None:
     expected = lot44_safety()
     require(set(value) == set(expected), "Lot 44 safety fields changed")
     for field, expected_value in expected.items():

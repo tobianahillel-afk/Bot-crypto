@@ -13,6 +13,7 @@ from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema 
     CONFIG_PATH,
     _load_snapshot,
     _validate_confidence_policy,
+    _validate_config_identity,
     build_lot44_artifacts,
     classify_trade,
 )
@@ -24,6 +25,7 @@ from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_
 )
 from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_validation import (
     TradesAggressorClassificationValidationError,
+    decimal_text,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -245,3 +247,45 @@ def test_state_rejects_self_consistent_wrong_category_volumes() -> None:
         match="metrics do not match classified trades",
     ):
         replace(state, metrics=bad_metrics)
+
+
+
+def test_decimal_text_normalizes_signed_zero() -> None:
+    assert decimal_text(Decimal("-0")) == "0"
+    assert decimal_text(Decimal("0")) == "0"
+
+
+def test_config_rejects_non_v1_confidence_version() -> None:
+    config = load_json_object(ROOT / CONFIG_PATH)
+    config["confidence_version"] = "lot44-aggressor-confidence-v2"
+    with pytest.raises(
+        TradesAggressorClassificationValidationError,
+        match="Lot 44 confidence version changed",
+    ):
+        _validate_config_identity(config)
+
+
+def test_negative_zero_confidence_serializes_to_schema_constant() -> None:
+    confidence = AggressorConfidenceStateV1(
+        policy_version="lot44-aggressor-confidence-v1",
+        semantics="DESCRIPTIVE_METHOD_CONFIDENCE_NOT_PROBABILITY",
+        quote_test_confidence=Decimal("1"),
+        tick_rule_confidence=Decimal("0.5"),
+        unknown_confidence=Decimal("-0"),
+        confidence_checksum="0" * 64,
+    )
+    assert confidence.to_dict()["unknown_confidence"] == "0"
+
+
+def test_state_safety_is_immutable_after_validation() -> None:
+    state, _ = build_lot44_artifacts(ROOT, code_commit=CODE_COMMIT)
+    with pytest.raises(TypeError):
+        state.safety["trade_allowed"] = True  # type: ignore[index]
+    assert state.to_dict()["safety"]["trade_allowed"] is False
+
+
+def test_audit_safety_is_immutable_after_validation() -> None:
+    _, audit = build_lot44_artifacts(ROOT, code_commit=CODE_COMMIT)
+    with pytest.raises(TypeError):
+        audit.safety["trade_allowed"] = True  # type: ignore[index]
+    assert audit.to_dict()["safety"]["trade_allowed"] is False
