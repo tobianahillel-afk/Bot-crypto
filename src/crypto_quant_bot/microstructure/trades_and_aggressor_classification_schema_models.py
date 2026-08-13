@@ -11,6 +11,7 @@ from .trades_and_aggressor_classification_schema_validation import (
     CONFIDENCE_SEMANTICS,
     METHODS,
     decimal_text,
+    parse_utc_timestamp,
     require,
     require_git_sha,
     require_integer,
@@ -21,6 +22,8 @@ from .trades_and_aggressor_classification_schema_validation import (
     validate_run_context,
     validate_safety,
 )
+
+ZERO_SHA256 = "0" * 64
 
 
 @dataclass(frozen=True, slots=True)
@@ -161,6 +164,19 @@ def _validate_classification_tuple(
     )
 
 
+def _validate_classification_evidence(method: str, quote_snapshot_checksum: str) -> None:
+    if method == "QUOTE_TEST":
+        require(
+            quote_snapshot_checksum != ZERO_SHA256,
+            "quote-test classification requires quote evidence",
+        )
+    elif method == "TICK_RULE":
+        require(
+            quote_snapshot_checksum == ZERO_SHA256,
+            "tick-rule classification must use no-quote sentinel",
+        )
+
+
 @dataclass(frozen=True, slots=True)
 class ClassifiedTradeV1:
     trade: TimestampedTradeV1
@@ -195,6 +211,10 @@ class ClassifiedTradeV1:
             self.aggressor_classification,
             self.classification_method,
             self.confidence,
+        )
+        _validate_classification_evidence(
+            self.classification_method,
+            self.quote_snapshot_checksum,
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -356,6 +376,57 @@ def _metrics_from_classified_trades(
     )
 
 
+def _validate_state_trade_envelope(
+    event_time: str,
+    receive_time: str,
+    generated_at: str,
+    classified_trades: tuple[ClassifiedTradeV1, ...],
+) -> None:
+    state_event = parse_utc_timestamp(event_time, "state event_time")
+    state_receive = parse_utc_timestamp(receive_time, "state receive_time")
+    generated = parse_utc_timestamp(generated_at, "state generated_at")
+    trade_events = tuple(
+        parse_utc_timestamp(item.trade.event_time, "classified trade event_time")
+        for item in classified_trades
+    )
+    trade_receives = tuple(
+        parse_utc_timestamp(item.trade.receive_time, "classified trade receive_time")
+        for item in classified_trades
+    )
+    require(state_event == max(trade_events), "state event_time must match trade maximum")
+    require(
+        state_receive == max(trade_receives),
+        "state receive_time must match trade maximum",
+    )
+    require(
+        all(received <= generated for received in trade_receives),
+        "classified trade cannot be received after state generation",
+    )
+
+
+def _validate_state_quote_evidence(
+    lineage: Lot44LineageEnvelopeV1,
+    classified_trades: tuple[ClassifiedTradeV1, ...],
+) -> None:
+    for item in classified_trades:
+        checksum = item.quote_snapshot_checksum
+        if checksum != ZERO_SHA256:
+            require(
+                checksum == lineage.order_book_snapshot_checksum,
+                "classified trade quote evidence differs from state lineage snapshot",
+            )
+        if item.classification_method == "QUOTE_TEST":
+            require(
+                checksum == lineage.order_book_snapshot_checksum,
+                "quote-test classification not bound to lineage snapshot",
+            )
+        elif item.classification_method == "TICK_RULE":
+            require(
+                checksum == ZERO_SHA256,
+                "tick-rule classification must use no-quote sentinel",
+            )
+
+
 @dataclass(frozen=True, slots=True)
 class TradesAggressorClassificationSchemaStateV1:
     run_context: Lot44RunContextV1
@@ -383,6 +454,13 @@ class TradesAggressorClassificationSchemaStateV1:
             == len(self.classified_trades),
             "trade ids must be unique",
         )
+        _validate_state_trade_envelope(
+            self.event_time,
+            self.receive_time,
+            self.generated_at,
+            self.classified_trades,
+        )
+        _validate_state_quote_evidence(self.lineage, self.classified_trades)
         require(
             self.metrics == _metrics_from_classified_trades(self.classified_trades),
             "metrics do not match classified trades",
