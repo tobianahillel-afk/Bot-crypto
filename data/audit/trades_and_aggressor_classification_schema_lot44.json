@@ -5,7 +5,7 @@
       "classification_method": "NONE",
       "confidence": "0",
       "confidence_version": "lot44-aggressor-confidence-v1",
-      "quote_snapshot_checksum": "0d63ca7ac1ca48b44e58c0b1f1eb8946190eaf2da6745c2bbd2dd8de14f49b16",
+      "quote_snapshot_checksum": "0d63ca7ac1ca48b44e58c0b0f1eb8946190eaf2da6745c2bbd2dd8de14f49b16",
       "reason_codes": [
         "TRADE_INSIDE_SPREAD_UNKNOWN",
         "UNKNOWN_VOLUME_PRESERVED"
