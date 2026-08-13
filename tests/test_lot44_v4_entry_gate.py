@@ -114,6 +114,11 @@ def test_scope_distinguishes_lot44_confidence_state_from_lot46_engine() -> None:
     assert "PARTICIPANT_INTENT_AS_FACT" in payload["forbidden_scope"]
 
 
+def test_lot43_historical_gate_isolated_from_authorized_lot44_current_tree() -> None:
+    historical_test = (ROOT / "tests/test_lot43_v4_entry_gate.py").read_text(encoding="utf-8")
+    assert 'monkeypatch.setattr(gate_validator, "LOT44_FORBIDDEN_IMPLEMENTATION_PATHS", ())' in historical_test
+
+
 def test_lot45_implementation_remains_absent() -> None:
     for path in gate_validator.LOT45_FORBIDDEN_IMPLEMENTATION_PATHS:
         assert not path.exists()
