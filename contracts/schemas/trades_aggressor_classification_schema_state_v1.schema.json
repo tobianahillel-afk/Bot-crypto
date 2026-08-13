@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "trades_aggressor_classification_schema_state_v1.schema.json",
+  "title": "TradesAggressorClassificationSchemaStateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_context", "lineage", "event_time", "receive_time", "generated_at", "validation_state", "classified_trades", "confidence_state", "metrics", "reason_codes", "safety", "output_checksum"],
+  "properties": {
+    "schema_version": {"const": "trades-aggressor-classification-schema-state-v1"},
+    "run_context": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_version", "run_id", "runtime_mode", "config_version", "code_commit", "correlation_id"],
+      "properties": {
+        "schema_version": {"const": "lot44-run-context-v1"}, "run_id": {"type": "string", "minLength": 1},
+        "runtime_mode": {"const": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY"}, "config_version": {"const": "lot44-trades-aggressor-classification-config-v1"},
+        "code_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"}, "correlation_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "lineage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_version", "lineage_id", "entry_gate_checksum", "lot43_state_checksum", "lot43_audit_checksum", "lot43_resilience_checksum", "lot43_post_merge_checksum", "trade_fixture_checksum", "order_book_snapshot_checksum", "available_at"],
+      "properties": {
+        "schema_version": {"const": "lot44-lineage-envelope-v1"}, "lineage_id": {"type": "string", "minLength": 1},
+        "entry_gate_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "lot43_state_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lot43_audit_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "lot43_resilience_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lot43_post_merge_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "trade_fixture_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "order_book_snapshot_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "available_at": {"type": "string", "minLength": 1}
+      }
+    },
+    "event_time": {"type": "string", "minLength": 1}, "receive_time": {"type": "string", "minLength": 1}, "generated_at": {"type": "string", "minLength": 1},
+    "validation_state": {"const": "VALIDATED_OFFLINE_AGGRESSOR_CLASSIFICATION_ONLY"},
+    "classified_trades": {"type": "array", "minItems": 1, "items": {"$ref": "classified_trade_v1.schema.json"}},
+    "confidence_state": {"$ref": "aggressor_confidence_state_v1.schema.json"},
+    "metrics": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_version", "lot_44_trades_total", "lot_44_buy_trades_total", "lot_44_sell_trades_total", "lot_44_unknown_trades_total", "total_volume", "buy_volume", "sell_volume", "unknown_volume", "unknown_volume_ratio"],
+      "properties": {
+        "schema_version": {"const": "lot44-metrics-v1"}, "lot_44_trades_total": {"type": "integer", "minimum": 1},
+        "lot_44_buy_trades_total": {"type": "integer", "minimum": 0}, "lot_44_sell_trades_total": {"type": "integer", "minimum": 0}, "lot_44_unknown_trades_total": {"type": "integer", "minimum": 0},
+        "total_volume": {"type": "string", "pattern": "^(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)$"},
+        "buy_volume": {"type": "string", "pattern": "^[0-9]+(?:\\.[0-9]+)?$"},
+        "sell_volume": {"type": "string", "pattern": "^[0-9]+(?:\\.[0-9]+)?$"},
+        "unknown_volume": {"type": "string", "pattern": "^[0-9]+(?:\\.[0-9]+)?$"},
+        "unknown_volume_ratio": {"type": "string", "pattern": "^(?:0(?:\\.[0-9]+)?|1(?:\\.0+)?)$"}
+      }
+    },
+    "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "safety": {"$ref": "#/$defs/safety"},
+    "output_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["analysis_only", "approved_size", "execution_allowed", "external_connectivity_allowed", "market_event_publication_allowed", "network_ingestion_allowed", "order_routing_allowed", "participant_behavior_inference_explicitly_labeled", "raw_data_mutation_allowed", "real_credentials_allowed", "risk_approval_allowed", "scenario_score_is_signal", "signal_generation_allowed", "trade_allowed", "used_for_decision"],
+      "properties": {
+        "analysis_only": {"const": true},
+        "approved_size": {"const": 0},
+        "execution_allowed": {"const": false},
+        "external_connectivity_allowed": {"const": false},
+        "market_event_publication_allowed": {"const": false},
+        "network_ingestion_allowed": {"const": false},
+        "order_routing_allowed": {"const": false},
+        "participant_behavior_inference_explicitly_labeled": {"const": true},
+        "raw_data_mutation_allowed": {"const": false},
+        "real_credentials_allowed": {"const": false},
+        "risk_approval_allowed": {"const": false},
+        "scenario_score_is_signal": {"const": false},
+        "signal_generation_allowed": {"const": false},
+        "trade_allowed": {"const": false},
+        "used_for_decision": {"const": false}
+      }
+    }
+  }
+}

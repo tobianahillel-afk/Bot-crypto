@@ -1,0 +1,182 @@
+name: Lot 44 frozen evidence attestation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/lot44-frozen-evidence.yml'
+      - '.github/workflows/lot44-trades-aggressor-classification.yml'
+      - '.github/workflows/lot44-mutation-assurance.yml'
+      - 'config/microstructure/trades_and_aggressor_classification_schema_v1.json'
+      - 'contracts/schemas/classified_trade_v1.schema.json'
+      - 'contracts/schemas/aggressor_confidence_state_v1.schema.json'
+      - 'contracts/schemas/trades_aggressor_classification_schema_state_v1.schema.json'
+      - 'contracts/schemas/trades_aggressor_classification_schema_audit_v1.schema.json'
+      - 'src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py'
+      - 'src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py'
+      - 'src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py'
+      - 'scripts/run_lot44_trades_and_aggressor_classification_schema.py'
+      - 'scripts/validate_lot44.py'
+      - 'scripts/validate_lot44_frozen_evidence.py'
+      - 'scripts/validate_lot44_no_connectivity.py'
+      - 'tests/test_lot44*.py'
+      - 'docs/LOT_44_TRADES_AND_AGGRESSOR_CLASSIFICATION_SCHEMA.md'
+      - 'docs/ACCEPTANCE_CRITERIA_LOT_44.md'
+      - 'data/audit/trades_and_aggressor_classification_schema_lot44.json'
+      - 'data/audit/trades_and_aggressor_classification_schema_audit_lot44.json'
+      - 'data/audit/aggressor_confidence_state_lot44.json'
+      - 'reports/lot44/**'
+      - 'reports/lot_44_trades_and_aggressor_classification_schema_report.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  attest:
+    runs-on: ubuntu-22.04
+    env:
+      PYTHONPATH: src
+      GATE_MERGE_SHA: 6bbf4fcc5543f2599378bcab93263e2c8cebcec6
+      SOURCE_HEAD_SHA: d3cc4cf916ecea5166716746143a593f01b1d051
+      QUALITY_RETRIGGER_SHA: d3cc4cf916ecea5166716746143a593f01b1d051
+      CERTIFICATION_ANCHOR_SHA: 720b6f895672b650a7c7df96cdf68524479ae3f4
+      EVIDENCE_HEAD_SHA: 8ca3edadb7e811bad428575cfe236b20dd5ed62f
+      VALIDATOR_HEAD_SHA: 888fbf696432bec1a5f9d3e4f9c09279ed569325
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Prove final certification evidence and validator chain
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$GATE_MERGE_SHA" "$SOURCE_HEAD_SHA"
+          git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$QUALITY_RETRIGGER_SHA"
+          git merge-base --is-ancestor "$QUALITY_RETRIGGER_SHA" "$CERTIFICATION_ANCHOR_SHA"
+          git merge-base --is-ancestor "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA"
+          git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" "$VALIDATOR_HEAD_SHA"
+          git merge-base --is-ancestor "$VALIDATOR_HEAD_SHA" HEAD
+          test "$(git rev-list --count "$SOURCE_HEAD_SHA..$QUALITY_RETRIGGER_SHA")" = "0"
+          git diff --quiet "$SOURCE_HEAD_SHA" "$QUALITY_RETRIGGER_SHA"
+          test "$(git rev-list --count "$SOURCE_HEAD_SHA..$CERTIFICATION_ANCHOR_SHA")" = "2"
+          git diff --name-only "$SOURCE_HEAD_SHA" "$CERTIFICATION_ANCHOR_SHA" | sort > /tmp/cert.txt
+          printf '%s\n' \
+            .github/workflows/lot44-mutation-assurance.yml \
+            .github/workflows/lot44-trades-aggressor-classification.yml | sort > /tmp/cert-expected.txt
+          diff -u /tmp/cert-expected.txt /tmp/cert.txt
+          test "$(git rev-list --count "$CERTIFICATION_ANCHOR_SHA..$EVIDENCE_HEAD_SHA")" = "4"
+          git diff --name-only "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA" | sort > /tmp/evidence.txt
+          printf '%s\n' \
+            data/audit/trades_and_aggressor_classification_schema_audit_lot44.json \
+            data/audit/trades_and_aggressor_classification_schema_lot44.json \
+            reports/lot44/coverage_summary.json \
+            reports/lot44/mutation_summary.json | sort > /tmp/evidence-expected.txt
+          diff -u /tmp/evidence-expected.txt /tmp/evidence.txt
+          git diff --quiet "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA" -- \
+            data/audit/aggressor_confidence_state_lot44.json
+          test "$(git rev-list --count "$EVIDENCE_HEAD_SHA..$VALIDATOR_HEAD_SHA")" = "1"
+          git diff --name-only "$EVIDENCE_HEAD_SHA" "$VALIDATOR_HEAD_SHA" > /tmp/validator.txt
+          printf '%s\n' scripts/validate_lot44_frozen_evidence.py > /tmp/validator-expected.txt
+          diff -u /tmp/validator-expected.txt /tmp/validator.txt
+      - name: Prove final source controls evidence and validator immutability
+        run: |
+          set -euo pipefail
+          git diff --quiet "$SOURCE_HEAD_SHA" HEAD -- \
+            config/microstructure/trades_and_aggressor_classification_schema_v1.json \
+            contracts/schemas/classified_trade_v1.schema.json \
+            contracts/schemas/aggressor_confidence_state_v1.schema.json \
+            contracts/schemas/trades_aggressor_classification_schema_state_v1.schema.json \
+            contracts/schemas/trades_aggressor_classification_schema_audit_v1.schema.json \
+            src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py \
+            src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py \
+            src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py \
+            scripts/run_lot44_trades_and_aggressor_classification_schema.py \
+            scripts/validate_lot44.py scripts/validate_lot44_no_connectivity.py \
+            tests/test_lot44_trades_and_aggressor_classification_schema.py \
+            tests/test_lot44_schema_contracts.py tests/test_lot44_causal_guards.py \
+            tests/test_lot44_runtime_confidence_version.py \
+            docs/LOT_44_TRADES_AND_AGGRESSOR_CLASSIFICATION_SCHEMA.md \
+            docs/ACCEPTANCE_CRITERIA_LOT_44.md \
+            reports/lot_44_trades_and_aggressor_classification_schema_report.md
+          git diff --quiet "$CERTIFICATION_ANCHOR_SHA" HEAD -- \
+            .github/workflows/lot44-trades-aggressor-classification.yml \
+            .github/workflows/lot44-mutation-assurance.yml
+          git diff --quiet "$EVIDENCE_HEAD_SHA" HEAD -- \
+            data/audit/aggressor_confidence_state_lot44.json \
+            data/audit/trades_and_aggressor_classification_schema_audit_lot44.json \
+            data/audit/trades_and_aggressor_classification_schema_lot44.json \
+            reports/lot44/coverage_summary.json reports/lot44/mutation_summary.json
+          git diff --quiet "$VALIDATOR_HEAD_SHA" HEAD -- scripts/validate_lot44_frozen_evidence.py
+      - name: Validate final frozen evidence v7
+        run: |
+          set -euo pipefail
+          python -m compileall -q scripts/validate_lot44_frozen_evidence.py
+          ruff check scripts/validate_lot44_frozen_evidence.py
+          python scripts/validate_lot44_frozen_evidence.py | tee /tmp/lot44-frozen-validation.json
+      - name: Replay final source byte-identically
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/lot44-source /tmp/lot44-run1 /tmp/lot44-expected
+          mkdir -p /tmp/lot44-run1 /tmp/lot44-expected
+          cp data/audit/trades_and_aggressor_classification_schema_lot44.json /tmp/lot44-expected/
+          cp data/audit/trades_and_aggressor_classification_schema_audit_lot44.json /tmp/lot44-expected/
+          cp data/audit/aggressor_confidence_state_lot44.json /tmp/lot44-expected/
+          git worktree add --detach /tmp/lot44-source "$SOURCE_HEAD_SHA"
+          trap 'git worktree remove --force /tmp/lot44-source >/dev/null 2>&1 || true' EXIT
+          (
+            cd /tmp/lot44-source
+            outputs=(
+              data/audit/trades_and_aggressor_classification_schema_lot44.json
+              data/audit/trades_and_aggressor_classification_schema_audit_lot44.json
+              data/audit/aggressor_confidence_state_lot44.json
+            )
+            PYTHONPATH=src python scripts/run_lot44_trades_and_aggressor_classification_schema.py --code-commit "$SOURCE_HEAD_SHA"
+            PYTHONPATH=src python scripts/validate_lot44.py --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
+            PYTHONPATH=src python scripts/validate_lot44_no_connectivity.py
+            for path in "${outputs[@]}"; do
+              cmp "$path" "/tmp/lot44-expected/$(basename "$path")"
+              cp "$path" "/tmp/lot44-run1/$(basename "$path")"
+            done
+            PYTHONPATH=src python scripts/run_lot44_trades_and_aggressor_classification_schema.py --code-commit "$SOURCE_HEAD_SHA"
+            PYTHONPATH=src python scripts/validate_lot44.py --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
+            for path in "${outputs[@]}"; do cmp "/tmp/lot44-run1/$(basename "$path")" "$path"; done
+            PYTHONPATH=src pytest -q tests/test_lot44_trades_and_aggressor_classification_schema.py tests/test_lot44_schema_contracts.py tests/test_lot44_causal_guards.py tests/test_lot44_runtime_confidence_version.py
+          )
+          git worktree remove --force /tmp/lot44-source
+          trap - EXIT
+      - name: Current architecture security regression and downstream locks
+        run: |
+          set -euo pipefail
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          python scripts/validate_lot44_no_connectivity.py
+          bandit -q -r scripts/validate_lot44_frozen_evidence.py -ll
+          pip-audit -r requirements-dev.lock
+          pytest -q
+          for repetition in 1 2 3; do
+            pytest -q tests/test_lot44_trades_and_aggressor_classification_schema.py tests/test_lot44_schema_contracts.py tests/test_lot44_causal_guards.py tests/test_lot44_runtime_confidence_version.py
+          done
+          test ! -e src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py
+          test ! -e scripts/run_lot45_order_flow_delta_and_cvd_engine.py
+          test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine.py
+          test ! -e scripts/run_lot46_trade_classification_confidence_engine.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot44-frozen-evidence-attestation
+          path: /tmp/lot44-frozen-validation.json
