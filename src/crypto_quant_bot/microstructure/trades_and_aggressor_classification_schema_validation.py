@@ -162,7 +162,18 @@ def lot44_safety() -> dict[str, object]:
 
 
 def validate_safety(value: dict[str, object]) -> None:
-    require(value == lot44_safety(), "Lot 44 safety boundary changed")
+    expected = lot44_safety()
+    require(set(value) == set(expected), "Lot 44 safety fields changed")
+    for field, expected_value in expected.items():
+        actual_value = value[field]
+        require(
+            type(actual_value) is type(expected_value),
+            f"Lot 44 safety type changed: {field}",
+        )
+        require(
+            actual_value == expected_value,
+            f"Lot 44 safety value changed: {field}",
+        )
 
 
 def require_closed_mapping(
