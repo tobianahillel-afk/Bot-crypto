@@ -111,7 +111,7 @@
     "unknown_volume": "0.05",
     "unknown_volume_ratio": "0.3125"
   },
-  "output_checksum": "13073e0c1dc620670eb9f66ae4fc3a228993f36da96899f3a85cc4ce980123c9",
+  "output_checksum": "d8387596343f279d10e7b3a3958f0e7fffd54f707583ab133bf3a6b16f08ec90",
   "reason_codes": [
     "LOT44_OFFLINE_AGGRESSOR_CLASSIFICATION_VALIDATED",
     "QUOTE_TEST_PRIMARY_POLICY_ENFORCED",
@@ -122,7 +122,7 @@
   ],
   "receive_time": "2026-08-06T19:18:40.050000Z",
   "run_context": {
-    "code_commit": "fd6d4d88608b80a7f27d561f59988072177d00b2",
+    "code_commit": "39c975e1b9777eec2d5616d7c11ff4be65898e7d",
     "config_version": "lot44-trades-aggressor-classification-config-v1",
     "correlation_id": "lot44-reference-correlation",
     "run_id": "lot44-reference-run",
