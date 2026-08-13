@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   harden:
-    if: github.event.head_commit.message == 'Run temporary Lot 44 review hardening'
+    if: github.event.head_commit.message == 'Retry temporary Lot 44 review hardening'
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -26,13 +26,17 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
       - name: Apply review hardening
-        run: python scripts/_lot44_review_hardening.py
+        run: |
+          python scripts/_lot44_review_hardening.py
+          sed -i 's/Lot 44 confidence policy ordering changed/Lot 44 v1 confidence policy constants changed/g' \
+            tests/test_lot44_trades_and_aggressor_classification_schema.py
       - name: Validate hardening
         run: |
           set -euo pipefail
           ruff check \
             src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py \
             src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py \
+            tests/test_lot44_trades_and_aggressor_classification_schema.py \
             tests/test_lot44_causal_guards.py
           mypy src/crypto_quant_bot/microstructure
           pytest -q \
