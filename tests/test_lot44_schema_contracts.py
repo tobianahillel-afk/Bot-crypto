@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -62,6 +63,42 @@ def test_lot44_classified_trade_contract_is_closed_and_versioned() -> None:
         "NONE",
     }
     assert properties["confidence_version"]["const"] == "lot44-aggressor-confidence-v1"
+    assert len(schema["allOf"]) == 4
+
+
+def test_lot44_trade_numeric_patterns_match_positive_runtime_contract() -> None:
+    trade = _load(CLASSIFIED_TRADE_SCHEMA)["properties"]["trade"]
+    for field in ("price", "quantity"):
+        pattern = trade["properties"][field]["pattern"]
+        for value in ("0.0001", "0.05", "1", "50025.1"):
+            assert re.fullmatch(pattern, value)
+        for value in ("0", "0.0", "-1", "NaN", "Infinity", "invalid"):
+            assert re.fullmatch(pattern, value) is None
+
+
+def test_lot44_classification_method_implications_are_closed() -> None:
+    schema = _load(CLASSIFIED_TRADE_SCHEMA)
+    clauses = schema["allOf"]
+    by_method = {
+        clause["if"]["properties"].get("classification_method", {}).get("const"): clause
+        for clause in clauses
+        if "classification_method" in clause["if"]["properties"]
+    }
+    quote = by_method["QUOTE_TEST"]["then"]["properties"]
+    tick = by_method["TICK_RULE"]["then"]["properties"]
+    none = by_method["NONE"]["then"]["properties"]
+    assert set(quote["aggressor_classification"]["enum"]) == {
+        "BUY_AGGRESSOR",
+        "SELL_AGGRESSOR",
+    }
+    assert quote["confidence"]["const"] == "1"
+    assert set(tick["aggressor_classification"]["enum"]) == {
+        "BUY_AGGRESSOR",
+        "SELL_AGGRESSOR",
+    }
+    assert tick["confidence"]["const"] == "0.5"
+    assert none["aggressor_classification"]["const"] == "UNKNOWN"
+    assert none["confidence"]["const"] == "0"
 
 
 def test_lot44_confidence_contract_is_descriptive_not_probability_engine() -> None:
@@ -95,6 +132,22 @@ def test_lot44_state_schema_keeps_runtime_lineage_metrics_and_safety_closed() ->
     assert safety["properties"]["execution_allowed"]["const"] is False
     assert safety["properties"]["approved_size"]["const"] == 0
     assert safety["properties"]["used_for_decision"]["const"] is False
+
+
+def test_lot44_metric_numeric_patterns_match_runtime_bounds() -> None:
+    metrics = _load(STATE_SCHEMA)["properties"]["metrics"]["properties"]
+    positive = metrics["total_volume"]["pattern"]
+    non_negative = metrics["unknown_volume"]["pattern"]
+    ratio = metrics["unknown_volume_ratio"]["pattern"]
+    assert re.fullmatch(positive, "0.16")
+    assert re.fullmatch(positive, "0") is None
+    assert re.fullmatch(non_negative, "0")
+    assert re.fullmatch(non_negative, "0.05")
+    assert re.fullmatch(non_negative, "-0.1") is None
+    for value in ("0", "0.3125", "1", "1.0"):
+        assert re.fullmatch(ratio, value)
+    for value in ("-0.1", "1.01", "NaN", "Infinity"):
+        assert re.fullmatch(ratio, value) is None
 
 
 def test_lot44_audit_schema_binds_frozen_inputs_and_closed_safety() -> None:
