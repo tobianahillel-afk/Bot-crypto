@@ -5,6 +5,6 @@
   "line_coverage_min_percent": 95.0,
   "line_coverage_percent": 98.78,
   "schema_version": "lot44-coverage-summary-v1",
-  "source_head_sha": "fe11756c449fccc9cccf7013feac2997024721c9",
+  "source_head_sha": "d3cc4cf916ecea5166716746143a593f01b1d051",
   "status": "PASS"
 }
