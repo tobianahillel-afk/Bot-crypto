@@ -20,8 +20,8 @@
         "trade_id": {"type": "string", "minLength": 1},
         "event_time": {"type": "string", "minLength": 1},
         "receive_time": {"type": "string", "minLength": 1},
-        "price": {"type": "string", "pattern": "^[0-9]+(?:\\.[0-9]+)?$"},
-        "quantity": {"type": "string", "pattern": "^[0-9]+(?:\\.[0-9]+)?$"},
+        "price": {"type": "string", "pattern": "^(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)$"},
+        "quantity": {"type": "string", "pattern": "^(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)$"},
         "source_side": {"const": "UNKNOWN"}
       }
     },
@@ -31,5 +31,43 @@
     "confidence_version": {"const": "lot44-aggressor-confidence-v1"},
     "quote_snapshot_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
-  }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"classification_method": {"const": "QUOTE_TEST"}}, "required": ["classification_method"]},
+      "then": {
+        "properties": {
+          "aggressor_classification": {"enum": ["BUY_AGGRESSOR", "SELL_AGGRESSOR"]},
+          "confidence": {"const": "1"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"classification_method": {"const": "TICK_RULE"}}, "required": ["classification_method"]},
+      "then": {
+        "properties": {
+          "aggressor_classification": {"enum": ["BUY_AGGRESSOR", "SELL_AGGRESSOR"]},
+          "confidence": {"const": "0.5"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"classification_method": {"const": "NONE"}}, "required": ["classification_method"]},
+      "then": {
+        "properties": {
+          "aggressor_classification": {"const": "UNKNOWN"},
+          "confidence": {"const": "0"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"aggressor_classification": {"const": "UNKNOWN"}}, "required": ["aggressor_classification"]},
+      "then": {
+        "properties": {
+          "classification_method": {"const": "NONE"},
+          "confidence": {"const": "0"}
+        }
+      }
+    }
+  ]
 }
