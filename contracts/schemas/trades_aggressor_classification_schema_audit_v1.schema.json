@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "trades_aggressor_classification_schema_audit_v1.schema.json",
+  "title": "TradesAggressorClassificationSchemaAuditV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "code_commit", "state_output_checksum", "config_checksum", "entry_gate_checksum", "trade_fixture_checksum", "order_book_snapshot_checksum", "validation_state", "safety", "audit_checksum"],
+  "properties": {
+    "schema_version": {"const": "trades-aggressor-classification-schema-audit-v1"},
+    "code_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "state_output_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "config_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "entry_gate_checksum": {"const": "100d21ea18cfd7d9fe275ac0bea162c76a0bb7e5f85e319b543b4053e3c4d5ef"},
+    "trade_fixture_checksum": {"const": "b07e3a6a784c801c9ae386a33a1cbe1f936901b1549d5001bc5e53e42de9e2f8"},
+    "order_book_snapshot_checksum": {"const": "0d63ca7ac1ca48b44e58c0b0f1eb8946190eaf2da6745c2bbd2dd8de14f49b16"},
+    "validation_state": {"const": "VALIDATED_OFFLINE_AGGRESSOR_CLASSIFICATION_ONLY"},
+    "safety": {"type": "object"},
+    "audit_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
