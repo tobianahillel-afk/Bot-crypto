@@ -36,7 +36,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Replay certified historical Lot 43 gate
+      - name: Prove certified gate squash and replay historical absence
         run: |
           set -euo pipefail
           git merge-base --is-ancestor "$GATE_MERGE_SHA" HEAD
@@ -48,6 +48,14 @@ jobs:
             cd /tmp/lot43-gate-certified
             PYTHONPATH=src python scripts/validate_lot43_entry_gate.py
             PYTHONPATH=src pytest -q tests/test_lot43_v4_entry_gate.py
+            test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py
+            test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py
+            test ! -e src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_validation.py
+            test ! -e config/microstructure/book_resilience_and_replenishment_engine_v1.json
+            test ! -e scripts/run_lot43_book_resilience_and_replenishment_engine.py
+            test ! -e scripts/validate_lot43.py
+            test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py
+            test ! -e scripts/run_lot44_trades_and_aggressor_classification_schema.py
           )
           git worktree remove --force /tmp/lot43-gate-certified
           trap - EXIT
@@ -59,12 +67,21 @@ jobs:
           python -m json.tool contracts/schemas/lot43_v4_entry_gate_v1.schema.json >/dev/null
           ruff check scripts/validate_lot43_entry_gate.py tests/test_lot43_v4_entry_gate.py
           pytest -q tests/test_lot43_v4_entry_gate.py
+      - name: Architecture roadmap traceability and engineering controls
+        run: |
+          set -euo pipefail
           python scripts/validate_roadmap_documentation.py
           python scripts/validate_architecture_boundaries.py
           python scripts/validate_domain_architecture.py
           python scripts/audit_roadmap_semantics.py
           python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
           python scripts/quality_inventory.py
           python scripts/validate_engineering_deviations.py
+      - name: Security dependency full regression and anti-flake
+        run: |
+          set -euo pipefail
           bandit -q -r scripts/validate_lot43_entry_gate.py -ll
           pip-audit -r requirements-dev.lock
+          pytest -q
+          for repetition in 1 2 3; do pytest -q tests/test_lot43_v4_entry_gate.py; done
