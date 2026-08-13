@@ -16,18 +16,19 @@ from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_re
 )
 
 GATE_MERGE = "6bbf4fcc5543f2599378bcab93263e2c8cebcec6"
-SOURCE_HEAD = "fd6d4d88608b80a7f27d561f59988072177d00b2"
-CERTIFICATION_ANCHOR = "74dce49ba636cb47ae09fcef7de48bdc3d21de15"
-EVIDENCE_HEAD = "dc9fb81b2b32858b75180d6b632346577df02d1e"
+SOURCE_HEAD = "39c975e1b9777eec2d5616d7c11ff4be65898e7d"
+CERTIFICATION_ANCHOR = "275ef9e4806e3d1bbe85c5cd678280456ef3a67b"
+EVIDENCE_HEAD = "e5748d3924434f2bb73ec5f174315edca4840509"
+SUPERSEDED_FROZEN_HEAD = "e2141fb19fd9d200ada823ebcc14df26f81f5506"
 VALIDATION_PROOF = (
-    31686334383,
-    9175566934,
-    "sha256:c46fe1ce78ebd7d0b3c53c92a7e2dc384e0533db01fc8a2d5c35f9cab6229a27",
+    31688053781,
+    9176241069,
+    "sha256:6f89a53b5d91ba04c2828a8b58ec893352e7c8137b136a854b6e0d4b7dc363c7",
 )
 MUTATION_PROOF = (
-    31686334377,
-    9175606543,
-    "sha256:2ac06ae633ebe463615f94323435e8e21d6bc6bea975fed3e2647e1c01db7a10",
+    31688053766,
+    9176279963,
+    "sha256:5400cdf59f1014f23680e133d204e94c8f03cce3f92c89f4e4e0f24f5e3364c4",
 )
 
 STATE = ROOT / "data/audit/trades_and_aggressor_classification_schema_lot44.json"
@@ -37,14 +38,14 @@ COVERAGE = ROOT / "reports/lot44/coverage_summary.json"
 MUTATION = ROOT / "reports/lot44/mutation_summary.json"
 
 EXPECTED_HASHES = {
-    STATE: "09c211e4fa243fcb79a01264afb4d21c8b132a0ab5b488260e595aaf7f9eb36e",
-    AUDIT: "82dbb582430a0c3600981bcdbfd58f1353f8cd80d609f2cb5a9c20fcd1592374",
+    STATE: "db689e95164fcdacdf20f0f8106501cdca39009ae8945cf49c2140152c38aacb",
+    AUDIT: "8a0a7aa511d0027f3985cf5b470cdec92cb30b02e591c77fd6998f1f9bf3bdb1",
     CONFIDENCE: "20c5d82709d8fa2ef03e789bc691472b9015d2fe657dec7751ae0a6076cfd027",
-    COVERAGE: "c0f5330701ad77cd3a6f41d43be64fc9d6c57eda96411c5ce40a9977a4223009",
-    MUTATION: "155a21fe93a4b5a619cb696af5bb64f63958b61ede605212c07140917c293610",
+    COVERAGE: "2f7093db38b3fd2f8e5dc62b1675740dc249637de90a3195f4c27f48bc6ed5b5",
+    MUTATION: "8d8959cd731f9fcdfe74ce90e10abce9d46d5044a0c97a76d2fac843b1278855",
 }
-EXPECTED_STATE = "13073e0c1dc620670eb9f66ae4fc3a228993f36da96899f3a85cc4ce980123c9"
-EXPECTED_AUDIT = "8a818942b1e49a2755dd86eff629c31006128b2c1d3be060b1d8a170a501a836"
+EXPECTED_STATE = "d8387596343f279d10e7b3a3958f0e7fffd54f707583ab133bf3a6b16f08ec90"
+EXPECTED_AUDIT = "bfcf82fc6227bdcc33dff696a61e110a79a3306113532f7fc58b5f1a67b7709c"
 EXPECTED_CONFIDENCE = "7cb11e078d7f0d9ed0858229d8c6fe31a7cf653a238b280b05dbdd84d1250f05"
 EXPECTED_LINEAGE = {
     "entry_gate_checksum": "100d21ea18cfd7d9fe275ac0bea162c76a0bb7e5f85e319b543b4053e3c4d5ef",
@@ -168,16 +169,16 @@ def _verify_reference(state: dict[str, Any], confidence: dict[str, Any]) -> None
 def _verify_quality(coverage: dict[str, Any], mutation: dict[str, Any]) -> None:
     require(coverage["status"] == "PASS", "coverage not PASS")
     require(coverage["source_head_sha"] == SOURCE_HEAD, "coverage source changed")
-    require(coverage["line_coverage_percent"] == 98.86, "line coverage changed")
+    require(coverage["line_coverage_percent"] == 98.88, "line coverage changed")
     require(coverage["branch_coverage_percent"] == 100.0, "branch coverage changed")
     require(coverage["anti_flake_repetitions"] == 3, "anti-flake changed")
     require(mutation["status"] == "PASS", "mutation not PASS")
     require(mutation["source_head_sha"] == SOURCE_HEAD, "mutation source changed")
-    require(mutation["mutation_score_percent"] == 81.01, "mutation score changed")
-    require(mutation["killed_mutants"] == 1237, "killed mutants changed")
-    require(mutation["survived_mutants"] == 290, "survived mutants changed")
-    require(mutation["total_mutants"] == 1527, "total mutants changed")
-    require(mutation["evaluated_mutants"] == 1527, "evaluated mutants changed")
+    require(mutation["mutation_score_percent"] == 80.61, "mutation score changed")
+    require(mutation["killed_mutants"] == 1260, "killed mutants changed")
+    require(mutation["survived_mutants"] == 303, "survived mutants changed")
+    require(mutation["total_mutants"] == 1563, "total mutants changed")
+    require(mutation["evaluated_mutants"] == 1563, "evaluated mutants changed")
     require(mutation["timeout_mutants"] == 0, "mutation timeout present")
     require(mutation["suspicious_mutants"] == 0, "suspicious mutation present")
 
@@ -194,12 +195,13 @@ def validate() -> dict[str, object]:
     _verify_quality(coverage, mutation)
     _verify_downstream_lock()
     return {
-        "schema_version": "lot44-frozen-evidence-validation-v1",
+        "schema_version": "lot44-frozen-evidence-validation-v2",
         "status": "PASS",
         "gate_merge": GATE_MERGE,
         "source_head": SOURCE_HEAD,
         "certification_anchor": CERTIFICATION_ANCHOR,
         "evidence_head": EVIDENCE_HEAD,
+        "superseded_frozen_head": SUPERSEDED_FROZEN_HEAD,
         "state_output_checksum": EXPECTED_STATE,
         "audit_checksum": EXPECTED_AUDIT,
         "confidence_checksum": EXPECTED_CONFIDENCE,
