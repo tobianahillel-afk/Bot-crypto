@@ -75,28 +75,38 @@ def test_lot44_confidence_contract_is_descriptive_not_probability_engine() -> No
     assert properties["unknown_confidence"]["const"] == "0"
 
 
-def test_lot44_state_schema_keeps_runtime_lineage_and_metrics_closed() -> None:
+def test_lot44_state_schema_keeps_runtime_lineage_metrics_and_safety_closed() -> None:
     schema = _load(STATE_SCHEMA)
     properties = schema["properties"]
     run_context = properties["run_context"]
     lineage = properties["lineage"]
     metrics = properties["metrics"]
+    safety = schema["$defs"]["safety"]
     assert run_context["additionalProperties"] is False
     assert lineage["additionalProperties"] is False
     assert metrics["additionalProperties"] is False
+    assert safety["additionalProperties"] is False
     assert run_context["properties"]["runtime_mode"]["const"] == "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY"
     assert properties["validation_state"]["const"] == "VALIDATED_OFFLINE_AGGRESSOR_CLASSIFICATION_ONLY"
     assert properties["classified_trades"]["items"]["$ref"] == "classified_trade_v1.schema.json"
     assert properties["confidence_state"]["$ref"] == "aggressor_confidence_state_v1.schema.json"
+    assert properties["safety"]["$ref"] == "#/$defs/safety"
+    assert safety["properties"]["trade_allowed"]["const"] is False
+    assert safety["properties"]["execution_allowed"]["const"] is False
+    assert safety["properties"]["approved_size"]["const"] == 0
+    assert safety["properties"]["used_for_decision"]["const"] is False
 
 
-def test_lot44_audit_schema_binds_frozen_input_checksums() -> None:
+def test_lot44_audit_schema_binds_frozen_inputs_and_closed_safety() -> None:
     schema = _load(AUDIT_SCHEMA)
     properties = schema["properties"]
     assert properties["entry_gate_checksum"]["const"] == "100d21ea18cfd7d9fe275ac0bea162c76a0bb7e5f85e319b543b4053e3c4d5ef"
     assert properties["trade_fixture_checksum"]["const"] == "b07e3a6a784c801c9ae386a33a1cbe1f936901b1549d5001bc5e53e42de9e2f8"
     assert properties["order_book_snapshot_checksum"]["const"] == "0d63ca7ac1ca48b44e58c0b0f1eb8946190eaf2da6745c2bbd2dd8de14f49b16"
     assert properties["validation_state"]["const"] == "VALIDATED_OFFLINE_AGGRESSOR_CLASSIFICATION_ONLY"
+    assert properties["safety"]["$ref"] == (
+        "trades_aggressor_classification_schema_state_v1.schema.json#/$defs/safety"
+    )
 
 
 def test_lot44_runtime_outputs_match_closed_schema_key_sets() -> None:
@@ -108,6 +118,7 @@ def test_lot44_runtime_outputs_match_closed_schema_key_sets() -> None:
     _assert_required_keys(state.to_dict(), state_schema)
     _assert_required_keys(audit.to_dict(), audit_schema)
     _assert_required_keys(state.confidence_state.to_dict(), confidence_schema)
+    _assert_required_keys(state.safety, state_schema["$defs"]["safety"])
     for item in state.classified_trades:
         payload = item.to_dict()
         _assert_required_keys(payload, trade_schema)
