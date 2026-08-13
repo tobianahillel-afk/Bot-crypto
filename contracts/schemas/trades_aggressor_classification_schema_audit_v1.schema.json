@@ -14,7 +14,7 @@
     "trade_fixture_checksum": {"const": "b07e3a6a784c801c9ae386a33a1cbe1f936901b1549d5001bc5e53e42de9e2f8"},
     "order_book_snapshot_checksum": {"const": "0d63ca7ac1ca48b44e58c0b0f1eb8946190eaf2da6745c2bbd2dd8de14f49b16"},
     "validation_state": {"const": "VALIDATED_OFFLINE_AGGRESSOR_CLASSIFICATION_ONLY"},
-    "safety": {"type": "object"},
+    "safety": {"$ref": "trades_aggressor_classification_schema_state_v1.schema.json#/$defs/safety"},
     "audit_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
   }
 }
