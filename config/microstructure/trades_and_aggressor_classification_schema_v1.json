@@ -1,0 +1,17 @@
+{
+  "schema_version": "lot44-trades-aggressor-classification-config-v1",
+  "config_version": "lot44-trades-aggressor-classification-config-v1",
+  "confidence_version": "lot44-aggressor-confidence-v1",
+  "run_id": "lot44-reference-run",
+  "correlation_id": "lot44-reference-correlation",
+  "lineage_id": "lot44-from-go-lot44-entry-and-frozen-v4-inputs",
+  "generated_at": "2026-08-06T19:18:41.000000Z",
+  "entry_gate_path": "data/audit/lot44_v4_entry_gate.json",
+  "trade_fixture_path": "tests/fixtures/lot37/offline_trade_availability_fixture_v1.json",
+  "order_book_snapshot_path": "data/audit/order_book_snapshot_lot38.json",
+  "max_quote_age_us": 250000,
+  "tick_rule_fallback_when_quote_unavailable": true,
+  "quote_test_confidence": "1",
+  "tick_rule_confidence": "0.5",
+  "unknown_confidence": "0"
+}
