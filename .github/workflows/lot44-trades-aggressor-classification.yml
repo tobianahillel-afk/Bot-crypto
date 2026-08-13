@@ -29,12 +29,12 @@ jobs:
     env:
       PYTHONPATH: src
       GATE_MERGE_SHA: 6bbf4fcc5543f2599378bcab93263e2c8cebcec6
-      SOURCE_HEAD_SHA: fd6d4d88608b80a7f27d561f59988072177d00b2
+      SOURCE_HEAD_SHA: 39c975e1b9777eec2d5616d7c11ff4be65898e7d
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: fd6d4d88608b80a7f27d561f59988072177d00b2
+          ref: 39c975e1b9777eec2d5616d7c11ff4be65898e7d
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
@@ -76,7 +76,8 @@ jobs:
               scripts/run_lot44_trades_and_aggressor_classification_schema.py \
               scripts/validate_lot44.py scripts/validate_lot44_no_connectivity.py \
               tests/test_lot44_trades_and_aggressor_classification_schema.py \
-              tests/test_lot44_schema_contracts.py
+              tests/test_lot44_schema_contracts.py \
+              tests/test_lot44_causal_guards.py
             mypy src/crypto_quant_bot/microstructure
             python scripts/validate_lot44_no_connectivity.py
           } 2>&1 | tee reports/lot44/static_checks.txt
@@ -87,6 +88,7 @@ jobs:
           pytest -q \
             tests/test_lot44_trades_and_aggressor_classification_schema.py \
             tests/test_lot44_schema_contracts.py \
+            tests/test_lot44_causal_guards.py \
             --cov=crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema \
             --cov=crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_models \
             --cov=crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_validation \
@@ -155,7 +157,8 @@ jobs:
           for repetition in 1 2 3; do
             pytest -q \
               tests/test_lot44_trades_and_aggressor_classification_schema.py \
-              tests/test_lot44_schema_contracts.py
+              tests/test_lot44_schema_contracts.py \
+              tests/test_lot44_causal_guards.py
           done
       - uses: actions/upload-artifact@v4
         if: always()
