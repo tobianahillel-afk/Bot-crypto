@@ -12,7 +12,6 @@ from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_
     TradesAggressorClassificationValidationError,
 )
 
-
 ROOT = Path(__file__).resolve().parents[1]
 CODE_COMMIT = "a" * 40
 
