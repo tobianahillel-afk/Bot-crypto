@@ -29,12 +29,12 @@ jobs:
     env:
       PYTHONPATH: src
       GATE_MERGE_SHA: 6bbf4fcc5543f2599378bcab93263e2c8cebcec6
-      SOURCE_HEAD_SHA: bfe9f67ea4fc3daffc14d238aff61f298dbd1bef
+      SOURCE_HEAD_SHA: fe11756c449fccc9cccf7013feac2997024721c9
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: bfe9f67ea4fc3daffc14d238aff61f298dbd1bef
+          ref: fe11756c449fccc9cccf7013feac2997024721c9
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
