@@ -423,6 +423,30 @@ def _classify_with_quote(
     )
 
 
+def _validate_tick_history(
+    previous_trade: TimestampedTradeV1,
+    trade: TimestampedTradeV1,
+) -> None:
+    previous_event = parse_utc_timestamp(previous_trade.event_time, "previous event_time")
+    trade_event = parse_utc_timestamp(trade.event_time, "trade event_time")
+    previous_receive = parse_utc_timestamp(
+        previous_trade.receive_time, "previous receive_time"
+    )
+    trade_receive = parse_utc_timestamp(trade.receive_time, "trade receive_time")
+    require(
+        previous_event <= trade_event and previous_receive <= trade_receive,
+        "tick-rule previous trade cannot be future",
+    )
+    previous_identity = (
+        previous_trade.source_id,
+        previous_trade.venue,
+        previous_trade.instrument_id,
+        previous_trade.market_type,
+    )
+    trade_identity = (trade.source_id, trade.venue, trade.instrument_id, trade.market_type)
+    require(previous_identity == trade_identity, "tick-rule previous trade identity mismatch")
+
+
 def _classify_without_quote(
     trade: TimestampedTradeV1,
     previous_trade: TimestampedTradeV1 | None,
@@ -436,27 +460,7 @@ def _classify_without_quote(
             "QUOTE_UNAVAILABLE_NO_FALLBACK_EVIDENCE",
             confidence,
         )
-    previous_event = parse_utc_timestamp(previous_trade.event_time, "previous event_time")
-    trade_event = parse_utc_timestamp(trade.event_time, "trade event_time")
-    previous_receive = parse_utc_timestamp(
-        previous_trade.receive_time,
-        "previous receive_time",
-    )
-    trade_receive = parse_utc_timestamp(trade.receive_time, "trade receive_time")
-    require(
-        previous_event <= trade_event and previous_receive <= trade_receive,
-        "tick-rule previous trade cannot be future",
-    )
-    require(
-        (
-            previous_trade.source_id,
-            previous_trade.venue,
-            previous_trade.instrument_id,
-            previous_trade.market_type,
-        )
-        == (trade.source_id, trade.venue, trade.instrument_id, trade.market_type),
-        "tick-rule previous trade identity mismatch",
-    )
+    _validate_tick_history(previous_trade, trade)
     if trade.price > previous_trade.price:
         return _classified(
             trade,
