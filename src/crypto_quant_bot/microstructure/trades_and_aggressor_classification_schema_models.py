@@ -8,7 +8,6 @@ from .trades_and_aggressor_classification_schema_validation import (
     CLASSIFICATIONS,
     CONFIDENCE_SEMANTICS,
     METHODS,
-    TradesAggressorClassificationValidationError,
     decimal_text,
     require,
     require_git_sha,
@@ -31,7 +30,13 @@ class Lot44RunContextV1:
     correlation_id: str
 
     def __post_init__(self) -> None:
-        validate_run_context(self.run_id, self.runtime_mode, self.config_version, self.code_commit, self.correlation_id)
+        validate_run_context(
+            self.run_id,
+            self.runtime_mode,
+            self.config_version,
+            self.code_commit,
+            self.correlation_id,
+        )
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -100,15 +105,26 @@ class TimestampedTradeV1:
 
     def __post_init__(self) -> None:
         for field, value in (
-            ("source_id", self.source_id), ("venue", self.venue),
-            ("instrument_id", self.instrument_id), ("trade_id", self.trade_id),
+            ("source_id", self.source_id),
+            ("venue", self.venue),
+            ("instrument_id", self.instrument_id),
+            ("trade_id", self.trade_id),
         ):
             require_text(value, field)
         require(self.market_type == "SPOT", "Lot 44 reference trade must be SPOT")
         validate_causal_times(self.event_time, self.receive_time, self.receive_time)
-        require(self.price.is_finite() and self.price > 0, "trade price must be positive finite Decimal")
-        require(self.quantity.is_finite() and self.quantity > 0, "trade quantity must be positive finite Decimal")
-        require(self.source_side == "UNKNOWN", "Lot 44 source trade side must remain UNKNOWN")
+        require(
+            self.price.is_finite() and self.price > 0,
+            "trade price must be positive finite Decimal",
+        )
+        require(
+            self.quantity.is_finite() and self.quantity > 0,
+            "trade quantity must be positive finite Decimal",
+        )
+        require(
+            self.source_side == "UNKNOWN",
+            "Lot 44 source trade side must remain UNKNOWN",
+        )
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -137,18 +153,37 @@ class ClassifiedTradeV1:
     reason_codes: tuple[str, ...]
 
     def __post_init__(self) -> None:
-        require(self.aggressor_classification in CLASSIFICATIONS, "unknown aggressor classification")
-        require(self.classification_method in METHODS, "unknown classification method")
-        require(self.confidence.is_finite() and Decimal(0) <= self.confidence <= Decimal(1), "confidence outside [0,1]")
+        require(
+            self.aggressor_classification in CLASSIFICATIONS,
+            "unknown aggressor classification",
+        )
+        require(
+            self.classification_method in METHODS,
+            "unknown classification method",
+        )
+        require(
+            self.confidence.is_finite()
+            and Decimal(0) <= self.confidence <= Decimal(1),
+            "confidence outside [0,1]",
+        )
         require_text(self.confidence_version, "confidence_version")
         require_sha256(self.quote_snapshot_checksum, "quote_snapshot_checksum")
         require_reason_codes(self.reason_codes)
         if self.aggressor_classification == "UNKNOWN":
-            require(self.classification_method == "NONE" or self.confidence == 0, "UNKNOWN cannot carry positive inferred confidence")
+            require(
+                self.classification_method == "NONE" or self.confidence == 0,
+                "UNKNOWN cannot carry positive inferred confidence",
+            )
         if self.classification_method == "QUOTE_TEST":
-            require(self.aggressor_classification != "UNKNOWN", "quote-test method requires classified side")
+            require(
+                self.aggressor_classification != "UNKNOWN",
+                "quote-test method requires classified side",
+            )
         if self.classification_method == "TICK_RULE":
-            require(self.aggressor_classification != "UNKNOWN", "tick-rule method requires classified side")
+            require(
+                self.aggressor_classification != "UNKNOWN",
+                "tick-rule method requires classified side",
+            )
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -174,19 +209,32 @@ class AggressorConfidenceStateV1:
 
     def __post_init__(self) -> None:
         require_text(self.policy_version, "policy_version")
-        require(self.semantics == CONFIDENCE_SEMANTICS, "confidence semantics changed")
+        require(
+            self.semantics == CONFIDENCE_SEMANTICS,
+            "confidence semantics changed",
+        )
         for field, value in (
             ("quote_test_confidence", self.quote_test_confidence),
             ("tick_rule_confidence", self.tick_rule_confidence),
             ("unknown_confidence", self.unknown_confidence),
         ):
-            require(value.is_finite() and Decimal(0) <= value <= Decimal(1), f"{field} outside [0,1]")
-        require(self.quote_test_confidence > self.tick_rule_confidence > self.unknown_confidence, "confidence ordering changed")
+            require(
+                value.is_finite() and Decimal(0) <= value <= Decimal(1),
+                f"{field} outside [0,1]",
+            )
+        require(
+            self.quote_test_confidence
+            > self.tick_rule_confidence
+            > self.unknown_confidence,
+            "confidence ordering changed",
+        )
         require(self.unknown_confidence == 0, "unknown confidence must remain zero")
         require_sha256(self.confidence_checksum, "confidence_checksum")
 
     def payload_without_checksum(self) -> dict[str, Any]:
-        payload = self.to_dict(); payload.pop("confidence_checksum"); return payload
+        payload = self.to_dict()
+        payload.pop("confidence_checksum")
+        return payload
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -214,15 +262,32 @@ class Lot44MetricsV1:
 
     def __post_init__(self) -> None:
         for field, value in (
-            ("trades_total", self.trades_total), ("buy_trades_total", self.buy_trades_total),
-            ("sell_trades_total", self.sell_trades_total), ("unknown_trades_total", self.unknown_trades_total),
+            ("trades_total", self.trades_total),
+            ("buy_trades_total", self.buy_trades_total),
+            ("sell_trades_total", self.sell_trades_total),
+            ("unknown_trades_total", self.unknown_trades_total),
         ):
             require_integer(value, field)
-        require(self.trades_total == self.buy_trades_total + self.sell_trades_total + self.unknown_trades_total, "trade count conservation failed")
-        require(self.total_volume == self.buy_volume + self.sell_volume + self.unknown_volume, "volume conservation failed")
+        require(
+            self.trades_total
+            == self.buy_trades_total
+            + self.sell_trades_total
+            + self.unknown_trades_total,
+            "trade count conservation failed",
+        )
+        require(
+            self.total_volume == self.buy_volume + self.sell_volume + self.unknown_volume,
+            "volume conservation failed",
+        )
         require(self.total_volume > 0, "total volume must be positive")
-        require(self.unknown_volume_ratio == self.unknown_volume / self.total_volume, "unknown volume ratio mismatch")
-        require(Decimal(0) <= self.unknown_volume_ratio <= Decimal(1), "unknown volume ratio outside [0,1]")
+        require(
+            self.unknown_volume_ratio == self.unknown_volume / self.total_volume,
+            "unknown volume ratio mismatch",
+        )
+        require(
+            Decimal(0) <= self.unknown_volume_ratio <= Decimal(1),
+            "unknown volume ratio outside [0,1]",
+        )
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -256,16 +321,28 @@ class TradesAggressorClassificationSchemaStateV1:
 
     def __post_init__(self) -> None:
         validate_causal_times(self.event_time, self.receive_time, self.generated_at)
-        require(self.validation_state == "VALIDATED_OFFLINE_AGGRESSOR_CLASSIFICATION_ONLY", "unknown Lot 44 validation state")
+        require(
+            self.validation_state == "VALIDATED_OFFLINE_AGGRESSOR_CLASSIFICATION_ONLY",
+            "unknown Lot 44 validation state",
+        )
         require(bool(self.classified_trades), "classified trades cannot be empty")
-        require(len({item.trade.trade_id for item in self.classified_trades}) == len(self.classified_trades), "trade ids must be unique")
-        require(self.metrics.trades_total == len(self.classified_trades), "metrics trade count mismatch")
+        require(
+            len({item.trade.trade_id for item in self.classified_trades})
+            == len(self.classified_trades),
+            "trade ids must be unique",
+        )
+        require(
+            self.metrics.trades_total == len(self.classified_trades),
+            "metrics trade count mismatch",
+        )
         require_reason_codes(self.reason_codes)
         validate_safety(self.safety)
         require_sha256(self.output_checksum, "output_checksum")
 
     def payload_without_checksum(self) -> dict[str, Any]:
-        payload = self.to_dict(); payload.pop("output_checksum"); return payload
+        payload = self.to_dict()
+        payload.pop("output_checksum")
+        return payload
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -300,16 +377,24 @@ class TradesAggressorClassificationSchemaAuditV1:
     def __post_init__(self) -> None:
         require_git_sha(self.code_commit, "code_commit")
         for field, value in (
-            ("state_output_checksum", self.state_output_checksum), ("config_checksum", self.config_checksum),
-            ("entry_gate_checksum", self.entry_gate_checksum), ("trade_fixture_checksum", self.trade_fixture_checksum),
-            ("order_book_snapshot_checksum", self.order_book_snapshot_checksum), ("audit_checksum", self.audit_checksum),
+            ("state_output_checksum", self.state_output_checksum),
+            ("config_checksum", self.config_checksum),
+            ("entry_gate_checksum", self.entry_gate_checksum),
+            ("trade_fixture_checksum", self.trade_fixture_checksum),
+            ("order_book_snapshot_checksum", self.order_book_snapshot_checksum),
+            ("audit_checksum", self.audit_checksum),
         ):
             require_sha256(value, field)
-        require(self.validation_state == "VALIDATED_OFFLINE_AGGRESSOR_CLASSIFICATION_ONLY", "audit validation state changed")
+        require(
+            self.validation_state == "VALIDATED_OFFLINE_AGGRESSOR_CLASSIFICATION_ONLY",
+            "audit validation state changed",
+        )
         validate_safety(self.safety)
 
     def payload_without_checksum(self) -> dict[str, Any]:
-        payload = self.to_dict(); payload.pop("audit_checksum"); return payload
+        payload = self.to_dict()
+        payload.pop("audit_checksum")
+        return payload
 
     def to_dict(self) -> dict[str, Any]:
         return {
