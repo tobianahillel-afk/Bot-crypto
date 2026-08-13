@@ -38,10 +38,11 @@ jobs:
     env:
       PYTHONPATH: src
       GATE_MERGE_SHA: 6bbf4fcc5543f2599378bcab93263e2c8cebcec6
-      SOURCE_HEAD_SHA: bfe9f67ea4fc3daffc14d238aff61f298dbd1bef
-      QUALITY_RETRIGGER_SHA: bfe9f67ea4fc3daffc14d238aff61f298dbd1bef
-      CERTIFICATION_ANCHOR_SHA: 078ba09fceab15e4ff9329b7e02ca6e900c3a300
-      EVIDENCE_HEAD_SHA: a53e4283e932eaed70f3f16dab33969cabc66dd3
+      SOURCE_HEAD_SHA: fe11756c449fccc9cccf7013feac2997024721c9
+      QUALITY_RETRIGGER_SHA: fe11756c449fccc9cccf7013feac2997024721c9
+      CERTIFICATION_ANCHOR_SHA: 9015895b9af447c70fa94e0f1c2b1f488d98a5bb
+      EVIDENCE_HEAD_SHA: d2e17da18c0e6c30fb9a908d187981e125de1fc9
+      VALIDATOR_HEAD_SHA: 9e0927af4bdd9829712b69fc85a439027caba4e5
     steps:
       - uses: actions/checkout@v4
         with:
@@ -55,20 +56,20 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove final certification and atomic evidence chain
+      - name: Prove final certification evidence and validator chain
         run: |
           set -euo pipefail
           git merge-base --is-ancestor "$GATE_MERGE_SHA" "$SOURCE_HEAD_SHA"
           git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$QUALITY_RETRIGGER_SHA"
           git merge-base --is-ancestor "$QUALITY_RETRIGGER_SHA" "$CERTIFICATION_ANCHOR_SHA"
           git merge-base --is-ancestor "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA"
-          git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" HEAD
+          git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" "$VALIDATOR_HEAD_SHA"
+          git merge-base --is-ancestor "$VALIDATOR_HEAD_SHA" HEAD
           test "$(git rev-list --count "$SOURCE_HEAD_SHA..$QUALITY_RETRIGGER_SHA")" = "0"
           git diff --quiet "$SOURCE_HEAD_SHA" "$QUALITY_RETRIGGER_SHA"
-          test "$(git rev-list --count "$SOURCE_HEAD_SHA..$CERTIFICATION_ANCHOR_SHA")" = "3"
+          test "$(git rev-list --count "$SOURCE_HEAD_SHA..$CERTIFICATION_ANCHOR_SHA")" = "2"
           git diff --name-only "$SOURCE_HEAD_SHA" "$CERTIFICATION_ANCHOR_SHA" | sort > /tmp/cert.txt
           printf '%s\n' \
-            .github/workflows/lot44-frozen-evidence.yml \
             .github/workflows/lot44-mutation-assurance.yml \
             .github/workflows/lot44-trades-aggressor-classification.yml | sort > /tmp/cert-expected.txt
           diff -u /tmp/cert-expected.txt /tmp/cert.txt
@@ -82,7 +83,11 @@ jobs:
           diff -u /tmp/evidence-expected.txt /tmp/evidence.txt
           git diff --quiet "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA" -- \
             data/audit/aggressor_confidence_state_lot44.json
-      - name: Prove final source and evidence immutability
+          test "$(git rev-list --count "$EVIDENCE_HEAD_SHA..$VALIDATOR_HEAD_SHA")" = "1"
+          git diff --name-only "$EVIDENCE_HEAD_SHA" "$VALIDATOR_HEAD_SHA" > /tmp/validator.txt
+          printf '%s\n' scripts/validate_lot44_frozen_evidence.py > /tmp/validator-expected.txt
+          diff -u /tmp/validator-expected.txt /tmp/validator.txt
+      - name: Prove final source controls evidence and validator immutability
         run: |
           set -euo pipefail
           git diff --quiet "$SOURCE_HEAD_SHA" HEAD -- \
@@ -110,7 +115,8 @@ jobs:
             data/audit/trades_and_aggressor_classification_schema_audit_lot44.json \
             data/audit/trades_and_aggressor_classification_schema_lot44.json \
             reports/lot44/coverage_summary.json reports/lot44/mutation_summary.json
-      - name: Validate final frozen evidence v5
+          git diff --quiet "$VALIDATOR_HEAD_SHA" HEAD -- scripts/validate_lot44_frozen_evidence.py
+      - name: Validate final frozen evidence v6
         run: |
           set -euo pipefail
           python -m compileall -q scripts/validate_lot44_frozen_evidence.py
