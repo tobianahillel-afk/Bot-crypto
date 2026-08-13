@@ -74,6 +74,8 @@ jobs:
       - name: Prove frozen Lot 43 source tests and evidence immutability
         run: |
           set -euo pipefail
+          # The historical Lot 43 entry-gate test is governance-migrated by the Lot 44 gate;
+          # its certified historical version remains replayed in detached worktrees.
           git diff --quiet "$SOURCE_HEAD_SHA" HEAD -- \
             config/microstructure/book_resilience_and_replenishment_engine_v1.json \
             contracts/schemas/book_resilience_state_v1.schema.json \
@@ -89,7 +91,7 @@ jobs:
             tests/test_lot43_fail_closed_contracts.py tests/test_lot43_schema_contracts.py \
             tests/test_lot43_edge_contracts.py tests/test_lot43_mutation_contracts.py \
             tests/test_lot43_review_regressions.py tests/test_lot43_final_review_blockers.py \
-            tests/test_lot43_v4_entry_gate.py tests/test_lot43_semantic_consistency.py \
+            tests/test_lot43_semantic_consistency.py \
             docs/LOT_43_BOOK_RESILIENCE_AND_REPLENISHMENT_ENGINE.md \
             docs/ACCEPTANCE_CRITERIA_LOT_43.md
           git diff --quiet "$EVIDENCE_HEAD_SHA" HEAD -- \
