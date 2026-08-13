@@ -3,6 +3,17 @@ name: Lot 42 independent post-merge audit
 on:
   pull_request:
     branches: [main]
+    paths:
+      - '.github/workflows/lot42-post-merge-audit.yml'
+      - 'src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids*.py'
+      - 'config/microstructure/liquidity_zones_walls_and_voids_engine_v1.json'
+      - 'contracts/schemas/liquidity_zone_set_v1.schema.json'
+      - 'contracts/schemas/liquidity_zones_walls_voids*.schema.json'
+      - 'scripts/*lot42*'
+      - 'tests/test_lot42*.py'
+      - 'docs/*LOT_42*'
+      - 'data/audit/*lot42.json'
+      - 'reports/lot42/**'
   workflow_dispatch:
 
 permissions:

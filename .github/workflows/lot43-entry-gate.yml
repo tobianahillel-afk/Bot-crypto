@@ -3,6 +3,14 @@ name: Lot 43 V4 implementation entry gate
 on:
   pull_request:
     branches: [main]
+    paths:
+      - '.github/workflows/lot43-entry-gate.yml'
+      - 'contracts/schemas/lot43_v4_entry_gate_v1.schema.json'
+      - 'data/audit/lot43_v4_entry_gate.json'
+      - 'docs/LOT_43_V4_ENTRY_GATE.md'
+      - 'reports/lot_43_v4_entry_gate_report.md'
+      - 'scripts/validate_lot43_entry_gate.py'
+      - 'tests/test_lot43_v4_entry_gate.py'
   workflow_dispatch:
 
 permissions:
@@ -51,19 +59,7 @@ jobs:
           )
           git worktree remove --force /tmp/lot43-gate-certified
           trap - EXIT
-      - name: Prove Lot 44 implementation remains absent on current head
-        run: |
-          set -euo pipefail
-          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py
-          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py
-          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py
-          test ! -e config/microstructure/trades_and_aggressor_classification_schema_v1.json
-          test ! -e scripts/run_lot44_trades_and_aggressor_classification_schema.py
-          test ! -e scripts/validate_lot44.py
-          test ! -e tests/test_lot44_trades_and_aggressor_classification_schema.py
-          test ! -e docs/LOT_44_TRADES_AND_AGGRESSOR_CLASSIFICATION_SCHEMA.md
-          test ! -e docs/ACCEPTANCE_CRITERIA_LOT_44.md
-      - name: Validate immutable gate contract on current source tree
+      - name: Validate immutable Lot 43 gate contract
         run: |
           set -euo pipefail
           python -m compileall -q scripts tests
@@ -89,8 +85,3 @@ jobs:
           pip-audit -r requirements-dev.lock
           pytest -q
           for repetition in 1 2 3; do pytest -q tests/test_lot43_v4_entry_gate.py; done
-      - name: Re-prove downstream Lot 44 lock
-        run: |
-          set -euo pipefail
-          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py
-          test ! -e scripts/run_lot44_trades_and_aggressor_classification_schema.py

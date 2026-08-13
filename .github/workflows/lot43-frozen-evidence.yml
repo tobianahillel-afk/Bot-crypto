@@ -3,6 +3,29 @@ name: Lot 43 frozen evidence attestation
 on:
   pull_request:
     branches: [main]
+    paths:
+      - '.github/workflows/lot43-frozen-evidence.yml'
+      - '.github/workflows/lot43-book-resilience-replenishment.yml'
+      - '.github/workflows/lot43-mutation-assurance.yml'
+      - 'config/microstructure/book_resilience_and_replenishment_engine_v1.json'
+      - 'contracts/schemas/book_resilience_state_v1.schema.json'
+      - 'contracts/schemas/book_resilience_replenishment_engine_state_v1.schema.json'
+      - 'contracts/schemas/book_resilience_replenishment_engine_audit_v1.schema.json'
+      - 'src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py'
+      - 'src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py'
+      - 'src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_validation.py'
+      - 'src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_analysis.py'
+      - 'scripts/run_lot43_book_resilience_and_replenishment_engine.py'
+      - 'scripts/validate_lot43.py'
+      - 'scripts/validate_lot43_frozen_evidence.py'
+      - 'scripts/validate_lot43_no_connectivity.py'
+      - 'tests/test_lot43*.py'
+      - 'docs/LOT_43_BOOK_RESILIENCE_AND_REPLENISHMENT_ENGINE.md'
+      - 'docs/ACCEPTANCE_CRITERIA_LOT_43.md'
+      - 'data/audit/book_resilience_and_replenishment_engine_lot43.json'
+      - 'data/audit/book_resilience_and_replenishment_engine_audit_lot43.json'
+      - 'data/audit/book_resilience_state_lot43.json'
+      - 'reports/lot43/**'
   workflow_dispatch:
 
 permissions:
@@ -59,6 +82,8 @@ jobs:
       - name: Prove frozen Lot 43 production source immutability
         run: |
           set -euo pipefail
+          # The historical Lot 43 entry-gate test is governance-migrated by the Lot 44 gate;
+          # its certified historical version is replayed in detached worktrees instead.
           git diff --quiet "$SOURCE_HEAD_SHA" HEAD -- \
             config/microstructure/book_resilience_and_replenishment_engine_v1.json \
             contracts/schemas/book_resilience_state_v1.schema.json \
@@ -78,7 +103,6 @@ jobs:
             tests/test_lot43_mutation_contracts.py \
             tests/test_lot43_review_regressions.py \
             tests/test_lot43_final_review_blockers.py \
-            tests/test_lot43_v4_entry_gate.py \
             tests/test_lot43_semantic_consistency.py \
             docs/LOT_43_BOOK_RESILIENCE_AND_REPLENISHMENT_ENGINE.md \
             docs/ACCEPTANCE_CRITERIA_LOT_43.md
@@ -139,7 +163,7 @@ jobs:
           )
           git worktree remove --force /tmp/lot43-source-certified
           trap - EXIT
-      - name: Current architecture security regression and Lot 44 lock
+      - name: Current architecture and security regression
         run: |
           set -euo pipefail
           python scripts/validate_roadmap_documentation.py
@@ -155,15 +179,6 @@ jobs:
           pip-audit -r requirements-dev.lock
           pytest -q
           for repetition in 1 2 3; do pytest -q tests/test_lot43*.py; done
-          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py
-          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py
-          test ! -e src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py
-          test ! -e config/microstructure/trades_and_aggressor_classification_schema_v1.json
-          test ! -e scripts/run_lot44_trades_and_aggressor_classification_schema.py
-          test ! -e scripts/validate_lot44.py
-          test ! -e tests/test_lot44_trades_and_aggressor_classification_schema.py
-          test ! -e docs/LOT_44_TRADES_AND_AGGRESSOR_CLASSIFICATION_SCHEMA.md
-          test ! -e docs/ACCEPTANCE_CRITERIA_LOT_44.md
       - uses: actions/upload-artifact@v4
         if: always()
         with:

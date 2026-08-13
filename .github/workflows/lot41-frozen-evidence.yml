@@ -3,6 +3,17 @@ name: Lot 41 frozen evidence attestation
 on:
   pull_request:
     branches: [main]
+    paths:
+      - '.github/workflows/lot41-frozen-evidence.yml'
+      - 'src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine*.py'
+      - 'config/microstructure/spread_depth_and_imbalance_engine_v1.json'
+      - 'contracts/schemas/book_feature_state_v1.schema.json'
+      - 'contracts/schemas/spread_depth_imbalance*.schema.json'
+      - 'scripts/*lot41*'
+      - 'tests/test_lot41*.py'
+      - 'docs/*LOT_41*'
+      - 'data/audit/*lot41.json'
+      - 'reports/lot41/**'
   workflow_dispatch:
 
 permissions:

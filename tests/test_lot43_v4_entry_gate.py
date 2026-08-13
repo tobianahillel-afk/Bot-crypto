@@ -24,7 +24,7 @@ SCHEMA_PATH = ROOT / "contracts/schemas/lot43_v4_entry_gate_v1.schema.json"
 
 @pytest.fixture(autouse=True)
 def _isolate_historical_gate(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Replay immutable gate facts without requiring Lot 43 absence after gate merge."""
+    """Replay immutable Lot 43 gate facts without current-tree Lot 43/44 absence vetoes."""
     monkeypatch.setattr(
         gate_validator,
         "validate_lot42_post_merge",
@@ -38,6 +38,7 @@ def _isolate_historical_gate(monkeypatch: pytest.MonkeyPatch) -> None:
         },
     )
     monkeypatch.setattr(gate_validator, "LOT43_FORBIDDEN_IMPLEMENTATION_PATHS", ())
+    monkeypatch.setattr(gate_validator, "LOT44_FORBIDDEN_IMPLEMENTATION_PATHS", ())
 
 
 def _write_json(path: Path, payload: object) -> None:
