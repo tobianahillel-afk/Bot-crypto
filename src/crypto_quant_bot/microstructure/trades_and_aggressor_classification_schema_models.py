@@ -185,7 +185,10 @@ class ClassifiedTradeV1:
             and Decimal(0) <= self.confidence <= Decimal(1),
             "confidence outside [0,1]",
         )
-        require_text(self.confidence_version, "confidence_version")
+        require(
+            self.confidence_version == "lot44-aggressor-confidence-v1",
+            "Lot 44 classified trade confidence version changed",
+        )
         require_sha256(self.quote_snapshot_checksum, "quote_snapshot_checksum")
         require_reason_codes(self.reason_codes)
         _validate_classification_tuple(
@@ -217,7 +220,10 @@ class AggressorConfidenceStateV1:
     confidence_checksum: str
 
     def __post_init__(self) -> None:
-        require_text(self.policy_version, "policy_version")
+        require(
+            self.policy_version == "lot44-aggressor-confidence-v1",
+            "Lot 44 confidence policy version changed",
+        )
         require(
             self.semantics == CONFIDENCE_SEMANTICS,
             "confidence semantics changed",
