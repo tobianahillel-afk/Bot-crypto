@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sys
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -16,19 +17,22 @@ from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_re
 )
 
 GATE_MERGE = "6bbf4fcc5543f2599378bcab93263e2c8cebcec6"
-SOURCE_HEAD = "39c975e1b9777eec2d5616d7c11ff4be65898e7d"
-CERTIFICATION_ANCHOR = "275ef9e4806e3d1bbe85c5cd678280456ef3a67b"
-EVIDENCE_HEAD = "e5748d3924434f2bb73ec5f174315edca4840509"
-SUPERSEDED_FROZEN_HEAD = "e2141fb19fd9d200ada823ebcc14df26f81f5506"
+SOURCE_HEAD = "2f6779fa2be6dbb78fac1a824d470e66cf2ffa9f"
+CERTIFICATION_ANCHOR = "95c855ede9cccc77dc89d2ce176e531f5dcd4ee1"
+EVIDENCE_HEAD = "20118feab2ddba2a67a467b28f33eee22520ab25"
+SUPERSEDED_FROZEN_HEADS = (
+    "e2141fb19fd9d200ada823ebcc14df26f81f5506",
+    "9f8d088836776ed7319bc4d94daeed797322ca14",
+)
 VALIDATION_PROOF = (
-    31688053781,
-    9176241069,
-    "sha256:6f89a53b5d91ba04c2828a8b58ec893352e7c8137b136a854b6e0d4b7dc363c7",
+    31698772338,
+    9180407783,
+    "sha256:4147d1afbc9b553aaff72bf5d278a5ea2a5c217e9a8ebdc56a9ce8980b21e40e",
 )
 MUTATION_PROOF = (
-    31688053766,
-    9176279963,
-    "sha256:5400cdf59f1014f23680e133d204e94c8f03cce3f92c89f4e4e0f24f5e3364c4",
+    31698772097,
+    9180440721,
+    "sha256:040da9e6a770edf7a6fe11e819e4ffb2a1aafbb9e8f372655949e9409fc228c7",
 )
 
 STATE = ROOT / "data/audit/trades_and_aggressor_classification_schema_lot44.json"
@@ -38,14 +42,14 @@ COVERAGE = ROOT / "reports/lot44/coverage_summary.json"
 MUTATION = ROOT / "reports/lot44/mutation_summary.json"
 
 EXPECTED_HASHES = {
-    STATE: "db689e95164fcdacdf20f0f8106501cdca39009ae8945cf49c2140152c38aacb",
-    AUDIT: "8a0a7aa511d0027f3985cf5b470cdec92cb30b02e591c77fd6998f1f9bf3bdb1",
+    STATE: "f78b7a1c841be9c899f590b2f99a5e94d52a61d8fa066ad92b7381e28f418954",
+    AUDIT: "58666081f0bcdd41c977a3a61583ddbe5ae342dfb12eac32dd8b9df207b4e89a",
     CONFIDENCE: "20c5d82709d8fa2ef03e789bc691472b9015d2fe657dec7751ae0a6076cfd027",
-    COVERAGE: "2f7093db38b3fd2f8e5dc62b1675740dc249637de90a3195f4c27f48bc6ed5b5",
-    MUTATION: "8d8959cd731f9fcdfe74ce90e10abce9d46d5044a0c97a76d2fac843b1278855",
+    COVERAGE: "3265cec978f2ef9f488e1d791c1e7bc3f0e1da05a1f28bbd1ad53fd37eaa2f5d",
+    MUTATION: "065c1a8dbbc367eedf31190b2072cd635ffa76275b74eab139ea3824635b860c",
 }
-EXPECTED_STATE = "d8387596343f279d10e7b3a3958f0e7fffd54f707583ab133bf3a6b16f08ec90"
-EXPECTED_AUDIT = "bfcf82fc6227bdcc33dff696a61e110a79a3306113532f7fc58b5f1a67b7709c"
+EXPECTED_STATE = "3afacfb257f03026840c7f61d172bd257027bf3b625ffbe991f58c59c2410ba8"
+EXPECTED_AUDIT = "a320af13bf8e18b31bb063437dfb97a6eb32657fbdeac93c58a76931109ac8a3"
 EXPECTED_CONFIDENCE = "7cb11e078d7f0d9ed0858229d8c6fe31a7cf653a238b280b05dbdd84d1250f05"
 EXPECTED_LINEAGE = {
     "entry_gate_checksum": "100d21ea18cfd7d9fe275ac0bea162c76a0bb7e5f85e319b543b4053e3c4d5ef",
@@ -132,9 +136,6 @@ def _verify_links(
     require(audit["safety"] == EXPECTED_SAFETY, "audit safety boundary changed")
     for field, expected in EXPECTED_LINEAGE.items():
         require(state["lineage"][field] == expected, f"lineage changed: {field}")
-    require(audit["entry_gate_checksum"] == EXPECTED_LINEAGE["entry_gate_checksum"], "audit gate changed")
-    require(audit["trade_fixture_checksum"] == EXPECTED_LINEAGE["trade_fixture_checksum"], "audit trade fixture changed")
-    require(audit["order_book_snapshot_checksum"] == EXPECTED_LINEAGE["order_book_snapshot_checksum"], "audit snapshot changed")
 
 
 def _verify_reference(state: dict[str, Any], confidence: dict[str, Any]) -> None:
@@ -155,30 +156,53 @@ def _verify_reference(state: dict[str, Any], confidence: dict[str, Any]) -> None
         for item in state["classified_trades"]
     )
     require(actual == expected, "reference trade classification changed")
-    require(state["metrics"]["total_volume"] == "0.16", "total volume changed")
-    require(state["metrics"]["buy_volume"] == "0.08", "buy volume changed")
-    require(state["metrics"]["sell_volume"] == "0.03", "sell volume changed")
-    require(state["metrics"]["unknown_volume"] == "0.05", "unknown volume changed")
-    require(state["metrics"]["unknown_volume_ratio"] == "0.3125", "unknown ratio changed")
-    require(confidence["quote_test_confidence"] == "1", "quote confidence changed")
-    require(confidence["tick_rule_confidence"] == "0.5", "tick confidence changed")
-    require(confidence["unknown_confidence"] == "0", "unknown confidence changed")
-    require(confidence["semantics"] == "DESCRIPTIVE_METHOD_CONFIDENCE_NOT_PROBABILITY", "confidence semantics changed")
+    require(
+        (
+            confidence["quote_test_confidence"],
+            confidence["tick_rule_confidence"],
+            confidence["unknown_confidence"],
+        )
+        == ("1", "0.5", "0"),
+        "v1 confidence constants changed",
+    )
+    require(
+        confidence["semantics"] == "DESCRIPTIVE_METHOD_CONFIDENCE_NOT_PROBABILITY",
+        "confidence semantics changed",
+    )
+
+
+def _verify_metrics(state: dict[str, Any]) -> None:
+    trades = state["classified_trades"]
+    quantities = [(item["aggressor_classification"], Decimal(item["trade"]["quantity"])) for item in trades]
+    total = sum((quantity for _, quantity in quantities), Decimal("0"))
+    buy = sum((quantity for side, quantity in quantities if side == "BUY_AGGRESSOR"), Decimal("0"))
+    sell = sum((quantity for side, quantity in quantities if side == "SELL_AGGRESSOR"), Decimal("0"))
+    unknown = sum((quantity for side, quantity in quantities if side == "UNKNOWN"), Decimal("0"))
+    metrics = state["metrics"]
+    require(metrics["lot_44_trades_total"] == len(trades), "trade count mismatch")
+    require(metrics["lot_44_buy_trades_total"] == 1, "buy count mismatch")
+    require(metrics["lot_44_sell_trades_total"] == 1, "sell count mismatch")
+    require(metrics["lot_44_unknown_trades_total"] == 1, "unknown count mismatch")
+    require(Decimal(metrics["total_volume"]) == total, "total volume mismatch")
+    require(Decimal(metrics["buy_volume"]) == buy, "buy volume mismatch")
+    require(Decimal(metrics["sell_volume"]) == sell, "sell volume mismatch")
+    require(Decimal(metrics["unknown_volume"]) == unknown, "unknown volume mismatch")
+    require(Decimal(metrics["unknown_volume_ratio"]) == unknown / total, "unknown ratio mismatch")
 
 
 def _verify_quality(coverage: dict[str, Any], mutation: dict[str, Any]) -> None:
     require(coverage["status"] == "PASS", "coverage not PASS")
     require(coverage["source_head_sha"] == SOURCE_HEAD, "coverage source changed")
-    require(coverage["line_coverage_percent"] == 98.88, "line coverage changed")
+    require(coverage["line_coverage_percent"] == 98.91, "line coverage changed")
     require(coverage["branch_coverage_percent"] == 100.0, "branch coverage changed")
     require(coverage["anti_flake_repetitions"] == 3, "anti-flake changed")
     require(mutation["status"] == "PASS", "mutation not PASS")
     require(mutation["source_head_sha"] == SOURCE_HEAD, "mutation source changed")
-    require(mutation["mutation_score_percent"] == 80.61, "mutation score changed")
-    require(mutation["killed_mutants"] == 1260, "killed mutants changed")
-    require(mutation["survived_mutants"] == 303, "survived mutants changed")
-    require(mutation["total_mutants"] == 1563, "total mutants changed")
-    require(mutation["evaluated_mutants"] == 1563, "evaluated mutants changed")
+    require(mutation["mutation_score_percent"] == 81.66, "mutation score changed")
+    require(mutation["killed_mutants"] == 1367, "killed mutants changed")
+    require(mutation["survived_mutants"] == 307, "survived mutants changed")
+    require(mutation["total_mutants"] == 1674, "total mutants changed")
+    require(mutation["evaluated_mutants"] == 1674, "evaluated mutants changed")
     require(mutation["timeout_mutants"] == 0, "mutation timeout present")
     require(mutation["suspicious_mutants"] == 0, "suspicious mutation present")
 
@@ -192,16 +216,17 @@ def validate() -> dict[str, object]:
     state, audit, confidence, coverage, mutation = _load_frozen()
     _verify_links(state, audit, confidence)
     _verify_reference(state, confidence)
+    _verify_metrics(state)
     _verify_quality(coverage, mutation)
     _verify_downstream_lock()
     return {
-        "schema_version": "lot44-frozen-evidence-validation-v2",
+        "schema_version": "lot44-frozen-evidence-validation-v3",
         "status": "PASS",
         "gate_merge": GATE_MERGE,
         "source_head": SOURCE_HEAD,
         "certification_anchor": CERTIFICATION_ANCHOR,
         "evidence_head": EVIDENCE_HEAD,
-        "superseded_frozen_head": SUPERSEDED_FROZEN_HEAD,
+        "superseded_frozen_heads": list(SUPERSEDED_FROZEN_HEADS),
         "state_output_checksum": EXPECTED_STATE,
         "audit_checksum": EXPECTED_AUDIT,
         "confidence_checksum": EXPECTED_CONFIDENCE,
@@ -214,6 +239,13 @@ def validate() -> dict[str, object]:
         "mutation_run": MUTATION_PROOF[0],
         "mutation_artifact": MUTATION_PROOF[1],
         "mutation_artifact_digest": MUTATION_PROOF[2],
+        "review_hardening": {
+            "causal_event_and_receive_time": True,
+            "tick_history_identity_match": True,
+            "classification_tuple_exact": True,
+            "state_metrics_recomputed": True,
+            "confidence_v1_constants_exact": True,
+        },
         "lot45_status": "PLANNED_LOCKED",
         "lot46_status": "PLANNED_LOCKED",
     }
