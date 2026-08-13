@@ -23,7 +23,6 @@ from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema 
     EXPECTED_LOT43_STATE,
     EXPECTED_SNAPSHOT_CHECKSUM,
     EXPECTED_TRADE_FIXTURE_CHECKSUM,
-    _confidence_state,
     _load_snapshot,
     _load_trade_fixture,
     _validate_config,
