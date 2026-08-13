@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   patch:
-    if: github.event.head_commit.message == 'Run final Lot 44 review patch'
+    if: github.event.head_commit.message == 'Retry final Lot 44 review patch'
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -26,7 +26,9 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
       - name: Apply final review patch
-        run: python scripts/_lot44_final_review_patch.py
+        run: |
+          sed -i 's/unknown Lot 44 audit state/audit validation state changed/g' scripts/_lot44_final_review_patch.py
+          python scripts/_lot44_final_review_patch.py
       - name: Validate final review patch
         run: |
           set -euo pipefail
