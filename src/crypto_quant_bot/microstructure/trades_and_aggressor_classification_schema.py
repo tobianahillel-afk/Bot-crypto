@@ -76,19 +76,26 @@ def _validate_config(config: dict[str, Any]) -> None:
         "unknown_confidence",
     }
     require(set(config) == expected, "Lot 44 config fields differ from contract")
+    _validate_config_identity(config)
+    _validate_confidence_policy(config)
+
+
+def _validate_config_identity(config: dict[str, Any]) -> None:
+    expected_version = "lot44-trades-aggressor-classification-config-v1"
     require(
-        config.get("schema_version")
-        == "lot44-trades-aggressor-classification-config-v1",
+        config.get("schema_version") == expected_version,
         "Lot 44 config schema changed",
     )
     require(
-        config.get("config_version")
-        == "lot44-trades-aggressor-classification-config-v1",
+        config.get("config_version") == expected_version,
         "Lot 44 config version changed",
     )
     require_text(config.get("confidence_version"), "confidence_version")
     parse_utc_timestamp(config.get("generated_at"), "generated_at")
     require_integer(config.get("max_quote_age_us"), "max_quote_age_us", minimum=1)
+
+
+def _validate_confidence_policy(config: dict[str, Any]) -> None:
     require(
         config.get("tick_rule_fallback_when_quote_unavailable") is True,
         "tick-rule fallback policy changed",
@@ -164,6 +171,18 @@ def _load_trade_fixture(
         "Lot 37 trade fixture checksum changed",
     )
     fixture = load_json_object(path)
+    _validate_trade_fixture(fixture)
+    event_time = require_text(fixture["event_time"], "fixture event_time")
+    receive_time = require_text(fixture["available_at"], "fixture available_at")
+    mapped = _map_trade_records(fixture, event_time, receive_time)
+    require(
+        len({item.trade_id for item in mapped}) == len(mapped),
+        "trade fixture ids must be unique",
+    )
+    return mapped, checksum
+
+
+def _validate_trade_fixture(fixture: dict[str, Any]) -> None:
     required = {
         "schema_version",
         "fixture_id",
@@ -192,22 +211,22 @@ def _load_trade_fixture(
         fixture["used_for_decision"] is False,
         "raw trade fixture cannot become decision data",
     )
-    event_time = require_text(fixture["event_time"], "fixture event_time")
-    receive_time = require_text(fixture["available_at"], "fixture available_at")
+
+
+def _map_trade_records(
+    fixture: dict[str, Any],
+    event_time: str,
+    receive_time: str,
+) -> tuple[TimestampedTradeV1, ...]:
     raw_trades = fixture.get("trades")
     require(
         isinstance(raw_trades, list) and bool(raw_trades),
         "trade fixture requires records",
     )
     trades = cast(list[object], raw_trades)
-    mapped = tuple(
+    return tuple(
         _map_trade(fixture, raw, event_time, receive_time) for raw in trades
     )
-    require(
-        len({item.trade_id for item in mapped}) == len(mapped),
-        "trade fixture ids must be unique",
-    )
-    return mapped, checksum
 
 
 def _map_trade(
@@ -354,34 +373,57 @@ def classify_trade(
     tick_rule_fallback: bool,
 ) -> ClassifiedTradeV1:
     if snapshot is not None:
-        usable, reason = _quote_usable(trade, snapshot, max_quote_age_us)
-        if not usable:
-            return _unknown(trade, snapshot.snapshot_checksum, reason, confidence)
-        best_bid, best_ask = snapshot.bids[0].price, snapshot.asks[0].price
-        if trade.price >= best_ask:
-            return _classified(
-                trade,
-                "BUY_AGGRESSOR",
-                "QUOTE_TEST",
-                confidence.quote_test_confidence,
-                snapshot.snapshot_checksum,
-                "TRADE_AT_OR_ABOVE_ASK",
-            )
-        if trade.price <= best_bid:
-            return _classified(
-                trade,
-                "SELL_AGGRESSOR",
-                "QUOTE_TEST",
-                confidence.quote_test_confidence,
-                snapshot.snapshot_checksum,
-                "TRADE_AT_OR_BELOW_BID",
-            )
-        return _unknown(
+        return _classify_with_quote(trade, snapshot, max_quote_age_us, confidence)
+    return _classify_without_quote(
+        trade,
+        previous_trade,
+        confidence,
+        tick_rule_fallback,
+    )
+
+
+def _classify_with_quote(
+    trade: TimestampedTradeV1,
+    snapshot: OrderBookSnapshotV1,
+    max_quote_age_us: int,
+    confidence: AggressorConfidenceStateV1,
+) -> ClassifiedTradeV1:
+    usable, reason = _quote_usable(trade, snapshot, max_quote_age_us)
+    if not usable:
+        return _unknown(trade, snapshot.snapshot_checksum, reason, confidence)
+    best_bid, best_ask = snapshot.bids[0].price, snapshot.asks[0].price
+    if trade.price >= best_ask:
+        return _classified(
             trade,
+            "BUY_AGGRESSOR",
+            "QUOTE_TEST",
+            confidence.quote_test_confidence,
             snapshot.snapshot_checksum,
-            "TRADE_INSIDE_SPREAD_UNKNOWN",
-            confidence,
+            "TRADE_AT_OR_ABOVE_ASK",
         )
+    if trade.price <= best_bid:
+        return _classified(
+            trade,
+            "SELL_AGGRESSOR",
+            "QUOTE_TEST",
+            confidence.quote_test_confidence,
+            snapshot.snapshot_checksum,
+            "TRADE_AT_OR_BELOW_BID",
+        )
+    return _unknown(
+        trade,
+        snapshot.snapshot_checksum,
+        "TRADE_INSIDE_SPREAD_UNKNOWN",
+        confidence,
+    )
+
+
+def _classify_without_quote(
+    trade: TimestampedTradeV1,
+    previous_trade: TimestampedTradeV1 | None,
+    confidence: AggressorConfidenceStateV1,
+    tick_rule_fallback: bool,
+) -> ClassifiedTradeV1:
     if not tick_rule_fallback or previous_trade is None:
         return _unknown(
             trade,
@@ -487,6 +529,112 @@ def _metrics(items: tuple[ClassifiedTradeV1, ...]) -> Lot44MetricsV1:
     )
 
 
+def _classify_trades(
+    trades: tuple[TimestampedTradeV1, ...],
+    snapshot: OrderBookSnapshotV1,
+    confidence: AggressorConfidenceStateV1,
+    max_quote_age_us: int,
+    tick_rule_fallback: bool,
+) -> tuple[ClassifiedTradeV1, ...]:
+    classified: list[ClassifiedTradeV1] = []
+    for index, trade in enumerate(trades):
+        previous = trades[index - 1] if index else None
+        classified.append(
+            classify_trade(
+                trade,
+                snapshot,
+                previous,
+                max_quote_age_us=max_quote_age_us,
+                confidence=confidence,
+                tick_rule_fallback=tick_rule_fallback,
+            )
+        )
+    return tuple(classified)
+
+
+def _build_lineage(
+    config: dict[str, Any],
+    trade_checksum: str,
+    snapshot: OrderBookSnapshotV1,
+    receive_time: str,
+) -> Lot44LineageEnvelopeV1:
+    return Lot44LineageEnvelopeV1(
+        require_text(config["lineage_id"], "lineage_id"),
+        EXPECTED_GATE_CHECKSUM,
+        EXPECTED_LOT43_STATE,
+        EXPECTED_LOT43_AUDIT,
+        EXPECTED_LOT43_RESILIENCE,
+        EXPECTED_LOT43_POST_MERGE,
+        trade_checksum,
+        snapshot.snapshot_checksum,
+        receive_time,
+    )
+
+
+def _build_context(config: dict[str, Any], code_commit: str) -> Lot44RunContextV1:
+    return Lot44RunContextV1(
+        require_text(config["run_id"], "run_id"),
+        "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+        require_text(config["config_version"], "config_version"),
+        code_commit,
+        require_text(config["correlation_id"], "correlation_id"),
+    )
+
+
+def _build_state(
+    config: dict[str, Any],
+    code_commit: str,
+    trade_checksum: str,
+    snapshot: OrderBookSnapshotV1,
+    confidence: AggressorConfidenceStateV1,
+    items: tuple[ClassifiedTradeV1, ...],
+) -> TradesAggressorClassificationSchemaStateV1:
+    receive_time = max(item.trade.receive_time for item in items)
+    event_time = max(item.trade.event_time for item in items)
+    state0 = TradesAggressorClassificationSchemaStateV1(
+        _build_context(config, code_commit),
+        _build_lineage(config, trade_checksum, snapshot, receive_time),
+        event_time,
+        receive_time,
+        require_text(config["generated_at"], "generated_at"),
+        "VALIDATED_OFFLINE_AGGRESSOR_CLASSIFICATION_ONLY",
+        items,
+        confidence,
+        _metrics(items),
+        COMMON_REASON_CODES,
+        lot44_safety(),
+        ZERO_SHA256,
+    )
+    return replace(
+        state0,
+        output_checksum=canonical_checksum(state0.payload_without_checksum()),
+    )
+
+
+def _build_audit(
+    root: Path,
+    code_commit: str,
+    state: TradesAggressorClassificationSchemaStateV1,
+    trade_checksum: str,
+    snapshot: OrderBookSnapshotV1,
+) -> TradesAggressorClassificationSchemaAuditV1:
+    audit0 = TradesAggressorClassificationSchemaAuditV1(
+        code_commit,
+        state.output_checksum,
+        file_checksum(root / CONFIG_PATH),
+        EXPECTED_GATE_CHECKSUM,
+        trade_checksum,
+        snapshot.snapshot_checksum,
+        state.validation_state,
+        lot44_safety(),
+        ZERO_SHA256,
+    )
+    return replace(
+        audit0,
+        audit_checksum=canonical_checksum(audit0.payload_without_checksum()),
+    )
+
+
 def build_lot44_artifacts(
     root: Path,
     *,
@@ -501,84 +649,22 @@ def build_lot44_artifacts(
     trades, trade_checksum = _load_trade_fixture(root, config)
     snapshot = _load_snapshot(root, config)
     confidence = _confidence_state(config)
-    max_age = require_integer(
-        config["max_quote_age_us"],
-        "max_quote_age_us",
-        minimum=1,
-    )
-    classified: list[ClassifiedTradeV1] = []
-    for index, trade in enumerate(trades):
-        previous = trades[index - 1] if index else None
-        classified.append(
-            classify_trade(
-                trade,
-                snapshot,
-                previous,
-                max_quote_age_us=max_age,
-                confidence=confidence,
-                tick_rule_fallback=config[
-                    "tick_rule_fallback_when_quote_unavailable"
-                ],
-            )
-        )
-    items = tuple(classified)
-    metrics = _metrics(items)
-    generated_at = require_text(config["generated_at"], "generated_at")
-    receive_time = max(item.trade.receive_time for item in items)
-    event_time = max(item.trade.event_time for item in items)
-    lineage = Lot44LineageEnvelopeV1(
-        require_text(config["lineage_id"], "lineage_id"),
-        EXPECTED_GATE_CHECKSUM,
-        EXPECTED_LOT43_STATE,
-        EXPECTED_LOT43_AUDIT,
-        EXPECTED_LOT43_RESILIENCE,
-        EXPECTED_LOT43_POST_MERGE,
-        trade_checksum,
-        snapshot.snapshot_checksum,
-        receive_time,
-    )
-    context = Lot44RunContextV1(
-        require_text(config["run_id"], "run_id"),
-        "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
-        require_text(config["config_version"], "config_version"),
-        code_commit,
-        require_text(config["correlation_id"], "correlation_id"),
-    )
-    state0 = TradesAggressorClassificationSchemaStateV1(
-        context,
-        lineage,
-        event_time,
-        receive_time,
-        generated_at,
-        "VALIDATED_OFFLINE_AGGRESSOR_CLASSIFICATION_ONLY",
-        items,
+    items = _classify_trades(
+        trades,
+        snapshot,
         confidence,
-        metrics,
-        COMMON_REASON_CODES,
-        lot44_safety(),
-        ZERO_SHA256,
+        require_integer(config["max_quote_age_us"], "max_quote_age_us", minimum=1),
+        config["tick_rule_fallback_when_quote_unavailable"],
     )
-    state = replace(
-        state0,
-        output_checksum=canonical_checksum(state0.payload_without_checksum()),
-    )
-    config_checksum = file_checksum(root / CONFIG_PATH)
-    audit0 = TradesAggressorClassificationSchemaAuditV1(
+    state = _build_state(
+        config,
         code_commit,
-        state.output_checksum,
-        config_checksum,
-        EXPECTED_GATE_CHECKSUM,
         trade_checksum,
-        snapshot.snapshot_checksum,
-        state.validation_state,
-        lot44_safety(),
-        ZERO_SHA256,
+        snapshot,
+        confidence,
+        items,
     )
-    audit = replace(
-        audit0,
-        audit_checksum=canonical_checksum(audit0.payload_without_checksum()),
-    )
-    return state, audit
+    return state, _build_audit(root, code_commit, state, trade_checksum, snapshot)
 
 
 def write_lot44_artifacts(
