@@ -115,7 +115,11 @@ def _validate_confidence_policy(config: dict[str, Any]) -> None:
         "unknown_confidence",
         allow_zero=True,
     )
-    require(quote > tick > unknown == 0, "Lot 44 confidence policy ordering changed")
+    require(
+        (quote, tick, unknown)
+        == (Decimal("1"), Decimal("0.5"), Decimal("0")),
+        "Lot 44 v1 confidence policy constants changed",
+    )
 
 
 def _verify_gate(root: Path, config: dict[str, Any]) -> None:
@@ -442,6 +446,16 @@ def _classify_without_quote(
     require(
         previous_event <= trade_event and previous_receive <= trade_receive,
         "tick-rule previous trade cannot be future",
+    )
+    require(
+        (
+            previous_trade.source_id,
+            previous_trade.venue,
+            previous_trade.instrument_id,
+            previous_trade.market_type,
+        )
+        == (trade.source_id, trade.venue, trade.instrument_id, trade.market_type),
+        "tick-rule previous trade identity mismatch",
     )
     if trade.price > previous_trade.price:
         return _classified(

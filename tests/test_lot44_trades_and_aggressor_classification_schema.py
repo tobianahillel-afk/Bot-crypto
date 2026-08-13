@@ -480,9 +480,9 @@ def test_config_validator_rejects_shape_identity_and_policy_drift() -> None:
         ("generated_at", "not-time", "generated_at must use UTC Z suffix"),
         ("max_quote_age_us", 0, "max_quote_age_us must be >= 1"),
         ("tick_rule_fallback_when_quote_unavailable", False, "tick-rule fallback policy changed"),
-        ("quote_test_confidence", "0.4", "Lot 44 confidence policy ordering changed"),
-        ("tick_rule_confidence", "1", "Lot 44 confidence policy ordering changed"),
-        ("unknown_confidence", "0.1", "Lot 44 confidence policy ordering changed"),
+        ("quote_test_confidence", "0.4", "Lot 44 v1 confidence policy constants changed"),
+        ("tick_rule_confidence", "1", "Lot 44 v1 confidence policy constants changed"),
+        ("unknown_confidence", "0.1", "Lot 44 v1 confidence policy constants changed"),
     ):
         changed = deepcopy(valid)
         changed[field] = value

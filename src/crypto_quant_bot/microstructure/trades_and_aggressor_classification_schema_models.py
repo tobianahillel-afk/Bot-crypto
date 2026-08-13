@@ -142,6 +142,23 @@ class TimestampedTradeV1:
         }
 
 
+def _validate_classification_tuple(
+    classification: str,
+    method: str,
+    confidence: Decimal,
+) -> None:
+    allowed = {
+        "NONE": ({"UNKNOWN"}, Decimal("0")),
+        "QUOTE_TEST": ({"BUY_AGGRESSOR", "SELL_AGGRESSOR"}, Decimal("1")),
+        "TICK_RULE": ({"BUY_AGGRESSOR", "SELL_AGGRESSOR"}, Decimal("0.5")),
+    }
+    allowed_classifications, expected_confidence = allowed[method]
+    require(
+        classification in allowed_classifications and confidence == expected_confidence,
+        "classification method/class/confidence tuple invalid",
+    )
+
+
 @dataclass(frozen=True, slots=True)
 class ClassifiedTradeV1:
     trade: TimestampedTradeV1
@@ -169,21 +186,11 @@ class ClassifiedTradeV1:
         require_text(self.confidence_version, "confidence_version")
         require_sha256(self.quote_snapshot_checksum, "quote_snapshot_checksum")
         require_reason_codes(self.reason_codes)
-        if self.aggressor_classification == "UNKNOWN":
-            require(
-                self.classification_method == "NONE" or self.confidence == 0,
-                "UNKNOWN cannot carry positive inferred confidence",
-            )
-        if self.classification_method == "QUOTE_TEST":
-            require(
-                self.aggressor_classification != "UNKNOWN",
-                "quote-test method requires classified side",
-            )
-        if self.classification_method == "TICK_RULE":
-            require(
-                self.aggressor_classification != "UNKNOWN",
-                "tick-rule method requires classified side",
-            )
+        _validate_classification_tuple(
+            self.aggressor_classification,
+            self.classification_method,
+            self.confidence,
+        )
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -223,12 +230,14 @@ class AggressorConfidenceStateV1:
                 f"{field} outside [0,1]",
             )
         require(
-            self.quote_test_confidence
-            > self.tick_rule_confidence
-            > self.unknown_confidence,
-            "confidence ordering changed",
+            (
+                self.quote_test_confidence,
+                self.tick_rule_confidence,
+                self.unknown_confidence,
+            )
+            == (Decimal("1"), Decimal("0.5"), Decimal("0")),
+            "Lot 44 v1 confidence constants changed",
         )
-        require(self.unknown_confidence == 0, "unknown confidence must remain zero")
         require_sha256(self.confidence_checksum, "confidence_checksum")
 
     def payload_without_checksum(self) -> dict[str, Any]:
@@ -304,6 +313,41 @@ class Lot44MetricsV1:
         }
 
 
+def _metrics_from_classified_trades(
+    classified_trades: tuple[ClassifiedTradeV1, ...],
+) -> Lot44MetricsV1:
+    buy = tuple(
+        item
+        for item in classified_trades
+        if item.aggressor_classification == "BUY_AGGRESSOR"
+    )
+    sell = tuple(
+        item
+        for item in classified_trades
+        if item.aggressor_classification == "SELL_AGGRESSOR"
+    )
+    unknown = tuple(
+        item for item in classified_trades if item.aggressor_classification == "UNKNOWN"
+    )
+    total_volume = sum(
+        (item.trade.quantity for item in classified_trades), Decimal("0")
+    )
+    buy_volume = sum((item.trade.quantity for item in buy), Decimal("0"))
+    sell_volume = sum((item.trade.quantity for item in sell), Decimal("0"))
+    unknown_volume = sum((item.trade.quantity for item in unknown), Decimal("0"))
+    return Lot44MetricsV1(
+        trades_total=len(classified_trades),
+        buy_trades_total=len(buy),
+        sell_trades_total=len(sell),
+        unknown_trades_total=len(unknown),
+        total_volume=total_volume,
+        buy_volume=buy_volume,
+        sell_volume=sell_volume,
+        unknown_volume=unknown_volume,
+        unknown_volume_ratio=unknown_volume / total_volume,
+    )
+
+
 @dataclass(frozen=True, slots=True)
 class TradesAggressorClassificationSchemaStateV1:
     run_context: Lot44RunContextV1
@@ -332,8 +376,8 @@ class TradesAggressorClassificationSchemaStateV1:
             "trade ids must be unique",
         )
         require(
-            self.metrics.trades_total == len(self.classified_trades),
-            "metrics trade count mismatch",
+            self.metrics == _metrics_from_classified_trades(self.classified_trades),
+            "metrics do not match classified trades",
         )
         require_reason_codes(self.reason_codes)
         validate_safety(self.safety)
