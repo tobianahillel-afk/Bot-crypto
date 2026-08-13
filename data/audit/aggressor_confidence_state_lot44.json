@@ -1,0 +1,9 @@
+{
+  "confidence_checksum": "7cb11e078d7f0d9ed0858229d8c6fe31a7cf653a238b280b05dbdd84d1250f05",
+  "policy_version": "lot44-aggressor-confidence-v1",
+  "quote_test_confidence": "1",
+  "schema_version": "aggressor-confidence-state-v1",
+  "semantics": "DESCRIPTIVE_METHOD_CONFIDENCE_NOT_PROBABILITY",
+  "tick_rule_confidence": "0.5",
+  "unknown_confidence": "0"
+}
