@@ -1,6 +1,6 @@
 {
-  "audit_checksum": "34de6e66e8184ef3eded76ca13689c1e450a2f3a0dede7939d37f9b6812e186e",
-  "code_commit": "bfe9f67ea4fc3daffc14d238aff61f298dbd1bef",
+  "audit_checksum": "e0e5dff87a05c02fdf6330ccd19ff0af1b61fba879662f02174d89d4dd69aa4d",
+  "code_commit": "fe11756c449fccc9cccf7013feac2997024721c9",
   "config_checksum": "dac06cb3235f3a09cbbb9b41098d7cf2593b94171659f50ef840d1633bfa95b7",
   "entry_gate_checksum": "100d21ea18cfd7d9fe275ac0bea162c76a0bb7e5f85e319b543b4053e3c4d5ef",
   "order_book_snapshot_checksum": "0d63ca7ac1ca48b44e58c0b0f1eb8946190eaf2da6745c2bbd2dd8de14f49b16",
@@ -22,7 +22,7 @@
     "used_for_decision": false
   },
   "schema_version": "trades-aggressor-classification-schema-audit-v1",
-  "state_output_checksum": "2a750ad4959c2d86459a8a6169398835ee310783e371dde3dc621298fabfe158",
+  "state_output_checksum": "9e37e2e25361451a86f2f8872d3caf3e725bd230ecba6b3a1b354676456210f7",
   "trade_fixture_checksum": "b07e3a6a784c801c9ae386a33a1cbe1f936901b1549d5001bc5e53e42de9e2f8",
   "validation_state": "VALIDATED_OFFLINE_AGGRESSOR_CLASSIFICATION_ONLY"
 }
