@@ -21,13 +21,13 @@ jobs:
   mutation:
     runs-on: ubuntu-22.04
     env:
-      SOURCE_HEAD_SHA: 0bffb5c0716f1ef4744fd4be93bd17ed4db76046
+      SOURCE_HEAD_SHA: b51b64ce87f1371d2a2f1198de160fc905caa514
       PYTHONHASHSEED: '0'
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: 0bffb5c0716f1ef4744fd4be93bd17ed4db76046
+          ref: b51b64ce87f1371d2a2f1198de160fc905caa514
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
@@ -48,6 +48,7 @@ jobs:
             tests/test_lot44_trades_and_aggressor_classification_schema.py \
             tests/test_lot44_schema_contracts.py \
             tests/test_lot44_causal_guards.py \
+            tests/test_lot44_runtime_confidence_version.py \
             --junitxml=reports/lot44/mutation/baseline.xml \
             2>&1 | tee reports/lot44/mutation/baseline.txt
       - name: Build isolated mutation workspace
@@ -63,6 +64,7 @@ jobs:
           cp tests/test_lot44_trades_and_aggressor_classification_schema.py .tmp-lot44-mutants/tests/
           cp tests/test_lot44_schema_contracts.py .tmp-lot44-mutants/tests/
           cp tests/test_lot44_causal_guards.py .tmp-lot44-mutants/tests/
+          cp tests/test_lot44_runtime_confidence_version.py .tmp-lot44-mutants/tests/
           python - <<'PY'
           from pathlib import Path
           import toml
