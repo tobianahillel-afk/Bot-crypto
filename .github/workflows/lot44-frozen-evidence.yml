@@ -97,6 +97,7 @@ jobs:
             scripts/validate_lot44.py scripts/validate_lot44_no_connectivity.py \
             tests/test_lot44_trades_and_aggressor_classification_schema.py \
             tests/test_lot44_schema_contracts.py tests/test_lot44_causal_guards.py \
+            tests/test_lot44_runtime_confidence_version.py \
             docs/LOT_44_TRADES_AND_AGGRESSOR_CLASSIFICATION_SCHEMA.md \
             docs/ACCEPTANCE_CRITERIA_LOT_44.md \
             reports/lot_44_trades_and_aggressor_classification_schema_report.md
@@ -141,7 +142,7 @@ jobs:
             PYTHONPATH=src python scripts/run_lot44_trades_and_aggressor_classification_schema.py --code-commit "$SOURCE_HEAD_SHA"
             PYTHONPATH=src python scripts/validate_lot44.py --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
             for path in "${outputs[@]}"; do cmp "/tmp/lot44-run1/$(basename "$path")" "$path"; done
-            PYTHONPATH=src pytest -q tests/test_lot44_trades_and_aggressor_classification_schema.py tests/test_lot44_schema_contracts.py tests/test_lot44_causal_guards.py
+            PYTHONPATH=src pytest -q tests/test_lot44_trades_and_aggressor_classification_schema.py tests/test_lot44_schema_contracts.py tests/test_lot44_causal_guards.py tests/test_lot44_runtime_confidence_version.py
           )
           git worktree remove --force /tmp/lot44-source
           trap - EXIT
@@ -161,7 +162,7 @@ jobs:
           pip-audit -r requirements-dev.lock
           pytest -q
           for repetition in 1 2 3; do
-            pytest -q tests/test_lot44_trades_and_aggressor_classification_schema.py tests/test_lot44_schema_contracts.py tests/test_lot44_causal_guards.py
+            pytest -q tests/test_lot44_trades_and_aggressor_classification_schema.py tests/test_lot44_schema_contracts.py tests/test_lot44_causal_guards.py tests/test_lot44_runtime_confidence_version.py
           done
           test ! -e src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py
           test ! -e scripts/run_lot45_order_flow_delta_and_cvd_engine.py
