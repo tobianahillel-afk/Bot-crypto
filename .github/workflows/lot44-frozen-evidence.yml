@@ -38,10 +38,10 @@ jobs:
     env:
       PYTHONPATH: src
       GATE_MERGE_SHA: 6bbf4fcc5543f2599378bcab93263e2c8cebcec6
-      SOURCE_HEAD_SHA: 0bffb5c0716f1ef4744fd4be93bd17ed4db76046
-      QUALITY_RETRIGGER_SHA: c767bc7d5b690c5db2979c1a031d97bbdc2d7638
-      CERTIFICATION_ANCHOR_SHA: cfa6707a54b75e7632179fd34437395b877b8c3a
-      EVIDENCE_HEAD_SHA: c1eb766be5219931016536dd5bc5f89ebb02fc6c
+      SOURCE_HEAD_SHA: bfe9f67ea4fc3daffc14d238aff61f298dbd1bef
+      QUALITY_RETRIGGER_SHA: bfe9f67ea4fc3daffc14d238aff61f298dbd1bef
+      CERTIFICATION_ANCHOR_SHA: 078ba09fceab15e4ff9329b7e02ca6e900c3a300
+      EVIDENCE_HEAD_SHA: a53e4283e932eaed70f3f16dab33969cabc66dd3
     steps:
       - uses: actions/checkout@v4
         with:
@@ -63,15 +63,16 @@ jobs:
           git merge-base --is-ancestor "$QUALITY_RETRIGGER_SHA" "$CERTIFICATION_ANCHOR_SHA"
           git merge-base --is-ancestor "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA"
           git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" HEAD
-          test "$(git rev-list --count "$SOURCE_HEAD_SHA..$QUALITY_RETRIGGER_SHA")" = "1"
+          test "$(git rev-list --count "$SOURCE_HEAD_SHA..$QUALITY_RETRIGGER_SHA")" = "0"
           git diff --quiet "$SOURCE_HEAD_SHA" "$QUALITY_RETRIGGER_SHA"
           test "$(git rev-list --count "$SOURCE_HEAD_SHA..$CERTIFICATION_ANCHOR_SHA")" = "3"
           git diff --name-only "$SOURCE_HEAD_SHA" "$CERTIFICATION_ANCHOR_SHA" | sort > /tmp/cert.txt
           printf '%s\n' \
+            .github/workflows/lot44-frozen-evidence.yml \
             .github/workflows/lot44-mutation-assurance.yml \
             .github/workflows/lot44-trades-aggressor-classification.yml | sort > /tmp/cert-expected.txt
           diff -u /tmp/cert-expected.txt /tmp/cert.txt
-          test "$(git rev-list --count "$CERTIFICATION_ANCHOR_SHA..$EVIDENCE_HEAD_SHA")" = "1"
+          test "$(git rev-list --count "$CERTIFICATION_ANCHOR_SHA..$EVIDENCE_HEAD_SHA")" = "4"
           git diff --name-only "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA" | sort > /tmp/evidence.txt
           printf '%s\n' \
             data/audit/trades_and_aggressor_classification_schema_audit_lot44.json \
@@ -109,7 +110,7 @@ jobs:
             data/audit/trades_and_aggressor_classification_schema_audit_lot44.json \
             data/audit/trades_and_aggressor_classification_schema_lot44.json \
             reports/lot44/coverage_summary.json reports/lot44/mutation_summary.json
-      - name: Validate final frozen evidence v4
+      - name: Validate final frozen evidence v5
         run: |
           set -euo pipefail
           python -m compileall -q scripts/validate_lot44_frozen_evidence.py
