@@ -20,18 +20,18 @@ def require(condition: bool, message: str) -> None:
 
 
 def require_text(value: object, field: str) -> str:
-    require(
-        isinstance(value, str) and bool(value.strip()),
-        f"{field} must be non-empty text",
-    )
+    if not isinstance(value, str) or not value.strip():
+        raise TradesAggressorClassificationValidationError(
+            f"{field} must be non-empty text"
+        )
     return value
 
 
 def require_integer(value: object, field: str, minimum: int = 0) -> int:
-    require(
-        isinstance(value, int) and not isinstance(value, bool),
-        f"{field} must be integer",
-    )
+    if not isinstance(value, int) or isinstance(value, bool):
+        raise TradesAggressorClassificationValidationError(
+            f"{field} must be integer"
+        )
     require(value >= minimum, f"{field} must be >= {minimum}")
     return value
 
@@ -60,7 +60,10 @@ def decimal_from_text(
     *,
     allow_zero: bool = False,
 ) -> Decimal:
-    require(isinstance(value, str), f"{field} must be decimal text")
+    if not isinstance(value, str):
+        raise TradesAggressorClassificationValidationError(
+            f"{field} must be decimal text"
+        )
     try:
         number = Decimal(value)
     except InvalidOperation as exc:
