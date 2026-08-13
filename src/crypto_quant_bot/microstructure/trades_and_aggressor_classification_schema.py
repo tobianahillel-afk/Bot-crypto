@@ -351,10 +351,11 @@ def _quote_usable(
     max_age_us: int,
 ) -> tuple[bool, str]:
     _identity_matches(trade, snapshot)
-    if parse_utc_timestamp(
-        snapshot.receive_time,
-        "quote receive_time",
-    ) > parse_utc_timestamp(trade.receive_time, "trade receive_time"):
+    quote_event = parse_utc_timestamp(snapshot.event_time, "quote event_time")
+    trade_event = parse_utc_timestamp(trade.event_time, "trade event_time")
+    quote_receive = parse_utc_timestamp(snapshot.receive_time, "quote receive_time")
+    trade_receive = parse_utc_timestamp(trade.receive_time, "trade receive_time")
+    if quote_event > trade_event or quote_receive > trade_receive:
         return False, "FUTURE_QUOTE_FORBIDDEN"
     if duration_us(snapshot.receive_time, trade.receive_time) > max_age_us:
         return False, "STALE_QUOTE_UNKNOWN"
@@ -431,9 +432,15 @@ def _classify_without_quote(
             "QUOTE_UNAVAILABLE_NO_FALLBACK_EVIDENCE",
             confidence,
         )
+    previous_event = parse_utc_timestamp(previous_trade.event_time, "previous event_time")
+    trade_event = parse_utc_timestamp(trade.event_time, "trade event_time")
+    previous_receive = parse_utc_timestamp(
+        previous_trade.receive_time,
+        "previous receive_time",
+    )
+    trade_receive = parse_utc_timestamp(trade.receive_time, "trade receive_time")
     require(
-        parse_utc_timestamp(previous_trade.receive_time, "previous receive_time")
-        <= parse_utc_timestamp(trade.receive_time, "trade receive_time"),
+        previous_event <= trade_event and previous_receive <= trade_receive,
         "tick-rule previous trade cannot be future",
     )
     if trade.price > previous_trade.price:
