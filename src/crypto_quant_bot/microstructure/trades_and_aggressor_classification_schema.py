@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry import (
     atomic_write_json,
@@ -137,8 +137,9 @@ def _verify_gate(root: Path, config: dict[str, Any]) -> None:
         "Lot 44 gate does not authorize implementation",
     )
     require(gate.get("safety") == lot44_safety(), "Lot 44 gate safety boundary changed")
-    prerequisites = gate.get("prerequisites")
-    require(isinstance(prerequisites, dict), "Lot 44 gate prerequisites missing")
+    raw_prerequisites = gate.get("prerequisites")
+    require(isinstance(raw_prerequisites, dict), "Lot 44 gate prerequisites missing")
+    prerequisites = cast(dict[str, Any], raw_prerequisites)
     required = {
         "lot43_state_checksum": EXPECTED_LOT43_STATE,
         "lot43_audit_checksum": EXPECTED_LOT43_AUDIT,
@@ -193,8 +194,12 @@ def _load_trade_fixture(
     )
     event_time = require_text(fixture["event_time"], "fixture event_time")
     receive_time = require_text(fixture["available_at"], "fixture available_at")
-    trades = fixture.get("trades")
-    require(isinstance(trades, list) and bool(trades), "trade fixture requires records")
+    raw_trades = fixture.get("trades")
+    require(
+        isinstance(raw_trades, list) and bool(raw_trades),
+        "trade fixture requires records",
+    )
+    trades = cast(list[object], raw_trades)
     mapped = tuple(
         _map_trade(fixture, raw, event_time, receive_time) for raw in trades
     )
