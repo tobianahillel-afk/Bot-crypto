@@ -1,0 +1,119 @@
+name: Lot 44 independent post-merge audit
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/lot44-post-merge-audit.yml'
+      - 'scripts/validate_lot44_post_merge.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-22.04
+    env:
+      PYTHONPATH: src
+      SOURCE_HEAD_SHA: d3cc4cf916ecea5166716746143a593f01b1d051
+      IMPLEMENTATION_MERGE_SHA: 5c5d3c388abaf10e2e81593a6a3918375a0c0e19
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Validate audit implementation quality
+        run: |
+          set -euo pipefail
+          python -m compileall -q scripts/validate_lot44_post_merge.py scripts/validate_lot44_frozen_evidence.py
+          ruff check scripts/validate_lot44_post_merge.py scripts/validate_lot44_frozen_evidence.py
+          bandit -q -r scripts/validate_lot44_post_merge.py scripts/validate_lot44_frozen_evidence.py -ll
+      - name: Prove implementation merge and frozen v7 chain
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$IMPLEMENTATION_MERGE_SHA"
+          git merge-base --is-ancestor "$IMPLEMENTATION_MERGE_SHA" HEAD
+          python scripts/validate_lot44_post_merge.py | tee /tmp/lot44-post-merge-audit.json
+          grep -Fx 'GO_LOT44_POST_MERGE' /tmp/lot44-post-merge-audit.json
+      - name: Replay final source byte-identically
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/lot44-source /tmp/lot44-run1 /tmp/lot44-expected
+          mkdir -p /tmp/lot44-run1 /tmp/lot44-expected
+          cp data/audit/trades_and_aggressor_classification_schema_lot44.json /tmp/lot44-expected/
+          cp data/audit/trades_and_aggressor_classification_schema_audit_lot44.json /tmp/lot44-expected/
+          cp data/audit/aggressor_confidence_state_lot44.json /tmp/lot44-expected/
+          git worktree add --detach /tmp/lot44-source "$SOURCE_HEAD_SHA"
+          trap 'git worktree remove --force /tmp/lot44-source >/dev/null 2>&1 || true' EXIT
+          (
+            cd /tmp/lot44-source
+            outputs=(
+              data/audit/trades_and_aggressor_classification_schema_lot44.json
+              data/audit/trades_and_aggressor_classification_schema_audit_lot44.json
+              data/audit/aggressor_confidence_state_lot44.json
+            )
+            PYTHONPATH=src python scripts/run_lot44_trades_and_aggressor_classification_schema.py --code-commit "$SOURCE_HEAD_SHA"
+            PYTHONPATH=src python scripts/validate_lot44.py --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
+            PYTHONPATH=src python scripts/validate_lot44_no_connectivity.py
+            for path in "${outputs[@]}"; do
+              cmp "$path" "/tmp/lot44-expected/$(basename "$path")"
+              cp "$path" "/tmp/lot44-run1/$(basename "$path")"
+            done
+            PYTHONPATH=src python scripts/run_lot44_trades_and_aggressor_classification_schema.py --code-commit "$SOURCE_HEAD_SHA"
+            PYTHONPATH=src python scripts/validate_lot44.py --expected-code-commit "$SOURCE_HEAD_SHA" --require-persisted
+            for path in "${outputs[@]}"; do cmp "/tmp/lot44-run1/$(basename "$path")" "$path"; done
+            PYTHONPATH=src pytest -q \
+              tests/test_lot44_trades_and_aggressor_classification_schema.py \
+              tests/test_lot44_schema_contracts.py \
+              tests/test_lot44_causal_guards.py \
+              tests/test_lot44_runtime_confidence_version.py
+          )
+          git worktree remove --force /tmp/lot44-source
+          trap - EXIT
+      - name: Full institutional regression and downstream locks
+        run: |
+          set -euo pipefail
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          python scripts/validate_lot44_no_connectivity.py
+          pip-audit -r requirements-dev.lock
+          pytest -q
+          for repetition in 1 2 3; do
+            pytest -q \
+              tests/test_lot44_trades_and_aggressor_classification_schema.py \
+              tests/test_lot44_schema_contracts.py \
+              tests/test_lot44_causal_guards.py \
+              tests/test_lot44_runtime_confidence_version.py
+          done
+          test ! -e src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py
+          test ! -e scripts/run_lot45_order_flow_delta_and_cvd_engine.py
+          test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine.py
+          test ! -e scripts/run_lot46_trade_classification_confidence_engine.py
+      - name: Re-emit final GO verdict after regression
+        run: |
+          set -euo pipefail
+          python scripts/validate_lot44_post_merge.py | tee /tmp/lot44-post-merge-audit-final.json
+          grep -Fx 'GO_LOT44_POST_MERGE' /tmp/lot44-post-merge-audit-final.json
+          cmp /tmp/lot44-post-merge-audit.json /tmp/lot44-post-merge-audit-final.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot44-post-merge-audit-evidence
+          path: |
+            /tmp/lot44-post-merge-audit.json
+            /tmp/lot44-post-merge-audit-final.json
