@@ -21,13 +21,13 @@ jobs:
   mutation:
     runs-on: ubuntu-22.04
     env:
-      SOURCE_HEAD_SHA: 29cf31ba581346b1d7d328911daa76a6c7a681a1
+      SOURCE_HEAD_SHA: fd6d4d88608b80a7f27d561f59988072177d00b2
       PYTHONHASHSEED: '0'
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: 29cf31ba581346b1d7d328911daa76a6c7a681a1
+          ref: fd6d4d88608b80a7f27d561f59988072177d00b2
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
