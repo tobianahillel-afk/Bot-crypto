@@ -53,8 +53,8 @@ from .trades_and_aggressor_classification_schema_models import (
 )
 
 CONFIG_PATH = Path("config/microstructure/order_flow_delta_and_cvd_engine_v1.json")
-STATE_PATH = Path("data/audit/order_flow_delta_cvd_engine_lot45.json")
-AUDIT_PATH = Path("data/audit/order_flow_delta_cvd_engine_audit_lot45.json")
+STATE_PATH = Path("data/audit/order_flow_delta_and_cvd_engine_lot45.json")
+AUDIT_PATH = Path("data/audit/order_flow_delta_and_cvd_engine_audit_lot45.json")
 ORDER_FLOW_PATH = Path("data/audit/order_flow_state_lot45.json")
 CVD_PATH = Path("data/audit/cvd_series_lot45.json")
 
