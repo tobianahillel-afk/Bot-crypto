@@ -69,15 +69,7 @@ class Lot45LineageEnvelopeV1:
 
     def __post_init__(self) -> None:
         require_text(self.lineage_id, "lineage_id")
-        for field, value in (
-            ("entry_gate_checksum", self.entry_gate_checksum),
-            ("lot44_state_checksum", self.lot44_state_checksum),
-            ("lot44_audit_checksum", self.lot44_audit_checksum),
-            ("lot44_confidence_checksum", self.lot44_confidence_checksum),
-            ("lot44_config_checksum", self.lot44_config_checksum),
-            ("lot44_post_merge_checksum", self.lot44_post_merge_checksum),
-        ):
-            require_sha256(value, field)
+        _validate_lineage_checksums(self)
         require_git_sha(self.entry_gate_merge_commit, "entry_gate_merge_commit")
         parse_utc_timestamp(self.available_at, "available_at")
 
@@ -119,68 +111,10 @@ class OrderFlowWindowV1:
     window_checksum: str
 
     def __post_init__(self) -> None:
-        start = parse_utc_timestamp(self.window_start, "window_start")
-        end = parse_utc_timestamp(self.window_end, "window_end")
-        event = parse_utc_timestamp(self.event_time, "window event_time")
-        receive = parse_utc_timestamp(self.receive_time, "window receive_time")
-        require(start < end, "window_start must precede window_end")
-        require(start <= event < end, "window event_time must be inside event-time window")
-        require(event <= receive, "window receive_time precedes event_time")
-        require_text(self.session_id, "session_id")
-        for field, count in (
-            ("trades_total", self.trades_total),
-            ("buy_trades_total", self.buy_trades_total),
-            ("sell_trades_total", self.sell_trades_total),
-            ("unknown_trades_total", self.unknown_trades_total),
-        ):
-            require_integer(count, field)
-        require(self.trades_total > 0, "order-flow window cannot be empty")
-        require(
-            self.trades_total
-            == self.buy_trades_total + self.sell_trades_total + self.unknown_trades_total,
-            "order-flow trade count conservation failed",
-        )
-        for field, volume in (
-            ("total_volume", self.total_volume),
-            ("buy_volume", self.buy_volume),
-            ("sell_volume", self.sell_volume),
-            ("unknown_volume", self.unknown_volume),
-        ):
-            require(
-                volume.is_finite() and volume >= 0,
-                f"{field} must be finite non-negative",
-            )
-        require(self.total_volume > 0, "order-flow total volume must be positive")
-        require(
-            self.total_volume == self.buy_volume + self.sell_volume + self.unknown_volume,
-            "order-flow volume conservation failed",
-        )
-        require(
-            self.signed_delta == self.buy_volume - self.sell_volume,
-            "signed delta must equal buy minus sell volume",
-        )
-        with localcontext() as context:
-            context.prec = CALCULATION_DECIMAL_PRECISION
-            expected_imbalance = self.signed_delta / self.total_volume
-            expected_coverage = (self.buy_volume + self.sell_volume) / self.total_volume
-        require(
-            self.signed_imbalance == expected_imbalance,
-            "signed imbalance must equal signed delta divided by total volume",
-        )
-        require(
-            self.classification_coverage == expected_coverage,
-            "classification coverage mismatch",
-        )
-        validate_ratio(self.classification_coverage, "classification_coverage")
-        validate_ratio(
-            self.confidence_weighted_coverage,
-            "confidence_weighted_coverage",
-        )
-        require(
-            self.confidence_weighted_coverage <= self.classification_coverage,
-            "weighted confidence cannot exceed classified-volume coverage",
-        )
-        require(self.delta_impulse.is_finite(), "delta impulse must be finite")
+        _validate_window_times(self)
+        _validate_window_counts(self)
+        _validate_window_volumes(self)
+        _validate_window_metrics(self)
         require_sha256(self.window_checksum, "window_checksum")
 
     def payload_without_checksum(self) -> dict[str, Any]:
@@ -234,76 +168,10 @@ class OrderFlowStateV1:
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "windows", tuple(self.windows))
-        require(bool(self.windows), "order-flow windows cannot be empty")
-        starts = [
-            parse_utc_timestamp(item.window_start, "window_start") for item in self.windows
-        ]
-        require(starts == sorted(starts), "order-flow windows must be event-time ordered")
-        require(len(starts) == len(set(starts)), "order-flow windows must be unique")
-        expected_impulse = Decimal("0")
-        previous_delta = Decimal("0")
-        previous_session: str | None = None
-        for item in self.windows:
-            if previous_session != item.session_id:
-                expected_impulse = item.signed_delta
-            else:
-                expected_impulse = item.signed_delta - previous_delta
-            require(item.delta_impulse == expected_impulse, "window delta impulse mismatch")
-            previous_delta = item.signed_delta
-            previous_session = item.session_id
-        aggregates = {
-            "trades_total": sum(item.trades_total for item in self.windows),
-            "buy_trades_total": sum(item.buy_trades_total for item in self.windows),
-            "sell_trades_total": sum(item.sell_trades_total for item in self.windows),
-            "unknown_trades_total": sum(item.unknown_trades_total for item in self.windows),
-        }
-        for field, expected in aggregates.items():
-            require(getattr(self, field) == expected, f"{field} aggregate mismatch")
-        total_volume = sum((item.total_volume for item in self.windows), Decimal("0"))
-        buy_volume = sum((item.buy_volume for item in self.windows), Decimal("0"))
-        sell_volume = sum((item.sell_volume for item in self.windows), Decimal("0"))
-        unknown_volume = sum((item.unknown_volume for item in self.windows), Decimal("0"))
-        require(self.total_volume == total_volume, "total volume aggregate mismatch")
-        require(self.buy_volume == buy_volume, "buy volume aggregate mismatch")
-        require(self.sell_volume == sell_volume, "sell volume aggregate mismatch")
-        require(self.unknown_volume == unknown_volume, "unknown volume aggregate mismatch")
-        require(
-            self.total_volume == self.buy_volume + self.sell_volume + self.unknown_volume,
-            "aggregate volume conservation failed",
-        )
-        require(
-            self.signed_delta == self.buy_volume - self.sell_volume,
-            "aggregate delta mismatch",
-        )
-        with localcontext() as context:
-            context.prec = CALCULATION_DECIMAL_PRECISION
-            expected_unknown_ratio = self.unknown_volume / self.total_volume
-            expected_coverage = (self.buy_volume + self.sell_volume) / self.total_volume
-            expected_weighted = sum(
-                (
-                    item.confidence_weighted_coverage * item.total_volume
-                    for item in self.windows
-                ),
-                Decimal("0"),
-            ) / self.total_volume
-        require(
-            self.unknown_volume_ratio == expected_unknown_ratio,
-            "unknown volume ratio mismatch",
-        )
-        require(
-            self.classification_coverage == expected_coverage,
-            "aggregate classification coverage mismatch",
-        )
-        require(
-            self.confidence_weighted_coverage == expected_weighted,
-            "aggregate confidence-weighted coverage mismatch",
-        )
-        validate_ratio(self.unknown_volume_ratio, "unknown_volume_ratio")
-        validate_ratio(self.classification_coverage, "classification_coverage")
-        validate_ratio(
-            self.confidence_weighted_coverage,
-            "confidence_weighted_coverage",
-        )
+        _validate_flow_window_sequence(self.windows)
+        _validate_flow_counts(self)
+        _validate_flow_volumes(self)
+        _validate_flow_metrics(self)
         require_sha256(self.order_flow_checksum, "order_flow_checksum")
 
     def payload_without_checksum(self) -> dict[str, Any]:
@@ -371,20 +239,7 @@ class CVDSeriesV1:
             self.session_policy_version == SESSION_POLICY_VERSION,
             "CVD session policy version changed",
         )
-        require(bool(self.points), "CVD points cannot be empty")
-        event_times = [
-            parse_utc_timestamp(item.event_time, "CVD event_time") for item in self.points
-        ]
-        require(event_times == sorted(event_times), "CVD points must be event-time ordered")
-        require(len(event_times) == len(set(event_times)), "CVD event times must be unique")
-        current_session: str | None = None
-        running = Decimal("0")
-        for point in self.points:
-            if point.session_id != current_session:
-                current_session = point.session_id
-                running = Decimal("0")
-            running += point.signed_delta
-            require(point.cvd == running, "CVD recurrence mismatch")
+        _validate_cvd_points(self.points)
         require_sha256(self.cvd_checksum, "cvd_checksum")
 
     def payload_without_checksum(self) -> dict[str, Any]:
@@ -422,37 +277,9 @@ class OrderFlowDeltaCVDEngineStateV1:
         object.__setattr__(self, "reason_codes", tuple(self.reason_codes))
         object.__setattr__(self, "safety", MappingProxyType(dict(self.safety)))
         validate_causal_times(self.event_time, self.receive_time, self.generated_at)
-        require(self.validation_state == VALIDATION_STATE, "Lot45 validation state changed")
-        require(self.policy_version == POLICY_VERSION, "Lot45 policy version changed")
-        require(
-            self.window_policy_version == WINDOW_POLICY_VERSION,
-            "Lot45 window policy version changed",
-        )
-        require(
-            self.session_policy_version == SESSION_POLICY_VERSION,
-            "Lot45 session policy version changed",
-        )
-        max_event = max(
-            parse_utc_timestamp(item.event_time, "window event_time")
-            for item in self.order_flow.windows
-        )
-        max_receive = max(
-            parse_utc_timestamp(item.receive_time, "window receive_time")
-            for item in self.order_flow.windows
-        )
-        require(
-            parse_utc_timestamp(self.event_time, "state event_time") == max_event,
-            "Lot45 state event_time must equal latest source event",
-        )
-        require(
-            parse_utc_timestamp(self.receive_time, "state receive_time") == max_receive,
-            "Lot45 state receive_time must equal latest source receive time",
-        )
-        require(
-            [point.window_checksum for point in self.cvd_series.points]
-            == [window.window_checksum for window in self.order_flow.windows],
-            "CVD points must bind one-to-one to order-flow windows",
-        )
+        _validate_state_versions(self)
+        _validate_state_time_envelope(self)
+        _validate_state_cvd_binding(self)
         require_reason_codes(self.reason_codes)
         validate_safety(self.safety)
         require_sha256(self.output_checksum, "output_checksum")
@@ -501,19 +328,7 @@ class OrderFlowDeltaCVDEngineAuditV1:
     def __post_init__(self) -> None:
         object.__setattr__(self, "safety", MappingProxyType(dict(self.safety)))
         require_git_sha(self.code_commit, "code_commit")
-        for field, value in (
-            ("state_output_checksum", self.state_output_checksum),
-            ("config_checksum", self.config_checksum),
-            ("entry_gate_checksum", self.entry_gate_checksum),
-            ("lot44_state_checksum", self.lot44_state_checksum),
-            ("lot44_audit_checksum", self.lot44_audit_checksum),
-            ("lot44_confidence_checksum", self.lot44_confidence_checksum),
-            ("lot44_post_merge_checksum", self.lot44_post_merge_checksum),
-            ("order_flow_checksum", self.order_flow_checksum),
-            ("cvd_checksum", self.cvd_checksum),
-            ("audit_checksum", self.audit_checksum),
-        ):
-            require_sha256(value, field)
+        _validate_audit_checksums(self)
         require(
             self.validation_state == VALIDATION_STATE,
             "Lot45 audit validation state changed",
@@ -542,3 +357,198 @@ class OrderFlowDeltaCVDEngineAuditV1:
             "safety": dict(self.safety),
             "audit_checksum": self.audit_checksum,
         }
+
+
+def _validate_lineage_checksums(lineage: Lot45LineageEnvelopeV1) -> None:
+    values = {
+        "entry_gate_checksum": lineage.entry_gate_checksum,
+        "lot44_state_checksum": lineage.lot44_state_checksum,
+        "lot44_audit_checksum": lineage.lot44_audit_checksum,
+        "lot44_confidence_checksum": lineage.lot44_confidence_checksum,
+        "lot44_config_checksum": lineage.lot44_config_checksum,
+        "lot44_post_merge_checksum": lineage.lot44_post_merge_checksum,
+    }
+    for field, value in values.items():
+        require_sha256(value, field)
+
+
+def _validate_window_times(window: OrderFlowWindowV1) -> None:
+    start = parse_utc_timestamp(window.window_start, "window_start")
+    end = parse_utc_timestamp(window.window_end, "window_end")
+    event = parse_utc_timestamp(window.event_time, "window event_time")
+    receive = parse_utc_timestamp(window.receive_time, "window receive_time")
+    require(start < end, "window_start must precede window_end")
+    require(start <= event < end, "window event_time must be inside event-time window")
+    require(event <= receive, "window receive_time precedes event_time")
+    require_text(window.session_id, "session_id")
+
+
+def _validate_window_counts(window: OrderFlowWindowV1) -> None:
+    values = {
+        "trades_total": window.trades_total,
+        "buy_trades_total": window.buy_trades_total,
+        "sell_trades_total": window.sell_trades_total,
+        "unknown_trades_total": window.unknown_trades_total,
+    }
+    for field, count in values.items():
+        require_integer(count, field)
+    require(window.trades_total > 0, "order-flow window cannot be empty")
+    classified_total = (
+        window.buy_trades_total + window.sell_trades_total + window.unknown_trades_total
+    )
+    require(window.trades_total == classified_total, "order-flow trade count conservation failed")
+
+
+def _validate_window_volumes(window: OrderFlowWindowV1) -> None:
+    volumes = {
+        "total_volume": window.total_volume,
+        "buy_volume": window.buy_volume,
+        "sell_volume": window.sell_volume,
+        "unknown_volume": window.unknown_volume,
+    }
+    for field, volume in volumes.items():
+        require(volume.is_finite() and volume >= 0, f"{field} must be finite non-negative")
+    require(window.total_volume > 0, "order-flow total volume must be positive")
+    classified_total = window.buy_volume + window.sell_volume + window.unknown_volume
+    require(window.total_volume == classified_total, "order-flow volume conservation failed")
+    require(
+        window.signed_delta == window.buy_volume - window.sell_volume,
+        "signed delta must equal buy minus sell volume",
+    )
+
+
+def _validate_window_metrics(window: OrderFlowWindowV1) -> None:
+    with localcontext() as context:
+        context.prec = CALCULATION_DECIMAL_PRECISION
+        expected_imbalance = window.signed_delta / window.total_volume
+        expected_coverage = (window.buy_volume + window.sell_volume) / window.total_volume
+    require(window.signed_imbalance == expected_imbalance, "signed imbalance mismatch")
+    require(window.classification_coverage == expected_coverage, "classification coverage mismatch")
+    validate_ratio(window.classification_coverage, "classification_coverage")
+    validate_ratio(window.confidence_weighted_coverage, "confidence_weighted_coverage")
+    require(
+        window.confidence_weighted_coverage <= window.classification_coverage,
+        "weighted confidence cannot exceed classified-volume coverage",
+    )
+    require(window.delta_impulse.is_finite(), "delta impulse must be finite")
+
+
+def _validate_flow_window_sequence(windows: tuple[OrderFlowWindowV1, ...]) -> None:
+    require(bool(windows), "order-flow windows cannot be empty")
+    starts = [parse_utc_timestamp(item.window_start, "window_start") for item in windows]
+    require(starts == sorted(starts), "order-flow windows must be event-time ordered")
+    require(len(starts) == len(set(starts)), "order-flow windows must be unique")
+    previous_delta = Decimal("0")
+    previous_session: str | None = None
+    for item in windows:
+        expected = item.signed_delta
+        if previous_session == item.session_id:
+            expected -= previous_delta
+        require(item.delta_impulse == expected, "window delta impulse mismatch")
+        previous_delta = item.signed_delta
+        previous_session = item.session_id
+
+
+def _validate_flow_counts(state: OrderFlowStateV1) -> None:
+    expected = {
+        "trades_total": sum(item.trades_total for item in state.windows),
+        "buy_trades_total": sum(item.buy_trades_total for item in state.windows),
+        "sell_trades_total": sum(item.sell_trades_total for item in state.windows),
+        "unknown_trades_total": sum(item.unknown_trades_total for item in state.windows),
+    }
+    for field, value in expected.items():
+        require(getattr(state, field) == value, f"{field} aggregate mismatch")
+
+
+def _validate_flow_volumes(state: OrderFlowStateV1) -> None:
+    expected = {
+        "total_volume": sum((item.total_volume for item in state.windows), Decimal("0")),
+        "buy_volume": sum((item.buy_volume for item in state.windows), Decimal("0")),
+        "sell_volume": sum((item.sell_volume for item in state.windows), Decimal("0")),
+        "unknown_volume": sum((item.unknown_volume for item in state.windows), Decimal("0")),
+    }
+    for field, value in expected.items():
+        require(getattr(state, field) == value, f"{field} aggregate mismatch")
+    require(
+        state.total_volume == state.buy_volume + state.sell_volume + state.unknown_volume,
+        "aggregate volume conservation failed",
+    )
+    require(state.signed_delta == state.buy_volume - state.sell_volume, "aggregate delta mismatch")
+
+
+def _validate_flow_metrics(state: OrderFlowStateV1) -> None:
+    with localcontext() as context:
+        context.prec = CALCULATION_DECIMAL_PRECISION
+        expected_unknown = state.unknown_volume / state.total_volume
+        expected_coverage = (state.buy_volume + state.sell_volume) / state.total_volume
+        weighted_volume = sum(
+            (item.confidence_weighted_coverage * item.total_volume for item in state.windows),
+            Decimal("0"),
+        )
+        expected_weighted = weighted_volume / state.total_volume
+    require(state.unknown_volume_ratio == expected_unknown, "unknown volume ratio mismatch")
+    require(state.classification_coverage == expected_coverage, "aggregate coverage mismatch")
+    require(state.confidence_weighted_coverage == expected_weighted, "aggregate weighted coverage mismatch")
+    validate_ratio(state.unknown_volume_ratio, "unknown_volume_ratio")
+    validate_ratio(state.classification_coverage, "classification_coverage")
+    validate_ratio(state.confidence_weighted_coverage, "confidence_weighted_coverage")
+
+
+def _validate_cvd_points(points: tuple[CVDPointV1, ...]) -> None:
+    require(bool(points), "CVD points cannot be empty")
+    event_times = [parse_utc_timestamp(item.event_time, "CVD event_time") for item in points]
+    require(event_times == sorted(event_times), "CVD points must be event-time ordered")
+    require(len(event_times) == len(set(event_times)), "CVD event times must be unique")
+    current_session: str | None = None
+    running = Decimal("0")
+    for point in points:
+        if point.session_id != current_session:
+            current_session = point.session_id
+            running = Decimal("0")
+        running += point.signed_delta
+        require(point.cvd == running, "CVD recurrence mismatch")
+
+
+def _validate_state_versions(state: OrderFlowDeltaCVDEngineStateV1) -> None:
+    require(state.validation_state == VALIDATION_STATE, "Lot45 validation state changed")
+    require(state.policy_version == POLICY_VERSION, "Lot45 policy version changed")
+    require(state.window_policy_version == WINDOW_POLICY_VERSION, "Lot45 window policy changed")
+    require(state.session_policy_version == SESSION_POLICY_VERSION, "Lot45 session policy changed")
+
+
+def _validate_state_time_envelope(state: OrderFlowDeltaCVDEngineStateV1) -> None:
+    max_event = max(
+        parse_utc_timestamp(item.event_time, "window event_time")
+        for item in state.order_flow.windows
+    )
+    max_receive = max(
+        parse_utc_timestamp(item.receive_time, "window receive_time")
+        for item in state.order_flow.windows
+    )
+    actual_event = parse_utc_timestamp(state.event_time, "state event_time")
+    actual_receive = parse_utc_timestamp(state.receive_time, "state receive_time")
+    require(actual_event == max_event, "Lot45 state event_time must equal latest source event")
+    require(actual_receive == max_receive, "Lot45 state receive_time must equal latest source receive time")
+
+
+def _validate_state_cvd_binding(state: OrderFlowDeltaCVDEngineStateV1) -> None:
+    point_checksums = [point.window_checksum for point in state.cvd_series.points]
+    window_checksums = [window.window_checksum for window in state.order_flow.windows]
+    require(point_checksums == window_checksums, "CVD points must bind one-to-one to windows")
+
+
+def _validate_audit_checksums(audit: OrderFlowDeltaCVDEngineAuditV1) -> None:
+    values = {
+        "state_output_checksum": audit.state_output_checksum,
+        "config_checksum": audit.config_checksum,
+        "entry_gate_checksum": audit.entry_gate_checksum,
+        "lot44_state_checksum": audit.lot44_state_checksum,
+        "lot44_audit_checksum": audit.lot44_audit_checksum,
+        "lot44_confidence_checksum": audit.lot44_confidence_checksum,
+        "lot44_post_merge_checksum": audit.lot44_post_merge_checksum,
+        "order_flow_checksum": audit.order_flow_checksum,
+        "cvd_checksum": audit.cvd_checksum,
+        "audit_checksum": audit.audit_checksum,
+    }
+    for field, value in values.items():
+        require_sha256(value, field)
