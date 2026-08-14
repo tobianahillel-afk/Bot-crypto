@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
-from decimal import Decimal, localcontext
+from decimal import ROUND_HALF_EVEN, Decimal, localcontext
 from types import MappingProxyType
 from typing import Any
 
@@ -420,6 +420,7 @@ def _validate_window_volumes(window: OrderFlowWindowV1) -> None:
 def _validate_window_metrics(window: OrderFlowWindowV1) -> None:
     with localcontext() as context:
         context.prec = CALCULATION_DECIMAL_PRECISION
+        context.rounding = ROUND_HALF_EVEN
         expected_imbalance = window.signed_delta / window.total_volume
         expected_coverage = (window.buy_volume + window.sell_volume) / window.total_volume
     require(window.signed_imbalance == expected_imbalance, "signed imbalance mismatch")
@@ -479,6 +480,7 @@ def _validate_flow_volumes(state: OrderFlowStateV1) -> None:
 def _validate_flow_metrics(state: OrderFlowStateV1) -> None:
     with localcontext() as context:
         context.prec = CALCULATION_DECIMAL_PRECISION
+        context.rounding = ROUND_HALF_EVEN
         expected_unknown = state.unknown_volume / state.total_volume
         expected_coverage = (state.buy_volume + state.sell_volume) / state.total_volume
         weighted_volume = sum(
