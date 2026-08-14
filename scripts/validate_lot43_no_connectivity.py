@@ -22,7 +22,7 @@ FORBIDDEN_IMPORT_ROOTS = {
     "httpx",
     "requests",
     "socket",
-    "urllib" + ".request",
+    "urllib.request",
     "urllib3",
     "websocket",
     "websockets",
