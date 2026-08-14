@@ -32,11 +32,12 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
 
-      - name: Prove exact governance-only Lot 45 gate transition
+      - name: Locate exact immutable Lot 45 gate transition
         run: |
           set -euo pipefail
           git merge-base --is-ancestor "$BASE_COMMIT_SHA" HEAD
           cat > /tmp/lot45-gate-paths.txt <<'EOF'
+          .github/workflows/lot44-entry-gate.yml
           .github/workflows/lot45-entry-gate.yml
           contracts/schemas/lot45_v4_entry_gate_v1.schema.json
           data/audit/lot45_v4_entry_gate.json
@@ -46,8 +47,19 @@ jobs:
           tests/test_lot45_v4_entry_gate.py
           EOF
           sort -o /tmp/lot45-gate-paths.txt /tmp/lot45-gate-paths.txt
-          git diff --name-only "$BASE_COMMIT_SHA" HEAD | sort > /tmp/lot45-actual-paths.txt
-          diff -u /tmp/lot45-gate-paths.txt /tmp/lot45-actual-paths.txt
+          gate_commit=""
+          while read -r candidate; do
+            git diff --name-only "$BASE_COMMIT_SHA" "$candidate" | sort > /tmp/candidate-paths.txt
+            if diff -q /tmp/lot45-gate-paths.txt /tmp/candidate-paths.txt >/dev/null; then
+              gate_commit="$candidate"
+              break
+            fi
+          done < <(git rev-list --first-parent "$BASE_COMMIT_SHA..HEAD")
+          test -n "$gate_commit"
+          echo "$gate_commit" | tee /tmp/lot45-gate-commit.txt
+          while read -r path; do
+            git diff --quiet "$gate_commit" HEAD -- "$path"
+          done < /tmp/lot45-gate-paths.txt
           test "$(git show -s --format=%P "$BASE_COMMIT_SHA" | wc -w)" -eq 2
           git show -s --format=%P "$BASE_COMMIT_SHA" | grep -F 'e390b6e5d76c53d9dd6d74724f3246b92e628079'
           git show -s --format=%P "$BASE_COMMIT_SHA" | grep -F "$LOT44_AUDIT_PR_HEAD"
@@ -69,16 +81,49 @@ jobs:
           git worktree remove --force /tmp/lot44-post-merge-certified
           trap - EXIT
 
-      - name: Validate immutable Lot 45 gate contracts
+      - name: Replay gate at certified governance transition
         run: |
           set -euo pipefail
-          python -m compileall -q scripts tests
+          gate_commit="$(cat /tmp/lot45-gate-commit.txt)"
+          rm -rf /tmp/lot45-gate-certified
+          git worktree add --detach /tmp/lot45-gate-certified "$gate_commit"
+          trap 'git worktree remove --force /tmp/lot45-gate-certified >/dev/null 2>&1 || true' EXIT
+          (
+            cd /tmp/lot45-gate-certified
+            python -m compileall -q scripts tests
+            python -m json.tool data/audit/lot45_v4_entry_gate.json >/dev/null
+            python -m json.tool contracts/schemas/lot45_v4_entry_gate_v1.schema.json >/dev/null
+            ruff check scripts/validate_lot45_entry_gate.py tests/test_lot45_v4_entry_gate.py
+            PYTHONPATH=src python scripts/validate_lot45_entry_gate.py \
+              | tee /tmp/lot45-entry-gate.json
+            grep -F '"status": "PASS"' /tmp/lot45-entry-gate.json
+            grep -F '"verdict": "GO_LOT45_IMPLEMENTATION_ENTRY"' /tmp/lot45-entry-gate.json
+            PYTHONPATH=src pytest -q tests/test_lot45_v4_entry_gate.py
+            test ! -e src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py
+            test ! -e src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py
+            test ! -e src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py
+            test ! -e config/microstructure/order_flow_delta_and_cvd_engine_v1.json
+            test ! -e scripts/run_lot45_order_flow_delta_and_cvd_engine.py
+            test ! -e scripts/validate_lot45.py
+            test ! -e tests/test_lot45_order_flow_delta_and_cvd_engine.py
+            test ! -e contracts/schemas/order_flow_delta_cvd_engine_state_v1.schema.json
+            test ! -e contracts/schemas/order_flow_delta_cvd_engine_audit_v1.schema.json
+            test ! -e contracts/schemas/order_flow_state_v1.schema.json
+            test ! -e contracts/schemas/cvd_series_v1.schema.json
+            test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine.py
+            test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine_models.py
+          )
+          git worktree remove --force /tmp/lot45-gate-certified
+          trap - EXIT
+
+      - name: Validate immutable gate contracts on current tree
+        run: |
+          set -euo pipefail
           python -m json.tool data/audit/lot45_v4_entry_gate.json >/dev/null
           python -m json.tool contracts/schemas/lot45_v4_entry_gate_v1.schema.json >/dev/null
           ruff check scripts/validate_lot45_entry_gate.py tests/test_lot45_v4_entry_gate.py
-          python scripts/validate_lot45_entry_gate.py | tee /tmp/lot45-entry-gate.json
-          grep -F '"status": "PASS"' /tmp/lot45-entry-gate.json
-          grep -F '"verdict": "GO_LOT45_IMPLEMENTATION_ENTRY"' /tmp/lot45-entry-gate.json
+          python scripts/validate_lot45_entry_gate.py >/tmp/lot45-entry-gate-current.json
+          grep -F '"verdict": "GO_LOT45_IMPLEMENTATION_ENTRY"' /tmp/lot45-entry-gate-current.json
           pytest -q tests/test_lot45_v4_entry_gate.py
 
       - name: Architecture roadmap traceability and engineering controls
@@ -103,20 +148,9 @@ jobs:
             pytest -q tests/test_lot45_v4_entry_gate.py
           done
 
-      - name: Re-prove Lot 45 pre-implementation and Lot 46 downstream locks
+      - name: Re-prove Lot 46 downstream lock on current tree
         run: |
           set -euo pipefail
-          test ! -e src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py
-          test ! -e src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py
-          test ! -e src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py
-          test ! -e config/microstructure/order_flow_delta_and_cvd_engine_v1.json
-          test ! -e scripts/run_lot45_order_flow_delta_and_cvd_engine.py
-          test ! -e scripts/validate_lot45.py
-          test ! -e tests/test_lot45_order_flow_delta_and_cvd_engine.py
-          test ! -e contracts/schemas/order_flow_delta_cvd_engine_state_v1.schema.json
-          test ! -e contracts/schemas/order_flow_delta_cvd_engine_audit_v1.schema.json
-          test ! -e contracts/schemas/order_flow_state_v1.schema.json
-          test ! -e contracts/schemas/cvd_series_v1.schema.json
           test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine.py
           test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine_models.py
           test ! -e scripts/run_lot46_trade_classification_confidence_engine.py
