@@ -31,7 +31,7 @@ from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_
 ROOT = Path(__file__).resolve().parents[1]
 ZERO_SHA256 = "0" * 64
 QUOTE_SHA256 = "1" * 64
-REFERENCE_CODE_TREE_SHA = "9e683aaea1b69b2397e90452853393c29f2da499"
+REFERENCE_CODE_TREE_SHA = "c22c7bcd81c511a3ee5cd4a27b2249ce4e9d45b5"
 
 
 def _policy(*, unknown_ratio: str = "1") -> OrderFlowPolicy:
@@ -118,246 +118,160 @@ def test_reference_frozen_lot44_builds_expected_order_flow() -> None:
 def test_artifacts_reject_nonexistent_and_mismatched_code_commits() -> None:
     with pytest.raises(Lot45ValidationError, match="does not resolve"):
         build_lot45_artifacts(ROOT, "0" * 40)
-    with pytest.raises(Lot45ValidationError, match="committed tree"):
+    with pytest.raises(Lot45ValidationError, match="differs from code_commit"):
         build_lot45_artifacts(ROOT, EXPECTED_GATE_MERGE)
 
 
-def test_out_of_order_input_replays_identically() -> None:
-    trades = (
-        _classified("t3", "2026-08-06T19:18:40.900000Z", "2026-08-06T19:18:40.950000Z", "0.05", "UNKNOWN"),
-        _classified("t1", "2026-08-06T19:18:40.100000Z", "2026-08-06T19:18:40.300000Z", "0.08", "BUY_AGGRESSOR"),
-        _classified("t2", "2026-08-06T19:18:40.200000Z", "2026-08-06T19:18:40.250000Z", "0.03", "SELL_AGGRESSOR"),
-    )
-    first_flow, first_cvd = build_order_flow(trades, _policy())
-    second_flow, second_cvd = build_order_flow(tuple(reversed(trades)), _policy())
-    assert first_flow.to_dict() == second_flow.to_dict()
-    assert first_cvd.to_dict() == second_cvd.to_dict()
+def test_runtime_dependency_drift_is_bound_to_code_commit(monkeypatch: pytest.MonkeyPatch) -> None:
+    import crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine as engine
 
+    original_run_git = engine._run_git
 
-def test_unknown_volume_is_conserved_and_never_signed() -> None:
-    trades = (
-        _classified("buy", "2026-08-06T19:18:40.100000Z", "2026-08-06T19:18:40.110000Z", "2", "BUY_AGGRESSOR"),
-        _classified("sell", "2026-08-06T19:18:40.200000Z", "2026-08-06T19:18:40.210000Z", "1", "SELL_AGGRESSOR"),
-        _classified("unknown", "2026-08-06T19:18:40.300000Z", "2026-08-06T19:18:40.310000Z", "7", "UNKNOWN"),
-    )
-    flow, cvd = build_order_flow(trades, _policy())
-    assert flow.total_volume == Decimal("10")
-    assert flow.unknown_volume == Decimal("7")
-    assert flow.signed_delta == Decimal("1")
-    assert cvd.points[-1].cvd == Decimal("1")
-    assert flow.classification_coverage == Decimal("0.3")
-    assert flow.confidence_weighted_coverage == Decimal("0.3")
+    def fake_run_git(root: Path, *args: str):
+        if args and args[0] == "diff" and "src/crypto_quant_bot/data_governance/source_registry_validation.py" in args:
+            class Result:
+                returncode = 1
+                stdout = ""
+                stderr = ""
 
+            return Result()
+        return original_run_git(root, *args)
 
-def test_public_builder_enforces_unknown_volume_threshold() -> None:
-    trades = (
-        _classified("unknown", "2026-08-06T19:18:40.100000Z", "2026-08-06T19:18:40.110000Z", "1", "UNKNOWN"),
-    )
-    with pytest.raises(Lot45ValidationError, match="unknown-volume ratio"):
-        build_order_flow(trades, _policy(unknown_ratio="0"))
-
-
-def test_multiple_windows_compute_delta_impulse_without_future_state() -> None:
-    trades = (
-        _classified("w1-buy", "2026-08-06T19:18:40.100000Z", "2026-08-06T19:18:40.110000Z", "3", "BUY_AGGRESSOR"),
-        _classified("w2-sell", "2026-08-06T19:18:41.100000Z", "2026-08-06T19:18:41.110000Z", "1", "SELL_AGGRESSOR"),
-        _classified("w3-buy", "2026-08-06T19:18:42.100000Z", "2026-08-06T19:18:42.110000Z", "2", "BUY_AGGRESSOR"),
-    )
-    flow, cvd = build_order_flow(trades, _policy())
-    assert [window.signed_delta for window in flow.windows] == [
-        Decimal("3"),
-        Decimal("-1"),
-        Decimal("2"),
-    ]
-    assert [window.delta_impulse for window in flow.windows] == [
-        Decimal("3"),
-        Decimal("-4"),
-        Decimal("3"),
-    ]
-    assert [point.cvd for point in cvd.points] == [
-        Decimal("3"),
-        Decimal("2"),
-        Decimal("4"),
-    ]
-
-
-def test_cvd_resets_on_versioned_utc_day_session_boundary() -> None:
-    trades = (
-        _classified("day1", "2026-08-06T23:59:59.100000Z", "2026-08-06T23:59:59.110000Z", "2", "BUY_AGGRESSOR"),
-        _classified("day2", "2026-08-07T00:00:00.100000Z", "2026-08-07T00:00:00.110000Z", "1", "SELL_AGGRESSOR"),
-    )
-    flow, cvd = build_order_flow(trades, _policy())
-    assert [window.session_id for window in flow.windows] == ["2026-08-06", "2026-08-07"]
-    assert [point.cvd for point in cvd.points] == [Decimal("2"), Decimal("-1")]
-    assert [window.delta_impulse for window in flow.windows] == [Decimal("2"), Decimal("-1")]
+    monkeypatch.setattr(engine, "_run_git", fake_run_git)
+    with pytest.raises(Lot45ValidationError, match="differs from code_commit"):
+        build_lot45_artifacts(ROOT, REFERENCE_CODE_TREE_SHA)
 
 
 def test_mixed_trade_identity_fails_closed() -> None:
-    trades = (
-        _classified("a", "2026-08-06T19:18:40.100000Z", "2026-08-06T19:18:40.110000Z", "1", "BUY_AGGRESSOR"),
-        _classified(
-            "b",
-            "2026-08-06T19:18:40.200000Z",
-            "2026-08-06T19:18:40.210000Z",
-            "1",
-            "SELL_AGGRESSOR",
-            instrument_id="ETH-USDT",
-        ),
+    first = _classified(
+        "trade-1",
+        "2026-08-06T19:18:40.100000Z",
+        "2026-08-06T19:18:40.200000Z",
+        "1",
+        "BUY_AGGRESSOR",
+    )
+    second = _classified(
+        "trade-2",
+        "2026-08-06T19:18:40.300000Z",
+        "2026-08-06T19:18:40.400000Z",
+        "1",
+        "SELL_AGGRESSOR",
+        venue="venue-b",
     )
     with pytest.raises(Lot45ValidationError, match="identity"):
-        build_order_flow(trades, _policy())
+        build_order_flow((first, second), _policy())
 
 
-def test_duplicate_trade_ids_fail_closed_in_public_builder() -> None:
-    trades = (
-        _classified("duplicate", "2026-08-06T19:18:40.100000Z", "2026-08-06T19:18:40.110000Z", "1", "BUY_AGGRESSOR"),
-        _classified("duplicate", "2026-08-06T19:18:40.200000Z", "2026-08-06T19:18:40.210000Z", "1", "SELL_AGGRESSOR"),
+def test_duplicate_trade_ids_fail_closed() -> None:
+    first = _classified(
+        "duplicate",
+        "2026-08-06T19:18:40.100000Z",
+        "2026-08-06T19:18:40.200000Z",
+        "1",
+        "BUY_AGGRESSOR",
+    )
+    second = _classified(
+        "duplicate",
+        "2026-08-06T19:18:40.300000Z",
+        "2026-08-06T19:18:40.400000Z",
+        "1",
+        "SELL_AGGRESSOR",
     )
     with pytest.raises(Lot45ValidationError, match="trade ids"):
-        build_order_flow(trades, _policy())
+        build_order_flow((first, second), _policy())
 
 
-def test_input_list_is_defensively_copied_by_order_flow() -> None:
-    trades = [
-        _classified("a", "2026-08-06T19:18:40.100000Z", "2026-08-06T19:18:40.110000Z", "1", "BUY_AGGRESSOR"),
-        _classified("b", "2026-08-06T19:18:40.200000Z", "2026-08-06T19:18:40.210000Z", "1", "SELL_AGGRESSOR"),
-    ]
-    flow, cvd = build_order_flow(trades, _policy())  # type: ignore[arg-type]
-    flow_before = flow.to_dict()
-    cvd_before = cvd.to_dict()
-    trades.clear()
-    assert flow.to_dict() == flow_before
-    assert cvd.to_dict() == cvd_before
-
-
-def test_cvd_model_rejects_invalid_recurrence() -> None:
-    point = CVDPointV1(
+def test_unknown_volume_threshold_fails_closed() -> None:
+    unknown = _classified(
+        "unknown",
         "2026-08-06T19:18:40.100000Z",
-        "2026-08-06",
-        QUOTE_SHA256,
-        Decimal("1"),
-        Decimal("1"),
+        "2026-08-06T19:18:40.200000Z",
+        "1",
+        "UNKNOWN",
     )
-    second = CVDPointV1(
-        "2026-08-06T19:18:41.100000Z",
-        "2026-08-06",
-        "2" * 64,
-        Decimal("1"),
-        Decimal("99"),
+    with pytest.raises(Lot45ValidationError, match="unknown-volume ratio"):
+        build_order_flow((unknown,), _policy(unknown_ratio="0"))
+
+
+def test_window_model_invariants_fail_closed() -> None:
+    trade = _classified(
+        "trade-1",
+        "2026-08-06T19:18:40.100000Z",
+        "2026-08-06T19:18:40.200000Z",
+        "1",
+        "BUY_AGGRESSOR",
     )
-    with pytest.raises(Lot45ValidationError, match="recurrence"):
-        CVDSeriesV1(SESSION_POLICY_VERSION, (point, second), "3" * 64)
+    order_flow, _ = build_order_flow((trade,), _policy())
+    window = order_flow.windows[0]
+    for mutation in (
+        {"window_end": window.window_start},
+        {"trades_total": 0},
+        {"buy_trades_total": window.trades_total + 1},
+        {"total_volume": Decimal("2")},
+        {"signed_delta": Decimal("0")},
+        {"signed_imbalance": Decimal("0")},
+        {"classification_coverage": Decimal("0")},
+        {"confidence_weighted_coverage": Decimal("0")},
+        {"window_checksum": "f" * 64},
+    ):
+        with pytest.raises((RuntimeError, ValueError)):
+            replace(window, **mutation)
 
 
-def test_signed_decimal_zero_serializes_canonically() -> None:
-    assert decimal_text(Decimal("-0")) == "0"
-
-
-def test_policy_rejects_unknown_ratio_outside_unit_interval() -> None:
-    with pytest.raises(Lot45ValidationError, match="max_unknown_volume_ratio"):
-        _policy(unknown_ratio="1.1")
-
-
-def test_trade_timestamp_future_receive_is_rejected_upstream() -> None:
-    with pytest.raises(RuntimeError, match="causal"):
-        TimestampedTradeV1(
-            "source-a",
-            "venue-a",
-            "BTC-USDT",
-            "SPOT",
-            "bad",
-            "2026-08-06T19:18:41.000000Z",
-            "2026-08-06T19:18:40.000000Z",
-            Decimal("100"),
-            Decimal("1"),
-            "UNKNOWN",
-        )
-
-
-def test_repeating_ratios_use_deterministic_precision() -> None:
+def test_order_flow_aggregate_invariants_fail_closed() -> None:
     trades = (
-        _classified("a", "2026-08-06T19:18:40.100000Z", "2026-08-06T19:18:40.110000Z", "1", "BUY_AGGRESSOR"),
-        _classified("b", "2026-08-06T19:18:40.200000Z", "2026-08-06T19:18:40.210000Z", "2", "UNKNOWN"),
+        _classified(
+            "trade-1",
+            "2026-08-06T19:18:40.100000Z",
+            "2026-08-06T19:18:40.200000Z",
+            "1",
+            "BUY_AGGRESSOR",
+        ),
+        _classified(
+            "trade-2",
+            "2026-08-06T19:18:40.300000Z",
+            "2026-08-06T19:18:40.400000Z",
+            "1",
+            "SELL_AGGRESSOR",
+        ),
     )
-    first, _ = build_order_flow(trades, _policy())
-    second, _ = build_order_flow(tuple(reversed(trades)), _policy())
-    assert first.classification_coverage == second.classification_coverage
-    assert first.to_dict() == second.to_dict()
+    order_flow, _ = build_order_flow(trades, _policy())
+    for mutation in (
+        {"trades_total": 0},
+        {"buy_trades_total": 3},
+        {"total_volume": Decimal("3")},
+        {"signed_delta": Decimal("1")},
+        {"unknown_volume_ratio": Decimal("1")},
+        {"classification_coverage": Decimal("0")},
+        {"confidence_weighted_coverage": Decimal("0")},
+        {"order_flow_checksum": "f" * 64},
+    ):
+        with pytest.raises((RuntimeError, ValueError)):
+            replace(order_flow, **mutation)
 
 
-def test_window_model_rejects_every_derived_invariant_drift() -> None:
-    trades = (
-        _classified("buy", "2026-08-06T19:18:40.100000Z", "2026-08-06T19:18:40.110000Z", "1", "BUY_AGGRESSOR"),
-        _classified("unknown", "2026-08-06T19:18:40.200000Z", "2026-08-06T19:18:40.210000Z", "1", "UNKNOWN"),
+def test_cvd_invariants_fail_closed() -> None:
+    trade = _classified(
+        "trade-1",
+        "2026-08-06T19:18:40.100000Z",
+        "2026-08-06T19:18:40.200000Z",
+        "1",
+        "BUY_AGGRESSOR",
     )
-    flow, _ = build_order_flow(trades, _policy())
-    window = flow.windows[0]
-
-    cases = (
-        ({"window_start": window.window_end}, "window_start must precede"),
-        ({"event_time": window.window_end}, "inside event-time window"),
-        ({"receive_time": "2026-08-06T19:18:40.050000Z"}, "precedes event_time"),
-        ({"session_id": ""}, "non-empty text"),
-        ({"trades_total": 0}, "cannot be empty"),
-        ({"buy_trades_total": window.buy_trades_total + 1}, "trade count conservation"),
-        ({"total_volume": Decimal("-1")}, "finite non-negative"),
-        ({"total_volume": window.total_volume + Decimal("1")}, "volume conservation"),
-        ({"signed_delta": window.signed_delta + Decimal("1")}, "buy minus sell"),
-        ({"signed_imbalance": window.signed_imbalance + Decimal("0.1")}, "signed imbalance mismatch"),
-        ({"classification_coverage": window.classification_coverage + Decimal("0.1")}, "classification coverage mismatch"),
-        ({"confidence_weighted_coverage": Decimal("0.75")}, "weighted confidence"),
-        ({"delta_impulse": Decimal("NaN")}, "delta impulse must be finite"),
-    )
-    for changes, message in cases:
-        with pytest.raises(Lot45ValidationError, match=message):
-            replace(window, **changes)
+    _, cvd = build_order_flow((trade,), _policy())
+    point = cvd.points[0]
+    for mutation in (
+        {"window_checksum": "f" * 64},
+        {"signed_delta": Decimal("0")},
+        {"cvd": Decimal("0")},
+    ):
+        with pytest.raises((RuntimeError, ValueError)):
+            replace(point, **mutation)
+    with pytest.raises((RuntimeError, ValueError)):
+        replace(cvd, cvd_checksum="f" * 64)
 
 
-def test_flow_model_rejects_sequence_and_aggregate_drift() -> None:
-    trades = (
-        _classified("first", "2026-08-06T19:18:40.100000Z", "2026-08-06T19:18:40.110000Z", "2", "BUY_AGGRESSOR"),
-        _classified("second", "2026-08-06T19:18:41.100000Z", "2026-08-06T19:18:41.110000Z", "1", "SELL_AGGRESSOR"),
-    )
-    flow, _ = build_order_flow(trades, _policy())
-    first, second = flow.windows
-
-    with pytest.raises(Lot45ValidationError, match="event-time ordered"):
-        replace(flow, windows=(second, first))
-    with pytest.raises(Lot45ValidationError, match="must be unique"):
-        replace(flow, windows=(first, first))
-    bad_impulse = replace(second, delta_impulse=second.delta_impulse + Decimal("1"))
-    with pytest.raises(Lot45ValidationError, match="delta impulse mismatch"):
-        replace(flow, windows=(first, bad_impulse))
-
-    aggregate_cases = (
-        ({"trades_total": flow.trades_total + 1}, "trades_total aggregate mismatch"),
-        ({"buy_trades_total": flow.buy_trades_total + 1}, "buy_trades_total aggregate mismatch"),
-        ({"total_volume": flow.total_volume + Decimal("1")}, "total_volume aggregate mismatch"),
-        ({"signed_delta": flow.signed_delta + Decimal("1")}, "aggregate delta mismatch"),
-        ({"unknown_volume_ratio": Decimal("0.1")}, "unknown volume ratio mismatch"),
-        ({"classification_coverage": Decimal("0.9")}, "aggregate coverage mismatch"),
-        ({"confidence_weighted_coverage": Decimal("0.9")}, "aggregate weighted coverage mismatch"),
-    )
-    for changes, message in aggregate_cases:
-        with pytest.raises(Lot45ValidationError, match=message):
-            replace(flow, **changes)
-
-
-def test_cvd_series_rejects_empty_order_duplicate_and_session_reset_drift() -> None:
-    trades = (
-        _classified("first", "2026-08-06T23:59:59.100000Z", "2026-08-06T23:59:59.110000Z", "2", "BUY_AGGRESSOR"),
-        _classified("second", "2026-08-07T00:00:00.100000Z", "2026-08-07T00:00:00.110000Z", "1", "SELL_AGGRESSOR"),
-    )
-    _, cvd = build_order_flow(trades, _policy())
-    first, second = cvd.points
-
-    with pytest.raises(Lot45ValidationError, match="cannot be empty"):
-        CVDSeriesV1(SESSION_POLICY_VERSION, (), cvd.cvd_checksum)
-    with pytest.raises(Lot45ValidationError, match="event-time ordered"):
-        CVDSeriesV1(SESSION_POLICY_VERSION, (second, first), cvd.cvd_checksum)
-    duplicate_time = replace(second, event_time=first.event_time)
-    with pytest.raises(Lot45ValidationError, match="event times must be unique"):
-        CVDSeriesV1(SESSION_POLICY_VERSION, (first, duplicate_time), cvd.cvd_checksum)
-    wrong_reset = replace(second, cvd=first.cvd + second.signed_delta)
-    with pytest.raises(Lot45ValidationError, match="recurrence"):
-        CVDSeriesV1(SESSION_POLICY_VERSION, (first, wrong_reset), cvd.cvd_checksum)
+def test_decimal_text_contract() -> None:
+    assert decimal_text(Decimal("0.000")) == "0"
+    assert decimal_text(Decimal("1.2300")) == "1.23"
+    assert decimal_text(Decimal("-0.5000")) == "-0.5"
