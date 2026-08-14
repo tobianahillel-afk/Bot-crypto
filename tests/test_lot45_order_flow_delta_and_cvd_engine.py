@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import subprocess
 from decimal import Decimal
 from pathlib import Path
 
 import pytest
 
 from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine import (
+    EXPECTED_GATE_MERGE,
     OrderFlowPolicy,
     build_lot45_artifacts,
     build_order_flow,
@@ -29,7 +31,17 @@ from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_
 ROOT = Path(__file__).resolve().parents[1]
 ZERO_SHA256 = "0" * 64
 QUOTE_SHA256 = "1" * 64
-SOURCE_CANDIDATE_SHA = "f3cf6c50f61aa8077994aabac39df66c4bbc873f"
+
+
+def _head_sha() -> str:
+    completed = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return completed.stdout.strip()
 
 
 def _policy(*, unknown_ratio: str = "1") -> OrderFlowPolicy:
@@ -89,7 +101,7 @@ def _classified(
 
 
 def test_reference_frozen_lot44_builds_expected_order_flow() -> None:
-    state, audit, order_flow, cvd = build_lot45_artifacts(ROOT, SOURCE_CANDIDATE_SHA)
+    state, audit, order_flow, cvd = build_lot45_artifacts(ROOT, _head_sha())
 
     assert state["validation_state"] == "VALIDATED_OFFLINE_ORDER_FLOW_DELTA_CVD_ONLY"
     assert order_flow["trades_total"] == 3
@@ -111,6 +123,13 @@ def test_reference_frozen_lot44_builds_expected_order_flow() -> None:
     assert state["safety"]["trade_allowed"] is False
     assert state["safety"]["execution_allowed"] is False
     assert state["safety"]["approved_size"] == 0
+
+
+def test_artifacts_reject_nonexistent_and_mismatched_code_commits() -> None:
+    with pytest.raises(Lot45ValidationError, match="does not resolve"):
+        build_lot45_artifacts(ROOT, "0" * 40)
+    with pytest.raises(Lot45ValidationError, match="committed tree"):
+        build_lot45_artifacts(ROOT, EXPECTED_GATE_MERGE)
 
 
 def test_out_of_order_input_replays_identically() -> None:
@@ -138,6 +157,14 @@ def test_unknown_volume_is_conserved_and_never_signed() -> None:
     assert cvd.points[-1].cvd == Decimal("1")
     assert flow.classification_coverage == Decimal("0.3")
     assert flow.confidence_weighted_coverage == Decimal("0.3")
+
+
+def test_public_builder_enforces_unknown_volume_threshold() -> None:
+    trades = (
+        _classified("unknown", "2026-08-06T19:18:40.100000Z", "2026-08-06T19:18:40.110000Z", "1", "UNKNOWN"),
+    )
+    with pytest.raises(Lot45ValidationError, match="unknown-volume ratio"):
+        build_order_flow(trades, _policy(unknown_ratio="0"))
 
 
 def test_multiple_windows_compute_delta_impulse_without_future_state() -> None:
@@ -188,6 +215,15 @@ def test_mixed_trade_identity_fails_closed() -> None:
         ),
     )
     with pytest.raises(Lot45ValidationError, match="identity"):
+        build_order_flow(trades, _policy())
+
+
+def test_duplicate_trade_ids_fail_closed_in_public_builder() -> None:
+    trades = (
+        _classified("duplicate", "2026-08-06T19:18:40.100000Z", "2026-08-06T19:18:40.110000Z", "1", "BUY_AGGRESSOR"),
+        _classified("duplicate", "2026-08-06T19:18:40.200000Z", "2026-08-06T19:18:40.210000Z", "1", "SELL_AGGRESSOR"),
+    )
+    with pytest.raises(Lot45ValidationError, match="trade ids"):
         build_order_flow(trades, _policy())
 
 
