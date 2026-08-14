@@ -22,13 +22,13 @@ jobs:
   mutation:
     runs-on: ubuntu-22.04
     env:
-      SOURCE_HEAD_SHA: 019f4881aabb3c83f3f4b8b7349dd387dd319eae
+      SOURCE_HEAD_SHA: 97dec45b4c9e7b54a3c701a2634720748a0f9dbf
       PYTHONHASHSEED: '0'
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: 019f4881aabb3c83f3f4b8b7349dd387dd319eae
+          ref: 97dec45b4c9e7b54a3c701a2634720748a0f9dbf
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
@@ -53,6 +53,7 @@ jobs:
           PYTHONPATH=src pytest -q \
             tests/test_lot45_order_flow_delta_and_cvd_engine.py \
             tests/test_lot45_policy_contract.py \
+            tests/test_lot45_runtime_binding_and_rounding.py \
             tests/test_lot45_schema_contracts.py \
             --junitxml=reports/lot45/mutation/baseline.xml \
             2>&1 | tee reports/lot45/mutation/baseline.txt
@@ -68,6 +69,7 @@ jobs:
           cp -R tests/fixtures .tmp-lot45-mutants/tests/ 2>/dev/null || true
           cp tests/test_lot45_order_flow_delta_and_cvd_engine.py .tmp-lot45-mutants/tests/
           cp tests/test_lot45_policy_contract.py .tmp-lot45-mutants/tests/
+          cp tests/test_lot45_runtime_binding_and_rounding.py .tmp-lot45-mutants/tests/
           cp tests/test_lot45_schema_contracts.py .tmp-lot45-mutants/tests/
           python - <<'PY'
           from pathlib import Path
@@ -92,6 +94,7 @@ jobs:
           mutation_test_selection = [
               'tests/test_lot45_order_flow_delta_and_cvd_engine.py',
               'tests/test_lot45_policy_contract.py',
+              'tests/test_lot45_runtime_binding_and_rounding.py',
               'tests/test_lot45_schema_contracts.py',
               '-k',
               (
