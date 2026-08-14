@@ -5,6 +5,12 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
+from .trades_and_aggressor_classification_schema_validation import (
+    decimal_text as _lot44_decimal_text,
+    require_reason_codes as _lot44_require_reason_codes,
+    validate_causal_times as _lot44_validate_causal_times,
+)
+
 RUNTIME_MODE = "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY"
 CONFIG_VERSION = "lot45-order-flow-delta-cvd-config-v1"
 POLICY_VERSION = "lot45-order-flow-delta-cvd-policy-v1"
@@ -74,13 +80,10 @@ def decimal_from_text(
 
 
 def decimal_text(value: Decimal) -> str:
-    require(value.is_finite(), "decimal must be finite")
-    if value == 0:
-        return "0"
-    text = format(value, "f")
-    if "." in text:
-        text = text.rstrip("0").rstrip(".")
-    return text or "0"
+    try:
+        return _lot44_decimal_text(value)
+    except RuntimeError as exc:
+        raise Lot45ValidationError(str(exc)) from exc
 
 
 def parse_utc_timestamp(value: object, field: str) -> datetime:
@@ -100,13 +103,10 @@ def timestamp_text(value: datetime) -> str:
 
 
 def validate_causal_times(event_time: str, receive_time: str, generated_at: str) -> None:
-    event = parse_utc_timestamp(event_time, "event_time")
-    receive = parse_utc_timestamp(receive_time, "receive_time")
-    generated = parse_utc_timestamp(generated_at, "generated_at")
-    require(
-        event <= receive <= generated,
-        "causal timestamps require event <= receive <= generated",
-    )
+    try:
+        _lot44_validate_causal_times(event_time, receive_time, generated_at)
+    except RuntimeError as exc:
+        raise Lot45ValidationError(str(exc)) from exc
 
 
 def duration_us(earlier: str, later: str) -> int:
@@ -152,10 +152,10 @@ def validate_ratio(value: Decimal, field: str) -> None:
 
 
 def require_reason_codes(value: tuple[str, ...]) -> None:
-    require(bool(value), "reason_codes cannot be empty")
-    require(len(value) == len(set(value)), "reason_codes must be unique")
-    for item in value:
-        require_text(item, "reason_code")
+    try:
+        _lot44_require_reason_codes(value)
+    except RuntimeError as exc:
+        raise Lot45ValidationError(str(exc)) from exc
 
 
 def validate_run_context(
