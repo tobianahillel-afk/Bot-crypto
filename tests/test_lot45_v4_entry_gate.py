@@ -3,11 +3,12 @@ from __future__ import annotations
 import copy
 
 import pytest
-from jsonschema import Draft202012Validator, ValidationError
 
 from scripts.validate_lot45_entry_gate import (
     EXPECTED_GATE_CHECKSUM,
     EXPECTED_OUTPUTS,
+    EXPECTED_QUALITY,
+    EXPECTED_SAFETY,
     GATE_PATH,
     LOT45_FORBIDDEN_BEFORE_GATE,
     LOT46_FORBIDDEN,
@@ -36,13 +37,8 @@ def test_lot45_contract_is_exact_and_fail_closed() -> None:
     gate = load(GATE_PATH)
     assert set(gate["output_contracts"]) == EXPECTED_OUTPUTS
     assert gate["runtime_mode"] == "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY"
-    assert gate["safety"]["analysis_only"] is True
-    assert gate["safety"]["trade_allowed"] is False
-    assert gate["safety"]["execution_allowed"] is False
-    assert gate["safety"]["approved_size"] == 0
-    assert gate["safety"]["signal_generation_allowed"] is False
-    assert gate["safety"]["risk_approval_allowed"] is False
-    assert gate["safety"]["order_routing_allowed"] is False
+    assert gate["safety"] == EXPECTED_SAFETY
+    assert gate["quality"] == EXPECTED_QUALITY
 
 
 def test_gate_checksum_rejects_tampering() -> None:
@@ -53,26 +49,25 @@ def test_gate_checksum_rejects_tampering() -> None:
         validate_gate_payload(tampered)
 
 
-def test_published_schema_rejects_enabled_execution_and_contract_drift() -> None:
+def test_published_schema_encodes_exact_contracts_and_fail_closed_values() -> None:
     gate = load(GATE_PATH)
     schema = load(SCHEMA_PATH)
-    validator = Draft202012Validator(schema)
-    validator.validate(gate)
+    properties = schema["properties"]
 
-    unsafe = copy.deepcopy(gate)
-    unsafe["safety"]["execution_allowed"] = True
-    with pytest.raises(ValidationError):
-        validator.validate(unsafe)
+    assert properties["input_contracts"]["const"] == gate["input_contracts"]
+    assert properties["output_contracts"]["const"] == gate["output_contracts"]
 
-    drifted = copy.deepcopy(gate)
-    drifted["output_contracts"][0] = "ArbitraryStateV1"
-    with pytest.raises(ValidationError):
-        validator.validate(drifted)
+    safety_schema = properties["safety"]
+    assert safety_schema["additionalProperties"] is False
+    assert set(safety_schema["required"]) == set(EXPECTED_SAFETY)
+    for key, expected in EXPECTED_SAFETY.items():
+        assert safety_schema["properties"][key]["const"] == expected
 
-    empty_quality = copy.deepcopy(gate)
-    empty_quality["quality"] = {}
-    with pytest.raises(ValidationError):
-        validator.validate(empty_quality)
+    quality_schema = properties["quality"]
+    assert quality_schema["additionalProperties"] is False
+    assert set(quality_schema["required"]) == set(EXPECTED_QUALITY)
+    for key, expected in EXPECTED_QUALITY.items():
+        assert quality_schema["properties"][key]["const"] == expected
 
 
 def test_lot45_and_lot46_were_absent_at_frozen_gate_snapshot() -> None:
