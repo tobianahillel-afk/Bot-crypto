@@ -63,60 +63,59 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p reports/lot45
-          {
-            python -m compileall -q src scripts tests
-            for path in \
-              config/microstructure/order_flow_delta_and_cvd_engine_v1.json \
-              contracts/schemas/order_flow_delta_cvd_engine_state_v1.schema.json \
-              contracts/schemas/order_flow_delta_cvd_engine_audit_v1.schema.json \
-              contracts/schemas/order_flow_state_v1.schema.json \
-              contracts/schemas/cvd_series_v1.schema.json; do
-              python -m json.tool "$path" >/dev/null
-            done
-            ruff check \
-              src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py \
-              src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py \
-              src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py \
-              scripts/run_lot45_order_flow_delta_and_cvd_engine.py \
-              scripts/validate_lot45.py \
-              tests/test_lot45_order_flow_delta_and_cvd_engine.py \
-              tests/test_lot45_policy_contract.py \
-              tests/test_lot45_schema_contracts.py
-            mypy src/crypto_quant_bot/microstructure
-            python - <<'PY'
-            import ast
-            from pathlib import Path
+          exec > >(tee reports/lot45/static_checks.txt) 2>&1
+          python -m compileall -q src scripts tests
+          for path in \
+            config/microstructure/order_flow_delta_and_cvd_engine_v1.json \
+            contracts/schemas/order_flow_delta_cvd_engine_state_v1.schema.json \
+            contracts/schemas/order_flow_delta_cvd_engine_audit_v1.schema.json \
+            contracts/schemas/order_flow_state_v1.schema.json \
+            contracts/schemas/cvd_series_v1.schema.json; do
+            python -m json.tool "$path" >/dev/null
+          done
+          ruff check \
+            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py \
+            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py \
+            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py \
+            scripts/run_lot45_order_flow_delta_and_cvd_engine.py \
+            scripts/validate_lot45.py \
+            tests/test_lot45_order_flow_delta_and_cvd_engine.py \
+            tests/test_lot45_policy_contract.py \
+            tests/test_lot45_schema_contracts.py
+          mypy src/crypto_quant_bot/microstructure
+          python - <<'PY'
+          import ast
+          from pathlib import Path
 
-            paths = [
-                Path('src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py'),
-                Path('src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py'),
-                Path('src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py'),
-                Path('scripts/run_lot45_order_flow_delta_and_cvd_engine.py'),
-                Path('scripts/validate_lot45.py'),
-            ]
-            forbidden_modules = {'requests', 'httpx', 'aiohttp', 'socket', 'websocket', 'websockets', 'urllib.request'}
-            forbidden_literals = ('http://', 'https://', 'ws://', 'wss://')
-            violations = []
-            for path in paths:
-                text = path.read_text(encoding='utf-8')
-                tree = ast.parse(text, filename=str(path))
-                for node in ast.walk(tree):
-                    if isinstance(node, ast.Import):
-                        for alias in node.names:
-                            if alias.name in forbidden_modules or any(alias.name.startswith(m + '.') for m in forbidden_modules):
-                                violations.append(f'{path}: import {alias.name}')
-                    elif isinstance(node, ast.ImportFrom):
-                        module = node.module or ''
-                        if module in forbidden_modules or any(module.startswith(m + '.') for m in forbidden_modules):
-                            violations.append(f'{path}: from {module} import ...')
-                    elif isinstance(node, ast.Constant) and isinstance(node.value, str):
-                        if any(marker in node.value.lower() for marker in forbidden_literals):
-                            violations.append(f'{path}: network URL literal')
-            if violations:
-                raise SystemExit('LOT45_EXTERNAL_CONNECTIVITY_FORBIDDEN\n' + '\n'.join(violations))
-            print('LOT45_NO_CONNECTIVITY: PASS')
-            PY
-          } 2>&1 | tee reports/lot45/static_checks.txt
+          paths = [
+              Path('src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py'),
+              Path('src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py'),
+              Path('src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py'),
+              Path('scripts/run_lot45_order_flow_delta_and_cvd_engine.py'),
+              Path('scripts/validate_lot45.py'),
+          ]
+          forbidden_modules = {'requests', 'httpx', 'aiohttp', 'socket', 'websocket', 'websockets', 'urllib.request'}
+          forbidden_literals = ('http://', 'https://', 'ws://', 'wss://')
+          violations = []
+          for path in paths:
+              text = path.read_text(encoding='utf-8')
+              tree = ast.parse(text, filename=str(path))
+              for node in ast.walk(tree):
+                  if isinstance(node, ast.Import):
+                      for alias in node.names:
+                          if alias.name in forbidden_modules or any(alias.name.startswith(m + '.') for m in forbidden_modules):
+                              violations.append(f'{path}: import {alias.name}')
+                  elif isinstance(node, ast.ImportFrom):
+                      module = node.module or ''
+                      if module in forbidden_modules or any(module.startswith(m + '.') for m in forbidden_modules):
+                          violations.append(f'{path}: from {module} import ...')
+                  elif isinstance(node, ast.Constant) and isinstance(node.value, str):
+                      if any(marker in node.value.lower() for marker in forbidden_literals):
+                          violations.append(f'{path}: network URL literal')
+          if violations:
+              raise SystemExit('LOT45_EXTERNAL_CONNECTIVITY_FORBIDDEN\n' + '\n'.join(violations))
+          print('LOT45_NO_CONNECTIVITY: PASS')
+          PY
       - name: Targeted line and branch coverage
         run: |
           set -euo pipefail
