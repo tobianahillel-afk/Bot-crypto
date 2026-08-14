@@ -9,6 +9,7 @@ from typing import Any
 from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry import (
     atomic_write_json,
     canonical_checksum,
+    file_checksum,
     load_json_object,
 )
 
@@ -271,25 +272,26 @@ def _reason_codes_from_payload(raw: Any) -> tuple[str, ...]:
 def _load_lot44_evidence(
     root: Path,
     config: dict[str, Any],
-) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+) -> tuple[dict[str, Any], dict[str, Any], str]:
     state_path = root / require_text(config.get("lot44_state_path"), "lot44_state_path")
     audit_path = root / require_text(config.get("lot44_audit_path"), "lot44_audit_path")
     config_path = root / require_text(config.get("lot44_config_path"), "lot44_config_path")
+    load_json_object(config_path)
     return (
         load_json_object(state_path),
         load_json_object(audit_path),
-        load_json_object(config_path),
+        file_checksum(config_path),
     )
 
 
 def _verify_lot44_links(
     state: dict[str, Any],
     audit: dict[str, Any],
-    config44: dict[str, Any],
+    config_checksum: str,
 ) -> None:
     _verify_checksum(state, "output_checksum", EXPECTED_LOT44_STATE, "Lot44 state")
     _verify_checksum(audit, "audit_checksum", EXPECTED_LOT44_AUDIT, "Lot44 audit")
-    require(canonical_checksum(config44) == EXPECTED_LOT44_CONFIG, "Lot44 config checksum changed")
+    require(config_checksum == EXPECTED_LOT44_CONFIG, "Lot44 config checksum changed")
     require(audit.get("state_output_checksum") == EXPECTED_LOT44_STATE, "Lot44 state linkage changed")
     require(audit.get("config_checksum") == EXPECTED_LOT44_CONFIG, "Lot44 config linkage changed")
     require(
@@ -361,8 +363,8 @@ def _verify_lot44(
     config: dict[str, Any],
     policy: OrderFlowPolicy,
 ) -> tuple[dict[str, Any], tuple[ClassifiedTradeV1, ...]]:
-    state, audit, config44 = _load_lot44_evidence(root, config)
-    _verify_lot44_links(state, audit, config44)
+    state, audit, config_checksum = _load_lot44_evidence(root, config)
+    _verify_lot44_links(state, audit, config_checksum)
     _verify_lot44_confidence(state)
     _verify_lot44_temporal(state, config, policy)
     return state, _classified_trades_from_state(state)
