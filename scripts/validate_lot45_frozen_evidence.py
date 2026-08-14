@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sys
+from decimal import ROUND_HALF_EVEN
 from pathlib import Path
 from typing import Any
 
@@ -15,27 +16,29 @@ from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_re
     load_json_object,
 )
 from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine import (  # noqa: E402
+    CALCULATION_DECIMAL_ROUNDING,
+    CODE_BOUND_PATHS,
     build_lot45_artifacts,
 )
 
 GATE_MERGE = "390d0779f2be257fa8134faf8f02193a760a09c3"
-SOURCE_HEAD = "019f4881aabb3c83f3f4b8b7349dd387dd319eae"
-CERTIFICATION_ANCHOR = "bf6303fbcb3b73805fce6f25f76a8ec37ea45aaf"
-EVIDENCE_HEAD = "6cd278817ecf83370977466f1a34794f65b3ac07"
+SOURCE_HEAD = "97dec45b4c9e7b54a3c701a2634720748a0f9dbf"
+CERTIFICATION_ANCHOR = "92a6a6a8b8063a6768fd5682e0c66663ccc89d89"
+EVIDENCE_HEAD = "20f8cfab4492ea8b9634e8f4ab94c1190ef152ca"
 VALIDATION_PROOF = (
-    31821592585,
-    9227184660,
-    "sha256:efaf1a04018352fe56f420841bc56280fa28037400d2c11379cce5a9c55b25ec",
+    31829552764,
+    9230156740,
+    "sha256:50581b1790ae6e5c16c1cae83cbe8e2111e595a266f98469ed90d8fd3522c145",
 )
 MUTATION_PROOF = (
-    31821592626,
-    9227209448,
-    "sha256:3e87acd6f3d75b236df66ded62059a419b684a451d49dc9ecba7d26eb7888f6f",
+    31829552804,
+    9230182681,
+    "sha256:1062e1c36224c775e9e85abee6b45c034ad5bf57b82bc25ba56c4f9c66f2a585",
 )
 QUALITY_PROOF = (
-    31821388233,
-    9227162672,
-    "sha256:fd80f2e945b0b2dccfa277598f8e030ac34ccb3cb1c5be1da081a805be5cc76d",
+    31829150723,
+    9230077332,
+    "sha256:2d358fb118030dd1a1557b40f906b3b2887123d62c189f19cd198424680c0b9a",
 )
 
 STATE = ROOT / "data/audit/order_flow_delta_cvd_engine_lot45.json"
@@ -46,15 +49,15 @@ COVERAGE = ROOT / "reports/lot45/coverage_summary.json"
 MUTATION = ROOT / "reports/lot45/mutation_summary.json"
 
 EXPECTED_HASHES = {
-    STATE: "1d9244729e10999ec3406260cb894076f0ecc147166ef51478b38ff399206b90",
-    AUDIT: "4573755d69ac739b2a45dd5dbdfe44786de4a2bd7c3f89d7de937064936c8488",
+    STATE: "53224479f78cdf54ca4cab9014614d3d923e6964d736e1aff09f6b6b528c5e44",
+    AUDIT: "d8b6c3573ef68ab76d093af9ab1265c5b0b8679f1cb7d754ce1aa084e2c65618",
     ORDER_FLOW: "f7b7e04c555106c7ca312f81d3258d7afc288990c4ba2d1bfdc094d4c0c33502",
     CVD: "6a017b7b6932399ab46a654692dcafe28390f971226be8cf4a1af17f316335b6",
-    COVERAGE: "fef3c99c9e4330512f7163b1e40e635a625f371b4bcbb9e84feaa83114532c73",
-    MUTATION: "639d27adaf72da15375fc1ef60cb146b7bd16050b0924297ce31007e2732a07b",
+    COVERAGE: "f70d5c68096d40e3842aa1c067474683e24c94d4f6c5c37024349ad41ea37ce4",
+    MUTATION: "45e5de976139916a13a5fa8172c2546e43d5842d857dd6d80076e23786e69cb4",
 }
-EXPECTED_STATE = "de46340b9c3cb9a7a72bb0e809a4e1d7ab0193300a349d4c1631bbf7c0e4d5ff"
-EXPECTED_AUDIT = "8524ec5ef3aac1972a8618a21ca46d4faa19f0667952ce0a7ec45d041d9281a8"
+EXPECTED_STATE = "b4d7e28207f87f152f9a0faa6042d09978a8875c5d56fdce0717a32dc7988ba6"
+EXPECTED_AUDIT = "3b790bd8878c2453ea1ea6ae0122565773f38bea7a54e996e0611d07e66b14b8"
 EXPECTED_ORDER_FLOW = "200585b65c124754c3e308aaf40eba2c98435ecac4f5a93815d278adcf887da0"
 EXPECTED_CVD = "9f9bd3f9360e2f488a4b6d96a0e930b4353333e35debb3b47264793c1149979c"
 EXPECTED_CONFIG = "2200905208b366f6230d76a35733fbde7338c3dc3902e3c6cc50999ba0d4fb30"
@@ -95,6 +98,18 @@ EXPECTED_REASON_CODES = [
     "NO_FUTURE_STATE_OR_LOOKAHEAD",
     "LOT46_REMAINS_LOCKED",
 ]
+REQUIRED_CODE_BOUND_PATHS = {
+    "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py",
+    "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py",
+    "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py",
+    "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py",
+    "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py",
+    "src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry.py",
+    "src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry_models.py",
+    "src/crypto_quant_bot/data_governance/source_registry_models.py",
+    "src/crypto_quant_bot/data_governance/source_registry_state.py",
+    "src/crypto_quant_bot/data_governance/source_registry_validation.py",
+}
 LOT46_FORBIDDEN = (
     "src/crypto_quant_bot/microstructure/trade_classification_confidence_engine.py",
     "src/crypto_quant_bot/microstructure/trade_classification_confidence_engine_models.py",
@@ -208,12 +223,12 @@ def _verify_quality(coverage: dict[str, Any], mutation: dict[str, Any]) -> None:
     require(coverage["anti_flake_repetitions"] == 3, "anti-flake count changed")
     require(mutation["status"] == "PASS", "mutation not PASS")
     require(mutation["source_head_sha"] == SOURCE_HEAD, "mutation source changed")
-    require(mutation["mutation_score_percent"] == 82.48, "mutation score changed")
-    require(mutation["killed_mutants"] == 871, "killed mutant count changed")
+    require(mutation["mutation_score_percent"] == 82.5, "mutation score changed")
+    require(mutation["killed_mutants"] == 872, "killed mutant count changed")
     require(mutation["survived_mutants"] == 185, "survived mutant count changed")
-    require(mutation["evaluated_mutants"] == 1056, "evaluated mutant count changed")
-    require(mutation["completed_mutants"] == 1056, "completed mutant count changed")
-    require(mutation["total_mutants"] == 1056, "total mutant count changed")
+    require(mutation["evaluated_mutants"] == 1057, "evaluated mutant count changed")
+    require(mutation["completed_mutants"] == 1057, "completed mutant count changed")
+    require(mutation["total_mutants"] == 1057, "total mutant count changed")
     require(mutation["timeout_mutants"] == 0, "mutation timeout present")
     require(mutation["suspicious_mutants"] == 0, "suspicious mutation present")
     require(mutation["mutmut_run_exit_code"] == 0, "mutmut run exit changed")
@@ -231,6 +246,17 @@ def _verify_runtime_replay(
     require(replay == expected, "frozen Lot45 runtime replay diverged")
 
 
+def _verify_review_hardening() -> None:
+    require(
+        CALCULATION_DECIMAL_ROUNDING == ROUND_HALF_EVEN,
+        "Lot45 Decimal rounding contract changed",
+    )
+    require(
+        REQUIRED_CODE_BOUND_PATHS <= set(CODE_BOUND_PATHS),
+        "Lot45 runtime dependency binding weakened",
+    )
+
+
 def _verify_downstream_lock() -> None:
     for relative in LOT46_FORBIDDEN:
         require(not (ROOT / relative).exists(), f"Lot46 must remain locked: {relative}")
@@ -242,6 +268,7 @@ def validate() -> dict[str, object]:
     _verify_reference(order_flow, cvd)
     _verify_quality(coverage, mutation)
     _verify_runtime_replay(state, audit, order_flow, cvd)
+    _verify_review_hardening()
     _verify_downstream_lock()
     return {
         "schema_version": "lot45-frozen-evidence-validation-v1",
@@ -267,6 +294,10 @@ def validate() -> dict[str, object]:
         "quality_run": QUALITY_PROOF[0],
         "quality_artifact": QUALITY_PROOF[1],
         "quality_artifact_digest": QUALITY_PROOF[2],
+        "review_hardening": {
+            "decimal_rounding": "ROUND_HALF_EVEN",
+            "runtime_dependency_binding": True,
+        },
         "lot46_status": "PLANNED_LOCKED",
     }
 
