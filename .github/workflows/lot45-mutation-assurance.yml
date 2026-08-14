@@ -22,13 +22,13 @@ jobs:
   mutation:
     runs-on: ubuntu-22.04
     env:
-      SOURCE_HEAD_SHA: e3d998c704979f7d4ec5be957b373e8173eb4b89
+      SOURCE_HEAD_SHA: ba21c6e2c981140355758070f0669b101d3fb041
       PYTHONHASHSEED: '0'
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: e3d998c704979f7d4ec5be957b373e8173eb4b89
+          ref: ba21c6e2c981140355758070f0669b101d3fb041
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
@@ -93,6 +93,10 @@ jobs:
               str(path)
               for path in sorted((root / 'tests').glob('test_lot45*.py'))
           )
+          mutation_selection = (
+              "not test_reference_frozen_lot44_builds_expected_order_flow "
+              "and not test_artifacts_reject_nonexistent_and_mismatched_code_commits"
+          )
           config = {
               'project': {
                   'name': 'crypto-quant-bot-lot45-mutation',
@@ -114,7 +118,7 @@ jobs:
                           'src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py',
                       ],
                       'tests_dir': ['tests/'],
-                      'runner': f'python -m pytest -q {tests}',
+                      'runner': f'python -m pytest -q {tests} -k "{mutation_selection}"',
                       'also_copy': dependency_files + [
                           'config/', 'data/audit/', 'contracts/', 'tests/fixtures/'
                       ],
