@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import subprocess
 from dataclasses import dataclass, replace
 from datetime import datetime
 from decimal import Decimal, localcontext
@@ -66,6 +67,19 @@ EXPECTED_LOT44_CONFIG = "dac06cb3235f3a09cbbb9b41098d7cf2593b94171659f50ef840d16
 EXPECTED_LOT44_POST_MERGE = "b8b531b2fcb09a30728549cc480d54d9be71504356468704c102ff085c39ea9a"
 ZERO_SHA256 = "0" * 64
 
+CODE_BOUND_PATHS = (
+    "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py",
+    "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py",
+    "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py",
+    "scripts/run_lot45_order_flow_delta_and_cvd_engine.py",
+    "scripts/validate_lot45.py",
+    "config/microstructure/order_flow_delta_and_cvd_engine_v1.json",
+    "contracts/schemas/order_flow_delta_cvd_engine_state_v1.schema.json",
+    "contracts/schemas/order_flow_delta_cvd_engine_audit_v1.schema.json",
+    "contracts/schemas/order_flow_state_v1.schema.json",
+    "contracts/schemas/cvd_series_v1.schema.json",
+)
+
 LOT45_REASON_CODES = (
     "LOT45_OFFLINE_ORDER_FLOW_DELTA_CVD_VALIDATED",
     "EVENT_TIME_TUMBLING_WINDOWS_ENFORCED",
@@ -105,6 +119,34 @@ def _verify_checksum(payload: dict[str, Any], field: str, expected: str, label: 
     actual = body.pop(field, None)
     if actual != expected or canonical_checksum(body) != actual:
         raise Lot45ValidationError(f"{label} checksum changed")
+
+
+def _run_git(root: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    try:
+        return subprocess.run(
+            ["git", *args],
+            cwd=root,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except OSError as exc:
+        raise Lot45ValidationError("Lot45 git verification unavailable") from exc
+
+
+def _verify_code_tree(root: Path, code_commit: str) -> None:
+    require_git_sha(code_commit, "code_commit")
+    resolved = _run_git(root, "rev-parse", "--verify", f"{code_commit}^{{commit}}")
+    if resolved.returncode != 0 or resolved.stdout.strip() != code_commit:
+        raise Lot45ValidationError("Lot45 code_commit does not resolve to the claimed commit")
+    comparisons = (
+        ("committed tree", ("diff", "--quiet", code_commit, "--", *CODE_BOUND_PATHS)),
+        ("working tree", ("diff", "--quiet", "--", *CODE_BOUND_PATHS)),
+        ("staged tree", ("diff", "--cached", "--quiet", "--", *CODE_BOUND_PATHS)),
+    )
+    for label, command in comparisons:
+        if _run_git(root, *command).returncode != 0:
+            raise Lot45ValidationError(f"Lot45 {label} differs from code_commit")
 
 
 def _config_fields() -> set[str]:
@@ -389,6 +431,8 @@ def _validate_trade_identity(trades: tuple[ClassifiedTradeV1, ...]) -> None:
         for item in trades
     }
     require(len(identities) == 1, "Lot45 trade identity must be unique")
+    trade_ids = {item.trade.trade_id for item in trades}
+    require(len(trade_ids) == len(trades), "Lot45 trade ids must be unique")
 
 
 def _group_trades(
@@ -550,7 +594,12 @@ def build_order_flow(
     with localcontext() as context:
         context.prec = policy.decimal_precision
         windows = _build_windows(groups, policy)
-        return _aggregate_order_flow(windows), _build_cvd(windows, policy)
+        order_flow = _aggregate_order_flow(windows)
+        require(
+            order_flow.unknown_volume_ratio <= policy.max_unknown_volume_ratio,
+            "Lot45 unknown-volume ratio exceeds configured fail-closed threshold",
+        )
+        return order_flow, _build_cvd(windows, policy)
 
 
 def _state_times(trades: tuple[ClassifiedTradeV1, ...]) -> tuple[str, str]:
@@ -650,16 +699,12 @@ def build_lot45_artifacts(
     root: Path,
     code_commit: str,
 ) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
-    require_git_sha(code_commit, "code_commit")
+    _verify_code_tree(root, code_commit)
     config = load_json_object(root / CONFIG_PATH)
     policy = _validate_config(config)
     _verify_gate(root, config)
     state44, trades = _verify_lot44(root, config, policy)
     order_flow, cvd = build_order_flow(trades, policy)
-    require(
-        order_flow.unknown_volume_ratio <= policy.max_unknown_volume_ratio,
-        "Lot45 unknown-volume ratio exceeds configured fail-closed threshold",
-    )
     state = _build_engine_state(config, code_commit, state44, trades, order_flow, cvd)
     audit = _build_engine_audit(config, code_commit, state, order_flow, cvd)
     return state.to_dict(), audit.to_dict(), order_flow.to_dict(), cvd.to_dict()
