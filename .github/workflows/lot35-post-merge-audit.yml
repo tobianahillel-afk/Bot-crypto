@@ -17,8 +17,6 @@ on:
       - 'scripts/validate_roadmap_documentation.py'
       - 'tests/test_lot35_post_merge_state.py'
       - '.github/workflows/lot35-post-merge-audit.yml'
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
