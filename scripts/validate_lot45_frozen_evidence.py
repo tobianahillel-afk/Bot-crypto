@@ -4,7 +4,8 @@ from __future__ import annotations
 import hashlib
 import json
 import sys
-from decimal import ROUND_HALF_EVEN
+from dataclasses import replace
+from decimal import ROUND_DOWN, ROUND_HALF_EVEN, ROUND_UP, Decimal, localcontext
 from pathlib import Path
 from typing import Any
 
@@ -18,46 +19,59 @@ from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_re
 from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine import (  # noqa: E402
     CALCULATION_DECIMAL_ROUNDING,
     CODE_BOUND_PATHS,
+    OrderFlowPolicy,
     build_lot45_artifacts,
+    build_order_flow,
+)
+from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_validation import (  # noqa: E402
+    POLICY_VERSION,
+    SESSION_POLICY_VERSION,
+    WINDOW_POLICY_VERSION,
+)
+from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_models import (  # noqa: E402
+    ClassifiedTradeV1,
+    TimestampedTradeV1,
 )
 
 GATE_MERGE = "390d0779f2be257fa8134faf8f02193a760a09c3"
-SOURCE_HEAD = "97dec45b4c9e7b54a3c701a2634720748a0f9dbf"
-CERTIFICATION_ANCHOR = "92a6a6a8b8063a6768fd5682e0c66663ccc89d89"
-EVIDENCE_HEAD = "20f8cfab4492ea8b9634e8f4ab94c1190ef152ca"
+SOURCE_HEAD = "8558ae4a2e620a0967e01067b3446be35cb2354d"
+CERTIFICATION_ANCHOR = "cbf1027d0db605b26426313eb5fe28e07a25ab6d"
+EVIDENCE_HEAD = "3f2240cd93b6a7d37e666dde3a4d41d1ee3fb1e1"
 VALIDATION_PROOF = (
-    31829552764,
-    9230156740,
-    "sha256:50581b1790ae6e5c16c1cae83cbe8e2111e595a266f98469ed90d8fd3522c145",
+    31832385349,
+    9231204275,
+    "sha256:9c3d60a5670e7d6074167b8375b0e37d527797203b5be1c7e7e7dbd51d73e945",
 )
 MUTATION_PROOF = (
-    31829552804,
-    9230182681,
-    "sha256:1062e1c36224c775e9e85abee6b45c034ad5bf57b82bc25ba56c4f9c66f2a585",
+    31832385427,
+    9231227463,
+    "sha256:6bfd7b373c69d21916e754114632bff8e8fcbf6e8066836f47ebb5fc854fd236",
 )
 QUALITY_PROOF = (
-    31829150723,
-    9230077332,
-    "sha256:2d358fb118030dd1a1557b40f906b3b2887123d62c189f19cd198424680c0b9a",
+    31832044449,
+    9231113939,
+    "sha256:3d06484dd9052a8dd461b5dced988a818863304f04a598226dfeeb2b0c1f15c1",
 )
 
-STATE = ROOT / "data/audit/order_flow_delta_cvd_engine_lot45.json"
-AUDIT = ROOT / "data/audit/order_flow_delta_cvd_engine_audit_lot45.json"
+STATE = ROOT / "data/audit/order_flow_delta_and_cvd_engine_lot45.json"
+AUDIT = ROOT / "data/audit/order_flow_delta_and_cvd_engine_audit_lot45.json"
 ORDER_FLOW = ROOT / "data/audit/order_flow_state_lot45.json"
 CVD = ROOT / "data/audit/cvd_series_lot45.json"
 COVERAGE = ROOT / "reports/lot45/coverage_summary.json"
 MUTATION = ROOT / "reports/lot45/mutation_summary.json"
+OLD_STATE_ALIAS = ROOT / "data/audit/order_flow_delta_cvd_engine_lot45.json"
+OLD_AUDIT_ALIAS = ROOT / "data/audit/order_flow_delta_cvd_engine_audit_lot45.json"
 
 EXPECTED_HASHES = {
-    STATE: "53224479f78cdf54ca4cab9014614d3d923e6964d736e1aff09f6b6b528c5e44",
-    AUDIT: "d8b6c3573ef68ab76d093af9ab1265c5b0b8679f1cb7d754ce1aa084e2c65618",
+    STATE: "65828639bb381ff994078a99ea71e5a343aacc5d01b92fd52c6f86958e32f8ea",
+    AUDIT: "687e3bbfef0b6646619f5d797277bc60d6ee0d3a0e8ac478fe5c6698925ef2e7",
     ORDER_FLOW: "f7b7e04c555106c7ca312f81d3258d7afc288990c4ba2d1bfdc094d4c0c33502",
     CVD: "6a017b7b6932399ab46a654692dcafe28390f971226be8cf4a1af17f316335b6",
-    COVERAGE: "f70d5c68096d40e3842aa1c067474683e24c94d4f6c5c37024349ad41ea37ce4",
-    MUTATION: "45e5de976139916a13a5fa8172c2546e43d5842d857dd6d80076e23786e69cb4",
+    COVERAGE: "24f0428ff3eb974ad22b6fe5b2025b7153b40485d0ba5215b2a6056ae6bcb1ff",
+    MUTATION: "332945800a4b01ab669ec9a26df1afb2f30a6dcc6db6a52f51d5c3564ad5bc9c",
 }
-EXPECTED_STATE = "b4d7e28207f87f152f9a0faa6042d09978a8875c5d56fdce0717a32dc7988ba6"
-EXPECTED_AUDIT = "3b790bd8878c2453ea1ea6ae0122565773f38bea7a54e996e0611d07e66b14b8"
+EXPECTED_STATE = "ca5a78a0327a17a0f10801d316274cabd83b3f78c73622c22b7e1d164df09b03"
+EXPECTED_AUDIT = "c606ebd430be371192e7359dc62003d8295676dde69317e298e9e00fb1c4b4d7"
 EXPECTED_ORDER_FLOW = "200585b65c124754c3e308aaf40eba2c98435ecac4f5a93815d278adcf887da0"
 EXPECTED_CVD = "9f9bd3f9360e2f488a4b6d96a0e930b4353333e35debb3b47264793c1149979c"
 EXPECTED_CONFIG = "2200905208b366f6230d76a35733fbde7338c3dc3902e3c6cc50999ba0d4fb30"
@@ -98,18 +112,6 @@ EXPECTED_REASON_CODES = [
     "NO_FUTURE_STATE_OR_LOOKAHEAD",
     "LOT46_REMAINS_LOCKED",
 ]
-REQUIRED_CODE_BOUND_PATHS = {
-    "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py",
-    "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py",
-    "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py",
-    "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py",
-    "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py",
-    "src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry.py",
-    "src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry_models.py",
-    "src/crypto_quant_bot/data_governance/source_registry_models.py",
-    "src/crypto_quant_bot/data_governance/source_registry_state.py",
-    "src/crypto_quant_bot/data_governance/source_registry_validation.py",
-}
 LOT46_FORBIDDEN = (
     "src/crypto_quant_bot/microstructure/trade_classification_confidence_engine.py",
     "src/crypto_quant_bot/microstructure/trade_classification_confidence_engine_models.py",
@@ -121,6 +123,8 @@ LOT46_FORBIDDEN = (
     "docs/LOT_46_TRADE_CLASSIFICATION_CONFIDENCE_ENGINE.md",
     "docs/ACCEPTANCE_CRITERIA_LOT_46.md",
 )
+ZERO_SHA256 = "0" * 64
+QUOTE_SHA256 = "1" * 64
 
 
 class Lot45FrozenEvidenceError(RuntimeError):
@@ -144,6 +148,8 @@ def verify_canonical(payload: dict[str, Any], field: str, expected: str) -> None
 
 
 def _load_frozen() -> tuple[dict[str, Any], ...]:
+    require(not OLD_STATE_ALIAS.exists(), "stale Lot45 state alias still exists")
+    require(not OLD_AUDIT_ALIAS.exists(), "stale Lot45 audit alias still exists")
     for path, expected in EXPECTED_HASHES.items():
         require(path.is_file(), f"missing frozen evidence: {path}")
         require(file_sha256(path) == expected, f"frozen evidence drifted: {path}")
@@ -218,17 +224,17 @@ def _verify_reference(order_flow: dict[str, Any], cvd: dict[str, Any]) -> None:
 def _verify_quality(coverage: dict[str, Any], mutation: dict[str, Any]) -> None:
     require(coverage["status"] == "PASS", "coverage not PASS")
     require(coverage["source_head_sha"] == SOURCE_HEAD, "coverage source changed")
-    require(coverage["line_coverage_percent"] == 98.25, "line coverage changed")
+    require(coverage["line_coverage_percent"] == 98.26, "line coverage changed")
     require(coverage["branch_coverage_percent"] == 92.59, "branch coverage changed")
     require(coverage["anti_flake_repetitions"] == 3, "anti-flake count changed")
     require(mutation["status"] == "PASS", "mutation not PASS")
     require(mutation["source_head_sha"] == SOURCE_HEAD, "mutation source changed")
-    require(mutation["mutation_score_percent"] == 82.5, "mutation score changed")
-    require(mutation["killed_mutants"] == 872, "killed mutant count changed")
+    require(mutation["mutation_score_percent"] == 82.53, "mutation score changed")
+    require(mutation["killed_mutants"] == 874, "killed mutant count changed")
     require(mutation["survived_mutants"] == 185, "survived mutant count changed")
-    require(mutation["evaluated_mutants"] == 1057, "evaluated mutant count changed")
-    require(mutation["completed_mutants"] == 1057, "completed mutant count changed")
-    require(mutation["total_mutants"] == 1057, "total mutant count changed")
+    require(mutation["evaluated_mutants"] == 1059, "evaluated mutant count changed")
+    require(mutation["completed_mutants"] == 1059, "completed mutant count changed")
+    require(mutation["total_mutants"] == 1059, "total mutant count changed")
     require(mutation["timeout_mutants"] == 0, "mutation timeout present")
     require(mutation["suspicious_mutants"] == 0, "suspicious mutation present")
     require(mutation["mutmut_run_exit_code"] == 0, "mutmut run exit changed")
@@ -246,15 +252,80 @@ def _verify_runtime_replay(
     require(replay == expected, "frozen Lot45 runtime replay diverged")
 
 
+def _policy() -> OrderFlowPolicy:
+    return OrderFlowPolicy(
+        50,
+        1_000_000,
+        2_000_000,
+        Decimal("1"),
+        WINDOW_POLICY_VERSION,
+        SESSION_POLICY_VERSION,
+        POLICY_VERSION,
+    )
+
+
+def _classified(trade_id: str, quantity: str, unknown: bool) -> ClassifiedTradeV1:
+    trade = TimestampedTradeV1(
+        "source-a",
+        "venue-a",
+        "BTC-USDT",
+        "SPOT",
+        trade_id,
+        "2026-08-06T19:18:40.100000Z",
+        "2026-08-06T19:18:40.110000Z",
+        Decimal("100"),
+        Decimal(quantity),
+        "UNKNOWN",
+    )
+    if unknown:
+        return ClassifiedTradeV1(
+            trade,
+            "UNKNOWN",
+            "NONE",
+            Decimal("0"),
+            "lot44-aggressor-confidence-v1",
+            ZERO_SHA256,
+            ("UNKNOWN_REFERENCE",),
+        )
+    return ClassifiedTradeV1(
+        trade,
+        "BUY_AGGRESSOR",
+        "QUOTE_TEST",
+        Decimal("1"),
+        "lot44-aggressor-confidence-v1",
+        QUOTE_SHA256,
+        ("QUOTE_REFERENCE",),
+    )
+
+
 def _verify_review_hardening() -> None:
     require(
         CALCULATION_DECIMAL_ROUNDING == ROUND_HALF_EVEN,
-        "Lot45 Decimal rounding contract changed",
+        "Lot45 builder Decimal rounding contract changed",
     )
     require(
-        REQUIRED_CODE_BOUND_PATHS <= set(CODE_BOUND_PATHS),
-        "Lot45 runtime dependency binding weakened",
+        "src/crypto_quant_bot" in CODE_BOUND_PATHS,
+        "Lot45 complete package-tree binding weakened",
     )
+
+    flow, _ = build_order_flow(
+        (_classified("buy", "1", False), _classified("unknown", "2", True)),
+        _policy(),
+    )
+    window = flow.windows[0]
+    for rounding in (ROUND_DOWN, ROUND_UP):
+        with localcontext() as ambient:
+            ambient.rounding = rounding
+            replayed_window = replace(window)
+            replayed_flow = replace(flow, windows=(replayed_window,))
+        require(
+            replayed_window.to_dict() == window.to_dict(),
+            f"window model depends on ambient Decimal rounding: {rounding}",
+        )
+        require(
+            replayed_flow.to_dict() == flow.to_dict(),
+            f"flow model depends on ambient Decimal rounding: {rounding}",
+        )
 
 
 def _verify_downstream_lock() -> None:
@@ -271,7 +342,7 @@ def validate() -> dict[str, object]:
     _verify_review_hardening()
     _verify_downstream_lock()
     return {
-        "schema_version": "lot45-frozen-evidence-validation-v1",
+        "schema_version": "lot45-frozen-evidence-validation-v2",
         "status": "PASS",
         "verdict": "PASS_LOT45_FROZEN_EVIDENCE",
         "gate_merge": GATE_MERGE,
@@ -295,9 +366,11 @@ def validate() -> dict[str, object]:
         "quality_artifact": QUALITY_PROOF[1],
         "quality_artifact_digest": QUALITY_PROOF[2],
         "review_hardening": {
-            "decimal_rounding": "ROUND_HALF_EVEN",
-            "runtime_dependency_binding": True,
+            "builder_decimal_rounding": "ROUND_HALF_EVEN",
+            "model_decimal_rounding_independent": True,
+            "complete_package_tree_binding": True,
         },
+        "canonical_evidence_paths": True,
         "lot46_status": "PLANNED_LOCKED",
     }
 
