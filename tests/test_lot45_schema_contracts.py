@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine import (
@@ -17,6 +18,11 @@ from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_validation 
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_ROOT = ROOT / "contracts/schemas"
+NONNEGATIVE_DECIMAL = r"^(?:0|[1-9][0-9]*(?:\.[0-9]*[1-9])?|0\.[0-9]*[1-9])$"
+POSITIVE_DECIMAL = r"^(?:[1-9][0-9]*(?:\.[0-9]*[1-9])?|0\.[0-9]*[1-9])$"
+SIGNED_DECIMAL = r"^(?:0|-?[1-9][0-9]*(?:\.[0-9]*[1-9])?|-?0\.[0-9]*[1-9])$"
+UNIT_RATIO = r"^(?:0|1|0\.[0-9]*[1-9])$"
+SIGNED_UNIT_RATIO = r"^(?:0|1|-1|0\.[0-9]*[1-9]|-0\.[0-9]*[1-9])$"
 
 
 def _schema(name: str) -> dict[str, object]:
@@ -95,6 +101,42 @@ def test_order_flow_schema_requires_unknown_and_conservation_observables() -> No
         "delta_impulse",
         "window_checksum",
     } <= set(window["required"])
+
+
+def test_decimal_schema_fields_are_canonical_and_bounded() -> None:
+    schema = _schema("order_flow_state_v1.schema.json")
+    properties = schema["properties"]
+    window_properties = properties["windows"]["items"]["properties"]
+
+    assert properties["total_volume"]["pattern"] == POSITIVE_DECIMAL
+    for field in ("buy_volume", "sell_volume", "unknown_volume"):
+        assert properties[field]["pattern"] == NONNEGATIVE_DECIMAL
+    assert properties["signed_delta"]["pattern"] == SIGNED_DECIMAL
+    for field in ("unknown_volume_ratio", "classification_coverage", "confidence_weighted_coverage"):
+        assert properties[field]["pattern"] == UNIT_RATIO
+
+    assert window_properties["total_volume"]["pattern"] == POSITIVE_DECIMAL
+    for field in ("buy_volume", "sell_volume", "unknown_volume"):
+        assert window_properties[field]["pattern"] == NONNEGATIVE_DECIMAL
+    for field in ("signed_delta", "delta_impulse"):
+        assert window_properties[field]["pattern"] == SIGNED_DECIMAL
+    assert window_properties["signed_imbalance"]["pattern"] == SIGNED_UNIT_RATIO
+    for field in ("classification_coverage", "confidence_weighted_coverage"):
+        assert window_properties[field]["pattern"] == UNIT_RATIO
+
+    cvd_schema = _schema("cvd_series_v1.schema.json")
+    point_properties = cvd_schema["properties"]["points"]["items"]["properties"]
+    assert point_properties["signed_delta"]["pattern"] == SIGNED_DECIMAL
+    assert point_properties["cvd"]["pattern"] == SIGNED_DECIMAL
+
+    for invalid in ("garbage", "NaN", "Infinity", "1e3", "-0", "01", "1.0", "0.10"):
+        assert re.fullmatch(SIGNED_DECIMAL, invalid) is None
+    for invalid in ("-1", "1.1", "2", "NaN", "0.10"):
+        assert re.fullmatch(UNIT_RATIO, invalid) is None
+    for invalid in ("-1.1", "1.1", "2", "NaN", "-0"):
+        assert re.fullmatch(SIGNED_UNIT_RATIO, invalid) is None
+    for valid in ("0", "1", "-1", "0.125", "-0.125", "123.45", "-123.45"):
+        assert re.fullmatch(SIGNED_DECIMAL, valid) is not None
 
 
 def test_cvd_schema_fixes_session_policy_and_checksum() -> None:
