@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from types import MappingProxyType
 from typing import Any
 
 from .order_flow_delta_and_cvd_engine_validation import (
-    CONFIG_VERSION,
+    CALCULATION_DECIMAL_PRECISION,
     POLICY_VERSION,
     SESSION_POLICY_VERSION,
     VALIDATION_STATE,
@@ -156,11 +156,14 @@ class OrderFlowWindowV1:
             self.signed_delta == self.buy_volume - self.sell_volume,
             "signed delta must equal buy minus sell volume",
         )
+        with localcontext() as context:
+            context.prec = CALCULATION_DECIMAL_PRECISION
+            expected_imbalance = self.signed_delta / self.total_volume
+            expected_coverage = (self.buy_volume + self.sell_volume) / self.total_volume
         require(
-            self.signed_imbalance == self.signed_delta / self.total_volume,
+            self.signed_imbalance == expected_imbalance,
             "signed imbalance must equal signed delta divided by total volume",
         )
-        expected_coverage = (self.buy_volume + self.sell_volume) / self.total_volume
         require(
             self.classification_coverage == expected_coverage,
             "classification coverage mismatch",
@@ -264,22 +267,25 @@ class OrderFlowStateV1:
             "aggregate volume conservation failed",
         )
         require(self.signed_delta == self.buy_volume - self.sell_volume, "aggregate delta mismatch")
+        with localcontext() as context:
+            context.prec = CALCULATION_DECIMAL_PRECISION
+            expected_unknown_ratio = self.unknown_volume / self.total_volume
+            expected_coverage = (self.buy_volume + self.sell_volume) / self.total_volume
+            expected_weighted = sum(
+                (
+                    item.confidence_weighted_coverage * item.total_volume
+                    for item in self.windows
+                ),
+                Decimal("0"),
+            ) / self.total_volume
         require(
-            self.unknown_volume_ratio == self.unknown_volume / self.total_volume,
+            self.unknown_volume_ratio == expected_unknown_ratio,
             "unknown volume ratio mismatch",
         )
         require(
-            self.classification_coverage
-            == (self.buy_volume + self.sell_volume) / self.total_volume,
+            self.classification_coverage == expected_coverage,
             "aggregate classification coverage mismatch",
         )
-        expected_weighted = sum(
-            (
-                item.confidence_weighted_coverage * item.total_volume
-                for item in self.windows
-            ),
-            Decimal("0"),
-        ) / self.total_volume
         require(
             self.confidence_weighted_coverage == expected_weighted,
             "aggregate confidence-weighted coverage mismatch",
