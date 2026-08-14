@@ -1,0 +1,207 @@
+name: Lot 45 frozen evidence attestation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/lot45-frozen-evidence.yml'
+      - '.github/workflows/lot45-order-flow-delta-cvd.yml'
+      - '.github/workflows/lot45-mutation-assurance.yml'
+      - '.github/workflows/lot44-frozen-evidence.yml'
+      - 'config/microstructure/order_flow_delta_and_cvd_engine_v1.json'
+      - 'contracts/schemas/order_flow_delta_cvd_engine_state_v1.schema.json'
+      - 'contracts/schemas/order_flow_delta_cvd_engine_audit_v1.schema.json'
+      - 'contracts/schemas/order_flow_state_v1.schema.json'
+      - 'contracts/schemas/cvd_series_v1.schema.json'
+      - 'src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py'
+      - 'src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py'
+      - 'src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py'
+      - 'scripts/run_lot45_order_flow_delta_and_cvd_engine.py'
+      - 'scripts/validate_lot45.py'
+      - 'scripts/validate_lot45_frozen_evidence.py'
+      - 'tests/test_lot45*.py'
+      - 'tests/test_lot44_v4_entry_gate.py'
+      - 'docs/LOT_45_ORDER_FLOW_DELTA_AND_CVD_ENGINE.md'
+      - 'docs/ACCEPTANCE_CRITERIA_LOT_45.md'
+      - 'reports/lot_45_order_flow_delta_and_cvd_engine_report.md'
+      - 'data/audit/lot45_v4_entry_gate.json'
+      - 'data/audit/order_flow_delta_cvd_engine_lot45.json'
+      - 'data/audit/order_flow_delta_cvd_engine_audit_lot45.json'
+      - 'data/audit/order_flow_state_lot45.json'
+      - 'data/audit/cvd_series_lot45.json'
+      - 'reports/lot45/**'
+      - 'requirements-dev.lock'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  attest:
+    runs-on: ubuntu-22.04
+    env:
+      PYTHONPATH: src
+      GATE_MERGE_SHA: 390d0779f2be257fa8134faf8f02193a760a09c3
+      SOURCE_HEAD_SHA: 019f4881aabb3c83f3f4b8b7349dd387dd319eae
+      CERTIFICATION_ANCHOR_SHA: bf6303fbcb3b73805fce6f25f76a8ec37ea45aaf
+      EVIDENCE_HEAD_SHA: 6cd278817ecf83370977466f1a34794f65b3ac07
+      VALIDATOR_HEAD_SHA: 552831ca88fa9227ba894a9f6140116b2efd60bd
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Prove final certification evidence and validator chain
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$GATE_MERGE_SHA" "$SOURCE_HEAD_SHA"
+          git merge-base --is-ancestor "$SOURCE_HEAD_SHA" "$CERTIFICATION_ANCHOR_SHA"
+          git merge-base --is-ancestor "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA"
+          git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" "$VALIDATOR_HEAD_SHA"
+          git merge-base --is-ancestor "$VALIDATOR_HEAD_SHA" HEAD
+
+          test "$(git rev-list --count "$SOURCE_HEAD_SHA..$CERTIFICATION_ANCHOR_SHA")" = "2"
+          git diff --name-only "$SOURCE_HEAD_SHA" "$CERTIFICATION_ANCHOR_SHA" | sort > /tmp/cert.txt
+          printf '%s\n' \
+            .github/workflows/lot45-mutation-assurance.yml \
+            .github/workflows/lot45-order-flow-delta-cvd.yml | sort > /tmp/cert-expected.txt
+          diff -u /tmp/cert-expected.txt /tmp/cert.txt
+
+          test "$(git rev-list --count "$CERTIFICATION_ANCHOR_SHA..$EVIDENCE_HEAD_SHA")" = "1"
+          git diff --name-only "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA" | sort > /tmp/evidence.txt
+          printf '%s\n' \
+            data/audit/cvd_series_lot45.json \
+            data/audit/order_flow_delta_cvd_engine_audit_lot45.json \
+            data/audit/order_flow_delta_cvd_engine_lot45.json \
+            data/audit/order_flow_state_lot45.json \
+            reports/lot45/coverage_summary.json \
+            reports/lot45/mutation_summary.json | sort > /tmp/evidence-expected.txt
+          diff -u /tmp/evidence-expected.txt /tmp/evidence.txt
+
+          test "$(git rev-list --count "$EVIDENCE_HEAD_SHA..$VALIDATOR_HEAD_SHA")" = "1"
+          git diff --name-only "$EVIDENCE_HEAD_SHA" "$VALIDATOR_HEAD_SHA" > /tmp/validator.txt
+          printf '%s\n' scripts/validate_lot45_frozen_evidence.py > /tmp/validator-expected.txt
+          diff -u /tmp/validator-expected.txt /tmp/validator.txt
+      - name: Prove source controls evidence and validator immutability
+        run: |
+          set -euo pipefail
+          git diff --quiet "$SOURCE_HEAD_SHA" HEAD -- \
+            .github/workflows/lot44-frozen-evidence.yml \
+            config/microstructure/order_flow_delta_and_cvd_engine_v1.json \
+            contracts/schemas/order_flow_delta_cvd_engine_state_v1.schema.json \
+            contracts/schemas/order_flow_delta_cvd_engine_audit_v1.schema.json \
+            contracts/schemas/order_flow_state_v1.schema.json \
+            contracts/schemas/cvd_series_v1.schema.json \
+            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py \
+            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py \
+            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py \
+            scripts/run_lot45_order_flow_delta_and_cvd_engine.py \
+            scripts/validate_lot45.py \
+            tests/test_lot44_v4_entry_gate.py \
+            tests/test_lot45_order_flow_delta_and_cvd_engine.py \
+            tests/test_lot45_policy_contract.py \
+            tests/test_lot45_schema_contracts.py \
+            docs/LOT_45_ORDER_FLOW_DELTA_AND_CVD_ENGINE.md \
+            docs/ACCEPTANCE_CRITERIA_LOT_45.md \
+            reports/lot_45_order_flow_delta_and_cvd_engine_report.md \
+            data/audit/lot45_v4_entry_gate.json \
+            data/audit/trades_and_aggressor_classification_schema_lot44.json \
+            data/audit/trades_and_aggressor_classification_schema_audit_lot44.json \
+            data/audit/aggressor_confidence_state_lot44.json \
+            config/microstructure/trades_and_aggressor_classification_schema_v1.json \
+            requirements-dev.lock
+          git diff --quiet "$CERTIFICATION_ANCHOR_SHA" HEAD -- \
+            .github/workflows/lot45-order-flow-delta-cvd.yml \
+            .github/workflows/lot45-mutation-assurance.yml
+          git diff --quiet "$EVIDENCE_HEAD_SHA" HEAD -- \
+            data/audit/cvd_series_lot45.json \
+            data/audit/order_flow_delta_cvd_engine_audit_lot45.json \
+            data/audit/order_flow_delta_cvd_engine_lot45.json \
+            data/audit/order_flow_state_lot45.json \
+            reports/lot45/coverage_summary.json \
+            reports/lot45/mutation_summary.json
+          git diff --quiet "$VALIDATOR_HEAD_SHA" HEAD -- scripts/validate_lot45_frozen_evidence.py
+      - name: Validate frozen Lot 45 evidence
+        run: |
+          set -euo pipefail
+          python -m compileall -q scripts/validate_lot45_frozen_evidence.py
+          ruff check scripts/validate_lot45_frozen_evidence.py
+          python scripts/validate_lot45_frozen_evidence.py | tee /tmp/lot45-frozen-validation.json
+      - name: Replay certified source byte-identically
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/lot45-source /tmp/lot45-expected /tmp/lot45-run1 /tmp/lot45-run2
+          mkdir -p /tmp/lot45-expected /tmp/lot45-run1 /tmp/lot45-run2
+          cp data/audit/order_flow_delta_cvd_engine_lot45.json /tmp/lot45-expected/
+          cp data/audit/order_flow_delta_cvd_engine_audit_lot45.json /tmp/lot45-expected/
+          cp data/audit/order_flow_state_lot45.json /tmp/lot45-expected/
+          cp data/audit/cvd_series_lot45.json /tmp/lot45-expected/
+          git worktree add --detach /tmp/lot45-source "$SOURCE_HEAD_SHA"
+          trap 'git worktree remove --force /tmp/lot45-source >/dev/null 2>&1 || true' EXIT
+          (
+            cd /tmp/lot45-source
+            PYTHONPATH=src python scripts/validate_lot45.py \
+              --code-commit "$SOURCE_HEAD_SHA" --output-dir /tmp/lot45-run1
+            for path in /tmp/lot45-run1/*.json; do
+              cmp "$path" "/tmp/lot45-expected/$(basename "$path")"
+            done
+            PYTHONPATH=src python scripts/validate_lot45.py \
+              --code-commit "$SOURCE_HEAD_SHA" --output-dir /tmp/lot45-run2
+            for path in /tmp/lot45-run2/*.json; do
+              cmp "$path" "/tmp/lot45-run1/$(basename "$path")"
+            done
+            PYTHONPATH=src pytest -q \
+              tests/test_lot45_order_flow_delta_and_cvd_engine.py \
+              tests/test_lot45_policy_contract.py \
+              tests/test_lot45_schema_contracts.py
+          )
+          git worktree remove --force /tmp/lot45-source
+          trap - EXIT
+      - name: Current architecture security regression and Lot 46 lock
+        run: |
+          set -euo pipefail
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+          bandit -q -r \
+            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py \
+            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py \
+            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py \
+            scripts/run_lot45_order_flow_delta_and_cvd_engine.py \
+            scripts/validate_lot45.py \
+            scripts/validate_lot45_frozen_evidence.py -ll
+          pip-audit -r requirements-dev.lock
+          pytest -q
+          for repetition in 1 2 3; do
+            pytest -q \
+              tests/test_lot45_order_flow_delta_and_cvd_engine.py \
+              tests/test_lot45_policy_contract.py \
+              tests/test_lot45_schema_contracts.py
+          done
+          test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine.py
+          test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine_models.py
+          test ! -e scripts/run_lot46_trade_classification_confidence_engine.py
+          test ! -e scripts/validate_lot46.py
+          test ! -e tests/test_lot46_trade_classification_confidence_engine.py
+          test ! -e data/audit/trade_classification_confidence_engine_lot46.json
+          test ! -e reports/lot_46_trade_classification_confidence_engine_report.md
+          test ! -e docs/LOT_46_TRADE_CLASSIFICATION_CONFIDENCE_ENGINE.md
+          test ! -e docs/ACCEPTANCE_CRITERIA_LOT_46.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot45-frozen-evidence-attestation
+          path: /tmp/lot45-frozen-validation.json
