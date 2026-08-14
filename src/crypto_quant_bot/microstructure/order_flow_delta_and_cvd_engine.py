@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
+from datetime import datetime
 from decimal import Decimal, localcontext
 from pathlib import Path
 from typing import Any
@@ -188,7 +189,8 @@ def _verify_gate(root: Path, config: dict[str, Any]) -> dict[str, Any]:
 
 def _verify_gate_safety(gate: dict[str, Any]) -> None:
     safety = gate.get("safety")
-    require(isinstance(safety, dict), "Lot45 entry gate safety missing")
+    if not isinstance(safety, dict):
+        raise Lot45ValidationError("Lot45 entry gate safety missing")
     disabled = (
         "trade_allowed",
         "execution_allowed",
@@ -300,7 +302,8 @@ def _verify_lot44_links(
 
 def _verify_lot44_confidence(state: dict[str, Any]) -> None:
     confidence = state.get("confidence_state")
-    require(isinstance(confidence, dict), "Lot44 confidence state missing")
+    if not isinstance(confidence, dict):
+        raise Lot45ValidationError("Lot44 confidence state missing")
     _verify_checksum(
         confidence,
         "confidence_checksum",
@@ -345,7 +348,8 @@ def _verify_lot44_temporal(
 
 def _classified_trades_from_state(state: dict[str, Any]) -> tuple[ClassifiedTradeV1, ...]:
     raw_trades = state.get("classified_trades")
-    require(isinstance(raw_trades, list) and bool(raw_trades), "Lot44 classified trades missing")
+    if not isinstance(raw_trades, list) or not raw_trades:
+        raise Lot45ValidationError("Lot44 classified trades missing")
     trades = tuple(_trade_from_payload(item) for item in raw_trades)
     trade_ids = {item.trade.trade_id for item in trades}
     require(len(trade_ids) == len(trades), "Lot44 trade ids are not unique")
@@ -364,7 +368,7 @@ def _verify_lot44(
     return state, _classified_trades_from_state(state)
 
 
-def _sort_key(item: ClassifiedTradeV1) -> tuple[object, object, str]:
+def _sort_key(item: ClassifiedTradeV1) -> tuple[datetime, datetime, str]:
     return (
         parse_utc_timestamp(item.trade.event_time, "trade event_time"),
         parse_utc_timestamp(item.trade.receive_time, "trade receive_time"),
@@ -458,7 +462,7 @@ def _build_window(
     return replace(provisional, window_checksum=checksum)
 
 
-def _receive_time_key(item: ClassifiedTradeV1) -> object:
+def _receive_time_key(item: ClassifiedTradeV1) -> datetime:
     return parse_utc_timestamp(item.trade.receive_time, "trade receive_time")
 
 
