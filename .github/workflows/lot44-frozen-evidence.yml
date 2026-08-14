@@ -43,6 +43,8 @@ jobs:
       CERTIFICATION_ANCHOR_SHA: 720b6f895672b650a7c7df96cdf68524479ae3f4
       EVIDENCE_HEAD_SHA: 8ca3edadb7e811bad428575cfe236b20dd5ed62f
       VALIDATOR_HEAD_SHA: 888fbf696432bec1a5f9d3e4f9c09279ed569325
+      FINAL_LOT44_PR_HEAD_SHA: 8287155273e87f3c6d27a74ad373ac6a9ba0b026
+      LOT45_GATE_CHECKSUM: 15ca4d69e59a0898f32eb9cbe558571ecf00ae496ec5d41075da1124393d4468
     steps:
       - uses: actions/checkout@v4
         with:
@@ -56,7 +58,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove final certification evidence and validator chain
+      - name: Prove final certification evidence validator and PR-head chain
         run: |
           set -euo pipefail
           git merge-base --is-ancestor "$GATE_MERGE_SHA" "$SOURCE_HEAD_SHA"
@@ -64,7 +66,8 @@ jobs:
           git merge-base --is-ancestor "$QUALITY_RETRIGGER_SHA" "$CERTIFICATION_ANCHOR_SHA"
           git merge-base --is-ancestor "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA"
           git merge-base --is-ancestor "$EVIDENCE_HEAD_SHA" "$VALIDATOR_HEAD_SHA"
-          git merge-base --is-ancestor "$VALIDATOR_HEAD_SHA" HEAD
+          git merge-base --is-ancestor "$VALIDATOR_HEAD_SHA" "$FINAL_LOT44_PR_HEAD_SHA"
+          git merge-base --is-ancestor "$FINAL_LOT44_PR_HEAD_SHA" HEAD
           test "$(git rev-list --count "$SOURCE_HEAD_SHA..$QUALITY_RETRIGGER_SHA")" = "0"
           git diff --quiet "$SOURCE_HEAD_SHA" "$QUALITY_RETRIGGER_SHA"
           test "$(git rev-list --count "$SOURCE_HEAD_SHA..$CERTIFICATION_ANCHOR_SHA")" = "2"
@@ -87,6 +90,10 @@ jobs:
           git diff --name-only "$EVIDENCE_HEAD_SHA" "$VALIDATOR_HEAD_SHA" > /tmp/validator.txt
           printf '%s\n' scripts/validate_lot44_frozen_evidence.py > /tmp/validator-expected.txt
           diff -u /tmp/validator-expected.txt /tmp/validator.txt
+          test "$(git rev-list --count "$VALIDATOR_HEAD_SHA..$FINAL_LOT44_PR_HEAD_SHA")" = "1"
+          git diff --name-only "$VALIDATOR_HEAD_SHA" "$FINAL_LOT44_PR_HEAD_SHA" > /tmp/final-head.txt
+          printf '%s\n' .github/workflows/lot44-frozen-evidence.yml > /tmp/final-head-expected.txt
+          diff -u /tmp/final-head-expected.txt /tmp/final-head.txt
       - name: Prove final source controls evidence and validator immutability
         run: |
           set -euo pipefail
@@ -116,12 +123,20 @@ jobs:
             data/audit/trades_and_aggressor_classification_schema_lot44.json \
             reports/lot44/coverage_summary.json reports/lot44/mutation_summary.json
           git diff --quiet "$VALIDATOR_HEAD_SHA" HEAD -- scripts/validate_lot44_frozen_evidence.py
-      - name: Validate final frozen evidence v7
+      - name: Replay final frozen evidence v7 at certified Lot 44 head
         run: |
           set -euo pipefail
-          python -m compileall -q scripts/validate_lot44_frozen_evidence.py
-          ruff check scripts/validate_lot44_frozen_evidence.py
-          python scripts/validate_lot44_frozen_evidence.py | tee /tmp/lot44-frozen-validation.json
+          rm -rf /tmp/lot44-final
+          git worktree add --detach /tmp/lot44-final "$FINAL_LOT44_PR_HEAD_SHA"
+          trap 'git worktree remove --force /tmp/lot44-final >/dev/null 2>&1 || true' EXIT
+          (
+            cd /tmp/lot44-final
+            PYTHONPATH=src python -m compileall -q scripts/validate_lot44_frozen_evidence.py
+            ruff check scripts/validate_lot44_frozen_evidence.py
+            PYTHONPATH=src python scripts/validate_lot44_frozen_evidence.py
+          ) | tee /tmp/lot44-frozen-validation.json
+          git worktree remove --force /tmp/lot44-final
+          trap - EXIT
       - name: Replay final source byte-identically
         run: |
           set -euo pipefail
@@ -153,7 +168,7 @@ jobs:
           )
           git worktree remove --force /tmp/lot44-source
           trap - EXIT
-      - name: Current architecture security regression and downstream locks
+      - name: Current architecture security authorized Lot 45 and Lot 46 lock
         run: |
           set -euo pipefail
           python scripts/validate_roadmap_documentation.py
@@ -171,10 +186,34 @@ jobs:
           for repetition in 1 2 3; do
             pytest -q tests/test_lot44_trades_and_aggressor_classification_schema.py tests/test_lot44_schema_contracts.py tests/test_lot44_causal_guards.py tests/test_lot44_runtime_confidence_version.py
           done
-          test ! -e src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py
-          test ! -e scripts/run_lot45_order_flow_delta_and_cvd_engine.py
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path('data/audit/lot45_v4_entry_gate.json')
+          gate = json.loads(path.read_text(encoding='utf-8'))
+          body = dict(gate)
+          actual = body.pop('gate_checksum', None)
+          encoded = json.dumps(body, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode('utf-8')
+          expected = os.environ['LOT45_GATE_CHECKSUM']
+          assert actual == expected
+          assert hashlib.sha256(encoded).hexdigest() == expected
+          assert gate['gate_status'] == 'GO_LOT45_IMPLEMENTATION_ENTRY'
+          assert gate['post_merge_verdict'] == 'GO_LOT44_POST_MERGE'
+          assert gate['next_lot'] == 46
+          assert gate['next_lot_status'] == 'PLANNED_LOCKED'
+          PY
           test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine.py
+          test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine_models.py
           test ! -e scripts/run_lot46_trade_classification_confidence_engine.py
+          test ! -e scripts/validate_lot46.py
+          test ! -e tests/test_lot46_trade_classification_confidence_engine.py
+          test ! -e data/audit/trade_classification_confidence_engine_lot46.json
+          test ! -e reports/lot_46_trade_classification_confidence_engine_report.md
+          test ! -e docs/LOT_46_TRADE_CLASSIFICATION_CONFIDENCE_ENGINE.md
+          test ! -e docs/ACCEPTANCE_CRITERIA_LOT_46.md
       - uses: actions/upload-artifact@v4
         if: always()
         with:
