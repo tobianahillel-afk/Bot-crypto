@@ -1,0 +1,53 @@
+{
+  "schema_version": "lot45-v4-entry-gate-v1",
+  "target_lot": 45,
+  "base_commit": "1fd85f26102f94d4c42a8f515b522c23028bac89",
+  "post_merge_audit_pr_head": "0ddf2c3150b339b8573fead8c942c4b1efa4b300",
+  "post_merge_audit_merge": "1fd85f26102f94d4c42a8f515b522c23028bac89",
+  "post_merge_verdict": "GO_LOT44_POST_MERGE",
+  "post_merge_checksum": "b8b531b2fcb09a30728549cc480d54d9be71504356468704c102ff085c39ea9a",
+  "current_version": "0.44.0",
+  "gate_status": "GO_LOT45_IMPLEMENTATION_ENTRY",
+  "runtime_mode": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+  "responsible_component": "MicrostructureDomain",
+  "package_boundary": "src/crypto_quant_bot/microstructure",
+  "canonical_roadmap": {
+    "source_line": 46,
+    "source_blob_sha": "84de51bda788a8d124fb7d344419c4a4b12030b5",
+    "lot_id": "Lot 45",
+    "title": "Order Flow, Delta & CVD Engine"
+  },
+  "input_contracts": [
+    "RunContextV1 (run_id, runtime_mode, config_version, code_commit, correlation_id)",
+    "LineageEnvelopeV1 des artefacts produits par les lots préalables"
+  ],
+  "output_contracts": [
+    "OrderFlowDeltaCVDEngineStateV1",
+    "OrderFlowDeltaCVDEngineAuditV1",
+    "OrderFlowStateV1",
+    "CVDSeriesV1"
+  ],
+  "safety": {
+    "analysis_only": true,
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "approved_size": 0,
+    "signal_generation_allowed": false,
+    "risk_approval_allowed": false,
+    "order_routing_allowed": false,
+    "external_connectivity_allowed": false,
+    "network_ingestion_allowed": false,
+    "real_credentials_allowed": false,
+    "participant_behavior_inference_explicitly_labeled": true,
+    "scenario_score_is_signal": false
+  },
+  "quality": {
+    "line_coverage_min_percent": 95,
+    "branch_coverage_min_percent": 90,
+    "mutation_score_min_percent": 80,
+    "anti_flake_repetitions": 3
+  },
+  "next_lot": 46,
+  "next_lot_status": "PLANNED_LOCKED",
+  "gate_checksum": "15ca4d69e59a0898f32eb9cbe558571ecf00ae496ec5d41075da1124393d4468"
+}
