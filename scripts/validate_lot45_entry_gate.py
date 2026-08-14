@@ -16,11 +16,16 @@ ROADMAP_PATH = ROOT / "data/audit/product_scope_roadmap_lot21.jsonl"
 EXPECTED_BASE = "1fd85f26102f94d4c42a8f515b522c23028bac89"
 EXPECTED_BASE_PARENT = "e390b6e5d76c53d9dd6d74724f3246b92e628079"
 EXPECTED_AUDIT_PR_HEAD = "0ddf2c3150b339b8573fead8c942c4b1efa4b300"
-EXPECTED_POST_MERGE_CHECKSUM = "b8b531b2fcb09a30728549cc480d54d9be71504356468704c102ff085c39ea9a"
-EXPECTED_GATE_CHECKSUM = "15ca4d69e59a0898f32eb9cbe558571ecf00ae496ec5d41075da1124393d4468"
+EXPECTED_POST_MERGE_CHECKSUM = (
+    "b8b531b2fcb09a30728549cc480d54d9be71504356468704c102ff085c39ea9a"
+)
+EXPECTED_GATE_CHECKSUM = (
+    "15ca4d69e59a0898f32eb9cbe558571ecf00ae496ec5d41075da1124393d4468"
+)
 EXPECTED_ROADMAP_BLOB = "84de51bda788a8d124fb7d344419c4a4b12030b5"
 
 GATE_PATHS = {
+    ".github/workflows/lot44-entry-gate.yml",
     ".github/workflows/lot45-entry-gate.yml",
     "contracts/schemas/lot45_v4_entry_gate_v1.schema.json",
     "data/audit/lot45_v4_entry_gate.json",
@@ -139,12 +144,28 @@ def changed_paths(base: str, head: str) -> set[str]:
     return {line for line in raw.splitlines() if line}
 
 
+def locate_gate_commit() -> str:
+    subprocess.run(
+        ["git", "merge-base", "--is-ancestor", EXPECTED_BASE, "HEAD"],
+        cwd=ROOT,
+        check=True,
+    )
+    candidates = git("rev-list", "--first-parent", f"{EXPECTED_BASE}..HEAD").splitlines()
+    for candidate in candidates:
+        if changed_paths(EXPECTED_BASE, candidate) == GATE_PATHS:
+            return candidate
+    raise Lot45EntryGateError("exact Lot45 governance gate transition not found")
+
+
 def validate_gate_payload(gate: dict[str, Any]) -> None:
     checksum = gate.get("gate_checksum")
     require(checksum == EXPECTED_GATE_CHECKSUM, "Lot45 gate checksum field changed")
     without_checksum = dict(gate)
     without_checksum.pop("gate_checksum", None)
-    require(canonical_checksum(without_checksum) == EXPECTED_GATE_CHECKSUM, "Lot45 gate payload checksum mismatch")
+    require(
+        canonical_checksum(without_checksum) == EXPECTED_GATE_CHECKSUM,
+        "Lot45 gate payload checksum mismatch",
+    )
 
     expected_scalars = {
         "schema_version": "lot45-v4-entry-gate-v1",
@@ -164,8 +185,14 @@ def validate_gate_payload(gate: dict[str, Any]) -> None:
     }
     for key, expected in expected_scalars.items():
         require(gate.get(key) == expected, f"Lot45 gate field changed: {key}")
-    require(set(gate.get("input_contracts", [])) == EXPECTED_INPUTS, "Lot45 input contracts changed")
-    require(set(gate.get("output_contracts", [])) == EXPECTED_OUTPUTS, "Lot45 output contracts changed")
+    require(
+        set(gate.get("input_contracts", [])) == EXPECTED_INPUTS,
+        "Lot45 input contracts changed",
+    )
+    require(
+        set(gate.get("output_contracts", [])) == EXPECTED_OUTPUTS,
+        "Lot45 output contracts changed",
+    )
     require(gate.get("safety") == EXPECTED_SAFETY, "Lot45 gate safety policy changed")
     require(gate.get("quality") == EXPECTED_QUALITY, "Lot45 quality thresholds changed")
 
@@ -193,7 +220,36 @@ def validate_schema_contract() -> None:
         "gate_checksum": EXPECTED_GATE_CHECKSUM,
     }
     for field, value in constants.items():
-        require(props.get(field, {}).get("const") == value, f"Lot45 schema constant changed: {field}")
+        require(
+            props.get(field, {}).get("const") == value,
+            f"Lot45 schema constant changed: {field}",
+        )
+    require(
+        props.get("input_contracts", {}).get("const")
+        == [
+            "RunContextV1 (run_id, runtime_mode, config_version, code_commit, correlation_id)",
+            "LineageEnvelopeV1 des artefacts produits par les lots préalables",
+        ],
+        "Lot45 schema input contracts are not exact",
+    )
+    require(
+        props.get("output_contracts", {}).get("const")
+        == [
+            "OrderFlowDeltaCVDEngineStateV1",
+            "OrderFlowDeltaCVDEngineAuditV1",
+            "OrderFlowStateV1",
+            "CVDSeriesV1",
+        ],
+        "Lot45 schema output contracts are not exact",
+    )
+    require(
+        props.get("safety", {}).get("additionalProperties") is False,
+        "Lot45 schema safety object must be closed",
+    )
+    require(
+        props.get("quality", {}).get("additionalProperties") is False,
+        "Lot45 schema quality object must be closed",
+    )
 
 
 def roadmap_record(source_line: int) -> dict[str, Any]:
@@ -221,55 +277,93 @@ def validate_roadmap(gate: dict[str, Any]) -> None:
     }
     for field, value in expected.items():
         require(lot45.get(field) == value, f"canonical Lot45 field changed: {field}")
-    require(set(lot45.get("input_contracts", [])) == EXPECTED_INPUTS, "canonical Lot45 inputs changed")
-    require(set(lot45.get("output_contracts", [])) == EXPECTED_OUTPUTS, "canonical Lot45 outputs changed")
-    require(set(lot45.get("implementation_files", [])) == EXPECTED_IMPLEMENTATION_FILES, "canonical Lot45 implementation file set changed")
-    require(len(lot45.get("processing_sequence", [])) >= 5, "canonical Lot45 processing sequence incomplete")
-    require(len(lot45.get("acceptance_tests", [])) >= 8, "canonical Lot45 acceptance tests incomplete")
+    require(
+        set(lot45.get("input_contracts", [])) == EXPECTED_INPUTS,
+        "canonical Lot45 inputs changed",
+    )
+    require(
+        set(lot45.get("output_contracts", [])) == EXPECTED_OUTPUTS,
+        "canonical Lot45 outputs changed",
+    )
+    require(
+        set(lot45.get("implementation_files", [])) == EXPECTED_IMPLEMENTATION_FILES,
+        "canonical Lot45 implementation file set changed",
+    )
+    require(
+        len(lot45.get("processing_sequence", [])) >= 5,
+        "canonical Lot45 processing sequence incomplete",
+    )
+    require(
+        len(lot45.get("acceptance_tests", [])) >= 8,
+        "canonical Lot45 acceptance tests incomplete",
+    )
 
     binding = gate.get("canonical_roadmap")
     require(isinstance(binding, dict), "Lot45 canonical roadmap binding missing")
     require(binding.get("source_line") == 46, "Lot45 roadmap source line changed")
-    require(binding.get("source_blob_sha") == EXPECTED_ROADMAP_BLOB, "Lot45 roadmap blob binding changed")
+    require(
+        binding.get("source_blob_sha") == EXPECTED_ROADMAP_BLOB,
+        "Lot45 roadmap blob binding changed",
+    )
     require(binding.get("lot_id") == "Lot 45", "Lot45 roadmap lot binding changed")
-    require(binding.get("title") == "Order Flow, Delta & CVD Engine", "Lot45 roadmap title binding changed")
+    require(
+        binding.get("title") == "Order Flow, Delta & CVD Engine",
+        "Lot45 roadmap title binding changed",
+    )
 
     lot46 = roadmap_record(47)
     require(lot46.get("lot_id") == "Lot 46", "canonical Lot46 identity changed")
-    require(lot46.get("title") == "Trade Classification Confidence Engine", "canonical Lot46 title changed")
+    require(
+        lot46.get("title") == "Trade Classification Confidence Engine",
+        "canonical Lot46 title changed",
+    )
     require(lot46.get("status") == "PLANNED_LOCKED", "Lot46 must remain locked")
 
 
-def validate_git_transition() -> None:
-    subprocess.run(
-        ["git", "merge-base", "--is-ancestor", EXPECTED_BASE, "HEAD"],
-        cwd=ROOT,
-        check=True,
-    )
+def validate_git_transition(gate_commit: str) -> None:
     parents = set(git("show", "-s", "--format=%P", EXPECTED_BASE).split())
-    require(parents == {EXPECTED_BASE_PARENT, EXPECTED_AUDIT_PR_HEAD}, "Lot44 audit merge parents changed")
-    paths = changed_paths(EXPECTED_BASE, "HEAD")
-    require(paths == GATE_PATHS, f"Lot45 gate branch path set changed: {sorted(paths)}")
-    require(changed_paths(EXPECTED_AUDIT_PR_HEAD, EXPECTED_BASE) == set(), "Lot44 audit merge tree differs from certified audit PR head")
+    require(
+        parents == {EXPECTED_BASE_PARENT, EXPECTED_AUDIT_PR_HEAD},
+        "Lot44 audit merge parents changed",
+    )
+    require(
+        changed_paths(EXPECTED_BASE, gate_commit) == GATE_PATHS,
+        "Lot45 gate transition path set changed",
+    )
+    require(
+        changed_paths(EXPECTED_AUDIT_PR_HEAD, EXPECTED_BASE) == set(),
+        "Lot44 audit merge tree differs from certified audit PR head",
+    )
+    for path in GATE_PATHS:
+        require(
+            path not in changed_paths(gate_commit, "HEAD"),
+            f"Lot45 gate artifact drifted after gate transition: {path}",
+        )
 
 
-def validate_downstream_locks() -> None:
+def validate_downstream_locks(gate_commit: str) -> None:
+    gate_tree = set(git("ls-tree", "-r", "--name-only", gate_commit).splitlines())
     for path in sorted(LOT45_FORBIDDEN_BEFORE_GATE | LOT46_FORBIDDEN):
-        require(not (ROOT / path).exists(), f"implementation started before Lot45 gate: {path}")
+        require(
+            path not in gate_tree,
+            f"implementation started before Lot45 gate: {path}",
+        )
 
 
 def validate() -> dict[str, Any]:
+    gate_commit = locate_gate_commit()
     gate = load(GATE_PATH)
     validate_gate_payload(gate)
     validate_schema_contract()
     validate_roadmap(gate)
-    validate_git_transition()
-    validate_downstream_locks()
+    validate_git_transition(gate_commit)
+    validate_downstream_locks(gate_commit)
     return {
         "schema_version": "lot45-v4-entry-gate-validation-v1",
         "status": "PASS",
         "verdict": "GO_LOT45_IMPLEMENTATION_ENTRY",
         "base_commit": EXPECTED_BASE,
+        "gate_commit": gate_commit,
         "post_merge_verdict": "GO_LOT44_POST_MERGE",
         "post_merge_checksum": EXPECTED_POST_MERGE_CHECKSUM,
         "target_lot": 45,
