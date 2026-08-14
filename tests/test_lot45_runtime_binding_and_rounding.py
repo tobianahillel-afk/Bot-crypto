@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from decimal import ROUND_DOWN, ROUND_HALF_EVEN, ROUND_UP, Decimal, localcontext
 
 from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine import (
@@ -72,6 +73,14 @@ def _classified(
     )
 
 
+def _repeating_ratio_flow():
+    trades = (
+        _classified("buy", "1", "BUY_AGGRESSOR"),
+        _classified("unknown", "2", "UNKNOWN"),
+    )
+    return build_order_flow(trades, _policy())
+
+
 def test_repeating_ratios_ignore_ambient_decimal_rounding() -> None:
     trades = (
         _classified("buy", "1", "BUY_AGGRESSOR"),
@@ -90,7 +99,22 @@ def test_repeating_ratios_ignore_ambient_decimal_rounding() -> None:
     assert down_cvd.to_dict() == up_cvd.to_dict()
 
 
-def test_code_binding_covers_runtime_dependency_chain() -> None:
+def test_model_validation_ignores_ambient_decimal_rounding() -> None:
+    flow, _ = _repeating_ratio_flow()
+    window = flow.windows[0]
+
+    for rounding in (ROUND_DOWN, ROUND_UP):
+        with localcontext() as ambient:
+            ambient.rounding = rounding
+            replayed_window = replace(window)
+            replayed_flow = replace(flow, windows=(replayed_window,))
+        assert replayed_window.to_dict() == window.to_dict()
+        assert replayed_flow.to_dict() == flow.to_dict()
+
+
+def test_code_binding_covers_complete_runtime_package_tree() -> None:
+    assert "src/crypto_quant_bot" in CODE_BOUND_PATHS
+
     required = {
         "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py",
         "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py",
