@@ -1,0 +1,32 @@
+{
+  "audit_checksum": "8524ec5ef3aac1972a8618a21ca46d4faa19f0667952ce0a7ec45d041d9281a8",
+  "code_commit": "019f4881aabb3c83f3f4b8b7349dd387dd319eae",
+  "config_checksum": "2200905208b366f6230d76a35733fbde7338c3dc3902e3c6cc50999ba0d4fb30",
+  "cvd_checksum": "9f9bd3f9360e2f488a4b6d96a0e930b4353333e35debb3b47264793c1149979c",
+  "entry_gate_checksum": "15ca4d69e59a0898f32eb9cbe558571ecf00ae496ec5d41075da1124393d4468",
+  "lot44_audit_checksum": "03ceda1c49746509f95e7f2ed039e8cc321e8e3cb4adbb946f1aef4ed3eba07d",
+  "lot44_confidence_checksum": "7cb11e078d7f0d9ed0858229d8c6fe31a7cf653a238b280b05dbdd84d1250f05",
+  "lot44_post_merge_checksum": "b8b531b2fcb09a30728549cc480d54d9be71504356468704c102ff085c39ea9a",
+  "lot44_state_checksum": "1a461cef0bedc0e2b34185ff538a64b1b53373b12b0633b749a34cee2b3c5541",
+  "order_flow_checksum": "200585b65c124754c3e308aaf40eba2c98435ecac4f5a93815d278adcf887da0",
+  "safety": {
+    "analysis_only": true,
+    "approved_size": 0,
+    "execution_allowed": false,
+    "external_connectivity_allowed": false,
+    "market_event_publication_allowed": false,
+    "network_ingestion_allowed": false,
+    "order_routing_allowed": false,
+    "participant_behavior_inference_explicitly_labeled": true,
+    "raw_data_mutation_allowed": false,
+    "real_credentials_allowed": false,
+    "risk_approval_allowed": false,
+    "scenario_score_is_signal": false,
+    "signal_generation_allowed": false,
+    "trade_allowed": false,
+    "used_for_decision": false
+  },
+  "schema_version": "order-flow-delta-cvd-engine-audit-v1",
+  "state_output_checksum": "de46340b9c3cb9a7a72bb0e809a4e1d7ab0193300a349d4c1631bbf7c0e4d5ff",
+  "validation_state": "VALIDATED_OFFLINE_ORDER_FLOW_DELTA_CVD_ONLY"
+}

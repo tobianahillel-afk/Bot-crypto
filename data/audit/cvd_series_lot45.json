@@ -1,0 +1,15 @@
+{
+  "cvd_checksum": "9f9bd3f9360e2f488a4b6d96a0e930b4353333e35debb3b47264793c1149979c",
+  "points": [
+    {
+      "cvd": "0.05",
+      "event_time": "2026-08-06T19:18:40.000000Z",
+      "schema_version": "cvd-point-v1",
+      "session_id": "2026-08-06",
+      "signed_delta": "0.05",
+      "window_checksum": "bbe4fabcc1ec72075353552a7dfbd55d21b815de7ace991df8697b78799a3ab5"
+    }
+  ],
+  "schema_version": "cvd-series-v1",
+  "session_policy_version": "lot45-utc-day-session-v1"
+}
