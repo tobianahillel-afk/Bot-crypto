@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "order_flow_state_v1.schema.json",
+  "title": "OrderFlowStateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "windows",
+    "trades_total",
+    "buy_trades_total",
+    "sell_trades_total",
+    "unknown_trades_total",
+    "total_volume",
+    "buy_volume",
+    "sell_volume",
+    "unknown_volume",
+    "signed_delta",
+    "unknown_volume_ratio",
+    "classification_coverage",
+    "confidence_weighted_coverage",
+    "order_flow_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "order-flow-state-v1"},
+    "windows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema_version", "window_start", "window_end", "event_time", "receive_time",
+          "session_id", "trades_total", "buy_trades_total", "sell_trades_total",
+          "unknown_trades_total", "total_volume", "buy_volume", "sell_volume",
+          "unknown_volume", "signed_delta", "signed_imbalance", "classification_coverage",
+          "confidence_weighted_coverage", "delta_impulse", "window_checksum"
+        ],
+        "properties": {
+          "schema_version": {"const": "order-flow-window-v1"},
+          "window_start": {"type": "string", "pattern": "Z$"},
+          "window_end": {"type": "string", "pattern": "Z$"},
+          "event_time": {"type": "string", "pattern": "Z$"},
+          "receive_time": {"type": "string", "pattern": "Z$"},
+          "session_id": {"type": "string", "minLength": 1},
+          "trades_total": {"type": "integer", "minimum": 1},
+          "buy_trades_total": {"type": "integer", "minimum": 0},
+          "sell_trades_total": {"type": "integer", "minimum": 0},
+          "unknown_trades_total": {"type": "integer", "minimum": 0},
+          "total_volume": {"type": "string"},
+          "buy_volume": {"type": "string"},
+          "sell_volume": {"type": "string"},
+          "unknown_volume": {"type": "string"},
+          "signed_delta": {"type": "string"},
+          "signed_imbalance": {"type": "string"},
+          "classification_coverage": {"type": "string"},
+          "confidence_weighted_coverage": {"type": "string"},
+          "delta_impulse": {"type": "string"},
+          "window_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "trades_total": {"type": "integer", "minimum": 1},
+    "buy_trades_total": {"type": "integer", "minimum": 0},
+    "sell_trades_total": {"type": "integer", "minimum": 0},
+    "unknown_trades_total": {"type": "integer", "minimum": 0},
+    "total_volume": {"type": "string"},
+    "buy_volume": {"type": "string"},
+    "sell_volume": {"type": "string"},
+    "unknown_volume": {"type": "string"},
+    "signed_delta": {"type": "string"},
+    "unknown_volume_ratio": {"type": "string"},
+    "classification_coverage": {"type": "string"},
+    "confidence_weighted_coverage": {"type": "string"},
+    "order_flow_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
