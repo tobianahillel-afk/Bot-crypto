@@ -537,7 +537,7 @@ def build_order_flow(
     classified_trades: tuple[ClassifiedTradeV1, ...],
     policy: OrderFlowPolicy,
 ) -> tuple[OrderFlowStateV1, CVDSeriesV1]:
-    trades = tuple(sorted(tuple(classified_trades), key=_sort_key))
+    trades = tuple(sorted(classified_trades, key=_sort_key))
     require(bool(trades), "Lot45 requires classified trades")
     _validate_trade_identity(trades)
     groups = _group_trades(trades, policy)
