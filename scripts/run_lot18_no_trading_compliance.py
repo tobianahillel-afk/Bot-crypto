@@ -7,18 +7,22 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from crypto_quant_bot.compliance import write_json, write_jsonl, write_report
-from crypto_quant_bot.compliance import no_trading_audit
-from crypto_quant_bot.compliance.no_trading_audit import (
+from crypto_quant_bot.compliance import (  # noqa: E402
+    no_trading_audit,
+    write_json,
+    write_jsonl,
+    write_report,
+)
+from crypto_quant_bot.compliance.no_trading_audit import (  # noqa: E402
     DATASET_CATALOG_PATH,
     LOT18_CHECKS_OUTPUT_PATH,
     LOT18_OUTPUT_PATH,
     LOT18_REPORT_OUTPUT_PATH,
     FinalNoTradingComplianceAudit,
 )
-from crypto_quant_bot.contracts.dataset import DatasetMetadata
-from crypto_quant_bot.data.catalog import DatasetCatalog
-from crypto_quant_bot.data.checksum import sha256_file
+from crypto_quant_bot.contracts.dataset import DatasetMetadata  # noqa: E402
+from crypto_quant_bot.data.catalog import DatasetCatalog  # noqa: E402
+from crypto_quant_bot.data.checksum import sha256_file  # noqa: E402
 
 PAIR = "BTC/EUR"
 
