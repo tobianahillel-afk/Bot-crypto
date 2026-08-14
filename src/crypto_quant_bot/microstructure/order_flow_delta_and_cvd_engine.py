@@ -145,13 +145,12 @@ def _validate_config(config: dict[str, Any]) -> OrderFlowPolicy:
     require_text(config.get("run_id"), "run_id")
     require_text(config.get("correlation_id"), "correlation_id")
     require_text(config.get("lineage_id"), "lineage_id")
-    validate_causal_times(
-        require_text(config.get("generated_at"), "generated_at"),
-        require_text(config.get("decision_time"), "decision_time"),
-        require_text(config.get("decision_time"), "decision_time"),
-    )
+    generated_at = require_text(config.get("generated_at"), "generated_at")
+    decision_time = require_text(config.get("decision_time"), "decision_time")
+    parse_utc_timestamp(generated_at, "generated_at")
+    parse_utc_timestamp(decision_time, "decision_time")
     require(
-        config.get("generated_at") == config.get("decision_time"),
+        generated_at == decision_time,
         "Lot45 generated_at and decision_time must match",
     )
     require(
@@ -343,8 +342,19 @@ def build_order_flow(
     classified_trades: tuple[ClassifiedTradeV1, ...],
     policy: OrderFlowPolicy,
 ) -> tuple[OrderFlowStateV1, CVDSeriesV1]:
-    trades = tuple(sorted(tuple(classified_trades), key=_sort_key))
+    frozen_trades = tuple(classified_trades)
+    trades = tuple(sorted(frozen_trades, key=_sort_key))
     require(bool(trades), "Lot45 requires classified trades")
+    identities = {
+        (
+            item.trade.source_id,
+            item.trade.venue,
+            item.trade.instrument_id,
+            item.trade.market_type,
+        )
+        for item in trades
+    }
+    require(len(identities) == 1, "Lot45 trade identity must be unique")
     groups: dict[tuple[str, str], list[ClassifiedTradeV1]] = {}
     for item in trades:
         start, _ = event_window_bounds(item.trade.event_time, policy.window_size_us)
