@@ -16,12 +16,17 @@ from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_validation 
     decimal_text,
     duration_us,
     epoch_us,
+    event_window_bounds,
+    from_epoch_us,
     parse_utc_timestamp,
     require_integer,
     require_reason_codes,
+    require_sha256,
     require_text,
+    session_id_for_event,
     timestamp_text,
     validate_causal_times,
+    validate_ratio,
 )
 
 
@@ -86,3 +91,57 @@ def test_causal_and_reason_code_errors_are_fail_closed() -> None:
     with pytest.raises(Lot45ValidationError):
         require_reason_codes(())
     assert timestamp_text(datetime(2026, 8, 14, tzinfo=UTC)) == "2026-08-14T00:00:00.000000Z"
+
+
+def test_integer_sha_and_ratio_guards_cover_boundaries_exactly() -> None:
+    assert require_integer(2, "count", 2) == 2
+    with pytest.raises(Lot45ValidationError, match="must be >= 2"):
+        require_integer(1, "count", 2)
+
+    valid_sha = "a" * 64
+    assert require_sha256(valid_sha, "checksum") == valid_sha
+    for invalid_sha in ("a" * 63, "A" * 64, "g" * 64):
+        with pytest.raises(Lot45ValidationError, match="lowercase sha256"):
+            require_sha256(invalid_sha, "checksum")
+
+    validate_ratio(Decimal("0"), "ratio")
+    validate_ratio(Decimal("1"), "ratio")
+    for invalid_ratio in (Decimal("-0.0001"), Decimal("1.0001"), Decimal("NaN")):
+        with pytest.raises(Lot45ValidationError):
+            validate_ratio(invalid_ratio, "ratio")
+
+
+def test_temporal_primitives_use_exact_microsecond_arithmetic() -> None:
+    assert duration_us(
+        "2026-08-14T00:00:00.000001Z",
+        "2026-08-15T00:00:01.000003Z",
+    ) == 86_401_000_002
+
+    epoch_value = datetime(1970, 1, 2, 0, 0, 1, 2, tzinfo=UTC)
+    assert epoch_us(epoch_value) == 86_401_000_002
+    assert from_epoch_us(86_401_000_002) == epoch_value
+    with pytest.raises(Lot45ValidationError, match="must be >= 0"):
+        from_epoch_us(-1)
+
+    assert event_window_bounds(
+        "2026-08-14T00:00:00.750000Z",
+        500_000,
+    ) == (
+        "2026-08-14T00:00:00.500000Z",
+        "2026-08-14T00:00:01.000000Z",
+    )
+    with pytest.raises(Lot45ValidationError, match="must be >= 1"):
+        event_window_bounds("2026-08-14T00:00:00Z", 0)
+
+    assert session_id_for_event(
+        "2026-08-14T23:59:59.999999Z",
+        SESSION_POLICY_VERSION,
+    ) == "2026-08-14"
+    with pytest.raises(Lot45ValidationError, match="session policy version"):
+        session_id_for_event("2026-08-14T00:00:00Z", "wrong-policy")
+
+
+def test_timestamp_parser_returns_exact_utc_datetime() -> None:
+    parsed = parse_utc_timestamp("2026-08-14T12:34:56.123456Z", "timestamp")
+    assert parsed == datetime(2026, 8, 14, 12, 34, 56, 123456, tzinfo=UTC)
+    assert timestamp_text(parsed) == "2026-08-14T12:34:56.123456Z"
