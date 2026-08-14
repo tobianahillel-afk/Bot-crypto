@@ -35,7 +35,7 @@
       "properties": {
         "schema_version": {"const": "lot45-lineage-envelope-v1"},
         "lineage_id": {"type": "string", "minLength": 1},
-        "entry_gate_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "entry_gate_checksum": {"const": "15ca4d69e59a0898f32eb9cbe558571ecf00ae496ec5d41075da1124393d4468"},
         "entry_gate_merge_commit": {"const": "390d0779f2be257fa8134faf8f02193a760a09c3"},
         "lot44_state_checksum": {"const": "1a461cef0bedc0e2b34185ff538a64b1b53373b12b0633b749a34cee2b3c5541"},
         "lot44_audit_checksum": {"const": "03ceda1c49746509f95e7f2ed039e8cc321e8e3cb4adbb946f1aef4ed3eba07d"},
