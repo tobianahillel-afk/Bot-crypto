@@ -3,7 +3,7 @@ from __future__ import annotations
 import subprocess
 from dataclasses import dataclass, replace
 from datetime import datetime
-from decimal import Decimal, localcontext
+from decimal import ROUND_HALF_EVEN, Decimal, localcontext
 from pathlib import Path
 from typing import Any
 
@@ -66,11 +66,19 @@ EXPECTED_LOT44_CONFIDENCE = "7cb11e078d7f0d9ed0858229d8c6fe31a7cf653a238b280b05d
 EXPECTED_LOT44_CONFIG = "dac06cb3235f3a09cbbb9b41098d7cf2593b94171659f50ef840d1633bfa95b7"
 EXPECTED_LOT44_POST_MERGE = "b8b531b2fcb09a30728549cc480d54d9be71504356468704c102ff085c39ea9a"
 ZERO_SHA256 = "0" * 64
+CALCULATION_DECIMAL_ROUNDING = ROUND_HALF_EVEN
 
 CODE_BOUND_PATHS = (
     "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py",
     "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py",
     "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py",
+    "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py",
+    "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py",
+    "src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry.py",
+    "src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry_models.py",
+    "src/crypto_quant_bot/data_governance/source_registry_models.py",
+    "src/crypto_quant_bot/data_governance/source_registry_state.py",
+    "src/crypto_quant_bot/data_governance/source_registry_validation.py",
     "scripts/run_lot45_order_flow_delta_and_cvd_engine.py",
     "scripts/validate_lot45.py",
     "config/microstructure/order_flow_delta_and_cvd_engine_v1.json",
@@ -593,6 +601,7 @@ def build_order_flow(
     groups = _group_trades(trades, policy)
     with localcontext() as context:
         context.prec = policy.decimal_precision
+        context.rounding = CALCULATION_DECIMAL_ROUNDING
         windows = _build_windows(groups, policy)
         order_flow = _aggregate_order_flow(windows)
         require(
