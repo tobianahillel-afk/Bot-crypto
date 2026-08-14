@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import subprocess
 from decimal import Decimal
 from pathlib import Path
 
@@ -31,17 +30,7 @@ from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_
 ROOT = Path(__file__).resolve().parents[1]
 ZERO_SHA256 = "0" * 64
 QUOTE_SHA256 = "1" * 64
-
-
-def _head_sha() -> str:
-    completed = subprocess.run(
-        ["git", "rev-parse", "HEAD"],
-        cwd=ROOT,
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    return completed.stdout.strip()
+REFERENCE_CODE_TREE_SHA = "9e683aaea1b69b2397e90452853393c29f2da499"
 
 
 def _policy(*, unknown_ratio: str = "1") -> OrderFlowPolicy:
@@ -101,7 +90,7 @@ def _classified(
 
 
 def test_reference_frozen_lot44_builds_expected_order_flow() -> None:
-    state, audit, order_flow, cvd = build_lot45_artifacts(ROOT, _head_sha())
+    state, audit, order_flow, cvd = build_lot45_artifacts(ROOT, REFERENCE_CODE_TREE_SHA)
 
     assert state["validation_state"] == "VALIDATED_OFFLINE_ORDER_FLOW_DELTA_CVD_ONLY"
     assert order_flow["trades_total"] == 3
