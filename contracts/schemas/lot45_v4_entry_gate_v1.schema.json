@@ -50,10 +50,68 @@
         "title": {"const": "Order Flow, Delta & CVD Engine"}
       }
     },
-    "input_contracts": {"type": "array", "minItems": 2, "uniqueItems": true, "items": {"type": "string"}},
-    "output_contracts": {"type": "array", "minItems": 4, "uniqueItems": true, "items": {"type": "string"}},
-    "safety": {"type": "object"},
-    "quality": {"type": "object"},
+    "input_contracts": {
+      "const": [
+        "RunContextV1 (run_id, runtime_mode, config_version, code_commit, correlation_id)",
+        "LineageEnvelopeV1 des artefacts produits par les lots préalables"
+      ]
+    },
+    "output_contracts": {
+      "const": [
+        "OrderFlowDeltaCVDEngineStateV1",
+        "OrderFlowDeltaCVDEngineAuditV1",
+        "OrderFlowStateV1",
+        "CVDSeriesV1"
+      ]
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "analysis_only",
+        "trade_allowed",
+        "execution_allowed",
+        "approved_size",
+        "signal_generation_allowed",
+        "risk_approval_allowed",
+        "order_routing_allowed",
+        "external_connectivity_allowed",
+        "network_ingestion_allowed",
+        "real_credentials_allowed",
+        "participant_behavior_inference_explicitly_labeled",
+        "scenario_score_is_signal"
+      ],
+      "properties": {
+        "analysis_only": {"const": true},
+        "trade_allowed": {"const": false},
+        "execution_allowed": {"const": false},
+        "approved_size": {"const": 0},
+        "signal_generation_allowed": {"const": false},
+        "risk_approval_allowed": {"const": false},
+        "order_routing_allowed": {"const": false},
+        "external_connectivity_allowed": {"const": false},
+        "network_ingestion_allowed": {"const": false},
+        "real_credentials_allowed": {"const": false},
+        "participant_behavior_inference_explicitly_labeled": {"const": true},
+        "scenario_score_is_signal": {"const": false}
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "line_coverage_min_percent",
+        "branch_coverage_min_percent",
+        "mutation_score_min_percent",
+        "anti_flake_repetitions"
+      ],
+      "properties": {
+        "line_coverage_min_percent": {"const": 95},
+        "branch_coverage_min_percent": {"const": 90},
+        "mutation_score_min_percent": {"const": 80},
+        "anti_flake_repetitions": {"const": 3}
+      }
+    },
     "next_lot": {"const": 46},
     "next_lot_status": {"const": "PLANNED_LOCKED"},
     "gate_checksum": {"const": "15ca4d69e59a0898f32eb9cbe558571ecf00ae496ec5d41075da1124393d4468"}
