@@ -1,8 +1,8 @@
-name: Lot 44 V4 implementation entry gate
+name: Lot 44 V4 implementation entry gate (archived)
 
+# Archived after GO_LOT44_POST_MERGE. Retained for explicit historical replay only;
+# it must not block authorized Lot 45 implementation pull requests.
 on:
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

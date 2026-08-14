@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lot45_v4_entry_gate_v1.schema.json",
+  "title": "Lot 45 V4 implementation entry gate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "target_lot",
+    "base_commit",
+    "post_merge_audit_pr_head",
+    "post_merge_audit_merge",
+    "post_merge_verdict",
+    "post_merge_checksum",
+    "current_version",
+    "gate_status",
+    "runtime_mode",
+    "responsible_component",
+    "package_boundary",
+    "canonical_roadmap",
+    "input_contracts",
+    "output_contracts",
+    "safety",
+    "quality",
+    "next_lot",
+    "next_lot_status",
+    "gate_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "lot45-v4-entry-gate-v1"},
+    "target_lot": {"const": 45},
+    "base_commit": {"const": "1fd85f26102f94d4c42a8f515b522c23028bac89"},
+    "post_merge_audit_pr_head": {"const": "0ddf2c3150b339b8573fead8c942c4b1efa4b300"},
+    "post_merge_audit_merge": {"const": "1fd85f26102f94d4c42a8f515b522c23028bac89"},
+    "post_merge_verdict": {"const": "GO_LOT44_POST_MERGE"},
+    "post_merge_checksum": {"const": "b8b531b2fcb09a30728549cc480d54d9be71504356468704c102ff085c39ea9a"},
+    "current_version": {"const": "0.44.0"},
+    "gate_status": {"const": "GO_LOT45_IMPLEMENTATION_ENTRY"},
+    "runtime_mode": {"const": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY"},
+    "responsible_component": {"const": "MicrostructureDomain"},
+    "package_boundary": {"const": "src/crypto_quant_bot/microstructure"},
+    "canonical_roadmap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_line", "source_blob_sha", "lot_id", "title"],
+      "properties": {
+        "source_line": {"const": 46},
+        "source_blob_sha": {"const": "84de51bda788a8d124fb7d344419c4a4b12030b5"},
+        "lot_id": {"const": "Lot 45"},
+        "title": {"const": "Order Flow, Delta & CVD Engine"}
+      }
+    },
+    "input_contracts": {
+      "const": [
+        "RunContextV1 (run_id, runtime_mode, config_version, code_commit, correlation_id)",
+        "LineageEnvelopeV1 des artefacts produits par les lots préalables"
+      ]
+    },
+    "output_contracts": {
+      "const": [
+        "OrderFlowDeltaCVDEngineStateV1",
+        "OrderFlowDeltaCVDEngineAuditV1",
+        "OrderFlowStateV1",
+        "CVDSeriesV1"
+      ]
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "analysis_only",
+        "trade_allowed",
+        "execution_allowed",
+        "approved_size",
+        "signal_generation_allowed",
+        "risk_approval_allowed",
+        "order_routing_allowed",
+        "external_connectivity_allowed",
+        "network_ingestion_allowed",
+        "real_credentials_allowed",
+        "participant_behavior_inference_explicitly_labeled",
+        "scenario_score_is_signal"
+      ],
+      "properties": {
+        "analysis_only": {"const": true},
+        "trade_allowed": {"const": false},
+        "execution_allowed": {"const": false},
+        "approved_size": {"const": 0},
+        "signal_generation_allowed": {"const": false},
+        "risk_approval_allowed": {"const": false},
+        "order_routing_allowed": {"const": false},
+        "external_connectivity_allowed": {"const": false},
+        "network_ingestion_allowed": {"const": false},
+        "real_credentials_allowed": {"const": false},
+        "participant_behavior_inference_explicitly_labeled": {"const": true},
+        "scenario_score_is_signal": {"const": false}
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "line_coverage_min_percent",
+        "branch_coverage_min_percent",
+        "mutation_score_min_percent",
+        "anti_flake_repetitions"
+      ],
+      "properties": {
+        "line_coverage_min_percent": {"const": 95},
+        "branch_coverage_min_percent": {"const": 90},
+        "mutation_score_min_percent": {"const": 80},
+        "anti_flake_repetitions": {"const": 3}
+      }
+    },
+    "next_lot": {"const": 46},
+    "next_lot_status": {"const": "PLANNED_LOCKED"},
+    "gate_checksum": {"const": "15ca4d69e59a0898f32eb9cbe558571ecf00ae496ec5d41075da1124393d4468"}
+  }
+}
