@@ -13,16 +13,7 @@ on:
       - 'contracts/schemas/order_flow_delta_cvd_engine_audit_v1.schema.json'
       - 'contracts/schemas/order_flow_state_v1.schema.json'
       - 'contracts/schemas/cvd_series_v1.schema.json'
-      - 'src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py'
-      - 'src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py'
-      - 'src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py'
-      - 'src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py'
-      - 'src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py'
-      - 'src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry.py'
-      - 'src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry_models.py'
-      - 'src/crypto_quant_bot/data_governance/source_registry_models.py'
-      - 'src/crypto_quant_bot/data_governance/source_registry_state.py'
-      - 'src/crypto_quant_bot/data_governance/source_registry_validation.py'
+      - 'src/crypto_quant_bot/**'
       - 'scripts/run_lot45_order_flow_delta_and_cvd_engine.py'
       - 'scripts/validate_lot45.py'
       - 'scripts/validate_lot45_frozen_evidence.py'
@@ -32,6 +23,8 @@ on:
       - 'docs/ACCEPTANCE_CRITERIA_LOT_45.md'
       - 'reports/lot_45_order_flow_delta_and_cvd_engine_report.md'
       - 'data/audit/lot45_v4_entry_gate.json'
+      - 'data/audit/order_flow_delta_and_cvd_engine_lot45.json'
+      - 'data/audit/order_flow_delta_and_cvd_engine_audit_lot45.json'
       - 'data/audit/order_flow_delta_cvd_engine_lot45.json'
       - 'data/audit/order_flow_delta_cvd_engine_audit_lot45.json'
       - 'data/audit/order_flow_state_lot45.json'
@@ -49,10 +42,10 @@ jobs:
     env:
       PYTHONPATH: src
       GATE_MERGE_SHA: 390d0779f2be257fa8134faf8f02193a760a09c3
-      SOURCE_HEAD_SHA: 97dec45b4c9e7b54a3c701a2634720748a0f9dbf
-      CERTIFICATION_ANCHOR_SHA: 92a6a6a8b8063a6768fd5682e0c66663ccc89d89
-      EVIDENCE_HEAD_SHA: 20f8cfab4492ea8b9634e8f4ab94c1190ef152ca
-      VALIDATOR_HEAD_SHA: 7ba4fd9214cef1ed9d4432b352faac6ac0e6c657
+      SOURCE_HEAD_SHA: 8558ae4a2e620a0967e01067b3446be35cb2354d
+      CERTIFICATION_ANCHOR_SHA: cbf1027d0db605b26426313eb5fe28e07a25ab6d
+      EVIDENCE_HEAD_SHA: 3f2240cd93b6a7d37e666dde3a4d41d1ee3fb1e1
+      VALIDATOR_HEAD_SHA: 789f744108c8ad42a2329abff738e25902d86f6f
     steps:
       - uses: actions/checkout@v4
         with:
@@ -83,8 +76,10 @@ jobs:
           diff -u /tmp/cert-expected.txt /tmp/cert.txt
 
           test "$(git rev-list --count "$CERTIFICATION_ANCHOR_SHA..$EVIDENCE_HEAD_SHA")" = "1"
-          git diff --name-only "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA" | sort > /tmp/evidence.txt
+          git diff --no-renames --name-only "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA" | sort > /tmp/evidence.txt
           printf '%s\n' \
+            data/audit/order_flow_delta_and_cvd_engine_audit_lot45.json \
+            data/audit/order_flow_delta_and_cvd_engine_lot45.json \
             data/audit/order_flow_delta_cvd_engine_audit_lot45.json \
             data/audit/order_flow_delta_cvd_engine_lot45.json \
             reports/lot45/coverage_summary.json \
@@ -93,6 +88,10 @@ jobs:
           git diff --quiet "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA" -- \
             data/audit/cvd_series_lot45.json \
             data/audit/order_flow_state_lot45.json
+          test ! -e data/audit/order_flow_delta_cvd_engine_lot45.json
+          test ! -e data/audit/order_flow_delta_cvd_engine_audit_lot45.json
+          test -f data/audit/order_flow_delta_and_cvd_engine_lot45.json
+          test -f data/audit/order_flow_delta_and_cvd_engine_audit_lot45.json
 
           test "$(git rev-list --count "$EVIDENCE_HEAD_SHA..$VALIDATOR_HEAD_SHA")" = "1"
           git diff --name-only "$EVIDENCE_HEAD_SHA" "$VALIDATOR_HEAD_SHA" > /tmp/validator.txt
@@ -102,24 +101,14 @@ jobs:
         run: |
           set -euo pipefail
           git diff --quiet "$SOURCE_HEAD_SHA" HEAD -- \
-            .github/workflows/lot44-frozen-evidence.yml \
+            src/crypto_quant_bot \
+            scripts/run_lot45_order_flow_delta_and_cvd_engine.py \
+            scripts/validate_lot45.py \
             config/microstructure/order_flow_delta_and_cvd_engine_v1.json \
             contracts/schemas/order_flow_delta_cvd_engine_state_v1.schema.json \
             contracts/schemas/order_flow_delta_cvd_engine_audit_v1.schema.json \
             contracts/schemas/order_flow_state_v1.schema.json \
             contracts/schemas/cvd_series_v1.schema.json \
-            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py \
-            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py \
-            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py \
-            src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py \
-            src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py \
-            src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry.py \
-            src/crypto_quant_bot/data_governance/market_data_governance_scope_and_source_registry_models.py \
-            src/crypto_quant_bot/data_governance/source_registry_models.py \
-            src/crypto_quant_bot/data_governance/source_registry_state.py \
-            src/crypto_quant_bot/data_governance/source_registry_validation.py \
-            scripts/run_lot45_order_flow_delta_and_cvd_engine.py \
-            scripts/validate_lot45.py \
             tests/test_lot44_v4_entry_gate.py \
             tests/test_lot45_order_flow_delta_and_cvd_engine.py \
             tests/test_lot45_policy_contract.py \
@@ -133,17 +122,20 @@ jobs:
             data/audit/trades_and_aggressor_classification_schema_audit_lot44.json \
             data/audit/aggressor_confidence_state_lot44.json \
             config/microstructure/trades_and_aggressor_classification_schema_v1.json \
+            .github/workflows/lot44-frozen-evidence.yml \
             requirements-dev.lock
           git diff --quiet "$CERTIFICATION_ANCHOR_SHA" HEAD -- \
             .github/workflows/lot45-order-flow-delta-cvd.yml \
             .github/workflows/lot45-mutation-assurance.yml
           git diff --quiet "$EVIDENCE_HEAD_SHA" HEAD -- \
             data/audit/cvd_series_lot45.json \
-            data/audit/order_flow_delta_cvd_engine_audit_lot45.json \
-            data/audit/order_flow_delta_cvd_engine_lot45.json \
+            data/audit/order_flow_delta_and_cvd_engine_audit_lot45.json \
+            data/audit/order_flow_delta_and_cvd_engine_lot45.json \
             data/audit/order_flow_state_lot45.json \
             reports/lot45/coverage_summary.json \
             reports/lot45/mutation_summary.json
+          test ! -e data/audit/order_flow_delta_cvd_engine_lot45.json
+          test ! -e data/audit/order_flow_delta_cvd_engine_audit_lot45.json
           git diff --quiet "$VALIDATOR_HEAD_SHA" HEAD -- scripts/validate_lot45_frozen_evidence.py
       - name: Validate frozen Lot 45 evidence
         run: |
@@ -154,24 +146,31 @@ jobs:
       - name: Replay certified source byte-identically
         run: |
           set -euo pipefail
-          rm -rf /tmp/lot45-source /tmp/lot45-expected /tmp/lot45-run1 /tmp/lot45-run2
-          mkdir -p /tmp/lot45-expected /tmp/lot45-run1 /tmp/lot45-run2
-          cp data/audit/order_flow_delta_cvd_engine_lot45.json /tmp/lot45-expected/
-          cp data/audit/order_flow_delta_cvd_engine_audit_lot45.json /tmp/lot45-expected/
+          rm -rf /tmp/lot45-source /tmp/lot45-expected /tmp/lot45-run1
+          mkdir -p /tmp/lot45-expected /tmp/lot45-run1
+          cp data/audit/order_flow_delta_and_cvd_engine_lot45.json /tmp/lot45-expected/
+          cp data/audit/order_flow_delta_and_cvd_engine_audit_lot45.json /tmp/lot45-expected/
           cp data/audit/order_flow_state_lot45.json /tmp/lot45-expected/
           cp data/audit/cvd_series_lot45.json /tmp/lot45-expected/
           git worktree add --detach /tmp/lot45-source "$SOURCE_HEAD_SHA"
           trap 'git worktree remove --force /tmp/lot45-source >/dev/null 2>&1 || true' EXIT
           (
             cd /tmp/lot45-source
-            PYTHONPATH=src python scripts/validate_lot45.py \
-              --code-commit "$SOURCE_HEAD_SHA" --output-dir /tmp/lot45-run1
-            for path in /tmp/lot45-run1/*.json; do
+            outputs=(
+              data/audit/order_flow_delta_and_cvd_engine_lot45.json
+              data/audit/order_flow_delta_and_cvd_engine_audit_lot45.json
+              data/audit/order_flow_state_lot45.json
+              data/audit/cvd_series_lot45.json
+            )
+            PYTHONPATH=src python scripts/run_lot45_order_flow_delta_and_cvd_engine.py --code-commit "$SOURCE_HEAD_SHA"
+            PYTHONPATH=src python scripts/validate_lot45.py --code-commit "$SOURCE_HEAD_SHA"
+            for path in "${outputs[@]}"; do
               cmp "$path" "/tmp/lot45-expected/$(basename "$path")"
+              cp "$path" "/tmp/lot45-run1/$(basename "$path")"
             done
-            PYTHONPATH=src python scripts/validate_lot45.py \
-              --code-commit "$SOURCE_HEAD_SHA" --output-dir /tmp/lot45-run2
-            for path in /tmp/lot45-run2/*.json; do
+            PYTHONPATH=src python scripts/run_lot45_order_flow_delta_and_cvd_engine.py --code-commit "$SOURCE_HEAD_SHA"
+            PYTHONPATH=src python scripts/validate_lot45.py --code-commit "$SOURCE_HEAD_SHA"
+            for path in "${outputs[@]}"; do
               cmp "$path" "/tmp/lot45-run1/$(basename "$path")"
             done
             PYTHONPATH=src pytest -q \
