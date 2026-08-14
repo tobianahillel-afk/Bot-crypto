@@ -5,11 +5,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
-from .trades_and_aggressor_classification_schema_validation import (
-    decimal_text as _lot44_decimal_text,
-    require_reason_codes as _lot44_require_reason_codes,
-    validate_causal_times as _lot44_validate_causal_times,
-)
+from . import trades_and_aggressor_classification_schema_validation as lot44_validation
 
 RUNTIME_MODE = "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY"
 CONFIG_VERSION = "lot45-order-flow-delta-cvd-config-v1"
@@ -81,7 +77,7 @@ def decimal_from_text(
 
 def decimal_text(value: Decimal) -> str:
     try:
-        return _lot44_decimal_text(value)
+        return lot44_validation.decimal_text(value)
     except RuntimeError as exc:
         raise Lot45ValidationError(str(exc)) from exc
 
@@ -104,7 +100,7 @@ def timestamp_text(value: datetime) -> str:
 
 def validate_causal_times(event_time: str, receive_time: str, generated_at: str) -> None:
     try:
-        _lot44_validate_causal_times(event_time, receive_time, generated_at)
+        lot44_validation.validate_causal_times(event_time, receive_time, generated_at)
     except RuntimeError as exc:
         raise Lot45ValidationError(str(exc)) from exc
 
@@ -153,7 +149,7 @@ def validate_ratio(value: Decimal, field: str) -> None:
 
 def require_reason_codes(value: tuple[str, ...]) -> None:
     try:
-        _lot44_require_reason_codes(value)
+        lot44_validation.require_reason_codes(value)
     except RuntimeError as exc:
         raise Lot45ValidationError(str(exc)) from exc
 
