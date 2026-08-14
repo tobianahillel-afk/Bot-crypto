@@ -20,8 +20,8 @@
           "event_time": {"type": "string", "pattern": "Z$"},
           "session_id": {"type": "string", "minLength": 1},
           "window_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-          "signed_delta": {"type": "string"},
-          "cvd": {"type": "string"}
+          "signed_delta": {"type": "string", "pattern": "^(?:0|-?[1-9][0-9]*(?:\\.[0-9]*[1-9])?|-?0\\.[0-9]*[1-9])$"},
+          "cvd": {"type": "string", "pattern": "^(?:0|-?[1-9][0-9]*(?:\\.[0-9]*[1-9])?|-?0\\.[0-9]*[1-9])$"}
         }
       }
     },
