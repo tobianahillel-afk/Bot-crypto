@@ -1,0 +1,21 @@
+{
+  "schema_version": "lot45-order-flow-delta-cvd-config-v1",
+  "config_version": "lot45-order-flow-delta-cvd-config-v1",
+  "policy_version": "lot45-order-flow-delta-cvd-policy-v1",
+  "window_policy_version": "lot45-event-time-tumbling-v1",
+  "session_policy_version": "lot45-utc-day-session-v1",
+  "run_id": "lot45-reference-run-v1",
+  "correlation_id": "microstructure-v4-lot45-reference",
+  "lineage_id": "lot45-from-certified-lot44-order-flow-inputs-v1",
+  "generated_at": "2026-08-06T19:18:41.100000Z",
+  "decision_time": "2026-08-06T19:18:41.100000Z",
+  "calculation_decimal_precision": 50,
+  "window_size_us": 1000000,
+  "max_input_age_us": 2000000,
+  "max_unknown_volume_ratio": "0.5",
+  "entry_gate_path": "data/audit/lot45_v4_entry_gate.json",
+  "entry_gate_merge_commit": "390d0779f2be257fa8134faf8f02193a760a09c3",
+  "lot44_state_path": "data/audit/trades_and_aggressor_classification_schema_lot44.json",
+  "lot44_audit_path": "data/audit/trades_and_aggressor_classification_schema_audit_lot44.json",
+  "lot44_config_path": "config/microstructure/trades_and_aggressor_classification_schema_v1.json"
+}
