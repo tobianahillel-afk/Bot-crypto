@@ -1,0 +1,205 @@
+name: Lot 45 order flow delta CVD validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine*.py'
+      - 'scripts/run_lot45_order_flow_delta_and_cvd_engine.py'
+      - 'scripts/validate_lot45.py'
+      - 'tests/test_lot45*.py'
+      - 'tests/test_lot44_v4_entry_gate.py'
+      - 'config/microstructure/order_flow_delta_and_cvd_engine_v1.json'
+      - 'contracts/schemas/order_flow_delta_cvd_engine_state_v1.schema.json'
+      - 'contracts/schemas/order_flow_delta_cvd_engine_audit_v1.schema.json'
+      - 'contracts/schemas/order_flow_state_v1.schema.json'
+      - 'contracts/schemas/cvd_series_v1.schema.json'
+      - 'docs/LOT_45_ORDER_FLOW_DELTA_AND_CVD_ENGINE.md'
+      - 'docs/ACCEPTANCE_CRITERIA_LOT_45.md'
+      - 'reports/lot_45_order_flow_delta_and_cvd_engine_report.md'
+      - '.github/workflows/lot45-order-flow-delta-cvd.yml'
+      - 'requirements-dev.lock'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lot45:
+    runs-on: ubuntu-22.04
+    env:
+      PYTHONPATH: src
+      PYTHONHASHSEED: '0'
+      GATE_MERGE_SHA: 390d0779f2be257fa8134faf8f02193a760a09c3
+      SOURCE_HEAD_SHA: 9eb63ae1b948842523eeaa723f802e0b919cb475
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: 9eb63ae1b948842523eeaa723f802e0b919cb475
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+          cache: pip
+      - name: Install locked toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.lock
+      - name: Prove exact source gate ancestry and Lot 46 lock
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_HEAD_SHA"
+          git merge-base --is-ancestor "$GATE_MERGE_SHA" "$SOURCE_HEAD_SHA"
+          test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine.py
+          test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine_models.py
+          test ! -e scripts/run_lot46_trade_classification_confidence_engine.py
+          test ! -e scripts/validate_lot46.py
+          test ! -e tests/test_lot46_trade_classification_confidence_engine.py
+          test ! -e data/audit/trade_classification_confidence_engine_lot46.json
+          test ! -e reports/lot_46_trade_classification_confidence_engine_report.md
+          test ! -e docs/LOT_46_TRADE_CLASSIFICATION_CONFIDENCE_ENGINE.md
+          test ! -e docs/ACCEPTANCE_CRITERIA_LOT_46.md
+      - name: Compile lint type schemas and no-connectivity checks
+        run: |
+          set -euo pipefail
+          mkdir -p reports/lot45
+          {
+            python -m compileall -q src scripts tests
+            for path in \
+              config/microstructure/order_flow_delta_and_cvd_engine_v1.json \
+              contracts/schemas/order_flow_delta_cvd_engine_state_v1.schema.json \
+              contracts/schemas/order_flow_delta_cvd_engine_audit_v1.schema.json \
+              contracts/schemas/order_flow_state_v1.schema.json \
+              contracts/schemas/cvd_series_v1.schema.json; do
+              python -m json.tool "$path" >/dev/null
+            done
+            ruff check \
+              src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py \
+              src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py \
+              src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py \
+              scripts/run_lot45_order_flow_delta_and_cvd_engine.py \
+              scripts/validate_lot45.py \
+              tests/test_lot45_order_flow_delta_and_cvd_engine.py \
+              tests/test_lot45_policy_contract.py \
+              tests/test_lot45_schema_contracts.py
+            mypy src/crypto_quant_bot/microstructure
+            python - <<'PY'
+            import ast
+            from pathlib import Path
+
+            paths = [
+                Path('src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py'),
+                Path('src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py'),
+                Path('src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py'),
+                Path('scripts/run_lot45_order_flow_delta_and_cvd_engine.py'),
+                Path('scripts/validate_lot45.py'),
+            ]
+            forbidden_modules = {'requests', 'httpx', 'aiohttp', 'socket', 'websocket', 'websockets', 'urllib.request'}
+            forbidden_literals = ('http://', 'https://', 'ws://', 'wss://')
+            violations = []
+            for path in paths:
+                text = path.read_text(encoding='utf-8')
+                tree = ast.parse(text, filename=str(path))
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.Import):
+                        for alias in node.names:
+                            if alias.name in forbidden_modules or any(alias.name.startswith(m + '.') for m in forbidden_modules):
+                                violations.append(f'{path}: import {alias.name}')
+                    elif isinstance(node, ast.ImportFrom):
+                        module = node.module or ''
+                        if module in forbidden_modules or any(module.startswith(m + '.') for m in forbidden_modules):
+                            violations.append(f'{path}: from {module} import ...')
+                    elif isinstance(node, ast.Constant) and isinstance(node.value, str):
+                        if any(marker in node.value.lower() for marker in forbidden_literals):
+                            violations.append(f'{path}: network URL literal')
+            if violations:
+                raise SystemExit('LOT45_EXTERNAL_CONNECTIVITY_FORBIDDEN\n' + '\n'.join(violations))
+            print('LOT45_NO_CONNECTIVITY: PASS')
+            PY
+          } 2>&1 | tee reports/lot45/static_checks.txt
+      - name: Targeted line and branch coverage
+        run: |
+          set -euo pipefail
+          coverage erase
+          pytest -q \
+            tests/test_lot45_order_flow_delta_and_cvd_engine.py \
+            tests/test_lot45_policy_contract.py \
+            tests/test_lot45_schema_contracts.py \
+            --cov=crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine \
+            --cov=crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_models \
+            --cov=crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_validation \
+            --cov-branch --cov-report=json:reports/lot45/coverage.json --cov-report=term-missing \
+            2>&1 | tee reports/lot45/targeted_coverage.txt
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          totals = json.loads(Path('reports/lot45/coverage.json').read_text(encoding='utf-8'))['totals']
+          lines = float(totals['percent_statements_covered'])
+          branches = float(totals['percent_branches_covered'])
+          result = {
+              'schema_version': 'lot45-coverage-summary-v1',
+              'status': 'PASS' if lines >= 95.0 and branches >= 90.0 else 'FAIL',
+              'source_head_sha': os.environ['SOURCE_HEAD_SHA'],
+              'line_coverage_percent': round(lines, 2),
+              'branch_coverage_percent': round(branches, 2),
+              'line_coverage_min_percent': 95.0,
+              'branch_coverage_min_percent': 90.0,
+              'anti_flake_repetitions': 3,
+          }
+          Path('reports/lot45/coverage_summary.json').write_text(
+              json.dumps(result, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+          )
+          print(json.dumps(result, sort_keys=True))
+          if result['status'] != 'PASS':
+              raise SystemExit('LOT45_CRITICAL_COVERAGE_BELOW_THRESHOLD')
+          PY
+      - name: Validate and replay deterministic Lot 45 evidence
+        run: |
+          set -euo pipefail
+          rm -rf reports/lot45/generated /tmp/lot45-run1
+          mkdir -p reports/lot45/generated /tmp/lot45-run1
+          python scripts/validate_lot45.py --code-commit "$SOURCE_HEAD_SHA" --output-dir reports/lot45/generated \
+            | tee reports/lot45/validation_result_run1.json
+          cp reports/lot45/generated/*.json /tmp/lot45-run1/
+          python scripts/validate_lot45.py --code-commit "$SOURCE_HEAD_SHA" --output-dir reports/lot45/generated \
+            | tee reports/lot45/validation_result_run2.json
+          cmp reports/lot45/validation_result_run1.json reports/lot45/validation_result_run2.json
+          for path in reports/lot45/generated/*.json; do
+            cmp "/tmp/lot45-run1/$(basename "$path")" "$path"
+          done
+      - name: Architecture roadmap traceability engineering and safety
+        run: |
+          set -euo pipefail
+          python scripts/validate_roadmap_documentation.py
+          python scripts/validate_architecture_boundaries.py
+          python scripts/validate_domain_architecture.py
+          python scripts/audit_roadmap_semantics.py
+          python scripts/validate_traceability_contract.py
+          python scripts/check_no_silent_numeric_coercion.py
+          python scripts/quality_inventory.py
+          python scripts/validate_engineering_deviations.py
+      - name: Security dependency full regression and anti-flake
+        run: |
+          set -euo pipefail
+          bandit -q -r \
+            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py \
+            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py \
+            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py \
+            scripts/run_lot45_order_flow_delta_and_cvd_engine.py \
+            scripts/validate_lot45.py -ll
+          pip-audit -r requirements-dev.lock
+          pytest -q
+          for repetition in 1 2 3; do
+            pytest -q \
+              tests/test_lot45_order_flow_delta_and_cvd_engine.py \
+              tests/test_lot45_policy_contract.py \
+              tests/test_lot45_schema_contracts.py
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lot45-order-flow-delta-cvd-evidence
+          path: |
+            reports/lot45/
