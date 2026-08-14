@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "order_flow_delta_cvd_engine_state_v1.schema.json",
+  "title": "OrderFlowDeltaCVDEngineStateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "run_context", "lineage", "event_time", "receive_time", "generated_at",
+    "validation_state", "policy_version", "window_policy_version", "session_policy_version",
+    "order_flow", "cvd_series", "reason_codes", "safety", "output_checksum"
+  ],
+  "properties": {
+    "schema_version": {"const": "order-flow-delta-cvd-engine-state-v1"},
+    "run_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "run_id", "runtime_mode", "config_version", "code_commit", "correlation_id"],
+      "properties": {
+        "schema_version": {"const": "lot45-run-context-v1"},
+        "run_id": {"type": "string", "minLength": 1},
+        "runtime_mode": {"const": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY"},
+        "config_version": {"const": "lot45-order-flow-delta-cvd-config-v1"},
+        "code_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "correlation_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version", "lineage_id", "entry_gate_checksum", "entry_gate_merge_commit",
+        "lot44_state_checksum", "lot44_audit_checksum", "lot44_confidence_checksum",
+        "lot44_config_checksum", "lot44_post_merge_checksum", "available_at"
+      ],
+      "properties": {
+        "schema_version": {"const": "lot45-lineage-envelope-v1"},
+        "lineage_id": {"type": "string", "minLength": 1},
+        "entry_gate_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "entry_gate_merge_commit": {"const": "390d0779f2be257fa8134faf8f02193a760a09c3"},
+        "lot44_state_checksum": {"const": "1a461cef0bedc0e2b34185ff538a64b1b53373b12b0633b749a34cee2b3c5541"},
+        "lot44_audit_checksum": {"const": "03ceda1c49746509f95e7f2ed039e8cc321e8e3cb4adbb946f1aef4ed3eba07d"},
+        "lot44_confidence_checksum": {"const": "7cb11e078d7f0d9ed0858229d8c6fe31a7cf653a238b280b05dbdd84d1250f05"},
+        "lot44_config_checksum": {"const": "dac06cb3235f3a09cbbb9b41098d7cf2593b94171659f50ef840d1633bfa95b7"},
+        "lot44_post_merge_checksum": {"const": "b8b531b2fcb09a30728549cc480d54d9be71504356468704c102ff085c39ea9a"},
+        "available_at": {"type": "string", "pattern": "Z$"}
+      }
+    },
+    "event_time": {"type": "string", "pattern": "Z$"},
+    "receive_time": {"type": "string", "pattern": "Z$"},
+    "generated_at": {"type": "string", "pattern": "Z$"},
+    "validation_state": {"const": "VALIDATED_OFFLINE_ORDER_FLOW_DELTA_CVD_ONLY"},
+    "policy_version": {"const": "lot45-order-flow-delta-cvd-policy-v1"},
+    "window_policy_version": {"const": "lot45-event-time-tumbling-v1"},
+    "session_policy_version": {"const": "lot45-utc-day-session-v1"},
+    "order_flow": {"$ref": "order_flow_state_v1.schema.json"},
+    "cvd_series": {"$ref": "cvd_series_v1.schema.json"},
+    "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "analysis_only", "approved_size", "execution_allowed", "external_connectivity_allowed",
+        "market_event_publication_allowed", "network_ingestion_allowed", "order_routing_allowed",
+        "participant_behavior_inference_explicitly_labeled", "raw_data_mutation_allowed",
+        "real_credentials_allowed", "risk_approval_allowed", "scenario_score_is_signal",
+        "signal_generation_allowed", "trade_allowed", "used_for_decision"
+      ],
+      "properties": {
+        "analysis_only": {"const": true},
+        "approved_size": {"const": 0},
+        "execution_allowed": {"const": false},
+        "external_connectivity_allowed": {"const": false},
+        "market_event_publication_allowed": {"const": false},
+        "network_ingestion_allowed": {"const": false},
+        "order_routing_allowed": {"const": false},
+        "participant_behavior_inference_explicitly_labeled": {"const": true},
+        "raw_data_mutation_allowed": {"const": false},
+        "real_credentials_allowed": {"const": false},
+        "risk_approval_allowed": {"const": false},
+        "scenario_score_is_signal": {"const": false},
+        "signal_generation_allowed": {"const": false},
+        "trade_allowed": {"const": false},
+        "used_for_decision": {"const": false}
+      }
+    },
+    "output_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
