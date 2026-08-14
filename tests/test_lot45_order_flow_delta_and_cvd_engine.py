@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
@@ -282,3 +283,81 @@ def test_repeating_ratios_use_deterministic_precision() -> None:
     second, _ = build_order_flow(tuple(reversed(trades)), _policy())
     assert first.classification_coverage == second.classification_coverage
     assert first.to_dict() == second.to_dict()
+
+
+def test_window_model_rejects_every_derived_invariant_drift() -> None:
+    trades = (
+        _classified("buy", "2026-08-06T19:18:40.100000Z", "2026-08-06T19:18:40.110000Z", "1", "BUY_AGGRESSOR"),
+        _classified("unknown", "2026-08-06T19:18:40.200000Z", "2026-08-06T19:18:40.210000Z", "1", "UNKNOWN"),
+    )
+    flow, _ = build_order_flow(trades, _policy())
+    window = flow.windows[0]
+
+    cases = (
+        ({"window_start": window.window_end}, "window_start must precede"),
+        ({"event_time": window.window_end}, "inside event-time window"),
+        ({"receive_time": "2026-08-06T19:18:40.050000Z"}, "precedes event_time"),
+        ({"session_id": ""}, "non-empty text"),
+        ({"trades_total": 0}, "cannot be empty"),
+        ({"buy_trades_total": window.buy_trades_total + 1}, "trade count conservation"),
+        ({"total_volume": Decimal("-1")}, "finite non-negative"),
+        ({"total_volume": window.total_volume + Decimal("1")}, "volume conservation"),
+        ({"signed_delta": window.signed_delta + Decimal("1")}, "buy minus sell"),
+        ({"signed_imbalance": window.signed_imbalance + Decimal("0.1")}, "signed imbalance mismatch"),
+        ({"classification_coverage": window.classification_coverage + Decimal("0.1")}, "classification coverage mismatch"),
+        ({"confidence_weighted_coverage": Decimal("0.75")}, "weighted confidence"),
+        ({"delta_impulse": Decimal("NaN")}, "delta impulse must be finite"),
+    )
+    for changes, message in cases:
+        with pytest.raises(Lot45ValidationError, match=message):
+            replace(window, **changes)
+
+
+def test_flow_model_rejects_sequence_and_aggregate_drift() -> None:
+    trades = (
+        _classified("first", "2026-08-06T19:18:40.100000Z", "2026-08-06T19:18:40.110000Z", "2", "BUY_AGGRESSOR"),
+        _classified("second", "2026-08-06T19:18:41.100000Z", "2026-08-06T19:18:41.110000Z", "1", "SELL_AGGRESSOR"),
+    )
+    flow, _ = build_order_flow(trades, _policy())
+    first, second = flow.windows
+
+    with pytest.raises(Lot45ValidationError, match="event-time ordered"):
+        replace(flow, windows=(second, first))
+    with pytest.raises(Lot45ValidationError, match="must be unique"):
+        replace(flow, windows=(first, first))
+    bad_impulse = replace(second, delta_impulse=second.delta_impulse + Decimal("1"))
+    with pytest.raises(Lot45ValidationError, match="delta impulse mismatch"):
+        replace(flow, windows=(first, bad_impulse))
+
+    aggregate_cases = (
+        ({"trades_total": flow.trades_total + 1}, "trades_total aggregate mismatch"),
+        ({"buy_trades_total": flow.buy_trades_total + 1}, "buy_trades_total aggregate mismatch"),
+        ({"total_volume": flow.total_volume + Decimal("1")}, "total_volume aggregate mismatch"),
+        ({"signed_delta": flow.signed_delta + Decimal("1")}, "aggregate delta mismatch"),
+        ({"unknown_volume_ratio": Decimal("0.1")}, "unknown volume ratio mismatch"),
+        ({"classification_coverage": Decimal("0.9")}, "aggregate coverage mismatch"),
+        ({"confidence_weighted_coverage": Decimal("0.9")}, "aggregate weighted coverage mismatch"),
+    )
+    for changes, message in aggregate_cases:
+        with pytest.raises(Lot45ValidationError, match=message):
+            replace(flow, **changes)
+
+
+def test_cvd_series_rejects_empty_order_duplicate_and_session_reset_drift() -> None:
+    trades = (
+        _classified("first", "2026-08-06T23:59:59.100000Z", "2026-08-06T23:59:59.110000Z", "2", "BUY_AGGRESSOR"),
+        _classified("second", "2026-08-07T00:00:00.100000Z", "2026-08-07T00:00:00.110000Z", "1", "SELL_AGGRESSOR"),
+    )
+    _, cvd = build_order_flow(trades, _policy())
+    first, second = cvd.points
+
+    with pytest.raises(Lot45ValidationError, match="cannot be empty"):
+        CVDSeriesV1(SESSION_POLICY_VERSION, (), cvd.cvd_checksum)
+    with pytest.raises(Lot45ValidationError, match="event-time ordered"):
+        CVDSeriesV1(SESSION_POLICY_VERSION, (second, first), cvd.cvd_checksum)
+    duplicate_time = replace(second, event_time=first.event_time)
+    with pytest.raises(Lot45ValidationError, match="event times must be unique"):
+        CVDSeriesV1(SESSION_POLICY_VERSION, (first, duplicate_time), cvd.cvd_checksum)
+    wrong_reset = replace(second, cvd=first.cvd + second.signed_delta)
+    with pytest.raises(Lot45ValidationError, match="recurrence"):
+        CVDSeriesV1(SESSION_POLICY_VERSION, (first, wrong_reset), cvd.cvd_checksum)
