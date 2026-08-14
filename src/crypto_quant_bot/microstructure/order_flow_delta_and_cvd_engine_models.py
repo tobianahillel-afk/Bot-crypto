@@ -127,26 +127,29 @@ class OrderFlowWindowV1:
         require(start <= event < end, "window event_time must be inside event-time window")
         require(event <= receive, "window receive_time precedes event_time")
         require_text(self.session_id, "session_id")
-        for field, value in (
+        for field, count in (
             ("trades_total", self.trades_total),
             ("buy_trades_total", self.buy_trades_total),
             ("sell_trades_total", self.sell_trades_total),
             ("unknown_trades_total", self.unknown_trades_total),
         ):
-            require_integer(value, field)
+            require_integer(count, field)
         require(self.trades_total > 0, "order-flow window cannot be empty")
         require(
             self.trades_total
             == self.buy_trades_total + self.sell_trades_total + self.unknown_trades_total,
             "order-flow trade count conservation failed",
         )
-        for field, value in (
+        for field, volume in (
             ("total_volume", self.total_volume),
             ("buy_volume", self.buy_volume),
             ("sell_volume", self.sell_volume),
             ("unknown_volume", self.unknown_volume),
         ):
-            require(value.is_finite() and value >= 0, f"{field} must be finite non-negative")
+            require(
+                volume.is_finite() and volume >= 0,
+                f"{field} must be finite non-negative",
+            )
         require(self.total_volume > 0, "order-flow total volume must be positive")
         require(
             self.total_volume == self.buy_volume + self.sell_volume + self.unknown_volume,
@@ -232,7 +235,9 @@ class OrderFlowStateV1:
     def __post_init__(self) -> None:
         object.__setattr__(self, "windows", tuple(self.windows))
         require(bool(self.windows), "order-flow windows cannot be empty")
-        starts = [parse_utc_timestamp(item.window_start, "window_start") for item in self.windows]
+        starts = [
+            parse_utc_timestamp(item.window_start, "window_start") for item in self.windows
+        ]
         require(starts == sorted(starts), "order-flow windows must be event-time ordered")
         require(len(starts) == len(set(starts)), "order-flow windows must be unique")
         expected_impulse = Decimal("0")
@@ -266,7 +271,10 @@ class OrderFlowStateV1:
             self.total_volume == self.buy_volume + self.sell_volume + self.unknown_volume,
             "aggregate volume conservation failed",
         )
-        require(self.signed_delta == self.buy_volume - self.sell_volume, "aggregate delta mismatch")
+        require(
+            self.signed_delta == self.buy_volume - self.sell_volume,
+            "aggregate delta mismatch",
+        )
         with localcontext() as context:
             context.prec = CALCULATION_DECIMAL_PRECISION
             expected_unknown_ratio = self.unknown_volume / self.total_volume
@@ -364,7 +372,9 @@ class CVDSeriesV1:
             "CVD session policy version changed",
         )
         require(bool(self.points), "CVD points cannot be empty")
-        event_times = [parse_utc_timestamp(item.event_time, "CVD event_time") for item in self.points]
+        event_times = [
+            parse_utc_timestamp(item.event_time, "CVD event_time") for item in self.points
+        ]
         require(event_times == sorted(event_times), "CVD points must be event-time ordered")
         require(len(event_times) == len(set(event_times)), "CVD event times must be unique")
         current_session: str | None = None
@@ -504,7 +514,10 @@ class OrderFlowDeltaCVDEngineAuditV1:
             ("audit_checksum", self.audit_checksum),
         ):
             require_sha256(value, field)
-        require(self.validation_state == VALIDATION_STATE, "Lot45 audit validation state changed")
+        require(
+            self.validation_state == VALIDATION_STATE,
+            "Lot45 audit validation state changed",
+        )
         validate_safety(self.safety)
 
     def payload_without_checksum(self) -> dict[str, Any]:
