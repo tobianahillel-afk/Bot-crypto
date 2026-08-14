@@ -3,8 +3,8 @@
   "branch_coverage_min_percent": 90.0,
   "branch_coverage_percent": 92.59,
   "line_coverage_min_percent": 95.0,
-  "line_coverage_percent": 98.25,
+  "line_coverage_percent": 98.26,
   "schema_version": "lot45-coverage-summary-v1",
-  "source_head_sha": "97dec45b4c9e7b54a3c701a2634720748a0f9dbf",
+  "source_head_sha": "8558ae4a2e620a0967e01067b3446be35cb2354d",
   "status": "PASS"
 }
