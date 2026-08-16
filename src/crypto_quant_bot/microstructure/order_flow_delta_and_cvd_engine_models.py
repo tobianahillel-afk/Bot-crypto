@@ -598,6 +598,19 @@ def _validate_state_time_envelope(state: OrderFlowDeltaCVDEngineStateV1) -> None
 def _validate_state_cvd_binding(state: OrderFlowDeltaCVDEngineStateV1) -> None:
     windows = state.order_flow.windows
     points = state.cvd_series.points
+    require(len(points) == len(windows), "CVD points must bind one-to-one to windows")
+    for point, window in zip(points, windows, strict=True):
+        require(
+            point.window_checksum == window.window_checksum,
+            "CVD point window checksum mismatch",
+        )
+        require(point.event_time == window.event_time, "CVD point event_time mismatch")
+        require(point.session_id == window.session_id, "CVD point session_id mismatch")
+        require(point.signed_delta == window.signed_delta, "CVD point signed delta mismatch")
+        require(
+            canonical_checksum(window.payload_without_checksum()) == window.window_checksum,
+            "window checksum canonical mismatch",
+        )
     require(
         canonical_checksum(state.order_flow.payload_without_checksum())
         == state.order_flow.order_flow_checksum,
@@ -608,19 +621,6 @@ def _validate_state_cvd_binding(state: OrderFlowDeltaCVDEngineStateV1) -> None:
         == state.cvd_series.cvd_checksum,
         "CVD checksum canonical mismatch",
     )
-    require(len(points) == len(windows), "CVD points must bind one-to-one to windows")
-    for point, window in zip(points, windows, strict=True):
-        require(
-            canonical_checksum(window.payload_without_checksum()) == window.window_checksum,
-            "window checksum canonical mismatch",
-        )
-        require(
-            point.window_checksum == window.window_checksum,
-            "CVD point window checksum mismatch",
-        )
-        require(point.event_time == window.event_time, "CVD point event_time mismatch")
-        require(point.session_id == window.session_id, "CVD point session_id mismatch")
-        require(point.signed_delta == window.signed_delta, "CVD point signed delta mismatch")
 
 
 def _validate_audit_checksums(audit: OrderFlowDeltaCVDEngineAuditV1) -> None:
