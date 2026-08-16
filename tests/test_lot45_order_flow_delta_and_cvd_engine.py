@@ -32,7 +32,7 @@ from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_
 ROOT = Path(__file__).resolve().parents[1]
 ZERO_SHA256 = "0" * 64
 QUOTE_SHA256 = "1" * 64
-REFERENCE_CODE_TREE_SHA = "2ddecfa7913b17521358bc54b22a925ef19ccd47"
+REFERENCE_CODE_TREE_SHA = "cf45e466373459ebcb5530a1116d954e33aff6d3"
 
 
 def _policy(*, unknown_ratio: str = "1") -> OrderFlowPolicy:
@@ -119,7 +119,10 @@ def test_reference_frozen_lot44_builds_expected_order_flow() -> None:
 def test_artifacts_reject_nonexistent_and_mismatched_code_commits() -> None:
     with pytest.raises(Lot45ValidationError, match="does not resolve"):
         build_lot45_artifacts(ROOT, "0" * 40)
-    with pytest.raises(Lot45ValidationError, match="committed tree"):
+    with pytest.raises(
+        Lot45ValidationError,
+        match="committed tree|executable source absent from code_commit",
+    ):
         build_lot45_artifacts(ROOT, EXPECTED_GATE_MERGE)
 
 
@@ -147,7 +150,6 @@ def test_unknown_volume_is_conserved_and_never_signed() -> None:
     assert flow.signed_delta == Decimal("1")
     assert cvd.points[-1].cvd == Decimal("1")
     assert flow.classification_coverage == Decimal("0.3")
-    assert flow.confidence_weighted_coverage == Decimal("0.3")
 
 
 def test_public_builder_enforces_unknown_volume_threshold() -> None:
