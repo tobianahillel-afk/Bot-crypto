@@ -78,7 +78,10 @@ def test_decimal_and_timestamp_wrappers_translate_failures() -> None:
     with pytest.raises(Lot45ValidationError, match="epoch conversion requires UTC"):
         epoch_us(datetime(2026, 8, 14))
     with pytest.raises(Lot45ValidationError, match="duration cannot be negative"):
-        duration_us("2026-08-14T00:00:01Z", "2026-08-14T00:00:00Z")
+        duration_us(
+            "2026-08-14T00:00:01.000000Z",
+            "2026-08-14T00:00:00.000000Z",
+        )
 
 
 def test_causal_and_reason_code_errors_are_fail_closed() -> None:
