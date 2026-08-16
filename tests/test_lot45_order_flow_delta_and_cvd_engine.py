@@ -32,7 +32,7 @@ from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_
 ROOT = Path(__file__).resolve().parents[1]
 ZERO_SHA256 = "0" * 64
 QUOTE_SHA256 = "1" * 64
-REFERENCE_CODE_TREE_SHA = "5cde61538a54af920a340e987a0d802cf1f06876"
+REFERENCE_CODE_TREE_SHA = "951d869b81e8ffe8584e8f8cb938c6d4f157363c"
 
 
 def _policy(*, unknown_ratio: str = "1") -> OrderFlowPolicy:
@@ -175,9 +175,15 @@ def test_v1_window_policy_rejects_noncanonical_window_size() -> None:
         build_order_flow(trades, policy)
 
 
-def test_runtime_timestamp_parser_preserves_valid_utc_forms() -> None:
+def test_runtime_timestamp_parser_enforces_canonical_microsecond_utc_text() -> None:
     assert parse_utc_timestamp("2026-08-06T19:18:40.000000Z", "timestamp").microsecond == 0
-    assert parse_utc_timestamp("2026-08-06T19:18:40Z", "timestamp").microsecond == 0
+    for invalid in (
+        "2026-08-06T19:18:40Z",
+        "2026-08-06T19:18:40.000000+00:00",
+        "2026-08-06 19:18:40.000000Z",
+    ):
+        with pytest.raises(Lot45ValidationError, match="canonical UTC timestamp text|UTC Z suffix"):
+            parse_utc_timestamp(invalid, "timestamp")
 
 
 def test_multiple_windows_compute_delta_impulse_without_future_state() -> None:
