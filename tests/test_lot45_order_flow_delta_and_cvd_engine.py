@@ -22,6 +22,7 @@ from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_validation 
     WINDOW_POLICY_VERSION,
     Lot45ValidationError,
     decimal_text,
+    parse_utc_timestamp,
 )
 from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_models import (
     ClassifiedTradeV1,
@@ -155,6 +156,29 @@ def test_public_builder_enforces_unknown_volume_threshold() -> None:
     )
     with pytest.raises(Lot45ValidationError, match="unknown-volume ratio"):
         build_order_flow(trades, _policy(unknown_ratio="0"))
+
+
+def test_v1_window_policy_rejects_noncanonical_window_size() -> None:
+    trades = (
+        _classified("buy", "2026-08-06T19:18:40.100000Z", "2026-08-06T19:18:40.110000Z", "1", "BUY_AGGRESSOR"),
+    )
+    policy = OrderFlowPolicy(
+        50,
+        500_000,
+        2_000_000,
+        Decimal("1"),
+        WINDOW_POLICY_VERSION,
+        SESSION_POLICY_VERSION,
+        POLICY_VERSION,
+    )
+    with pytest.raises(Lot45ValidationError, match="window size changed"):
+        build_order_flow(trades, policy)
+
+
+def test_runtime_rejects_noncanonical_utc_timestamp_text() -> None:
+    assert parse_utc_timestamp("2026-08-06T19:18:40.000000Z", "timestamp").microsecond == 0
+    with pytest.raises(Lot45ValidationError, match="canonical UTC timestamp text"):
+        parse_utc_timestamp("2026-08-06T19:18:40Z", "timestamp")
 
 
 def test_multiple_windows_compute_delta_impulse_without_future_state() -> None:
@@ -311,6 +335,20 @@ def test_window_model_rejects_every_derived_invariant_drift() -> None:
     for changes, message in cases:
         with pytest.raises(Lot45ValidationError, match=message):
             replace(window, **changes)
+
+
+def test_window_model_rejects_forged_noncanonical_tumbling_bounds() -> None:
+    trades = (
+        _classified("buy", "2026-08-06T19:18:40.200000Z", "2026-08-06T19:18:40.210000Z", "1", "BUY_AGGRESSOR"),
+    )
+    flow, _ = build_order_flow(trades, _policy())
+    window = flow.windows[0]
+    with pytest.raises(Lot45ValidationError, match="tumbling policy"):
+        replace(
+            window,
+            window_start="2026-08-06T19:18:40.050000Z",
+            window_end="2026-08-06T19:18:40.900000Z",
+        )
 
 
 def test_flow_model_rejects_sequence_and_aggregate_drift() -> None:

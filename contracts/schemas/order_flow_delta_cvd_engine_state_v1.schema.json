@@ -42,12 +42,12 @@
         "lot44_confidence_checksum": {"const": "7cb11e078d7f0d9ed0858229d8c6fe31a7cf653a238b280b05dbdd84d1250f05"},
         "lot44_config_checksum": {"const": "dac06cb3235f3a09cbbb9b41098d7cf2593b94171659f50ef840d1633bfa95b7"},
         "lot44_post_merge_checksum": {"const": "b8b531b2fcb09a30728549cc480d54d9be71504356468704c102ff085c39ea9a"},
-        "available_at": {"type": "string", "pattern": "Z$"}
+        "available_at": {"type": "string", "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{6}Z$"}
       }
     },
-    "event_time": {"type": "string", "pattern": "Z$"},
-    "receive_time": {"type": "string", "pattern": "Z$"},
-    "generated_at": {"type": "string", "pattern": "Z$"},
+    "event_time": {"type": "string", "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{6}Z$"},
+    "receive_time": {"type": "string", "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{6}Z$"},
+    "generated_at": {"type": "string", "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{6}Z$"},
     "validation_state": {"const": "VALIDATED_OFFLINE_ORDER_FLOW_DELTA_CVD_ONLY"},
     "policy_version": {"const": "lot45-order-flow-delta-cvd-policy-v1"},
     "window_policy_version": {"const": "lot45-event-time-tumbling-v1"},

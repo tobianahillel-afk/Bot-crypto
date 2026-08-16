@@ -12,7 +12,9 @@ from .order_flow_delta_and_cvd_engine_validation import (
     SESSION_POLICY_VERSION,
     VALIDATION_STATE,
     WINDOW_POLICY_VERSION,
+    WINDOW_SIZE_US,
     decimal_text,
+    event_window_bounds,
     parse_utc_timestamp,
     require,
     require_git_sha,
@@ -389,6 +391,11 @@ def _validate_window_times(window: OrderFlowWindowV1) -> None:
     receive = parse_utc_timestamp(window.receive_time, "window receive_time")
     require(start < end, "window_start must precede window_end")
     require(start <= event < end, "window event_time must be inside event-time window")
+    expected_start, expected_end = event_window_bounds(window.event_time, WINDOW_SIZE_US)
+    require(
+        window.window_start == expected_start and window.window_end == expected_end,
+        "window bounds do not match Lot45 event-time tumbling policy",
+    )
     require(event <= receive, "window receive_time precedes event_time")
     require_text(window.session_id, "session_id")
     require(

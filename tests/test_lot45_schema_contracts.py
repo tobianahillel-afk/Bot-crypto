@@ -23,6 +23,10 @@ POSITIVE_DECIMAL = r"^(?:[1-9][0-9]*(?:\.[0-9]*[1-9])?|0\.[0-9]*[1-9])$"
 SIGNED_DECIMAL = r"^(?:0|-?[1-9][0-9]*(?:\.[0-9]*[1-9])?|-?0\.[0-9]*[1-9])$"
 UNIT_RATIO = r"^(?:0|1|0\.[0-9]*[1-9])$"
 SIGNED_UNIT_RATIO = r"^(?:0|1|-1|0\.[0-9]*[1-9]|-0\.[0-9]*[1-9])$"
+UTC_TIMESTAMP = (
+    r"^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])"
+    r"T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\.[0-9]{6}Z$"
+)
 
 
 def _schema(name: str) -> dict[str, object]:
@@ -149,6 +153,34 @@ def test_decimal_schema_fields_are_canonical_and_bounded() -> None:
         assert re.fullmatch(SIGNED_UNIT_RATIO, invalid) is None
     for valid in ("0", "1", "-1", "0.125", "-0.125", "123.45", "-123.45"):
         assert re.fullmatch(SIGNED_DECIMAL, valid) is not None
+
+
+def test_timestamp_schema_fields_use_canonical_utc_text() -> None:
+    state_schema = _schema("order_flow_delta_cvd_engine_state_v1.schema.json")
+    state_properties = state_schema["properties"]
+    for field in ("event_time", "receive_time", "generated_at"):
+        assert state_properties[field]["pattern"] == UTC_TIMESTAMP
+    assert state_properties["lineage"]["properties"]["available_at"]["pattern"] == UTC_TIMESTAMP
+
+    flow_schema = _schema("order_flow_state_v1.schema.json")
+    window_properties = flow_schema["properties"]["windows"]["items"]["properties"]
+    for field in ("window_start", "window_end", "event_time", "receive_time"):
+        assert window_properties[field]["pattern"] == UTC_TIMESTAMP
+
+    cvd_schema = _schema("cvd_series_v1.schema.json")
+    point_properties = cvd_schema["properties"]["points"]["items"]["properties"]
+    assert point_properties["event_time"]["pattern"] == UTC_TIMESTAMP
+
+    for invalid in (
+        "garbageZ",
+        "2026-08-06T19:18:40Z",
+        "2026-08-06T19:18:40.000000+00:00",
+        "2026-08-06 19:18:40.000000Z",
+        "2026-08-06T25:18:40.000000Z",
+        "2026-08-06T19:18:40.000000z",
+    ):
+        assert re.fullmatch(UTC_TIMESTAMP, invalid) is None
+    assert re.fullmatch(UTC_TIMESTAMP, "2026-08-06T19:18:40.000000Z") is not None
 
 
 def test_cvd_schema_fixes_session_policy_and_checksum() -> None:
