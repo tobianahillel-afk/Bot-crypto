@@ -31,12 +31,12 @@ jobs:
       PYTHONPATH: src
       PYTHONHASHSEED: '0'
       GATE_MERGE_SHA: 390d0779f2be257fa8134faf8f02193a760a09c3
-      SOURCE_HEAD_SHA: bf84c046e14f6148213e48ff7e130de018ebe2df
+      SOURCE_HEAD_SHA: 2797b1dbb4d0e04d31b5c95734e36e3231869fb3
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: bf84c046e14f6148213e48ff7e130de018ebe2df
+          ref: 2797b1dbb4d0e04d31b5c95734e36e3231869fb3
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
@@ -82,7 +82,8 @@ jobs:
             tests/test_lot45_order_flow_delta_and_cvd_engine.py \
             tests/test_lot45_policy_contract.py \
             tests/test_lot45_runtime_binding_and_rounding.py \
-            tests/test_lot45_schema_contracts.py
+            tests/test_lot45_schema_contracts.py \
+            tests/test_lot45_checksum_binding_adversarial.py
           mypy src/crypto_quant_bot/microstructure
           python - <<'PY'
           import ast
@@ -126,6 +127,7 @@ jobs:
             tests/test_lot45_policy_contract.py \
             tests/test_lot45_runtime_binding_and_rounding.py \
             tests/test_lot45_schema_contracts.py \
+            tests/test_lot45_checksum_binding_adversarial.py \
             --cov=crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine \
             --cov=crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_models \
             --cov=crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_validation \
@@ -197,7 +199,8 @@ jobs:
               tests/test_lot45_order_flow_delta_and_cvd_engine.py \
               tests/test_lot45_policy_contract.py \
               tests/test_lot45_runtime_binding_and_rounding.py \
-              tests/test_lot45_schema_contracts.py
+              tests/test_lot45_schema_contracts.py \
+              tests/test_lot45_checksum_binding_adversarial.py
           done
       - uses: actions/upload-artifact@v4
         if: always()
