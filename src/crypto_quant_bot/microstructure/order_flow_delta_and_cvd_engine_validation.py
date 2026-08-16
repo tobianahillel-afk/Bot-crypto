@@ -51,27 +51,32 @@ def require_sha256(value: object, field: str) -> str:
     return text
 
 
-def require_git_sha(value: object, field: str) -> str:
-    text = require_text(value, field)
-    require(
-        len(text) == 40 and all(ch in "0123456789abcdef" for ch in text),
-        f"{field} must be git sha",
-    )
-    return text
+def _git_commit_exists(root: Path, commit: str) -> bool:
+    try:
+        result = subprocess.run(
+            ["git", "cat-file", "-e", f"{commit}^{{commit}}"],
+            cwd=root,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except OSError:
+        return False
+    return result.returncode == 0
 
 
-def reject_untracked_executable_sources(root: Path) -> None:
-    """Reject live Python sources under ``src`` that are absent from the Git index.
+def reject_untracked_executable_sources(root: Path, code_commit: str) -> None:
+    """Bind every live Python source under ``src`` to the claimed Git commit.
 
-    This intentionally compares the filesystem with the cached Git file set instead of
-    ``git status --others`` so ignored Python files (notably ``src/sitecustomize.py``)
-    cannot execute and still allow a Lot 45 attestation to pass.
+    Filesystem enumeration intentionally catches ignored and untracked Python files,
+    including ``src/sitecustomize.py``. Comparing against ``git ls-tree`` rather than
+    the current index also rejects sources added or staged after the claimed commit.
     """
 
     src_root = root / "src"
     try:
         tracked = subprocess.run(
-            ["git", "ls-files", "--cached", "--", "src"],
+            ["git", "ls-tree", "-r", "--name-only", code_commit, "--", "src"],
             cwd=root,
             check=False,
             capture_output=True,
@@ -99,8 +104,21 @@ def reject_untracked_executable_sources(root: Path) -> None:
     unexpected = sorted(live_python - tracked_python)
     require(
         not unexpected,
-        "Lot45 untracked executable source present: " + ", ".join(unexpected),
+        "Lot45 executable source absent from code_commit: " + ", ".join(unexpected),
     )
+
+
+def require_git_sha(value: object, field: str) -> str:
+    text = require_text(value, field)
+    require(
+        len(text) == 40 and all(ch in "0123456789abcdef" for ch in text),
+        f"{field} must be git sha",
+    )
+    if field == "code_commit":
+        root = Path(__file__).resolve().parents[3]
+        if (root / ".git").exists() and _git_commit_exists(root, text):
+            reject_untracked_executable_sources(root, text)
+    return text
 
 
 def decimal_from_text(
