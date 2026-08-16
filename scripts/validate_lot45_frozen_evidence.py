@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sys
+from collections.abc import Callable
 from dataclasses import replace
 from decimal import ROUND_DOWN, ROUND_HALF_EVEN, ROUND_UP, Decimal, localcontext
 from pathlib import Path
@@ -27,6 +28,7 @@ from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_validation 
     POLICY_VERSION,
     SESSION_POLICY_VERSION,
     WINDOW_POLICY_VERSION,
+    Lot45ValidationError,
 )
 from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_models import (  # noqa: E402
     ClassifiedTradeV1,
@@ -34,23 +36,24 @@ from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_
 )
 
 GATE_MERGE = "390d0779f2be257fa8134faf8f02193a760a09c3"
-SOURCE_HEAD = "1f7bbd133139babb1a956adc7ada711390f16397"
-CERTIFICATION_ANCHOR = "e1a10fb5469a6caf084b10a44c51def08e3d25d0"
-EVIDENCE_HEAD = "8dd046838b64721d14f18b2f2f062bd73bb0e759"
+SOURCE_HEAD = "266ad1370ebea17918d3e7d7f95e62e81d4e9ed4"
+CERTIFICATION_ANCHOR = "6cf3df9e93cd5e79217c6eed030726f672a76cad"
+EVIDENCE_HEAD = "094521c17b3e211b9797a697fd593d6085d18563"
+
 VALIDATION_PROOF = (
-    31917100403,
-    9255238489,
-    "sha256:be4f61b5c2c417c8fdb0f50c4391b7a227250bb4f1a29e41bc353a331345bfe7",
+    31955586885,
+    9265891597,
+    "sha256:f4ca118691f9a4cb2a5b881356ca0e574a9dd46ad7853b350f65662ab2fcabd0",
 )
 MUTATION_PROOF = (
-    31917100355,
-    9255248190,
-    "sha256:f17fd53e683cbaa25b0175f9e1ea0e3d42be49e3c01f8f2944ef3b831969afbd",
+    31955588847,
+    9265913598,
+    "sha256:5a395cdc925e7589be9bf67e23df367269dded3d059d8fdaadf63688bb4f5685",
 )
 QUALITY_PROOF = (
-    31916875636,
-    9255195337,
-    "sha256:11ba051e66a62deffb84e0642323769fe21ce20ff55aa569178321ec1e86d5cf",
+    31955586763,
+    9265917524,
+    "sha256:8a07ecce6a45032732ed910ddd03ffa564d48a51a0b6d42b4cc6f64c091b266a",
 )
 
 STATE = ROOT / "data/audit/order_flow_delta_and_cvd_engine_lot45.json"
@@ -63,18 +66,19 @@ OLD_STATE_ALIAS = ROOT / "data/audit/order_flow_delta_cvd_engine_lot45.json"
 OLD_AUDIT_ALIAS = ROOT / "data/audit/order_flow_delta_cvd_engine_audit_lot45.json"
 
 EXPECTED_HASHES = {
-    STATE: "499338f9ea023a9c84f6f345de86079132ed0cf0481915f9f29a74abcfd9a1a9",
-    AUDIT: "ad4a59e739c331b81a2b657deead5ed6752d1685cf2ca4f59d9cd1f9721d83ba",
-    ORDER_FLOW: "f7b7e04c555106c7ca312f81d3258d7afc288990c4ba2d1bfdc094d4c0c33502",
-    CVD: "6a017b7b6932399ab46a654692dcafe28390f971226be8cf4a1af17f316335b6",
-    COVERAGE: "4b4d1f4132a185d572483e512350d0facb75f5a7c1fe880133dd9f4ecd9b274c",
-    MUTATION: "adabd445130a57ac3b2469ac53837955abbf6752ac5b972111474ed6978f7876",
+    STATE: "125201880310f2e989ce07cf9a0b5456cd573d28a3b56abd1003283776c413d8",
+    AUDIT: "cf1006935fe72706c6f4543636aac5ec212bf953fcc21f7279d7dc6ec7fb6f11",
+    ORDER_FLOW: "f9d46121e552dcea5eca7306befa47114d9602e81be32a19bc565221398724f8",
+    CVD: "a8923ce2fb08a571059a411edd4e2b0dd1d0a7116727a66edd9046c0e70d352f",
+    COVERAGE: "3bee11be4f64110355f44917d4c4128d0e7918daf768ac928c8d14903d737767",
+    MUTATION: "17f6d8e8336b30b12a993bbacd9da58d12b5dfaf56ba7c9b192e08c273ecf4f4",
 }
-EXPECTED_STATE = "7670b0f7f20a1e90b8dc25c35f8deb1fe2134a2056c2d01e41ebdf4d38a8eb17"
-EXPECTED_AUDIT = "acc8ea913c99ec1a3ef5e749a84808c5cec15e5aca51231d2f06652acb8c9038"
-EXPECTED_ORDER_FLOW = "200585b65c124754c3e308aaf40eba2c98435ecac4f5a93815d278adcf887da0"
-EXPECTED_CVD = "9f9bd3f9360e2f488a4b6d96a0e930b4353333e35debb3b47264793c1149979c"
+EXPECTED_STATE = "1e74075715bf64b09a83d3e15ee68970e7e0ddff63155415c8e5a94dd220df19"
+EXPECTED_AUDIT = "08dbd50cc65e2f5723c77e8042650422643beda5b4ad472eb9eb770cf507087d"
+EXPECTED_ORDER_FLOW = "3dc7a0d4836090509d12239c2a407cfa3afd736fa7d3f80ef2c2eeed3b4fa9ea"
+EXPECTED_CVD = "68e6f47f0df214f74279c9749b1cfd1ac9e0cead7484bff9a098ee34481aa559"
 EXPECTED_CONFIG = "2200905208b366f6230d76a35733fbde7338c3dc3902e3c6cc50999ba0d4fb30"
+EXPECTED_WINDOW = "09bd6b8809622b450f04e98c5d519a0fb3cc9f9b3c749eaa588f97499aebc10c"
 EXPECTED_LINEAGE = {
     "lineage_id": "lot45-from-certified-lot44-order-flow-inputs-v1",
     "entry_gate_checksum": "15ca4d69e59a0898f32eb9cbe558571ecf00ae496ec5d41075da1124393d4468",
@@ -191,6 +195,15 @@ def _verify_links(
     for field, expected in EXPECTED_LINEAGE.items():
         require(state["lineage"][field] == expected, f"lineage changed: {field}")
 
+    windows = order_flow["windows"]
+    points = cvd["points"]
+    require(len(windows) == len(points), "CVD/window cardinality changed")
+    for window, point in zip(windows, points, strict=True):
+        require(point["window_checksum"] == window["window_checksum"], "CVD/window checksum drift")
+        require(point["event_time"] == window["event_time"], "CVD/window event-time drift")
+        require(point["session_id"] == window["session_id"], "CVD/window session drift")
+        require(point["signed_delta"] == window["signed_delta"], "CVD/window delta drift")
+
 
 def _verify_reference(order_flow: dict[str, Any], cvd: dict[str, Any]) -> None:
     expected_metrics = {
@@ -205,17 +218,15 @@ def _verify_reference(order_flow: dict[str, Any], cvd: dict[str, Any]) -> None:
         "signed_delta": "0.05",
         "unknown_volume_ratio": "0.3125",
         "classification_coverage": "0.6875",
+        "confidence_weighted_volume": "0.11",
         "confidence_weighted_coverage": "0.6875",
     }
     for field, expected in expected_metrics.items():
         require(order_flow[field] == expected, f"reference metric changed: {field}")
     require(len(order_flow["windows"]) == 1, "reference window count changed")
     window = order_flow["windows"][0]
-    require(
-        window["window_checksum"]
-        == "bbe4fabcc1ec72075353552a7dfbd55d21b815de7ace991df8697b78799a3ab5",
-        "reference window checksum changed",
-    )
+    require(window["confidence_weighted_volume"] == "0.11", "window weighted volume changed")
+    require(window["window_checksum"] == EXPECTED_WINDOW, "reference window checksum changed")
     require(len(cvd["points"]) == 1, "reference CVD point count changed")
     require(cvd["points"][0]["cvd"] == "0.05", "reference CVD changed")
     require(cvd["points"][0]["signed_delta"] == "0.05", "reference CVD delta changed")
@@ -224,17 +235,18 @@ def _verify_reference(order_flow: dict[str, Any], cvd: dict[str, Any]) -> None:
 def _verify_quality(coverage: dict[str, Any], mutation: dict[str, Any]) -> None:
     require(coverage["status"] == "PASS", "coverage not PASS")
     require(coverage["source_head_sha"] == SOURCE_HEAD, "coverage source changed")
-    require(coverage["line_coverage_percent"] == 98.3, "line coverage changed")
-    require(coverage["branch_coverage_percent"] == 92.59, "branch coverage changed")
+    require(coverage["line_coverage_percent"] == 98.33, "line coverage changed")
+    require(coverage["branch_coverage_percent"] == 92.86, "branch coverage changed")
     require(coverage["anti_flake_repetitions"] == 3, "anti-flake count changed")
+
     require(mutation["status"] == "PASS", "mutation not PASS")
     require(mutation["source_head_sha"] == SOURCE_HEAD, "mutation source changed")
-    require(mutation["mutation_score_percent"] == 82.71, "mutation score changed")
-    require(mutation["killed_mutants"] == 885, "killed mutant count changed")
-    require(mutation["survived_mutants"] == 185, "survived mutant count changed")
-    require(mutation["evaluated_mutants"] == 1070, "evaluated mutant count changed")
-    require(mutation["completed_mutants"] == 1070, "completed mutant count changed")
-    require(mutation["total_mutants"] == 1070, "total mutant count changed")
+    require(mutation["mutation_score_percent"] == 81.55, "mutation score changed")
+    require(mutation["killed_mutants"] == 1096, "killed mutant count changed")
+    require(mutation["survived_mutants"] == 248, "survived mutant count changed")
+    require(mutation["evaluated_mutants"] == 1344, "evaluated mutant count changed")
+    require(mutation["completed_mutants"] == 1344, "completed mutant count changed")
+    require(mutation["total_mutants"] == 1344, "total mutant count changed")
     require(mutation["timeout_mutants"] == 0, "mutation timeout present")
     require(mutation["suspicious_mutants"] == 0, "suspicious mutation present")
     require(mutation["mutmut_run_exit_code"] == 0, "mutmut run exit changed")
@@ -248,8 +260,7 @@ def _verify_runtime_replay(
     cvd: dict[str, Any],
 ) -> None:
     replay = build_lot45_artifacts(ROOT, SOURCE_HEAD)
-    expected = (state, audit, order_flow, cvd)
-    require(replay == expected, "frozen Lot45 runtime replay diverged")
+    require(replay == (state, audit, order_flow, cvd), "frozen Lot45 runtime replay diverged")
 
 
 def _policy() -> OrderFlowPolicy:
@@ -269,8 +280,8 @@ def _classified(
     quantity: str,
     unknown: bool,
     *,
-    event_time: str = "2026-08-06T19:18:40.100000Z",
-    receive_time: str = "2026-08-06T19:18:40.110000Z",
+    event_time: str,
+    receive_time: str,
 ) -> ClassifiedTradeV1:
     trade = TimestampedTradeV1(
         "source-a",
@@ -305,6 +316,14 @@ def _classified(
     )
 
 
+def _expect_lot45_rejection(action: Callable[[], object], message: str) -> None:
+    try:
+        action()
+    except Lot45ValidationError:
+        return
+    raise Lot45FrozenEvidenceError(message)
+
+
 def _verify_review_hardening() -> None:
     require(
         CALCULATION_DECIMAL_ROUNDING == ROUND_HALF_EVEN,
@@ -317,55 +336,106 @@ def _verify_review_hardening() -> None:
 
     first = "12345678901234567890123456789"
     second = "12345678901234567890123456788"
-    trades = (
+    high_precision_trades = (
         _classified(
-            "w1-buy",
+            "hp-w1-buy",
             first,
             False,
             event_time="2026-08-06T19:18:40.100000Z",
             receive_time="2026-08-06T19:18:40.110000Z",
         ),
         _classified(
-            "w1-unknown",
+            "hp-w1-unknown",
             "1",
             True,
             event_time="2026-08-06T19:18:40.200000Z",
             receive_time="2026-08-06T19:18:40.210000Z",
         ),
         _classified(
-            "w2-buy",
+            "hp-w2-buy",
             second,
             False,
             event_time="2026-08-06T19:18:41.100000Z",
             receive_time="2026-08-06T19:18:41.110000Z",
         ),
         _classified(
-            "w2-unknown",
+            "hp-w2-unknown",
             "1",
             True,
             event_time="2026-08-06T19:18:41.200000Z",
             receive_time="2026-08-06T19:18:41.210000Z",
         ),
     )
-    flow, cvd = build_order_flow(trades, _policy())
-
+    high_flow, high_cvd = build_order_flow(high_precision_trades, _policy())
     for precision in (9, 28):
         for rounding in (ROUND_DOWN, ROUND_UP):
             with localcontext() as ambient:
                 ambient.prec = precision
                 ambient.rounding = rounding
-                replayed_windows = tuple(replace(window) for window in flow.windows)
-                replayed_flow = replace(flow, windows=replayed_windows)
-                replayed_points = tuple(replace(point) for point in cvd.points)
-                replayed_cvd = replace(cvd, points=replayed_points)
+                replayed_windows = tuple(replace(window) for window in high_flow.windows)
+                replayed_flow = replace(high_flow, windows=replayed_windows)
+                replayed_points = tuple(replace(point) for point in high_cvd.points)
+                replayed_cvd = replace(high_cvd, points=replayed_points)
             require(
-                replayed_flow.to_dict() == flow.to_dict(),
+                replayed_flow.to_dict() == high_flow.to_dict(),
                 f"flow Decimal invariants depend on ambient context: {precision}/{rounding}",
             )
             require(
-                replayed_cvd.to_dict() == cvd.to_dict(),
+                replayed_cvd.to_dict() == high_cvd.to_dict(),
                 f"CVD Decimal recurrence depends on ambient context: {precision}/{rounding}",
             )
+
+    weighted_trades = (
+        _classified(
+            "weighted-w1-buy",
+            "1",
+            False,
+            event_time="2026-08-06T19:18:40.100000Z",
+            receive_time="2026-08-06T19:18:40.110000Z",
+        ),
+        _classified(
+            "weighted-w1-unknown",
+            "1",
+            True,
+            event_time="2026-08-06T19:18:40.200000Z",
+            receive_time="2026-08-06T19:18:40.210000Z",
+        ),
+        _classified(
+            "weighted-w2-buy",
+            "5",
+            False,
+            event_time="2026-08-06T19:18:41.100000Z",
+            receive_time="2026-08-06T19:18:41.110000Z",
+        ),
+        _classified(
+            "weighted-w2-unknown",
+            "8",
+            True,
+            event_time="2026-08-06T19:18:41.200000Z",
+            receive_time="2026-08-06T19:18:41.210000Z",
+        ),
+    )
+    weighted_flow, weighted_cvd = build_order_flow(weighted_trades, _policy())
+    require(weighted_flow.total_volume == Decimal("15"), "weighted test total volume changed")
+    require(
+        weighted_flow.confidence_weighted_volume == Decimal("6"),
+        "aggregate weighted volume is not preserved raw",
+    )
+    require(
+        weighted_flow.confidence_weighted_coverage == Decimal("0.4"),
+        "aggregate weighted coverage is not computed from raw weighted volume",
+    )
+
+    first_window = weighted_flow.windows[0]
+    first_point = weighted_cvd.points[0]
+    _expect_lot45_rejection(
+        lambda: replace(first_window, session_id="2026-08-05"),
+        "forged window session_id was accepted",
+    )
+    _expect_lot45_rejection(
+        lambda: replace(first_point, session_id="2026-08-05"),
+        "forged CVD session_id was accepted",
+    )
 
 
 def _verify_downstream_lock() -> None:
@@ -382,7 +452,7 @@ def validate() -> dict[str, object]:
     _verify_review_hardening()
     _verify_downstream_lock()
     return {
-        "schema_version": "lot45-frozen-evidence-validation-v3",
+        "schema_version": "lot45-frozen-evidence-validation-v4",
         "status": "PASS",
         "verdict": "PASS_LOT45_FROZEN_EVIDENCE",
         "gate_merge": GATE_MERGE,
@@ -411,6 +481,9 @@ def validate() -> dict[str, object]:
             "complete_decimal_invariant_context": True,
             "high_precision_decimal_replay": True,
             "complete_package_tree_binding": True,
+            "raw_weighted_volume_aggregation": True,
+            "event_time_session_binding": True,
+            "cvd_window_metric_binding": True,
         },
         "canonical_evidence_paths": True,
         "lot46_status": "PLANNED_LOCKED",
