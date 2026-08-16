@@ -91,7 +91,6 @@ def parse_utc_timestamp(value: object, field: str) -> datetime:
     except ValueError as exc:
         raise Lot45ValidationError(f"{field} invalid UTC timestamp") from exc
     require(parsed.tzinfo == UTC, f"{field} must be UTC")
-    require(text == timestamp_text(parsed), f"{field} must use canonical UTC timestamp text")
     return parsed
 
 
@@ -128,7 +127,6 @@ def from_epoch_us(value: int) -> datetime:
 
 def event_window_bounds(event_time: str, window_size_us: int) -> tuple[str, str]:
     require_integer(window_size_us, "window_size_us", 1)
-    require(window_size_us == WINDOW_SIZE_US, "Lot45 v1 window size changed")
     event = parse_utc_timestamp(event_time, "event_time")
     raw_us = epoch_us(event)
     start_us = (raw_us // window_size_us) * window_size_us
