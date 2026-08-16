@@ -7,6 +7,7 @@ Ce document est l’index canonique de progression. Les spécifications détaill
 ## État actuel
 
 - Dernier lot fusionné et audité : **Lot 44 — Trades & Aggressor Classification Schema**.
+- Release correspondant au dernier lot fusionné : `0.44.0`.
 - V1 (Lots 0–20) : fermée et validée.
 - V2 (Lots 21–30) : fermée et validée offline.
 - V3 (Lots 31–36) : fermée et auditée ; aucune connectivité/ingestion live n’est ouverte.
@@ -47,6 +48,31 @@ La branche `main` porte le gate certifié du Lot 45 (`390d0779f2be257fa8134faf8f
 | 45 | Order Flow / Delta / CVD | IMPLEMENTATION CANDIDATE — CERTIFICATION IN PROGRESS |
 
 Aucun statut `IMPLEMENTED`, `AUDITED` ou `GO` ne doit être déduit d’un simple workflow vert : la preuve doit porter sur le commit/source exact annoncé par le lot.
+
+## Marqueurs historiques certifiés
+
+Ces marqueurs sont conservés textuellement parce qu’ils font partie des contrats de preuve des releases historiques. Leur présence ne signifie pas que l’état courant du projet s’arrête à ces lots.
+
+- Lot 26 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
+- Lot 27 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
+- Lot 28 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
+- Lot 29 : `IMPLEMENTED_VALIDATED_OFFLINE_REPLAY_ONLY`.
+- Lot 30 : `IMPLEMENTED_VALIDATED_OFFLINE_CLOSURE_ONLY`.
+- Lot 31 : `IMPLEMENTED_VALIDATED_METADATA_ONLY`.
+- Lot 32 : `IMPLEMENTED_VALIDATED_NORMALIZATION_ONLY`.
+- Lot 33 : `IMPLEMENTED_VALIDATED_TEMPORAL_ONLY`.
+- Lot 34 : `IMPLEMENTED_VALIDATED_DATA_QUALITY_ONLY`.
+- Lot 35 : `IMPLEMENTED_VALIDATED_RECONCILIATION_ONLY`.
+- Lot 36 : `IMPLEMENTED_VALIDATED_V3_CLOSURE_ONLY`.
+- Lot 37 : `IMPLEMENTED_VALIDATED_OFFLINE_SCOPE_CONTRACTS_ONLY`.
+
+## Lot 30
+
+La preuve historique de clôture V2 reste liée à `data/audit/closure_manifest_lot30.json`, `docs/LOT_30_POST_MERGE_AUDIT.md` et `data/audit/roadmap_lifecycle_overlay_lot30.json`. Elle n’est pas réécrite par V4.
+
+## Lot 32
+
+La preuve historique de normalisation reste liée à `data/audit/instrument_symbol_and_contract_normalization_lot32.json`, `data/audit/instrument_registry_lot32.json`, `docs/LOT_32_POST_MERGE_AUDIT.md` et `data/audit/roadmap_lifecycle_overlay_lot32.json`.
 
 ## Documents normatifs transverses
 
