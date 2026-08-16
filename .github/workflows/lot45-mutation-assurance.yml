@@ -22,13 +22,13 @@ jobs:
   mutation:
     runs-on: ubuntu-22.04
     env:
-      SOURCE_HEAD_SHA: 2797b1dbb4d0e04d31b5c95734e36e3231869fb3
+      SOURCE_HEAD_SHA: 89ec5c692622d80222eb63bfa2732242d4a84987
       PYTHONHASHSEED: '0'
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: 2797b1dbb4d0e04d31b5c95734e36e3231869fb3
+          ref: 89ec5c692622d80222eb63bfa2732242d4a84987
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
@@ -56,6 +56,7 @@ jobs:
             tests/test_lot45_runtime_binding_and_rounding.py \
             tests/test_lot45_schema_contracts.py \
             tests/test_lot45_checksum_binding_adversarial.py \
+            tests/test_lot45_untracked_executable_source_binding.py \
             --junitxml=reports/lot45/mutation/baseline.xml \
             2>&1 | tee reports/lot45/mutation/baseline.txt
       - name: Build isolated mutation workspace
@@ -73,6 +74,7 @@ jobs:
           cp tests/test_lot45_runtime_binding_and_rounding.py .tmp-lot45-mutants/tests/
           cp tests/test_lot45_schema_contracts.py .tmp-lot45-mutants/tests/
           cp tests/test_lot45_checksum_binding_adversarial.py .tmp-lot45-mutants/tests/
+          cp tests/test_lot45_untracked_executable_source_binding.py .tmp-lot45-mutants/tests/
           python - <<'PY'
           from pathlib import Path
           import toml
@@ -99,10 +101,12 @@ jobs:
               'tests/test_lot45_runtime_binding_and_rounding.py',
               'tests/test_lot45_schema_contracts.py',
               'tests/test_lot45_checksum_binding_adversarial.py',
+              'tests/test_lot45_untracked_executable_source_binding.py',
               '-k',
               (
                   'not test_reference_frozen_lot44_builds_expected_order_flow '
-                  'and not test_artifacts_reject_nonexistent_and_mismatched_code_commits'
+                  'and not test_artifacts_reject_nonexistent_and_mismatched_code_commits '
+                  'and not test_real_code_commit_validation_invokes_executable_source_guard'
               ),
           ]
           config = {
