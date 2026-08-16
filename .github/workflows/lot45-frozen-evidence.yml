@@ -33,6 +33,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   attest:
@@ -40,10 +41,31 @@ jobs:
     env:
       PYTHONPATH: src
       GATE_MERGE_SHA: 390d0779f2be257fa8134faf8f02193a760a09c3
-      SOURCE_HEAD_SHA: bf84c046e14f6148213e48ff7e130de018ebe2df
-      CERTIFICATION_ANCHOR_SHA: c5c7c44efb96719f579e3e7c99f4b9e596e5c4fc
-      EVIDENCE_HEAD_SHA: 5f8e5a03022d6e5c15a35a7f4e131e41d3c2b537
-      VALIDATOR_HEAD_SHA: c6ef132d8d08834c7adda69972c5051a822a3985
+      SOURCE_HEAD_SHA: 2797b1dbb4d0e04d31b5c95734e36e3231869fb3
+      CERTIFICATION_ANCHOR_SHA: ee1d8fa813cb540ac7f202932c21904f64e0fdf3
+      EVIDENCE_HEAD_SHA: d229df65dd1516da83f8d3ebad08bae9af845c7f
+      VALIDATOR_HEAD_SHA: 15c48b2c73852dbf0e1adf18e9a69a45a0667d1e
+      VALIDATION_RUN_ID: '31965134136'
+      VALIDATION_WORKFLOW_ID: '334417396'
+      VALIDATION_WORKFLOW_PATH: .github/workflows/lot45-order-flow-delta-cvd.yml
+      VALIDATION_ARTIFACT_ID: '9268293146'
+      VALIDATION_ARTIFACT_NAME: lot45-order-flow-delta-cvd-evidence
+      VALIDATION_ARTIFACT_DIGEST: sha256:3726fac395620fd632d31c19661fbeac5f338148c095783ca127198f47500cf8
+      MUTATION_RUN_ID: '31965134210'
+      MUTATION_WORKFLOW_ID: '334417751'
+      MUTATION_WORKFLOW_PATH: .github/workflows/lot45-mutation-assurance.yml
+      MUTATION_ARTIFACT_ID: '9268319350'
+      MUTATION_ARTIFACT_NAME: lot45-mutation-evidence
+      MUTATION_ARTIFACT_DIGEST: sha256:6eacc64b443de55bdc90ad6de44d4e1057183d89d0da43816d2e7086cb354eeb
+      QUALITY_RUN_ID: '31965134208'
+      QUALITY_WORKFLOW_ID: '326998792'
+      QUALITY_WORKFLOW_PATH: .github/workflows/code-quality.yml
+      QUALITY_ARTIFACT_ID: '9268320068'
+      QUALITY_ARTIFACT_NAME: institutional-quality-evidence
+      QUALITY_ARTIFACT_DIGEST: sha256:62cd318c8c865b8e8c9f33a443e19e27b117422a789d57760f523cb8a40d659f
+      QUALITY_GLOBAL_COVERAGE_SHA256: a263aa736602995674214ee7d36940247758e6d6f26333f60930c5bc461b9d2b
+      QUALITY_MUTATION_SCORE_SHA256: 678b53c31bdd93760360ead142833bd90b36319093fc2dac1f3c7a6d3af6ec3a
+      QUALITY_ENGINEERING_DEVIATION_SHA256: 2622d31a7f9093dacb95f7aeacd7b5e0ce1f08e58eec244a7e1e21d7a8604d14
     steps:
       - uses: actions/checkout@v4
         with:
@@ -107,6 +129,7 @@ jobs:
             tests/test_lot45_policy_contract.py \
             tests/test_lot45_runtime_binding_and_rounding.py \
             tests/test_lot45_schema_contracts.py \
+            tests/test_lot45_checksum_binding_adversarial.py \
             docs/LOT_45_ORDER_FLOW_DELTA_AND_CVD_ENGINE.md \
             docs/ACCEPTANCE_CRITERIA_LOT_45.md \
             reports/lot_45_order_flow_delta_and_cvd_engine_report.md \
@@ -128,6 +151,162 @@ jobs:
             reports/lot45/coverage_summary.json \
             reports/lot45/mutation_summary.json
           git diff --quiet "$VALIDATOR_HEAD_SHA" HEAD -- scripts/validate_lot45_frozen_evidence.py
+      - name: Authenticate certified GitHub Actions artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from __future__ import annotations
+
+          import hashlib
+          import io
+          import json
+          import os
+          import urllib.error
+          import urllib.request
+          import zipfile
+          from pathlib import Path
+
+          repo = os.environ['GITHUB_REPOSITORY']
+          token = os.environ['GH_TOKEN']
+          anchor = os.environ['CERTIFICATION_ANCHOR_SHA']
+          api = f'https://api.github.com/repos/{repo}'
+          user_agent = 'lot45-frozen-evidence-attestation'
+          headers = {
+              'Authorization': f'Bearer {token}',
+              'Accept': 'application/vnd.github+json',
+              'X-GitHub-Api-Version': '2022-11-28',
+              'User-Agent': user_agent,
+          }
+
+          def get_json(url: str) -> dict[str, object]:
+              request = urllib.request.Request(url, headers=headers)
+              with urllib.request.urlopen(request, timeout=60) as response:
+                  return json.loads(response.read())
+
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, response_headers, newurl):
+                  return None
+
+          def get_artifact_bytes(url: str) -> bytes:
+              request = urllib.request.Request(url, headers=headers)
+              opener = urllib.request.build_opener(NoRedirect)
+              location = None
+              try:
+                  with opener.open(request, timeout=60):
+                      raise AssertionError('artifact endpoint did not redirect')
+              except urllib.error.HTTPError as exc:
+                  if exc.code not in (302, 303, 307, 308):
+                      raise
+                  location = exc.headers.get('Location')
+              assert location and location.startswith('https://'), 'artifact signed redirect missing'
+              signed_request = urllib.request.Request(
+                  location,
+                  headers={'User-Agent': user_agent},
+              )
+              with urllib.request.urlopen(signed_request, timeout=120) as response:
+                  return response.read()
+
+          proofs = [
+              (
+                  'validation',
+                  int(os.environ['VALIDATION_RUN_ID']),
+                  int(os.environ['VALIDATION_WORKFLOW_ID']),
+                  os.environ['VALIDATION_WORKFLOW_PATH'],
+                  int(os.environ['VALIDATION_ARTIFACT_ID']),
+                  os.environ['VALIDATION_ARTIFACT_NAME'],
+                  os.environ['VALIDATION_ARTIFACT_DIGEST'],
+              ),
+              (
+                  'mutation',
+                  int(os.environ['MUTATION_RUN_ID']),
+                  int(os.environ['MUTATION_WORKFLOW_ID']),
+                  os.environ['MUTATION_WORKFLOW_PATH'],
+                  int(os.environ['MUTATION_ARTIFACT_ID']),
+                  os.environ['MUTATION_ARTIFACT_NAME'],
+                  os.environ['MUTATION_ARTIFACT_DIGEST'],
+              ),
+              (
+                  'quality',
+                  int(os.environ['QUALITY_RUN_ID']),
+                  int(os.environ['QUALITY_WORKFLOW_ID']),
+                  os.environ['QUALITY_WORKFLOW_PATH'],
+                  int(os.environ['QUALITY_ARTIFACT_ID']),
+                  os.environ['QUALITY_ARTIFACT_NAME'],
+                  os.environ['QUALITY_ARTIFACT_DIGEST'],
+              ),
+          ]
+
+          archives: dict[str, zipfile.ZipFile] = {}
+          backing: list[io.BytesIO] = []
+          for (
+              label,
+              run_id,
+              expected_workflow_id,
+              expected_workflow_path,
+              artifact_id,
+              artifact_name,
+              expected_digest,
+          ) in proofs:
+              run = get_json(f'{api}/actions/runs/{run_id}')
+              assert int(run['id']) == run_id, f'{label}: run id mismatch'
+              assert run['head_sha'] == anchor, f'{label}: run head is not certification anchor'
+              assert run['conclusion'] == 'success', f'{label}: run not successful'
+              assert run['event'] == 'pull_request', f'{label}: unexpected run event'
+              assert int(run['workflow_id']) == expected_workflow_id, f'{label}: workflow id mismatch'
+              assert run['path'] == expected_workflow_path, f'{label}: workflow path mismatch'
+
+              artifact = get_json(f'{api}/actions/artifacts/{artifact_id}')
+              assert int(artifact['id']) == artifact_id, f'{label}: artifact id mismatch'
+              assert artifact['name'] == artifact_name, f'{label}: artifact name mismatch'
+              assert artifact['digest'] == expected_digest, f'{label}: metadata digest mismatch'
+              assert artifact['expired'] is False, f'{label}: artifact expired'
+              workflow_run = artifact['workflow_run']
+              assert int(workflow_run['id']) == run_id, f'{label}: artifact/run mismatch'
+              assert workflow_run['head_sha'] == anchor, f'{label}: artifact head mismatch'
+
+              archive_bytes = get_artifact_bytes(f'{api}/actions/artifacts/{artifact_id}/zip')
+              actual_digest = 'sha256:' + hashlib.sha256(archive_bytes).hexdigest()
+              assert actual_digest == expected_digest, f'{label}: downloaded ZIP digest mismatch'
+              memory = io.BytesIO(archive_bytes)
+              backing.append(memory)
+              archives[label] = zipfile.ZipFile(memory)
+
+          validation = archives['validation']
+          expected_validation = {
+              'generated/order_flow_delta_cvd_engine_lot45.json': Path('data/audit/order_flow_delta_and_cvd_engine_lot45.json'),
+              'generated/order_flow_delta_cvd_engine_audit_lot45.json': Path('data/audit/order_flow_delta_and_cvd_engine_audit_lot45.json'),
+              'generated/order_flow_state_lot45.json': Path('data/audit/order_flow_state_lot45.json'),
+              'generated/cvd_series_lot45.json': Path('data/audit/cvd_series_lot45.json'),
+              'coverage_summary.json': Path('reports/lot45/coverage_summary.json'),
+          }
+          for member, frozen_path in expected_validation.items():
+              assert validation.read(member) == frozen_path.read_bytes(), f'validation artifact drift: {member}'
+
+          mutation = archives['mutation']
+          assert mutation.read('mutation_summary.json') == Path('reports/lot45/mutation_summary.json').read_bytes(), 'mutation artifact drift'
+
+          quality = archives['quality']
+          quality_expected = {
+              'reports/quality/global_coverage_gate.json': os.environ['QUALITY_GLOBAL_COVERAGE_SHA256'],
+              'reports/quality/mutation_score.json': os.environ['QUALITY_MUTATION_SCORE_SHA256'],
+              'reports/quality/engineering_deviation_gate.json': os.environ['QUALITY_ENGINEERING_DEVIATION_SHA256'],
+          }
+          for member, expected_hash in quality_expected.items():
+              member_bytes = quality.read(member)
+              actual_hash = hashlib.sha256(member_bytes).hexdigest()
+              assert actual_hash == expected_hash, f'quality artifact byte drift: {member}'
+              payload = json.loads(member_bytes)
+              assert payload['status'] == 'PASS', f'quality artifact not PASS: {member}'
+
+          print(json.dumps({
+              'status': 'PASS',
+              'certification_anchor_sha': anchor,
+              'authenticated_artifacts': [item[4] for item in proofs],
+              'authenticated_workflows': [item[2] for item in proofs],
+          }, sort_keys=True))
+          PY
       - name: Validate frozen Lot 45 evidence
         run: |
           set -euo pipefail
@@ -168,7 +347,8 @@ jobs:
               tests/test_lot45_order_flow_delta_and_cvd_engine.py \
               tests/test_lot45_policy_contract.py \
               tests/test_lot45_runtime_binding_and_rounding.py \
-              tests/test_lot45_schema_contracts.py
+              tests/test_lot45_schema_contracts.py \
+              tests/test_lot45_checksum_binding_adversarial.py
           )
           git worktree remove --force /tmp/lot45-source
           trap - EXIT
@@ -197,7 +377,8 @@ jobs:
               tests/test_lot45_order_flow_delta_and_cvd_engine.py \
               tests/test_lot45_policy_contract.py \
               tests/test_lot45_runtime_binding_and_rounding.py \
-              tests/test_lot45_schema_contracts.py
+              tests/test_lot45_schema_contracts.py \
+              tests/test_lot45_checksum_binding_adversarial.py
           done
           test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine.py
           test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine_models.py
