@@ -1,6 +1,6 @@
 {
   "cvd_series": {
-    "cvd_checksum": "9f9bd3f9360e2f488a4b6d96a0e930b4353333e35debb3b47264793c1149979c",
+    "cvd_checksum": "68e6f47f0df214f74279c9749b1cfd1ac9e0cead7484bff9a098ee34481aa559",
     "points": [
       {
         "cvd": "0.05",
@@ -8,7 +8,7 @@
         "schema_version": "cvd-point-v1",
         "session_id": "2026-08-06",
         "signed_delta": "0.05",
-        "window_checksum": "bbe4fabcc1ec72075353552a7dfbd55d21b815de7ace991df8697b78799a3ab5"
+        "window_checksum": "09bd6b8809622b450f04e98c5d519a0fb3cc9f9b3c749eaa588f97499aebc10c"
       }
     ],
     "schema_version": "cvd-series-v1",
@@ -33,7 +33,8 @@
     "buy_volume": "0.08",
     "classification_coverage": "0.6875",
     "confidence_weighted_coverage": "0.6875",
-    "order_flow_checksum": "200585b65c124754c3e308aaf40eba2c98435ecac4f5a93815d278adcf887da0",
+    "confidence_weighted_volume": "0.11",
+    "order_flow_checksum": "3dc7a0d4836090509d12239c2a407cfa3afd736fa7d3f80ef2c2eeed3b4fa9ea",
     "schema_version": "order-flow-state-v1",
     "sell_trades_total": 1,
     "sell_volume": "0.03",
@@ -49,6 +50,7 @@
         "buy_volume": "0.08",
         "classification_coverage": "0.6875",
         "confidence_weighted_coverage": "0.6875",
+        "confidence_weighted_volume": "0.11",
         "delta_impulse": "0.05",
         "event_time": "2026-08-06T19:18:40.000000Z",
         "receive_time": "2026-08-06T19:18:40.050000Z",
@@ -62,13 +64,13 @@
         "trades_total": 3,
         "unknown_trades_total": 1,
         "unknown_volume": "0.05",
-        "window_checksum": "bbe4fabcc1ec72075353552a7dfbd55d21b815de7ace991df8697b78799a3ab5",
+        "window_checksum": "09bd6b8809622b450f04e98c5d519a0fb3cc9f9b3c749eaa588f97499aebc10c",
         "window_end": "2026-08-06T19:18:41.000000Z",
         "window_start": "2026-08-06T19:18:40.000000Z"
       }
     ]
   },
-  "output_checksum": "7670b0f7f20a1e90b8dc25c35f8deb1fe2134a2056c2d01e41ebdf4d38a8eb17",
+  "output_checksum": "1e74075715bf64b09a83d3e15ee68970e7e0ddff63155415c8e5a94dd220df19",
   "policy_version": "lot45-order-flow-delta-cvd-policy-v1",
   "reason_codes": [
     "LOT45_OFFLINE_ORDER_FLOW_DELTA_CVD_VALIDATED",
@@ -81,7 +83,7 @@
   ],
   "receive_time": "2026-08-06T19:18:40.050000Z",
   "run_context": {
-    "code_commit": "1f7bbd133139babb1a956adc7ada711390f16397",
+    "code_commit": "266ad1370ebea17918d3e7d7f95e62e81d4e9ed4",
     "config_version": "lot45-order-flow-delta-cvd-config-v1",
     "correlation_id": "microstructure-v4-lot45-reference",
     "run_id": "lot45-reference-run-v1",

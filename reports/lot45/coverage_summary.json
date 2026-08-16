@@ -1,10 +1,10 @@
 {
   "anti_flake_repetitions": 3,
   "branch_coverage_min_percent": 90.0,
-  "branch_coverage_percent": 92.59,
+  "branch_coverage_percent": 92.86,
   "line_coverage_min_percent": 95.0,
-  "line_coverage_percent": 98.3,
+  "line_coverage_percent": 98.33,
   "schema_version": "lot45-coverage-summary-v1",
-  "source_head_sha": "1f7bbd133139babb1a956adc7ada711390f16397",
+  "source_head_sha": "266ad1370ebea17918d3e7d7f95e62e81d4e9ed4",
   "status": "PASS"
 }
