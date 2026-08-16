@@ -23,7 +23,7 @@
 ```text
 Canonical continuous event stream
 → data quality / time / source governance
-→ ContinuousMarketStateV1 (V3/V4, planned)
+→ ContinuousMarketStateV1 (contrat cible V3/V4, activation progressive par lots)
 → registered temporal projections
 → confirmed scale states
 → scale-edge alignment (Lot26: 5m→15m)
@@ -107,4 +107,9 @@ Aucun score, forecast ou vote entre horizons ne neutralise un veto critique.
 
 ## 8. État actuel
 
-Lots 0–25 implémentent uniquement une fondation offline descriptive. Lot 26, continuous state, order book, forecasting, participant inference, risk approval, protective orders et execution restent non implémentés jusqu'à leurs gates respectifs.
+- V1 (Lots 0–20), V2 (Lots 21–30) et V3 (Lots 31–36) sont fermées/validées dans leurs modes offline respectifs.
+- V4 est active. Les Lots 37–44 sont fusionnés et audités : scope/contracts microstructure, snapshots L2, reconstruction des deltas/séquences, intégrité/désynchronisation du book, spread/depth/imbalance, zones/walls/voids, résilience/replenishment et trades/aggressor classification.
+- Le Lot 45 — Order Flow / Delta / CVD — est le seul lot d’implémentation actuellement ouvert. Son candidat reste `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY`, non exécutable et soumis à certification exacte avant merge.
+- Les Lots 46–52 restent verrouillés jusqu’à un audit post-merge indépendant du Lot 45 et une décision explicite `GO_LOT45_POST_MERGE`.
+- Forecasting/alpha (V5), backtest/TCA (V6), risk approval/sizing (V7), paper (V8), portfolio/PnL (V9), connecteurs account, OMS/EMS, sandbox et live restent non activés.
+- `trade_allowed=false`, `execution_allowed=false`, `approved_size=0`, leverage/withdrawals interdits et live désactivé par défaut restent des invariants transverses.
