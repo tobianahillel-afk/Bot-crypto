@@ -20,12 +20,14 @@ Lot 45 is accepted only when every criterion below is PASS on the exact certifie
 - Input order does not affect output: shuffled/out-of-order delivery must replay byte-identically after deterministic event-time sorting.
 - Window boundaries are deterministic from event timestamps.
 - Session transitions reset CVD exactly according to `lot45-utc-day-session-v1`.
+- Runtime timestamps and every published Lot45 timestamp schema accept only real Gregorian calendar dates in canonical microsecond UTC `Z` text; impossible dates and invalid leap days fail closed.
 - Two complete builds from the same source/config/input must produce identical state, audit, order-flow and CVD payloads/checksums.
 
 ## Upstream integrity
 
 - Entry gate merge is exactly bound to the certified Lot45 gate.
 - Lot44 frozen state, audit, confidence, config and post-merge checksums are revalidated before calculation.
+- The executable Python inventory under `src/` is compared with the claimed `code_commit` tree; ignored, untracked and post-freeze staged Python sources fail closed, including `src/sitecustomize.py`.
 - Duplicate trade ids fail closed.
 - Mixed source/venue/instrument/market identities fail closed.
 - Stale or causally impossible upstream evidence fails closed.
@@ -33,6 +35,7 @@ Lot 45 is accepted only when every criterion below is PASS on the exact certifie
 ## Contracts and persistence
 
 - Published JSON schemas are closed objects and require checksum fields.
+- Published timestamp schemas preserve exact canonical UTC text while also enforcing valid calendar dates.
 - Runtime safety is exact and fail-closed.
 - Decimal zero serializes canonically as `"0"`.
 - Final artifacts are persisted only with atomic JSON writes.
@@ -61,6 +64,7 @@ Lot 45 is accepted only when every criterion below is PASS on the exact certifie
 - Dedicated Lot45 line coverage >= 95%.
 - Dedicated Lot45 branch coverage >= 90%.
 - Dedicated mutation score >= 80%.
+- Adversarial tests prove ignored/untracked executable source rejection and calendar-invalid timestamp rejection.
 - Full repository tests PASS.
 - Architecture/roadmap/traceability/engineering/security checks PASS.
 - Targeted Lot45 tests repeat at least three times without flake.
