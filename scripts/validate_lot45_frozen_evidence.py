@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import sys
 from collections.abc import Callable
 from dataclasses import replace
@@ -36,24 +37,24 @@ from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_
 )
 
 GATE_MERGE = "390d0779f2be257fa8134faf8f02193a760a09c3"
-SOURCE_HEAD = "266ad1370ebea17918d3e7d7f95e62e81d4e9ed4"
-CERTIFICATION_ANCHOR = "6cf3df9e93cd5e79217c6eed030726f672a76cad"
-EVIDENCE_HEAD = "094521c17b3e211b9797a697fd593d6085d18563"
+SOURCE_HEAD = "bf84c046e14f6148213e48ff7e130de018ebe2df"
+CERTIFICATION_ANCHOR = "c5c7c44efb96719f579e3e7c99f4b9e596e5c4fc"
+EVIDENCE_HEAD = "5f8e5a03022d6e5c15a35a7f4e131e41d3c2b537"
 
 VALIDATION_PROOF = (
-    31955586885,
-    9265891597,
-    "sha256:f4ca118691f9a4cb2a5b881356ca0e574a9dd46ad7853b350f65662ab2fcabd0",
+    31963231150,
+    9267797039,
+    "sha256:d1d82352eb4b25a9bbe01ed08ffdff59a151f0d65cd0f2707866ede3baa22d18",
 )
 MUTATION_PROOF = (
-    31955588847,
-    9265913598,
-    "sha256:5a395cdc925e7589be9bf67e23df367269dded3d059d8fdaadf63688bb4f5685",
+    31963231194,
+    9267827662,
+    "sha256:e446e3f9db828d5b59b072911e12bbbea702043aade67989e735000d0a7f5f75",
 )
 QUALITY_PROOF = (
-    31955586763,
-    9265917524,
-    "sha256:8a07ecce6a45032732ed910ddd03ffa564d48a51a0b6d42b4cc6f64c091b266a",
+    31963231177,
+    9267813807,
+    "sha256:0cb5f6210bac24925c0de4dbe7c0eb92ee0e8f17bcb2387acc8f9fba51f93e92",
 )
 
 STATE = ROOT / "data/audit/order_flow_delta_and_cvd_engine_lot45.json"
@@ -64,17 +65,18 @@ COVERAGE = ROOT / "reports/lot45/coverage_summary.json"
 MUTATION = ROOT / "reports/lot45/mutation_summary.json"
 OLD_STATE_ALIAS = ROOT / "data/audit/order_flow_delta_cvd_engine_lot45.json"
 OLD_AUDIT_ALIAS = ROOT / "data/audit/order_flow_delta_cvd_engine_audit_lot45.json"
+SCHEMA_ROOT = ROOT / "contracts/schemas"
 
 EXPECTED_HASHES = {
-    STATE: "125201880310f2e989ce07cf9a0b5456cd573d28a3b56abd1003283776c413d8",
-    AUDIT: "cf1006935fe72706c6f4543636aac5ec212bf953fcc21f7279d7dc6ec7fb6f11",
+    STATE: "979201c84a8979efde06c9fb813368935e798d606f9e6b860839df67e89aa6d0",
+    AUDIT: "a78b0a7f6252bb77dd4223f0f080a2420dec5be6c9b1c26e44a4a98e67888211",
     ORDER_FLOW: "f9d46121e552dcea5eca7306befa47114d9602e81be32a19bc565221398724f8",
     CVD: "a8923ce2fb08a571059a411edd4e2b0dd1d0a7116727a66edd9046c0e70d352f",
-    COVERAGE: "3bee11be4f64110355f44917d4c4128d0e7918daf768ac928c8d14903d737767",
-    MUTATION: "17f6d8e8336b30b12a993bbacd9da58d12b5dfaf56ba7c9b192e08c273ecf4f4",
+    COVERAGE: "a94dc652cd7db418b378694115d2abe602b7199d8430d1f2286b4e2e2dabd9a8",
+    MUTATION: "28ddbc3d1c0b5631a79fbeefd1f31d093e0933c2f9d0c25f04328f59fde6ebe6",
 }
-EXPECTED_STATE = "1e74075715bf64b09a83d3e15ee68970e7e0ddff63155415c8e5a94dd220df19"
-EXPECTED_AUDIT = "08dbd50cc65e2f5723c77e8042650422643beda5b4ad472eb9eb770cf507087d"
+EXPECTED_STATE = "948d5edf213f738b7616cdb5c84178f801872f7d8f6698a01e310122047119b3"
+EXPECTED_AUDIT = "933e966e87ed7f80fa7da0f1801650b1ca327395ebaf0aebd2d012c5ab9c70cc"
 EXPECTED_ORDER_FLOW = "3dc7a0d4836090509d12239c2a407cfa3afd736fa7d3f80ef2c2eeed3b4fa9ea"
 EXPECTED_CVD = "68e6f47f0df214f74279c9749b1cfd1ac9e0cead7484bff9a098ee34481aa559"
 EXPECTED_CONFIG = "2200905208b366f6230d76a35733fbde7338c3dc3902e3c6cc50999ba0d4fb30"
@@ -126,6 +128,10 @@ LOT46_FORBIDDEN = (
     "reports/lot_46_trade_classification_confidence_engine_report.md",
     "docs/LOT_46_TRADE_CLASSIFICATION_CONFIDENCE_ENGINE.md",
     "docs/ACCEPTANCE_CRITERIA_LOT_46.md",
+)
+UTC_TIMESTAMP_PATTERN = (
+    r"^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])"
+    r"T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\.[0-9]{6}Z$"
 )
 ZERO_SHA256 = "0" * 64
 QUOTE_SHA256 = "1" * 64
@@ -235,18 +241,18 @@ def _verify_reference(order_flow: dict[str, Any], cvd: dict[str, Any]) -> None:
 def _verify_quality(coverage: dict[str, Any], mutation: dict[str, Any]) -> None:
     require(coverage["status"] == "PASS", "coverage not PASS")
     require(coverage["source_head_sha"] == SOURCE_HEAD, "coverage source changed")
-    require(coverage["line_coverage_percent"] == 98.33, "line coverage changed")
+    require(coverage["line_coverage_percent"] == 98.34, "line coverage changed")
     require(coverage["branch_coverage_percent"] == 92.86, "branch coverage changed")
     require(coverage["anti_flake_repetitions"] == 3, "anti-flake count changed")
 
     require(mutation["status"] == "PASS", "mutation not PASS")
     require(mutation["source_head_sha"] == SOURCE_HEAD, "mutation source changed")
-    require(mutation["mutation_score_percent"] == 81.55, "mutation score changed")
-    require(mutation["killed_mutants"] == 1096, "killed mutant count changed")
-    require(mutation["survived_mutants"] == 248, "survived mutant count changed")
-    require(mutation["evaluated_mutants"] == 1344, "evaluated mutant count changed")
-    require(mutation["completed_mutants"] == 1344, "completed mutant count changed")
-    require(mutation["total_mutants"] == 1344, "total mutant count changed")
+    require(mutation["mutation_score_percent"] == 81.6, "mutation score changed")
+    require(mutation["killed_mutants"] == 1109, "killed mutant count changed")
+    require(mutation["survived_mutants"] == 250, "survived mutant count changed")
+    require(mutation["evaluated_mutants"] == 1359, "evaluated mutant count changed")
+    require(mutation["completed_mutants"] == 1359, "completed mutant count changed")
+    require(mutation["total_mutants"] == 1359, "total mutant count changed")
     require(mutation["timeout_mutants"] == 0, "mutation timeout present")
     require(mutation["suspicious_mutants"] == 0, "suspicious mutation present")
     require(mutation["mutmut_run_exit_code"] == 0, "mutmut run exit changed")
@@ -436,6 +442,51 @@ def _verify_review_hardening() -> None:
         lambda: replace(first_point, session_id="2026-08-05"),
         "forged CVD session_id was accepted",
     )
+    _expect_lot45_rejection(
+        lambda: replace(
+            first_window,
+            window_start="2026-08-06T19:18:40.050000Z",
+            window_end="2026-08-06T19:18:40.900000Z",
+        ),
+        "forged noncanonical tumbling window was accepted",
+    )
+
+
+def _verify_schema_timestamp_hardening() -> None:
+    state = load_json_object(SCHEMA_ROOT / "order_flow_delta_cvd_engine_state_v1.schema.json")
+    flow = load_json_object(SCHEMA_ROOT / "order_flow_state_v1.schema.json")
+    cvd = load_json_object(SCHEMA_ROOT / "cvd_series_v1.schema.json")
+
+    state_props = state["properties"]
+    patterns = [state_props[field]["pattern"] for field in ("event_time", "receive_time", "generated_at")]
+    patterns.append(state_props["lineage"]["properties"]["available_at"]["pattern"])
+    window_props = flow["properties"]["windows"]["items"]["properties"]
+    patterns.extend(
+        window_props[field]["pattern"]
+        for field in ("window_start", "window_end", "event_time", "receive_time")
+    )
+    point_props = cvd["properties"]["points"]["items"]["properties"]
+    patterns.append(point_props["event_time"]["pattern"])
+
+    require(patterns, "no Lot45 timestamp schema patterns found")
+    for pattern in patterns:
+        require(pattern == UTC_TIMESTAMP_PATTERN, "Lot45 timestamp schema pattern drifted")
+        require(
+            re.fullmatch(pattern, "2026-08-06T19:18:40.000000Z") is not None,
+            "canonical Lot45 UTC timestamp rejected by schema",
+        )
+        for invalid in (
+            "garbageZ",
+            "2026-08-06T19:18:40Z",
+            "2026-08-06T19:18:40.000000+00:00",
+            "2026-08-06 19:18:40.000000Z",
+            "2026-08-06T25:18:40.000000Z",
+            "2026-08-06T19:18:40.000000z",
+        ):
+            require(
+                re.fullmatch(pattern, invalid) is None,
+                f"noncanonical timestamp accepted by Lot45 schema: {invalid}",
+            )
 
 
 def _verify_downstream_lock() -> None:
@@ -450,9 +501,10 @@ def validate() -> dict[str, object]:
     _verify_quality(coverage, mutation)
     _verify_runtime_replay(state, audit, order_flow, cvd)
     _verify_review_hardening()
+    _verify_schema_timestamp_hardening()
     _verify_downstream_lock()
     return {
-        "schema_version": "lot45-frozen-evidence-validation-v4",
+        "schema_version": "lot45-frozen-evidence-validation-v5",
         "status": "PASS",
         "verdict": "PASS_LOT45_FROZEN_EVIDENCE",
         "gate_merge": GATE_MERGE,
@@ -484,6 +536,8 @@ def validate() -> dict[str, object]:
             "raw_weighted_volume_aggregation": True,
             "event_time_session_binding": True,
             "cvd_window_metric_binding": True,
+            "event_time_tumbling_window_binding": True,
+            "canonical_utc_schema_timestamp_binding": True,
         },
         "canonical_evidence_paths": True,
         "lot46_status": "PLANNED_LOCKED",
