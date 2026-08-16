@@ -1,6 +1,6 @@
 {
-  "audit_checksum": "4a22be2304bb09cd96e0c63704776a9def0b7ab63ab21825468bef9a7663aa52",
-  "code_commit": "2797b1dbb4d0e04d31b5c95734e36e3231869fb3",
+  "audit_checksum": "260c0014be23819118d051cb6630910f0f3d4d274164c17e98bf0eff88239642",
+  "code_commit": "89ec5c692622d80222eb63bfa2732242d4a84987",
   "config_checksum": "2200905208b366f6230d76a35733fbde7338c3dc3902e3c6cc50999ba0d4fb30",
   "cvd_checksum": "68e6f47f0df214f74279c9749b1cfd1ac9e0cead7484bff9a098ee34481aa559",
   "entry_gate_checksum": "15ca4d69e59a0898f32eb9cbe558571ecf00ae496ec5d41075da1124393d4468",
@@ -27,6 +27,6 @@
     "used_for_decision": false
   },
   "schema_version": "order-flow-delta-cvd-engine-audit-v1",
-  "state_output_checksum": "38f8b97713de3adb879eaf0f6eed0ef5c3db35b820784c4e263b79567c4c38b7",
+  "state_output_checksum": "24cca6d239ada8471b407bd66e3d4340790155ced5bc7d1c56034b81ccabc38a",
   "validation_state": "VALIDATED_OFFLINE_ORDER_FLOW_DELTA_CVD_ONLY"
 }

@@ -70,7 +70,7 @@
       }
     ]
   },
-  "output_checksum": "38f8b97713de3adb879eaf0f6eed0ef5c3db35b820784c4e263b79567c4c38b7",
+  "output_checksum": "24cca6d239ada8471b407bd66e3d4340790155ced5bc7d1c56034b81ccabc38a",
   "policy_version": "lot45-order-flow-delta-cvd-policy-v1",
   "reason_codes": [
     "LOT45_OFFLINE_ORDER_FLOW_DELTA_CVD_VALIDATED",
@@ -83,7 +83,7 @@
   ],
   "receive_time": "2026-08-06T19:18:40.050000Z",
   "run_context": {
-    "code_commit": "2797b1dbb4d0e04d31b5c95734e36e3231869fb3",
+    "code_commit": "89ec5c692622d80222eb63bfa2732242d4a84987",
     "config_version": "lot45-order-flow-delta-cvd-config-v1",
     "correlation_id": "microstructure-v4-lot45-reference",
     "run_id": "lot45-reference-run-v1",
