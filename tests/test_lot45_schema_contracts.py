@@ -24,8 +24,11 @@ SIGNED_DECIMAL = r"^(?:0|-?[1-9][0-9]*(?:\.[0-9]*[1-9])?|-?0\.[0-9]*[1-9])$"
 UNIT_RATIO = r"^(?:0|1|0\.[0-9]*[1-9])$"
 SIGNED_UNIT_RATIO = r"^(?:0|1|-1|0\.[0-9]*[1-9]|-0\.[0-9]*[1-9])$"
 UTC_TIMESTAMP = (
-    r"^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])"
-    r"T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\.[0-9]{6}Z$"
+    r"^(?!0000-)(?:"
+    r"(?:[0-9]{4}-(?:(?:01|03|05|07|08|10|12)-(?:0[1-9]|[12][0-9]|3[01])"
+    r"|(?:04|06|09|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8])))"
+    r"|(?:(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29)"
+    r")T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\.[0-9]{6}Z$"
 )
 
 
@@ -155,32 +158,55 @@ def test_decimal_schema_fields_are_canonical_and_bounded() -> None:
         assert re.fullmatch(SIGNED_DECIMAL, valid) is not None
 
 
-def test_timestamp_schema_fields_use_canonical_utc_text() -> None:
+def _timestamp_schema_nodes() -> tuple[dict[str, object], ...]:
     state_schema = _schema("order_flow_delta_cvd_engine_state_v1.schema.json")
     state_properties = state_schema["properties"]
-    for field in ("event_time", "receive_time", "generated_at"):
-        assert state_properties[field]["pattern"] == UTC_TIMESTAMP
-    assert state_properties["lineage"]["properties"]["available_at"]["pattern"] == UTC_TIMESTAMP
-
     flow_schema = _schema("order_flow_state_v1.schema.json")
     window_properties = flow_schema["properties"]["windows"]["items"]["properties"]
-    for field in ("window_start", "window_end", "event_time", "receive_time"):
-        assert window_properties[field]["pattern"] == UTC_TIMESTAMP
-
     cvd_schema = _schema("cvd_series_v1.schema.json")
     point_properties = cvd_schema["properties"]["points"]["items"]["properties"]
-    assert point_properties["event_time"]["pattern"] == UTC_TIMESTAMP
+    return (
+        state_properties["event_time"],
+        state_properties["receive_time"],
+        state_properties["generated_at"],
+        state_properties["lineage"]["properties"]["available_at"],
+        window_properties["window_start"],
+        window_properties["window_end"],
+        window_properties["event_time"],
+        window_properties["receive_time"],
+        point_properties["event_time"],
+    )
+
+
+def test_timestamp_schema_fields_use_calendar_valid_canonical_utc_text() -> None:
+    for node in _timestamp_schema_nodes():
+        assert node["pattern"] == UTC_TIMESTAMP
+        assert node["format"] == "date-time"
 
     for invalid in (
         "garbageZ",
+        "0000-01-01T00:00:00.000000Z",
         "2026-08-06T19:18:40Z",
         "2026-08-06T19:18:40.000000+00:00",
         "2026-08-06 19:18:40.000000Z",
         "2026-08-06T25:18:40.000000Z",
         "2026-08-06T19:18:40.000000z",
+        "2026-02-29T19:18:40.000000Z",
+        "2026-02-31T19:18:40.000000Z",
+        "2026-04-31T19:18:40.000000Z",
+        "1900-02-29T19:18:40.000000Z",
+        "2100-02-29T19:18:40.000000Z",
     ):
         assert re.fullmatch(UTC_TIMESTAMP, invalid) is None
-    assert re.fullmatch(UTC_TIMESTAMP, "2026-08-06T19:18:40.000000Z") is not None
+
+    for valid in (
+        "2026-08-06T19:18:40.000000Z",
+        "2024-02-29T00:00:00.000000Z",
+        "2000-02-29T23:59:59.999999Z",
+        "2400-02-29T00:00:00.000001Z",
+        "9999-12-31T23:59:59.999999Z",
+    ):
+        assert re.fullmatch(UTC_TIMESTAMP, valid) is not None
 
 
 def test_cvd_schema_fixes_session_policy_and_checksum() -> None:
