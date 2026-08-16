@@ -6,6 +6,10 @@ from decimal import ROUND_HALF_EVEN, Decimal, localcontext
 from types import MappingProxyType
 from typing import Any
 
+from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry import (
+    canonical_checksum,
+)
+
 from .order_flow_delta_and_cvd_engine_validation import (
     CALCULATION_DECIMAL_PRECISION,
     POLICY_VERSION,
@@ -594,8 +598,22 @@ def _validate_state_time_envelope(state: OrderFlowDeltaCVDEngineStateV1) -> None
 def _validate_state_cvd_binding(state: OrderFlowDeltaCVDEngineStateV1) -> None:
     windows = state.order_flow.windows
     points = state.cvd_series.points
+    require(
+        canonical_checksum(state.order_flow.payload_without_checksum())
+        == state.order_flow.order_flow_checksum,
+        "order-flow checksum canonical mismatch",
+    )
+    require(
+        canonical_checksum(state.cvd_series.payload_without_checksum())
+        == state.cvd_series.cvd_checksum,
+        "CVD checksum canonical mismatch",
+    )
     require(len(points) == len(windows), "CVD points must bind one-to-one to windows")
     for point, window in zip(points, windows, strict=True):
+        require(
+            canonical_checksum(window.payload_without_checksum()) == window.window_checksum,
+            "window checksum canonical mismatch",
+        )
         require(
             point.window_checksum == window.window_checksum,
             "CVD point window checksum mismatch",
