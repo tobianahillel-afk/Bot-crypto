@@ -91,6 +91,7 @@ def parse_utc_timestamp(value: object, field: str) -> datetime:
     except ValueError as exc:
         raise Lot45ValidationError(f"{field} invalid UTC timestamp") from exc
     require(parsed.tzinfo == UTC, f"{field} must be UTC")
+    require(text == timestamp_text(parsed), f"{field} must use canonical UTC timestamp text")
     return parsed
 
 
