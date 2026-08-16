@@ -409,10 +409,14 @@ def _validate_window_volumes(window: OrderFlowWindowV1) -> None:
     for field, volume in volumes.items():
         require(volume.is_finite() and volume >= 0, f"{field} must be finite non-negative")
     require(window.total_volume > 0, "order-flow total volume must be positive")
-    classified_total = window.buy_volume + window.sell_volume + window.unknown_volume
+    with localcontext() as context:
+        context.prec = CALCULATION_DECIMAL_PRECISION
+        context.rounding = ROUND_HALF_EVEN
+        classified_total = window.buy_volume + window.sell_volume + window.unknown_volume
+        expected_delta = window.buy_volume - window.sell_volume
     require(window.total_volume == classified_total, "order-flow volume conservation failed")
     require(
-        window.signed_delta == window.buy_volume - window.sell_volume,
+        window.signed_delta == expected_delta,
         "signed delta must equal buy minus sell volume",
     )
 
@@ -439,15 +443,18 @@ def _validate_flow_window_sequence(windows: tuple[OrderFlowWindowV1, ...]) -> No
     starts = [parse_utc_timestamp(item.window_start, "window_start") for item in windows]
     require(starts == sorted(starts), "order-flow windows must be event-time ordered")
     require(len(starts) == len(set(starts)), "order-flow windows must be unique")
-    previous_delta = Decimal("0")
-    previous_session: str | None = None
-    for item in windows:
-        expected = item.signed_delta
-        if previous_session == item.session_id:
-            expected -= previous_delta
-        require(item.delta_impulse == expected, "window delta impulse mismatch")
-        previous_delta = item.signed_delta
-        previous_session = item.session_id
+    with localcontext() as context:
+        context.prec = CALCULATION_DECIMAL_PRECISION
+        context.rounding = ROUND_HALF_EVEN
+        previous_delta = Decimal("0")
+        previous_session: str | None = None
+        for item in windows:
+            expected = item.signed_delta
+            if previous_session == item.session_id:
+                expected -= previous_delta
+            require(item.delta_impulse == expected, "window delta impulse mismatch")
+            previous_delta = item.signed_delta
+            previous_session = item.session_id
 
 
 def _validate_flow_counts(state: OrderFlowStateV1) -> None:
@@ -462,19 +469,24 @@ def _validate_flow_counts(state: OrderFlowStateV1) -> None:
 
 
 def _validate_flow_volumes(state: OrderFlowStateV1) -> None:
-    expected = {
-        "total_volume": sum((item.total_volume for item in state.windows), Decimal("0")),
-        "buy_volume": sum((item.buy_volume for item in state.windows), Decimal("0")),
-        "sell_volume": sum((item.sell_volume for item in state.windows), Decimal("0")),
-        "unknown_volume": sum((item.unknown_volume for item in state.windows), Decimal("0")),
-    }
+    with localcontext() as context:
+        context.prec = CALCULATION_DECIMAL_PRECISION
+        context.rounding = ROUND_HALF_EVEN
+        expected = {
+            "total_volume": sum((item.total_volume for item in state.windows), Decimal("0")),
+            "buy_volume": sum((item.buy_volume for item in state.windows), Decimal("0")),
+            "sell_volume": sum((item.sell_volume for item in state.windows), Decimal("0")),
+            "unknown_volume": sum((item.unknown_volume for item in state.windows), Decimal("0")),
+        }
+        classified_total = state.buy_volume + state.sell_volume + state.unknown_volume
+        expected_delta = state.buy_volume - state.sell_volume
     for field, value in expected.items():
         require(getattr(state, field) == value, f"{field} aggregate mismatch")
     require(
-        state.total_volume == state.buy_volume + state.sell_volume + state.unknown_volume,
+        state.total_volume == classified_total,
         "aggregate volume conservation failed",
     )
-    require(state.signed_delta == state.buy_volume - state.sell_volume, "aggregate delta mismatch")
+    require(state.signed_delta == expected_delta, "aggregate delta mismatch")
 
 
 def _validate_flow_metrics(state: OrderFlowStateV1) -> None:
@@ -501,14 +513,17 @@ def _validate_cvd_points(points: tuple[CVDPointV1, ...]) -> None:
     event_times = [parse_utc_timestamp(item.event_time, "CVD event_time") for item in points]
     require(event_times == sorted(event_times), "CVD points must be event-time ordered")
     require(len(event_times) == len(set(event_times)), "CVD event times must be unique")
-    current_session: str | None = None
-    running = Decimal("0")
-    for point in points:
-        if point.session_id != current_session:
-            current_session = point.session_id
-            running = Decimal("0")
-        running += point.signed_delta
-        require(point.cvd == running, "CVD recurrence mismatch")
+    with localcontext() as context:
+        context.prec = CALCULATION_DECIMAL_PRECISION
+        context.rounding = ROUND_HALF_EVEN
+        current_session: str | None = None
+        running = Decimal("0")
+        for point in points:
+            if point.session_id != current_session:
+                current_session = point.session_id
+                running = Decimal("0")
+            running += point.signed_delta
+            require(point.cvd == running, "CVD recurrence mismatch")
 
 
 def _validate_state_versions(state: OrderFlowDeltaCVDEngineStateV1) -> None:
