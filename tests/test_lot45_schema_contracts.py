@@ -86,6 +86,7 @@ def test_order_flow_schema_requires_unknown_and_conservation_observables() -> No
         "unknown_volume",
         "unknown_volume_ratio",
         "classification_coverage",
+        "confidence_weighted_volume",
         "confidence_weighted_coverage",
         "signed_delta",
         "order_flow_checksum",
@@ -97,6 +98,7 @@ def test_order_flow_schema_requires_unknown_and_conservation_observables() -> No
         "signed_delta",
         "signed_imbalance",
         "classification_coverage",
+        "confidence_weighted_volume",
         "confidence_weighted_coverage",
         "delta_impulse",
         "window_checksum",
@@ -109,14 +111,24 @@ def test_decimal_schema_fields_are_canonical_and_bounded() -> None:
     window_properties = properties["windows"]["items"]["properties"]
 
     assert properties["total_volume"]["pattern"] == POSITIVE_DECIMAL
-    for field in ("buy_volume", "sell_volume", "unknown_volume"):
+    for field in (
+        "buy_volume",
+        "sell_volume",
+        "unknown_volume",
+        "confidence_weighted_volume",
+    ):
         assert properties[field]["pattern"] == NONNEGATIVE_DECIMAL
     assert properties["signed_delta"]["pattern"] == SIGNED_DECIMAL
     for field in ("unknown_volume_ratio", "classification_coverage", "confidence_weighted_coverage"):
         assert properties[field]["pattern"] == UNIT_RATIO
 
     assert window_properties["total_volume"]["pattern"] == POSITIVE_DECIMAL
-    for field in ("buy_volume", "sell_volume", "unknown_volume"):
+    for field in (
+        "buy_volume",
+        "sell_volume",
+        "unknown_volume",
+        "confidence_weighted_volume",
+    ):
         assert window_properties[field]["pattern"] == NONNEGATIVE_DECIMAL
     for field in ("signed_delta", "delta_impulse"):
         assert window_properties[field]["pattern"] == SIGNED_DECIMAL

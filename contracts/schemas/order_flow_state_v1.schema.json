@@ -18,6 +18,7 @@
     "signed_delta",
     "unknown_volume_ratio",
     "classification_coverage",
+    "confidence_weighted_volume",
     "confidence_weighted_coverage",
     "order_flow_checksum"
   ],
@@ -34,7 +35,8 @@
           "session_id", "trades_total", "buy_trades_total", "sell_trades_total",
           "unknown_trades_total", "total_volume", "buy_volume", "sell_volume",
           "unknown_volume", "signed_delta", "signed_imbalance", "classification_coverage",
-          "confidence_weighted_coverage", "delta_impulse", "window_checksum"
+          "confidence_weighted_volume", "confidence_weighted_coverage", "delta_impulse",
+          "window_checksum"
         ],
         "properties": {
           "schema_version": {"const": "order-flow-window-v1"},
@@ -54,6 +56,7 @@
           "signed_delta": {"type": "string", "pattern": "^(?:0|-?[1-9][0-9]*(?:\\.[0-9]*[1-9])?|-?0\\.[0-9]*[1-9])$"},
           "signed_imbalance": {"type": "string", "pattern": "^(?:0|1|-1|0\\.[0-9]*[1-9]|-0\\.[0-9]*[1-9])$"},
           "classification_coverage": {"type": "string", "pattern": "^(?:0|1|0\\.[0-9]*[1-9])$"},
+          "confidence_weighted_volume": {"type": "string", "pattern": "^(?:0|[1-9][0-9]*(?:\\.[0-9]*[1-9])?|0\\.[0-9]*[1-9])$"},
           "confidence_weighted_coverage": {"type": "string", "pattern": "^(?:0|1|0\\.[0-9]*[1-9])$"},
           "delta_impulse": {"type": "string", "pattern": "^(?:0|-?[1-9][0-9]*(?:\\.[0-9]*[1-9])?|-?0\\.[0-9]*[1-9])$"},
           "window_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
@@ -71,6 +74,7 @@
     "signed_delta": {"type": "string", "pattern": "^(?:0|-?[1-9][0-9]*(?:\\.[0-9]*[1-9])?|-?0\\.[0-9]*[1-9])$"},
     "unknown_volume_ratio": {"type": "string", "pattern": "^(?:0|1|0\\.[0-9]*[1-9])$"},
     "classification_coverage": {"type": "string", "pattern": "^(?:0|1|0\\.[0-9]*[1-9])$"},
+    "confidence_weighted_volume": {"type": "string", "pattern": "^(?:0|[1-9][0-9]*(?:\\.[0-9]*[1-9])?|0\\.[0-9]*[1-9])$"},
     "confidence_weighted_coverage": {"type": "string", "pattern": "^(?:0|1|0\\.[0-9]*[1-9])$"},
     "order_flow_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
   }

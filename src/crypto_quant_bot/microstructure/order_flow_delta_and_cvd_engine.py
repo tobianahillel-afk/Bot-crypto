@@ -509,6 +509,7 @@ def _build_window(
         signed_delta,
         signed_delta / total,
         (buy_volume + sell_volume) / total,
+        weighted,
         weighted / total,
         impulse,
         ZERO_SHA256,
@@ -542,10 +543,7 @@ def _aggregate_order_flow(windows: tuple[OrderFlowWindowV1, ...]) -> OrderFlowSt
     buy = sum((item.buy_volume for item in windows), Decimal("0"))
     sell = sum((item.sell_volume for item in windows), Decimal("0"))
     unknown = sum((item.unknown_volume for item in windows), Decimal("0"))
-    weighted = sum(
-        (item.confidence_weighted_coverage * item.total_volume for item in windows),
-        Decimal("0"),
-    )
+    weighted = sum((item.confidence_weighted_volume for item in windows), Decimal("0"))
     provisional = OrderFlowStateV1(
         windows,
         sum(item.trades_total for item in windows),
@@ -559,6 +557,7 @@ def _aggregate_order_flow(windows: tuple[OrderFlowWindowV1, ...]) -> OrderFlowSt
         buy - sell,
         unknown / total,
         (buy + sell) / total,
+        weighted,
         weighted / total,
         ZERO_SHA256,
     )

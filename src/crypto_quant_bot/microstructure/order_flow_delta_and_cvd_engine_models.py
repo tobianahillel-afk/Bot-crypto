@@ -20,6 +20,7 @@ from .order_flow_delta_and_cvd_engine_validation import (
     require_reason_codes,
     require_sha256,
     require_text,
+    session_id_for_event,
     validate_causal_times,
     validate_ratio,
     validate_run_context,
@@ -106,6 +107,7 @@ class OrderFlowWindowV1:
     signed_delta: Decimal
     signed_imbalance: Decimal
     classification_coverage: Decimal
+    confidence_weighted_volume: Decimal
     confidence_weighted_coverage: Decimal
     delta_impulse: Decimal
     window_checksum: str
@@ -141,6 +143,7 @@ class OrderFlowWindowV1:
             "signed_delta": decimal_text(self.signed_delta),
             "signed_imbalance": decimal_text(self.signed_imbalance),
             "classification_coverage": decimal_text(self.classification_coverage),
+            "confidence_weighted_volume": decimal_text(self.confidence_weighted_volume),
             "confidence_weighted_coverage": decimal_text(
                 self.confidence_weighted_coverage
             ),
@@ -163,6 +166,7 @@ class OrderFlowStateV1:
     signed_delta: Decimal
     unknown_volume_ratio: Decimal
     classification_coverage: Decimal
+    confidence_weighted_volume: Decimal
     confidence_weighted_coverage: Decimal
     order_flow_checksum: str
 
@@ -194,6 +198,7 @@ class OrderFlowStateV1:
             "signed_delta": decimal_text(self.signed_delta),
             "unknown_volume_ratio": decimal_text(self.unknown_volume_ratio),
             "classification_coverage": decimal_text(self.classification_coverage),
+            "confidence_weighted_volume": decimal_text(self.confidence_weighted_volume),
             "confidence_weighted_coverage": decimal_text(
                 self.confidence_weighted_coverage
             ),
@@ -212,6 +217,11 @@ class CVDPointV1:
     def __post_init__(self) -> None:
         parse_utc_timestamp(self.event_time, "CVD event_time")
         require_text(self.session_id, "session_id")
+        require(
+            self.session_id
+            == session_id_for_event(self.event_time, SESSION_POLICY_VERSION),
+            "CVD session_id does not match event-time session policy",
+        )
         require_sha256(self.window_checksum, "window_checksum")
         require(self.signed_delta.is_finite(), "CVD signed delta must be finite")
         require(self.cvd.is_finite(), "CVD must be finite")
@@ -381,6 +391,11 @@ def _validate_window_times(window: OrderFlowWindowV1) -> None:
     require(start <= event < end, "window event_time must be inside event-time window")
     require(event <= receive, "window receive_time precedes event_time")
     require_text(window.session_id, "session_id")
+    require(
+        window.session_id
+        == session_id_for_event(window.event_time, SESSION_POLICY_VERSION),
+        "window session_id does not match event-time session policy",
+    )
 
 
 def _validate_window_counts(window: OrderFlowWindowV1) -> None:
@@ -405,6 +420,7 @@ def _validate_window_volumes(window: OrderFlowWindowV1) -> None:
         "buy_volume": window.buy_volume,
         "sell_volume": window.sell_volume,
         "unknown_volume": window.unknown_volume,
+        "confidence_weighted_volume": window.confidence_weighted_volume,
     }
     for field, volume in volumes.items():
         require(volume.is_finite() and volume >= 0, f"{field} must be finite non-negative")
@@ -413,8 +429,13 @@ def _validate_window_volumes(window: OrderFlowWindowV1) -> None:
         context.prec = CALCULATION_DECIMAL_PRECISION
         context.rounding = ROUND_HALF_EVEN
         classified_total = window.buy_volume + window.sell_volume + window.unknown_volume
+        classified_volume = window.buy_volume + window.sell_volume
         expected_delta = window.buy_volume - window.sell_volume
     require(window.total_volume == classified_total, "order-flow volume conservation failed")
+    require(
+        window.confidence_weighted_volume <= classified_volume,
+        "confidence-weighted volume cannot exceed classified volume",
+    )
     require(
         window.signed_delta == expected_delta,
         "signed delta must equal buy minus sell volume",
@@ -427,8 +448,13 @@ def _validate_window_metrics(window: OrderFlowWindowV1) -> None:
         context.rounding = ROUND_HALF_EVEN
         expected_imbalance = window.signed_delta / window.total_volume
         expected_coverage = (window.buy_volume + window.sell_volume) / window.total_volume
+        expected_weighted = window.confidence_weighted_volume / window.total_volume
     require(window.signed_imbalance == expected_imbalance, "signed imbalance mismatch")
     require(window.classification_coverage == expected_coverage, "classification coverage mismatch")
+    require(
+        window.confidence_weighted_coverage == expected_weighted,
+        "confidence-weighted coverage mismatch",
+    )
     validate_ratio(window.classification_coverage, "classification_coverage")
     validate_ratio(window.confidence_weighted_coverage, "confidence_weighted_coverage")
     require(
@@ -477,14 +503,23 @@ def _validate_flow_volumes(state: OrderFlowStateV1) -> None:
             "buy_volume": sum((item.buy_volume for item in state.windows), Decimal("0")),
             "sell_volume": sum((item.sell_volume for item in state.windows), Decimal("0")),
             "unknown_volume": sum((item.unknown_volume for item in state.windows), Decimal("0")),
+            "confidence_weighted_volume": sum(
+                (item.confidence_weighted_volume for item in state.windows),
+                Decimal("0"),
+            ),
         }
         classified_total = state.buy_volume + state.sell_volume + state.unknown_volume
+        classified_volume = state.buy_volume + state.sell_volume
         expected_delta = state.buy_volume - state.sell_volume
     for field, value in expected.items():
         require(getattr(state, field) == value, f"{field} aggregate mismatch")
     require(
         state.total_volume == classified_total,
         "aggregate volume conservation failed",
+    )
+    require(
+        state.confidence_weighted_volume <= classified_volume,
+        "aggregate confidence-weighted volume cannot exceed classified volume",
     )
     require(state.signed_delta == expected_delta, "aggregate delta mismatch")
 
@@ -495,11 +530,7 @@ def _validate_flow_metrics(state: OrderFlowStateV1) -> None:
         context.rounding = ROUND_HALF_EVEN
         expected_unknown = state.unknown_volume / state.total_volume
         expected_coverage = (state.buy_volume + state.sell_volume) / state.total_volume
-        weighted_volume = sum(
-            (item.confidence_weighted_coverage * item.total_volume for item in state.windows),
-            Decimal("0"),
-        )
-        expected_weighted = weighted_volume / state.total_volume
+        expected_weighted = state.confidence_weighted_volume / state.total_volume
     require(state.unknown_volume_ratio == expected_unknown, "unknown volume ratio mismatch")
     require(state.classification_coverage == expected_coverage, "aggregate coverage mismatch")
     require(state.confidence_weighted_coverage == expected_weighted, "aggregate weighted coverage mismatch")
@@ -519,6 +550,11 @@ def _validate_cvd_points(points: tuple[CVDPointV1, ...]) -> None:
         current_session: str | None = None
         running = Decimal("0")
         for point in points:
+            expected_session = session_id_for_event(point.event_time, SESSION_POLICY_VERSION)
+            require(
+                point.session_id == expected_session,
+                "CVD session_id does not match event-time session policy",
+            )
             if point.session_id != current_session:
                 current_session = point.session_id
                 running = Decimal("0")
@@ -549,9 +585,17 @@ def _validate_state_time_envelope(state: OrderFlowDeltaCVDEngineStateV1) -> None
 
 
 def _validate_state_cvd_binding(state: OrderFlowDeltaCVDEngineStateV1) -> None:
-    point_checksums = [point.window_checksum for point in state.cvd_series.points]
-    window_checksums = [window.window_checksum for window in state.order_flow.windows]
-    require(point_checksums == window_checksums, "CVD points must bind one-to-one to windows")
+    windows = state.order_flow.windows
+    points = state.cvd_series.points
+    require(len(points) == len(windows), "CVD points must bind one-to-one to windows")
+    for point, window in zip(points, windows, strict=True):
+        require(
+            point.window_checksum == window.window_checksum,
+            "CVD point window checksum mismatch",
+        )
+        require(point.event_time == window.event_time, "CVD point event_time mismatch")
+        require(point.session_id == window.session_id, "CVD point session_id mismatch")
+        require(point.signed_delta == window.signed_delta, "CVD point signed delta mismatch")
 
 
 def _validate_audit_checksums(audit: OrderFlowDeltaCVDEngineAuditV1) -> None:
