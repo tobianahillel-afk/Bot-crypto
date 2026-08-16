@@ -12,6 +12,7 @@ from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine import (
     build_order_flow,
 )
 from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_models import (
+    CVDPointV1,
     CVDSeriesV1,
     Lot45LineageEnvelopeV1,
     Lot45RunContextV1,
@@ -20,11 +21,21 @@ from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_models impo
 from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_validation import (
     CONFIG_VERSION,
     POLICY_VERSION,
+    RUNTIME_MODE,
     SESSION_POLICY_VERSION,
     VALIDATION_STATE,
     WINDOW_POLICY_VERSION,
     Lot45ValidationError,
+    decimal_from_text,
+    duration_us,
+    event_window_bounds,
     lot45_safety,
+    parse_utc_timestamp,
+    require_git_sha,
+    require_integer,
+    require_sha256,
+    session_id_for_event,
+    validate_ratio,
 )
 from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_models import (
     ClassifiedTradeV1,
@@ -94,6 +105,66 @@ def _repeating_ratio_flow():
         _classified("unknown", "2", "UNKNOWN"),
     )
     return build_order_flow(trades, _policy())
+
+
+def _two_window_flow():
+    trades = (
+        _classified(
+            "first-buy",
+            "2",
+            "BUY_AGGRESSOR",
+            event_time="2026-08-06T19:18:40.100000Z",
+            receive_time="2026-08-06T19:18:40.110000Z",
+        ),
+        _classified(
+            "second-buy",
+            "1",
+            "BUY_AGGRESSOR",
+            event_time="2026-08-06T19:18:41.100000Z",
+            receive_time="2026-08-06T19:18:41.110000Z",
+        ),
+    )
+    return build_order_flow(trades, _policy())
+
+
+def _lineage() -> Lot45LineageEnvelopeV1:
+    return Lot45LineageEnvelopeV1(
+        "test-lineage",
+        "1" * 64,
+        "b" * 40,
+        "2" * 64,
+        "3" * 64,
+        "4" * 64,
+        "5" * 64,
+        "6" * 64,
+        "2026-08-06T19:18:40.110000Z",
+    )
+
+
+def _state(flow, cvd) -> OrderFlowDeltaCVDEngineStateV1:
+    latest_window = flow.windows[-1]
+    return OrderFlowDeltaCVDEngineStateV1(
+        Lot45RunContextV1(
+            "test-run",
+            RUNTIME_MODE,
+            CONFIG_VERSION,
+            "a" * 40,
+            "test-correlation",
+        ),
+        _lineage(),
+        latest_window.event_time,
+        latest_window.receive_time,
+        "2026-08-06T19:18:42.000000Z",
+        VALIDATION_STATE,
+        POLICY_VERSION,
+        WINDOW_POLICY_VERSION,
+        SESSION_POLICY_VERSION,
+        flow,
+        cvd,
+        ("TEST_STATE",),
+        lot45_safety(),
+        ZERO_SHA256,
+    )
 
 
 def test_repeating_ratios_ignore_ambient_decimal_rounding() -> None:
@@ -237,41 +308,202 @@ def test_engine_state_binds_cvd_metrics_to_corresponding_window() -> None:
     forged_cvd = CVDSeriesV1(SESSION_POLICY_VERSION, (forged_point,), cvd.cvd_checksum)
     window = flow.windows[0]
 
-    run_context = Lot45RunContextV1(
-        "test-run",
-        "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
-        CONFIG_VERSION,
-        "a" * 40,
-        "test-correlation",
-    )
-    lineage = Lot45LineageEnvelopeV1(
-        "test-lineage",
-        "1" * 64,
-        "b" * 40,
-        "2" * 64,
-        "3" * 64,
-        "4" * 64,
-        "5" * 64,
-        "6" * 64,
-        "2026-08-06T19:18:40.110000Z",
-    )
     with pytest.raises(Lot45ValidationError, match="CVD point signed delta mismatch"):
-        OrderFlowDeltaCVDEngineStateV1(
-            run_context,
-            lineage,
-            window.event_time,
-            window.receive_time,
-            "2026-08-06T19:18:41.000000Z",
-            VALIDATION_STATE,
-            POLICY_VERSION,
-            WINDOW_POLICY_VERSION,
-            SESSION_POLICY_VERSION,
-            flow,
-            forged_cvd,
-            ("TEST_BINDING",),
-            lot45_safety(),
-            ZERO_SHA256,
+        _state(flow, forged_cvd)
+    assert window.signed_delta != forged_point.signed_delta
+
+
+@pytest.mark.parametrize(
+    ("changes", "message"),
+    (
+        ({"buy_volume": Decimal("-1")}, "buy_volume must be finite non-negative"),
+        ({"sell_volume": Decimal("-1")}, "sell_volume must be finite non-negative"),
+        ({"unknown_volume": Decimal("-1")}, "unknown_volume must be finite non-negative"),
+        (
+            {"confidence_weighted_volume": Decimal("-1")},
+            "confidence_weighted_volume must be finite non-negative",
+        ),
+        (
+            {"confidence_weighted_volume": Decimal("2")},
+            "confidence-weighted volume cannot exceed classified volume",
+        ),
+        ({"buy_volume": Decimal("NaN")}, "buy_volume must be finite non-negative"),
+    ),
+)
+def test_window_volume_and_weighted_volume_guards_fail_closed(
+    changes: dict[str, Decimal],
+    message: str,
+) -> None:
+    flow, _ = _repeating_ratio_flow()
+    with pytest.raises(Lot45ValidationError, match=message):
+        replace(flow.windows[0], **changes)
+
+
+def test_window_time_guards_reject_reverse_and_pre_window_events() -> None:
+    flow, _ = _repeating_ratio_flow()
+    window = flow.windows[0]
+    with pytest.raises(Lot45ValidationError, match="window_start must precede window_end"):
+        replace(
+            window,
+            window_start="2026-08-06T19:18:40.900000Z",
+            window_end="2026-08-06T19:18:40.800000Z",
         )
+    with pytest.raises(Lot45ValidationError, match="inside event-time window"):
+        replace(window, window_start="2026-08-06T19:18:40.200000Z")
+
+
+def test_flow_rejects_raw_weighted_volume_aggregate_drift() -> None:
+    flow, _ = _two_window_flow()
+    with pytest.raises(Lot45ValidationError, match="confidence_weighted_volume aggregate mismatch"):
+        replace(
+            flow,
+            confidence_weighted_volume=flow.confidence_weighted_volume + Decimal("1"),
+        )
+
+
+def test_engine_state_binding_rejects_length_checksum_and_event_time_drift() -> None:
+    flow, cvd = _repeating_ratio_flow()
+    point = cvd.points[0]
+
+    checksum_drift = CVDSeriesV1(
+        SESSION_POLICY_VERSION,
+        (replace(point, window_checksum="2" * 64),),
+        cvd.cvd_checksum,
+    )
+    with pytest.raises(Lot45ValidationError, match="CVD point window checksum mismatch"):
+        _state(flow, checksum_drift)
+
+    event_drift = CVDSeriesV1(
+        SESSION_POLICY_VERSION,
+        (replace(point, event_time="2026-08-06T19:18:40.150000Z"),),
+        cvd.cvd_checksum,
+    )
+    with pytest.raises(Lot45ValidationError, match="CVD point event_time mismatch"):
+        _state(flow, event_drift)
+
+    extra_point = CVDPointV1(
+        "2026-08-06T19:18:40.200000Z",
+        "2026-08-06",
+        "3" * 64,
+        Decimal("0"),
+        point.cvd,
+    )
+    length_drift = CVDSeriesV1(
+        SESSION_POLICY_VERSION,
+        (point, extra_point),
+        cvd.cvd_checksum,
+    )
+    with pytest.raises(Lot45ValidationError, match="one-to-one"):
+        _state(flow, length_drift)
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    (
+        ("validation_state", "BROKEN", "Lot45 validation state changed"),
+        ("policy_version", "broken-policy", "Lot45 policy version changed"),
+        ("window_policy_version", "broken-window", "Lot45 window policy changed"),
+        ("session_policy_version", "broken-session", "Lot45 session policy changed"),
+    ),
+)
+def test_engine_state_rejects_every_version_drift(
+    field: str,
+    value: str,
+    message: str,
+) -> None:
+    flow, cvd = _two_window_flow()
+    state = _state(flow, cvd)
+    with pytest.raises(Lot45ValidationError, match=message):
+        replace(state, **{field: value})
+
+
+def test_engine_state_rejects_event_and_receive_envelope_drift() -> None:
+    flow, cvd = _two_window_flow()
+    state = _state(flow, cvd)
+    with pytest.raises(Lot45ValidationError, match="latest source event"):
+        replace(state, event_time=flow.windows[0].event_time)
+    with pytest.raises(Lot45ValidationError, match="latest source receive time"):
+        replace(state, receive_time="2026-08-06T19:18:41.105000Z")
+
+
+@pytest.mark.parametrize(
+    "field",
+    (
+        "entry_gate_checksum",
+        "lot44_state_checksum",
+        "lot44_audit_checksum",
+        "lot44_confidence_checksum",
+        "lot44_config_checksum",
+        "lot44_post_merge_checksum",
+    ),
+)
+def test_lineage_rejects_each_invalid_checksum(field: str) -> None:
+    lineage = _lineage()
+    with pytest.raises(Lot45ValidationError, match="lowercase sha256"):
+        replace(lineage, **{field: "g" * 64})
+
+
+def test_run_context_rejects_each_identity_drift() -> None:
+    with pytest.raises(Lot45ValidationError, match="run_id"):
+        Lot45RunContextV1("", RUNTIME_MODE, CONFIG_VERSION, "a" * 40, "correlation")
+    with pytest.raises(Lot45ValidationError, match="runtime mode"):
+        Lot45RunContextV1("run", "LIVE", CONFIG_VERSION, "a" * 40, "correlation")
+    with pytest.raises(Lot45ValidationError, match="config version"):
+        Lot45RunContextV1("run", RUNTIME_MODE, "broken", "a" * 40, "correlation")
+    with pytest.raises(Lot45ValidationError, match="git sha"):
+        Lot45RunContextV1("run", RUNTIME_MODE, CONFIG_VERSION, "bad", "correlation")
+    with pytest.raises(Lot45ValidationError, match="correlation_id"):
+        Lot45RunContextV1("run", RUNTIME_MODE, CONFIG_VERSION, "a" * 40, "")
+
+
+def test_validation_primitives_enforce_fail_closed_boundaries() -> None:
+    with pytest.raises(Lot45ValidationError, match="must be integer"):
+        require_integer(True, "value")
+    with pytest.raises(Lot45ValidationError, match=">= 0"):
+        require_integer(-1, "value")
+    with pytest.raises(Lot45ValidationError, match="lowercase sha256"):
+        require_sha256("A" * 64, "checksum")
+    with pytest.raises(Lot45ValidationError, match="lowercase sha256"):
+        require_sha256("0" * 63, "checksum")
+    with pytest.raises(Lot45ValidationError, match="git sha"):
+        require_git_sha("A" * 40, "commit")
+    with pytest.raises(Lot45ValidationError, match="git sha"):
+        require_git_sha("0" * 39, "commit")
+    with pytest.raises(Lot45ValidationError, match="decimal text"):
+        decimal_from_text(1, "decimal")
+    with pytest.raises(Lot45ValidationError, match="invalid decimal"):
+        decimal_from_text("not-a-decimal", "decimal")
+    with pytest.raises(Lot45ValidationError, match="must be finite"):
+        decimal_from_text("NaN", "decimal")
+    with pytest.raises(Lot45ValidationError, match="non-negative"):
+        decimal_from_text("-1", "decimal")
+    with pytest.raises(Lot45ValidationError, match="UTC Z suffix"):
+        parse_utc_timestamp("2026-08-06T19:18:40+00:00", "timestamp")
+    with pytest.raises(Lot45ValidationError, match="duration cannot be negative"):
+        duration_us("2026-08-06T19:18:41.000000Z", "2026-08-06T19:18:40.000000Z")
+    assert duration_us(
+        "2026-08-06T19:18:40.000000Z",
+        "2026-08-06T19:18:40.123456Z",
+    ) == 123456
+    assert event_window_bounds(
+        "2026-08-06T19:18:40.123456Z",
+        1_000_000,
+    ) == (
+        "2026-08-06T19:18:40.000000Z",
+        "2026-08-06T19:18:41.000000Z",
+    )
+    with pytest.raises(Lot45ValidationError, match="session policy version"):
+        session_id_for_event("2026-08-06T19:18:40.000000Z", "broken")
+    assert session_id_for_event(
+        "2026-08-06T19:18:40.000000Z",
+        SESSION_POLICY_VERSION,
+    ) == "2026-08-06"
+    with pytest.raises(Lot45ValidationError, match="must be finite"):
+        validate_ratio(Decimal("NaN"), "ratio")
+    with pytest.raises(Lot45ValidationError, match="outside"):
+        validate_ratio(Decimal("-0.1"), "ratio")
+    with pytest.raises(Lot45ValidationError, match="outside"):
+        validate_ratio(Decimal("1.1"), "ratio")
 
 
 def test_code_binding_covers_complete_runtime_package_tree() -> None:
