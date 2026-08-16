@@ -1,7 +1,7 @@
 [project]
 name = "crypto-quant-bot"
-version = "0.45.0.dev0"
-description = "Crypto Quant Bot V4.1-Ops — Lot 45 Order Flow / Delta / CVD candidate under exact-head certification"
+version = "0.44.0"
+description = "Crypto Quant Bot V4.1-Ops — Lot 44 audited baseline; Lot 45 candidate under exact-head certification"
 requires-python = "==3.11.*"
 dependencies = []
 
