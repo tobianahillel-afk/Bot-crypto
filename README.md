@@ -9,7 +9,7 @@ Le projet n’est pas conçu comme un simple bot « signal → ordre ». Son pri
 | Élément | État |
 |---|---|
 | Dernier lot fusionné et audité | **Lot 44 — Trades & Aggressor Classification Schema** |
-| Version de développement | **0.45.0.dev0** |
+| Release correspondant au dernier lot fusionné | **0.44.0** |
 | Version V4 | **active** |
 | Lot actuellement ouvert | **Lot 45 — Order Flow, Delta & CVD Engine** |
 | État Lot 45 | **candidat en certification exacte sur PR #66** |
@@ -27,7 +27,7 @@ approved_size = 0
 live_execution = DISABLED
 ```
 
-La branche `main` est actuellement le gate certifié du Lot 45, issu du `GO_LOT44_POST_MERGE`. Le candidat Lot 45 reste non exécutable et ne peut produire ni `Signal`, ni `RiskDecision`, ni `OrderIntent`.
+La branche `main` porte le gate certifié du Lot 45, issu du `GO_LOT44_POST_MERGE`. Le candidat Lot 45 reste non exécutable et ne peut produire ni `Signal`, ni `RiskDecision`, ni `OrderIntent`.
 
 ## Ce qui est déjà construit
 
@@ -131,6 +131,42 @@ Aucun HFT live n’est prévu dans V1→V21. Aucun scale-up autonome n’est aut
 - pas de levier dans le périmètre initial ;
 - aucun lot suivant avant le gate explicite du lot courant.
 
+## Compatibilité des preuves historiques
+
+Les lots historiques gardent leurs intitulés, manifests et marqueurs normatifs. Ils ne sont pas renommés lorsque le projet avance.
+
+### Lot 30
+
+- [Spécification](docs/LOT_30_V2_MARKET_ANALYSIS_CLOSURE.md)
+- [Critères d’acceptation](docs/ACCEPTANCE_CRITERIA_LOT_30.md)
+- [Worklog certifié](docs/LOT_30_IMPLEMENTATION_WORKLOG.md)
+- [Audit post-merge](docs/LOT_30_POST_MERGE_AUDIT.md)
+- [Rapport final](reports/lot_30_v2_market_analysis_closure_report.md)
+- État certifié : `data/audit/v2_market_analysis_closure_lot30.json`
+- Audit certifié : `data/audit/v2_market_analysis_closure_audit_lot30.json`
+- Manifest final V2 : `data/audit/closure_manifest_lot30.json`
+- Lifecycle historique : `data/audit/roadmap_lifecycle_overlay_lot30.json`
+
+### Lot 31
+
+- [Audit post-merge](docs/LOT_31_POST_MERGE_AUDIT.md)
+- État certifié : `data/audit/market_data_governance_scope_and_source_registry_lot31.json`
+- Registre de sources : `data/audit/source_registry_lot31.json`
+- Lifecycle historique : `data/audit/roadmap_lifecycle_overlay_lot31.json`
+
+### Lot 32 — Instrument, Symbol & Contract Normalization
+
+- [Spécification](docs/LOT_32_INSTRUMENT_SYMBOL_AND_CONTRACT_NORMALIZATION.md)
+- [Critères d’acceptation](docs/ACCEPTANCE_CRITERIA_LOT_32.md)
+- [Audit post-merge](docs/LOT_32_POST_MERGE_AUDIT.md)
+- État certifié : `data/audit/instrument_symbol_and_contract_normalization_lot32.json`
+- Registre d’instruments : `data/audit/instrument_registry_lot32.json`
+- Lifecycle historique : `data/audit/roadmap_lifecycle_overlay_lot32.json`
+
+### Lots 33–44
+
+Le détail normatif et les preuves restent dans leurs documents `LOT_x`, `ACCEPTANCE_CRITERIA_LOT_x`, rapports, artefacts d’audit et lifecycle overlays. L’avancement de Lot45 ne réécrit aucune de ces preuves.
+
 ## Environnement canonique
 
 ```text
@@ -171,6 +207,15 @@ La CI ajoute Ruff, mypy, couverture lignes/branches, Bandit, `pip-audit`, mutati
 - [V4 Microstructure / Liquidity / Game Theory](docs/roadmap/V04_MICROSTRUCTURE_LIQUIDITY_GAME_THEORY.md)
 - [Lot 45 — Order Flow, Delta & CVD Engine](docs/LOT_45_ORDER_FLOW_DELTA_AND_CVD_ENGINE.md)
 - [Lot 45 — Acceptance Criteria](docs/ACCEPTANCE_CRITERIA_LOT_45.md)
+
+### Architecture future verrouillée
+
+- [Risque portefeuille, sizing, réservations et sorties](docs/CANONICAL_PORTFOLIO_RISK_SIZING_AND_EXIT_STANDARD.md) — `CANONICAL_PORTFOLIO_RISK_SIZING_AND_EXIT_STANDARD.md`
+- [Addendum normatif V7/V9](docs/roadmap/V07_V09_PORTFOLIO_RISK_NORMATIVE_ADDENDUM.md) — `V07_V09_PORTFOLIO_RISK_NORMATIVE_ADDENDUM.md`
+- [Architecture multi-échelle et horloges](docs/TEMPORAL_MULTI_SCALE_AND_DECISION_CLOCK_ARCHITECTURE.md)
+- [Standard stochastique et multi-horizon](docs/STOCHASTIC_CONTINUOUS_STATE_AND_MULTI_HORIZON_FORECASTING_STANDARD.md)
+- [Participants et zones de sortie](docs/PARTICIPANT_BEHAVIOR_AND_LIQUIDITY_EXIT_ZONE_INFERENCE_STANDARD.md)
+- [Ordres protecteurs](docs/PROTECTIVE_ORDERS_AND_EXIT_LIFECYCLE_STANDARD.md)
 
 Pour les lots historiques, les critères d’acceptation, rapports PASS, artefacts et commits certifiés restent normatifs. Une documentation future ne réécrit jamais rétroactivement une preuve auditée.
 
