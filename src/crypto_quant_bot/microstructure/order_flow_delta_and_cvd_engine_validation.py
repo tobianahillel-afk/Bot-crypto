@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import subprocess
 from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal, InvalidOperation
+from pathlib import Path
 from typing import Any
 
 from . import trades_and_aggressor_classification_schema_validation as lot44_validation
@@ -56,6 +58,49 @@ def require_git_sha(value: object, field: str) -> str:
         f"{field} must be git sha",
     )
     return text
+
+
+def reject_untracked_executable_sources(root: Path) -> None:
+    """Reject live Python sources under ``src`` that are absent from the Git index.
+
+    This intentionally compares the filesystem with the cached Git file set instead of
+    ``git status --others`` so ignored Python files (notably ``src/sitecustomize.py``)
+    cannot execute and still allow a Lot 45 attestation to pass.
+    """
+
+    src_root = root / "src"
+    try:
+        tracked = subprocess.run(
+            ["git", "ls-files", "--cached", "--", "src"],
+            cwd=root,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except OSError as exc:
+        raise Lot45ValidationError("Lot45 source tracking verification unavailable") from exc
+    if tracked.returncode != 0:
+        raise Lot45ValidationError("Lot45 source tracking verification unavailable")
+
+    tracked_python = {
+        line.strip().replace("\\", "/")
+        for line in tracked.stdout.splitlines()
+        if line.strip().endswith(".py")
+    }
+    try:
+        live_python = {
+            path.relative_to(root).as_posix()
+            for path in src_root.rglob("*.py")
+            if path.is_file()
+        }
+    except OSError as exc:
+        raise Lot45ValidationError("Lot45 executable source inventory unavailable") from exc
+
+    unexpected = sorted(live_python - tracked_python)
+    require(
+        not unexpected,
+        "Lot45 untracked executable source present: " + ", ".join(unexpected),
+    )
 
 
 def decimal_from_text(
