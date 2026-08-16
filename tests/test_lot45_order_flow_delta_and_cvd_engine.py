@@ -305,7 +305,7 @@ def test_window_model_rejects_every_derived_invariant_drift() -> None:
         ({"signed_delta": window.signed_delta + Decimal("1")}, "buy minus sell"),
         ({"signed_imbalance": window.signed_imbalance + Decimal("0.1")}, "signed imbalance mismatch"),
         ({"classification_coverage": window.classification_coverage + Decimal("0.1")}, "classification coverage mismatch"),
-        ({"confidence_weighted_coverage": Decimal("0.75")}, "weighted confidence"),
+        ({"confidence_weighted_coverage": Decimal("0.75")}, "confidence-weighted coverage mismatch"),
         ({"delta_impulse": Decimal("NaN")}, "delta impulse must be finite"),
     )
     for changes, message in cases:
@@ -355,7 +355,11 @@ def test_cvd_series_rejects_empty_order_duplicate_and_session_reset_drift() -> N
         CVDSeriesV1(SESSION_POLICY_VERSION, (), cvd.cvd_checksum)
     with pytest.raises(Lot45ValidationError, match="event-time ordered"):
         CVDSeriesV1(SESSION_POLICY_VERSION, (second, first), cvd.cvd_checksum)
-    duplicate_time = replace(second, event_time=first.event_time)
+    duplicate_time = replace(
+        second,
+        event_time=first.event_time,
+        session_id=first.session_id,
+    )
     with pytest.raises(Lot45ValidationError, match="event times must be unique"):
         CVDSeriesV1(SESSION_POLICY_VERSION, (first, duplicate_time), cvd.cvd_checksum)
     wrong_reset = replace(second, cvd=first.cvd + second.signed_delta)
