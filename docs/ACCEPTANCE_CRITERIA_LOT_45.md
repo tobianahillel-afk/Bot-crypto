@@ -23,11 +23,16 @@ Lot 45 is accepted only when every criterion below is PASS on the exact certifie
 - Runtime timestamps and every published Lot45 timestamp schema accept only real Gregorian calendar dates in canonical microsecond UTC `Z` text; impossible dates and invalid leap days fail closed.
 - Two complete builds from the same source/config/input must produce identical state, audit, order-flow and CVD payloads/checksums.
 
-## Upstream integrity
+## Upstream and executable integrity
 
 - Entry gate merge is exactly bound to the certified Lot45 gate.
 - Lot44 frozen state, audit, confidence, config and post-merge checksums are revalidated before calculation.
-- The executable Python inventory under `src/` is compared with the claimed `code_commit` tree; ignored, untracked and post-freeze staged Python sources fail closed, including `src/sitecustomize.py`.
+- Every certified Lot45 Python launch is mediated by the trusted shell wrapper `scripts/lot45_trusted_prelaunch.sh` before Python startup.
+- The trusted wrapper resolves the exact claimed `code_commit` and proves bound committed, working and staged paths are unchanged before launch.
+- The trusted wrapper inspects `src/` with ignored and untracked paths included; any unexpected object fails closed before Python starts.
+- Self-deleting `sitecustomize.py`, `usercustomize.py`, sourceless `.pyc`/`.pyo`, native `.so`/`.pyd`, symlinks, package startup hooks and other ignored/untracked executable artifacts cannot be launched as part of a certified run.
+- The in-process executable Python inventory remains a secondary defense and still rejects ignored, untracked and post-freeze staged `*.py` sources.
+- Certified launches use an explicit repository `src` path with safe-path enabled, user-site disabled and bytecode writes disabled.
 - Duplicate trade ids fail closed.
 - Mixed source/venue/instrument/market identities fail closed.
 - Stale or causally impossible upstream evidence fails closed.
@@ -64,7 +69,8 @@ Lot 45 is accepted only when every criterion below is PASS on the exact certifie
 - Dedicated Lot45 line coverage >= 95%.
 - Dedicated Lot45 branch coverage >= 90%.
 - Dedicated mutation score >= 80%.
-- Adversarial tests prove ignored/untracked executable source rejection and calendar-invalid timestamp rejection.
+- Adversarial certification proves pre-launch rejection of a self-deleting startup source and a valid sourceless startup `.pyc` before Python is started.
+- Adversarial tests prove ignored/untracked executable Python source rejection and calendar-invalid timestamp rejection.
 - Full repository tests PASS.
 - Architecture/roadmap/traceability/engineering/security checks PASS.
 - Targeted Lot45 tests repeat at least three times without flake.
