@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine*.py'
+      - 'scripts/lot45_trusted_prelaunch.sh'
       - 'scripts/run_lot45_order_flow_delta_and_cvd_engine.py'
       - 'scripts/validate_lot45.py'
       - 'tests/test_lot45*.py'
@@ -28,15 +29,19 @@ jobs:
   lot45:
     runs-on: ubuntu-22.04
     env:
-      PYTHONPATH: src
       PYTHONHASHSEED: '0'
       GATE_MERGE_SHA: 390d0779f2be257fa8134faf8f02193a760a09c3
-      SOURCE_HEAD_SHA: 89ec5c692622d80222eb63bfa2732242d4a84987
+      SOURCE_HEAD_SHA: daa6c4b230bc7bf9f71a0eabdb41348ac713e053
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: 89ec5c692622d80222eb63bfa2732242d4a84987
+          ref: daa6c4b230bc7bf9f71a0eabdb41348ac713e053
+      - name: Trusted pre-launch proof before Python setup
+        run: |
+          set -euo pipefail
+          bash -n scripts/lot45_trusted_prelaunch.sh
+          bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" /usr/bin/true
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
@@ -45,6 +50,50 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
+      - name: Adversarial pre-launch startup artifact rejection
+        run: |
+          set -euo pipefail
+          guard=(bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA")
+
+          for module in sitecustomize usercustomize; do
+            marker="/tmp/lot45-${module}-source-executed"
+            rm -f "$marker" "src/${module}.py"
+            cat > "src/${module}.py" <<PY
+          from pathlib import Path
+          Path("$marker").write_text("executed", encoding="utf-8")
+          Path(__file__).unlink()
+          PY
+            set +e
+            attack_output="$("${guard[@]}" python -c 'print("SHOULD_NOT_RUN")' 2>&1)"
+            attack_status=$?
+            set -e
+            test "$attack_status" -ne 0
+            test ! -e "$marker"
+            test -e "src/${module}.py"
+            printf '%s\n' "$attack_output" | grep -F 'LOT45_PRELAUNCH_UNBOUND_EXECUTABLE_TREE'
+            rm -f "src/${module}.py" "$marker"
+          done
+
+          rm -f /tmp/lot45-startup.py /tmp/lot45-startup.pyc /tmp/lot45-sitecustomize-pyc-executed src/sitecustomize.pyc
+          cat > /tmp/lot45-startup.py <<'PY'
+          from pathlib import Path
+          Path('/tmp/lot45-sitecustomize-pyc-executed').write_text('executed', encoding='utf-8')
+          PY
+          env -u PYTHONPATH PYTHONNOUSERSITE=1 PYTHONSAFEPATH=1 PYTHONDONTWRITEBYTECODE=1 \
+            python -c "import py_compile; py_compile.compile('/tmp/lot45-startup.py', cfile='/tmp/lot45-startup.pyc', doraise=True)"
+          mv /tmp/lot45-startup.pyc src/sitecustomize.pyc
+          set +e
+          pyc_output="$("${guard[@]}" python -c 'print("SHOULD_NOT_RUN")' 2>&1)"
+          pyc_status=$?
+          set -e
+          test "$pyc_status" -ne 0
+          test ! -e /tmp/lot45-sitecustomize-pyc-executed
+          test -e src/sitecustomize.pyc
+          printf '%s\n' "$pyc_output" | grep -F 'LOT45_PRELAUNCH_UNBOUND_EXECUTABLE_TREE'
+          rm -f src/sitecustomize.pyc /tmp/lot45-startup.py /tmp/lot45-sitecustomize-pyc-executed
+
+          bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" python -c \
+            'import sys; assert sys.flags.safe_path; print("LOT45_TRUSTED_PRELAUNCH: PASS")'
       - name: Prove exact source gate ancestry and Lot 46 lock
         run: |
           set -euo pipefail
@@ -64,14 +113,22 @@ jobs:
           set -euo pipefail
           mkdir -p reports/lot45
           exec > >(tee reports/lot45/static_checks.txt) 2>&1
-          python -m compileall -q src scripts tests
+          bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" bash -c '
+            set -euo pipefail
+            rm -rf /tmp/lot45-compile
+            mkdir -p /tmp/lot45-compile
+            cp -R src scripts tests /tmp/lot45-compile/
+            env PYTHONPATH=/tmp/lot45-compile/src PYTHONSAFEPATH=1 PYTHONNOUSERSITE=1 PYTHONDONTWRITEBYTECODE=1 \
+              python -m compileall -q /tmp/lot45-compile/src /tmp/lot45-compile/scripts /tmp/lot45-compile/tests
+            rm -rf /tmp/lot45-compile
+          '
           for path in \
             config/microstructure/order_flow_delta_and_cvd_engine_v1.json \
             contracts/schemas/order_flow_delta_cvd_engine_state_v1.schema.json \
             contracts/schemas/order_flow_delta_cvd_engine_audit_v1.schema.json \
             contracts/schemas/order_flow_state_v1.schema.json \
             contracts/schemas/cvd_series_v1.schema.json; do
-            python -m json.tool "$path" >/dev/null
+            bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" python -m json.tool "$path" >/dev/null
           done
           ruff check \
             src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py \
@@ -86,7 +143,7 @@ jobs:
             tests/test_lot45_checksum_binding_adversarial.py \
             tests/test_lot45_untracked_executable_source_binding.py
           mypy src/crypto_quant_bot/microstructure
-          python - <<'PY'
+          bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" python - <<'PY'
           import ast
           from pathlib import Path
 
@@ -119,30 +176,11 @@ jobs:
               raise SystemExit('LOT45_EXTERNAL_CONNECTIVITY_FORBIDDEN\n' + '\n'.join(violations))
           print('LOT45_NO_CONNECTIVITY: PASS')
           PY
-      - name: Adversarial untracked executable source rejection
-        run: |
-          set -euo pipefail
-          test ! -e src/sitecustomize.py
-          trap 'rm -f src/sitecustomize.py' EXIT
-          printf '%s\n' "MARKER = 'lot45-untracked-source-adversarial'" > src/sitecustomize.py
-          set +e
-          attack_output="$(PYTHONPATH=src python scripts/run_lot45_order_flow_delta_and_cvd_engine.py --code-commit "$SOURCE_HEAD_SHA" 2>&1)"
-          attack_status=$?
-          set -e
-          rm -f src/sitecustomize.py
-          trap - EXIT
-          test "$attack_status" -ne 0
-          printf '%s\n' "$attack_output" | grep -F 'Lot45 executable source absent from code_commit: src/sitecustomize.py'
-          if printf '%s\n' "$attack_output" | grep -F '"status": "PASS"'; then
-            echo 'LOT45_UNTRACKED_EXECUTABLE_SOURCE_WAS_ATTESTED' >&2
-            exit 1
-          fi
-          echo 'LOT45_UNTRACKED_EXECUTABLE_SOURCE_REJECTED: PASS'
       - name: Targeted line and branch coverage
         run: |
           set -euo pipefail
-          coverage erase
-          pytest -q \
+          bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" coverage erase
+          bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" pytest -q \
             tests/test_lot45_order_flow_delta_and_cvd_engine.py \
             tests/test_lot45_policy_contract.py \
             tests/test_lot45_runtime_binding_and_rounding.py \
@@ -154,7 +192,7 @@ jobs:
             --cov=crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_validation \
             --cov-branch --cov-report=json:reports/lot45/coverage.json --cov-report=term-missing \
             2>&1 | tee reports/lot45/targeted_coverage.txt
-          python - <<'PY'
+          bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" python - <<'PY'
           import json
           import os
           from pathlib import Path
@@ -184,10 +222,12 @@ jobs:
           set -euo pipefail
           rm -rf reports/lot45/generated /tmp/lot45-run1
           mkdir -p reports/lot45/generated /tmp/lot45-run1
-          python scripts/validate_lot45.py --code-commit "$SOURCE_HEAD_SHA" --output-dir reports/lot45/generated \
+          bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" python scripts/validate_lot45.py \
+            --code-commit "$SOURCE_HEAD_SHA" --output-dir reports/lot45/generated \
             | tee reports/lot45/validation_result_run1.json
           cp reports/lot45/generated/*.json /tmp/lot45-run1/
-          python scripts/validate_lot45.py --code-commit "$SOURCE_HEAD_SHA" --output-dir reports/lot45/generated \
+          bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" python scripts/validate_lot45.py \
+            --code-commit "$SOURCE_HEAD_SHA" --output-dir reports/lot45/generated \
             | tee reports/lot45/validation_result_run2.json
           cmp reports/lot45/validation_result_run1.json reports/lot45/validation_result_run2.json
           for path in reports/lot45/generated/*.json; do
@@ -196,34 +236,40 @@ jobs:
       - name: Architecture roadmap traceability engineering and safety
         run: |
           set -euo pipefail
-          python scripts/validate_roadmap_documentation.py
-          python scripts/validate_architecture_boundaries.py
-          python scripts/validate_domain_architecture.py
-          python scripts/audit_roadmap_semantics.py
-          python scripts/validate_traceability_contract.py
-          python scripts/check_no_silent_numeric_coercion.py
-          python scripts/quality_inventory.py
-          python scripts/validate_engineering_deviations.py
+          bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" bash -c '
+            set -euo pipefail
+            python scripts/validate_roadmap_documentation.py
+            python scripts/validate_architecture_boundaries.py
+            python scripts/validate_domain_architecture.py
+            python scripts/audit_roadmap_semantics.py
+            python scripts/validate_traceability_contract.py
+            python scripts/check_no_silent_numeric_coercion.py
+            python scripts/quality_inventory.py
+            python -c "import runpy, sys; sys.path.insert(0, \"scripts\"); runpy.run_path(\"scripts/validate_engineering_deviations.py\", run_name=\"__main__\")"
+          '
       - name: Security dependency full regression and anti-flake
         run: |
           set -euo pipefail
-          bandit -q -r \
-            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py \
-            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py \
-            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py \
-            scripts/run_lot45_order_flow_delta_and_cvd_engine.py \
-            scripts/validate_lot45.py -ll
-          pip-audit -r requirements-dev.lock
-          pytest -q
-          for repetition in 1 2 3; do
-            pytest -q \
-              tests/test_lot45_order_flow_delta_and_cvd_engine.py \
-              tests/test_lot45_policy_contract.py \
-              tests/test_lot45_runtime_binding_and_rounding.py \
-              tests/test_lot45_schema_contracts.py \
-              tests/test_lot45_checksum_binding_adversarial.py \
-              tests/test_lot45_untracked_executable_source_binding.py
-          done
+          bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" bash -c '
+            set -euo pipefail
+            bandit -q -r \
+              src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py \
+              src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py \
+              src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py \
+              scripts/run_lot45_order_flow_delta_and_cvd_engine.py \
+              scripts/validate_lot45.py -ll
+            pip-audit -r requirements-dev.lock
+            pytest -q
+            for repetition in 1 2 3; do
+              pytest -q \
+                tests/test_lot45_order_flow_delta_and_cvd_engine.py \
+                tests/test_lot45_policy_contract.py \
+                tests/test_lot45_runtime_binding_and_rounding.py \
+                tests/test_lot45_schema_contracts.py \
+                tests/test_lot45_checksum_binding_adversarial.py \
+                tests/test_lot45_untracked_executable_source_binding.py
+            done
+          '
       - uses: actions/upload-artifact@v4
         if: always()
         with:
