@@ -39,6 +39,9 @@ def _classified(
     trade_id: str,
     quantity: str,
     classification: str,
+    *,
+    event_time: str = "2026-08-06T19:18:40.100000Z",
+    receive_time: str = "2026-08-06T19:18:40.110000Z",
 ) -> ClassifiedTradeV1:
     trade = TimestampedTradeV1(
         "source-a",
@@ -46,8 +49,8 @@ def _classified(
         "BTC-USDT",
         "SPOT",
         trade_id,
-        "2026-08-06T19:18:40.100000Z",
-        "2026-08-06T19:18:40.110000Z",
+        event_time,
+        receive_time,
         Decimal("100"),
         Decimal(quantity),
         "UNKNOWN",
@@ -110,6 +113,54 @@ def test_model_validation_ignores_ambient_decimal_rounding() -> None:
             replayed_flow = replace(flow, windows=(replayed_window,))
         assert replayed_window.to_dict() == window.to_dict()
         assert replayed_flow.to_dict() == flow.to_dict()
+
+
+def test_all_decimal_model_invariants_ignore_ambient_precision_and_rounding() -> None:
+    first = "12345678901234567890123456789"
+    second = "12345678901234567890123456788"
+    trades = (
+        _classified(
+            "w1-buy",
+            first,
+            "BUY_AGGRESSOR",
+            event_time="2026-08-06T19:18:40.100000Z",
+            receive_time="2026-08-06T19:18:40.110000Z",
+        ),
+        _classified(
+            "w1-unknown",
+            "1",
+            "UNKNOWN",
+            event_time="2026-08-06T19:18:40.200000Z",
+            receive_time="2026-08-06T19:18:40.210000Z",
+        ),
+        _classified(
+            "w2-buy",
+            second,
+            "BUY_AGGRESSOR",
+            event_time="2026-08-06T19:18:41.100000Z",
+            receive_time="2026-08-06T19:18:41.110000Z",
+        ),
+        _classified(
+            "w2-unknown",
+            "1",
+            "UNKNOWN",
+            event_time="2026-08-06T19:18:41.200000Z",
+            receive_time="2026-08-06T19:18:41.210000Z",
+        ),
+    )
+    flow, cvd = build_order_flow(trades, _policy())
+
+    for precision in (9, 28):
+        for rounding in (ROUND_DOWN, ROUND_UP):
+            with localcontext() as ambient:
+                ambient.prec = precision
+                ambient.rounding = rounding
+                replayed_windows = tuple(replace(window) for window in flow.windows)
+                replayed_flow = replace(flow, windows=replayed_windows)
+                replayed_points = tuple(replace(point) for point in cvd.points)
+                replayed_cvd = replace(cvd, points=replayed_points)
+            assert replayed_flow.to_dict() == flow.to_dict()
+            assert replayed_cvd.to_dict() == cvd.to_dict()
 
 
 def test_code_binding_covers_complete_runtime_package_tree() -> None:
