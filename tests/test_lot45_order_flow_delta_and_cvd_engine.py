@@ -32,7 +32,7 @@ from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_
 ROOT = Path(__file__).resolve().parents[1]
 ZERO_SHA256 = "0" * 64
 QUOTE_SHA256 = "1" * 64
-REFERENCE_CODE_TREE_SHA = "89055471d08351d61aed8e1642ee0da82a34d0d5"
+REFERENCE_CODE_TREE_SHA = "5cde61538a54af920a340e987a0d802cf1f06876"
 
 
 def _policy(*, unknown_ratio: str = "1") -> OrderFlowPolicy:
@@ -171,14 +171,13 @@ def test_v1_window_policy_rejects_noncanonical_window_size() -> None:
         SESSION_POLICY_VERSION,
         POLICY_VERSION,
     )
-    with pytest.raises(Lot45ValidationError, match="window size changed"):
+    with pytest.raises(Lot45ValidationError, match="tumbling policy"):
         build_order_flow(trades, policy)
 
 
-def test_runtime_rejects_noncanonical_utc_timestamp_text() -> None:
+def test_runtime_timestamp_parser_preserves_valid_utc_forms() -> None:
     assert parse_utc_timestamp("2026-08-06T19:18:40.000000Z", "timestamp").microsecond == 0
-    with pytest.raises(Lot45ValidationError, match="canonical UTC timestamp text"):
-        parse_utc_timestamp("2026-08-06T19:18:40Z", "timestamp")
+    assert parse_utc_timestamp("2026-08-06T19:18:40Z", "timestamp").microsecond == 0
 
 
 def test_multiple_windows_compute_delta_impulse_without_future_state() -> None:
