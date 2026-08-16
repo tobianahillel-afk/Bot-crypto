@@ -42,10 +42,10 @@ jobs:
     env:
       PYTHONPATH: src
       GATE_MERGE_SHA: 390d0779f2be257fa8134faf8f02193a760a09c3
-      SOURCE_HEAD_SHA: 8558ae4a2e620a0967e01067b3446be35cb2354d
-      CERTIFICATION_ANCHOR_SHA: cbf1027d0db605b26426313eb5fe28e07a25ab6d
-      EVIDENCE_HEAD_SHA: 3f2240cd93b6a7d37e666dde3a4d41d1ee3fb1e1
-      VALIDATOR_HEAD_SHA: 789f744108c8ad42a2329abff738e25902d86f6f
+      SOURCE_HEAD_SHA: 1f7bbd133139babb1a956adc7ada711390f16397
+      CERTIFICATION_ANCHOR_SHA: e1a10fb5469a6caf084b10a44c51def08e3d25d0
+      EVIDENCE_HEAD_SHA: 8dd046838b64721d14f18b2f2f062bd73bb0e759
+      VALIDATOR_HEAD_SHA: a3093a322afbc40996109a561dae70e8518911a1
     steps:
       - uses: actions/checkout@v4
         with:
@@ -76,12 +76,10 @@ jobs:
           diff -u /tmp/cert-expected.txt /tmp/cert.txt
 
           test "$(git rev-list --count "$CERTIFICATION_ANCHOR_SHA..$EVIDENCE_HEAD_SHA")" = "1"
-          git diff --no-renames --name-only "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA" | sort > /tmp/evidence.txt
+          git diff --name-only "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA" | sort > /tmp/evidence.txt
           printf '%s\n' \
             data/audit/order_flow_delta_and_cvd_engine_audit_lot45.json \
             data/audit/order_flow_delta_and_cvd_engine_lot45.json \
-            data/audit/order_flow_delta_cvd_engine_audit_lot45.json \
-            data/audit/order_flow_delta_cvd_engine_lot45.json \
             reports/lot45/coverage_summary.json \
             reports/lot45/mutation_summary.json | sort > /tmp/evidence-expected.txt
           diff -u /tmp/evidence-expected.txt /tmp/evidence.txt
