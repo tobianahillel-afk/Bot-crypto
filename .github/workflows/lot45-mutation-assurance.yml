@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine*.py'
+      - 'scripts/lot45_trusted_prelaunch.sh'
       - 'tests/test_lot45*.py'
       - 'config/microstructure/order_flow_delta_and_cvd_engine_v1.json'
       - 'contracts/schemas/order_flow_delta_cvd_engine_state_v1.schema.json'
@@ -22,13 +23,18 @@ jobs:
   mutation:
     runs-on: ubuntu-22.04
     env:
-      SOURCE_HEAD_SHA: 89ec5c692622d80222eb63bfa2732242d4a84987
+      SOURCE_HEAD_SHA: daa6c4b230bc7bf9f71a0eabdb41348ac713e053
       PYTHONHASHSEED: '0'
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: 89ec5c692622d80222eb63bfa2732242d4a84987
+          ref: daa6c4b230bc7bf9f71a0eabdb41348ac713e053
+      - name: Trusted pre-launch proof before Python setup
+        run: |
+          set -euo pipefail
+          bash -n scripts/lot45_trusted_prelaunch.sh
+          bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" /usr/bin/true
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
@@ -41,6 +47,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$SOURCE_HEAD_SHA"
+          bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" /usr/bin/true
           test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine.py
           test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine_models.py
           test ! -e scripts/run_lot46_trade_classification_confidence_engine.py
@@ -50,7 +57,7 @@ jobs:
         run: |
           set -o pipefail
           mkdir -p reports/lot45/mutation
-          PYTHONPATH=src pytest -q \
+          bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" pytest -q \
             tests/test_lot45_order_flow_delta_and_cvd_engine.py \
             tests/test_lot45_policy_contract.py \
             tests/test_lot45_runtime_binding_and_rounding.py \
@@ -62,6 +69,7 @@ jobs:
       - name: Build isolated mutation workspace
         run: |
           set -euo pipefail
+          bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" /usr/bin/true
           rm -rf .tmp-lot45-mutants
           mkdir -p .tmp-lot45-mutants/tests
           cp -R src .tmp-lot45-mutants/
@@ -75,7 +83,7 @@ jobs:
           cp tests/test_lot45_schema_contracts.py .tmp-lot45-mutants/tests/
           cp tests/test_lot45_checksum_binding_adversarial.py .tmp-lot45-mutants/tests/
           cp tests/test_lot45_untracked_executable_source_binding.py .tmp-lot45-mutants/tests/
-          python - <<'PY'
+          bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" python - <<'PY'
           from pathlib import Path
           import toml
 
@@ -147,13 +155,13 @@ jobs:
           mkdir -p reports/lot45/mutation
           cd .tmp-lot45-mutants
           set +e
-          mutmut run --max-children 1 2>&1 | tee ../reports/lot45/mutation/run.txt
+          env PYTHONDONTWRITEBYTECODE=1 PYTHONNOUSERSITE=1 mutmut run --max-children 1 2>&1 | tee ../reports/lot45/mutation/run.txt
           run_status=${PIPESTATUS[0]}
-          mutmut results 2>&1 | tee ../reports/lot45/mutation/results.txt
+          env PYTHONDONTWRITEBYTECODE=1 PYTHONNOUSERSITE=1 mutmut results 2>&1 | tee ../reports/lot45/mutation/results.txt
           results_status=${PIPESTATUS[0]}
           set -e
           cd ..
-          RUN_STATUS="$run_status" RESULTS_STATUS="$results_status" python - <<'PY'
+          RUN_STATUS="$run_status" RESULTS_STATUS="$results_status" env -u PYTHONPATH PYTHONNOUSERSITE=1 PYTHONSAFEPATH=1 python - <<'PY'
           from __future__ import annotations
 
           import json
@@ -231,10 +239,12 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf .tmp-lot45-mutants
+          bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" /usr/bin/true
           git diff --exit-code -- \
             src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py \
             src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py \
-            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py
+            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py \
+            scripts/lot45_trusted_prelaunch.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with:
