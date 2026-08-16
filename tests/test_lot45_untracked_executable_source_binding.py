@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import os
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -9,6 +11,8 @@ from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_validation 
     Lot45ValidationError,
     reject_untracked_executable_sources,
 )
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def _git(root: Path, *args: str) -> subprocess.CompletedProcess[str]:
@@ -60,3 +64,33 @@ def test_staged_python_added_after_source_freeze_is_rejected(tmp_path: Path) -> 
 
     with pytest.raises(Lot45ValidationError, match="post_freeze.py"):
         reject_untracked_executable_sources(root, source_head)
+
+
+def test_real_runner_rejects_untracked_sitecustomize_before_attesting() -> None:
+    sitecustomize = ROOT / "src/sitecustomize.py"
+    assert not sitecustomize.exists()
+    source_head = _git(ROOT, "rev-parse", "HEAD").stdout.strip()
+    environment = dict(os.environ)
+    environment["PYTHONPATH"] = "src"
+
+    try:
+        sitecustomize.write_text("MARKER = 'executed-before-runner'\n", encoding="utf-8")
+        result = subprocess.run(
+            [
+                sys.executable,
+                "scripts/run_lot45_order_flow_delta_and_cvd_engine.py",
+                "--code-commit",
+                source_head,
+            ],
+            cwd=ROOT,
+            env=environment,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    finally:
+        sitecustomize.unlink(missing_ok=True)
+
+    assert result.returncode == 1
+    assert "Lot45 executable source absent from code_commit: src/sitecustomize.py" in result.stderr
+    assert '"status": "PASS"' not in result.stdout
