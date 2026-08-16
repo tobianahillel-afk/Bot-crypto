@@ -46,6 +46,8 @@ A window is identified from the trade event time, never from arrival order. The 
 
 No calculation may use a future trade or future state.
 
+All published Lot45 timestamp fields use one canonical representation: a real Gregorian calendar date, UTC `Z`, and exactly six fractional-second digits. Schema constraints reject impossible calendar dates such as 31 February and apply the Gregorian leap-year rule in addition to the canonical text constraint. Runtime parsing and published schemas therefore accept the same timestamp domain.
+
 ## Order-flow accounting
 
 For each window the engine preserves three disjoint classes:
@@ -110,6 +112,8 @@ Every window has a canonical checksum. Order-flow and CVD artifacts have indepen
 
 Canonical JSON serialization uses sorted keys and compact separators through the repository's canonical checksum helper.
 
+The claimed `code_commit` also binds the executable Python inventory under `src/`. Before an attestation may pass, every live `*.py` file in that source root must exist in the claimed commit tree. This filesystem-to-Git-tree comparison deliberately detects ignored, untracked and post-freeze staged Python sources, including startup hooks such as `src/sitecustomize.py`; ordinary `git diff` alone is not considered sufficient.
+
 ## Persistence
 
 The runner calls the engine's `write_lot45_artifacts`, which writes all four final artifacts using the repository `atomic_write_json` primitive. Direct non-atomic `Path.write_text` persistence is not used for Lot 45 evidence.
@@ -120,7 +124,9 @@ Publication is rejected when, among other cases:
 
 - gate or frozen Lot 44 evidence changes;
 - source lineage/checksums diverge;
+- an executable Python source under `src/` is absent from the claimed `code_commit` tree;
 - input is stale or causally impossible;
+- a timestamp is non-canonical or not a real Gregorian calendar instant;
 - schema/config/policy version changes unexpectedly;
 - trade identities are mixed;
 - trade ids collide;
