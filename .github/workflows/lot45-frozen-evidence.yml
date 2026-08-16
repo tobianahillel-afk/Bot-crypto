@@ -41,29 +41,29 @@ jobs:
     env:
       PYTHONPATH: src
       GATE_MERGE_SHA: 390d0779f2be257fa8134faf8f02193a760a09c3
-      SOURCE_HEAD_SHA: 2797b1dbb4d0e04d31b5c95734e36e3231869fb3
-      CERTIFICATION_ANCHOR_SHA: ee1d8fa813cb540ac7f202932c21904f64e0fdf3
-      EVIDENCE_HEAD_SHA: d229df65dd1516da83f8d3ebad08bae9af845c7f
-      VALIDATOR_HEAD_SHA: 15c48b2c73852dbf0e1adf18e9a69a45a0667d1e
-      VALIDATION_RUN_ID: '31965134136'
+      SOURCE_HEAD_SHA: 89ec5c692622d80222eb63bfa2732242d4a84987
+      CERTIFICATION_ANCHOR_SHA: 880b91afc0f4590d91504be47168519e4ef1aa11
+      EVIDENCE_HEAD_SHA: 45c52cdd2560901b70eb8d1bcdddb0dbb5775f11
+      VALIDATOR_HEAD_SHA: 3938113d27a87f4cc98fcdeab6d59d4f3499c0a3
+      VALIDATION_RUN_ID: '31970067676'
       VALIDATION_WORKFLOW_ID: '334417396'
       VALIDATION_WORKFLOW_PATH: .github/workflows/lot45-order-flow-delta-cvd.yml
-      VALIDATION_ARTIFACT_ID: '9268293146'
+      VALIDATION_ARTIFACT_ID: '9269557580'
       VALIDATION_ARTIFACT_NAME: lot45-order-flow-delta-cvd-evidence
-      VALIDATION_ARTIFACT_DIGEST: sha256:3726fac395620fd632d31c19661fbeac5f338148c095783ca127198f47500cf8
-      MUTATION_RUN_ID: '31965134210'
+      VALIDATION_ARTIFACT_DIGEST: sha256:d72b4cf5516559975a6282be40f6eadb2faa257dbfaa742a8fb1052c1b63a1ba
+      MUTATION_RUN_ID: '31970067634'
       MUTATION_WORKFLOW_ID: '334417751'
       MUTATION_WORKFLOW_PATH: .github/workflows/lot45-mutation-assurance.yml
-      MUTATION_ARTIFACT_ID: '9268319350'
+      MUTATION_ARTIFACT_ID: '9269574905'
       MUTATION_ARTIFACT_NAME: lot45-mutation-evidence
-      MUTATION_ARTIFACT_DIGEST: sha256:6eacc64b443de55bdc90ad6de44d4e1057183d89d0da43816d2e7086cb354eeb
-      QUALITY_RUN_ID: '31965134208'
+      MUTATION_ARTIFACT_DIGEST: sha256:1f7d7ca74da0fad2de2b130f8e00acfcafc01160a6b089b74acf5fef204fe91d
+      QUALITY_RUN_ID: '31970067631'
       QUALITY_WORKFLOW_ID: '326998792'
       QUALITY_WORKFLOW_PATH: .github/workflows/code-quality.yml
-      QUALITY_ARTIFACT_ID: '9268320068'
+      QUALITY_ARTIFACT_ID: '9269584831'
       QUALITY_ARTIFACT_NAME: institutional-quality-evidence
-      QUALITY_ARTIFACT_DIGEST: sha256:62cd318c8c865b8e8c9f33a443e19e27b117422a789d57760f523cb8a40d659f
-      QUALITY_GLOBAL_COVERAGE_SHA256: a263aa736602995674214ee7d36940247758e6d6f26333f60930c5bc461b9d2b
+      QUALITY_ARTIFACT_DIGEST: sha256:69ade2a67752867b2a3da648b489918681c1938a633b7523ed1948b00dfc1b21
+      QUALITY_GLOBAL_COVERAGE_SHA256: ffbe4463824d3144ffa45b2068cd5ce776a0970ae7d7e90c2d58659ef5d1a7c1
       QUALITY_MUTATION_SCORE_SHA256: 678b53c31bdd93760360ead142833bd90b36319093fc2dac1f3c7a6d3af6ec3a
       QUALITY_ENGINEERING_DEVIATION_SHA256: 2622d31a7f9093dacb95f7aeacd7b5e0ce1f08e58eec244a7e1e21d7a8604d14
     steps:
@@ -110,6 +110,9 @@ jobs:
           test "$(git rev-list --count "$EVIDENCE_HEAD_SHA..$VALIDATOR_HEAD_SHA")" = "1"
           test "$(git diff --name-only "$EVIDENCE_HEAD_SHA" "$VALIDATOR_HEAD_SHA")" = "scripts/validate_lot45_frozen_evidence.py"
 
+          test "$(git rev-list --count "$VALIDATOR_HEAD_SHA..HEAD")" = "1"
+          test "$(git diff --name-only "$VALIDATOR_HEAD_SHA" HEAD)" = ".github/workflows/lot45-frozen-evidence.yml"
+
           test ! -e data/audit/order_flow_delta_cvd_engine_lot45.json
           test ! -e data/audit/order_flow_delta_cvd_engine_audit_lot45.json
       - name: Prove source evidence and validator immutability
@@ -130,6 +133,7 @@ jobs:
             tests/test_lot45_runtime_binding_and_rounding.py \
             tests/test_lot45_schema_contracts.py \
             tests/test_lot45_checksum_binding_adversarial.py \
+            tests/test_lot45_untracked_executable_source_binding.py \
             docs/LOT_45_ORDER_FLOW_DELTA_AND_CVD_ENGINE.md \
             docs/ACCEPTANCE_CRITERIA_LOT_45.md \
             reports/lot_45_order_flow_delta_and_cvd_engine_report.md \
@@ -313,25 +317,37 @@ jobs:
           python -m compileall -q scripts/validate_lot45_frozen_evidence.py
           ruff check scripts/validate_lot45_frozen_evidence.py
           python scripts/validate_lot45_frozen_evidence.py | tee /tmp/lot45-frozen-validation.json
-      - name: Replay certified source byte-identically
+      - name: Replay certified source byte-identically and reject unbound executable source
         run: |
           set -euo pipefail
-          rm -rf /tmp/lot45-source /tmp/lot45-expected /tmp/lot45-run1
+          rm -rf /tmp/Bot-crypto /tmp/lot45-expected /tmp/lot45-run1
           mkdir -p /tmp/lot45-expected /tmp/lot45-run1
           cp data/audit/order_flow_delta_and_cvd_engine_lot45.json /tmp/lot45-expected/
           cp data/audit/order_flow_delta_and_cvd_engine_audit_lot45.json /tmp/lot45-expected/
           cp data/audit/order_flow_state_lot45.json /tmp/lot45-expected/
           cp data/audit/cvd_series_lot45.json /tmp/lot45-expected/
-          git worktree add --detach /tmp/lot45-source "$SOURCE_HEAD_SHA"
-          trap 'git worktree remove --force /tmp/lot45-source >/dev/null 2>&1 || true' EXIT
+          git worktree add --detach /tmp/Bot-crypto "$SOURCE_HEAD_SHA"
+          trap 'git worktree remove --force /tmp/Bot-crypto >/dev/null 2>&1 || true' EXIT
           (
-            cd /tmp/lot45-source
+            cd /tmp/Bot-crypto
             outputs=(
               data/audit/order_flow_delta_and_cvd_engine_lot45.json
               data/audit/order_flow_delta_and_cvd_engine_audit_lot45.json
               data/audit/order_flow_state_lot45.json
               data/audit/cvd_series_lot45.json
             )
+
+            printf 'LOT45_ADVERSARIAL_MARKER = True\n' > src/sitecustomize.py
+            set +e
+            PYTHONPATH=src python scripts/run_lot45_order_flow_delta_and_cvd_engine.py \
+              --code-commit "$SOURCE_HEAD_SHA" > /tmp/lot45-unbound-source.log 2>&1
+            adversarial_status=$?
+            set -e
+            rm -f src/sitecustomize.py
+            test "$adversarial_status" -ne 0
+            grep -q 'Lot45 executable source absent from code_commit: src/sitecustomize.py' \
+              /tmp/lot45-unbound-source.log
+
             PYTHONPATH=src python scripts/run_lot45_order_flow_delta_and_cvd_engine.py --code-commit "$SOURCE_HEAD_SHA"
             PYTHONPATH=src python scripts/validate_lot45.py --code-commit "$SOURCE_HEAD_SHA"
             for path in "${outputs[@]}"; do
@@ -348,9 +364,10 @@ jobs:
               tests/test_lot45_policy_contract.py \
               tests/test_lot45_runtime_binding_and_rounding.py \
               tests/test_lot45_schema_contracts.py \
-              tests/test_lot45_checksum_binding_adversarial.py
+              tests/test_lot45_checksum_binding_adversarial.py \
+              tests/test_lot45_untracked_executable_source_binding.py
           )
-          git worktree remove --force /tmp/lot45-source
+          git worktree remove --force /tmp/Bot-crypto
           trap - EXIT
       - name: Current architecture security regression and Lot 46 lock
         run: |
@@ -378,7 +395,8 @@ jobs:
               tests/test_lot45_policy_contract.py \
               tests/test_lot45_runtime_binding_and_rounding.py \
               tests/test_lot45_schema_contracts.py \
-              tests/test_lot45_checksum_binding_adversarial.py
+              tests/test_lot45_checksum_binding_adversarial.py \
+              tests/test_lot45_untracked_executable_source_binding.py
           done
           test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine.py
           test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine_models.py
