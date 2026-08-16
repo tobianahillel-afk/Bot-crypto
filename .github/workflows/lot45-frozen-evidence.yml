@@ -76,13 +76,14 @@ jobs:
           test "$(git rev-list --count "$CERTIFICATION_ANCHOR_SHA..$EVIDENCE_HEAD_SHA")" = "1"
           git diff --name-only "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA" | sort > /tmp/evidence.txt
           printf '%s\n' \
-            data/audit/cvd_series_lot45.json \
             data/audit/order_flow_delta_and_cvd_engine_audit_lot45.json \
             data/audit/order_flow_delta_and_cvd_engine_lot45.json \
-            data/audit/order_flow_state_lot45.json \
             reports/lot45/coverage_summary.json \
             reports/lot45/mutation_summary.json | sort > /tmp/evidence-expected.txt
           diff -u /tmp/evidence-expected.txt /tmp/evidence.txt
+          git diff --quiet "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA" -- \
+            data/audit/cvd_series_lot45.json \
+            data/audit/order_flow_state_lot45.json
 
           test "$(git rev-list --count "$EVIDENCE_HEAD_SHA..$VALIDATOR_HEAD_SHA")" = "1"
           test "$(git diff --name-only "$EVIDENCE_HEAD_SHA" "$VALIDATOR_HEAD_SHA")" = "scripts/validate_lot45_frozen_evidence.py"
