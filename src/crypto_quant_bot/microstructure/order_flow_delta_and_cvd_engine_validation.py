@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import subprocess
-from collections.abc import Mapping
+from collections.abc import Mapping, Set
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -65,6 +65,24 @@ def _git_commit_exists(root: Path, commit: str) -> bool:
     return result.returncode == 0
 
 
+def executable_sources_absent_from_commit(
+    root: Path,
+    tracked_python: Set[str],
+) -> tuple[str, ...]:
+    """Return live Python files under ``src`` that are absent from the claimed tree."""
+
+    src_root = root / "src"
+    try:
+        live_python = {
+            path.relative_to(root).as_posix()
+            for path in src_root.rglob("*.py")
+            if path.is_file()
+        }
+    except OSError as exc:
+        raise Lot45ValidationError("Lot45 executable source inventory unavailable") from exc
+    return tuple(sorted(live_python - set(tracked_python)))
+
+
 def reject_untracked_executable_sources(root: Path, code_commit: str) -> None:
     """Bind every live Python source under ``src`` to the claimed Git commit.
 
@@ -73,7 +91,6 @@ def reject_untracked_executable_sources(root: Path, code_commit: str) -> None:
     the current index also rejects sources added or staged after the claimed commit.
     """
 
-    src_root = root / "src"
     try:
         tracked = subprocess.run(
             ["git", "ls-tree", "-r", "--name-only", code_commit, "--", "src"],
@@ -92,16 +109,7 @@ def reject_untracked_executable_sources(root: Path, code_commit: str) -> None:
         for line in tracked.stdout.splitlines()
         if line.strip().endswith(".py")
     }
-    try:
-        live_python = {
-            path.relative_to(root).as_posix()
-            for path in src_root.rglob("*.py")
-            if path.is_file()
-        }
-    except OSError as exc:
-        raise Lot45ValidationError("Lot45 executable source inventory unavailable") from exc
-
-    unexpected = sorted(live_python - tracked_python)
+    unexpected = executable_sources_absent_from_commit(root, tracked_python)
     require(
         not unexpected,
         "Lot45 executable source absent from code_commit: " + ", ".join(unexpected),
