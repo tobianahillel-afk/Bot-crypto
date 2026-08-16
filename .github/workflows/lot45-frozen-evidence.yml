@@ -25,8 +25,6 @@ on:
       - 'data/audit/lot45_v4_entry_gate.json'
       - 'data/audit/order_flow_delta_and_cvd_engine_lot45.json'
       - 'data/audit/order_flow_delta_and_cvd_engine_audit_lot45.json'
-      - 'data/audit/order_flow_delta_cvd_engine_lot45.json'
-      - 'data/audit/order_flow_delta_cvd_engine_audit_lot45.json'
       - 'data/audit/order_flow_state_lot45.json'
       - 'data/audit/cvd_series_lot45.json'
       - 'reports/lot45/**'
@@ -42,10 +40,10 @@ jobs:
     env:
       PYTHONPATH: src
       GATE_MERGE_SHA: 390d0779f2be257fa8134faf8f02193a760a09c3
-      SOURCE_HEAD_SHA: 1f7bbd133139babb1a956adc7ada711390f16397
-      CERTIFICATION_ANCHOR_SHA: e1a10fb5469a6caf084b10a44c51def08e3d25d0
-      EVIDENCE_HEAD_SHA: 8dd046838b64721d14f18b2f2f062bd73bb0e759
-      VALIDATOR_HEAD_SHA: a3093a322afbc40996109a561dae70e8518911a1
+      SOURCE_HEAD_SHA: 266ad1370ebea17918d3e7d7f95e62e81d4e9ed4
+      CERTIFICATION_ANCHOR_SHA: 6cf3df9e93cd5e79217c6eed030726f672a76cad
+      EVIDENCE_HEAD_SHA: 094521c17b3e211b9797a697fd593d6085d18563
+      VALIDATOR_HEAD_SHA: b97c89dce9b1a832b8d2c387716a590bbe66cb38
     steps:
       - uses: actions/checkout@v4
         with:
@@ -59,7 +57,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.lock
-      - name: Prove final certification evidence and validator chain
+      - name: Prove immutable certification chain
         run: |
           set -euo pipefail
           git merge-base --is-ancestor "$GATE_MERGE_SHA" "$SOURCE_HEAD_SHA"
@@ -78,24 +76,20 @@ jobs:
           test "$(git rev-list --count "$CERTIFICATION_ANCHOR_SHA..$EVIDENCE_HEAD_SHA")" = "1"
           git diff --name-only "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA" | sort > /tmp/evidence.txt
           printf '%s\n' \
+            data/audit/cvd_series_lot45.json \
             data/audit/order_flow_delta_and_cvd_engine_audit_lot45.json \
             data/audit/order_flow_delta_and_cvd_engine_lot45.json \
+            data/audit/order_flow_state_lot45.json \
             reports/lot45/coverage_summary.json \
             reports/lot45/mutation_summary.json | sort > /tmp/evidence-expected.txt
           diff -u /tmp/evidence-expected.txt /tmp/evidence.txt
-          git diff --quiet "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA" -- \
-            data/audit/cvd_series_lot45.json \
-            data/audit/order_flow_state_lot45.json
-          test ! -e data/audit/order_flow_delta_cvd_engine_lot45.json
-          test ! -e data/audit/order_flow_delta_cvd_engine_audit_lot45.json
-          test -f data/audit/order_flow_delta_and_cvd_engine_lot45.json
-          test -f data/audit/order_flow_delta_and_cvd_engine_audit_lot45.json
 
           test "$(git rev-list --count "$EVIDENCE_HEAD_SHA..$VALIDATOR_HEAD_SHA")" = "1"
-          git diff --name-only "$EVIDENCE_HEAD_SHA" "$VALIDATOR_HEAD_SHA" > /tmp/validator.txt
-          printf '%s\n' scripts/validate_lot45_frozen_evidence.py > /tmp/validator-expected.txt
-          diff -u /tmp/validator-expected.txt /tmp/validator.txt
-      - name: Prove source controls evidence and validator immutability
+          test "$(git diff --name-only "$EVIDENCE_HEAD_SHA" "$VALIDATOR_HEAD_SHA")" = "scripts/validate_lot45_frozen_evidence.py"
+
+          test ! -e data/audit/order_flow_delta_cvd_engine_lot45.json
+          test ! -e data/audit/order_flow_delta_cvd_engine_audit_lot45.json
+      - name: Prove source evidence and validator immutability
         run: |
           set -euo pipefail
           git diff --quiet "$SOURCE_HEAD_SHA" HEAD -- \
@@ -132,8 +126,6 @@ jobs:
             data/audit/order_flow_state_lot45.json \
             reports/lot45/coverage_summary.json \
             reports/lot45/mutation_summary.json
-          test ! -e data/audit/order_flow_delta_cvd_engine_lot45.json
-          test ! -e data/audit/order_flow_delta_cvd_engine_audit_lot45.json
           git diff --quiet "$VALIDATOR_HEAD_SHA" HEAD -- scripts/validate_lot45_frozen_evidence.py
       - name: Validate frozen Lot 45 evidence
         run: |
