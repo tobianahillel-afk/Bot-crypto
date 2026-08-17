@@ -7,7 +7,15 @@ import re
 import sys
 from collections.abc import Callable
 from dataclasses import replace
-from decimal import ROUND_DOWN, ROUND_HALF_EVEN, ROUND_UP, Decimal, localcontext
+from decimal import (
+    ROUND_DOWN,
+    ROUND_HALF_EVEN,
+    ROUND_UP,
+    Decimal,
+    Inexact,
+    Rounded,
+    localcontext,
+)
 from pathlib import Path
 from typing import Any
 
@@ -27,12 +35,18 @@ from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine import (  #
     build_order_flow,
 )
 from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_validation import (  # noqa: E402
+    CALCULATION_DECIMAL_EMAX,
+    CALCULATION_DECIMAL_EMIN,
+    CALCULATION_DECIMAL_PRECISION,
     POLICY_VERSION,
     SESSION_POLICY_VERSION,
     WINDOW_POLICY_VERSION,
     Lot45ValidationError,
+    event_window_bounds,
+    frozen_decimal_context,
     parse_utc_timestamp,
     reject_untracked_executable_sources,
+    validate_causal_times,
 )
 from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_models import (  # noqa: E402
     ClassifiedTradeV1,
@@ -40,27 +54,27 @@ from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_
 )
 
 GATE_MERGE = "390d0779f2be257fa8134faf8f02193a760a09c3"
-SOURCE_HEAD = "daa6c4b230bc7bf9f71a0eabdb41348ac713e053"
-CERTIFICATION_ANCHOR = "352225d75fbc94fba48e8db91966d0d94e8a9b42"
-EVIDENCE_HEAD = "53ed9347c05027748d6ead046bcbceddebf67b2b"
+SOURCE_HEAD = "e8db82222ec1d64017479918c2745eb0c8ec6cc1"
+CERTIFICATION_ANCHOR = "4f0d893049158e58dba0bcd0c13b5dc1cd76091f"
+EVIDENCE_HEAD = "d075787abe84d19c9609e7bae48671868b46b51f"
 
 VALIDATION_PROOF = (
-    31977096127,
-    9271367454,
-    "sha256:ac233f0297b2672cab5652f8ef64c1ba6a7737c007b3faecff1385eff53386db",
+    32015607585,
+    9283428746,
+    "sha256:4990510b93e4e6078db92e53016c53e83e7683c7f9df5a0d54e1b1cf24f72cea",
 )
 MUTATION_PROOF = (
-    31977096162,
-    9271369970,
-    "sha256:13ee461f2d4fcdeda3bcba25d5c132e9caff20ee62e56a2452fde3fe71729652",
+    32015607500,
+    9283462890,
+    "sha256:364e1a2719f0817521a555d7e9cdf92a0a9d414a1710e7721e63b15d46f8e175",
 )
 QUALITY_PROOF = (
-    31977096187,
-    9271383482,
-    "sha256:6a8247052e00f5d530efabda2eced2fbbd89c41d798de9833c9ab2443567ba6e",
+    32015607576,
+    9283488037,
+    "sha256:193583971395641e7f1ee3896ff37674b06c7c35d9b0047dc2326d3301f8113e",
 )
 QUALITY_GLOBAL_COVERAGE_SHA256 = (
-    "ffbe4463824d3144ffa45b2068cd5ce776a0970ae7d7e90c2d58659ef5d1a7c1"
+    "33a1fb5f956737b62b70d0fb9fd67a983ebec4d1179ffdaa971ee71488d31019"
 )
 QUALITY_MUTATION_SCORE_SHA256 = (
     "678b53c31bdd93760360ead142833bd90b36319093fc2dac1f3c7a6d3af6ec3a"
@@ -81,15 +95,15 @@ OLD_STATE_ALIAS = ROOT / "data/audit/order_flow_delta_cvd_engine_lot45.json"
 OLD_AUDIT_ALIAS = ROOT / "data/audit/order_flow_delta_cvd_engine_audit_lot45.json"
 
 EXPECTED_HASHES = {
-    STATE: "e22b964e3e6b081324aa8154ea11ef8f7b299998841252a6bde20a18ab0f6fee",
-    AUDIT: "db99f4a3d6b2dd8fde6e67d1ec43f401421f117b4c48a370a6441a35174ecc50",
+    STATE: "dcb0c52a2f1d359e410fc54e303c59c0d2f49e8518b96bdaffff82b42bb3de39",
+    AUDIT: "e9bb4ccfa88f60badfebf830f0b387b472abab4e0354da50d78c2398042c1b21",
     ORDER_FLOW: "f9d46121e552dcea5eca7306befa47114d9602e81be32a19bc565221398724f8",
     CVD: "a8923ce2fb08a571059a411edd4e2b0dd1d0a7116727a66edd9046c0e70d352f",
-    COVERAGE: "d10b98a3745f8affed2738a2e695795635f6c088d1d68f5df2fe9506cce1e3a1",
-    MUTATION: "f96ff4bab1f24e4ec5da91f25ef224e9047633a98c8329b959fa8e3e93ef8098",
+    COVERAGE: "6c2d4cc3b4d6b2e7ecefb3d9b212842e5e44c5279c07000522b8dd41f0d20284",
+    MUTATION: "ba84c293e377ed38f9c57b7ba4d5d9cdac306bfc46b787f14915064b4e43c224",
 }
-EXPECTED_STATE = "9066a949551a6719319702a6a6c2e0f64256ad44484fc8ee4ac45c1365b668c7"
-EXPECTED_AUDIT = "4360bd2ea445fcb41d280a3f7262d0df5f34236563257c7ecc79ccd35f8beea3"
+EXPECTED_STATE = "b35048371d4c62d43ac392eef75427fd8214ca66b2c56d65e289c03081041c24"
+EXPECTED_AUDIT = "a14e47b8ea9d2ff06411572f51408a7017a1ff0fac5e3c7f79dc9c27ba1218c8"
 EXPECTED_ORDER_FLOW = "3dc7a0d4836090509d12239c2a407cfa3afd736fa7d3f80ef2c2eeed3b4fa9ea"
 EXPECTED_CVD = "68e6f47f0df214f74279c9749b1cfd1ac9e0cead7484bff9a098ee34481aa559"
 EXPECTED_WINDOW = "09bd6b8809622b450f04e98c5d519a0fb3cc9f9b3c749eaa588f97499aebc10c"
@@ -265,18 +279,18 @@ def _verify_reference(order_flow: dict[str, Any], cvd: dict[str, Any]) -> None:
 def _verify_quality(coverage: dict[str, Any], mutation: dict[str, Any]) -> None:
     require(coverage["status"] == "PASS", "coverage not PASS")
     require(coverage["source_head_sha"] == SOURCE_HEAD, "coverage source changed")
-    require(coverage["line_coverage_percent"] == 97.36, "line coverage changed")
-    require(coverage["branch_coverage_percent"] == 90.32, "branch coverage changed")
+    require(coverage["line_coverage_percent"] == 97.15, "line coverage changed")
+    require(coverage["branch_coverage_percent"] == 90.91, "branch coverage changed")
     require(coverage["anti_flake_repetitions"] == 3, "anti-flake count changed")
 
     require(mutation["status"] == "PASS", "mutation not PASS")
     require(mutation["source_head_sha"] == SOURCE_HEAD, "mutation source changed")
-    require(mutation["mutation_score_percent"] == 81.19, "mutation score changed")
-    require(mutation["killed_mutants"] == 1269, "killed mutant count changed")
-    require(mutation["survived_mutants"] == 294, "survived mutant count changed")
-    require(mutation["evaluated_mutants"] == 1563, "evaluated mutant count changed")
-    require(mutation["completed_mutants"] == 1563, "completed mutant count changed")
-    require(mutation["total_mutants"] == 1563, "total mutant count changed")
+    require(mutation["mutation_score_percent"] == 80.44, "mutation score changed")
+    require(mutation["killed_mutants"] == 1287, "killed mutant count changed")
+    require(mutation["survived_mutants"] == 313, "survived mutant count changed")
+    require(mutation["evaluated_mutants"] == 1600, "evaluated mutant count changed")
+    require(mutation["completed_mutants"] == 1600, "completed mutant count changed")
+    require(mutation["total_mutants"] == 1600, "total mutant count changed")
     require(mutation["timeout_mutants"] == 0, "mutation timeout present")
     require(mutation["suspicious_mutants"] == 0, "suspicious mutation present")
     require(mutation["mutmut_run_exit_code"] == 0, "mutmut run exit changed")
@@ -295,7 +309,7 @@ def _verify_runtime_replay(
 
 def _policy() -> OrderFlowPolicy:
     return OrderFlowPolicy(
-        50,
+        CALCULATION_DECIMAL_PRECISION,
         1_000_000,
         2_000_000,
         Decimal("1"),
@@ -360,6 +374,13 @@ def _verify_decimal_and_policy_hardening() -> None:
         "Lot45 builder Decimal rounding contract changed",
     )
     require("src/crypto_quant_bot" in CODE_BOUND_PATHS, "package-tree binding weakened")
+    with frozen_decimal_context() as frozen:
+        require(frozen.prec == CALCULATION_DECIMAL_PRECISION, "Decimal precision context changed")
+        require(frozen.rounding == ROUND_HALF_EVEN, "Decimal rounding context changed")
+        require(frozen.Emin == CALCULATION_DECIMAL_EMIN, "Decimal Emin context changed")
+        require(frozen.Emax == CALCULATION_DECIMAL_EMAX, "Decimal Emax context changed")
+        require(frozen.traps[Inexact] is False, "Decimal Inexact trap changed")
+        require(frozen.traps[Rounded] is False, "Decimal Rounded trap changed")
 
     first = "12345678901234567890123456789"
     second = "12345678901234567890123456788"
@@ -409,6 +430,43 @@ def _verify_decimal_and_policy_hardening() -> None:
                 )
             require(replayed_flow.to_dict() == flow.to_dict(), "ambient Decimal changed flow")
             require(replayed_cvd.to_dict() == cvd.to_dict(), "ambient Decimal changed CVD")
+
+    hostile_trades = (
+        _classified(
+            "hostile-buy",
+            "1E+100",
+            False,
+            event_time="2026-08-06T19:18:40.100000Z",
+            receive_time="2026-08-06T19:18:40.110000Z",
+        ),
+        _classified(
+            "hostile-unknown",
+            "2E+100",
+            True,
+            event_time="2026-08-06T19:18:40.200000Z",
+            receive_time="2026-08-06T19:18:40.210000Z",
+        ),
+    )
+    hostile_reference_flow, hostile_reference_cvd = build_order_flow(hostile_trades, _policy())
+    with localcontext() as ambient:
+        ambient.prec = 9
+        ambient.Emin = -2
+        ambient.Emax = 2
+        ambient.traps[Inexact] = True
+        ambient.traps[Rounded] = True
+        hostile_flow, hostile_cvd = build_order_flow(hostile_trades, _policy())
+        hostile_replay_flow = replace(
+            hostile_flow,
+            windows=tuple(replace(window) for window in hostile_flow.windows),
+        )
+        hostile_replay_cvd = replace(
+            hostile_cvd,
+            points=tuple(replace(point) for point in hostile_cvd.points),
+        )
+    require(hostile_flow.to_dict() == hostile_reference_flow.to_dict(), "hostile Decimal changed flow")
+    require(hostile_cvd.to_dict() == hostile_reference_cvd.to_dict(), "hostile Decimal changed CVD")
+    require(hostile_replay_flow.to_dict() == hostile_reference_flow.to_dict(), "hostile Decimal changed model flow")
+    require(hostile_replay_cvd.to_dict() == hostile_reference_cvd.to_dict(), "hostile Decimal changed model CVD")
 
     weighted = (
         _classified(
@@ -477,6 +535,19 @@ def _verify_timestamp_hardening() -> None:
             lambda value=invalid: parse_utc_timestamp(value, "adversarial_timestamp"),
             f"invalid runtime timestamp accepted: {invalid}",
         )
+    _expect_lot45_rejection(
+        lambda: validate_causal_times(
+            "2026-08-06T19:18:40.000000Z",
+            "2026-08-06T19:18:40.100000Z",
+            "2026-08-06T19:18:41Z",
+        ),
+        "noncanonical generated_at accepted by causal validator",
+    )
+    require(
+        event_window_bounds("1960-01-01T00:00:00.100000Z", 1_000_000)
+        == ("1960-01-01T00:00:00.000000Z", "1960-01-01T00:00:01.000000Z"),
+        "pre-epoch tumbling-window semantics changed",
+    )
 
     state = load_json_object(SCHEMA_ROOT / "order_flow_delta_cvd_engine_state_v1.schema.json")
     flow = load_json_object(SCHEMA_ROOT / "order_flow_state_v1.schema.json")
@@ -494,6 +565,10 @@ def _verify_timestamp_hardening() -> None:
         require(
             re.fullmatch(pattern, "2026-08-06T19:18:40.000000Z") is not None,
             "canonical UTC timestamp rejected by schema",
+        )
+        require(
+            re.fullmatch(pattern, "1960-01-01T00:00:00.100000Z") is not None,
+            "pre-epoch canonical UTC timestamp rejected by schema",
         )
         require(
             re.fullmatch(pattern, "2024-02-29T00:00:00.000000Z") is not None,
@@ -588,7 +663,7 @@ def validate() -> dict[str, object]:
     _verify_checksum_authenticity()
     _verify_downstream_lock()
     return {
-        "schema_version": "lot45-frozen-evidence-validation-v8",
+        "schema_version": "lot45-frozen-evidence-validation-v9",
         "status": "PASS",
         "verdict": "PASS_LOT45_FROZEN_EVIDENCE",
         "gate_merge": GATE_MERGE,
@@ -618,6 +693,9 @@ def validate() -> dict[str, object]:
             "trusted_prelaunch_startup_artifact_guard": True,
             "canonical_runtime_utc_timestamps": True,
             "calendar_valid_utc_schema_timestamps": True,
+            "pre_epoch_gregorian_window_support": True,
+            "canonical_causal_generated_at": True,
+            "complete_decimal_context_isolation": True,
             "canonical_window_checksum_authenticity": True,
             "executable_source_inventory_bound_to_code_commit": True,
             "builder_decimal_rounding": "ROUND_HALF_EVEN",
