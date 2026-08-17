@@ -90,3 +90,27 @@ def test_engine_audit_rejects_forged_top_level_audit_checksum() -> None:
 
     with pytest.raises(Lot45ValidationError, match="audit_checksum canonical mismatch"):
         replace(audit, audit_checksum="f" * 64)
+
+
+@pytest.mark.parametrize(
+    "field",
+    (
+        "state_output_checksum",
+        "config_checksum",
+        "entry_gate_checksum",
+        "lot44_state_checksum",
+        "lot44_audit_checksum",
+        "lot44_confidence_checksum",
+        "lot44_post_merge_checksum",
+        "order_flow_checksum",
+        "cvd_checksum",
+    ),
+)
+def test_engine_audit_rejects_invalid_bound_checksum_fields(field: str) -> None:
+    _, audit = _state_and_audit()
+
+    with pytest.raises(Lot45ValidationError, match=field):
+        replace(
+            audit,
+            **{field: "not-a-sha256", "audit_checksum": "0" * 64},
+        )
