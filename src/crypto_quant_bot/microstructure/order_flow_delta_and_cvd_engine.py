@@ -3,7 +3,7 @@ from __future__ import annotations
 import subprocess
 from dataclasses import dataclass, replace
 from datetime import datetime
-from decimal import ROUND_HALF_EVEN, Decimal, localcontext
+from decimal import ROUND_HALF_EVEN, Decimal
 from pathlib import Path
 from typing import Any
 
@@ -35,6 +35,7 @@ from .order_flow_delta_and_cvd_engine_validation import (
     decimal_from_text,
     duration_us,
     event_window_bounds,
+    frozen_decimal_context,
     lot45_safety,
     parse_utc_timestamp,
     require,
@@ -599,7 +600,7 @@ def build_order_flow(
     require(bool(trades), "Lot45 requires classified trades")
     _validate_trade_identity(trades)
     groups = _group_trades(trades, policy)
-    with localcontext() as context:
+    with frozen_decimal_context() as context:
         context.prec = policy.decimal_precision
         context.rounding = CALCULATION_DECIMAL_ROUNDING
         windows = _build_windows(groups, policy)
