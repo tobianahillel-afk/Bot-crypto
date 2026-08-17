@@ -207,13 +207,13 @@ def timestamp_text(value: datetime) -> str:
 
 
 def validate_causal_times(event_time: str, receive_time: str, generated_at: str) -> None:
-    event = parse_utc_timestamp(event_time, "event_time")
-    receive = parse_utc_timestamp(receive_time, "receive_time")
-    generated = parse_utc_timestamp(generated_at, "generated_at")
-    require(
-        event <= receive <= generated,
-        "causal timestamps require event <= receive <= generated",
-    )
+    parse_utc_timestamp(event_time, "event_time")
+    parse_utc_timestamp(receive_time, "receive_time")
+    parse_utc_timestamp(generated_at, "generated_at")
+    try:
+        lot44_validation.validate_causal_times(event_time, receive_time, generated_at)
+    except RuntimeError as exc:
+        raise Lot45ValidationError(str(exc)) from exc
 
 
 def duration_us(earlier: str, later: str) -> int:
