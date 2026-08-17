@@ -29,6 +29,7 @@ CALCULATION_DECIMAL_ROUNDING = ROUND_HALF_EVEN
 CALCULATION_DECIMAL_EMIN = -999_999
 CALCULATION_DECIMAL_EMAX = 999_999
 WINDOW_SIZE_US = 1_000_000
+MAX_CANONICAL_UTC_TIMESTAMP = "9999-12-31T23:59:58.999999Z"
 CLASSIFICATIONS = frozenset({"BUY_AGGRESSOR", "SELL_AGGRESSOR", "UNKNOWN"})
 _CALCULATION_DECIMAL_TRAPS = frozenset({InvalidOperation, DivisionByZero, Overflow})
 
@@ -198,6 +199,10 @@ def parse_utc_timestamp(value: object, field: str) -> datetime:
         raise Lot45ValidationError(f"{field} invalid UTC timestamp") from exc
     require(parsed.tzinfo == UTC, f"{field} must be UTC")
     require(text == timestamp_text(parsed), f"{field} must use canonical UTC timestamp text")
+    require(
+        text <= MAX_CANONICAL_UTC_TIMESTAMP,
+        f"{field} outside Lot45 representable timestamp domain",
+    )
     return parsed
 
 
@@ -232,7 +237,10 @@ def epoch_us(value: datetime) -> int:
 
 def from_epoch_us(value: int) -> datetime:
     signed_value = require_integer(value, "epoch_us", None)
-    return datetime(1970, 1, 1, tzinfo=UTC) + timedelta(microseconds=signed_value)
+    try:
+        return datetime(1970, 1, 1, tzinfo=UTC) + timedelta(microseconds=signed_value)
+    except OverflowError as exc:
+        raise Lot45ValidationError("epoch_us outside representable UTC timestamp domain") from exc
 
 
 def event_window_bounds(event_time: str, window_size_us: int) -> tuple[str, str]:
