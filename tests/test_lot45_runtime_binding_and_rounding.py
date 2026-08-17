@@ -305,7 +305,7 @@ def test_engine_state_binds_cvd_metrics_to_corresponding_window() -> None:
     flow, cvd = build_order_flow(trades, _policy())
     point = cvd.points[0]
     forged_point = replace(point, signed_delta=Decimal("0"), cvd=Decimal("0"))
-    forged_cvd = CVDSeriesV1(SESSION_POLICY_VERSION, (forged_point,), cvd.cvd_checksum)
+    forged_cvd = CVDSeriesV1(SESSION_POLICY_VERSION, (forged_point,), ZERO_SHA256)
     window = flow.windows[0]
 
     with pytest.raises(Lot45ValidationError, match="CVD point signed delta mismatch"):
@@ -368,7 +368,7 @@ def test_engine_state_binding_rejects_length_checksum_and_event_time_drift() -> 
     checksum_drift = CVDSeriesV1(
         SESSION_POLICY_VERSION,
         (replace(point, window_checksum="2" * 64),),
-        cvd.cvd_checksum,
+        ZERO_SHA256,
     )
     with pytest.raises(Lot45ValidationError, match="CVD point window checksum mismatch"):
         _state(flow, checksum_drift)
@@ -376,7 +376,7 @@ def test_engine_state_binding_rejects_length_checksum_and_event_time_drift() -> 
     event_drift = CVDSeriesV1(
         SESSION_POLICY_VERSION,
         (replace(point, event_time="2026-08-06T19:18:40.150000Z"),),
-        cvd.cvd_checksum,
+        ZERO_SHA256,
     )
     with pytest.raises(Lot45ValidationError, match="CVD point event_time mismatch"):
         _state(flow, event_drift)
@@ -391,7 +391,7 @@ def test_engine_state_binding_rejects_length_checksum_and_event_time_drift() -> 
     length_drift = CVDSeriesV1(
         SESSION_POLICY_VERSION,
         (point, extra_point),
-        cvd.cvd_checksum,
+        ZERO_SHA256,
     )
     with pytest.raises(Lot45ValidationError, match="one-to-one"):
         _state(flow, length_drift)
