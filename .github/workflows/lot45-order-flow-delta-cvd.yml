@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine*.py'
+      - 'src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine*.py'
       - 'scripts/lot45_trusted_prelaunch.sh'
       - 'scripts/run_lot45_order_flow_delta_and_cvd_engine.py'
       - 'scripts/validate_lot45.py'
@@ -31,12 +32,12 @@ jobs:
     env:
       PYTHONHASHSEED: '0'
       GATE_MERGE_SHA: 390d0779f2be257fa8134faf8f02193a760a09c3
-      SOURCE_HEAD_SHA: c418338da86c49bd4b688d4a64893ee5042adc40
+      SOURCE_HEAD_SHA: d6fbaecf56178fbcd23fc9ad722b97af225dce3c
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: c418338da86c49bd4b688d4a64893ee5042adc40
+          ref: d6fbaecf56178fbcd23fc9ad722b97af225dce3c
       - name: Trusted pre-launch proof before Python setup
         run: |
           set -euo pipefail
@@ -128,8 +129,11 @@ jobs:
             bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" python -m json.tool "$path" >/dev/null
           done
           ruff check \
+            src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine_impl.py \
+            src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine_models_impl.py \
             src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py \
             src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py \
+            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_policy.py \
             src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py \
             scripts/run_lot45_order_flow_delta_and_cvd_engine.py \
             scripts/validate_lot45.py \
@@ -140,14 +144,18 @@ jobs:
             tests/test_lot45_checksum_binding_adversarial.py \
             tests/test_lot45_untracked_executable_source_binding.py \
             tests/test_lot45_decimal_context_and_pre_epoch.py \
-            tests/test_lot45_top_level_checksum_authenticity.py
+            tests/test_lot45_top_level_checksum_authenticity.py \
+            tests/test_lot45_final_review_contracts.py
           mypy src/crypto_quant_bot/microstructure
           bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" python - <<'PY'
           import ast
           from pathlib import Path
           paths = [
+              Path('src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine_impl.py'),
+              Path('src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine_models_impl.py'),
               Path('src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py'),
               Path('src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py'),
+              Path('src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_policy.py'),
               Path('src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py'),
               Path('scripts/run_lot45_order_flow_delta_and_cvd_engine.py'),
               Path('scripts/validate_lot45.py'),
@@ -187,8 +195,12 @@ jobs:
             tests/test_lot45_untracked_executable_source_binding.py \
             tests/test_lot45_decimal_context_and_pre_epoch.py \
             tests/test_lot45_top_level_checksum_authenticity.py \
+            tests/test_lot45_final_review_contracts.py \
+            --cov=crypto_quant_bot.microstructure._order_flow_delta_and_cvd_engine_impl \
+            --cov=crypto_quant_bot.microstructure._order_flow_delta_and_cvd_engine_models_impl \
             --cov=crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine \
             --cov=crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_models \
+            --cov=crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_policy \
             --cov=crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_validation \
             --cov-branch --cov-report=json:reports/lot45/coverage.json --cov-report=term-missing \
             2>&1 | tee reports/lot45/targeted_coverage.txt
@@ -252,8 +264,11 @@ jobs:
           bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" bash -c '
             set -euo pipefail
             bandit -q -r \
+              src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine_impl.py \
+              src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine_models_impl.py \
               src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py \
               src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py \
+              src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_policy.py \
               src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py \
               scripts/run_lot45_order_flow_delta_and_cvd_engine.py \
               scripts/validate_lot45.py -ll
@@ -268,7 +283,8 @@ jobs:
                 tests/test_lot45_checksum_binding_adversarial.py \
                 tests/test_lot45_untracked_executable_source_binding.py \
                 tests/test_lot45_decimal_context_and_pre_epoch.py \
-                tests/test_lot45_top_level_checksum_authenticity.py
+                tests/test_lot45_top_level_checksum_authenticity.py \
+                tests/test_lot45_final_review_contracts.py
             done
           '
       - uses: actions/upload-artifact@v4
