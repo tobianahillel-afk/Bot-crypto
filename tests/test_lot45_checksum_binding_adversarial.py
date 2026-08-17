@@ -10,7 +10,6 @@ from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_re
 )
 from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine import (
     OrderFlowPolicy,
-    _build_engine_state,
     build_order_flow,
 )
 from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_validation import (
@@ -61,39 +60,58 @@ def _trade() -> ClassifiedTradeV1:
     )
 
 
-def test_engine_state_rejects_jointly_forged_window_and_cvd_checksums() -> None:
-    trades = (_trade(),)
-    flow, cvd = build_order_flow(trades, _policy())
+def _standalone_artifacts():
+    return build_order_flow((_trade(),), _policy())
 
-    forged_checksum = "f" * 64
-    forged_window = replace(flow.windows[0], window_checksum=forged_checksum)
-    forged_flow = replace(flow, windows=(forged_window,))
-    forged_flow = replace(
-        forged_flow,
-        order_flow_checksum=canonical_checksum(forged_flow.payload_without_checksum()),
-    )
 
-    forged_point = replace(cvd.points[0], window_checksum=forged_checksum)
-    forged_cvd = replace(cvd, points=(forged_point,))
-    forged_cvd = replace(
-        forged_cvd,
-        cvd_checksum=canonical_checksum(forged_cvd.payload_without_checksum()),
-    )
-
-    config = {
-        "run_id": "lot45-checksum-adversarial",
-        "correlation_id": "lot45-checksum-adversarial",
-        "lineage_id": "lot45-from-certified-lot44-order-flow-inputs-v1",
-        "generated_at": "2026-08-06T19:18:41.100000Z",
-    }
-    state44 = {"receive_time": "2026-08-06T19:18:40.050000Z"}
+def test_standalone_window_rejects_forged_checksum() -> None:
+    flow, _ = _standalone_artifacts()
 
     with pytest.raises(Lot45ValidationError, match="window checksum canonical mismatch"):
-        _build_engine_state(
-            config,
-            "1" * 40,
-            state44,
-            trades,
-            forged_flow,
-            forged_cvd,
-        )
+        replace(flow.windows[0], window_checksum="f" * 64)
+
+
+def test_standalone_order_flow_rejects_forged_checksum() -> None:
+    flow, _ = _standalone_artifacts()
+
+    with pytest.raises(Lot45ValidationError, match="order-flow checksum canonical mismatch"):
+        replace(flow, order_flow_checksum="f" * 64)
+
+
+def test_standalone_cvd_rejects_forged_checksum() -> None:
+    _, cvd = _standalone_artifacts()
+
+    with pytest.raises(Lot45ValidationError, match="CVD checksum canonical mismatch"):
+        replace(cvd, cvd_checksum="f" * 64)
+
+
+def test_zero_checksum_sentinel_is_immediately_canonicalized() -> None:
+    flow, cvd = _standalone_artifacts()
+    window = replace(flow.windows[0], window_checksum="0" * 64)
+    rebuilt_flow = replace(flow, windows=(window,), order_flow_checksum="0" * 64)
+    rebuilt_cvd = replace(cvd, cvd_checksum="0" * 64)
+
+    assert window.window_checksum == canonical_checksum(window.payload_without_checksum())
+    assert window.window_checksum != "0" * 64
+    assert rebuilt_flow.order_flow_checksum == canonical_checksum(
+        rebuilt_flow.payload_without_checksum()
+    )
+    assert rebuilt_flow.order_flow_checksum != "0" * 64
+    assert rebuilt_cvd.cvd_checksum == canonical_checksum(rebuilt_cvd.payload_without_checksum())
+    assert rebuilt_cvd.cvd_checksum != "0" * 64
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("trades_total", True),
+        ("buy_trades_total", True),
+        ("sell_trades_total", False),
+        ("unknown_trades_total", False),
+    ),
+)
+def test_order_flow_aggregate_counts_reject_booleans(field: str, value: bool) -> None:
+    flow, _ = _standalone_artifacts()
+
+    with pytest.raises(Lot45ValidationError, match=rf"{field} must be integer"):
+        replace(flow, **{field: value, "order_flow_checksum": "0" * 64})
