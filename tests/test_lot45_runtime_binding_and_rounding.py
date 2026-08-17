@@ -14,6 +14,13 @@ from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine import (
 from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_models import (
     CVDPointV1,
     CVDSeriesV1,
+    EXPECTED_GATE_CHECKSUM,
+    EXPECTED_GATE_MERGE,
+    EXPECTED_LOT44_AUDIT,
+    EXPECTED_LOT44_CONFIDENCE,
+    EXPECTED_LOT44_CONFIG,
+    EXPECTED_LOT44_POST_MERGE,
+    EXPECTED_LOT44_STATE,
     Lot45LineageEnvelopeV1,
     Lot45RunContextV1,
     OrderFlowDeltaCVDEngineStateV1,
@@ -56,6 +63,20 @@ def _policy() -> OrderFlowPolicy:
         SESSION_POLICY_VERSION,
         POLICY_VERSION,
     )
+
+
+@pytest.mark.parametrize("window_size_us", (500_000, 2_000_000))
+def test_policy_rejects_non_certified_window_size(window_size_us: int) -> None:
+    with pytest.raises(Lot45ValidationError, match="window size changed"):
+        OrderFlowPolicy(
+            50,
+            window_size_us,
+            2_000_000,
+            Decimal("1"),
+            WINDOW_POLICY_VERSION,
+            SESSION_POLICY_VERSION,
+            POLICY_VERSION,
+        )
 
 
 def _classified(
@@ -130,13 +151,13 @@ def _two_window_flow():
 def _lineage() -> Lot45LineageEnvelopeV1:
     return Lot45LineageEnvelopeV1(
         "test-lineage",
-        "1" * 64,
-        "b" * 40,
-        "2" * 64,
-        "3" * 64,
-        "4" * 64,
-        "5" * 64,
-        "6" * 64,
+        EXPECTED_GATE_CHECKSUM,
+        EXPECTED_GATE_MERGE,
+        EXPECTED_LOT44_STATE,
+        EXPECTED_LOT44_AUDIT,
+        EXPECTED_LOT44_CONFIDENCE,
+        EXPECTED_LOT44_CONFIG,
+        EXPECTED_LOT44_POST_MERGE,
         "2026-08-06T19:18:40.110000Z",
     )
 
@@ -426,6 +447,17 @@ def test_engine_state_rejects_event_and_receive_envelope_drift() -> None:
         replace(state, receive_time="2026-08-06T19:18:41.105000Z")
 
 
+def test_engine_state_rejects_future_lineage_availability() -> None:
+    flow, cvd = _two_window_flow()
+    state = _state(flow, cvd)
+    future_lineage = replace(
+        state.lineage,
+        available_at="2026-08-06T19:18:43.000000Z",
+    )
+    with pytest.raises(Lot45ValidationError, match="available_at cannot exceed generated_at"):
+        replace(state, lineage=future_lineage, output_checksum=ZERO_SHA256)
+
+
 @pytest.mark.parametrize(
     "field",
     (
@@ -441,6 +473,29 @@ def test_lineage_rejects_each_invalid_checksum(field: str) -> None:
     lineage = _lineage()
     with pytest.raises(Lot45ValidationError, match="lowercase sha256"):
         replace(lineage, **{field: "g" * 64})
+
+
+@pytest.mark.parametrize(
+    "field",
+    (
+        "entry_gate_checksum",
+        "lot44_state_checksum",
+        "lot44_audit_checksum",
+        "lot44_confidence_checksum",
+        "lot44_config_checksum",
+        "lot44_post_merge_checksum",
+    ),
+)
+def test_lineage_rejects_well_formed_but_uncertified_checksum(field: str) -> None:
+    lineage = _lineage()
+    with pytest.raises(Lot45ValidationError, match="certified value changed"):
+        replace(lineage, **{field: "f" * 64})
+
+
+def test_lineage_rejects_well_formed_but_uncertified_gate_commit() -> None:
+    lineage = _lineage()
+    with pytest.raises(Lot45ValidationError, match="certified value changed"):
+        replace(lineage, entry_gate_merge_commit="a" * 40)
 
 
 def test_run_context_rejects_each_identity_drift() -> None:

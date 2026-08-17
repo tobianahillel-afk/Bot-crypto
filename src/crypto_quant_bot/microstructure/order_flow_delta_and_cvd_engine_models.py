@@ -34,6 +34,14 @@ from .order_flow_delta_and_cvd_engine_validation import (
     validate_safety,
 )
 
+EXPECTED_GATE_CHECKSUM = "15ca4d69e59a0898f32eb9cbe558571ecf00ae496ec5d41075da1124393d4468"
+EXPECTED_GATE_MERGE = "390d0779f2be257fa8134faf8f02193a760a09c3"
+EXPECTED_LOT44_STATE = "1a461cef0bedc0e2b34185ff538a64b1b53373b12b0633b749a34cee2b3c5541"
+EXPECTED_LOT44_AUDIT = "03ceda1c49746509f95e7f2ed039e8cc321e8e3cb4adbb946f1aef4ed3eba07d"
+EXPECTED_LOT44_CONFIDENCE = "7cb11e078d7f0d9ed0858229d8c6fe31a7cf653a238b280b05dbdd84d1250f05"
+EXPECTED_LOT44_CONFIG = "dac06cb3235f3a09cbbb9b41098d7cf2593b94171659f50ef840d1633bfa95b7"
+EXPECTED_LOT44_POST_MERGE = "b8b531b2fcb09a30728549cc480d54d9be71504356468704c102ff085c39ea9a"
+
 
 @dataclass(frozen=True, slots=True)
 class Lot45RunContextV1:
@@ -79,6 +87,10 @@ class Lot45LineageEnvelopeV1:
         require_text(self.lineage_id, "lineage_id")
         _validate_lineage_checksums(self)
         require_git_sha(self.entry_gate_merge_commit, "entry_gate_merge_commit")
+        require(
+            self.entry_gate_merge_commit == EXPECTED_GATE_MERGE,
+            "entry_gate_merge_commit certified value changed",
+        )
         parse_utc_timestamp(self.available_at, "available_at")
 
     def to_dict(self) -> dict[str, Any]:
@@ -417,16 +429,18 @@ class OrderFlowDeltaCVDEngineAuditV1:
 
 
 def _validate_lineage_checksums(lineage: Lot45LineageEnvelopeV1) -> None:
-    values = {
-        "entry_gate_checksum": lineage.entry_gate_checksum,
-        "lot44_state_checksum": lineage.lot44_state_checksum,
-        "lot44_audit_checksum": lineage.lot44_audit_checksum,
-        "lot44_confidence_checksum": lineage.lot44_confidence_checksum,
-        "lot44_config_checksum": lineage.lot44_config_checksum,
-        "lot44_post_merge_checksum": lineage.lot44_post_merge_checksum,
+    expected = {
+        "entry_gate_checksum": EXPECTED_GATE_CHECKSUM,
+        "lot44_state_checksum": EXPECTED_LOT44_STATE,
+        "lot44_audit_checksum": EXPECTED_LOT44_AUDIT,
+        "lot44_confidence_checksum": EXPECTED_LOT44_CONFIDENCE,
+        "lot44_config_checksum": EXPECTED_LOT44_CONFIG,
+        "lot44_post_merge_checksum": EXPECTED_LOT44_POST_MERGE,
     }
-    for field, value in values.items():
+    for field, expected_value in expected.items():
+        value = getattr(lineage, field)
         require_sha256(value, field)
+        require(value == expected_value, f"{field} certified value changed")
 
 
 def _validate_window_times(window: OrderFlowWindowV1) -> None:
@@ -640,8 +654,17 @@ def _validate_state_time_envelope(state: OrderFlowDeltaCVDEngineStateV1) -> None
     )
     actual_event = parse_utc_timestamp(state.event_time, "state event_time")
     actual_receive = parse_utc_timestamp(state.receive_time, "state receive_time")
+    lineage_available = parse_utc_timestamp(
+        state.lineage.available_at,
+        "lineage available_at",
+    )
+    generated = parse_utc_timestamp(state.generated_at, "state generated_at")
     require(actual_event == max_event, "Lot45 state event_time must equal latest source event")
     require(actual_receive == max_receive, "Lot45 state receive_time must equal latest source receive time")
+    require(
+        lineage_available <= generated,
+        "Lot45 lineage available_at cannot exceed generated_at",
+    )
 
 
 def _validate_state_cvd_binding(state: OrderFlowDeltaCVDEngineStateV1) -> None:

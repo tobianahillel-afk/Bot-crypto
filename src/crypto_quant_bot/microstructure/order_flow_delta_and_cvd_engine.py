@@ -31,6 +31,7 @@ from .order_flow_delta_and_cvd_engine_validation import (
     SESSION_POLICY_VERSION,
     VALIDATION_STATE,
     WINDOW_POLICY_VERSION,
+    WINDOW_SIZE_US,
     Lot45ValidationError,
     decimal_from_text,
     duration_us,
@@ -117,6 +118,10 @@ class OrderFlowPolicy:
             "Lot45 calculation Decimal precision changed",
         )
         require_integer(self.window_size_us, "window_size_us", 1)
+        require(
+            self.window_size_us == WINDOW_SIZE_US,
+            "Lot45 window size changed",
+        )
         require_integer(self.max_input_age_us, "max_input_age_us", 1)
         validate_ratio(self.max_unknown_volume_ratio, "max_unknown_volume_ratio")
         require(self.window_policy_version == WINDOW_POLICY_VERSION, "Lot45 window policy changed")
