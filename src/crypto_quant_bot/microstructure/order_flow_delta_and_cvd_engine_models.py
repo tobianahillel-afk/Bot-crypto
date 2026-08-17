@@ -60,7 +60,7 @@ def _reject_completed_zero_sentinel(was_zero: bool, field: str) -> None:
 class OrderFlowWindowV1(_impl.OrderFlowWindowV1):
     def __post_init__(self) -> None:
         was_zero = self.window_checksum == _ZERO_SHA256
-        super().__post_init__()
+        _impl.OrderFlowWindowV1.__post_init__(self)
         _reject_completed_zero_sentinel(was_zero, "window_checksum")
 
 
@@ -68,7 +68,7 @@ class OrderFlowWindowV1(_impl.OrderFlowWindowV1):
 class OrderFlowStateV1(_impl.OrderFlowStateV1):
     def __post_init__(self) -> None:
         was_zero = self.order_flow_checksum == _ZERO_SHA256
-        super().__post_init__()
+        _impl.OrderFlowStateV1.__post_init__(self)
         _reject_completed_zero_sentinel(was_zero, "order_flow_checksum")
         if not _is_internal_construction():
             require(
@@ -81,14 +81,14 @@ class OrderFlowStateV1(_impl.OrderFlowStateV1):
 class CVDSeriesV1(_impl.CVDSeriesV1):
     def __post_init__(self) -> None:
         was_zero = self.cvd_checksum == _ZERO_SHA256
-        super().__post_init__()
+        _impl.CVDSeriesV1.__post_init__(self)
         _reject_completed_zero_sentinel(was_zero, "cvd_checksum")
 
 
 @dataclass(frozen=True, slots=True)
 class OrderFlowDeltaCVDEngineStateV1(_impl.OrderFlowDeltaCVDEngineStateV1):
     def __post_init__(self) -> None:
-        super().__post_init__()
+        _impl.OrderFlowDeltaCVDEngineStateV1.__post_init__(self)
         if not _is_internal_construction():
             require(
                 duration_us(self.lineage.available_at, self.generated_at)
@@ -101,7 +101,7 @@ class OrderFlowDeltaCVDEngineStateV1(_impl.OrderFlowDeltaCVDEngineStateV1):
 class OrderFlowDeltaCVDEngineAuditV1(_impl.OrderFlowDeltaCVDEngineAuditV1):
     def __post_init__(self) -> None:
         was_zero = self.audit_checksum == _ZERO_SHA256
-        super().__post_init__()
+        _impl.OrderFlowDeltaCVDEngineAuditV1.__post_init__(self)
         _reject_completed_zero_sentinel(was_zero, "audit_checksum")
 
 
