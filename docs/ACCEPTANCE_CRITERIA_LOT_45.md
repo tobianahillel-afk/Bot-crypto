@@ -21,6 +21,8 @@ Lot 45 is accepted only when every criterion below is PASS on the exact certifie
 - Window boundaries are deterministic from event timestamps.
 - Session transitions reset CVD exactly according to `lot45-utc-day-session-v1`.
 - Runtime timestamps and every published Lot45 timestamp schema accept only real Gregorian calendar dates in canonical microsecond UTC `Z` text; impossible dates and invalid leap days fail closed.
+- Canonical Gregorian timestamps before `1970-01-01T00:00:00.000000Z` remain valid inputs; signed Unix-epoch offsets must not narrow the published timestamp domain.
+- Every causal timestamp (`event_time`, `receive_time`, `generated_at`) is validated through the canonical Lot45 timestamp parser before causal ordering is evaluated.
 - Two complete builds from the same source/config/input must produce identical state, audit, order-flow and CVD payloads/checksums.
 
 ## Upstream and executable integrity
@@ -43,6 +45,7 @@ Lot 45 is accepted only when every criterion below is PASS on the exact certifie
 - Published timestamp schemas preserve exact canonical UTC text while also enforcing valid calendar dates.
 - Runtime safety is exact and fail-closed.
 - Decimal zero serializes canonically as `"0"`.
+- All Lot45 Decimal-derived arithmetic and invariant validation execute in a complete frozen context: precision, `ROUND_HALF_EVEN`, `Emin`, `Emax`, clamp and trap policy are explicit and independent of the caller's ambient Decimal context.
 - Final artifacts are persisted only with atomic JSON writes.
 - State/audit/order-flow/CVD checksums are canonical and replay-verifiable.
 
@@ -71,6 +74,8 @@ Lot 45 is accepted only when every criterion below is PASS on the exact certifie
 - Dedicated mutation score >= 80%.
 - Adversarial certification proves pre-launch rejection of a self-deleting startup source and a valid sourceless startup `.pyc` before Python is started.
 - Adversarial tests prove ignored/untracked executable Python source rejection and calendar-invalid timestamp rejection.
+- Adversarial tests prove hostile ambient Decimal traps/exponent limits cannot change valid Lot45 calculations or model reconstruction.
+- Adversarial tests prove canonical pre-1970 Gregorian timestamps retain deterministic event-time tumbling-window semantics.
 - Full repository tests PASS.
 - Architecture/roadmap/traceability/engineering/security checks PASS.
 - Targeted Lot45 tests repeat at least three times without flake.
