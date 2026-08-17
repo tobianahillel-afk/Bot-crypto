@@ -46,7 +46,9 @@ A window is identified from the trade event time, never from arrival order. The 
 
 No calculation may use a future trade or future state.
 
-All published Lot45 timestamp fields use one canonical representation: a real Gregorian calendar date, UTC `Z`, and exactly six fractional-second digits. Schema constraints reject impossible calendar dates such as 31 February and apply the Gregorian leap-year rule in addition to the canonical text constraint. Runtime parsing and published schemas therefore accept the same timestamp domain.
+All published Lot45 timestamp fields use one canonical representation: a real Gregorian calendar date, UTC `Z`, and exactly six fractional-second digits. Schema constraints reject impossible calendar dates such as 31 February and apply the Gregorian leap-year rule in addition to the canonical text constraint. Runtime parsing and published schemas therefore accept the same timestamp domain. That domain is not narrowed by the Unix epoch: canonical Gregorian instants before 1970 are represented internally with signed microsecond offsets and retain the same deterministic tumbling-window semantics.
+
+Every causal ordering check first passes `event_time`, `receive_time` and `generated_at` through the Lot45 canonical timestamp parser. A timestamp that is causally ordered but textually non-canonical cannot enter a valid Lot45 state.
 
 ## Order-flow accounting
 
@@ -71,6 +73,10 @@ The conservative signed imbalance is:
 `signed_imbalance = signed_delta / total_volume`
 
 so UNKNOWN remains in the denominator rather than being silently removed.
+
+## Numerical determinism
+
+Every Decimal-derived calculation and every Decimal-derived model invariant executes under one complete Lot45 context. The context freezes precision, `ROUND_HALF_EVEN`, `Emin`, `Emax`, clamp and the trap policy. Caller/thread ambient Decimal settings therefore cannot alter a calculation, validation decision or checksum. Ambient `Inexact`/`Rounded` traps and hostile exponent limits are explicit adversarial test cases.
 
 ## Coverage and confidence
 
