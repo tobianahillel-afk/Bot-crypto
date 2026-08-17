@@ -12,8 +12,6 @@ from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine import (
     build_order_flow,
 )
 from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_models import (
-    CVDPointV1,
-    CVDSeriesV1,
     EXPECTED_GATE_CHECKSUM,
     EXPECTED_GATE_MERGE,
     EXPECTED_LOT44_AUDIT,
@@ -21,6 +19,8 @@ from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_models impo
     EXPECTED_LOT44_CONFIG,
     EXPECTED_LOT44_POST_MERGE,
     EXPECTED_LOT44_STATE,
+    CVDPointV1,
+    CVDSeriesV1,
     Lot45LineageEnvelopeV1,
     Lot45RunContextV1,
     OrderFlowDeltaCVDEngineStateV1,
