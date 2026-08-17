@@ -125,6 +125,14 @@ class OrderFlowWindowV1:
         _validate_window_volumes(self)
         _validate_window_metrics(self)
         require_sha256(self.window_checksum, "window_checksum")
+        expected_checksum = canonical_checksum(self.payload_without_checksum())
+        if self.window_checksum == "0" * 64:
+            object.__setattr__(self, "window_checksum", expected_checksum)
+        else:
+            require(
+                self.window_checksum == expected_checksum,
+                "window checksum canonical mismatch",
+            )
 
     def payload_without_checksum(self) -> dict[str, Any]:
         payload = self.to_dict()
@@ -184,6 +192,14 @@ class OrderFlowStateV1:
         _validate_flow_volumes(self)
         _validate_flow_metrics(self)
         require_sha256(self.order_flow_checksum, "order_flow_checksum")
+        expected_checksum = canonical_checksum(self.payload_without_checksum())
+        if self.order_flow_checksum == "0" * 64:
+            object.__setattr__(self, "order_flow_checksum", expected_checksum)
+        else:
+            require(
+                self.order_flow_checksum == expected_checksum,
+                "order-flow checksum canonical mismatch",
+            )
 
     def payload_without_checksum(self) -> dict[str, Any]:
         payload = self.to_dict()
@@ -258,6 +274,14 @@ class CVDSeriesV1:
         )
         _validate_cvd_points(self.points)
         require_sha256(self.cvd_checksum, "cvd_checksum")
+        expected_checksum = canonical_checksum(self.payload_without_checksum())
+        if self.cvd_checksum == "0" * 64:
+            object.__setattr__(self, "cvd_checksum", expected_checksum)
+        else:
+            require(
+                self.cvd_checksum == expected_checksum,
+                "CVD checksum canonical mismatch",
+            )
 
     def payload_without_checksum(self) -> dict[str, Any]:
         payload = self.to_dict()
@@ -512,6 +536,14 @@ def _validate_flow_window_sequence(windows: tuple[OrderFlowWindowV1, ...]) -> No
 
 
 def _validate_flow_counts(state: OrderFlowStateV1) -> None:
+    fields = (
+        "trades_total",
+        "buy_trades_total",
+        "sell_trades_total",
+        "unknown_trades_total",
+    )
+    for field in fields:
+        require_integer(getattr(state, field), field)
     expected = {
         "trades_total": sum(item.trades_total for item in state.windows),
         "buy_trades_total": sum(item.buy_trades_total for item in state.windows),
