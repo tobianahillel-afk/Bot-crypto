@@ -29,7 +29,7 @@ CALCULATION_DECIMAL_ROUNDING = ROUND_HALF_EVEN
 CALCULATION_DECIMAL_EMIN = -999_999
 CALCULATION_DECIMAL_EMAX = 999_999
 WINDOW_SIZE_US = 1_000_000
-MAX_CANONICAL_UTC_TIMESTAMP = "9999-12-31T23:59:58.999999Z"
+MAX_WINDOWABLE_EVENT_TIMESTAMP = "9999-12-31T23:59:58.999999Z"
 CLASSIFICATIONS = frozenset({"BUY_AGGRESSOR", "SELL_AGGRESSOR", "UNKNOWN"})
 _CALCULATION_DECIMAL_TRAPS = frozenset({InvalidOperation, DivisionByZero, Overflow})
 
@@ -199,10 +199,6 @@ def parse_utc_timestamp(value: object, field: str) -> datetime:
         raise Lot45ValidationError(f"{field} invalid UTC timestamp") from exc
     require(parsed.tzinfo == UTC, f"{field} must be UTC")
     require(text == timestamp_text(parsed), f"{field} must use canonical UTC timestamp text")
-    require(
-        text <= MAX_CANONICAL_UTC_TIMESTAMP,
-        f"{field} outside Lot45 representable timestamp domain",
-    )
     return parsed
 
 
@@ -246,6 +242,10 @@ def from_epoch_us(value: int) -> datetime:
 def event_window_bounds(event_time: str, window_size_us: int) -> tuple[str, str]:
     require_integer(window_size_us, "window_size_us", 1)
     event = parse_utc_timestamp(event_time, "event_time")
+    require(
+        event_time <= MAX_WINDOWABLE_EVENT_TIMESTAMP,
+        "event_time cannot form representable Lot45 tumbling-window end",
+    )
     raw_us = epoch_us(event)
     start_us = (raw_us // window_size_us) * window_size_us
     end_us = start_us + window_size_us
