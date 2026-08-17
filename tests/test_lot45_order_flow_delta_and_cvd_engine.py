@@ -397,7 +397,11 @@ def test_flow_model_rejects_sequence_and_aggregate_drift() -> None:
         replace(flow, windows=(second, first))
     with pytest.raises(Lot45ValidationError, match="must be unique"):
         replace(flow, windows=(first, first))
-    bad_impulse = replace(second, delta_impulse=second.delta_impulse + Decimal("1"))
+    bad_impulse = replace(
+        second,
+        delta_impulse=second.delta_impulse + Decimal("1"),
+        window_checksum=ZERO_SHA256,
+    )
     with pytest.raises(Lot45ValidationError, match="delta impulse mismatch"):
         replace(flow, windows=(first, bad_impulse))
 
