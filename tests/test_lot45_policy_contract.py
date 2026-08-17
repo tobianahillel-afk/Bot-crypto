@@ -123,8 +123,9 @@ def test_temporal_primitives_use_exact_microsecond_arithmetic() -> None:
     epoch_value = datetime(1970, 1, 2, 0, 0, 1, 2, tzinfo=UTC)
     assert epoch_us(epoch_value) == 86_401_000_002
     assert from_epoch_us(86_401_000_002) == epoch_value
-    with pytest.raises(Lot45ValidationError, match="must be >= 0"):
-        from_epoch_us(-1)
+    pre_epoch = datetime(1969, 12, 31, 23, 59, 59, 999999, tzinfo=UTC)
+    assert epoch_us(pre_epoch) == -1
+    assert from_epoch_us(-1) == pre_epoch
 
     assert event_window_bounds(
         "2026-08-14T00:00:00.750000Z",
