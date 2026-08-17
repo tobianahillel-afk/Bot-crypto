@@ -2,8 +2,17 @@ from __future__ import annotations
 
 import subprocess
 from collections.abc import Mapping, Set
+from contextlib import AbstractContextManager
 from datetime import UTC, datetime, timedelta
-from decimal import Decimal, InvalidOperation
+from decimal import (
+    ROUND_HALF_EVEN,
+    Context,
+    Decimal,
+    DivisionByZero,
+    InvalidOperation,
+    Overflow,
+    localcontext,
+)
 from pathlib import Path
 from typing import Any
 
@@ -16,8 +25,12 @@ WINDOW_POLICY_VERSION = "lot45-event-time-tumbling-v1"
 SESSION_POLICY_VERSION = "lot45-utc-day-session-v1"
 VALIDATION_STATE = "VALIDATED_OFFLINE_ORDER_FLOW_DELTA_CVD_ONLY"
 CALCULATION_DECIMAL_PRECISION = 50
+CALCULATION_DECIMAL_ROUNDING = ROUND_HALF_EVEN
+CALCULATION_DECIMAL_EMIN = -999_999
+CALCULATION_DECIMAL_EMAX = 999_999
 WINDOW_SIZE_US = 1_000_000
 CLASSIFICATIONS = frozenset({"BUY_AGGRESSOR", "SELL_AGGRESSOR", "UNKNOWN"})
+_CALCULATION_DECIMAL_TRAPS = frozenset({InvalidOperation, DivisionByZero, Overflow})
 
 
 class Lot45ValidationError(RuntimeError):
@@ -35,10 +48,15 @@ def require_text(value: object, field: str) -> str:
     return value
 
 
-def require_integer(value: object, field: str, minimum: int = 0) -> int:
+def require_integer(
+    value: object,
+    field: str,
+    minimum: int | None = 0,
+) -> int:
     if not isinstance(value, int) or isinstance(value, bool):
         raise Lot45ValidationError(f"{field} must be integer")
-    require(value >= minimum, f"{field} must be >= {minimum}")
+    if minimum is not None:
+        require(value >= minimum, f"{field} must be >= {minimum}")
     return value
 
 
@@ -49,6 +67,23 @@ def require_sha256(value: object, field: str) -> str:
         f"{field} must be lowercase sha256",
     )
     return text
+
+
+def frozen_decimal_context() -> AbstractContextManager[Context]:
+    """Return the complete deterministic Decimal context for Lot 45 arithmetic."""
+
+    context = Context(
+        prec=CALCULATION_DECIMAL_PRECISION,
+        rounding=CALCULATION_DECIMAL_ROUNDING,
+        Emin=CALCULATION_DECIMAL_EMIN,
+        Emax=CALCULATION_DECIMAL_EMAX,
+        capitals=1,
+        clamp=0,
+    )
+    for signal in context.traps:
+        context.traps[signal] = signal in _CALCULATION_DECIMAL_TRAPS
+    context.clear_flags()
+    return localcontext(context)
 
 
 def _git_commit_exists(root: Path, commit: str) -> bool:
@@ -172,10 +207,13 @@ def timestamp_text(value: datetime) -> str:
 
 
 def validate_causal_times(event_time: str, receive_time: str, generated_at: str) -> None:
-    try:
-        lot44_validation.validate_causal_times(event_time, receive_time, generated_at)
-    except RuntimeError as exc:
-        raise Lot45ValidationError(str(exc)) from exc
+    event = parse_utc_timestamp(event_time, "event_time")
+    receive = parse_utc_timestamp(receive_time, "receive_time")
+    generated = parse_utc_timestamp(generated_at, "generated_at")
+    require(
+        event <= receive <= generated,
+        "causal timestamps require event <= receive <= generated",
+    )
 
 
 def duration_us(earlier: str, later: str) -> int:
@@ -193,8 +231,8 @@ def epoch_us(value: datetime) -> int:
 
 
 def from_epoch_us(value: int) -> datetime:
-    require_integer(value, "epoch_us")
-    return datetime(1970, 1, 1, tzinfo=UTC) + timedelta(microseconds=value)
+    signed_value = require_integer(value, "epoch_us", None)
+    return datetime(1970, 1, 1, tzinfo=UTC) + timedelta(microseconds=signed_value)
 
 
 def event_window_bounds(event_time: str, window_size_us: int) -> tuple[str, str]:
