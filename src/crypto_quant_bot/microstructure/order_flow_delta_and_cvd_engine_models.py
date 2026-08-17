@@ -45,8 +45,8 @@ def _is_internal_construction() -> bool:
     return _INTERNAL_CHECKSUM_CONSTRUCTION.get()
 
 
-def _reject_public_zero_sentinel(value: str, field: str) -> None:
-    if value == _ZERO_SHA256 and not _is_internal_construction():
+def _reject_completed_zero_sentinel(was_zero: bool, field: str) -> None:
+    if was_zero and not _is_internal_construction():
         raise _impl.Lot45ValidationError(
             f"{field} zero sentinel forbidden at reconstruction boundary"
         )
@@ -55,15 +55,17 @@ def _reject_public_zero_sentinel(value: str, field: str) -> None:
 @dataclass(frozen=True, slots=True)
 class OrderFlowWindowV1(_impl.OrderFlowWindowV1):
     def __post_init__(self) -> None:
-        _reject_public_zero_sentinel(self.window_checksum, "window_checksum")
+        was_zero = self.window_checksum == _ZERO_SHA256
         super().__post_init__()
+        _reject_completed_zero_sentinel(was_zero, "window_checksum")
 
 
 @dataclass(frozen=True, slots=True)
 class OrderFlowStateV1(_impl.OrderFlowStateV1):
     def __post_init__(self) -> None:
-        _reject_public_zero_sentinel(self.order_flow_checksum, "order_flow_checksum")
+        was_zero = self.order_flow_checksum == _ZERO_SHA256
         super().__post_init__()
+        _reject_completed_zero_sentinel(was_zero, "order_flow_checksum")
         if not _is_internal_construction():
             require(
                 self.unknown_volume_ratio <= MAX_UNKNOWN_VOLUME_RATIO,
@@ -74,8 +76,9 @@ class OrderFlowStateV1(_impl.OrderFlowStateV1):
 @dataclass(frozen=True, slots=True)
 class CVDSeriesV1(_impl.CVDSeriesV1):
     def __post_init__(self) -> None:
-        _reject_public_zero_sentinel(self.cvd_checksum, "cvd_checksum")
+        was_zero = self.cvd_checksum == _ZERO_SHA256
         super().__post_init__()
+        _reject_completed_zero_sentinel(was_zero, "cvd_checksum")
 
 
 @dataclass(frozen=True, slots=True)
@@ -93,8 +96,9 @@ class OrderFlowDeltaCVDEngineStateV1(_impl.OrderFlowDeltaCVDEngineStateV1):
 @dataclass(frozen=True, slots=True)
 class OrderFlowDeltaCVDEngineAuditV1(_impl.OrderFlowDeltaCVDEngineAuditV1):
     def __post_init__(self) -> None:
-        _reject_public_zero_sentinel(self.audit_checksum, "audit_checksum")
+        was_zero = self.audit_checksum == _ZERO_SHA256
         super().__post_init__()
+        _reject_completed_zero_sentinel(was_zero, "audit_checksum")
 
 
 def __getattr__(name: str) -> Any:
