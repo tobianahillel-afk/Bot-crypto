@@ -35,30 +35,30 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       GATE_MERGE_SHA: 390d0779f2be257fa8134faf8f02193a760a09c3
-      SOURCE_HEAD_SHA: e8db82222ec1d64017479918c2745eb0c8ec6cc1
-      CERTIFICATION_ANCHOR_SHA: 4f0d893049158e58dba0bcd0c13b5dc1cd76091f
-      EVIDENCE_HEAD_SHA: d075787abe84d19c9609e7bae48671868b46b51f
-      VALIDATOR_HEAD_SHA: b12cc87e2d55cde0b6153b44fa26901234b8a77b
-      VALIDATION_RUN_ID: '32015607585'
+      SOURCE_HEAD_SHA: c418338da86c49bd4b688d4a64893ee5042adc40
+      CERTIFICATION_ANCHOR_SHA: d0bae1993933651026e72c408287075aef899b3e
+      EVIDENCE_HEAD_SHA: ba01837a9c2a36b735fbdd6a11dce49e1105a184
+      VALIDATOR_HEAD_SHA: 8eeb519df6866f5359615bbd8b3cfbba0b61c070
+      VALIDATION_RUN_ID: '32022460427'
       VALIDATION_WORKFLOW_ID: '334417396'
       VALIDATION_WORKFLOW_PATH: .github/workflows/lot45-order-flow-delta-cvd.yml
-      VALIDATION_ARTIFACT_ID: '9283428746'
+      VALIDATION_ARTIFACT_ID: '9285879223'
       VALIDATION_ARTIFACT_NAME: lot45-order-flow-delta-cvd-evidence
-      VALIDATION_ARTIFACT_DIGEST: sha256:4990510b93e4e6078db92e53016c53e83e7683c7f9df5a0d54e1b1cf24f72cea
-      MUTATION_RUN_ID: '32015607500'
+      VALIDATION_ARTIFACT_DIGEST: sha256:be8f2b8e91488941e69b52af7f419f710be9f581de9aa63041eea7261ea73a29
+      MUTATION_RUN_ID: '32022460421'
       MUTATION_WORKFLOW_ID: '334417751'
       MUTATION_WORKFLOW_PATH: .github/workflows/lot45-mutation-assurance.yml
-      MUTATION_ARTIFACT_ID: '9283462890'
+      MUTATION_ARTIFACT_ID: '9285943059'
       MUTATION_ARTIFACT_NAME: lot45-mutation-evidence
-      MUTATION_ARTIFACT_DIGEST: sha256:364e1a2719f0817521a555d7e9cdf92a0a9d414a1710e7721e63b15d46f8e175
-      QUALITY_RUN_ID: '32015607576'
+      MUTATION_ARTIFACT_DIGEST: sha256:02d346763ea05389156aa387d24d4dcd74518391c28502697131068452754296
+      QUALITY_RUN_ID: '32022460425'
       QUALITY_WORKFLOW_ID: '326998792'
       QUALITY_WORKFLOW_PATH: .github/workflows/code-quality.yml
-      QUALITY_ARTIFACT_ID: '9283488037'
+      QUALITY_ARTIFACT_ID: '9285950191'
       QUALITY_ARTIFACT_NAME: institutional-quality-evidence
-      QUALITY_ARTIFACT_DIGEST: sha256:193583971395641e7f1ee3896ff37674b06c7c35d9b0047dc2326d3301f8113e
-      QUALITY_GLOBAL_COVERAGE_SHA256: 33a1fb5f956737b62b70d0fb9fd67a983ebec4d1179ffdaa971ee71488d31019
-      QUALITY_MUTATION_SCORE_SHA256: 678b53c31bdd93760360ead142833bd90b36319093fc2dac1f3c7a6d3af6ec3a
+      QUALITY_ARTIFACT_DIGEST: sha256:c281612b27aa98382c4f1292d18fac4bab561ce59d0777f355e9d889e96094ed
+      QUALITY_GLOBAL_COVERAGE_SHA256: f0962651a5422c3fc69e207f4d2dec79647870835b2a766f00d45ac67188d190
+      QUALITY_MUTATION_SCORE_SHA256: 990e74f0dbec868fa3730df60b2d1aec6b33656884e8394396685254e0f5e741
       QUALITY_ENGINEERING_DEVIATION_SHA256: 2622d31a7f9093dacb95f7aeacd7b5e0ce1f08e58eec244a7e1e21d7a8604d14
     steps:
       - uses: actions/checkout@v4
@@ -103,7 +103,7 @@ jobs:
           printf '%s\n' data/audit/order_flow_delta_and_cvd_engine_audit_lot45.json data/audit/order_flow_delta_and_cvd_engine_lot45.json reports/lot45/coverage_summary.json reports/lot45/mutation_summary.json | sort > /tmp/evidence.expected
           diff -u /tmp/evidence.expected /tmp/evidence.actual
           git diff --quiet "$CERTIFICATION_ANCHOR_SHA" "$EVIDENCE_HEAD_SHA" -- data/audit/order_flow_state_lot45.json data/audit/cvd_series_lot45.json
-          git diff --quiet "$SOURCE_HEAD_SHA" HEAD -- src/crypto_quant_bot scripts/lot45_trusted_prelaunch.sh scripts/run_lot45_order_flow_delta_and_cvd_engine.py scripts/validate_lot45.py config/microstructure/order_flow_delta_and_cvd_engine_v1.json contracts/schemas tests/test_lot45_decimal_context_and_pre_epoch.py
+          git diff --quiet "$SOURCE_HEAD_SHA" HEAD -- src/crypto_quant_bot scripts/lot45_trusted_prelaunch.sh scripts/run_lot45_order_flow_delta_and_cvd_engine.py scripts/validate_lot45.py config/microstructure/order_flow_delta_and_cvd_engine_v1.json contracts/schemas tests/test_lot45_decimal_context_and_pre_epoch.py tests/test_lot45_top_level_checksum_authenticity.py
 
       - name: Authenticate GitHub Actions proof metadata
         env:
@@ -134,7 +134,7 @@ jobs:
           path: /tmp/lot45-validation-proof
           github-token: ${{ github.token }}
           repository: ${{ github.repository }}
-          run-id: 32015607585
+          run-id: 32022460427
 
       - uses: actions/download-artifact@v4
         with:
@@ -142,7 +142,7 @@ jobs:
           path: /tmp/lot45-mutation-proof
           github-token: ${{ github.token }}
           repository: ${{ github.repository }}
-          run-id: 32015607500
+          run-id: 32022460421
 
       - uses: actions/download-artifact@v4
         with:
@@ -150,7 +150,7 @@ jobs:
           path: /tmp/lot45-quality-proof
           github-token: ${{ github.token }}
           repository: ${{ github.repository }}
-          run-id: 32015607576
+          run-id: 32022460425
 
       - name: Authenticate downloaded proof bytes
         run: |
@@ -191,7 +191,6 @@ jobs:
             test "$status" -ne 0; test ! -e "$marker"; printf '%s\n' "$output" | grep -F LOT45_PRELAUNCH_UNBOUND_EXECUTABLE_TREE
             rm -f "src/${module}.py" "$marker"
           done
-
           rm -f /tmp/lot45-startup.py /tmp/lot45-startup.pyc /tmp/lot45-sitecustomize-pyc-executed src/sitecustomize.pyc
           printf '%s\n' 'from pathlib import Path' "Path('/tmp/lot45-sitecustomize-pyc-executed').write_text('executed', encoding='utf-8')" > /tmp/lot45-startup.py
           env -u PYTHONPATH PYTHONNOUSERSITE=1 PYTHONSAFEPATH=1 PYTHONDONTWRITEBYTECODE=1 python -c "import py_compile; py_compile.compile('/tmp/lot45-startup.py', cfile='/tmp/lot45-startup.pyc', doraise=True)"
@@ -199,7 +198,6 @@ jobs:
           set +e; pyc_output="$("${guard[@]}" python -c 'print("SHOULD_NOT_RUN")' 2>&1)"; pyc_status=$?; set -e
           test "$pyc_status" -ne 0; test ! -e /tmp/lot45-sitecustomize-pyc-executed; printf '%s\n' "$pyc_output" | grep -F LOT45_PRELAUNCH_UNBOUND_EXECUTABLE_TREE
           rm -f src/sitecustomize.pyc /tmp/lot45-startup.py /tmp/lot45-sitecustomize-pyc-executed
-
           "${guard[@]}" python scripts/run_lot45_order_flow_delta_and_cvd_engine.py --code-commit "$SOURCE_HEAD_SHA"
           "${guard[@]}" python scripts/validate_lot45.py --code-commit "$SOURCE_HEAD_SHA"
           for f in order_flow_delta_and_cvd_engine_lot45.json order_flow_delta_and_cvd_engine_audit_lot45.json order_flow_state_lot45.json cvd_series_lot45.json; do
@@ -209,7 +207,7 @@ jobs:
           "${guard[@]}" python scripts/run_lot45_order_flow_delta_and_cvd_engine.py --code-commit "$SOURCE_HEAD_SHA"
           "${guard[@]}" python scripts/validate_lot45.py --code-commit "$SOURCE_HEAD_SHA"
           for f in order_flow_delta_and_cvd_engine_lot45.json order_flow_delta_and_cvd_engine_audit_lot45.json order_flow_state_lot45.json cvd_series_lot45.json; do cmp "data/audit/$f" "/tmp/lot45-run1/$f"; done
-          "${guard[@]}" pytest -q tests/test_lot45_order_flow_delta_and_cvd_engine.py tests/test_lot45_policy_contract.py tests/test_lot45_runtime_binding_and_rounding.py tests/test_lot45_schema_contracts.py tests/test_lot45_checksum_binding_adversarial.py tests/test_lot45_untracked_executable_source_binding.py tests/test_lot45_decimal_context_and_pre_epoch.py
+          "${guard[@]}" pytest -q tests/test_lot45_order_flow_delta_and_cvd_engine.py tests/test_lot45_policy_contract.py tests/test_lot45_runtime_binding_and_rounding.py tests/test_lot45_schema_contracts.py tests/test_lot45_checksum_binding_adversarial.py tests/test_lot45_untracked_executable_source_binding.py tests/test_lot45_decimal_context_and_pre_epoch.py tests/test_lot45_top_level_checksum_authenticity.py
           cd - >/dev/null
           git worktree remove --force /tmp/Bot-crypto
           trap - EXIT
@@ -228,7 +226,7 @@ jobs:
           bandit -q -r src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py scripts/run_lot45_order_flow_delta_and_cvd_engine.py scripts/validate_lot45.py scripts/validate_lot45_frozen_evidence.py -ll
           pip-audit -r requirements-dev.lock
           pytest -q
-          for repetition in 1 2 3; do pytest -q tests/test_lot45_order_flow_delta_and_cvd_engine.py tests/test_lot45_policy_contract.py tests/test_lot45_runtime_binding_and_rounding.py tests/test_lot45_schema_contracts.py tests/test_lot45_checksum_binding_adversarial.py tests/test_lot45_untracked_executable_source_binding.py tests/test_lot45_decimal_context_and_pre_epoch.py; done
+          for repetition in 1 2 3; do pytest -q tests/test_lot45_order_flow_delta_and_cvd_engine.py tests/test_lot45_policy_contract.py tests/test_lot45_runtime_binding_and_rounding.py tests/test_lot45_schema_contracts.py tests/test_lot45_checksum_binding_adversarial.py tests/test_lot45_untracked_executable_source_binding.py tests/test_lot45_decimal_context_and_pre_epoch.py tests/test_lot45_top_level_checksum_authenticity.py; done
           test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine.py
           test ! -e src/crypto_quant_bot/microstructure/trade_classification_confidence_engine_models.py
           test ! -e scripts/run_lot46_trade_classification_confidence_engine.py
