@@ -336,14 +336,15 @@ class OrderFlowDeltaCVDEngineStateV1:
         require_reason_codes(self.reason_codes)
         validate_safety(self.safety)
         require_sha256(self.output_checksum, "output_checksum")
+        require(
+            self.output_checksum != "0" * 64,
+            "output_checksum zero sentinel forbidden at reconstruction boundary",
+        )
         expected_checksum = canonical_checksum(self.payload_without_checksum())
-        if self.output_checksum == "0" * 64:
-            object.__setattr__(self, "output_checksum", expected_checksum)
-        else:
-            require(
-                self.output_checksum == expected_checksum,
-                "output_checksum canonical mismatch",
-            )
+        require(
+            self.output_checksum == expected_checksum,
+            "output_checksum canonical mismatch",
+        )
 
     def payload_without_checksum(self) -> dict[str, Any]:
         payload = self.to_dict()

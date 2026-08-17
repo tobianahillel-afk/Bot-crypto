@@ -664,9 +664,29 @@ def _build_engine_state(
     event_time, receive_time = _state_times(trades)
     generated_at = require_text(config.get("generated_at"), "generated_at")
     validate_causal_times(event_time, receive_time, generated_at)
-    provisional = OrderFlowDeltaCVDEngineStateV1(
-        _build_run_context(config, code_commit),
-        _build_lineage(config, state44),
+    run_context = _build_run_context(config, code_commit)
+    lineage = _build_lineage(config, state44)
+    safety = lot45_safety()
+    payload = {
+        "schema_version": "order-flow-delta-cvd-engine-state-v1",
+        "run_context": run_context.to_dict(),
+        "lineage": lineage.to_dict(),
+        "event_time": event_time,
+        "receive_time": receive_time,
+        "generated_at": generated_at,
+        "validation_state": VALIDATION_STATE,
+        "policy_version": POLICY_VERSION,
+        "window_policy_version": WINDOW_POLICY_VERSION,
+        "session_policy_version": SESSION_POLICY_VERSION,
+        "order_flow": order_flow.to_dict(),
+        "cvd_series": cvd.to_dict(),
+        "reason_codes": list(LOT45_REASON_CODES),
+        "safety": safety,
+    }
+    checksum = canonical_checksum(payload)
+    return OrderFlowDeltaCVDEngineStateV1(
+        run_context,
+        lineage,
         event_time,
         receive_time,
         generated_at,
@@ -677,11 +697,9 @@ def _build_engine_state(
         order_flow,
         cvd,
         LOT45_REASON_CODES,
-        lot45_safety(),
-        ZERO_SHA256,
+        safety,
+        checksum,
     )
-    checksum = canonical_checksum(provisional.payload_without_checksum())
-    return replace(provisional, output_checksum=checksum)
 
 
 def _build_engine_audit(
