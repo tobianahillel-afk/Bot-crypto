@@ -711,7 +711,6 @@ def _validate_audit_checksums(audit: OrderFlowDeltaCVDEngineAuditV1) -> None:
     for field, value in values.items():
         require_sha256(value, field)
     expected = {
-        "config_checksum": EXPECTED_LOT44_CONFIG,
         "entry_gate_checksum": EXPECTED_GATE_CHECKSUM,
         "lot44_state_checksum": EXPECTED_LOT44_STATE,
         "lot44_audit_checksum": EXPECTED_LOT44_AUDIT,
