@@ -22,6 +22,8 @@ from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_
     TimestampedTradeV1,
 )
 
+ZERO_SHA256 = "0" * 64
+
 
 def _policy() -> OrderFlowPolicy:
     return OrderFlowPolicy(
@@ -82,6 +84,17 @@ def test_engine_state_rejects_forged_top_level_output_checksum() -> None:
             state,
             generated_at="2026-08-06T19:18:43.000000Z",
             output_checksum="f" * 64,
+        )
+
+
+def test_engine_state_rejects_zero_checksum_sentinel_on_reconstruction() -> None:
+    state, _ = _state_and_audit()
+
+    with pytest.raises(Lot45ValidationError, match="zero sentinel forbidden"):
+        replace(
+            state,
+            generated_at="2026-08-06T19:18:43.000000Z",
+            output_checksum=ZERO_SHA256,
         )
 
 
