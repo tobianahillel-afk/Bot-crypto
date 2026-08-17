@@ -300,6 +300,14 @@ class OrderFlowDeltaCVDEngineStateV1:
         require_reason_codes(self.reason_codes)
         validate_safety(self.safety)
         require_sha256(self.output_checksum, "output_checksum")
+        expected_checksum = canonical_checksum(self.payload_without_checksum())
+        if self.output_checksum == "0" * 64:
+            object.__setattr__(self, "output_checksum", expected_checksum)
+        else:
+            require(
+                self.output_checksum == expected_checksum,
+                "output_checksum canonical mismatch",
+            )
 
     def payload_without_checksum(self) -> dict[str, Any]:
         payload = self.to_dict()
@@ -351,6 +359,14 @@ class OrderFlowDeltaCVDEngineAuditV1:
             "Lot45 audit validation state changed",
         )
         validate_safety(self.safety)
+        expected_checksum = canonical_checksum(self.payload_without_checksum())
+        if self.audit_checksum == "0" * 64:
+            object.__setattr__(self, "audit_checksum", expected_checksum)
+        else:
+            require(
+                self.audit_checksum == expected_checksum,
+                "audit_checksum canonical mismatch",
+            )
 
     def payload_without_checksum(self) -> dict[str, Any]:
         payload = self.to_dict()
