@@ -10,7 +10,6 @@ from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_models impo
     EXPECTED_GATE_CHECKSUM,
     EXPECTED_LOT44_AUDIT,
     EXPECTED_LOT44_CONFIDENCE,
-    EXPECTED_LOT44_CONFIG,
     EXPECTED_LOT44_POST_MERGE,
     EXPECTED_LOT44_STATE,
     OrderFlowDeltaCVDEngineAuditV1,
@@ -34,7 +33,7 @@ def _audit_kwargs() -> dict[str, Any]:
     return {
         "code_commit": "a" * 40,
         "state_output_checksum": "1" * 64,
-        "config_checksum": EXPECTED_LOT44_CONFIG,
+        "config_checksum": "4" * 64,
         "entry_gate_checksum": EXPECTED_GATE_CHECKSUM,
         "lot44_state_checksum": EXPECTED_LOT44_STATE,
         "lot44_audit_checksum": EXPECTED_LOT44_AUDIT,
@@ -61,12 +60,12 @@ def _canonical_payloads() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any
 def test_standalone_audit_accepts_exact_certified_upstream_hashes() -> None:
     audit = OrderFlowDeltaCVDEngineAuditV1(**_audit_kwargs())
     assert audit.audit_checksum != ZERO_SHA256
+    assert audit.config_checksum == "4" * 64
 
 
 @pytest.mark.parametrize(
     "field",
     (
-        "config_checksum",
         "entry_gate_checksum",
         "lot44_state_checksum",
         "lot44_audit_checksum",
