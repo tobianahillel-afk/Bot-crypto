@@ -11,7 +11,11 @@ from .order_flow_delta_and_cvd_engine_policy import (
     MAX_INPUT_AGE_US,
     MAX_UNKNOWN_VOLUME_RATIO,
 )
-from .order_flow_delta_and_cvd_engine_validation import duration_us, require
+from .order_flow_delta_and_cvd_engine_validation import (
+    Lot45ValidationError,
+    duration_us,
+    require,
+)
 
 EXPECTED_GATE_CHECKSUM = _impl.EXPECTED_GATE_CHECKSUM
 EXPECTED_GATE_MERGE = _impl.EXPECTED_GATE_MERGE
@@ -47,7 +51,7 @@ def _is_internal_construction() -> bool:
 
 def _reject_completed_zero_sentinel(was_zero: bool, field: str) -> None:
     if was_zero and not _is_internal_construction():
-        raise _impl.Lot45ValidationError(
+        raise Lot45ValidationError(
             f"{field} zero sentinel forbidden at reconstruction boundary"
         )
 
