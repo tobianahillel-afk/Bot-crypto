@@ -14,6 +14,7 @@ on:
       - 'contracts/schemas/order_flow_state_v1.schema.json'
       - 'contracts/schemas/cvd_series_v1.schema.json'
       - 'src/crypto_quant_bot/**'
+      - 'scripts/lot45_trusted_prelaunch.sh'
       - 'scripts/run_lot45_order_flow_delta_and_cvd_engine.py'
       - 'scripts/validate_lot45.py'
       - 'scripts/validate_lot45_frozen_evidence.py'
@@ -39,30 +40,29 @@ jobs:
   attest:
     runs-on: ubuntu-22.04
     env:
-      PYTHONPATH: src
       GATE_MERGE_SHA: 390d0779f2be257fa8134faf8f02193a760a09c3
-      SOURCE_HEAD_SHA: 89ec5c692622d80222eb63bfa2732242d4a84987
-      CERTIFICATION_ANCHOR_SHA: 880b91afc0f4590d91504be47168519e4ef1aa11
-      EVIDENCE_HEAD_SHA: 45c52cdd2560901b70eb8d1bcdddb0dbb5775f11
-      VALIDATOR_HEAD_SHA: 3938113d27a87f4cc98fcdeab6d59d4f3499c0a3
-      VALIDATION_RUN_ID: '31970067676'
+      SOURCE_HEAD_SHA: daa6c4b230bc7bf9f71a0eabdb41348ac713e053
+      CERTIFICATION_ANCHOR_SHA: 352225d75fbc94fba48e8db91966d0d94e8a9b42
+      EVIDENCE_HEAD_SHA: 53ed9347c05027748d6ead046bcbceddebf67b2b
+      VALIDATOR_HEAD_SHA: ebe541d6a92a0cfe1d5b7f57de9443726f702c91
+      VALIDATION_RUN_ID: '31977096127'
       VALIDATION_WORKFLOW_ID: '334417396'
       VALIDATION_WORKFLOW_PATH: .github/workflows/lot45-order-flow-delta-cvd.yml
-      VALIDATION_ARTIFACT_ID: '9269557580'
+      VALIDATION_ARTIFACT_ID: '9271367454'
       VALIDATION_ARTIFACT_NAME: lot45-order-flow-delta-cvd-evidence
-      VALIDATION_ARTIFACT_DIGEST: sha256:d72b4cf5516559975a6282be40f6eadb2faa257dbfaa742a8fb1052c1b63a1ba
-      MUTATION_RUN_ID: '31970067634'
+      VALIDATION_ARTIFACT_DIGEST: sha256:ac233f0297b2672cab5652f8ef64c1ba6a7737c007b3faecff1385eff53386db
+      MUTATION_RUN_ID: '31977096162'
       MUTATION_WORKFLOW_ID: '334417751'
       MUTATION_WORKFLOW_PATH: .github/workflows/lot45-mutation-assurance.yml
-      MUTATION_ARTIFACT_ID: '9269574905'
+      MUTATION_ARTIFACT_ID: '9271369970'
       MUTATION_ARTIFACT_NAME: lot45-mutation-evidence
-      MUTATION_ARTIFACT_DIGEST: sha256:1f7d7ca74da0fad2de2b130f8e00acfcafc01160a6b089b74acf5fef204fe91d
-      QUALITY_RUN_ID: '31970067631'
+      MUTATION_ARTIFACT_DIGEST: sha256:13ee461f2d4fcdeda3bcba25d5c132e9caff20ee62e56a2452fde3fe71729652
+      QUALITY_RUN_ID: '31977096187'
       QUALITY_WORKFLOW_ID: '326998792'
       QUALITY_WORKFLOW_PATH: .github/workflows/code-quality.yml
-      QUALITY_ARTIFACT_ID: '9269584831'
+      QUALITY_ARTIFACT_ID: '9271383482'
       QUALITY_ARTIFACT_NAME: institutional-quality-evidence
-      QUALITY_ARTIFACT_DIGEST: sha256:69ade2a67752867b2a3da648b489918681c1938a633b7523ed1948b00dfc1b21
+      QUALITY_ARTIFACT_DIGEST: sha256:6a8247052e00f5d530efabda2eced2fbbd89c41d798de9833c9ab2443567ba6e
       QUALITY_GLOBAL_COVERAGE_SHA256: ffbe4463824d3144ffa45b2068cd5ce776a0970ae7d7e90c2d58659ef5d1a7c1
       QUALITY_MUTATION_SCORE_SHA256: 678b53c31bdd93760360ead142833bd90b36319093fc2dac1f3c7a6d3af6ec3a
       QUALITY_ENGINEERING_DEVIATION_SHA256: 2622d31a7f9093dacb95f7aeacd7b5e0ce1f08e58eec244a7e1e21d7a8604d14
@@ -71,14 +71,19 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Trusted pre-launch proof before Python setup
+        run: |
+          set -euo pipefail
+          bash -n scripts/lot45_trusted_prelaunch.sh
+          bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" /usr/bin/true
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
           cache: pip
       - name: Install locked toolchain
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements-dev.lock
+          env -u PYTHONPATH PYTHONSAFEPATH=1 PYTHONNOUSERSITE=1 python -m pip install --upgrade pip
+          env -u PYTHONPATH PYTHONSAFEPATH=1 PYTHONNOUSERSITE=1 python -m pip install -r requirements-dev.lock
       - name: Prove immutable certification chain
         run: |
           set -euo pipefail
@@ -120,6 +125,7 @@ jobs:
           set -euo pipefail
           git diff --quiet "$SOURCE_HEAD_SHA" HEAD -- \
             src/crypto_quant_bot \
+            scripts/lot45_trusted_prelaunch.sh \
             scripts/run_lot45_order_flow_delta_and_cvd_engine.py \
             scripts/validate_lot45.py \
             config/microstructure/order_flow_delta_and_cvd_engine_v1.json \
@@ -160,7 +166,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          python - <<'PY'
+          env -u PYTHONPATH PYTHONSAFEPATH=1 PYTHONNOUSERSITE=1 python - <<'PY'
           from __future__ import annotations
 
           import hashlib
@@ -205,54 +211,31 @@ jobs:
                       raise
                   location = exc.headers.get('Location')
               assert location and location.startswith('https://'), 'artifact signed redirect missing'
-              signed_request = urllib.request.Request(
-                  location,
-                  headers={'User-Agent': user_agent},
-              )
+              signed_request = urllib.request.Request(location, headers={'User-Agent': user_agent})
               with urllib.request.urlopen(signed_request, timeout=120) as response:
                   return response.read()
 
           proofs = [
               (
-                  'validation',
-                  int(os.environ['VALIDATION_RUN_ID']),
-                  int(os.environ['VALIDATION_WORKFLOW_ID']),
-                  os.environ['VALIDATION_WORKFLOW_PATH'],
-                  int(os.environ['VALIDATION_ARTIFACT_ID']),
-                  os.environ['VALIDATION_ARTIFACT_NAME'],
-                  os.environ['VALIDATION_ARTIFACT_DIGEST'],
+                  'validation', int(os.environ['VALIDATION_RUN_ID']), int(os.environ['VALIDATION_WORKFLOW_ID']),
+                  os.environ['VALIDATION_WORKFLOW_PATH'], int(os.environ['VALIDATION_ARTIFACT_ID']),
+                  os.environ['VALIDATION_ARTIFACT_NAME'], os.environ['VALIDATION_ARTIFACT_DIGEST'],
               ),
               (
-                  'mutation',
-                  int(os.environ['MUTATION_RUN_ID']),
-                  int(os.environ['MUTATION_WORKFLOW_ID']),
-                  os.environ['MUTATION_WORKFLOW_PATH'],
-                  int(os.environ['MUTATION_ARTIFACT_ID']),
-                  os.environ['MUTATION_ARTIFACT_NAME'],
-                  os.environ['MUTATION_ARTIFACT_DIGEST'],
+                  'mutation', int(os.environ['MUTATION_RUN_ID']), int(os.environ['MUTATION_WORKFLOW_ID']),
+                  os.environ['MUTATION_WORKFLOW_PATH'], int(os.environ['MUTATION_ARTIFACT_ID']),
+                  os.environ['MUTATION_ARTIFACT_NAME'], os.environ['MUTATION_ARTIFACT_DIGEST'],
               ),
               (
-                  'quality',
-                  int(os.environ['QUALITY_RUN_ID']),
-                  int(os.environ['QUALITY_WORKFLOW_ID']),
-                  os.environ['QUALITY_WORKFLOW_PATH'],
-                  int(os.environ['QUALITY_ARTIFACT_ID']),
-                  os.environ['QUALITY_ARTIFACT_NAME'],
-                  os.environ['QUALITY_ARTIFACT_DIGEST'],
+                  'quality', int(os.environ['QUALITY_RUN_ID']), int(os.environ['QUALITY_WORKFLOW_ID']),
+                  os.environ['QUALITY_WORKFLOW_PATH'], int(os.environ['QUALITY_ARTIFACT_ID']),
+                  os.environ['QUALITY_ARTIFACT_NAME'], os.environ['QUALITY_ARTIFACT_DIGEST'],
               ),
           ]
 
           archives: dict[str, zipfile.ZipFile] = {}
           backing: list[io.BytesIO] = []
-          for (
-              label,
-              run_id,
-              expected_workflow_id,
-              expected_workflow_path,
-              artifact_id,
-              artifact_name,
-              expected_digest,
-          ) in proofs:
+          for label, run_id, expected_workflow_id, expected_workflow_path, artifact_id, artifact_name, expected_digest in proofs:
               run = get_json(f'{api}/actions/runs/{run_id}')
               assert int(run['id']) == run_id, f'{label}: run id mismatch'
               assert run['head_sha'] == anchor, f'{label}: run head is not certification anchor'
@@ -314,10 +297,11 @@ jobs:
       - name: Validate frozen Lot 45 evidence
         run: |
           set -euo pipefail
-          python -m compileall -q scripts/validate_lot45_frozen_evidence.py
+          env -u PYTHONPATH PYTHONSAFEPATH=1 PYTHONNOUSERSITE=1 python -m compileall -q scripts/validate_lot45_frozen_evidence.py
           ruff check scripts/validate_lot45_frozen_evidence.py
-          python scripts/validate_lot45_frozen_evidence.py | tee /tmp/lot45-frozen-validation.json
-      - name: Replay certified source byte-identically and reject unbound executable source
+          bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" \
+            python scripts/validate_lot45_frozen_evidence.py | tee /tmp/lot45-frozen-validation.json
+      - name: Replay certified source byte-identically behind trusted pre-launch guard
         run: |
           set -euo pipefail
           rm -rf /tmp/Bot-crypto /tmp/lot45-expected /tmp/lot45-run1
@@ -330,6 +314,7 @@ jobs:
           trap 'git worktree remove --force /tmp/Bot-crypto >/dev/null 2>&1 || true' EXIT
           (
             cd /tmp/Bot-crypto
+            guard=(bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA")
             outputs=(
               data/audit/order_flow_delta_and_cvd_engine_lot45.json
               data/audit/order_flow_delta_and_cvd_engine_audit_lot45.json
@@ -337,29 +322,54 @@ jobs:
               data/audit/cvd_series_lot45.json
             )
 
-            printf 'LOT45_ADVERSARIAL_MARKER = True\n' > src/sitecustomize.py
-            set +e
-            PYTHONPATH=src python scripts/run_lot45_order_flow_delta_and_cvd_engine.py \
-              --code-commit "$SOURCE_HEAD_SHA" > /tmp/lot45-unbound-source.log 2>&1
-            adversarial_status=$?
-            set -e
-            rm -f src/sitecustomize.py
-            test "$adversarial_status" -ne 0
-            grep -q 'Lot45 executable source absent from code_commit: src/sitecustomize.py' \
-              /tmp/lot45-unbound-source.log
+            for module in sitecustomize usercustomize; do
+              marker="/tmp/lot45-frozen-${module}-executed"
+              rm -f "$marker" "src/${module}.py"
+              printf '%s\n' \
+                'from pathlib import Path' \
+                "Path(\"$marker\").write_text(\"executed\", encoding=\"utf-8\")" \
+                'Path(__file__).unlink()' > "src/${module}.py"
+              set +e
+              attack_output="$("${guard[@]}" python -c 'print("SHOULD_NOT_RUN")' 2>&1)"
+              attack_status=$?
+              set -e
+              test "$attack_status" -ne 0
+              test ! -e "$marker"
+              test -e "src/${module}.py"
+              printf '%s\n' "$attack_output" | grep -F 'LOT45_PRELAUNCH_UNBOUND_EXECUTABLE_TREE'
+              rm -f "src/${module}.py" "$marker"
+            done
 
-            PYTHONPATH=src python scripts/run_lot45_order_flow_delta_and_cvd_engine.py --code-commit "$SOURCE_HEAD_SHA"
-            PYTHONPATH=src python scripts/validate_lot45.py --code-commit "$SOURCE_HEAD_SHA"
+            rm -f /tmp/lot45-frozen-startup.py /tmp/lot45-frozen-startup.pyc /tmp/lot45-frozen-sitecustomize-pyc-executed src/sitecustomize.pyc
+            printf '%s\n' \
+              'from pathlib import Path' \
+              "Path('/tmp/lot45-frozen-sitecustomize-pyc-executed').write_text('executed', encoding='utf-8')" \
+              > /tmp/lot45-frozen-startup.py
+            env -u PYTHONPATH PYTHONNOUSERSITE=1 PYTHONSAFEPATH=1 PYTHONDONTWRITEBYTECODE=1 \
+              python -c "import py_compile; py_compile.compile('/tmp/lot45-frozen-startup.py', cfile='/tmp/lot45-frozen-startup.pyc', doraise=True)"
+            mv /tmp/lot45-frozen-startup.pyc src/sitecustomize.pyc
+            set +e
+            pyc_output="$("${guard[@]}" python -c 'print("SHOULD_NOT_RUN")' 2>&1)"
+            pyc_status=$?
+            set -e
+            test "$pyc_status" -ne 0
+            test ! -e /tmp/lot45-frozen-sitecustomize-pyc-executed
+            test -e src/sitecustomize.pyc
+            printf '%s\n' "$pyc_output" | grep -F 'LOT45_PRELAUNCH_UNBOUND_EXECUTABLE_TREE'
+            rm -f src/sitecustomize.pyc /tmp/lot45-frozen-startup.py /tmp/lot45-frozen-sitecustomize-pyc-executed
+
+            "${guard[@]}" python scripts/run_lot45_order_flow_delta_and_cvd_engine.py --code-commit "$SOURCE_HEAD_SHA"
+            "${guard[@]}" python scripts/validate_lot45.py --code-commit "$SOURCE_HEAD_SHA"
             for path in "${outputs[@]}"; do
               cmp "$path" "/tmp/lot45-expected/$(basename "$path")"
               cp "$path" "/tmp/lot45-run1/$(basename "$path")"
             done
-            PYTHONPATH=src python scripts/run_lot45_order_flow_delta_and_cvd_engine.py --code-commit "$SOURCE_HEAD_SHA"
-            PYTHONPATH=src python scripts/validate_lot45.py --code-commit "$SOURCE_HEAD_SHA"
+            "${guard[@]}" python scripts/run_lot45_order_flow_delta_and_cvd_engine.py --code-commit "$SOURCE_HEAD_SHA"
+            "${guard[@]}" python scripts/validate_lot45.py --code-commit "$SOURCE_HEAD_SHA"
             for path in "${outputs[@]}"; do
               cmp "$path" "/tmp/lot45-run1/$(basename "$path")"
             done
-            PYTHONPATH=src pytest -q \
+            "${guard[@]}" pytest -q \
               tests/test_lot45_order_flow_delta_and_cvd_engine.py \
               tests/test_lot45_policy_contract.py \
               tests/test_lot45_runtime_binding_and_rounding.py \
@@ -372,14 +382,15 @@ jobs:
       - name: Current architecture security regression and Lot 46 lock
         run: |
           set -euo pipefail
-          python scripts/validate_roadmap_documentation.py
-          python scripts/validate_architecture_boundaries.py
-          python scripts/validate_domain_architecture.py
-          python scripts/audit_roadmap_semantics.py
-          python scripts/validate_traceability_contract.py
-          python scripts/check_no_silent_numeric_coercion.py
-          python scripts/quality_inventory.py
-          python scripts/validate_engineering_deviations.py
+          env -u PYTHONPATH PYTHONSAFEPATH=1 PYTHONNOUSERSITE=1 python scripts/validate_roadmap_documentation.py
+          env -u PYTHONPATH PYTHONSAFEPATH=1 PYTHONNOUSERSITE=1 python scripts/validate_architecture_boundaries.py
+          env -u PYTHONPATH PYTHONSAFEPATH=1 PYTHONNOUSERSITE=1 python scripts/validate_domain_architecture.py
+          env -u PYTHONPATH PYTHONSAFEPATH=1 PYTHONNOUSERSITE=1 python scripts/audit_roadmap_semantics.py
+          env -u PYTHONPATH PYTHONSAFEPATH=1 PYTHONNOUSERSITE=1 python scripts/validate_traceability_contract.py
+          env -u PYTHONPATH PYTHONSAFEPATH=1 PYTHONNOUSERSITE=1 python scripts/check_no_silent_numeric_coercion.py
+          env -u PYTHONPATH PYTHONSAFEPATH=1 PYTHONNOUSERSITE=1 python scripts/quality_inventory.py
+          env -u PYTHONPATH PYTHONSAFEPATH=1 PYTHONNOUSERSITE=1 python -c \
+            'import runpy, sys; sys.path.insert(0, "scripts"); runpy.run_path("scripts/validate_engineering_deviations.py", run_name="__main__")'
           bandit -q -r \
             src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py \
             src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py \
