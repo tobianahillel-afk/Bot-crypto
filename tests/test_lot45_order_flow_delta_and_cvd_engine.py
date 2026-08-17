@@ -11,6 +11,7 @@ from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine import (
     OrderFlowPolicy,
     build_lot45_artifacts,
     build_order_flow,
+    canonical_checksum,
 )
 from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_models import (
     CVDPointV1,
@@ -32,7 +33,7 @@ from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_
 ROOT = Path(__file__).resolve().parents[1]
 ZERO_SHA256 = "0" * 64
 QUOTE_SHA256 = "1" * 64
-REFERENCE_CODE_TREE_SHA = "9296264e1d8b4cd34f99480f5e950c9e55a9febf"
+REFERENCE_CODE_TREE_SHA = "f3edfa95007414cf64ef4ee829577b00f6aaac95"
 
 
 def _policy(*, unknown_ratio: str = "1") -> OrderFlowPolicy:
@@ -393,10 +394,14 @@ def test_flow_model_rejects_sequence_and_aggregate_drift() -> None:
         replace(flow, windows=(second, first))
     with pytest.raises(Lot45ValidationError, match="must be unique"):
         replace(flow, windows=(first, first))
+    bad_delta_impulse = second.delta_impulse + Decimal("1")
+    bad_payload = second.to_dict()
+    bad_payload["delta_impulse"] = decimal_text(bad_delta_impulse)
+    bad_payload.pop("window_checksum")
     bad_impulse = replace(
         second,
-        delta_impulse=second.delta_impulse + Decimal("1"),
-        window_checksum=ZERO_SHA256,
+        delta_impulse=bad_delta_impulse,
+        window_checksum=canonical_checksum(bad_payload),
     )
     with pytest.raises(Lot45ValidationError, match="delta impulse mismatch"):
         replace(flow, windows=(first, bad_impulse))
