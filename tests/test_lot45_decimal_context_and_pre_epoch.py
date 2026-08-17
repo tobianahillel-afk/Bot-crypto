@@ -87,13 +87,13 @@ def test_frozen_decimal_context_ignores_ambient_traps_and_exponent_limits() -> N
     trades = (
         _classified(
             "huge-buy",
-            "1E+100",
+            "2E+100",
             event_time="2026-08-06T19:18:40.100000Z",
             receive_time="2026-08-06T19:18:40.110000Z",
         ),
         _classified(
             "huge-unknown",
-            "2E+100",
+            "1E+100",
             event_time="2026-08-06T19:18:40.200000Z",
             receive_time="2026-08-06T19:18:40.210000Z",
             unknown=True,
