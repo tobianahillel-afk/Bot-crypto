@@ -32,7 +32,7 @@ from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_
 ROOT = Path(__file__).resolve().parents[1]
 ZERO_SHA256 = "0" * 64
 QUOTE_SHA256 = "1" * 64
-REFERENCE_CODE_TREE_SHA = "b8822f9de562005494a9866e4b1903b4c539e884"
+REFERENCE_CODE_TREE_SHA = "7941125d0b97766f752fa9ad54644eca431558ff"
 
 
 def _policy(*, unknown_ratio: str = "1") -> OrderFlowPolicy:
@@ -161,20 +161,16 @@ def test_public_builder_enforces_unknown_volume_threshold() -> None:
 
 
 def test_v1_window_policy_rejects_noncanonical_window_size() -> None:
-    trades = (
-        _classified("buy", "2026-08-06T19:18:40.100000Z", "2026-08-06T19:18:40.110000Z", "1", "BUY_AGGRESSOR"),
-    )
-    policy = OrderFlowPolicy(
-        50,
-        500_000,
-        2_000_000,
-        Decimal("1"),
-        WINDOW_POLICY_VERSION,
-        SESSION_POLICY_VERSION,
-        POLICY_VERSION,
-    )
-    with pytest.raises(Lot45ValidationError, match="tumbling policy"):
-        build_order_flow(trades, policy)
+    with pytest.raises(Lot45ValidationError, match="window size changed"):
+        OrderFlowPolicy(
+            50,
+            500_000,
+            2_000_000,
+            Decimal("1"),
+            WINDOW_POLICY_VERSION,
+            SESSION_POLICY_VERSION,
+            POLICY_VERSION,
+        )
 
 
 def test_runtime_timestamp_parser_enforces_canonical_microsecond_utc_text() -> None:
