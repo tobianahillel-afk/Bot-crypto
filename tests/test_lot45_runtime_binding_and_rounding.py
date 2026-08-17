@@ -210,6 +210,19 @@ def _state(flow, cvd) -> OrderFlowDeltaCVDEngineStateV1:
     )
 
 
+def _cvd_series(points: tuple[CVDPointV1, ...]) -> CVDSeriesV1:
+    payload = {
+        "schema_version": "cvd-series-v1",
+        "session_policy_version": SESSION_POLICY_VERSION,
+        "points": [point.to_dict() for point in points],
+    }
+    return CVDSeriesV1(
+        SESSION_POLICY_VERSION,
+        points,
+        canonical_checksum(payload),
+    )
+
+
 def test_repeating_ratios_ignore_ambient_decimal_rounding() -> None:
     trades = (
         _classified("buy", "1", "BUY_AGGRESSOR"),
@@ -348,7 +361,7 @@ def test_engine_state_binds_cvd_metrics_to_corresponding_window() -> None:
     flow, cvd = build_order_flow(trades, _policy())
     point = cvd.points[0]
     forged_point = replace(point, signed_delta=Decimal("0"), cvd=Decimal("0"))
-    forged_cvd = CVDSeriesV1(SESSION_POLICY_VERSION, (forged_point,), ZERO_SHA256)
+    forged_cvd = _cvd_series((forged_point,))
     window = flow.windows[0]
 
     with pytest.raises(Lot45ValidationError, match="CVD point signed delta mismatch"):
@@ -408,18 +421,14 @@ def test_engine_state_binding_rejects_length_checksum_and_event_time_drift() -> 
     flow, cvd = _repeating_ratio_flow()
     point = cvd.points[0]
 
-    checksum_drift = CVDSeriesV1(
-        SESSION_POLICY_VERSION,
+    checksum_drift = _cvd_series(
         (replace(point, window_checksum="2" * 64),),
-        ZERO_SHA256,
     )
     with pytest.raises(Lot45ValidationError, match="CVD point window checksum mismatch"):
         _state(flow, checksum_drift)
 
-    event_drift = CVDSeriesV1(
-        SESSION_POLICY_VERSION,
+    event_drift = _cvd_series(
         (replace(point, event_time="2026-08-06T19:18:40.150000Z"),),
-        ZERO_SHA256,
     )
     with pytest.raises(Lot45ValidationError, match="CVD point event_time mismatch"):
         _state(flow, event_drift)
@@ -431,11 +440,7 @@ def test_engine_state_binding_rejects_length_checksum_and_event_time_drift() -> 
         Decimal("0"),
         point.cvd,
     )
-    length_drift = CVDSeriesV1(
-        SESSION_POLICY_VERSION,
-        (point, extra_point),
-        ZERO_SHA256,
-    )
+    length_drift = _cvd_series((point, extra_point))
     with pytest.raises(Lot45ValidationError, match="one-to-one"):
         _state(flow, length_drift)
 

@@ -5,9 +5,6 @@ from decimal import Decimal
 
 import pytest
 
-from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry import (
-    canonical_checksum,
-)
 from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine import (
     OrderFlowPolicy,
     build_order_flow,
@@ -85,20 +82,14 @@ def test_standalone_cvd_rejects_forged_checksum() -> None:
         replace(cvd, cvd_checksum="f" * 64)
 
 
-def test_zero_checksum_sentinel_is_immediately_canonicalized() -> None:
+def test_zero_checksum_sentinels_are_rejected_on_public_reconstruction() -> None:
     flow, cvd = _standalone_artifacts()
-    window = replace(flow.windows[0], window_checksum="0" * 64)
-    rebuilt_flow = replace(flow, windows=(window,), order_flow_checksum="0" * 64)
-    rebuilt_cvd = replace(cvd, cvd_checksum="0" * 64)
-
-    assert window.window_checksum == canonical_checksum(window.payload_without_checksum())
-    assert window.window_checksum != "0" * 64
-    assert rebuilt_flow.order_flow_checksum == canonical_checksum(
-        rebuilt_flow.payload_without_checksum()
-    )
-    assert rebuilt_flow.order_flow_checksum != "0" * 64
-    assert rebuilt_cvd.cvd_checksum == canonical_checksum(rebuilt_cvd.payload_without_checksum())
-    assert rebuilt_cvd.cvd_checksum != "0" * 64
+    with pytest.raises(Lot45ValidationError, match="window_checksum zero sentinel"):
+        replace(flow.windows[0], window_checksum="0" * 64)
+    with pytest.raises(Lot45ValidationError, match="order_flow_checksum zero sentinel"):
+        replace(flow, order_flow_checksum="0" * 64)
+    with pytest.raises(Lot45ValidationError, match="cvd_checksum zero sentinel"):
+        replace(cvd, cvd_checksum="0" * 64)
 
 
 @pytest.mark.parametrize(

@@ -1,11 +1,22 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
 import pytest
 
+from crypto_quant_bot.data_governance.market_data_governance_scope_and_source_registry import (
+    canonical_checksum,
+)
+from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine import (
+    OrderFlowPolicy,
+    _build_engine_audit,
+    _build_engine_state,
+    build_order_flow,
+)
 from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_models import (
     EXPECTED_GATE_CHECKSUM,
     EXPECTED_LOT44_AUDIT,
@@ -15,9 +26,16 @@ from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_models impo
     OrderFlowDeltaCVDEngineAuditV1,
 )
 from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_validation import (
+    POLICY_VERSION,
+    SESSION_POLICY_VERSION,
     VALIDATION_STATE,
+    WINDOW_POLICY_VERSION,
     Lot45ValidationError,
     lot45_safety,
+)
+from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_models import (
+    ClassifiedTradeV1,
+    TimestampedTradeV1,
 )
 from scripts.validate_lot45 import (
     _load_schema_documents,
@@ -30,7 +48,7 @@ ZERO_SHA256 = "0" * 64
 
 
 def _audit_kwargs() -> dict[str, Any]:
-    return {
+    kwargs: dict[str, Any] = {
         "code_commit": "a" * 40,
         "state_output_checksum": "1" * 64,
         "config_checksum": "4" * 64,
@@ -43,8 +61,13 @@ def _audit_kwargs() -> dict[str, Any]:
         "cvd_checksum": "3" * 64,
         "validation_state": VALIDATION_STATE,
         "safety": lot45_safety(),
-        "audit_checksum": ZERO_SHA256,
     }
+    payload = {
+        "schema_version": "order-flow-delta-cvd-engine-audit-v1",
+        **kwargs,
+    }
+    kwargs["audit_checksum"] = canonical_checksum(payload)
+    return kwargs
 
 
 def _canonical_payloads() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
@@ -57,10 +80,72 @@ def _canonical_payloads() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any
     return tuple(json.loads(path.read_text(encoding="utf-8")) for path in paths)  # type: ignore[return-value]
 
 
+def _policy(max_unknown_ratio: str = "1") -> OrderFlowPolicy:
+    return OrderFlowPolicy(
+        50,
+        1_000_000,
+        2_000_000,
+        Decimal(max_unknown_ratio),
+        WINDOW_POLICY_VERSION,
+        SESSION_POLICY_VERSION,
+        POLICY_VERSION,
+    )
+
+
+def _classified(trade_id: str, quantity: str, classification: str) -> ClassifiedTradeV1:
+    trade = TimestampedTradeV1(
+        "source-a",
+        "venue-a",
+        "BTC-USDT",
+        "SPOT",
+        trade_id,
+        "2026-08-06T19:18:40.100000Z",
+        "2026-08-06T19:18:40.110000Z",
+        Decimal("100"),
+        Decimal(quantity),
+        "UNKNOWN",
+    )
+    if classification == "UNKNOWN":
+        return ClassifiedTradeV1(
+            trade,
+            "UNKNOWN",
+            "NONE",
+            Decimal("0"),
+            "lot44-aggressor-confidence-v1",
+            ZERO_SHA256,
+            ("UNKNOWN_REFERENCE",),
+        )
+    return ClassifiedTradeV1(
+        trade,
+        classification,
+        "QUOTE_TEST",
+        Decimal("1"),
+        "lot44-aggressor-confidence-v1",
+        "1" * 64,
+        ("QUOTE_REFERENCE",),
+    )
+
+
+def _state_config(generated_at: str) -> dict[str, Any]:
+    return {
+        "run_id": "lot45-final-review-state",
+        "correlation_id": "lot45-final-review-state",
+        "lineage_id": "lot45-from-certified-lot44-order-flow-inputs-v1",
+        "generated_at": generated_at,
+    }
+
+
 def test_standalone_audit_accepts_exact_certified_upstream_hashes() -> None:
     audit = OrderFlowDeltaCVDEngineAuditV1(**_audit_kwargs())
     assert audit.audit_checksum != ZERO_SHA256
     assert audit.config_checksum == "4" * 64
+
+
+def test_standalone_audit_rejects_zero_checksum_sentinel() -> None:
+    kwargs = _audit_kwargs()
+    kwargs["audit_checksum"] = ZERO_SHA256
+    with pytest.raises(Lot45ValidationError, match="audit_checksum zero sentinel"):
+        OrderFlowDeltaCVDEngineAuditV1(**kwargs)
 
 
 @pytest.mark.parametrize(
@@ -96,3 +181,56 @@ def test_generated_payload_schema_gate_rejects_nested_violation() -> None:
         match=r"Lot45 state payload violates schema at order_flow\.windows\.0\.classification_coverage",
     ):
         _validate_generated_payloads(schemas, state, audit, order_flow, cvd)
+
+
+def test_reconstructed_flow_enforces_certified_unknown_volume_limit() -> None:
+    flow, _ = build_order_flow(
+        (
+            _classified("buy", "1", "BUY_AGGRESSOR"),
+            _classified("unknown", "2", "UNKNOWN"),
+        ),
+        _policy("1"),
+    )
+    assert flow.unknown_volume_ratio > Decimal("0.5")
+    with pytest.raises(Lot45ValidationError, match="unknown volume ratio exceeds Lot45 policy limit"):
+        replace(flow)
+
+
+def test_reconstructed_state_enforces_certified_input_age_limit() -> None:
+    trades = (_classified("buy", "1", "BUY_AGGRESSOR"),)
+    flow, cvd = build_order_flow(trades, _policy())
+    with pytest.raises(Lot45ValidationError, match="lineage input age exceeds policy limit"):
+        _build_engine_state(
+            _state_config("2026-08-06T19:18:50.000000Z"),
+            "a" * 40,
+            {"receive_time": "2026-08-06T19:18:40.110000Z"},
+            trades,
+            flow,
+            cvd,
+        )
+
+
+def test_every_published_zero_checksum_sentinel_is_rejected() -> None:
+    trades = (_classified("buy", "1", "BUY_AGGRESSOR"),)
+    flow, cvd = build_order_flow(trades, _policy())
+    config = _state_config("2026-08-06T19:18:41.000000Z")
+    state = _build_engine_state(
+        config,
+        "a" * 40,
+        {"receive_time": "2026-08-06T19:18:40.110000Z"},
+        trades,
+        flow,
+        cvd,
+    )
+    audit = _build_engine_audit(config, "a" * 40, state, flow, cvd)
+
+    cases = (
+        (lambda: replace(flow.windows[0], window_checksum=ZERO_SHA256), "window_checksum zero sentinel"),
+        (lambda: replace(flow, order_flow_checksum=ZERO_SHA256), "order_flow_checksum zero sentinel"),
+        (lambda: replace(cvd, cvd_checksum=ZERO_SHA256), "cvd_checksum zero sentinel"),
+        (lambda: replace(state, output_checksum=ZERO_SHA256), "output_checksum zero sentinel"),
+        (lambda: replace(audit, audit_checksum=ZERO_SHA256), "audit_checksum zero sentinel"),
+    )
+    for build, message in cases:
+        with pytest.raises(Lot45ValidationError, match=message):
+            build()
