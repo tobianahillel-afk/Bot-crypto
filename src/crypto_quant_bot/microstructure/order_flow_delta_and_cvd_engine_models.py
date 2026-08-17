@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
-from decimal import ROUND_HALF_EVEN, Decimal, localcontext
+from decimal import ROUND_HALF_EVEN, Decimal
 from types import MappingProxyType
 from typing import Any
 
@@ -19,6 +19,7 @@ from .order_flow_delta_and_cvd_engine_validation import (
     WINDOW_SIZE_US,
     decimal_text,
     event_window_bounds,
+    frozen_decimal_context,
     parse_utc_timestamp,
     require,
     require_git_sha,
@@ -436,7 +437,7 @@ def _validate_window_volumes(window: OrderFlowWindowV1) -> None:
     for field, volume in volumes.items():
         require(volume.is_finite() and volume >= 0, f"{field} must be finite non-negative")
     require(window.total_volume > 0, "order-flow total volume must be positive")
-    with localcontext() as context:
+    with frozen_decimal_context() as context:
         context.prec = CALCULATION_DECIMAL_PRECISION
         context.rounding = ROUND_HALF_EVEN
         classified_total = window.buy_volume + window.sell_volume + window.unknown_volume
@@ -454,7 +455,7 @@ def _validate_window_volumes(window: OrderFlowWindowV1) -> None:
 
 
 def _validate_window_metrics(window: OrderFlowWindowV1) -> None:
-    with localcontext() as context:
+    with frozen_decimal_context() as context:
         context.prec = CALCULATION_DECIMAL_PRECISION
         context.rounding = ROUND_HALF_EVEN
         expected_imbalance = window.signed_delta / window.total_volume
@@ -480,7 +481,7 @@ def _validate_flow_window_sequence(windows: tuple[OrderFlowWindowV1, ...]) -> No
     starts = [parse_utc_timestamp(item.window_start, "window_start") for item in windows]
     require(starts == sorted(starts), "order-flow windows must be event-time ordered")
     require(len(starts) == len(set(starts)), "order-flow windows must be unique")
-    with localcontext() as context:
+    with frozen_decimal_context() as context:
         context.prec = CALCULATION_DECIMAL_PRECISION
         context.rounding = ROUND_HALF_EVEN
         previous_delta = Decimal("0")
@@ -506,7 +507,7 @@ def _validate_flow_counts(state: OrderFlowStateV1) -> None:
 
 
 def _validate_flow_volumes(state: OrderFlowStateV1) -> None:
-    with localcontext() as context:
+    with frozen_decimal_context() as context:
         context.prec = CALCULATION_DECIMAL_PRECISION
         context.rounding = ROUND_HALF_EVEN
         expected = {
@@ -536,7 +537,7 @@ def _validate_flow_volumes(state: OrderFlowStateV1) -> None:
 
 
 def _validate_flow_metrics(state: OrderFlowStateV1) -> None:
-    with localcontext() as context:
+    with frozen_decimal_context() as context:
         context.prec = CALCULATION_DECIMAL_PRECISION
         context.rounding = ROUND_HALF_EVEN
         expected_unknown = state.unknown_volume / state.total_volume
@@ -555,7 +556,7 @@ def _validate_cvd_points(points: tuple[CVDPointV1, ...]) -> None:
     event_times = [parse_utc_timestamp(item.event_time, "CVD event_time") for item in points]
     require(event_times == sorted(event_times), "CVD points must be event-time ordered")
     require(len(event_times) == len(set(event_times)), "CVD event times must be unique")
-    with localcontext() as context:
+    with frozen_decimal_context() as context:
         context.prec = CALCULATION_DECIMAL_PRECISION
         context.rounding = ROUND_HALF_EVEN
         current_session: str | None = None
