@@ -23,13 +23,13 @@ jobs:
   mutation:
     runs-on: ubuntu-22.04
     env:
-      SOURCE_HEAD_SHA: daa6c4b230bc7bf9f71a0eabdb41348ac713e053
+      SOURCE_HEAD_SHA: e8db82222ec1d64017479918c2745eb0c8ec6cc1
       PYTHONHASHSEED: '0'
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: daa6c4b230bc7bf9f71a0eabdb41348ac713e053
+          ref: e8db82222ec1d64017479918c2745eb0c8ec6cc1
       - name: Trusted pre-launch proof before Python setup
         run: |
           set -euo pipefail
@@ -64,6 +64,7 @@ jobs:
             tests/test_lot45_schema_contracts.py \
             tests/test_lot45_checksum_binding_adversarial.py \
             tests/test_lot45_untracked_executable_source_binding.py \
+            tests/test_lot45_decimal_context_and_pre_epoch.py \
             --junitxml=reports/lot45/mutation/baseline.xml \
             2>&1 | tee reports/lot45/mutation/baseline.txt
       - name: Build isolated mutation workspace
@@ -83,6 +84,7 @@ jobs:
           cp tests/test_lot45_schema_contracts.py .tmp-lot45-mutants/tests/
           cp tests/test_lot45_checksum_binding_adversarial.py .tmp-lot45-mutants/tests/
           cp tests/test_lot45_untracked_executable_source_binding.py .tmp-lot45-mutants/tests/
+          cp tests/test_lot45_decimal_context_and_pre_epoch.py .tmp-lot45-mutants/tests/
           bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" python - <<'PY'
           from pathlib import Path
           import toml
@@ -110,6 +112,7 @@ jobs:
               'tests/test_lot45_schema_contracts.py',
               'tests/test_lot45_checksum_binding_adversarial.py',
               'tests/test_lot45_untracked_executable_source_binding.py',
+              'tests/test_lot45_decimal_context_and_pre_epoch.py',
               '-k',
               (
                   'not test_reference_frozen_lot44_builds_expected_order_flow '
