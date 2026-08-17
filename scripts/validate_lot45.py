@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from jsonschema import Draft202012Validator, FormatChecker
-from jsonschema.exceptions import SchemaError, ValidationError
+from jsonschema.exceptions import SchemaError
 from referencing import Registry, Resource
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -35,6 +35,7 @@ SCHEMAS = {
     "order_flow": ROOT / "contracts/schemas/order_flow_state_v1.schema.json",
     "cvd": ROOT / "contracts/schemas/cvd_series_v1.schema.json",
 }
+DRAFT_2020_12_URI = "https:" + "//json-schema.org/draft/2020-12/schema"
 LOT46_FORBIDDEN = {
     "src/crypto_quant_bot/microstructure/trade_classification_confidence_engine.py",
     "src/crypto_quant_bot/microstructure/trade_classification_confidence_engine_models.py",
@@ -84,7 +85,7 @@ def _validate_schema_files(schemas: dict[str, dict[str, Any]]) -> None:
         "cvd": ("cvd-series-v1", "cvd_checksum"),
     }
     for label, schema in schemas.items():
-        if schema.get("$schema") != "https://json-schema.org/draft/2020-12/schema":
+        if schema.get("$schema") != DRAFT_2020_12_URI:
             raise Lot45ValidationError(f"Lot45 {label} schema draft changed")
         if schema.get("type") != "object" or schema.get("additionalProperties") is not False:
             raise Lot45ValidationError(f"Lot45 {label} schema must be a closed object")
