@@ -10,6 +10,7 @@ from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine import (
     CODE_BOUND_PATHS,
     OrderFlowPolicy,
     build_order_flow,
+    canonical_checksum,
 )
 from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_models import (
     EXPECTED_GATE_CHECKSUM,
@@ -164,27 +165,48 @@ def _lineage() -> Lot45LineageEnvelopeV1:
 
 def _state(flow, cvd) -> OrderFlowDeltaCVDEngineStateV1:
     latest_window = flow.windows[-1]
+    run_context = Lot45RunContextV1(
+        "test-run",
+        RUNTIME_MODE,
+        CONFIG_VERSION,
+        "a" * 40,
+        "test-correlation",
+    )
+    lineage = _lineage()
+    generated_at = "2026-08-06T19:18:42.000000Z"
+    reason_codes = ("TEST_STATE",)
+    safety = lot45_safety()
+    payload = {
+        "schema_version": "order-flow-delta-cvd-engine-state-v1",
+        "run_context": run_context.to_dict(),
+        "lineage": lineage.to_dict(),
+        "event_time": latest_window.event_time,
+        "receive_time": latest_window.receive_time,
+        "generated_at": generated_at,
+        "validation_state": VALIDATION_STATE,
+        "policy_version": POLICY_VERSION,
+        "window_policy_version": WINDOW_POLICY_VERSION,
+        "session_policy_version": SESSION_POLICY_VERSION,
+        "order_flow": flow.to_dict(),
+        "cvd_series": cvd.to_dict(),
+        "reason_codes": list(reason_codes),
+        "safety": safety,
+    }
     return OrderFlowDeltaCVDEngineStateV1(
-        Lot45RunContextV1(
-            "test-run",
-            RUNTIME_MODE,
-            CONFIG_VERSION,
-            "a" * 40,
-            "test-correlation",
-        ),
-        _lineage(),
+        run_context,
+        lineage,
         latest_window.event_time,
         latest_window.receive_time,
-        "2026-08-06T19:18:42.000000Z",
+        generated_at,
         VALIDATION_STATE,
         POLICY_VERSION,
         WINDOW_POLICY_VERSION,
         SESSION_POLICY_VERSION,
         flow,
         cvd,
-        ("TEST_STATE",),
-        lot45_safety(),
-        ZERO_SHA256,
+        reason_codes,
+        safety,
+        canonical_checksum(payload),
     )
 
 
