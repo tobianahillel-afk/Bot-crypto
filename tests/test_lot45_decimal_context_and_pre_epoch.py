@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from decimal import Inexact, Rounded, Decimal, localcontext
+from decimal import Decimal, Inexact, Rounded, localcontext
 
 import pytest
 
