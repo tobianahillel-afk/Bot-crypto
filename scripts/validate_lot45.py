@@ -8,6 +8,10 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from jsonschema import Draft202012Validator, FormatChecker
+from jsonschema.exceptions import SchemaError, ValidationError
+from referencing import Registry, Resource
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
@@ -68,15 +72,20 @@ def _validate_git_boundary(code_commit: str) -> None:
             raise Lot45ValidationError(f"Lot46 implementation started during Lot45: {path}")
 
 
-def _validate_schema_files() -> None:
+def _load_schema_documents() -> dict[str, dict[str, Any]]:
+    return {label: load_json_object(path) for label, path in SCHEMAS.items()}
+
+
+def _validate_schema_files(schemas: dict[str, dict[str, Any]]) -> None:
     expected = {
         "state": ("order-flow-delta-cvd-engine-state-v1", "output_checksum"),
         "audit": ("order-flow-delta-cvd-engine-audit-v1", "audit_checksum"),
         "order_flow": ("order-flow-state-v1", "order_flow_checksum"),
         "cvd": ("cvd-series-v1", "cvd_checksum"),
     }
-    for label, path in SCHEMAS.items():
-        schema = load_json_object(path)
+    for label, schema in schemas.items():
+        if schema.get("$schema") != "https://json-schema.org/draft/2020-12/schema":
+            raise Lot45ValidationError(f"Lot45 {label} schema draft changed")
         if schema.get("type") != "object" or schema.get("additionalProperties") is not False:
             raise Lot45ValidationError(f"Lot45 {label} schema must be a closed object")
         properties = schema.get("properties")
@@ -88,6 +97,56 @@ def _validate_schema_files() -> None:
         required = schema.get("required")
         if not isinstance(required, list) or checksum_field not in required:
             raise Lot45ValidationError(f"Lot45 {label} checksum field not required")
+        try:
+            Draft202012Validator.check_schema(schema)
+        except SchemaError as exc:
+            raise Lot45ValidationError(f"Lot45 {label} schema is invalid") from exc
+
+
+def _schema_registry(schemas: dict[str, dict[str, Any]]) -> Registry:
+    registry = Registry()
+    for label, schema in schemas.items():
+        schema_id = schema.get("$id")
+        if not isinstance(schema_id, str) or not schema_id:
+            raise Lot45ValidationError(f"Lot45 {label} schema id missing")
+        registry = registry.with_resource(schema_id, Resource.from_contents(schema))
+    return registry
+
+
+def _validate_generated_payloads(
+    schemas: dict[str, dict[str, Any]],
+    state: dict[str, Any],
+    audit: dict[str, Any],
+    order_flow: dict[str, Any],
+    cvd: dict[str, Any],
+) -> None:
+    payloads = {
+        "state": state,
+        "audit": audit,
+        "order_flow": order_flow,
+        "cvd": cvd,
+    }
+    registry = _schema_registry(schemas)
+    format_checker = FormatChecker()
+    for label, payload in payloads.items():
+        validator = Draft202012Validator(
+            schemas[label],
+            registry=registry,
+            format_checker=format_checker,
+        )
+        errors = sorted(
+            validator.iter_errors(payload),
+            key=lambda error: (
+                tuple(str(item) for item in error.absolute_path),
+                error.message,
+            ),
+        )
+        if errors:
+            error = errors[0]
+            location = ".".join(str(item) for item in error.absolute_path) or "$"
+            raise Lot45ValidationError(
+                f"Lot45 {label} payload violates schema at {location}: {error.message}"
+            ) from error
 
 
 def _write_validation_artifacts(
@@ -106,12 +165,14 @@ def _write_validation_artifacts(
 
 def validate(code_commit: str, output_dir: Path | None = None) -> dict[str, Any]:
     _validate_git_boundary(code_commit)
-    _validate_schema_files()
+    schemas = _load_schema_documents()
+    _validate_schema_files(schemas)
     first = build_lot45_artifacts(ROOT, code_commit)
     second = build_lot45_artifacts(ROOT, code_commit)
     if first != second:
         raise Lot45ValidationError("Lot45 deterministic replay diverged")
     state, audit, order_flow, cvd = first
+    _validate_generated_payloads(schemas, state, audit, order_flow, cvd)
     if canonical_checksum({k: v for k, v in state.items() if k != "output_checksum"}) != state["output_checksum"]:
         raise Lot45ValidationError("Lot45 state checksum replay mismatch")
     if canonical_checksum({k: v for k, v in audit.items() if k != "audit_checksum"}) != audit["audit_checksum"]:
