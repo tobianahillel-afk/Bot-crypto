@@ -30,6 +30,7 @@ from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine import (  #
     CALCULATION_DECIMAL_ROUNDING,
     CODE_BOUND_PATHS,
     OrderFlowPolicy,
+    _build_engine_audit,
     _build_engine_state,
     build_lot45_artifacts,
     build_order_flow,
@@ -54,30 +55,30 @@ from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_
 )
 
 GATE_MERGE = "390d0779f2be257fa8134faf8f02193a760a09c3"
-SOURCE_HEAD = "e8db82222ec1d64017479918c2745eb0c8ec6cc1"
-CERTIFICATION_ANCHOR = "4f0d893049158e58dba0bcd0c13b5dc1cd76091f"
-EVIDENCE_HEAD = "d075787abe84d19c9609e7bae48671868b46b51f"
+SOURCE_HEAD = "c418338da86c49bd4b688d4a64893ee5042adc40"
+CERTIFICATION_ANCHOR = "d0bae1993933651026e72c408287075aef899b3e"
+EVIDENCE_HEAD = "ba01837a9c2a36b735fbdd6a11dce49e1105a184"
 
 VALIDATION_PROOF = (
-    32015607585,
-    9283428746,
-    "sha256:4990510b93e4e6078db92e53016c53e83e7683c7f9df5a0d54e1b1cf24f72cea",
+    32022460427,
+    9285879223,
+    "sha256:be8f2b8e91488941e69b52af7f419f710be9f581de9aa63041eea7261ea73a29",
 )
 MUTATION_PROOF = (
-    32015607500,
-    9283462890,
-    "sha256:364e1a2719f0817521a555d7e9cdf92a0a9d414a1710e7721e63b15d46f8e175",
+    32022460421,
+    9285943059,
+    "sha256:02d346763ea05389156aa387d24d4dcd74518391c28502697131068452754296",
 )
 QUALITY_PROOF = (
-    32015607576,
-    9283488037,
-    "sha256:193583971395641e7f1ee3896ff37674b06c7c35d9b0047dc2326d3301f8113e",
+    32022460425,
+    9285950191,
+    "sha256:c281612b27aa98382c4f1292d18fac4bab561ce59d0777f355e9d889e96094ed",
 )
 QUALITY_GLOBAL_COVERAGE_SHA256 = (
-    "33a1fb5f956737b62b70d0fb9fd67a983ebec4d1179ffdaa971ee71488d31019"
+    "f0962651a5422c3fc69e207f4d2dec79647870835b2a766f00d45ac67188d190"
 )
 QUALITY_MUTATION_SCORE_SHA256 = (
-    "678b53c31bdd93760360ead142833bd90b36319093fc2dac1f3c7a6d3af6ec3a"
+    "990e74f0dbec868fa3730df60b2d1aec6b33656884e8394396685254e0f5e741"
 )
 QUALITY_ENGINEERING_DEVIATION_SHA256 = (
     "2622d31a7f9093dacb95f7aeacd7b5e0ce1f08e58eec244a7e1e21d7a8604d14"
@@ -95,15 +96,15 @@ OLD_STATE_ALIAS = ROOT / "data/audit/order_flow_delta_cvd_engine_lot45.json"
 OLD_AUDIT_ALIAS = ROOT / "data/audit/order_flow_delta_cvd_engine_audit_lot45.json"
 
 EXPECTED_HASHES = {
-    STATE: "dcb0c52a2f1d359e410fc54e303c59c0d2f49e8518b96bdaffff82b42bb3de39",
-    AUDIT: "e9bb4ccfa88f60badfebf830f0b387b472abab4e0354da50d78c2398042c1b21",
+    STATE: "56c232b416594b4f283392e6e04847e8d550f74cb7ae0b86f5cbfc37ccdc47cf",
+    AUDIT: "cddc8c4e1d6fd29cd3540aa7dd4c5ca6ddaf8c5b4238d9226899269af7359180",
     ORDER_FLOW: "f9d46121e552dcea5eca7306befa47114d9602e81be32a19bc565221398724f8",
     CVD: "a8923ce2fb08a571059a411edd4e2b0dd1d0a7116727a66edd9046c0e70d352f",
-    COVERAGE: "6c2d4cc3b4d6b2e7ecefb3d9b212842e5e44c5279c07000522b8dd41f0d20284",
-    MUTATION: "ba84c293e377ed38f9c57b7ba4d5d9cdac306bfc46b787f14915064b4e43c224",
+    COVERAGE: "7b508f8eeed5f11b96f43efed9256f90605739202951bcf5d32fd79cb58ac410",
+    MUTATION: "104293c8e761e7eae0f561ed6da22ca5c42e9f9fba6f0a8b282cec1a22a8e3a5",
 }
-EXPECTED_STATE = "b35048371d4c62d43ac392eef75427fd8214ca66b2c56d65e289c03081041c24"
-EXPECTED_AUDIT = "a14e47b8ea9d2ff06411572f51408a7017a1ff0fac5e3c7f79dc9c27ba1218c8"
+EXPECTED_STATE = "e22e4fa4c5fadfe687ce1b95229a339c427f7e52dc5e029ff0c7f1c1c6f92c12"
+EXPECTED_AUDIT = "5903893fc68865cee879b45a260285a791c8a4a71d9360fd4c611888c11d9fbf"
 EXPECTED_ORDER_FLOW = "3dc7a0d4836090509d12239c2a407cfa3afd736fa7d3f80ef2c2eeed3b4fa9ea"
 EXPECTED_CVD = "68e6f47f0df214f74279c9749b1cfd1ac9e0cead7484bff9a098ee34481aa559"
 EXPECTED_WINDOW = "09bd6b8809622b450f04e98c5d519a0fb3cc9f9b3c749eaa588f97499aebc10c"
@@ -279,18 +280,18 @@ def _verify_reference(order_flow: dict[str, Any], cvd: dict[str, Any]) -> None:
 def _verify_quality(coverage: dict[str, Any], mutation: dict[str, Any]) -> None:
     require(coverage["status"] == "PASS", "coverage not PASS")
     require(coverage["source_head_sha"] == SOURCE_HEAD, "coverage source changed")
-    require(coverage["line_coverage_percent"] == 97.15, "line coverage changed")
-    require(coverage["branch_coverage_percent"] == 90.91, "branch coverage changed")
+    require(coverage["line_coverage_percent"] == 97.18, "line coverage changed")
+    require(coverage["branch_coverage_percent"] == 91.43, "branch coverage changed")
     require(coverage["anti_flake_repetitions"] == 3, "anti-flake count changed")
 
     require(mutation["status"] == "PASS", "mutation not PASS")
     require(mutation["source_head_sha"] == SOURCE_HEAD, "mutation source changed")
-    require(mutation["mutation_score_percent"] == 80.44, "mutation score changed")
-    require(mutation["killed_mutants"] == 1287, "killed mutant count changed")
-    require(mutation["survived_mutants"] == 313, "survived mutant count changed")
-    require(mutation["evaluated_mutants"] == 1600, "evaluated mutant count changed")
-    require(mutation["completed_mutants"] == 1600, "completed mutant count changed")
-    require(mutation["total_mutants"] == 1600, "total mutant count changed")
+    require(mutation["mutation_score_percent"] == 80.54, "mutation score changed")
+    require(mutation["killed_mutants"] == 1341, "killed mutant count changed")
+    require(mutation["survived_mutants"] == 324, "survived mutant count changed")
+    require(mutation["evaluated_mutants"] == 1665, "evaluated mutant count changed")
+    require(mutation["completed_mutants"] == 1665, "completed mutant count changed")
+    require(mutation["total_mutants"] == 1665, "total mutant count changed")
     require(mutation["timeout_mutants"] == 0, "mutation timeout present")
     require(mutation["suspicious_mutants"] == 0, "suspicious mutation present")
     require(mutation["mutmut_run_exit_code"] == 0, "mutmut run exit changed")
@@ -645,6 +646,52 @@ def _verify_checksum_authenticity() -> None:
         "coordinated forged window/CVD checksum was accepted",
     )
 
+    valid_state = _build_engine_state(
+        config,
+        SOURCE_HEAD,
+        state44,
+        trades,
+        flow,
+        cvd,
+    )
+    _expect_lot45_rejection(
+        lambda: replace(
+            valid_state,
+            generated_at="2026-08-06T19:18:43.000000Z",
+            output_checksum=forged_checksum,
+        ),
+        "forged top-level state checksum was accepted",
+    )
+    valid_audit = _build_engine_audit(
+        config,
+        SOURCE_HEAD,
+        valid_state,
+        flow,
+        cvd,
+    )
+    _expect_lot45_rejection(
+        lambda: replace(valid_audit, audit_checksum=forged_checksum),
+        "forged top-level audit checksum was accepted",
+    )
+    for field in (
+        "state_output_checksum",
+        "config_checksum",
+        "entry_gate_checksum",
+        "lot44_state_checksum",
+        "lot44_audit_checksum",
+        "lot44_confidence_checksum",
+        "lot44_post_merge_checksum",
+        "order_flow_checksum",
+        "cvd_checksum",
+    ):
+        _expect_lot45_rejection(
+            lambda field=field: replace(
+                valid_audit,
+                **{field: "not-a-sha256", "audit_checksum": ZERO_SHA256},
+            ),
+            f"invalid audit checksum binding accepted: {field}",
+        )
+
 
 def _verify_downstream_lock() -> None:
     for relative in LOT46_FORBIDDEN:
@@ -663,7 +710,7 @@ def validate() -> dict[str, object]:
     _verify_checksum_authenticity()
     _verify_downstream_lock()
     return {
-        "schema_version": "lot45-frozen-evidence-validation-v9",
+        "schema_version": "lot45-frozen-evidence-validation-v10",
         "status": "PASS",
         "verdict": "PASS_LOT45_FROZEN_EVIDENCE",
         "gate_merge": GATE_MERGE,
@@ -697,6 +744,8 @@ def validate() -> dict[str, object]:
             "canonical_causal_generated_at": True,
             "complete_decimal_context_isolation": True,
             "canonical_window_checksum_authenticity": True,
+            "top_level_state_checksum_authenticity": True,
+            "top_level_audit_checksum_authenticity": True,
             "executable_source_inventory_bound_to_code_commit": True,
             "builder_decimal_rounding": "ROUND_HALF_EVEN",
             "complete_package_tree_binding": True,
