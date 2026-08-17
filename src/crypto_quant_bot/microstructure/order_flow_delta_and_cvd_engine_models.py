@@ -14,6 +14,7 @@ from .order_flow_delta_and_cvd_engine_policy import (
 from .order_flow_delta_and_cvd_engine_validation import (
     Lot45ValidationError,
     duration_us,
+    parse_utc_timestamp,
     require,
 )
 
@@ -90,6 +91,18 @@ class OrderFlowDeltaCVDEngineStateV1(_impl.OrderFlowDeltaCVDEngineStateV1):
     def __post_init__(self) -> None:
         _impl.OrderFlowDeltaCVDEngineStateV1.__post_init__(self)
         if not _is_internal_construction():
+            actual_receive = parse_utc_timestamp(
+                self.receive_time,
+                "state receive_time",
+            )
+            lineage_available = parse_utc_timestamp(
+                self.lineage.available_at,
+                "lineage available_at",
+            )
+            require(
+                actual_receive <= lineage_available,
+                "Lot45 lineage available_at cannot precede latest source receive_time",
+            )
             require(
                 duration_us(self.lineage.available_at, self.generated_at)
                 <= MAX_INPUT_AGE_US,
