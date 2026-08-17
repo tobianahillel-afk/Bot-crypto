@@ -40,24 +40,24 @@ from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_
 )
 
 GATE_MERGE = "390d0779f2be257fa8134faf8f02193a760a09c3"
-SOURCE_HEAD = "89ec5c692622d80222eb63bfa2732242d4a84987"
-CERTIFICATION_ANCHOR = "880b91afc0f4590d91504be47168519e4ef1aa11"
-EVIDENCE_HEAD = "45c52cdd2560901b70eb8d1bcdddb0dbb5775f11"
+SOURCE_HEAD = "daa6c4b230bc7bf9f71a0eabdb41348ac713e053"
+CERTIFICATION_ANCHOR = "352225d75fbc94fba48e8db91966d0d94e8a9b42"
+EVIDENCE_HEAD = "53ed9347c05027748d6ead046bcbceddebf67b2b"
 
 VALIDATION_PROOF = (
-    31970067676,
-    9269557580,
-    "sha256:d72b4cf5516559975a6282be40f6eadb2faa257dbfaa742a8fb1052c1b63a1ba",
+    31977096127,
+    9271367454,
+    "sha256:ac233f0297b2672cab5652f8ef64c1ba6a7737c007b3faecff1385eff53386db",
 )
 MUTATION_PROOF = (
-    31970067634,
-    9269574905,
-    "sha256:1f7d7ca74da0fad2de2b130f8e00acfcafc01160a6b089b74acf5fef204fe91d",
+    31977096162,
+    9271369970,
+    "sha256:13ee461f2d4fcdeda3bcba25d5c132e9caff20ee62e56a2452fde3fe71729652",
 )
 QUALITY_PROOF = (
-    31970067631,
-    9269584831,
-    "sha256:69ade2a67752867b2a3da648b489918681c1938a633b7523ed1948b00dfc1b21",
+    31977096187,
+    9271383482,
+    "sha256:6a8247052e00f5d530efabda2eced2fbbd89c41d798de9833c9ab2443567ba6e",
 )
 QUALITY_GLOBAL_COVERAGE_SHA256 = (
     "ffbe4463824d3144ffa45b2068cd5ce776a0970ae7d7e90c2d58659ef5d1a7c1"
@@ -76,19 +76,20 @@ CVD = ROOT / "data/audit/cvd_series_lot45.json"
 COVERAGE = ROOT / "reports/lot45/coverage_summary.json"
 MUTATION = ROOT / "reports/lot45/mutation_summary.json"
 SCHEMA_ROOT = ROOT / "contracts/schemas"
+TRUSTED_PRELAUNCH = ROOT / "scripts/lot45_trusted_prelaunch.sh"
 OLD_STATE_ALIAS = ROOT / "data/audit/order_flow_delta_cvd_engine_lot45.json"
 OLD_AUDIT_ALIAS = ROOT / "data/audit/order_flow_delta_cvd_engine_audit_lot45.json"
 
 EXPECTED_HASHES = {
-    STATE: "dd39aa211c6c3027fa05020aa408e673368ea446931cd330b478edb3d887df52",
-    AUDIT: "2fb1e70b871f0f839e349b07b2d3ad8292de3cdc3643acac2125d654fbf62f37",
+    STATE: "e22b964e3e6b081324aa8154ea11ef8f7b299998841252a6bde20a18ab0f6fee",
+    AUDIT: "db99f4a3d6b2dd8fde6e67d1ec43f401421f117b4c48a370a6441a35174ecc50",
     ORDER_FLOW: "f9d46121e552dcea5eca7306befa47114d9602e81be32a19bc565221398724f8",
     CVD: "a8923ce2fb08a571059a411edd4e2b0dd1d0a7116727a66edd9046c0e70d352f",
-    COVERAGE: "db3b3b75c3c32c755968b68b22c009c4b6558aaa0a5feff7bd6ba41fb74695a7",
-    MUTATION: "2ba8ccd5b4b6a670753ce9f9c53d69a1a87eccbd32a060a207edbe38c8d8f540",
+    COVERAGE: "d10b98a3745f8affed2738a2e695795635f6c088d1d68f5df2fe9506cce1e3a1",
+    MUTATION: "f96ff4bab1f24e4ec5da91f25ef224e9047633a98c8329b959fa8e3e93ef8098",
 }
-EXPECTED_STATE = "24cca6d239ada8471b407bd66e3d4340790155ced5bc7d1c56034b81ccabc38a"
-EXPECTED_AUDIT = "260c0014be23819118d051cb6630910f0f3d4d274164c17e98bf0eff88239642"
+EXPECTED_STATE = "9066a949551a6719319702a6a6c2e0f64256ad44484fc8ee4ac45c1365b668c7"
+EXPECTED_AUDIT = "4360bd2ea445fcb41d280a3f7262d0df5f34236563257c7ecc79ccd35f8beea3"
 EXPECTED_ORDER_FLOW = "3dc7a0d4836090509d12239c2a407cfa3afd736fa7d3f80ef2c2eeed3b4fa9ea"
 EXPECTED_CVD = "68e6f47f0df214f74279c9749b1cfd1ac9e0cead7484bff9a098ee34481aa559"
 EXPECTED_WINDOW = "09bd6b8809622b450f04e98c5d519a0fb3cc9f9b3c749eaa588f97499aebc10c"
@@ -176,6 +177,7 @@ def verify_canonical(payload: dict[str, Any], field: str, expected: str) -> None
 def _load_frozen() -> tuple[dict[str, Any], ...]:
     require(not OLD_STATE_ALIAS.exists(), "stale Lot45 state alias still exists")
     require(not OLD_AUDIT_ALIAS.exists(), "stale Lot45 audit alias still exists")
+    require(TRUSTED_PRELAUNCH.is_file(), "trusted pre-launch guard missing")
     for path, expected in EXPECTED_HASHES.items():
         require(path.is_file(), f"missing frozen evidence: {path}")
         require(file_sha256(path) == expected, f"frozen evidence drifted: {path}")
@@ -586,7 +588,7 @@ def validate() -> dict[str, object]:
     _verify_checksum_authenticity()
     _verify_downstream_lock()
     return {
-        "schema_version": "lot45-frozen-evidence-validation-v7",
+        "schema_version": "lot45-frozen-evidence-validation-v8",
         "status": "PASS",
         "verdict": "PASS_LOT45_FROZEN_EVIDENCE",
         "gate_merge": GATE_MERGE,
@@ -613,6 +615,7 @@ def validate() -> dict[str, object]:
         "quality_mutation_score_sha256": QUALITY_MUTATION_SCORE_SHA256,
         "quality_engineering_deviation_sha256": QUALITY_ENGINEERING_DEVIATION_SHA256,
         "review_hardening": {
+            "trusted_prelaunch_startup_artifact_guard": True,
             "canonical_runtime_utc_timestamps": True,
             "calendar_valid_utc_schema_timestamps": True,
             "canonical_window_checksum_authenticity": True,
