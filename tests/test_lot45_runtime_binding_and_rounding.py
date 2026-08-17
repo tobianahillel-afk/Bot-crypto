@@ -380,7 +380,7 @@ def test_engine_state_binds_cvd_metrics_to_corresponding_window() -> None:
             "confidence_weighted_volume must be finite non-negative",
         ),
         (
-            {"confidence_weighted_volume": Decimal("2")},
+            {"confidence_weighted_volume": Decimal("3")},
             "confidence-weighted volume cannot exceed classified volume",
         ),
         ({"buy_volume": Decimal("NaN")}, "buy_volume must be finite non-negative"),
