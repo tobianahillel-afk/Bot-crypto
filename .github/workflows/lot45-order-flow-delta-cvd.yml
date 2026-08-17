@@ -31,12 +31,12 @@ jobs:
     env:
       PYTHONHASHSEED: '0'
       GATE_MERGE_SHA: 390d0779f2be257fa8134faf8f02193a760a09c3
-      SOURCE_HEAD_SHA: e8db82222ec1d64017479918c2745eb0c8ec6cc1
+      SOURCE_HEAD_SHA: c418338da86c49bd4b688d4a64893ee5042adc40
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: e8db82222ec1d64017479918c2745eb0c8ec6cc1
+          ref: c418338da86c49bd4b688d4a64893ee5042adc40
       - name: Trusted pre-launch proof before Python setup
         run: |
           set -euo pipefail
@@ -54,7 +54,6 @@ jobs:
         run: |
           set -euo pipefail
           guard=(bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA")
-
           for module in sitecustomize usercustomize; do
             marker="/tmp/lot45-${module}-source-executed"
             rm -f "$marker" "src/${module}.py"
@@ -73,7 +72,6 @@ jobs:
             printf '%s\n' "$attack_output" | grep -F 'LOT45_PRELAUNCH_UNBOUND_EXECUTABLE_TREE'
             rm -f "src/${module}.py" "$marker"
           done
-
           rm -f /tmp/lot45-startup.py /tmp/lot45-startup.pyc /tmp/lot45-sitecustomize-pyc-executed src/sitecustomize.pyc
           cat > /tmp/lot45-startup.py <<'PY'
           from pathlib import Path
@@ -91,7 +89,6 @@ jobs:
           test -e src/sitecustomize.pyc
           printf '%s\n' "$pyc_output" | grep -F 'LOT45_PRELAUNCH_UNBOUND_EXECUTABLE_TREE'
           rm -f src/sitecustomize.pyc /tmp/lot45-startup.py /tmp/lot45-sitecustomize-pyc-executed
-
           bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" python -c \
             'import sys; assert sys.flags.safe_path; print("LOT45_TRUSTED_PRELAUNCH: PASS")'
       - name: Prove exact source gate ancestry and Lot 46 lock
@@ -142,12 +139,12 @@ jobs:
             tests/test_lot45_schema_contracts.py \
             tests/test_lot45_checksum_binding_adversarial.py \
             tests/test_lot45_untracked_executable_source_binding.py \
-            tests/test_lot45_decimal_context_and_pre_epoch.py
+            tests/test_lot45_decimal_context_and_pre_epoch.py \
+            tests/test_lot45_top_level_checksum_authenticity.py
           mypy src/crypto_quant_bot/microstructure
           bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" python - <<'PY'
           import ast
           from pathlib import Path
-
           paths = [
               Path('src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py'),
               Path('src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py'),
@@ -189,6 +186,7 @@ jobs:
             tests/test_lot45_checksum_binding_adversarial.py \
             tests/test_lot45_untracked_executable_source_binding.py \
             tests/test_lot45_decimal_context_and_pre_epoch.py \
+            tests/test_lot45_top_level_checksum_authenticity.py \
             --cov=crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine \
             --cov=crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_models \
             --cov=crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_validation \
@@ -198,7 +196,6 @@ jobs:
           import json
           import os
           from pathlib import Path
-
           totals = json.loads(Path('reports/lot45/coverage.json').read_text(encoding='utf-8'))['totals']
           lines = float(totals['percent_statements_covered'])
           branches = float(totals['percent_branches_covered'])
@@ -270,7 +267,8 @@ jobs:
                 tests/test_lot45_schema_contracts.py \
                 tests/test_lot45_checksum_binding_adversarial.py \
                 tests/test_lot45_untracked_executable_source_binding.py \
-                tests/test_lot45_decimal_context_and_pre_epoch.py
+                tests/test_lot45_decimal_context_and_pre_epoch.py \
+                tests/test_lot45_top_level_checksum_authenticity.py
             done
           '
       - uses: actions/upload-artifact@v4
