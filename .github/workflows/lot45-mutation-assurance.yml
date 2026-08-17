@@ -5,7 +5,9 @@ on:
     branches: [main]
     paths:
       - 'src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine*.py'
+      - 'src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine*.py'
       - 'scripts/lot45_trusted_prelaunch.sh'
+      - 'scripts/validate_lot45.py'
       - 'tests/test_lot45*.py'
       - 'config/microstructure/order_flow_delta_and_cvd_engine_v1.json'
       - 'contracts/schemas/order_flow_delta_cvd_engine_state_v1.schema.json'
@@ -23,13 +25,13 @@ jobs:
   mutation:
     runs-on: ubuntu-22.04
     env:
-      SOURCE_HEAD_SHA: c418338da86c49bd4b688d4a64893ee5042adc40
+      SOURCE_HEAD_SHA: d6fbaecf56178fbcd23fc9ad722b97af225dce3c
       PYTHONHASHSEED: '0'
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: c418338da86c49bd4b688d4a64893ee5042adc40
+          ref: d6fbaecf56178fbcd23fc9ad722b97af225dce3c
       - name: Trusted pre-launch proof before Python setup
         run: |
           set -euo pipefail
@@ -66,6 +68,7 @@ jobs:
             tests/test_lot45_untracked_executable_source_binding.py \
             tests/test_lot45_decimal_context_and_pre_epoch.py \
             tests/test_lot45_top_level_checksum_authenticity.py \
+            tests/test_lot45_final_review_contracts.py \
             --junitxml=reports/lot45/mutation/baseline.xml \
             2>&1 | tee reports/lot45/mutation/baseline.txt
       - name: Build isolated mutation workspace
@@ -73,12 +76,13 @@ jobs:
           set -euo pipefail
           bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" /usr/bin/true
           rm -rf .tmp-lot45-mutants
-          mkdir -p .tmp-lot45-mutants/tests
+          mkdir -p .tmp-lot45-mutants/tests .tmp-lot45-mutants/scripts
           cp -R src .tmp-lot45-mutants/
           cp -R config .tmp-lot45-mutants/
           cp -R data .tmp-lot45-mutants/
           cp -R contracts .tmp-lot45-mutants/
           cp -R tests/fixtures .tmp-lot45-mutants/tests/ 2>/dev/null || true
+          cp scripts/validate_lot45.py .tmp-lot45-mutants/scripts/
           cp tests/test_lot45_order_flow_delta_and_cvd_engine.py .tmp-lot45-mutants/tests/
           cp tests/test_lot45_policy_contract.py .tmp-lot45-mutants/tests/
           cp tests/test_lot45_runtime_binding_and_rounding.py .tmp-lot45-mutants/tests/
@@ -87,14 +91,18 @@ jobs:
           cp tests/test_lot45_untracked_executable_source_binding.py .tmp-lot45-mutants/tests/
           cp tests/test_lot45_decimal_context_and_pre_epoch.py .tmp-lot45-mutants/tests/
           cp tests/test_lot45_top_level_checksum_authenticity.py .tmp-lot45-mutants/tests/
+          cp tests/test_lot45_final_review_contracts.py .tmp-lot45-mutants/tests/
           bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" python - <<'PY'
           from pathlib import Path
           import toml
 
           root = Path('.tmp-lot45-mutants')
           mutated = {
+              '_order_flow_delta_and_cvd_engine_impl.py',
+              '_order_flow_delta_and_cvd_engine_models_impl.py',
               'order_flow_delta_and_cvd_engine.py',
               'order_flow_delta_and_cvd_engine_models.py',
+              'order_flow_delta_and_cvd_engine_policy.py',
               'order_flow_delta_and_cvd_engine_validation.py',
           }
           microstructure = root / 'src/crypto_quant_bot/microstructure'
@@ -116,6 +124,7 @@ jobs:
               'tests/test_lot45_untracked_executable_source_binding.py',
               'tests/test_lot45_decimal_context_and_pre_epoch.py',
               'tests/test_lot45_top_level_checksum_authenticity.py',
+              'tests/test_lot45_final_review_contracts.py',
               '-k',
               (
                   'not test_reference_frozen_lot44_builds_expected_order_flow '
@@ -139,13 +148,16 @@ jobs:
                   },
                   'mutmut': {
                       'paths_to_mutate': [
+                          'src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine_impl.py',
+                          'src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine_models_impl.py',
                           'src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py',
                           'src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py',
+                          'src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_policy.py',
                           'src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py',
                       ],
                       'pytest_add_cli_args_test_selection': mutation_test_selection,
                       'also_copy': dependency_files + [
-                          'config/', 'data/audit/', 'contracts/', 'tests/fixtures/'
+                          'config/', 'data/audit/', 'contracts/', 'scripts/', 'tests/fixtures/'
                       ],
                       'mutate_only_covered_lines': True,
                       'timeout_factor': 8.0,
@@ -247,8 +259,11 @@ jobs:
           rm -rf .tmp-lot45-mutants
           bash scripts/lot45_trusted_prelaunch.sh "$SOURCE_HEAD_SHA" /usr/bin/true
           git diff --exit-code -- \
+            src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine_impl.py \
+            src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine_models_impl.py \
             src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py \
             src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py \
+            src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_policy.py \
             src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py \
             scripts/lot45_trusted_prelaunch.sh
       - uses: actions/upload-artifact@v4
