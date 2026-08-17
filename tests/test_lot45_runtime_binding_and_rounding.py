@@ -123,8 +123,8 @@ def _classified(
 
 def _repeating_ratio_flow():
     trades = (
-        _classified("buy", "1", "BUY_AGGRESSOR"),
-        _classified("unknown", "2", "UNKNOWN"),
+        _classified("buy", "2", "BUY_AGGRESSOR"),
+        _classified("unknown", "1", "UNKNOWN"),
     )
     return build_order_flow(trades, _policy())
 
@@ -225,8 +225,8 @@ def _cvd_series(points: tuple[CVDPointV1, ...]) -> CVDSeriesV1:
 
 def test_repeating_ratios_ignore_ambient_decimal_rounding() -> None:
     trades = (
-        _classified("buy", "1", "BUY_AGGRESSOR"),
-        _classified("unknown", "2", "UNKNOWN"),
+        _classified("buy", "2", "BUY_AGGRESSOR"),
+        _classified("unknown", "1", "UNKNOWN"),
     )
 
     with localcontext() as ambient:
