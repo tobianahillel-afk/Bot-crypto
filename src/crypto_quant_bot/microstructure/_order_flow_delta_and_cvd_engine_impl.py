@@ -392,16 +392,16 @@ def _verify_lot44_temporal(
         },
         "Lot44 lineage",
     )
-    available_at = require_text(lineage.get("available_at"), "Lot44 available_at")
-    generated_at = require_text(config.get("generated_at"), "generated_at")
+    raw_available_at = require_text(lineage.get("available_at"), "Lot44 available_at")
+    lot44_event_time = require_text(state.get("event_time"), "Lot44 event_time")
+    lot44_receive_time = require_text(state.get("receive_time"), "Lot44 receive_time")
+    lot44_generated_at = require_text(state.get("generated_at"), "Lot44 generated_at")
+    lot45_generated_at = require_text(config.get("generated_at"), "generated_at")
+    validate_causal_times(lot44_event_time, lot44_receive_time, lot44_generated_at)
+    duration_us(raw_available_at, lot44_generated_at)
     require(
-        duration_us(available_at, generated_at) <= policy.max_input_age_us,
+        duration_us(lot44_generated_at, lot45_generated_at) <= policy.max_input_age_us,
         "Lot44 input is stale for Lot45",
-    )
-    validate_causal_times(
-        require_text(state.get("event_time"), "Lot44 event_time"),
-        require_text(state.get("receive_time"), "Lot44 receive_time"),
-        generated_at,
     )
 
 
@@ -649,7 +649,7 @@ def _build_lineage(config: dict[str, Any], state44: dict[str, Any]) -> Lot45Line
         EXPECTED_LOT44_CONFIDENCE,
         EXPECTED_LOT44_CONFIG,
         EXPECTED_LOT44_POST_MERGE,
-        require_text(state44.get("receive_time"), "Lot44 receive_time"),
+        require_text(state44.get("generated_at"), "Lot44 generated_at"),
     )
 
 
