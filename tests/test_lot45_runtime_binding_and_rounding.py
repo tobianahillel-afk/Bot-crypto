@@ -159,7 +159,7 @@ def _lineage() -> Lot45LineageEnvelopeV1:
         EXPECTED_LOT44_CONFIDENCE,
         EXPECTED_LOT44_CONFIG,
         EXPECTED_LOT44_POST_MERGE,
-        "2026-08-06T19:18:40.110000Z",
+        "2026-08-06T19:18:41.110000Z",
     )
 
 
