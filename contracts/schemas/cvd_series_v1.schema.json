@@ -4,9 +4,24 @@
   "title": "CVDSeriesV1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "session_policy_version", "points", "cvd_checksum"],
+  "$defs": {
+    "market_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "source_id", "venue", "instrument_id", "market_type"],
+      "properties": {
+        "schema_version": {"const": "lot45-market-identity-v1"},
+        "source_id": {"type": "string", "minLength": 1},
+        "venue": {"type": "string", "minLength": 1},
+        "instrument_id": {"type": "string", "minLength": 1},
+        "market_type": {"type": "string", "minLength": 1}
+      }
+    }
+  },
+  "required": ["schema_version", "market_identity", "session_policy_version", "points", "cvd_checksum"],
   "properties": {
     "schema_version": {"const": "cvd-series-v1"},
+    "market_identity": {"$ref": "#/$defs/market_identity"},
     "session_policy_version": {"const": "lot45-utc-day-session-v1"},
     "points": {
       "type": "array",
