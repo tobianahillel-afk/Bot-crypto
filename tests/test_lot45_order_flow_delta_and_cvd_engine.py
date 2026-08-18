@@ -33,7 +33,7 @@ from crypto_quant_bot.microstructure.trades_and_aggressor_classification_schema_
 ROOT = Path(__file__).resolve().parents[1]
 ZERO_SHA256 = "0" * 64
 QUOTE_SHA256 = "1" * 64
-REFERENCE_CODE_TREE_SHA = "f3edfa95007414cf64ef4ee829577b00f6aaac95"
+REFERENCE_CODE_TREE_SHA = "bb693ccf71dc637991fa0ea556e8113ce0d5de8e"
 
 
 def _policy(*, unknown_ratio: str = "1") -> OrderFlowPolicy:
