@@ -15,6 +15,7 @@ from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine import (
     OrderFlowPolicy,
     _build_engine_audit,
     _build_engine_state,
+    _verify_lot44_temporal,
     build_order_flow,
 )
 from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_models import (
@@ -135,6 +136,13 @@ def _state_config(generated_at: str) -> dict[str, Any]:
     }
 
 
+def _state44(receive_time: str, generated_at: str) -> dict[str, Any]:
+    return {
+        "receive_time": receive_time,
+        "generated_at": generated_at,
+    }
+
+
 def test_standalone_audit_accepts_exact_certified_upstream_hashes() -> None:
     audit = OrderFlowDeltaCVDEngineAuditV1(**_audit_kwargs())
     assert audit.audit_checksum != ZERO_SHA256
@@ -203,7 +211,10 @@ def test_reconstructed_state_enforces_certified_input_age_limit() -> None:
         _build_engine_state(
             _state_config("2026-08-06T19:18:50.000000Z"),
             "a" * 40,
-            {"receive_time": "2026-08-06T19:18:40.110000Z"},
+            _state44(
+                "2026-08-06T19:18:40.110000Z",
+                "2026-08-06T19:18:40.110000Z",
+            ),
             trades,
             flow,
             cvd,
@@ -220,7 +231,10 @@ def test_reconstructed_state_rejects_lineage_available_before_latest_receive() -
         _build_engine_state(
             _state_config("2026-08-06T19:18:41.100000Z"),
             "a" * 40,
-            {"receive_time": "2026-08-06T19:18:40.050000Z"},
+            _state44(
+                "2026-08-06T19:18:40.050000Z",
+                "2026-08-06T19:18:40.050000Z",
+            ),
             trades,
             flow,
             cvd,
@@ -233,12 +247,62 @@ def test_reconstructed_state_allows_lineage_available_at_latest_receive() -> Non
     state = _build_engine_state(
         _state_config("2026-08-06T19:18:41.100000Z"),
         "a" * 40,
-        {"receive_time": "2026-08-06T19:18:40.110000Z"},
+        _state44(
+            "2026-08-06T19:18:40.110000Z",
+            "2026-08-06T19:18:40.110000Z",
+        ),
         trades,
         flow,
         cvd,
     )
     assert state.lineage.available_at == state.receive_time
+
+
+def test_lineage_availability_uses_upstream_generated_at() -> None:
+    trades = (_classified("buy", "1", "BUY_AGGRESSOR"),)
+    flow, cvd = build_order_flow(trades, _policy())
+    state = _build_engine_state(
+        _state_config("2026-08-06T19:18:41.100000Z"),
+        "a" * 40,
+        _state44(
+            "2026-08-06T19:18:40.110000Z",
+            "2026-08-06T19:18:41.000000Z",
+        ),
+        trades,
+        flow,
+        cvd,
+    )
+    assert state.lineage.available_at == "2026-08-06T19:18:41.000000Z"
+    assert state.lineage.available_at != state.receive_time
+
+
+def test_lot44_temporal_rejects_generation_before_receive() -> None:
+    state44 = json.loads(
+        (ROOT / "data/audit/trades_and_aggressor_classification_schema_lot44.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    state44["generated_at"] = "2026-08-06T19:18:40.040000Z"
+    with pytest.raises(Lot45ValidationError, match="causal|generated|receive"):
+        _verify_lot44_temporal(
+            state44,
+            {"generated_at": "2026-08-06T19:18:41.100000Z"},
+            _policy("1"),
+        )
+
+
+def test_lot44_freshness_is_measured_from_upstream_generation() -> None:
+    state44 = json.loads(
+        (ROOT / "data/audit/trades_and_aggressor_classification_schema_lot44.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    with pytest.raises(Lot45ValidationError, match="Lot44 input is stale for Lot45"):
+        _verify_lot44_temporal(
+            state44,
+            {"generated_at": "2026-08-06T19:18:43.100000Z"},
+            _policy("1"),
+        )
 
 
 def test_every_published_zero_checksum_sentinel_is_rejected() -> None:
@@ -248,7 +312,10 @@ def test_every_published_zero_checksum_sentinel_is_rejected() -> None:
     state = _build_engine_state(
         config,
         "a" * 40,
-        {"receive_time": "2026-08-06T19:18:40.110000Z"},
+        _state44(
+            "2026-08-06T19:18:40.110000Z",
+            "2026-08-06T19:18:40.110000Z",
+        ),
         trades,
         flow,
         cvd,
