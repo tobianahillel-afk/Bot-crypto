@@ -16,6 +16,7 @@ from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine import (
     _build_engine_audit,
     _build_engine_state,
     _verify_lot44_temporal,
+    build_lot45_artifacts,
     build_order_flow,
 )
 from crypto_quant_bot.microstructure.order_flow_delta_and_cvd_engine_models import (
@@ -46,6 +47,7 @@ from scripts.validate_lot45 import (
 
 ROOT = Path(__file__).resolve().parents[1]
 ZERO_SHA256 = "0" * 64
+REFERENCE_CODE_TREE_SHA = "b807dec04368320f92e816248ac9039d94c1b529"
 
 
 def _audit_kwargs() -> dict[str, Any]:
@@ -72,13 +74,7 @@ def _audit_kwargs() -> dict[str, Any]:
 
 
 def _canonical_payloads() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
-    paths = (
-        ROOT / "data/audit/order_flow_delta_and_cvd_engine_lot45.json",
-        ROOT / "data/audit/order_flow_delta_and_cvd_engine_audit_lot45.json",
-        ROOT / "data/audit/order_flow_state_lot45.json",
-        ROOT / "data/audit/cvd_series_lot45.json",
-    )
-    return tuple(json.loads(path.read_text(encoding="utf-8")) for path in paths)  # type: ignore[return-value]
+    return build_lot45_artifacts(ROOT, REFERENCE_CODE_TREE_SHA)
 
 
 def _policy(max_unknown_ratio: str = "1") -> OrderFlowPolicy:
