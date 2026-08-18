@@ -70,7 +70,10 @@ def _state_and_audit():
         "lineage_id": "lot45-from-certified-lot44-order-flow-inputs-v1",
         "generated_at": "2026-08-06T19:18:41.100000Z",
     }
-    state44 = {"receive_time": "2026-08-06T19:18:40.110000Z"}
+    state44 = {
+        "receive_time": "2026-08-06T19:18:40.110000Z",
+        "generated_at": "2026-08-06T19:18:41.000000Z",
+    }
     state = _build_engine_state(config, "1" * 40, state44, trades, flow, cvd)
     audit = _build_engine_audit(config, "1" * 40, state, flow, cvd)
     return state, audit
