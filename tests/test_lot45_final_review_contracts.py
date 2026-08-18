@@ -210,6 +210,37 @@ def test_reconstructed_state_enforces_certified_input_age_limit() -> None:
         )
 
 
+def test_reconstructed_state_rejects_lineage_available_before_latest_receive() -> None:
+    trades = (_classified("buy", "1", "BUY_AGGRESSOR"),)
+    flow, cvd = build_order_flow(trades, _policy())
+    with pytest.raises(
+        Lot45ValidationError,
+        match="lineage available_at cannot precede latest source receive_time",
+    ):
+        _build_engine_state(
+            _state_config("2026-08-06T19:18:41.100000Z"),
+            "a" * 40,
+            {"receive_time": "2026-08-06T19:18:40.050000Z"},
+            trades,
+            flow,
+            cvd,
+        )
+
+
+def test_reconstructed_state_allows_lineage_available_at_latest_receive() -> None:
+    trades = (_classified("buy", "1", "BUY_AGGRESSOR"),)
+    flow, cvd = build_order_flow(trades, _policy())
+    state = _build_engine_state(
+        _state_config("2026-08-06T19:18:41.100000Z"),
+        "a" * 40,
+        {"receive_time": "2026-08-06T19:18:40.110000Z"},
+        trades,
+        flow,
+        cvd,
+    )
+    assert state.lineage.available_at == state.receive_time
+
+
 def test_every_published_zero_checksum_sentinel_is_rejected() -> None:
     trades = (_classified("buy", "1", "BUY_AGGRESSOR"),)
     flow, cvd = build_order_flow(trades, _policy())
