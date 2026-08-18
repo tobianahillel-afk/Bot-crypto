@@ -1,4 +1,4 @@
-# Master System Specification — Crypto Quant Bot V3.1-Ops
+# Master System Specification — Crypto Quant Bot V4.1-Ops
 
 Ce document réintègre les contrats fondateurs historiques dans la roadmap canonique V1→V21. Il est normatif avec `ROADMAP_V1_TO_V21.md`, les contrats canoniques et les documents de version.
 

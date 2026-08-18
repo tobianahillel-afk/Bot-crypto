@@ -4,17 +4,23 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'pyproject.toml'
       - 'data/audit/roadmap_lifecycle_overlay_lot34.json'
       - 'docs/LOT_34_POST_MERGE_AUDIT.md'
       - 'docs/LOT34_POST_MERGE_VALIDATION_MATRIX.md'
       - 'scripts/validate_lot34_post_merge.py'
       - 'tests/test_lot34_post_merge_state.py'
-      - '.github/workflows/lot34-post-merge-audit.yml'
       - 'reports/lot34/coverage_summary.json'
       - 'reports/lot34/mutation_summary.json'
   push:
     branches: [main]
+    paths:
+      - 'data/audit/roadmap_lifecycle_overlay_lot34.json'
+      - 'docs/LOT_34_POST_MERGE_AUDIT.md'
+      - 'docs/LOT34_POST_MERGE_VALIDATION_MATRIX.md'
+      - 'scripts/validate_lot34_post_merge.py'
+      - 'tests/test_lot34_post_merge_state.py'
+      - 'reports/lot34/coverage_summary.json'
+      - 'reports/lot34/mutation_summary.json'
   workflow_dispatch:
 
 permissions:

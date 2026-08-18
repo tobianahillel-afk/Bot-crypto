@@ -2,12 +2,57 @@
 
 Projet : **Crypto Quant Bot V4.1-Ops**
 
+Ce document est l’index canonique de progression. Les spécifications détaillées de chaque version vivent dans `docs/roadmap/V01_*.md` à `V21_*.md`. Pour les lots déjà certifiés, les critères d’acceptation, rapports PASS, artefacts, audits post-merge et commits exacts prévalent sur toute synthèse de roadmap.
+
 ## État actuel
 
-- Dernier lot dont l'implémentation est terminée et auditée : **Lot 37**.
-- Version courante : `0.37.0`.
-- Baseline P0 institutionnelle : fusionnée.
-- Gate transversal P0.6 : fusionné et conservé comme preuve historique.
+- Dernier lot fusionné et audité : **Lot 44 — Trades & Aggressor Classification Schema**.
+- Release correspondant au dernier lot fusionné : `0.44.0`.
+- V1 (Lots 0–20) : fermée et validée.
+- V2 (Lots 21–30) : fermée et validée offline.
+- V3 (Lots 31–36) : fermée et auditée ; aucune connectivité/ingestion live n’est ouverte.
+- V4 (Lots 37–52) : **active**.
+- Lots 37–44 : fusionnés, certifiés et audités dans le runtime `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY`.
+- Lot 45 — **Order Flow, Delta & CVD Engine** : seul lot d’implémentation actuellement ouvert ; candidat en certification exacte sur la PR #66.
+- Lots 46–52 : verrouillés jusqu’au merge du Lot 45, audit post-merge indépendant et décision explicite `GO_LOT45_POST_MERGE`.
+- V5–V18 : planifiées et verrouillées.
+- V19–V21 : extensions optionnelles de recherche/contexte, verrouillées et non exécutables.
+- Forecast, alpha, risk approval, paper, portfolio execution, sandbox, live et capital réel : `NO_GO` tant que leurs gates dédiés ne sont pas atteints.
+- Trading, exécution exchange, levier et withdrawals restent interdits dans l’état courant.
+
+La branche `main` porte le gate certifié du Lot 45 (`390d0779f2be257fa8134faf8f02193a760a09c3` au moment de l’ouverture de la PR #66), issu du `GO_LOT44_POST_MERGE`. Le registre `data/audit/product_scope_roadmap_lot21.jsonl` reste une preuve historique immuable : il ne doit pas être interprété comme l’état runtime courant des lots ultérieurs.
+
+## Lifecycle synthétique Lots 26–45
+
+| Lot | Capability | État courant |
+|---:|---|---|
+| 26 | Multi-Timeframe Alignment | IMPLEMENTED / VALIDATED |
+| 27 | Global Market Context | IMPLEMENTED / VALIDATED |
+| 28 | Explanation Core / Why-Not-Trade | IMPLEMENTED / VALIDATED |
+| 29 | Deterministic Replay & Audit | IMPLEMENTED / VALIDATED |
+| 30 | V2 Closure | IMPLEMENTED / VALIDATED / V2 CLOSED |
+| 31 | Market Data Source Registry | IMPLEMENTED / VALIDATED |
+| 32 | Instrument/Symbol Normalization | IMPLEMENTED / VALIDATED |
+| 33 | Timestamp/Clock/Timezone Governance | IMPLEMENTED / VALIDATED |
+| 34 | Market Data Quality Engine | IMPLEMENTED / VALIDATED |
+| 35 | Candle/Trade/Book Reconciliation | IMPLEMENTED / VALIDATED |
+| 36 | Freshness/Gap/Outage + V3 Closure | IMPLEMENTED / VALIDATED / V3 CLOSED |
+| 37 | Microstructure Scope & Offline Contracts | IMPLEMENTED / AUDITED |
+| 38 | Order Book L2 Snapshot Engine | IMPLEMENTED / AUDITED |
+| 39 | Order Book Delta & Sequence Reconstruction | IMPLEMENTED / AUDITED |
+| 40 | Book Integrity / Desynchronization | IMPLEMENTED / AUDITED |
+| 41 | Spread / Depth / Imbalance | IMPLEMENTED / AUDITED |
+| 42 | Liquidity Zones / Walls / Voids | IMPLEMENTED / AUDITED |
+| 43 | Book Resilience / Replenishment | IMPLEMENTED / AUDITED |
+| 44 | Trades & Aggressor Classification | IMPLEMENTED / AUDITED |
+| 45 | Order Flow / Delta / CVD | IMPLEMENTATION CANDIDATE — CERTIFICATION IN PROGRESS |
+
+Aucun statut `IMPLEMENTED`, `AUDITED` ou `GO` ne doit être déduit d’un simple workflow vert : la preuve doit porter sur le commit/source exact annoncé par le lot.
+
+## Marqueurs historiques certifiés
+
+Ces marqueurs sont conservés textuellement parce qu’ils font partie des contrats de preuve des releases historiques. Leur présence ne signifie pas que l’état courant du projet s’arrête à ces lots.
+
 - Lot 26 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
 - Lot 27 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
 - Lot 28 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
@@ -20,19 +65,20 @@ Projet : **Crypto Quant Bot V4.1-Ops**
 - Lot 35 : `IMPLEMENTED_VALIDATED_RECONCILIATION_ONLY`.
 - Lot 36 : `IMPLEMENTED_VALIDATED_V3_CLOSURE_ONLY`.
 - Lot 37 : `IMPLEMENTED_VALIDATED_OFFLINE_SCOPE_CONTRACTS_ONLY`.
-- Lots 38–177 : planifiés et verrouillés.
-- V2 Market Analysis Offline est fermée pour le périmètre Lots 21–30.
-- V3 Market Data Governance est fermée et auditée pour le périmètre Lots 31–36, sans connectivité ni ingestion.
-- V4 est ouverte au Lot 37 uniquement pour le scope et les contrats offline ; aucun moteur Lot38+ n'est activé.
-- Forecast, alpha, paper, sandbox et capital réel : `NO_GO`.
 
-L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot37.json`. Le registre
-`data/audit/product_scope_roadmap_lot21.jsonl` reste une preuve historique immuable.
+## Lot 30
+
+La preuve historique de clôture V2 reste liée à `data/audit/closure_manifest_lot30.json`, `docs/LOT_30_POST_MERGE_AUDIT.md` et `data/audit/roadmap_lifecycle_overlay_lot30.json`. Elle n’est pas réécrite par V4.
+
+## Lot 32
+
+La preuve historique de normalisation reste liée à `data/audit/instrument_symbol_and_contract_normalization_lot32.json`, `data/audit/instrument_registry_lot32.json`, `docs/LOT_32_POST_MERGE_AUDIT.md` et `data/audit/roadmap_lifecycle_overlay_lot32.json`.
 
 ## Documents normatifs transverses
 
 - [Master System Specification](MASTER_SYSTEM_SPECIFICATION.md)
 - [System Execution Architecture](SYSTEM_EXECUTION_ARCHITECTURE.md)
+- [Functional Coverage Registry](FUNCTIONAL_COVERAGE_REGISTRY.md)
 - [Domain Boundaries and Ownership](DOMAIN_BOUNDARIES_AND_OWNERSHIP.md)
 - [Canonical Data and Event Contracts](CANONICAL_DATA_AND_EVENT_CONTRACTS.md)
 - [Runtime Modes and State Machines](RUNTIME_MODES_AND_STATE_MACHINES.md)
@@ -47,8 +93,6 @@ L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot37.json`
 - [Decision Auditability and Traceability](DECISION_AUDITABILITY_AND_TRACEABILITY_STANDARD.md)
 - [Lot Final Audit and GO / NO-GO Gate](LOT_FINAL_AUDIT_AND_GO_NO_GO_GATE.md)
 - [Capability and Contract Ownership Registry](CAPABILITY_AND_CONTRACT_OWNERSHIP_REGISTRY.md)
-- [Model Retraining and Promotion Policy](MODEL_RETRAINING_AND_PROMOTION_POLICY.md)
-- [Economic Objective and Risk Utility Policy](ECONOMIC_OBJECTIVE_AND_RISK_UTILITY_POLICY.md)
 - [Canonical Portfolio Risk, Sizing, Reservation and Exit Standard](CANONICAL_PORTFOLIO_RISK_SIZING_AND_EXIT_STANDARD.md)
 
 ## Architecture quantitative multi-échelle
@@ -57,245 +101,14 @@ L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot37.json`
 - [Stochastic Continuous State and Multi-Horizon Forecasting Standard](STOCHASTIC_CONTINUOUS_STATE_AND_MULTI_HORIZON_FORECASTING_STANDARD.md)
 - [Participant Behavior and Liquidity Exit-Zone Inference Standard](PARTICIPANT_BEHAVIOR_AND_LIQUIDITY_EXIT_ZONE_INFERENCE_STANDARD.md)
 - [Protective Orders and Exit Lifecycle Standard](PROTECTIVE_ORDERS_AND_EXIT_LIFECYCLE_STANDARD.md)
-- [V7/V9 portfolio-risk normative addendum](roadmap/V07_V09_PORTFOLIO_RISK_NORMATIVE_ADDENDUM.md)
-- [Cross-version roadmap addendum](roadmap/MULTI_SCALE_STOCHASTIC_PREDICTION_AND_PARTICIPANT_INFERENCE_ADDENDUM.md)
 - [V3 continuous market-data addendum](roadmap/V03_CONTINUOUS_MARKET_DATA_NORMATIVE_ADDENDUM.md)
 - [V4 participant/Game Theory addendum](roadmap/V04_PARTICIPANT_GAME_THEORY_NORMATIVE_ADDENDUM.md)
 - [V5 multi-horizon forecasting addendum](roadmap/V05_MULTI_HORIZON_FORECASTING_NORMATIVE_ADDENDUM.md)
+- [V7/V9 portfolio-risk normative addendum](roadmap/V07_V09_PORTFOLIO_RISK_NORMATIVE_ADDENDUM.md)
 - [V15 protective-order addendum](roadmap/V15_PROTECTIVE_ORDER_LIFECYCLE_NORMATIVE_ADDENDUM.md)
+- [Cross-version roadmap addendum](roadmap/MULTI_SCALE_STOCHASTIC_PREDICTION_AND_PARTICIPANT_INFERENCE_ADDENDUM.md)
 
-Ces documents sont normatifs pour les lots futurs. Ils ne signifient pas que les capacités
-prédictives ou d'exécution sont déjà implémentées.
-
-## Lot 26
-
-- [Specification](LOT_26_MULTI_TIMEFRAME_ALIGNMENT_ENGINE.md)
-- [Acceptance criteria](ACCEPTANCE_CRITERIA_LOT_26.md)
-- [Implementation status](LOT_26_IMPLEMENTATION_WORKLOG.md)
-- [Requirement-test matrix](LOT26_REQUIREMENT_TEST_MATRIX.md)
-- [Time semantics ADR](adr/ADR_0001_TIME_SEMANTICS_AND_ASOF_JOIN.md)
-- [Temporal contracts](contracts/LOT26_TEMPORAL_CONTRACTS.md)
-- [Mathematical specification](math/LOT_26_MULTI_TIMEFRAME_ALIGNMENT_SPEC.md)
-- [V2 normative addendum](roadmap/V02_LOT26_NORMATIVE_ADDENDUM.md)
-- Configuration : `config/math/multi_timeframe_alignment_v1.json`
-- Temporal scale registry : `config/temporal/temporal_scale_registry_v1.json`
-- Decision clock policy : `config/temporal/decision_clock_policy_v1.json`
-- Runner : `scripts/run_lot26_multi_timeframe_alignment_engine.py`
-- Validator : `scripts/validate_lot26.py`
-
-## Lot 28
-
-- [Specification](LOT_28_EXPLANATION_CORE_AND_WHY_NOT_TRADE_LAYER.md)
-- [Acceptance criteria](ACCEPTANCE_CRITERIA_LOT_28.md)
-- [Implementation status](LOT_28_IMPLEMENTATION_WORKLOG.md)
-- Configuration : `config/explanations/explanation_core_why_not_trade_v1.json`
-- Schema : `contracts/schemas/explanation_core_why_not_trade_layer_state_v1.schema.json`
-- Runner : `scripts/run_lot28_explanation_core_and_why_not_trade_layer.py`
-- Validator : `scripts/validate_lot28.py`
-- Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot28.json`
-
-## Lot 29
-
-- [Specification](LOT_29_V2_DETERMINISTIC_REPLAY_AND_AUDIT.md)
-- [Acceptance criteria](ACCEPTANCE_CRITERIA_LOT_29.md)
-- [Implementation status](LOT_29_IMPLEMENTATION_WORKLOG.md)
-- [Post-merge audit](LOT_29_POST_MERGE_AUDIT.md)
-- Configuration : `config/replay/v2_deterministic_replay_audit_v1.json`
-- Schema : `contracts/schemas/v2_deterministic_replay_audit_state_v1.schema.json`
-- State : `data/audit/v2_deterministic_replay_and_audit_lot29.json`
-- Audit : `data/audit/v2_deterministic_replay_and_audit_audit_lot29.json`
-- Closure manifest : `data/audit/v2_replay_closure_manifest_lot29.json`
-- Report : `reports/lot_29_v2_deterministic_replay_and_audit_report.md`
-- Runner : `scripts/run_lot29_v2_deterministic_replay_and_audit.py`
-- Validator : `scripts/validate_lot29.py`
-- Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot29.json`
-
-## Lot 30
-
-- [Specification](LOT_30_V2_MARKET_ANALYSIS_CLOSURE.md)
-- [Acceptance criteria](ACCEPTANCE_CRITERIA_LOT_30.md)
-- [Implementation status](LOT_30_IMPLEMENTATION_WORKLOG.md)
-- [Post-merge audit](LOT_30_POST_MERGE_AUDIT.md)
-- Configuration : `config/closure/v2_market_analysis_closure_v1.json`
-- Schema : `contracts/schemas/v2_market_analysis_closure_state_v1.schema.json`
-- State : `data/audit/v2_market_analysis_closure_lot30.json`
-- Audit : `data/audit/v2_market_analysis_closure_audit_lot30.json`
-- Final V2 manifest : `data/audit/closure_manifest_lot30.json`
-- Report : `reports/lot_30_v2_market_analysis_closure_report.md`
-- Coverage evidence : `reports/lot30/coverage_summary.json`
-- Mutation evidence : `reports/lot30/mutation/score.json`
-- Runner : `scripts/run_lot30_v2_market_analysis_closure.py`
-- Validator : `scripts/validate_lot30.py`
-- Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot30.json`
-
-## Lot 31
-
-- [Entry gate](LOT_31_V3_ENTRY_GATE.md)
-- [Specification](LOT_31_MARKET_DATA_GOVERNANCE_SCOPE_AND_SOURCE_REGISTRY.md)
-- [Acceptance criteria](ACCEPTANCE_CRITERIA_LOT_31.md)
-- [Implementation status](LOT_31_IMPLEMENTATION_WORKLOG.md)
-- [Post-merge audit](LOT_31_POST_MERGE_AUDIT.md)
-- Configuration : `config/data_governance/market_data_source_registry_v1.json`
-- Source registry schema : `contracts/schemas/source_registry_v1.schema.json`
-- State schema : `contracts/schemas/market_data_governance_scope_source_registry_state_v1.schema.json`
-- Audit schema : `contracts/schemas/market_data_governance_scope_source_registry_audit_v1.schema.json`
-- State : `data/audit/market_data_governance_scope_and_source_registry_lot31.json`
-- Audit : `data/audit/market_data_governance_scope_and_source_registry_audit_lot31.json`
-- Source registry : `data/audit/source_registry_lot31.json`
-- Report : `reports/lot_31_market_data_governance_scope_and_source_registry_report.md`
-- Coverage evidence : `reports/lot31/coverage_summary.json`
-- Mutation evidence : `reports/lot31/mutation_summary.json`
-- Runner : `scripts/run_lot31_market_data_governance_scope_and_source_registry.py`
-- Validator : `scripts/validate_lot31.py`
-- No-connectivity validator : `scripts/validate_lot31_no_connectivity.py`
-- Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot31.json`
-
-## Lot 32
-
-- [Entry gate](LOT_32_V3_ENTRY_GATE.md)
-- [Specification](LOT_32_INSTRUMENT_SYMBOL_AND_CONTRACT_NORMALIZATION.md)
-- [Acceptance criteria](ACCEPTANCE_CRITERIA_LOT_32.md)
-- [Implementation status](LOT_32_IMPLEMENTATION_WORKLOG.md)
-- [Post-merge audit](LOT_32_POST_MERGE_AUDIT.md)
-- Configuration : `config/data_governance/instrument_symbol_contract_normalization_v1.json`
-- Instrument schema : `contracts/schemas/instrument_specification_v1.schema.json`
-- Registry schema : `contracts/schemas/instrument_registry_v1.schema.json`
-- State schema : `contracts/schemas/instrument_symbol_contract_normalization_state_v1.schema.json`
-- Audit schema : `contracts/schemas/instrument_symbol_contract_normalization_audit_v1.schema.json`
-- State : `data/audit/instrument_symbol_and_contract_normalization_lot32.json`
-- Audit : `data/audit/instrument_symbol_and_contract_normalization_audit_lot32.json`
-- Instrument registry : `data/audit/instrument_registry_lot32.json`
-- Report : `reports/lot_32_instrument_symbol_and_contract_normalization_report.md`
-- Coverage evidence : `reports/lot32/coverage_summary.json`
-- Mutation evidence : `reports/lot32/mutation_summary.json`
-- Runner : `scripts/run_lot32_instrument_symbol_and_contract_normalization.py`
-- Validator : `scripts/validate_lot32.py`
-- No-connectivity validator : `scripts/validate_lot32_no_connectivity.py`
-- Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot32.json`
-
-## Lot 33
-
-- [Entry gate](LOT_33_V3_ENTRY_GATE.md)
-- [Specification](LOT_33_TIMESTAMP_CLOCK_AND_TIMEZONE_GOVERNANCE.md)
-- [Acceptance criteria](ACCEPTANCE_CRITERIA_LOT_33.md)
-- [Implementation status](LOT_33_IMPLEMENTATION_WORKLOG.md)
-- [Post-merge audit](LOT_33_POST_MERGE_AUDIT.md)
-- State : `data/audit/timestamp_clock_and_timezone_governance_lot33.json`
-- Audit : `data/audit/timestamp_clock_and_timezone_governance_audit_lot33.json`
-- Canonical time collection : `data/audit/canonical_time_envelopes_lot33.json`
-- Report : `reports/lot_33_timestamp_clock_and_timezone_governance_report.md`
-- Coverage evidence : `reports/lot33/coverage_summary.json`
-- Mutation evidence : `reports/lot33/mutation_summary.json`
-- Runner : `scripts/run_lot33_timestamp_clock_and_timezone_governance.py`
-- Validator : `scripts/validate_lot33.py`
-- No-connectivity validator : `scripts/validate_lot33_no_connectivity.py`
-- Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot33.json`
-
-## Lot 34
-
-- [Entry gate](LOT_34_V3_ENTRY_GATE.md)
-- [Specification](LOT_34_MARKET_DATA_QUALITY_ENGINE.md)
-- [Acceptance criteria](ACCEPTANCE_CRITERIA_LOT_34.md)
-- [Post-merge audit](LOT_34_POST_MERGE_AUDIT.md)
-- Configuration : `config/data_governance/market_data_quality_engine_v1.json`
-- State : `data/audit/market_data_quality_engine_lot34.json`
-- Audit : `data/audit/market_data_quality_engine_audit_lot34.json`
-- Quality states : `data/audit/data_quality_states_lot34.json`
-- Anomalies : `data/audit/data_anomalies_lot34.json`
-- Quality veto : `data/audit/data_quality_veto_lot34.json`
-- Report : `reports/lot_34_market_data_quality_engine_report.md`
-- Coverage evidence : `reports/lot34/coverage_summary.json`
-- Mutation evidence : `reports/lot34/mutation_summary.json`
-- Runner : `scripts/run_lot34_market_data_quality_engine.py`
-- Validator : `scripts/validate_lot34.py`
-- No-connectivity validator : `scripts/validate_lot34_no_connectivity.py`
-- Post-merge validator : `scripts/validate_lot34_post_merge.py`
-- Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot34.json`
-
-## Lot 35
-
-- [Entry gate](LOT_35_V3_ENTRY_GATE.md)
-- [Specification](LOT_35_CANDLE_TRADE_BOOK_RECONCILIATION.md)
-- [Acceptance criteria](ACCEPTANCE_CRITERIA_LOT_35.md)
-- [Post-merge audit](LOT_35_POST_MERGE_AUDIT.md)
-- Configuration : `config/data_governance/candle_trade_book_reconciliation_v1.json`
-- State : `data/audit/candle_trade_book_reconciliation_lot35.json`
-- Audit : `data/audit/candle_trade_book_reconciliation_audit_lot35.json`
-- Reconciliation reports : `data/audit/reconciliation_reports_lot35.json`
-- Reconciliation veto : `data/audit/reconciliation_veto_lot35.json`
-- Report : `reports/lot_35_candle_trade_book_reconciliation_report.md`
-- Coverage evidence : `reports/lot35/coverage_summary.json`
-- Mutation evidence : `reports/lot35/mutation_summary.json`
-- Runner : `scripts/run_lot35_candle_trade_book_reconciliation.py`
-- Validator : `scripts/validate_lot35.py`
-- No-connectivity validator : `scripts/validate_lot35_no_connectivity.py`
-- Post-merge validator : `scripts/validate_lot35_post_merge.py`
-- Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot35.json`
-
-## Lot 36
-
-- [Entry gate](LOT_36_V3_ENTRY_GATE.md)
-- [Specification](LOT_36_FRESHNESS_GAP_OUTAGE_AUDIT_AND_V3_CLOSURE.md)
-- [Acceptance criteria](ACCEPTANCE_CRITERIA_LOT_36.md)
-- [Post-merge audit / V3 closure](LOT_36_POST_MERGE_AUDIT.md)
-- [Post-merge validation matrix](LOT36_POST_MERGE_VALIDATION_MATRIX.md)
-- Configuration : `config/data_governance/freshness_gap_outage_v3_closure_v1.json`
-- State : `data/audit/freshness_gap_outage_audit_and_v3_closure_lot36.json`
-- Audit : `data/audit/freshness_gap_outage_audit_and_v3_closure_audit_lot36.json`
-- Historical candidate manifest : `data/audit/closure_manifest_lot36.json`
-- Replay : `data/audit/replay_evidence_lot36.json`
-- Coverage evidence : `reports/lot36/coverage_summary.json`
-- Mutation evidence : `reports/lot36/mutation_summary.json`
-- Runner : `scripts/run_lot36_freshness_gap_outage_audit_and_v3_closure.py`
-- Validator : `scripts/validate_lot36.py`
-- Post-merge validator : `scripts/validate_lot36_post_merge.py`
-- Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot36.json`
-
-## Lot 37
-
-- [Entry gate](LOT_37_V4_ENTRY_GATE.md)
-- [Specification](LOT_37_MICROSTRUCTURE_SCOPE_AND_OFFLINE_DATA_CONTRACTS.md)
-- [Acceptance criteria](ACCEPTANCE_CRITERIA_LOT_37.md)
-- [Post-merge audit](LOT_37_POST_MERGE_AUDIT.md)
-- [Post-merge validation matrix](LOT37_POST_MERGE_VALIDATION_MATRIX.md)
-- Configuration : `config/microstructure/microstructure_scope_offline_data_contracts_v1.json`
-- State : `data/audit/microstructure_scope_and_offline_data_contracts_lot37.json`
-- Audit : `data/audit/microstructure_scope_and_offline_data_contracts_audit_lot37.json`
-- Contract registry : `data/audit/microstructure_contract_registry_lot37.json`
-- Capability matrix : `data/audit/microstructure_capability_matrix_lot37.json`
-- Coverage evidence : `reports/lot37/coverage_summary.json`
-- Mutation evidence : `reports/lot37/mutation_summary.json`
-- Runner : `scripts/run_lot37_microstructure_scope_and_offline_data_contracts.py`
-- Validator : `scripts/validate_lot37.py`
-- Frozen evidence validator : `scripts/validate_lot37_frozen_evidence.py`
-- Post-merge validator : `scripts/validate_lot37_post_merge.py`
-- Lifecycle overlay : `data/audit/roadmap_lifecycle_overlay_lot37.json`
-
-## Séparations obligatoires
-
-```text
-data resolution ≠ feature lookback ≠ forecast horizon
-decision clock ≠ signal TTL ≠ holding horizon
-alignment ≠ forecast ≠ scenario ≠ signal
-signal ≠ trade intent ≠ portfolio snapshot ≠ risk approval ≠ risk reservation ≠ order intent
-order intent ≠ ordre soumis ≠ fill ≠ position réconciliée
-CI verte ≠ validation mathématique ≠ preuve statistique ≠ alpha économique
-agreement score ≠ probability ≠ expected return
-source registry ≠ connector ≠ ingestion ≠ validated market event
-instrument registry ≠ live metadata fetch ≠ market event ≠ signal
-microstructure contract ≠ live book ingestion ≠ signal ≠ execution
-```
-
-## Profil temporel Lot 26
-
-```text
-timebar-5m → timebar-15m
-join = ASOF_BACKWARD
-trigger = CLOSED_LOCAL_BAR
-```
-
-Cette relation est une arête de configuration. Elle ne constitue pas un vote naïf entre
-timeframes et n'autorise aucune inférence de rendement futur.
+Ces documents décrivent l’architecture cible. Ils ne signifient jamais qu’une capability future est activée avant son lot propriétaire et son gate.
 
 ## Versions
 
@@ -323,21 +136,69 @@ timeframes et n'autorise aucune inférence de rendement futur.
 | V20 | Options Context | 172–174 | contexte options | `OPTIONS_CONTEXT_ONLY` |
 | V21 | On-chain / Flow Intelligence | 175–177 | contexte on-chain | `ONCHAIN_CONTEXT_ONLY` |
 
+Les documents détaillés de version sont dans `docs/roadmap/` et doivent contenir les Lots 0–177 exactement une fois.
+
+## Séparations obligatoires
+
+```text
+data resolution ≠ feature lookback ≠ forecast horizon
+decision clock ≠ signal TTL ≠ holding horizon
+alignment ≠ forecast ≠ scenario ≠ signal
+signal ≠ trade intent ≠ portfolio snapshot ≠ risk approval ≠ risk reservation ≠ order intent
+order intent ≠ ordre soumis ≠ fill ≠ position réconciliée
+CI verte ≠ validation mathématique ≠ preuve statistique ≠ alpha économique
+agreement score ≠ probability ≠ expected return
+source registry ≠ connector ≠ ingestion ≠ validated market event
+instrument registry ≠ live metadata fetch ≠ market event ≠ signal
+microstructure contract ≠ live book ingestion ≠ signal ≠ execution
+```
+
+## Profil temporel initial Lot 26
+
+```text
+timebar-5m → timebar-15m
+join = ASOF_BACKWARD
+trigger = CLOSED_LOCAL_BAR
+```
+
+Cette relation est une arête de configuration. Elle ne constitue pas un vote naïf entre timeframes et n’autorise aucune inférence de rendement futur.
+
 ## Règles de progression
 
-1. Ne jamais renuméroter ou réécrire un lot implémenté.
+1. Ne jamais renuméroter ou réécrire rétroactivement un lot certifié.
 2. Aucun lot suivant sans rapport final `GO`, validation exacte disponible et revue humaine.
-3. Chaque lot atteint les seuils tests, couverture et mutation applicables.
-4. Toute formule suit le standard mathématique et possède des oracles indépendants.
-5. Toute probabilité requiert une calibration versionnée ; les Lots 26–37 n'en produisent aucune.
+3. Chaque lot atteint les seuils de tests, couverture et mutation applicables.
+4. Toute formule suit le standard mathématique et possède des oracles indépendants adaptés.
+5. Toute probabilité requiert une calibration versionnée ; les lots V1–V4 n’en produisent pas comme autorisation de trading.
 6. Toute décision ou absence de décision est rejouable et auditable.
 7. Zéro BLOCKER et zéro MAJOR avant promotion.
 8. HFT, options et on-chain ne contournent jamais le core.
-9. Lot 26 reste descriptif ; V4 possède la Game Theory ; V5 possède la prévision.
+9. V4 possède la microstructure/Game Theory ; V5 possède la prévision/alpha.
 10. Les horizons ne sont jamais agrégés par vote naïf.
-11. Les données ajoutées démontrent leur valeur par ablation et hors échantillon.
-12. Un statut `PLANNED_LOCKED` ou `AWAITING_EXACT_COMMIT_CI` ne peut être promu sans preuve exacte.
-13. V7, V8, V9, V15 et V17 consomment le snapshot, le sizing et les réservations canoniques ; aucune implémentation locale incompatible n'est autorisée.
+11. Les données ajoutées démontrent leur valeur par ablation et hors échantillon quand elles sont utilisées pour une hypothèse prédictive.
+12. Un statut `PLANNED_LOCKED`, `CERTIFICATION_IN_PROGRESS` ou `AWAITING_EXACT_COMMIT_CI` ne peut être promu sans preuve exacte.
+13. V7, V8, V9, V15 et V17 consomment les snapshots, décisions, sizing et réservations canoniques ; aucune implémentation locale incompatible n’est autorisée.
 14. Tout ordre augmentant le risque exige une réservation atomique active ; toute moyenne à la baisse implicite est interdite.
-15. Lot 37 est limité au scope, aux contrats offline, au registre/matrice de capacités et à l'API publique du domaine Microstructure ; il n'autorise aucune logique Lot38+.
-16. Lot 38 reste `PLANNED_LOCKED` après l'audit post-merge Lot37 jusqu'à un gate d'entrée distinct et une décision humaine explicite.
+15. Les Lots 37–44 sont des preuves historiques V4 fusionnées/auditées et ne doivent pas être réécrits pour simuler une nouvelle progression.
+16. Le Lot 45 est limité à Order Flow / Delta / CVD offline. Il ne produit aucune permission de trading et ne peut ouvrir implicitement le Lot 46.
+17. Le Lot 46 reste `PLANNED_LOCKED` jusqu’au merge du Lot 45, audit post-merge indépendant et décision humaine explicite `GO_LOT45_POST_MERGE`.
+18. Un workflow dédié vert n’est recevable que si le SHA qu’il checkout/certifie correspond explicitement au candidat annoncé.
+
+## Point de reprise opérationnel
+
+Pour la PR #66, l’ordre de certification reste :
+
+```text
+source candidate exact
+→ dedicated validation + coverage sur ce SHA
+→ dedicated mutation sur ce SHA
+→ evidence canonique régénérée
+→ freeze/validator immuables
+→ frozen attestation
+→ matrice CI exacte
+→ review Codex finale du HEAD figé
+→ merge
+→ audit post-merge indépendant
+→ GO_LOT45_POST_MERGE
+→ seulement ensuite gate Lot46
+```

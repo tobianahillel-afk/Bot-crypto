@@ -1,7 +1,7 @@
 [project]
 name = "crypto-quant-bot"
-version = "0.43.0"
-description = "Crypto Quant Bot V4.1-Ops — Lot 43 post-merge audited offline book resilience replenishment engine"
+version = "0.44.0"
+description = "Crypto Quant Bot V4.1-Ops — Lot 44 audited baseline; Lot 45 candidate under exact-head certification"
 requires-python = "==3.11.*"
 dependencies = []
 
@@ -10,12 +10,14 @@ dev = [
   "bandit==1.8.0",
   "diff-cover==9.2.0",
   "hypothesis==6.161.0",
+  "jsonschema==4.26.0",
   "mypy==1.18.1",
   "mutmut==3.5.0",
   "pip-audit==2.9.0",
   "pytest==9.0.3",
   "pytest-cov==7.1.0",
   "radon==6.0.1",
+  "referencing==0.37.0",
   "ruff==0.12.0",
 ]
 

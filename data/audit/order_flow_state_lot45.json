@@ -1,0 +1,42 @@
+{
+  "buy_trades_total": 1,
+  "buy_volume": "0.08",
+  "classification_coverage": "0.6875",
+  "confidence_weighted_coverage": "0.6875",
+  "confidence_weighted_volume": "0.11",
+  "order_flow_checksum": "3dc7a0d4836090509d12239c2a407cfa3afd736fa7d3f80ef2c2eeed3b4fa9ea",
+  "schema_version": "order-flow-state-v1",
+  "sell_trades_total": 1,
+  "sell_volume": "0.03",
+  "signed_delta": "0.05",
+  "total_volume": "0.16",
+  "trades_total": 3,
+  "unknown_trades_total": 1,
+  "unknown_volume": "0.05",
+  "unknown_volume_ratio": "0.3125",
+  "windows": [
+    {
+      "buy_trades_total": 1,
+      "buy_volume": "0.08",
+      "classification_coverage": "0.6875",
+      "confidence_weighted_coverage": "0.6875",
+      "confidence_weighted_volume": "0.11",
+      "delta_impulse": "0.05",
+      "event_time": "2026-08-06T19:18:40.000000Z",
+      "receive_time": "2026-08-06T19:18:40.050000Z",
+      "schema_version": "order-flow-window-v1",
+      "sell_trades_total": 1,
+      "sell_volume": "0.03",
+      "session_id": "2026-08-06",
+      "signed_delta": "0.05",
+      "signed_imbalance": "0.3125",
+      "total_volume": "0.16",
+      "trades_total": 3,
+      "unknown_trades_total": 1,
+      "unknown_volume": "0.05",
+      "window_checksum": "09bd6b8809622b450f04e98c5d519a0fb3cc9f9b3c749eaa588f97499aebc10c",
+      "window_end": "2026-08-06T19:18:41.000000Z",
+      "window_start": "2026-08-06T19:18:40.000000Z"
+    }
+  ]
+}
