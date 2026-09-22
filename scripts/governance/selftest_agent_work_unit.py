@@ -63,6 +63,7 @@ def main()->int:
 
     done_unclassified=copy.deepcopy(base)
     done_unclassified["status"]="DONE"
+    done_unclassified["planning"]["risk_class"]="UNCLASSIFIED"
     _expect(mod.AgentWorkUnitError,lambda:mod.validate_awu(done_unclassified),"DONE unclassified")
 
     bad_sha=copy.deepcopy(base)
