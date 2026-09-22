@@ -29,8 +29,8 @@
     "BOOT-07 cold-start qualification passed on workflow run 35776801100",
     "ENG-00 Repository Truth Recovery completed with canonical baseline validated on workflow run 35792439447"
   ],
-  "current_objective": "ENG-01.5: formalize GitHub-only execution and evidence rules in the permanent engine.",
-  "next_action": "Upgrade agent capability policy with machine-readable claim/evidence rules and validate impossible-claim rejection.",
+  "current_objective": "ENG-01.6: implement permanent external Git state-drift detection and qualification.",
+  "next_action": "Implement deterministic snapshot comparison plus exact GitHub verification for main, PR66, branch protection and rulesets; qualify fail-closed drift scenarios.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -92,6 +92,12 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35793777054",
       "note": "Exact head 5ffe1f6711cee629a6cdcc2c351f4079a5afb2a5 validated permanent-state fresh-agent startup and 5 cold-start scenarios."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35794013765",
+      "note": "Exact head 835d966ccd7ea2957cd6b6f79be4c609816a4484 validated execution/evidence policy, adversarial evidence claims and permanent cold start."
     }
   ],
   "stale_when": [
@@ -104,7 +110,7 @@
   ],
   "next_engineering": {
     "active_lot": "ENG-01",
-    "active_task": "ENG-01.5",
+    "active_task": "ENG-01.6",
     "active_manifest": "engineering/lots/ENG-01.json"
   }
 }

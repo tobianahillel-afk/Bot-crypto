@@ -46,12 +46,12 @@
     },
     {
       "id": "ENG-01.5",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Formalize GitHub-only execution and evidence rules in the permanent engine."
     },
     {
       "id": "ENG-01.6",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Implement permanent state-drift detection and qualification."
     }
   ],
