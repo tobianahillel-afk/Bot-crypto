@@ -64,5 +64,16 @@
     "FROZEN_EVIDENCE_MUTATION",
     "LOT46_UNLOCK_ATTEMPT",
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
+  ],
+  "known_findings": [
+    {
+      "id": "BOOT-FINDING-001",
+      "severity": "HIGH",
+      "code": "MAIN_BRANCH_UNPROTECTED",
+      "observed": true,
+      "impact": "Direct pushes or unreviewed changes to main are not prevented by branch protection.",
+      "remediation_target": "ENG-04.6",
+      "must_be_resolved_before": "BUSINESS_DEVELOPMENT_UNLOCK"
+    }
   ]
 }
