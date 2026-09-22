@@ -42,6 +42,9 @@ jobs:
       - name: Validate handoff
         run: python scripts/governance/validate_handoff.py
 
+      - name: Validate repository truth registry
+        run: python scripts/governance/validate_truth_registry.py
+
       - name: Run negative validator self-tests
         run: python scripts/governance/selftest_bootstrap_validators.py
 
