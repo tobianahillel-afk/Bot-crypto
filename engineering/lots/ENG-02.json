@@ -37,12 +37,12 @@
     },
     {
       "id": "ENG-02.3",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Implement deterministic cognitive/technical complexity scoring."
     },
     {
       "id": "ENG-02.4",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Enforce mandatory split rules for oversized or cross-boundary work."
     },
     {
