@@ -13,7 +13,7 @@ This file is the mandatory first entry point for any coding or audit agent.
    - `main` still matches the recorded observation or an authorized transition;
    - the active engineering branch exists;
    - the recorded business candidate PR/head still matches when relevant.
-5. Any unexpected mismatch is `STATE_DRIFT`; do not auto-heal state.
+5. Any unexpected mismatch is `STATE_DRIFT`; do not auto-heal state. When execution is available, `python scripts/governance/verify_external_git_state.py --mode github` is the canonical live check.
 6. Read only the bounded context required by the active work item:
    - `engineering/MASTER_PLAN.md`;
    - active manifest;

@@ -42,7 +42,7 @@ Before any write, verify the external facts that can stale the state:
 - repository protection/ruleset facts when the task depends on them.
 
 Compare them with `external_observations`. An unexpected mismatch is `STATE_DRIFT`.
-Never silently rewrite state to match surprise Git movement.
+Never silently rewrite state to match surprise Git movement. The canonical executable check is `python scripts/governance/verify_external_git_state.py --mode github` when live GitHub access is available.
 
 ## S3 — Resolve exactly one work item
 

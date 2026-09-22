@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 concurrency:
   group: engineering-bootstrap-${{ github.ref }}
@@ -71,6 +72,17 @@ jobs:
 
       - name: Run agent evidence adversarial self-tests
         run: python scripts/governance/selftest_agent_evidence_policy.py
+
+      - name: Verify external state snapshot bindings
+        run: python scripts/governance/verify_external_git_state.py --mode snapshot
+
+      - name: Run external state-drift adversarial self-tests
+        run: python scripts/governance/selftest_external_state_drift.py
+
+      - name: Verify live external Git state
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python scripts/governance/verify_external_git_state.py --mode github
 
       - name: Run negative validator self-tests
         run: python scripts/governance/selftest_bootstrap_validators.py
