@@ -51,6 +51,9 @@ jobs:
       - name: Validate historical evidence protection
         run: python scripts/governance/validate_historical_evidence_protection.py
 
+      - name: Validate canonical ENG-00 baseline
+        run: python scripts/governance/validate_canonical_baseline.py
+
       - name: Run negative validator self-tests
         run: python scripts/governance/selftest_bootstrap_validators.py
 
