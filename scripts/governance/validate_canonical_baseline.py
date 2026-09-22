@@ -112,8 +112,19 @@ def validate() -> None:
 
     target = baseline.get("handoff_target", {})
     engine = state.get("engineering_engine", {})
-    if target.get("engineering_lot") != engine.get("next_lot"):
-        raise CanonicalBaselineError("ENG-01 handoff target disagrees with canonical state")
+    target_lot = target.get("engineering_lot")
+    if target_lot != "ENG-01":
+        raise CanonicalBaselineError("canonical baseline must hand off to ENG-01")
+    if engine.get("active_lot") == "ENG-00":
+        if engine.get("next_lot") != target_lot:
+            raise CanonicalBaselineError("ENG-01 handoff target disagrees with ENG-00 next_lot")
+    elif engine.get("active_lot") == "ENG-01":
+        if engine.get("active_task") != target.get("first_task"):
+            raise CanonicalBaselineError("active ENG-01 task disagrees with baseline handoff target")
+    else:
+        completed = engine.get("completed", [])
+        if "ENG-01" not in completed:
+            raise CanonicalBaselineError("ENG-01 handoff target was neither activated nor completed")
     if target.get("first_task") != "ENG-01.1":
         raise CanonicalBaselineError("ENG-01 must start at ENG-01.1")
 
