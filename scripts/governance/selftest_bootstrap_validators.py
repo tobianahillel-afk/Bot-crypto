@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Negative self-tests for bootstrap governance validators."""
+"""Negative self-tests for governance validators."""
 
 from __future__ import annotations
 
@@ -40,13 +40,15 @@ def _expect_failure(exc_type: type[Exception], fn: Any, label: str) -> None:
 
 
 def main() -> int:
-    state_mod = _module("bootstrap_state_validator", ROOT / "scripts/governance/validate_bootstrap_state.py")
-    item_mod = _module("work_item_validator", ROOT / "scripts/governance/validate_work_item.py")
+    state_mod = _module("state_validator", ROOT / "scripts/governance/validate_bootstrap_state.py")
+    item_mod = _module("item_validator", ROOT / "scripts/governance/validate_work_item.py")
     handoff_mod = _module("handoff_validator", ROOT / "scripts/governance/validate_handoff.py")
 
     state = _json(ROOT / "engineering/STATE.json")
     policy = _json(ROOT / "engineering/STATE_TRANSITIONS.json")
-    active_manifest = _json(ROOT / state["bootstrap_engine"]["active_manifest"])
+    phase = state["bootstrap_engine"]["phase"]
+    engine = state["bootstrap_engine"] if phase == "BUILDING" else state["engineering_engine"]
+    active_manifest = _json(ROOT / engine["active_manifest"])
     handoff = _json(ROOT / "engineering/handoff/CURRENT.json")
 
     state_mod.validate_state(state, policy, active_manifest)
@@ -58,15 +60,15 @@ def main() -> int:
     _expect_failure(
         state_mod.BootstrapStateError,
         lambda: state_mod.validate_state(unsafe_state, policy, active_manifest),
-        "trade_allowed true",
+        "unsafe state",
     )
 
-    mismatched_state = copy.deepcopy(state)
-    mismatched_state["bootstrap_engine"]["active_task"] = "BOOT-06.99"
+    invalid_prefix = copy.deepcopy(state)
+    invalid_prefix["bootstrap_engine"]["completed"] = invalid_prefix["bootstrap_engine"]["completed"][:-1]
     _expect_failure(
         state_mod.BootstrapStateError,
-        lambda: state_mod.validate_state(mismatched_state, policy, active_manifest),
-        "active task mismatch",
+        lambda: state_mod.validate_state(invalid_prefix, policy, active_manifest),
+        "bootstrap completed prefix",
     )
 
     invalid_manifest = copy.deepcopy(active_manifest)
@@ -78,14 +80,14 @@ def main() -> int:
     )
 
     stale_handoff = copy.deepcopy(handoff)
-    stale_handoff["state_snapshot"]["active_task"] = "BOOT-06.99"
+    stale_handoff["state_snapshot"]["phase"] = "CORRUPT"
     _expect_failure(
         handoff_mod.HandoffError,
         lambda: handoff_mod.validate_handoff(state, stale_handoff),
-        "stale handoff task",
+        "stale handoff",
     )
 
-    print("BOOTSTRAP_VALIDATOR_SELFTEST_PASS probes=4")
+    print("GOVERNANCE_VALIDATOR_SELFTEST_PASS probes=4")
     return 0
 
 
