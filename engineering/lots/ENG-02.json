@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "kind": "engineering_work_item",
+  "id": "ENG-02",
+  "title": "Work Decomposition & Context Engine",
+  "status": "IN_PROGRESS",
+  "objective": "Turn business/engineering objectives into bounded, dependency-aware, risk-scored work units with deterministic context routing and machine-enforced split/scope limits.",
+  "depends_on": [
+    "ENG-01"
+  ],
+  "allowed_paths": [
+    "AGENTS.md",
+    "config/governance/**",
+    "engineering/**",
+    "scripts/governance/**",
+    ".github/workflows/engineering-bootstrap.yml"
+  ],
+  "forbidden_scope": [
+    "src/crypto_quant_bot/** business implementation changes",
+    "Lot45 candidate branch changes",
+    "Lot46 implementation or unlock",
+    "frozen historical evidence mutation",
+    "runtime capability activation",
+    "mandatory paid or LLM-backed dependency",
+    "ENG-03 validation-tier implementation beyond interfaces required by ENG-02"
+  ],
+  "tasks": [
+    {
+      "id": "ENG-02.1",
+      "status": "IN_PROGRESS",
+      "description": "Define the permanent Agent Work Unit schema and bounded execution contract."
+    },
+    {
+      "id": "ENG-02.2",
+      "status": "PLANNED",
+      "description": "Implement dependency DAG validation and cycle/missing-dependency rejection."
+    },
+    {
+      "id": "ENG-02.3",
+      "status": "PLANNED",
+      "description": "Implement deterministic cognitive/technical complexity scoring."
+    },
+    {
+      "id": "ENG-02.4",
+      "status": "PLANNED",
+      "description": "Enforce mandatory split rules for oversized or cross-boundary work."
+    },
+    {
+      "id": "ENG-02.5",
+      "status": "PLANNED",
+      "description": "Define and validate risk classes R0 through R3."
+    },
+    {
+      "id": "ENG-02.6",
+      "status": "PLANNED",
+      "description": "Implement context routing and bounded context budgets."
+    },
+    {
+      "id": "ENG-02.7",
+      "status": "PLANNED",
+      "description": "Harden active-work diff/scope validation around AWU contracts."
+    },
+    {
+      "id": "ENG-02.8",
+      "status": "PLANNED",
+      "description": "Qualify work decomposition with adversarial cold-start and oversize-work scenarios."
+    }
+  ],
+  "done_when": [
+    "every implementable task can be represented as one bounded machine-readable AWU",
+    "dependency DAGs fail closed on cycles missing nodes and unauthorized predecessors",
+    "complexity scoring is deterministic and produces mandatory split decisions",
+    "risk class is explicit and machine-validated",
+    "context routing loads only task-relevant authorities within declared budgets",
+    "actual Git diffs are constrained to the active AWU scope",
+    "fresh agents reject oversized ambiguous or dependency-invalid work before implementation"
+  ],
+  "extensions": {
+    "scope_base_sha": "63047d1a62cc0e91ea9e7341b5c5e9b53c650c8c",
+    "scope_base_kind": "PREVIOUS_ENGINEERING_CERTIFIED_HEAD",
+    "scope_base_evidence_run": 35794262132
+  }
+}

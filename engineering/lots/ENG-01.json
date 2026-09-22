@@ -3,7 +3,7 @@
   "kind": "engineering_work_item",
   "id": "ENG-01",
   "title": "Agent Bootstrap & Canonical State",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "objective": "Replace bootstrap-only state with the permanent multi-track project state and deterministic context-free startup protocol.",
   "depends_on": [
     "ENG-00"
@@ -51,7 +51,7 @@
     },
     {
       "id": "ENG-01.6",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Implement permanent state-drift detection and qualification."
     }
   ],

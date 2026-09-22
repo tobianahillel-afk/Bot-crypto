@@ -27,10 +27,11 @@
     "BOOT-05 machine-readable handoff and stale-state detection created",
     "BOOT-06 lightweight zero-dependency CI passed",
     "BOOT-07 cold-start qualification passed on workflow run 35776801100",
-    "ENG-00 Repository Truth Recovery completed with canonical baseline validated on workflow run 35792439447"
+    "ENG-00 Repository Truth Recovery completed with canonical baseline validated on workflow run 35792439447",
+    "ENG-01 Agent Bootstrap & Canonical State completed; permanent state, state machine, fresh-agent startup, evidence policy and live state-drift qualification validated on workflow run 35794262132"
   ],
-  "current_objective": "ENG-01.6: implement permanent external Git state-drift detection and qualification.",
-  "next_action": "Implement deterministic snapshot comparison plus exact GitHub verification for main, PR66, branch protection and rulesets; qualify fail-closed drift scenarios.",
+  "current_objective": "ENG-02.1: define the permanent Agent Work Unit schema and bounded execution contract.",
+  "next_action": "Implement the AWU schema, reference fixture and validator; keep work bounded to decomposition/context governance only.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -98,6 +99,12 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35794013765",
       "note": "Exact head 835d966ccd7ea2957cd6b6f79be4c609816a4484 validated execution/evidence policy, adversarial evidence claims and permanent cold start."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35794262132",
+      "note": "Exact head 63047d1a62cc0e91ea9e7341b5c5e9b53c650c8c passed live GitHub drift verification, 7 adversarial drift probes, permanent cold-start and all ENG-01 governance gates."
     }
   ],
   "stale_when": [
@@ -109,8 +116,8 @@
     "Lot46 is no longer LOCKED before explicit unlock"
   ],
   "next_engineering": {
-    "active_lot": "ENG-01",
-    "active_task": "ENG-01.6",
-    "active_manifest": "engineering/lots/ENG-01.json"
+    "active_lot": "ENG-02",
+    "active_task": "ENG-02.1",
+    "active_manifest": "engineering/lots/ENG-02.json"
   }
 }
