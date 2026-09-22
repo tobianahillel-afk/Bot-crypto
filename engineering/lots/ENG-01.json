@@ -26,12 +26,12 @@
   "tasks": [
     {
       "id": "ENG-01.1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Define the permanent project-state schema from the certified ENG-00 baseline."
     },
     {
       "id": "ENG-01.2",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Implement independent BUSINESS / ENGINEERING / AUDIT tracks."
     },
     {
