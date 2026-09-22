@@ -62,5 +62,10 @@
     "fresh agents resolve exactly one authorized task",
     "GitHub-only agents cannot claim unavailable local evidence",
     "external Git drift is detected before work begins"
-  ]
+  ],
+  "extensions": {
+    "scope_base_sha": "b830dc3c94e8abd2d15723fc0e156f188cd10936",
+    "scope_base_kind": "PREVIOUS_ENGINEERING_CERTIFIED_HEAD",
+    "scope_base_evidence_run": 35792439447
+  }
 }
