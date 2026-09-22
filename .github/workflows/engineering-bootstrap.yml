@@ -60,6 +60,12 @@ jobs:
       - name: Validate permanent project state
         run: python scripts/governance/validate_project_state.py
 
+      - name: Validate permanent state machine
+        run: python scripts/governance/validate_project_state_machine.py
+
+      - name: Run state-machine adversarial self-tests
+        run: python scripts/governance/selftest_project_state_machine.py
+
       - name: Run negative validator self-tests
         run: python scripts/governance/selftest_bootstrap_validators.py
 
