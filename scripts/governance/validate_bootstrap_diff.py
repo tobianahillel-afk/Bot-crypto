@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail closed if the bootstrap engineering branch changes files outside its allowed scope."""
+"""Fail closed if the engineering branch changes files outside the active work-item scope."""
 
 from __future__ import annotations
 
@@ -49,25 +49,30 @@ def validate_scope(files: list[str], allowed_paths: list[str]) -> None:
         raise DiffScopeError(f"changed files outside active allowlist: {escaped}")
 
 
+def _active_engine(state: dict[str, Any]) -> dict[str, Any]:
+    bootstrap = state.get("bootstrap_engine", {})
+    if bootstrap.get("phase") == "BUILDING":
+        return bootstrap
+    engineering = state.get("engineering_engine")
+    if not isinstance(engineering, dict):
+        raise DiffScopeError("STABLE bootstrap requires engineering_engine")
+    return engineering
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     root = Path(__file__).resolve().parents[2]
     parser.add_argument("--base", default="origin/main")
-    parser.add_argument(
-        "--manifest",
-        type=Path,
-        default=None,
-        help="Override active manifest; defaults to STATE.json declaration.",
-    )
+    parser.add_argument("--manifest", type=Path, default=None)
     args = parser.parse_args()
 
     try:
         state = _load(root / "engineering" / "STATE.json")
         manifest_path = args.manifest
         if manifest_path is None:
-            declared = state.get("bootstrap_engine", {}).get("active_manifest")
+            declared = _active_engine(state).get("active_manifest")
             if not isinstance(declared, str):
-                raise DiffScopeError("state does not declare bootstrap_engine.active_manifest")
+                raise DiffScopeError("active engine does not declare active_manifest")
             manifest_path = root / declared
         manifest = _load(manifest_path)
         allowed = manifest.get("allowed_paths")
