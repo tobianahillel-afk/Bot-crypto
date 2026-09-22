@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Crypto Quant Bot Bootstrap Handoff V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "workstream",
+    "status",
+    "external_git_observation",
+    "engineering_branch",
+    "state_snapshot",
+    "completed",
+    "current_objective",
+    "next_action",
+    "blockers",
+    "validation_evidence",
+    "stale_when"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "kind": {
+      "const": "bootstrap_handoff"
+    },
+    "workstream": {
+      "const": "BOOTSTRAP_ENGINE"
+    },
+    "status": {
+      "enum": [
+        "IN_PROGRESS",
+        "BLOCKED",
+        "COMPLETE"
+      ]
+    },
+    "external_git_observation": {
+      "type": "object"
+    },
+    "engineering_branch": {
+      "type": "string",
+      "minLength": 1
+    },
+    "state_snapshot": {
+      "type": "object"
+    },
+    "completed": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "current_objective": {
+      "type": "string",
+      "minLength": 1
+    },
+    "next_action": {
+      "type": "string",
+      "minLength": 1
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "validation_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "stale_when": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "kind": "bootstrap_handoff",
+  "workstream": "BOOTSTRAP_ENGINE",
+  "status": "IN_PROGRESS",
+  "external_git_observation": {
+    "default_branch": "main",
+    "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "lot45_pr": 66,
+    "lot45_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133"
+  },
+  "engineering_branch": "engineering/bootstrap-development-engine",
+  "state_snapshot": {
+    "phase": "BUILDING",
+    "active_lot": "BOOT-06",
+    "active_task": "BOOT-06.1",
+    "active_manifest": "engineering/lots/BOOT-06.json",
+    "business_development": "PAUSED",
+    "lot46_status": "LOCKED"
+  },
+  "completed": [
+    "BOOT-00 baseline frozen",
+    "BOOT-01 master plan created",
+    "BOOT-02 canonical state and state validator created",
+    "BOOT-03 bounded JSON work-item standard created",
+    "BOOT-04 deterministic agent startup protocol created",
+    "BOOT-05 machine-readable handoff and stale-state semantics created"
+  ],
+  "current_objective": "Validate the entire bootstrap control plane cheaply and automatically.",
+  "next_action": "Implement BOOT-06.1 minimal bootstrap validation suite, then continue BOOT-06 in task order.",
+  "blockers": [],
+  "validation_evidence": [
+    {
+      "class": "GITHUB_STRUCTURE",
+      "status": "OBSERVED",
+      "ref": "engineering/bootstrap-development-engine",
+      "note": "No claim of local test execution; exact CI execution is BOOT-06 work."
+    }
+  ],
+  "stale_when": [
+    "STATE.json active_lot or active_task differs from state_snapshot",
+    "STATE.json active_manifest differs from state_snapshot",
+    "main SHA differs without authorized state transition",
+    "Lot45 candidate head differs without reconciliation",
+    "business development is no longer PAUSED during bootstrap",
+    "Lot46 is no longer LOCKED during bootstrap"
+  ]
+}

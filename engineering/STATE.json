@@ -41,13 +41,14 @@
       "BOOT-01",
       "BOOT-02",
       "BOOT-03",
-      "BOOT-04"
+      "BOOT-04",
+      "BOOT-05"
     ],
-    "active_lot": "BOOT-05",
-    "active_task": "BOOT-05.1",
-    "next_lot": "BOOT-06",
+    "active_lot": "BOOT-06",
+    "active_task": "BOOT-06.1",
+    "next_lot": "BOOT-07",
     "blockers": [],
-    "active_manifest": "engineering/lots/BOOT-05.json"
+    "active_manifest": "engineering/lots/BOOT-06.json"
   },
   "mandatory_cost_policy": {
     "paid_external_api_required": false,
@@ -59,9 +60,9 @@
     "current_state": "engineering/STATE.json",
     "transition_policy": "engineering/STATE_TRANSITIONS.json",
     "master_plan": "engineering/MASTER_PLAN.md",
-    "handoff": "engineering/handoff/CURRENT.yaml",
+    "handoff": "engineering/handoff/CURRENT.json",
     "bootstrap_protocol": "engineering/BOOTSTRAP.md",
-    "active_manifest": "engineering/lots/BOOT-05.json"
+    "active_manifest": "engineering/lots/BOOT-06.json"
   },
   "stop_conditions": [
     "STATE_DRIFT",

@@ -3,7 +3,7 @@
   "kind": "bootstrap_work_item",
   "id": "BOOT-06",
   "title": "Minimal Validation",
-  "status": "PLANNED",
+  "status": "IN_PROGRESS",
   "objective": "Validate bootstrap state and manifests cheaply without invoking heavy bot CI.",
   "depends_on": [
     "BOOT-05"
@@ -24,7 +24,7 @@
   "tasks": [
     {
       "id": "BOOT-06.1",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Validate JSON state and manifest structure."
     },
     {

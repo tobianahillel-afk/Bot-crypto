@@ -13,7 +13,7 @@ This file is the mandatory first entry point for any coding or audit agent.
 4. Read only:
    - `engineering/MASTER_PLAN.md`;
    - the active manifest named by `bootstrap_engine.active_manifest`;
-   - `engineering/handoff/CURRENT.*`;
+   - `engineering/handoff/CURRENT.json`;
    - additional files explicitly required by the active work item/protocol.
 5. Continue only `bootstrap_engine.active_task`.
 6. Respect `allowed_paths`, `forbidden_scope`, dependencies and stop conditions.
