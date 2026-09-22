@@ -4,72 +4,70 @@ This file is the mandatory first entry point for any coding or audit agent.
 
 ## Start here
 
-1. Read `engineering/STATE.json`.
-2. Select the active track:
-   - if `bootstrap_engine.phase = BUILDING`, use `bootstrap_engine.active_*`;
-   - if `bootstrap_engine.phase = STABLE`, use `engineering_engine.active_*`.
-3. Verify the declared GitHub reality before writing:
-   - default branch and declared main SHA;
-   - active engineering branch;
-   - declared business candidate PR/ref when relevant.
-4. If reality disagrees with canonical state, stop with `STATE_DRIFT`.
-5. Read only:
+1. Read `config/governance/project_state.json`.
+2. Resolve the requested track:
+   - ordinary `continue` / development work → `engineering_track`;
+   - historical audit work → `audit_track`, only when explicitly active/authorized.
+3. Read the active manifest declared by that track.
+4. Verify external Git reality before writing:
+   - `main` still matches the recorded observation or an authorized transition;
+   - the active engineering branch exists;
+   - the recorded business candidate PR/head still matches when relevant.
+5. Any unexpected mismatch is `STATE_DRIFT`; do not auto-heal state.
+6. Read only the bounded context required by the active work item:
    - `engineering/MASTER_PLAN.md`;
-   - the selected track's active manifest;
+   - active manifest;
    - `engineering/handoff/CURRENT.json`;
-   - additional files explicitly required by the active work item/protocol.
-6. Continue only the selected track's `active_task`.
-7. Respect `allowed_paths`, `forbidden_scope`, dependencies and stop conditions.
-8. Run only validation relevant to the current work stage.
-9. Leave an updated handoff before ending work.
+   - task-relevant normative files.
+7. Continue only the active task; respect allowed paths, forbidden scope and dependencies.
+8. Run the assurance level appropriate to the current work stage.
+9. Update the handoff before ending a work session.
 
-Do not reconstruct project state from chat history, model memory, README status text,
-old PR descriptions, or comments when a higher-authority source exists.
+`engineering/STATE.json` is now a **migration compatibility bridge**, not the fresh-agent
+source of current authorization.
 
 ## Canonical identity
 
 - Project: **Crypto Quant Bot V3.1-Ops**.
-- Same project since inception; do not rename or fork its identity.
-- Real trading remains disabled unless a future certified governance state explicitly unlocks it.
+- Same project since inception; never rename or fork its identity implicitly.
+- Trading/execution remain disabled unless a future certified governance transition explicitly unlocks them.
 
-## Current authority order
+## Authority by question
 
-1. Frozen historical evidence for facts about past certifications.
-2. `engineering/STATE.json` for current bootstrap/engineering state.
-3. Active work-item manifest for current allowed work.
-4. Normative project standards under `docs/`.
-5. `engineering/MASTER_PLAN.md` for planned engineering sequence.
-6. Handoff/status summaries.
-7. PR descriptions/comments.
-8. Chat history/model memory.
+- Historical certification fact → immutable historical Git/evidence anchors.
+- Current work authorization → `config/governance/project_state.json`.
+- Current allowed paths/tasks → active work-item manifest.
+- System rules/architecture → normative documents and contracts.
+- Human summaries/handoffs → convenience only; never override higher authority.
+- Chat history/model memory → never a source of authorization.
 
-Conflicts between higher-authority sources are fail-closed and become `STATE_DRIFT`.
+Conflicts affecting authorization fail closed as `STATE_DRIFT`.
 
 ## Business-development hold
 
-While canonical state says `business_development = PAUSED`:
+While `business_track.development_status = PAUSED`:
 
-- do not merge, extend, or remediate Lot45 as part of engine work;
+- do not merge, extend or remediate Lot45 as part of engineering work;
 - do not start or unlock Lot46;
-- do not change frozen historical evidence;
-- do not enable network/exchange execution, trading, leverage, withdrawals, signal authority,
-  risk authority, order authority or live execution.
+- do not mutate frozen historical evidence;
+- do not enable exchange/network execution, signals, risk approval, orders, leverage,
+  withdrawals or live trading.
 
 ## Capability honesty
 
-Identify the actual execution profile before claiming evidence:
+Use only evidence the current session can actually produce or inspect:
 
-- `GITHUB_CONNECTOR_ONLY`: may inspect/write GitHub resources; local commands were not run.
-- `LOCAL_REPOSITORY`: may claim local commands only when actually executed.
-- `CI_EXECUTION`: may rely on CI only for the exact commit/run proved by GitHub evidence.
-- `READ_ONLY_AUDITOR`: must not mutate repository state.
+- `GITHUB_CONNECTOR_ONLY`: GitHub read/write if authorized; no local execution claim.
+- `LOCAL_REPOSITORY`: local command claims only when actually executed.
+- `CI_EXECUTION`: evidence only for the exact workflow run/head inspected.
+- `READ_ONLY_AUDITOR`: no repository mutation.
 
 Never convert an unavailable capability into an assumed PASS.
 
 ## Mandatory-cost rule
 
-The mandatory path must require zero paid LLM/API tokens, zero paid SaaS dependency,
-zero paid GitHub larger runner and zero external paid service.
+The mandatory path requires zero paid LLM/API tokens, zero paid SaaS, zero paid larger
+runner and zero external paid service.
 
 ## Stop immediately on
 
@@ -78,12 +76,6 @@ zero paid GitHub larger runner and zero external paid service.
 - frozen evidence mutation;
 - Lot46 unlock attempt;
 - mandatory paid dependency introduction;
-- an active task whose dependencies or manifest do not validate.
-
-## Handoff
-
-A handoff accelerates resume but is not evidence. A fresh agent must bind it to Git reality
-before trusting it. Update the canonical handoff with current task, blockers and exact next
-action before ending a work session.
+- invalid active manifest/dependency/state-machine transition.
 
 Deep startup/recovery semantics live in `engineering/AGENT_PROTOCOL.md`.

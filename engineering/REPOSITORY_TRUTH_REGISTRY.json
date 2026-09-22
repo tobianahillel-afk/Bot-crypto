@@ -20,19 +20,20 @@
     {
       "id": "TRUTH-CURRENT-STATE",
       "type": "CURRENT_OPERATIONAL_STATE",
-      "locator": "engineering/STATE.json",
+      "locator": "config/governance/project_state.json",
       "authority_for": [
-        "current active development track",
-        "current active work item",
-        "business pause",
-        "Lot45 candidate pointer",
-        "Lot46 lock",
-        "runtime safety locks"
+        "current work authorization",
+        "BUSINESS track state",
+        "ENGINEERING track state",
+        "AUDIT track state",
+        "safety and mandatory-cost state",
+        "external observation snapshot",
+        "unresolved findings and stop conditions"
       ],
       "not_authority_for": [
-        "historical certification facts independent of recorded evidence"
+        "historical certification facts independent of frozen evidence"
       ],
-      "mutation_policy": "CONTROLLED_STATE_TRANSITION",
+      "mutation_policy": "PERMANENT_STATE_MACHINE_CONTROLLED",
       "status": "CURRENT"
     },
     {
@@ -286,6 +287,20 @@
       ],
       "mutation_policy": "ISOLATED_WHILE_BUSINESS_PAUSED",
       "status": "SUSPENDED_CANDIDATE"
+    },
+    {
+      "id": "BRIDGE-BOOTSTRAP-STATE",
+      "type": "DERIVED_OR_HUMAN_STATUS_VIEW",
+      "locator": "engineering/STATE.json",
+      "authority_for": [
+        "temporary migration compatibility with bootstrap-era validators"
+      ],
+      "not_authority_for": [
+        "fresh-agent work authorization",
+        "permanent BUSINESS ENGINEERING or AUDIT state"
+      ],
+      "mutation_policy": "MIGRATION_BRIDGE_KEEP_IN_PARITY",
+      "status": "MIGRATION_BRIDGE"
     }
   ],
   "known_drift_targets": [],

@@ -1,123 +1,124 @@
-# Agent Operating Protocol — Bootstrap V1
+# Agent Operating Protocol — Permanent V1
 
 ## Purpose
 
-This protocol makes a fresh agent deterministic without requiring previous conversation
-context. It is deliberately procedural: agents should spend reasoning on the engineering
-problem, not on rediscovering where the project is.
+A context-free agent must be able to resume the repository from machine-readable state
+without reconstructing history from chat, README prose or old PR descriptions.
 
-## Startup algorithm
+## S0 — Declare actual capability profile
 
-### S0 — Capability declaration
+Use the closest profile from `engineering/AGENT_CAPABILITIES.json`:
+`GITHUB_CONNECTOR_ONLY`, `LOCAL_REPOSITORY`, `CI_EXECUTION`, or
+`READ_ONLY_AUDITOR`.
 
-Determine which capabilities actually exist for the session:
+Unavailable capabilities change the valid route; they never become inferred evidence.
 
-| Profile | May read GitHub | May write GitHub | May execute local code | May claim CI evidence |
-|---|---:|---:|---:|---:|
-| GITHUB_CONNECTOR_ONLY | yes | if authorized | no | only from exact GitHub run |
-| LOCAL_REPOSITORY | yes/optional | yes/optional | yes | only if inspected |
-| CI_EXECUTION | yes | workflow-defined | workflow only | yes, exact run/head |
-| READ_ONLY_AUDITOR | yes | no | optional read-only | only if inspected |
+## S1 — Read permanent state first
 
-An unavailable capability is not a failure; it changes the valid execution route.
-
-### S1 — Canonical state
-
-Read `engineering/STATE.json`. Do not start with README, roadmap summaries or chat history.
+Read `config/governance/project_state.json`.
 
 Resolve:
-- project identity;
-- current phase;
-- completed work;
-- active lot;
-- active task;
-- active manifest;
-- business hold;
-- safety state;
-- blockers and findings.
+- canonical project identity;
+- BUSINESS merged baseline, entry gate, candidate and next lock;
+- ENGINEERING active lot/task/manifest;
+- AUDIT lifecycle;
+- safety and mandatory-cost policy;
+- unresolved findings and stop conditions;
+- recorded external Git observations.
 
-### S2 — External reality check
+For ordinary development/“continue”, the default work track is ENGINEERING.
+Use AUDIT only for explicitly authorized audit work.
 
-For GitHub-backed work, verify the facts that can make the state stale:
+`engineering/STATE.json` is a temporary migration bridge and must not override permanent
+state.
 
-- default branch still exists;
-- declared main baseline has not unexpectedly moved;
-- active engineering branch exists;
-- the Lot45 candidate remains isolated while business work is paused;
-- no declared locked future Lot has been opened by the engine work.
+## S2 — Verify external Git reality
 
-A mismatch is `STATE_DRIFT`. Do not silently update state to whatever GitHub currently says;
-first determine whether the movement was authorized.
+Before any write, verify the external facts that can stale the state:
 
-### S3 — Bounded context
+- default branch/main head;
+- active engineering branch;
+- current business candidate PR state/head when present;
+- repository protection/ruleset facts when the task depends on them.
 
-Read:
-1. `engineering/MASTER_PLAN.md`;
-2. the active manifest;
-3. current handoff;
-4. only normative documents explicitly relevant to the active task.
+Compare them with `external_observations`. An unexpected mismatch is `STATE_DRIFT`.
+Never silently rewrite state to match surprise Git movement.
 
-Do not recursively read the entire repository as a startup ritual.
+## S3 — Resolve exactly one work item
 
-### S4 — Work authorization
+For ENGINEERING:
+- `engineering_track.active_lot`;
+- `engineering_track.active_task`;
+- `engineering_track.active_manifest`.
 
-Before writing, establish:
-- dependencies are satisfied;
-- active task matches active manifest;
+For AUDIT, use the equivalent active batch/task/manifest only when that track is active.
+
+The manifest must agree with state, dependencies must be satisfied, and the task must be
+the single `IN_PROGRESS` task.
+
+## S4 — Load bounded context
+
+Read only:
+1. root `AGENTS.md`;
+2. permanent state;
+3. `engineering/MASTER_PLAN.md`;
+4. active manifest;
+5. current handoff;
+6. task-relevant normative/contracts/evidence.
+
+Do not recursively read the whole repository as a startup ritual.
+
+## S5 — Authorize the intended diff
+
+Before writing:
 - intended paths fit `allowed_paths`;
-- intended semantics do not violate `forbidden_scope`;
-- no stop condition is already true.
+- semantics do not enter `forbidden_scope`;
+- no stop condition is true;
+- BUSINESS remains isolated while paused;
+- historical evidence protection remains intact.
 
-If authorization cannot be proved, do not write.
+If authorization is ambiguous, stop rather than broadening scope.
 
-### S5 — Execute minimally
+## S6 — Execute minimally
 
-Implement the current task only. Avoid opportunistic refactors and future-task work.
-Use the cheapest validation tier that can prove the change at the current stage.
+Implement only the active task. Do not opportunistically implement later tasks.
+Use the cheapest validation tier that proves the current change; deep certification belongs
+to later assurance/certification stages.
 
-### S6 — Evidence
+## S7 — Evidence discipline
 
-Separate:
-- summary: prose, handoff, PR text;
-- evidence: exact Git SHA, diff, test output, workflow run, artifact/checksum.
+Keep distinct:
+- summary: handoff, PR text, prose;
+- evidence: exact SHA, diff, command output, workflow run, artifact/checksum.
 
-Never promote work solely from summary text.
+A summary can route work but cannot certify it.
 
-### S7 — Handoff
+## S8 — Handoff
 
-Record:
-- exact work item/task;
-- last verified Git ref;
-- what was completed;
-- unresolved blockers/findings;
-- next exact action;
-- validation already performed and its evidence class.
-
-The next agent re-verifies Git before relying on this handoff.
+Record current task, verified refs, completed work, blockers/findings, exact next action and
+evidence already obtained. A future agent still re-verifies Git before trusting the handoff.
 
 ## STATE_DRIFT conditions
 
 At minimum:
-- canonical main/reference SHA moved without a recorded transition;
-- active branch/ref is missing or unexpectedly diverged;
-- state says one work item but active manifest says another;
-- handoff refers to a different active item or stale ref;
-- dependency previously marked DONE is no longer represented as completed;
-- business development moves while engine state says PAUSED;
-- Lot46 is unlocked during bootstrap;
-- frozen historical evidence is edited.
+- observed main or candidate head differs unexpectedly;
+- active manifest/task disagrees with permanent state;
+- a dependency or completed-lot prefix regresses;
+- BUSINESS changes while its foundation lock is active;
+- Lot46 unlocks without its gate;
+- safety or mandatory-cost policy loosens unexpectedly;
+- frozen historical evidence drifts;
+- a handoff contradicts permanent state.
 
-## Recovery rule
+## Recovery
 
-When drift exists:
-1. stop feature/engine implementation;
-2. inventory the conflicting facts;
-3. prefer immutable evidence for historical facts;
-4. do not overwrite canonical state merely to make validation pass;
-5. create a bounded reconciliation change;
-6. resume only after state and Git agree again.
+1. stop implementation;
+2. inventory conflicting facts;
+3. preserve immutable historical evidence;
+4. do not auto-heal permanent state;
+5. create a bounded reconciliation transition;
+6. resume only after state, Git and validators agree.
 
-## Performance rule
+## Performance
 
-Startup should be O(number of bootstrap control files), not O(repository size).
-The permanent Development Engine may add context routing, but must preserve this property.
+Cold start must remain O(control-plane files), not O(repository size).

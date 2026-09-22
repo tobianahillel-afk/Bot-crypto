@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate repository truth classification and reconciled status views."""
+"""Validate repository truth classification and permanent current-state authority."""
 
 from __future__ import annotations
 
@@ -56,10 +56,11 @@ def validate(registry: dict[str, Any]) -> None:
         raise TruthRegistryError("sources must be non-empty")
 
     ids: set[str] = set()
-    current_state_count = 0
     historical_count = 0
     stale_locators: set[str] = set()
     by_locator: dict[str, dict[str, Any]] = {}
+    current_sources: list[dict[str, Any]] = []
+
     for source in sources:
         if not isinstance(source, dict):
             raise TruthRegistryError("source must be an object")
@@ -69,15 +70,19 @@ def validate(registry: dict[str, Any]) -> None:
         if source_id in ids:
             raise TruthRegistryError(f"duplicate source id: {source_id}")
         ids.add(source_id)
+
         source_type = source.get("type")
         if source_type not in ALLOWED_TYPES:
             raise TruthRegistryError(f"invalid source type: {source_type}")
         locator = source.get("locator")
         if not isinstance(locator, str) or not locator:
             raise TruthRegistryError(f"{source_id}: locator is required")
+        if locator in by_locator:
+            raise TruthRegistryError(f"duplicate source locator: {locator}")
         by_locator[locator] = source
+
         if source_type == "CURRENT_OPERATIONAL_STATE":
-            current_state_count += 1
+            current_sources.append(source)
         if source_type == "IMMUTABLE_HISTORICAL_EVIDENCE":
             historical_count += 1
             if source.get("mutation_policy") != "READ_ONLY_HISTORICAL":
@@ -85,15 +90,28 @@ def validate(registry: dict[str, Any]) -> None:
         if source.get("status") in {"STALE", "PARTIALLY_STALE"}:
             stale_locators.add(locator)
 
-    if current_state_count != 1:
+    if len(current_sources) != 1:
         raise TruthRegistryError("exactly one CURRENT_OPERATIONAL_STATE is required")
+    if current_sources[0].get("locator") != "config/governance/project_state.json":
+        raise TruthRegistryError("permanent project state must be sole current operational state")
+    if not (ROOT / "config/governance/project_state.json").exists():
+        raise TruthRegistryError("permanent project state file is missing")
     if historical_count < 1:
         raise TruthRegistryError("immutable historical evidence is required")
+
+    bridge = by_locator.get("engineering/STATE.json")
+    if bridge is None:
+        raise TruthRegistryError("bootstrap migration bridge must remain registered during ENG-01")
+    if bridge.get("type") != "DERIVED_OR_HUMAN_STATUS_VIEW":
+        raise TruthRegistryError("migration bridge must not be CURRENT_OPERATIONAL_STATE")
+    if bridge.get("status") != "MIGRATION_BRIDGE":
+        raise TruthRegistryError("engineering/STATE.json must be marked MIGRATION_BRIDGE")
 
     declared_stale = set(registry.get("known_drift_targets", []))
     if stale_locators != declared_stale:
         raise TruthRegistryError(
-            f"known_drift_targets mismatch: expected {sorted(stale_locators)}, got {sorted(declared_stale)}"
+            f"known_drift_targets mismatch: expected {sorted(stale_locators)}, "
+            f"got {sorted(declared_stale)}"
         )
     resolved = set(registry.get("resolved_drift_targets", []))
     if declared_stale & resolved:
@@ -112,6 +130,10 @@ def validate(registry: dict[str, Any]) -> None:
         source = by_locator.get(locator)
         if source is None or not str(source.get("status", "")).startswith("RECONCILED_"):
             raise TruthRegistryError(f"{locator}: registry does not mark reconciliation")
+
+    permanent = _json(ROOT / "config/governance/project_state.json")
+    if permanent.get("authority", {}).get("current_state") != "config/governance/project_state.json":
+        raise TruthRegistryError("permanent state does not self-declare current-state authority")
 
     readme = _text("README.md")
     if not readme.startswith("# Crypto Quant Bot V3.1-Ops"):
