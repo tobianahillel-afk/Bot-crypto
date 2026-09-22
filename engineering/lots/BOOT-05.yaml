@@ -1,0 +1,20 @@
+schema_version: 1
+id: BOOT-05
+title: Handoff and Resume
+status: PLANNED
+objective: Make interruption and context loss recoverable without trusting stale summaries.
+depends_on:
+  - BOOT-04
+tasks:
+  - id: BOOT-05.1
+    status: PLANNED
+    description: Define handoff fields and schema.
+  - id: BOOT-05.2
+    status: PLANNED
+    description: Bind handoff to a last verified Git ref.
+  - id: BOOT-05.3
+    status: PLANNED
+    description: Detect stale handoffs.
+  - id: BOOT-05.4
+    status: PLANNED
+    description: Define deterministic recovery sequence.

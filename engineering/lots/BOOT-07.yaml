@@ -1,0 +1,23 @@
+schema_version: 1
+id: BOOT-07
+title: Cold-Start Qualification
+status: PLANNED
+objective: Prove a context-free agent can resume engine work safely and efficiently.
+depends_on:
+  - BOOT-06
+tasks:
+  - id: BOOT-07.1
+    status: PLANNED
+    description: Cold-start continue-engine scenario.
+  - id: BOOT-07.2
+    status: PLANNED
+    description: State-drift and stale-handoff recovery scenario.
+  - id: BOOT-07.3
+    status: PLANNED
+    description: Forbidden Lot46 progression scenario.
+  - id: BOOT-07.4
+    status: PLANNED
+    description: GitHub-only tool-honesty scenario.
+  - id: BOOT-07.5
+    status: PLANNED
+    description: Declare Bootstrap Engine STABLE only if all scenarios pass.

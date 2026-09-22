@@ -1,0 +1,26 @@
+schema_version: 1
+id: BOOT-01
+title: Engineering Master Plan
+status: DONE
+objective: Define the permanent Development Engine roadmap before implementing it.
+depends_on:
+  - BOOT-00
+allowed_paths:
+  - AGENTS.md
+  - engineering/**
+tasks:
+  - id: BOOT-01.1
+    status: DONE
+    description: Define security, performance and zero-cost principles.
+  - id: BOOT-01.2
+    status: DONE
+    description: Define ENG-00 through ENG-09.
+  - id: BOOT-01.3
+    status: DONE
+    description: Subdivide every ENG lot into major sub-lots.
+  - id: BOOT-01.4
+    status: DONE
+    description: Define target validation tiers and business unlock boundary.
+done_when:
+  - ENGINEERING_MASTER_PLAN exists
+  - all permanent engine phases have ordered objectives and major sub-lots

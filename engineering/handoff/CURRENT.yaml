@@ -1,0 +1,42 @@
+schema_version: 1
+handoff_kind: bootstrap_engine_handoff
+
+workstream: BOOTSTRAP_ENGINE
+status: IN_PROGRESS
+
+baseline:
+  main_sha: 390d0779f2be257fa8134faf8f02193a760a09c3
+  engineering_branch: engineering/bootstrap-development-engine
+
+completed:
+  - id: BOOT-00
+    result: exact main/Lot45 separation verified and business hold established
+  - id: BOOT-01
+    result: Development Engine master plan and ENG-00 through ENG-09 decomposition created
+
+current:
+  lot: BOOT-02
+  task: BOOT-02.2
+  objective: define legal bootstrap state transitions and implement cheap consistency semantics
+
+next_actions:
+  - define legal BOOT state transitions
+  - define single-active-work-item invariants
+  - add minimal validator for STATE/manifests
+  - proceed to BOOT-03 manifest standard only after BOOT-02 validates
+
+known_constraints:
+  - do not modify PR66 Lot45 code/evidence as part of bootstrap work
+  - do not start Lot46
+  - do not add mandatory paid or LLM-backed tooling
+  - keep bootstrap validation lightweight
+
+blockers: []
+
+resume_protocol:
+  - read /AGENTS.md
+  - read engineering/STATE.yaml
+  - verify declared Git reality
+  - read engineering/MASTER_PLAN.md
+  - read engineering/lots/BOOT-02.yaml
+  - continue the first incomplete BOOT-02 task

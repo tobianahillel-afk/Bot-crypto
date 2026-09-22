@@ -1,0 +1,23 @@
+schema_version: 1
+id: BOOT-03
+title: Sub-Lot and Work-Item Standard
+status: PLANNED
+objective: Define the minimal bounded manifest used by BOOT and ENG work.
+depends_on:
+  - BOOT-02
+tasks:
+  - id: BOOT-03.1
+    status: PLANNED
+    description: Define required manifest fields.
+  - id: BOOT-03.2
+    status: PLANNED
+    description: Define dependency semantics.
+  - id: BOOT-03.3
+    status: PLANNED
+    description: Define allowed and forbidden path semantics.
+  - id: BOOT-03.4
+    status: PLANNED
+    description: Define task status and completion semantics.
+  - id: BOOT-03.5
+    status: PLANNED
+    description: Add manifest validation.

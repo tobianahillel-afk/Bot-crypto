@@ -1,0 +1,27 @@
+schema_version: 1
+id: BOOT-02
+title: Engineering State
+status: IN_PROGRESS
+objective: Make current, next and forbidden bootstrap work unambiguous and machine-checkable.
+depends_on:
+  - BOOT-01
+allowed_paths:
+  - AGENTS.md
+  - engineering/**
+tasks:
+  - id: BOOT-02.1
+    status: DONE
+    description: Create the minimal canonical bootstrap state fields.
+  - id: BOOT-02.2
+    status: IN_PROGRESS
+    description: Define legal lifecycle transitions and single-active-work invariants.
+  - id: BOOT-02.3
+    status: PLANNED
+    description: Define state/manifest consistency rules.
+  - id: BOOT-02.4
+    status: PLANNED
+    description: Implement a cheap deterministic state validator.
+done_when:
+  - current work is uniquely resolvable
+  - illegal transitions fail closed
+  - state can be validated without heavy project CI
