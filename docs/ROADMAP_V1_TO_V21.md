@@ -1,33 +1,29 @@
 # Roadmap canonique V1 → V21 — Lots 0 à 177
 
-Projet : **Crypto Quant Bot V4.1-Ops**
+Projet : **Crypto Quant Bot V3.1-Ops**
 
 ## État actuel
 
-- Dernier lot dont l'implémentation est terminée et auditée : **Lot 37**.
-- Version courante : `0.37.0`.
-- Baseline P0 institutionnelle : fusionnée.
-- Gate transversal P0.6 : fusionné et conservé comme preuve historique.
-- Lot 26 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
-- Lot 27 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
-- Lot 28 : `IMPLEMENTED_VALIDATED_OFFLINE_DESCRIPTIVE_ONLY`.
-- Lot 29 : `IMPLEMENTED_VALIDATED_OFFLINE_REPLAY_ONLY`.
-- Lot 30 : `IMPLEMENTED_VALIDATED_OFFLINE_CLOSURE_ONLY`.
-- Lot 31 : `IMPLEMENTED_VALIDATED_METADATA_ONLY`.
-- Lot 32 : `IMPLEMENTED_VALIDATED_NORMALIZATION_ONLY`.
-- Lot 33 : `IMPLEMENTED_VALIDATED_TEMPORAL_ONLY`.
-- Lot 34 : `IMPLEMENTED_VALIDATED_DATA_QUALITY_ONLY`.
-- Lot 35 : `IMPLEMENTED_VALIDATED_RECONCILIATION_ONLY`.
-- Lot 36 : `IMPLEMENTED_VALIDATED_V3_CLOSURE_ONLY`.
-- Lot 37 : `IMPLEMENTED_VALIDATED_OFFLINE_SCOPE_CONTRACTS_ONLY`.
-- Lots 38–177 : planifiés et verrouillés.
-- V2 Market Analysis Offline est fermée pour le périmètre Lots 21–30.
-- V3 Market Data Governance est fermée et auditée pour le périmètre Lots 31–36, sans connectivité ni ingestion.
-- V4 est ouverte au Lot 37 uniquement pour le scope et les contrats offline ; aucun moteur Lot38+ n'est activé.
-- Forecast, alpha, paper, sandbox et capital réel : `NO_GO`.
+> L'autorité opérationnelle courante est `engineering/STATE.json`. Cette roadmap reste
+> normative pour l'ordre et le contenu des Lots 0–177 ; son bloc d'état résume la baseline
+> métier fusionnée et ne transforme pas une PR candidate en état certifié.
 
-L'état courant est porté par `data/audit/roadmap_lifecycle_overlay_lot37.json`. Le registre
-`data/audit/product_scope_roadmap_lot21.jsonl` reste une preuve historique immuable.
+- Dernier lot métier fusionné et certifié : **Lot 44 — Trades & Aggressor Classification Schema**.
+- Version de baseline métier : `0.44.0`.
+- Lot 44 : post-merge audit certifié `GO_LOT44_POST_MERGE`.
+- Gate d'implémentation Lot 45 : fusionné, `GO_LOT45_IMPLEMENTATION_ENTRY`.
+- Lot 45 : implémentation candidate dans la PR #66, **non fusionnée** et suspendue pendant la construction du Development Engine.
+- Lot 46 : `LOCKED`.
+- Développement métier : `PAUSED`.
+- V2 Market Analysis Offline : fermée pour les Lots 21–30.
+- V3 Market Data Governance : fermée et auditée pour les Lots 31–36.
+- V4 Microstructure : progression fusionnée/certifiée jusqu'au Lot 44 ; Lot45 n'est pas encore une baseline fusionnée.
+- Forecast, alpha, paper, sandbox, capital réel et live : non autorisés par cette baseline.
+- Runtime maximal : `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY`.
+
+La preuve historique Lot44 et le gate Lot45 certifié prévalent sur les anciens résumés de
+statut. Les preuves historiques restent immuables ; les vues de statut doivent être dérivées
+de l'état canonique à terme.
 
 ## Documents normatifs transverses
 
