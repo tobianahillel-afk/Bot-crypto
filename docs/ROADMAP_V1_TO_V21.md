@@ -335,5 +335,5 @@ timeframes et n'autorise aucune inférence de rendement futur.
 12. Un statut `PLANNED_LOCKED` ou `AWAITING_EXACT_COMMIT_CI` ne peut être promu sans preuve exacte.
 13. V7, V8, V9, V15 et V17 consomment le snapshot, le sizing et les réservations canoniques ; aucune implémentation locale incompatible n'est autorisée.
 14. Tout ordre augmentant le risque exige une réservation atomique active ; toute moyenne à la baisse implicite est interdite.
-15. Lot 37 est limité au scope, aux contrats offline, au registre/matrice de capacités et à l'API publique du domaine Microstructure ; il n'autorise aucune logique Lot38+.
-16. Lot 38 reste `PLANNED_LOCKED` après l'audit post-merge Lot37 jusqu'à un gate d'entrée distinct et une décision humaine explicite.
+15. Le gate Lot37 était limité au scope, aux contrats offline, au registre/matrice de capacités et à l'API publique du domaine Microstructure ; il n'autorisait alors aucune logique Lot38+ sans gate distinct.
+16. Lot38 est resté `PLANNED_LOCKED` après l'audit post-merge Lot37 jusqu'à son gate d'entrée distinct ; cette règle décrit la transition historique et ne re-verrouille pas rétroactivement les Lots 38–44 désormais certifiés.
