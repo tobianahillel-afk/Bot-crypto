@@ -63,7 +63,7 @@ Le Lot 35 ajoute la **réconciliation Candle / Trade / Book** offline : deltas e
 
 Le Lot 36 clôture **V3 Market Data Governance** après audit post-merge indépendant. Il audite freshness/gaps/outages, rejoue exactement les Lots 34 et 35, vérifie la chaîne Lots 31–36 et conserve un manifest d’implémentation historiquement candidat. La certification post-merge porte la release à `0.36.0`, avec 100.00% lignes, 100.00% branches, 83.48% mutation et replay déterministe.
 
-Le Lot 37 ouvre **V4 Microstructure / Liquidity / Game Theory** avec une frontière strictement offline : package `MicrostructureDomain`, six contrats versionnés, registre de contrats, matrice de capacités et API publique minimale. Les artefacts sont liés au source head certifié `59b189e9980772245993a9212b6c8ad5e9a88a00`, avec 100.00% lignes, 100.00% branches et 80.26% mutation. Aucune logique Lot38+ n'est activée : carnet L2, deltas, spread/depth/imbalance, order flow, inférence participant, signal, risque, routing, trading et exécution restent verrouillés.
+Le Lot 37 a ouvert **V4 Microstructure / Liquidity / Game Theory** avec une frontière strictement offline : package `MicrostructureDomain`, six contrats versionnés, registre de contrats, matrice de capacités et API publique minimale. Les artefacts sont liés au source head certifié `59b189e9980772245993a9212b6c8ad5e9a88a00`, avec 100.00% lignes, 100.00% branches et 80.26% mutation. **Au gate Lot37**, aucune logique Lot38+ n'était encore activée ; les lots suivants ont ensuite été ouverts par leurs propres gates.
 
 ## Vision temporelle
 
