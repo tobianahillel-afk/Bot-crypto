@@ -119,8 +119,18 @@ def validate() -> None:
         if engine.get("next_lot") != target_lot:
             raise CanonicalBaselineError("ENG-01 handoff target disagrees with ENG-00 next_lot")
     elif engine.get("active_lot") == "ENG-01":
-        if engine.get("active_task") != target.get("first_task"):
-            raise CanonicalBaselineError("active ENG-01 task disagrees with baseline handoff target")
+        manifest_path = engine.get("active_manifest")
+        if not isinstance(manifest_path, str):
+            raise CanonicalBaselineError("active ENG-01 manifest path is missing")
+        manifest = _load(manifest_path)
+        first_task = target.get("first_task")
+        task_status = {
+            task.get("id"): task.get("status")
+            for task in manifest.get("tasks", [])
+            if isinstance(task, dict)
+        }.get(first_task)
+        if task_status not in {"IN_PROGRESS", "DONE"}:
+            raise CanonicalBaselineError("ENG-01 entry task has not been consumed")
     else:
         completed = engine.get("completed", [])
         if "ENG-01" not in completed:
