@@ -48,6 +48,22 @@ def _git_show_json(ref: str, path: str) -> dict[str, Any]:
     return value
 
 
+def _state_version_commits() -> tuple[str, str]:
+    result = subprocess.run(
+        ["git", "log", "-n", "2", "--format=%H", "--", STATE_PATH],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise StateMachineError(f"cannot resolve state history: {result.stderr.strip()}")
+    commits = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+    if len(commits) < 2:
+        raise StateMachineError("permanent state requires at least two version commits")
+    return commits[0], commits[1]
+
+
 def _manifest_current(state: dict[str, Any]) -> dict[str, Any]:
     path = state.get("engineering_track", {}).get("active_manifest")
     if not isinstance(path, str) or not path:
@@ -234,7 +250,11 @@ def main() -> int:
     try:
         policy = _load_file(POLICY_PATH)
         current = _load_file(ROOT / STATE_PATH)
-        previous = _git_show_json("HEAD^", STATE_PATH)
+        current_commit, previous_commit = _state_version_commits()
+        committed_current = _git_show_json(current_commit, STATE_PATH)
+        if current != committed_current:
+            raise StateMachineError("working tree permanent state differs from latest committed state version")
+        previous = _git_show_json(previous_commit, STATE_PATH)
         validate_current(current, policy)
         validate_transition(previous, current, policy)
     except StateMachineError as exc:
