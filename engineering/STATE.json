@@ -62,7 +62,7 @@
     "phase": "BUILDING",
     "completed": [],
     "active_lot": "ENG-00",
-    "active_task": "ENG-00.4",
+    "active_task": "ENG-00.5",
     "next_lot": "ENG-01",
     "active_manifest": "engineering/lots/ENG-00.json",
     "blockers": []

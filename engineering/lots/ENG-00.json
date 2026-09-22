@@ -44,12 +44,12 @@
     },
     {
       "id": "ENG-00.4",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Define explicit protection boundaries for frozen historical evidence."
     },
     {
       "id": "ENG-00.5",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Produce and validate the canonical baseline consumed by ENG-01."
     }
   ],

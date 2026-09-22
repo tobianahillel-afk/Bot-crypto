@@ -28,8 +28,8 @@
     "BOOT-06 lightweight zero-dependency CI passed",
     "BOOT-07 cold-start qualification passed on workflow run 35776801100"
   ],
-  "current_objective": "ENG-00.4: define explicit protection boundaries for frozen/certified historical evidence.",
-  "next_action": "Create commit-anchored historical evidence protection policy and enforce no protected-path drift on the engineering branch.",
+  "current_objective": "ENG-00.5: produce and validate the canonical baseline consumed by ENG-01.",
+  "next_action": "Create the machine-readable ENG-00 canonical baseline, validate it against current state/design/truth/evidence protection, then close ENG-00.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -55,6 +55,12 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35778141468",
       "note": "Exact head f2de5e4e40e4479742e099beb096688a51f294dc validated permanent multi-track state design."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35792145392",
+      "note": "Exact head e34e07d5818fb1a03363c45ba442dd6f04ee4e26 validated historical evidence protection and all prior governance checks."
     }
   ],
   "stale_when": [
@@ -67,7 +73,7 @@
   ],
   "next_engineering": {
     "active_lot": "ENG-00",
-    "active_task": "ENG-00.4",
+    "active_task": "ENG-00.5",
     "active_manifest": "engineering/lots/ENG-00.json"
   }
 }
