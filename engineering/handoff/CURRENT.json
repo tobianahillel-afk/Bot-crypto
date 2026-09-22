@@ -28,8 +28,8 @@
     "BOOT-06 lightweight zero-dependency CI passed",
     "BOOT-07 cold-start qualification passed on workflow run 35776801100"
   ],
-  "current_objective": "ENG-00 repository truth recovery is active; reconcile identity/version/status drift without touching historical evidence.",
-  "next_action": "Continue DEVELOPMENT_ENGINE ENG-00.2: reconcile the five registered stale status/metadata views.",
+  "current_objective": "ENG-00.3: map current Git, PR and certification reality into the permanent project-state design.",
+  "next_action": "Create and validate the permanent-state design without replacing canonical STATE.json yet.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -43,6 +43,12 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35777380265",
       "note": "Exact head 9986a964a96b9dffc7ab5a1f552af037abe15db5 validated the repository truth registry and all governance gates."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35777868752",
+      "note": "Exact head 21bbb4cac96a9db4b4b1b99ecaa78ca97575ff8c validated all ENG-00.2 reconciled truth views."
     }
   ],
   "stale_when": [
@@ -55,7 +61,7 @@
   ],
   "next_engineering": {
     "active_lot": "ENG-00",
-    "active_task": "ENG-00.2",
+    "active_task": "ENG-00.3",
     "active_manifest": "engineering/lots/ENG-00.json"
   }
 }

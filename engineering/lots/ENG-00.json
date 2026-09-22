@@ -34,12 +34,12 @@
     },
     {
       "id": "ENG-00.2",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Reconcile project identity, version and current-status drift without rewriting historical evidence."
     },
     {
       "id": "ENG-00.3",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Map current Git, PR and certification reality into the permanent-state design."
     },
     {
