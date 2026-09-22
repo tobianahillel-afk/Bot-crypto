@@ -83,9 +83,9 @@
     "split_required": false,
     "split_reasons": [],
     "context_budget": {
-      "max_primary_files": 1,
-      "max_reference_files": 1,
-      "max_total_kib": 64
+      "max_primary_files": 8,
+      "max_reference_files": 8,
+      "max_total_kib": 512
     }
   },
   "validation": {

@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "policy_kind": "awu_context_policy_v1",
+  "executable_statuses": [
+    "READY",
+    "IN_PROGRESS",
+    "DONE"
+  ],
+  "optional_statuses": [
+    "PLANNED",
+    "BLOCKED"
+  ],
+  "budgets_by_risk": {
+    "R0": {
+      "max_primary_files": 8,
+      "max_reference_files": 8,
+      "max_total_kib": 512
+    },
+    "R1": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "R2": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "R3": {
+      "max_primary_files": 12,
+      "max_reference_files": 20,
+      "max_total_kib": 1280
+    }
+  },
+  "always_primary": [
+    "AGENTS.md",
+    "config/governance/project_state.json"
+  ],
+  "always_reference": [
+    "engineering/MASTER_PLAN.md",
+    "engineering/AGENT_PROTOCOL.md"
+  ],
+  "local_input_kinds": [
+    "FILE",
+    "SCHEMA",
+    "CONFIG",
+    "CONTRACT",
+    "TEST",
+    "EVIDENCE",
+    "STATE"
+  ],
+  "rules": [
+    "parent manifest is always primary",
+    "AWU manifest itself is always primary",
+    "repository-local declared inputs are primary",
+    "duplicate context paths are removed preserving first occurrence",
+    "paths escaping repository root are rejected",
+    "actual routed context must fit declared risk budget"
+  ]
+}

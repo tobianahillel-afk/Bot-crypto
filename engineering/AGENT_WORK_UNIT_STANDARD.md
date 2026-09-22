@@ -39,3 +39,7 @@ reviewer discretion.
 ### Risk classification
 
 ENG-02.5 computes the exact minimum class R0–R3 from the AWU factors and scope. R3 covers risk/execution permission and critical risk/execution/OMS/EMS paths; R2 covers security, lineage, maths, state/concurrency, dependencies, cross-domain interfaces, persistence/checksum boundaries, or complexity score >=9; R1 covers production, contracts/configuration and CI topology; otherwise R0. Executable AWUs cannot remain UNCLASSIFIED.
+
+### Context routing
+
+ENG-02.6 assigns exact risk-aware context budgets. Executable AWUs must use the budget for their R0-R3 class; planned unclassified AWUs may defer it. The deterministic route always includes `AGENTS.md`, permanent project state, the parent manifest, the AWU manifest and repository-local input artifacts, plus bounded master-plan/protocol references. Paths escaping the repository are rejected and actual routed bytes/files must fit the budget.

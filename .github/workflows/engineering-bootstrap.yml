@@ -70,6 +70,12 @@ jobs:
       - name: Run AWU risk adversarial self-tests
         run: python scripts/governance/selftest_awu_risk.py
 
+      - name: Validate AWU context routing and budgets
+        run: python scripts/governance/validate_awu_context.py
+
+      - name: Run AWU context adversarial self-tests
+        run: python scripts/governance/selftest_awu_context.py
+
       - name: Validate handoff
         run: python scripts/governance/validate_handoff.py
 
