@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "kind": "bootstrap_work_item",
+  "id": "BOOT-02",
+  "title": "Engineering State",
+  "status": "IN_PROGRESS",
+  "objective": "Make current, next and forbidden bootstrap work unambiguous and machine-checkable.",
+  "depends_on": [
+    "BOOT-01"
+  ],
+  "allowed_paths": [
+    "AGENTS.md",
+    "engineering/**",
+    "scripts/governance/validate_bootstrap_state.py"
+  ],
+  "forbidden_scope": [
+    "Lot45 implementation changes",
+    "Lot46 implementation",
+    "frozen historical evidence mutation",
+    "mandatory paid or LLM-backed dependency"
+  ],
+  "tasks": [
+    {
+      "id": "BOOT-02.1",
+      "status": "DONE",
+      "description": "Create the minimal canonical bootstrap state fields."
+    },
+    {
+      "id": "BOOT-02.2",
+      "status": "DONE",
+      "description": "Define legal lifecycle transitions and single-active-work invariants."
+    },
+    {
+      "id": "BOOT-02.3",
+      "status": "DONE",
+      "description": "Define and enforce state/manifest consistency rules."
+    },
+    {
+      "id": "BOOT-02.4",
+      "status": "IN_PROGRESS",
+      "description": "Implement and validate a cheap deterministic standard-library state validator."
+    }
+  ],
+  "done_when": [
+    "current work is uniquely resolvable",
+    "illegal transitions fail closed",
+    "state and active manifest agree",
+    "state validates without heavy project CI or third-party parser"
+  ]
+}

@@ -2,8 +2,7 @@
 """Cheap fail-closed validator for the Bootstrap Engineering Engine state.
 
 This script intentionally uses only the Python 3.11 standard library.
-It validates bootstrap-level invariants only; work-item manifest validation
-is completed by the BOOT-03/BOOT-06 layers.
+It validates the canonical bootstrap state and its active work-item manifest.
 """
 
 from __future__ import annotations
@@ -16,6 +15,9 @@ from pathlib import Path
 from typing import Any
 
 SHA40_RE = re.compile(r"^[0-9a-f]{40}$")
+WORK_ID_RE = re.compile(r"^BOOT-\d{2}$")
+TASK_ID_RE = re.compile(r"^(BOOT-\d{2})\.(\d+)$")
+ALLOWED_TASK_STATUSES = {"PLANNED", "IN_PROGRESS", "BLOCKED", "DONE"}
 
 
 class BootstrapStateError(ValueError):
@@ -43,7 +45,87 @@ def _require_false(mapping: dict[str, Any], key: str, where: str) -> None:
         raise BootstrapStateError(f"{where}.{key} must be false")
 
 
-def validate_state(state: dict[str, Any], policy: dict[str, Any]) -> None:
+def _validate_active_manifest(
+    state: dict[str, Any],
+    manifest: dict[str, Any],
+) -> None:
+    engine = _require(state, "bootstrap_engine", "state")
+    active_lot = _require(engine, "active_lot", "bootstrap_engine")
+    active_task = _require(engine, "active_task", "bootstrap_engine")
+
+    if manifest.get("schema_version") != 1:
+        raise BootstrapStateError("unsupported active manifest schema_version")
+    if manifest.get("kind") != "bootstrap_work_item":
+        raise BootstrapStateError("active manifest kind must be bootstrap_work_item")
+    if manifest.get("id") != active_lot:
+        raise BootstrapStateError(
+            f"active manifest id {manifest.get('id')!r} does not match active_lot {active_lot!r}"
+        )
+    if not WORK_ID_RE.fullmatch(str(active_lot)):
+        raise BootstrapStateError(f"invalid active_lot id: {active_lot!r}")
+    if manifest.get("status") != "IN_PROGRESS":
+        raise BootstrapStateError("active manifest must be IN_PROGRESS while bootstrap is BUILDING")
+
+    dependencies = manifest.get("depends_on")
+    if not isinstance(dependencies, list) or any(not isinstance(item, str) for item in dependencies):
+        raise BootstrapStateError("active manifest depends_on must be a list of work-item ids")
+    completed_lots = engine.get("completed", [])
+    missing_dependencies = [item for item in dependencies if item not in completed_lots]
+    if missing_dependencies:
+        raise BootstrapStateError(
+            f"active manifest dependencies are not completed: {missing_dependencies}"
+        )
+
+    allowed_paths = manifest.get("allowed_paths")
+    if not isinstance(allowed_paths, list) or not allowed_paths:
+        raise BootstrapStateError("active manifest must declare at least one allowed path")
+
+    tasks = manifest.get("tasks")
+    if not isinstance(tasks, list) or not tasks:
+        raise BootstrapStateError("active manifest must declare tasks")
+
+    task_ids: list[str] = []
+    in_progress: list[str] = []
+    seen_planned_or_active = False
+    for index, task in enumerate(tasks):
+        if not isinstance(task, dict):
+            raise BootstrapStateError(f"task at index {index} must be an object")
+        task_id = task.get("id")
+        status = task.get("status")
+        match = TASK_ID_RE.fullmatch(str(task_id))
+        if match is None or match.group(1) != active_lot:
+            raise BootstrapStateError(f"task id {task_id!r} does not belong to {active_lot}")
+        if task_id in task_ids:
+            raise BootstrapStateError(f"duplicate task id: {task_id}")
+        task_ids.append(task_id)
+
+        if status not in ALLOWED_TASK_STATUSES:
+            raise BootstrapStateError(f"invalid status {status!r} for {task_id}")
+        if status == "IN_PROGRESS":
+            in_progress.append(task_id)
+
+        if status == "DONE":
+            if seen_planned_or_active:
+                raise BootstrapStateError(
+                    f"DONE task {task_id} appears after unfinished work; task order is inconsistent"
+                )
+        else:
+            seen_planned_or_active = True
+
+    if in_progress != [active_task]:
+        raise BootstrapStateError(
+            f"exactly active_task must be IN_PROGRESS: expected {[active_task]}, got {in_progress}"
+        )
+
+    if active_task not in task_ids:
+        raise BootstrapStateError(f"active_task {active_task!r} is absent from active manifest")
+
+
+def validate_state(
+    state: dict[str, Any],
+    policy: dict[str, Any],
+    manifest: dict[str, Any],
+) -> None:
     if state.get("schema_version") != 1:
         raise BootstrapStateError("unsupported state schema_version")
     if state.get("state_kind") != "bootstrap_engine_state":
@@ -136,6 +218,8 @@ def validate_state(state: dict[str, Any], policy: dict[str, Any]) -> None:
     if missing:
         raise BootstrapStateError(f"missing mandatory stop conditions: {missing}")
 
+    _validate_active_manifest(state, manifest)
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -150,12 +234,26 @@ def main() -> int:
         type=Path,
         default=root / "engineering" / "STATE_TRANSITIONS.json",
     )
+    parser.add_argument(
+        "--manifest",
+        type=Path,
+        default=None,
+        help="Override active manifest path; defaults to bootstrap_engine.active_manifest.",
+    )
     args = parser.parse_args()
 
     try:
         state = _load_json(args.state)
         policy = _load_json(args.policy)
-        validate_state(state, policy)
+        engine = _require(state, "bootstrap_engine", "state")
+        manifest_path = args.manifest
+        if manifest_path is None:
+            declared_manifest = _require(engine, "active_manifest", "bootstrap_engine")
+            if not isinstance(declared_manifest, str):
+                raise BootstrapStateError("bootstrap_engine.active_manifest must be a path")
+            manifest_path = root / declared_manifest
+        manifest = _load_json(manifest_path)
+        validate_state(state, policy, manifest)
     except BootstrapStateError as exc:
         print(f"BOOTSTRAP_STATE_INVALID: {exc}", file=sys.stderr)
         return 1

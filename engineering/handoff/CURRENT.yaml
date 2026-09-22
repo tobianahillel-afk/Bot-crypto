@@ -15,17 +15,19 @@ completed:
     result: Development Engine master plan and ENG-00 through ENG-09 decomposition created
   - id: BOOT-02.2
     result: legal bootstrap ordering, lifecycle transitions and single-active-work invariants defined
+  - id: BOOT-02.3
+    result: active state is explicitly bound to a machine-readable active manifest
 
 current:
   lot: BOOT-02
-  task: BOOT-02.3
-  objective: complete state/manifest consistency semantics before declaring BOOT-02 done
+  task: BOOT-02.4
+  objective: validate the state/manifest contract with the standard-library-only validator
 
 next_actions:
-  - bind active state to the matching work-item manifest
-  - define manifest consistency checks without adding a runtime dependency
-  - finalize the cheap validator for BOOT-02
-  - proceed to BOOT-03 only after BOOT-02 validates
+  - execute/check the bootstrap validator against STATE.json and BOOT-02.json
+  - fix any fail-closed validation defect
+  - mark BOOT-02 DONE only after the validator passes
+  - then activate BOOT-03 work-item standardization
 
 known_constraints:
   - do not modify PR66 Lot45 code/evidence as part of bootstrap work
@@ -40,5 +42,5 @@ resume_protocol:
   - read engineering/STATE.json
   - verify declared Git reality
   - read engineering/MASTER_PLAN.md
-  - read engineering/lots/BOOT-02.yaml
-  - continue the first incomplete BOOT-02 task
+  - read engineering/lots/BOOT-02.json
+  - continue BOOT-02.4

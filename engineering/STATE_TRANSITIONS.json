@@ -38,6 +38,10 @@
     "business_development_paused_while_building": true,
     "lot46_locked_while_building": true,
     "mandatory_paid_dependencies_forbidden": true,
-    "trading_execution_remain_disabled": true
+    "trading_execution_remain_disabled": true,
+    "active_manifest_must_match_active_lot": true,
+    "exactly_one_in_progress_task": true,
+    "active_task_must_match_manifest": true,
+    "dependencies_must_be_completed": true
   }
 }
