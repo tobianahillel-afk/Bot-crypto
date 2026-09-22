@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "state_kind": "project_state_v1",
+  "project": {
+    "canonical_name": "Crypto Quant Bot V3.1-Ops",
+    "repository": "tobianahillel-afk/Bot-crypto"
+  },
+  "business_track": {
+    "development_status": "PAUSED",
+    "merged_certified_baseline": {
+      "lot": 44,
+      "version": "0.44.0",
+      "verdict": "GO_LOT44_POST_MERGE",
+      "source_head": "d3cc4cf916ecea5166716746143a593f01b1d051",
+      "implementation_merge": "5c5d3c388abaf10e2e81593a6a3918375a0c0e19",
+      "post_merge_audit_pr": 64,
+      "post_merge_audit_head": "0ddf2c3150b339b8573fead8c942c4b1efa4b300",
+      "post_merge_audit_merge": "1fd85f26102f94d4c42a8f515b522c23028bac89"
+    },
+    "merged_entry_gate": {
+      "target_lot": 45,
+      "verdict": "GO_LOT45_IMPLEMENTATION_ENTRY",
+      "pr": 65,
+      "pr_head": "36a575f2f27da07625875b6fbb579aa75fe4d429",
+      "merge": "390d0779f2be257fa8134faf8f02193a760a09c3"
+    },
+    "candidate": {
+      "lot": 45,
+      "pr": 66,
+      "branch": "agent/lot45-order-flow-delta-cvd-engine-v2",
+      "observed_head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+      "state": "OPEN",
+      "merged": false,
+      "status": "SUSPENDED_CANDIDATE"
+    },
+    "next_lot": {
+      "lot": 46,
+      "status": "LOCKED"
+    }
+  },
+  "engineering_track": {
+    "phase": "BUILDING",
+    "completed": [
+      "ENG-00"
+    ],
+    "active_lot": "ENG-01",
+    "active_task": "ENG-01.2",
+    "next_lot": "ENG-02",
+    "active_manifest": "engineering/lots/ENG-01.json",
+    "branch": "engineering/bootstrap-development-engine",
+    "blockers": []
+  },
+  "audit_track": {
+    "phase": "NOT_STARTED",
+    "completed": [],
+    "active_batch": null,
+    "active_task": null,
+    "next_batch": null,
+    "active_manifest": null,
+    "blockers": []
+  },
+  "safety": {
+    "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED",
+    "leverage": "FORBIDDEN",
+    "withdrawals": "FORBIDDEN"
+  },
+  "cost_policy": {
+    "paid_external_api_required": false,
+    "paid_llm_required": false,
+    "paid_saas_required": false,
+    "paid_runner_required": false
+  },
+  "authority": {
+    "current_state": "config/governance/project_state.json",
+    "canonical_baseline": "engineering/CANONICAL_BASELINE.json",
+    "repository_truth_registry": "engineering/REPOSITORY_TRUTH_REGISTRY.json",
+    "historical_evidence_protection": "engineering/HISTORICAL_EVIDENCE_PROTECTION.json",
+    "master_plan": "engineering/MASTER_PLAN.md",
+    "active_manifest": "engineering/lots/ENG-01.json"
+  },
+  "external_observations": {
+    "main": {
+      "sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+      "branch_protected": false
+    },
+    "rulesets_count": 0,
+    "business_candidate": {
+      "pr": 66,
+      "state": "open",
+      "merged": false,
+      "head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+      "base": "390d0779f2be257fa8134faf8f02193a760a09c3"
+    }
+  },
+  "findings": [
+    {
+      "id": "BOOT-FINDING-001",
+      "severity": "HIGH",
+      "code": "MAIN_BRANCH_UNPROTECTED",
+      "observed": true,
+      "impact": "Direct pushes or unreviewed changes to main are not prevented by branch protection.",
+      "remediation_target": "ENG-04.6",
+      "must_be_resolved_before": "BUSINESS_DEVELOPMENT_UNLOCK"
+    }
+  ],
+  "stop_conditions": [
+    "STATE_DRIFT",
+    "BUSINESS_SCOPE_TOUCHED_WITHOUT_UNLOCK",
+    "FROZEN_EVIDENCE_MUTATION",
+    "LOT46_UNLOCK_ATTEMPT",
+    "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
+  ],
+  "freshness_policy": {
+    "verify_external_git_on_every_agent_resume": true,
+    "auto_heal_state_from_external_git": false,
+    "mismatch_consequence": "STATE_DRIFT"
+  }
+}
