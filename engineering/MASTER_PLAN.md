@@ -29,7 +29,7 @@ At bootstrap start:
 - Lot46: locked;
 - business development: paused while the engineering foundation is built.
 
-This section is descriptive. `engineering/STATE.yaml` is the current bootstrap state authority.
+This section is descriptive. `engineering/STATE.json` is the current bootstrap state authority.
 
 # Phase A — Bootstrap Engine
 

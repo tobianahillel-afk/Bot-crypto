@@ -8,20 +8,22 @@ depends_on:
 allowed_paths:
   - AGENTS.md
   - engineering/**
+  - scripts/governance/validate_bootstrap_state.py
 tasks:
   - id: BOOT-02.1
     status: DONE
     description: Create the minimal canonical bootstrap state fields.
   - id: BOOT-02.2
-    status: IN_PROGRESS
+    status: DONE
     description: Define legal lifecycle transitions and single-active-work invariants.
   - id: BOOT-02.3
-    status: PLANNED
-    description: Define state/manifest consistency rules.
+    status: IN_PROGRESS
+    description: Define and enforce state/manifest consistency rules.
   - id: BOOT-02.4
-    status: PLANNED
-    description: Implement a cheap deterministic state validator.
+    status: IN_PROGRESS
+    description: Implement a cheap deterministic standard-library state validator.
 done_when:
   - current work is uniquely resolvable
   - illegal transitions fail closed
-  - state can be validated without heavy project CI
+  - state and active manifest agree
+  - state can be validated without heavy project CI or third-party parser

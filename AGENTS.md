@@ -15,7 +15,7 @@ The repository is currently building its permanent Development Engine.
 
 Before any implementation work:
 
-1. Read `engineering/STATE.yaml`.
+1. Read `engineering/STATE.json`.
 2. Read `engineering/MASTER_PLAN.md`.
 3. Read `engineering/handoff/CURRENT.yaml`.
 4. Read the manifest for the active BOOT/ENG work item.
@@ -26,7 +26,7 @@ Do **not** infer the next task from README text, an old PR description, chat his
 
 ## 3. Business-development hold
 
-While `engineering/STATE.yaml` declares `business_development: PAUSED`:
+While `engineering/STATE.json` declares `business_development: PAUSED`:
 
 - do not merge or extend Lot45 as part of engineering-engine work;
 - do not start Lot46;
@@ -38,7 +38,7 @@ Lot44 is the current merged certified business baseline. PR #66 is a separate Lo
 ## 4. Source-of-truth precedence during bootstrap
 
 1. Frozen historical evidence for facts about past certification.
-2. `engineering/STATE.yaml` for current engineering/bootstrap state.
+2. `engineering/STATE.json` for current engineering/bootstrap state.
 3. Active work-item manifest for allowed current work.
 4. Normative project standards in `docs/`.
 5. `engineering/MASTER_PLAN.md` for planned engineering sequence.

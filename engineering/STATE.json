@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "state_kind": "bootstrap_engine_state",
+  "project": {
+    "canonical_name": "Crypto Quant Bot V3.1-Ops",
+    "repository": "tobianahillel-afk/Bot-crypto"
+  },
+  "observed_git_baseline": {
+    "default_branch": "main",
+    "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "verified_at_utc": "2026-09-22T19:19:32Z"
+  },
+  "business_track": {
+    "business_development": "PAUSED",
+    "last_merged_certified_lot": 44,
+    "active_candidate": {
+      "lot": 45,
+      "pull_request": 66,
+      "branch": "agent/lot45-order-flow-delta-cvd-engine-v2",
+      "observed_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+      "status": "SUSPENDED_CANDIDATE"
+    },
+    "next_lot": {
+      "lot": 46,
+      "status": "LOCKED"
+    }
+  },
+  "safety": {
+    "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED",
+    "leverage": "FORBIDDEN",
+    "withdrawals": "FORBIDDEN"
+  },
+  "bootstrap_engine": {
+    "phase": "BUILDING",
+    "branch": "engineering/bootstrap-development-engine",
+    "completed": [
+      "BOOT-00",
+      "BOOT-01"
+    ],
+    "active_lot": "BOOT-02",
+    "active_task": "BOOT-02.3",
+    "next_lot": "BOOT-03",
+    "blockers": []
+  },
+  "mandatory_cost_policy": {
+    "paid_external_api_required": false,
+    "paid_llm_required": false,
+    "paid_saas_required": false,
+    "paid_runner_required": false
+  },
+  "authority": {
+    "current_state": "engineering/STATE.json",
+    "transition_policy": "engineering/STATE_TRANSITIONS.json",
+    "master_plan": "engineering/MASTER_PLAN.md",
+    "handoff": "engineering/handoff/CURRENT.yaml",
+    "bootstrap_protocol": "engineering/BOOTSTRAP.md"
+  },
+  "stop_conditions": [
+    "STATE_DRIFT",
+    "BUSINESS_SCOPE_TOUCHED_WITHOUT_UNLOCK",
+    "FROZEN_EVIDENCE_MUTATION",
+    "LOT46_UNLOCK_ATTEMPT",
+    "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
+  ]
+}

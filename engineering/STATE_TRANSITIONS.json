@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "bootstrap_order": [
+    "BOOT-00",
+    "BOOT-01",
+    "BOOT-02",
+    "BOOT-03",
+    "BOOT-04",
+    "BOOT-05",
+    "BOOT-06",
+    "BOOT-07"
+  ],
+  "phase_transitions": {
+    "BUILDING": [
+      "STABLE"
+    ],
+    "STABLE": []
+  },
+  "work_status_transitions": {
+    "PLANNED": [
+      "IN_PROGRESS",
+      "BLOCKED"
+    ],
+    "IN_PROGRESS": [
+      "DONE",
+      "BLOCKED"
+    ],
+    "BLOCKED": [
+      "IN_PROGRESS"
+    ],
+    "DONE": []
+  },
+  "invariants": {
+    "one_active_lot_while_building": true,
+    "completed_lots_must_be_strict_prefix": true,
+    "active_lot_must_follow_completed_prefix": true,
+    "next_lot_must_follow_active_lot": true,
+    "business_development_paused_while_building": true,
+    "lot46_locked_while_building": true,
+    "mandatory_paid_dependencies_forbidden": true,
+    "trading_execution_remain_disabled": true
+  }
+}
