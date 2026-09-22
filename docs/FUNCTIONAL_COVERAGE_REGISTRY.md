@@ -8,12 +8,16 @@
 
 ## Couverture par version
 
+> Statut courant dérivé de la baseline métier fusionnée : Lot44 certifié. Le gate Lot45 est
+> fusionné mais son implémentation reste candidate/non fusionnée. Pour l'autorisation de
+> travail courante, consulter `engineering/STATE.json`.
+
 | Version | Lots | Owner | Package | Mode maximal | Statut |
 |---:|---:|---|---|---|---|
 | V1 | 0–20 | `SafetyKernel` | `core` | `EDUCATIONAL_AUDIT_ONLY` | DONE_VALIDATED |
-| V2 | 21–30 | `MarketAnalysisDomain` | `market_analysis` | `LOCAL_OFFLINE_ANALYSIS_ONLY` | ACTIVE_PARTIAL |
-| V3 | 31–36 | `MarketDataGovernanceDomain` | `data_governance` | `DATA_GOVERNANCE_ONLY` | PLANNED_LOCKED |
-| V4 | 37–52 | `MicrostructureDomain` | `microstructure` | `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY` | PLANNED_LOCKED |
+| V2 | 21–30 | `MarketAnalysisDomain` | `market_analysis` | `LOCAL_OFFLINE_ANALYSIS_ONLY` | DONE_VALIDATED |
+| V3 | 31–36 | `MarketDataGovernanceDomain` | `data_governance` | `DATA_GOVERNANCE_ONLY` | DONE_VALIDATED |
+| V4 | 37–52 | `MicrostructureDomain` | `microstructure` | `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY` | ACTIVE_PARTIAL_THROUGH_LOT44 |
 | V5 | 53–59 | `StrategyResearchDomain` | `strategy_research` | `OFFLINE_STRATEGY_RESEARCH_ONLY` | PLANNED_LOCKED |
 | V6 | 60–71 | `BacktestDomain` | `backtesting` | `BACKTEST_ONLY` | PLANNED_LOCKED |
 | V7 | 72–80 | `RiskDomain` | `risk` | `RISK_SIMULATION_ONLY` | PLANNED_LOCKED |
