@@ -28,8 +28,8 @@
     "BOOT-06 lightweight zero-dependency CI passed",
     "BOOT-07 cold-start qualification passed on workflow run 35776801100"
   ],
-  "current_objective": "Bootstrap Engine is STABLE and hands off permanent-engine construction to ENG-00.",
-  "next_action": "Read canonical state and continue DEVELOPMENT_ENGINE ENG-00.1.",
+  "current_objective": "ENG-00 repository truth recovery is active; reconcile identity/version/status drift without touching historical evidence.",
+  "next_action": "Continue DEVELOPMENT_ENGINE ENG-00.2: reconcile the five registered stale status/metadata views.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -37,6 +37,12 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35776801100",
       "note": "Exact head 8cf72a4008e2984189652782e9d8c3697f88cef0 passed all governance and cold-start checks."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35777380265",
+      "note": "Exact head 9986a964a96b9dffc7ab5a1f552af037abe15db5 validated the repository truth registry and all governance gates."
     }
   ],
   "stale_when": [
@@ -49,7 +55,7 @@
   ],
   "next_engineering": {
     "active_lot": "ENG-00",
-    "active_task": "ENG-00.1",
+    "active_task": "ENG-00.2",
     "active_manifest": "engineering/lots/ENG-00.json"
   }
 }

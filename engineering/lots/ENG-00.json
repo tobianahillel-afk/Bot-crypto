@@ -29,12 +29,12 @@
   "tasks": [
     {
       "id": "ENG-00.1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Inventory and classify authoritative, normative, generated and stale repository truth sources."
     },
     {
       "id": "ENG-00.2",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Reconcile project identity, version and current-status drift without rewriting historical evidence."
     },
     {
