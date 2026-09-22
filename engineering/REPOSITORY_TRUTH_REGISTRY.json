@@ -1,0 +1,284 @@
+{
+  "schema_version": 1,
+  "registry_kind": "repository_truth_registry",
+  "project": "Crypto Quant Bot V3.1-Ops",
+  "inventory_scope": {
+    "engineering_task": "ENG-00.1",
+    "observed_main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "observed_at_utc": "2026-09-22T19:34:25Z",
+    "rule": "Classify truth sources without rewriting historical evidence or business implementation."
+  },
+  "precedence": [
+    "IMMUTABLE_HISTORICAL_EVIDENCE",
+    "CURRENT_OPERATIONAL_STATE",
+    "NORMATIVE_POLICY",
+    "CERTIFIED_GATE_STATE",
+    "DERIVED_OR_HUMAN_STATUS_VIEW",
+    "CANDIDATE_OR_PR_CONTEXT"
+  ],
+  "sources": [
+    {
+      "id": "TRUTH-CURRENT-STATE",
+      "type": "CURRENT_OPERATIONAL_STATE",
+      "locator": "engineering/STATE.json",
+      "authority_for": [
+        "current active development track",
+        "current active work item",
+        "business pause",
+        "Lot45 candidate pointer",
+        "Lot46 lock",
+        "runtime safety locks"
+      ],
+      "not_authority_for": [
+        "historical certification facts independent of recorded evidence"
+      ],
+      "mutation_policy": "CONTROLLED_STATE_TRANSITION",
+      "status": "CURRENT"
+    },
+    {
+      "id": "TRUTH-PROJECT-IDENTITY",
+      "type": "NORMATIVE_POLICY",
+      "locator": "docs/PROJECT_IDENTITY.md",
+      "authority_for": [
+        "canonical project name",
+        "project continuity"
+      ],
+      "not_authority_for": [
+        "current lot number",
+        "current Git head"
+      ],
+      "mutation_policy": "NORMATIVE_CHANGE_REQUIRES_EXPLICIT_GOVERNANCE",
+      "status": "CURRENT"
+    },
+    {
+      "id": "TRUTH-MASTER-SPEC",
+      "type": "NORMATIVE_POLICY",
+      "locator": "docs/MASTER_SYSTEM_SPECIFICATION.md",
+      "authority_for": [
+        "system philosophy",
+        "safety defaults",
+        "canonical functional chain",
+        "non-negotiable system rules"
+      ],
+      "not_authority_for": [
+        "current implementation progress"
+      ],
+      "mutation_policy": "NORMATIVE_CHANGE_REQUIRES_EXPLICIT_GOVERNANCE",
+      "status": "CURRENT"
+    },
+    {
+      "id": "TRUTH-ENGINEERING-STANDARD",
+      "type": "NORMATIVE_POLICY",
+      "locator": "docs/DEVELOPMENT_ENGINEERING_STANDARD.md",
+      "authority_for": [
+        "engineering quality rules",
+        "complexity bounds",
+        "dependency rules"
+      ],
+      "not_authority_for": [
+        "current work item"
+      ],
+      "mutation_policy": "NORMATIVE_CHANGE_REQUIRES_EXPLICIT_GOVERNANCE",
+      "status": "CURRENT"
+    },
+    {
+      "id": "TRUTH-FINAL-AUDIT-STANDARD",
+      "type": "NORMATIVE_POLICY",
+      "locator": "docs/LOT_FINAL_AUDIT_AND_GO_NO_GO_GATE.md",
+      "authority_for": [
+        "lot GO/NO-GO semantics",
+        "audit requirements"
+      ],
+      "not_authority_for": [
+        "whether a specific current lot has actually passed"
+      ],
+      "mutation_policy": "NORMATIVE_CHANGE_REQUIRES_EXPLICIT_GOVERNANCE",
+      "status": "CURRENT"
+    },
+    {
+      "id": "TRUTH-LOT44-POST-MERGE",
+      "type": "IMMUTABLE_HISTORICAL_EVIDENCE",
+      "locator": "git:1fd85f26102f94d4c42a8f515b522c23028bac89",
+      "authority_for": [
+        "Lot44 post-merge certification merge",
+        "GO_LOT44_POST_MERGE historical prerequisite"
+      ],
+      "evidence_refs": [
+        "scripts/validate_lot44_post_merge.py",
+        ".github/workflows/lot44-post-merge-audit.yml",
+        "data/audit/trades_and_aggressor_classification_schema_lot44.json",
+        "data/audit/trades_and_aggressor_classification_schema_audit_lot44.json",
+        "reports/lot44/coverage_summary.json",
+        "reports/lot44/mutation_summary.json"
+      ],
+      "mutation_policy": "READ_ONLY_HISTORICAL",
+      "status": "CERTIFIED"
+    },
+    {
+      "id": "TRUTH-LOT45-ENTRY-GATE",
+      "type": "CERTIFIED_GATE_STATE",
+      "locator": "data/audit/lot45_v4_entry_gate.json",
+      "authority_for": [
+        "Lot45 implementation entry authorization",
+        "Lot45 scope",
+        "Lot45 runtime",
+        "Lot46 downstream lock at gate"
+      ],
+      "evidence_refs": [
+        "docs/LOT_45_V4_ENTRY_GATE.md",
+        "reports/lot_45_v4_entry_gate_report.md",
+        "git:390d0779f2be257fa8134faf8f02193a760a09c3"
+      ],
+      "mutation_policy": "READ_ONLY_CERTIFIED_GATE",
+      "status": "CERTIFIED"
+    },
+    {
+      "id": "TRUTH-SAFETY-MATRIX",
+      "type": "NORMATIVE_POLICY",
+      "locator": "config/module_status_matrix.yaml",
+      "authority_for": [
+        "baseline forbidden live execution",
+        "leverage prohibition",
+        "withdrawal prohibition"
+      ],
+      "not_authority_for": [
+        "current business lot progress"
+      ],
+      "mutation_policy": "SAFETY_GOVERNED",
+      "status": "CURRENT"
+    },
+    {
+      "id": "VIEW-README",
+      "type": "DERIVED_OR_HUMAN_STATUS_VIEW",
+      "locator": "README.md",
+      "authority_for": [
+        "human overview only"
+      ],
+      "not_authority_for": [
+        "canonical project identity",
+        "current lot",
+        "current version",
+        "next authorized work"
+      ],
+      "observed_drift": [
+        "title says V4.1-Ops",
+        "current status says Lot37/version 0.37.0/next Lot38"
+      ],
+      "mutation_policy": "RECONCILE_IN_ENG-00.2_THEN_GENERATE",
+      "status": "STALE"
+    },
+    {
+      "id": "VIEW-ROADMAP-STATUS",
+      "type": "DERIVED_OR_HUMAN_STATUS_VIEW",
+      "locator": "docs/ROADMAP_V1_TO_V21.md",
+      "authority_for": [
+        "planned V1-V21 lot decomposition except stale current-status assertions"
+      ],
+      "not_authority_for": [
+        "canonical project identity label in header",
+        "current implementation status block"
+      ],
+      "observed_drift": [
+        "header says V4.1-Ops",
+        "state block stops at Lot37 and locks Lots38-177"
+      ],
+      "mutation_policy": "PRESERVE_ROADMAP_STRUCTURE_RECONCILE_STATUS_IN_ENG-00.2",
+      "status": "PARTIALLY_STALE"
+    },
+    {
+      "id": "VIEW-PACKAGE-METADATA",
+      "type": "DERIVED_OR_HUMAN_STATUS_VIEW",
+      "locator": "pyproject.toml",
+      "authority_for": [
+        "Python package/tool configuration",
+        "declared package version until release metadata is reconciled"
+      ],
+      "not_authority_for": [
+        "canonical product identity",
+        "current certified lot"
+      ],
+      "observed_drift": [
+        "version is 0.43.0",
+        "description says V4.1-Ops and Lot43"
+      ],
+      "mutation_policy": "RECONCILE_METADATA_IN_ENG-00.2",
+      "status": "PARTIALLY_STALE"
+    },
+    {
+      "id": "VIEW-FUNCTIONAL-COVERAGE",
+      "type": "DERIVED_OR_HUMAN_STATUS_VIEW",
+      "locator": "docs/FUNCTIONAL_COVERAGE_REGISTRY.md",
+      "authority_for": [
+        "intended domain/version ownership mapping"
+      ],
+      "not_authority_for": [
+        "current completion status"
+      ],
+      "observed_drift": [
+        "V2 marked ACTIVE_PARTIAL",
+        "V3 and V4 marked PLANNED_LOCKED despite later certified work"
+      ],
+      "mutation_policy": "RECONCILE_STATUS_IN_ENG-00.2",
+      "status": "PARTIALLY_STALE"
+    },
+    {
+      "id": "VIEW-SYSTEM-EXECUTION-STATE",
+      "type": "DERIVED_OR_HUMAN_STATUS_VIEW",
+      "locator": "docs/SYSTEM_EXECUTION_ARCHITECTURE.md",
+      "authority_for": [
+        "target execution architecture and ownership chain"
+      ],
+      "not_authority_for": [
+        "section 8 current implementation state"
+      ],
+      "observed_drift": [
+        "section 8 says Lots0-25 only and Lot26/order-book non-implemented"
+      ],
+      "mutation_policy": "RECONCILE_STATUS_ONLY_IN_ENG-00.2",
+      "status": "PARTIALLY_STALE"
+    },
+    {
+      "id": "GIT-MAIN",
+      "type": "EXTERNAL_GIT_REALITY",
+      "locator": "github:refs/heads/main",
+      "authority_for": [
+        "actual merged repository head"
+      ],
+      "observed_value": "390d0779f2be257fa8134faf8f02193a760a09c3",
+      "mutation_policy": "EXTERNAL_OBSERVATION",
+      "status": "CURRENT"
+    },
+    {
+      "id": "GIT-LOT45-CANDIDATE",
+      "type": "CANDIDATE_OR_PR_CONTEXT",
+      "locator": "github:pull/66",
+      "authority_for": [
+        "current unmerged Lot45 candidate ref and PR state"
+      ],
+      "observed_value": {
+        "state": "open",
+        "merged": false,
+        "head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+        "base": "390d0779f2be257fa8134faf8f02193a760a09c3"
+      },
+      "not_authority_for": [
+        "merged certified business state"
+      ],
+      "mutation_policy": "ISOLATED_WHILE_BUSINESS_PAUSED",
+      "status": "SUSPENDED_CANDIDATE"
+    }
+  ],
+  "known_drift_targets": [
+    "README.md",
+    "docs/ROADMAP_V1_TO_V21.md",
+    "pyproject.toml",
+    "docs/FUNCTIONAL_COVERAGE_REGISTRY.md",
+    "docs/SYSTEM_EXECUTION_ARCHITECTURE.md"
+  ],
+  "invariants": [
+    "historical evidence is never rewritten merely to match current status",
+    "current operational state does not retroactively redefine past certifications",
+    "human-readable status views cannot outrank canonical operational state",
+    "candidate PR state cannot become merged truth before an authorized merge and certification transition"
+  ]
+}
