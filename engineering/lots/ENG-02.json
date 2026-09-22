@@ -27,12 +27,12 @@
   "tasks": [
     {
       "id": "ENG-02.1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Define the permanent Agent Work Unit schema and bounded execution contract."
     },
     {
       "id": "ENG-02.2",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Implement dependency DAG validation and cycle/missing-dependency rejection."
     },
     {
