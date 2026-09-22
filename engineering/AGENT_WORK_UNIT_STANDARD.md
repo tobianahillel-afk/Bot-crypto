@@ -35,3 +35,7 @@ the AWU may only remain `PLANNED` or `BLOCKED`; it cannot be executable or compl
 
 This turns “massive changes must be separated” into a machine-enforced rule rather than
 reviewer discretion.
+
+### Risk classification
+
+ENG-02.5 computes the exact minimum class R0–R3 from the AWU factors and scope. R3 covers risk/execution permission and critical risk/execution/OMS/EMS paths; R2 covers security, lineage, maths, state/concurrency, dependencies, cross-domain interfaces, persistence/checksum boundaries, or complexity score >=9; R1 covers production, contracts/configuration and CI topology; otherwise R0. Executable AWUs cannot remain UNCLASSIFIED.

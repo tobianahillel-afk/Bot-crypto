@@ -55,7 +55,7 @@
     ]
   },
   "planning": {
-    "risk_class": "UNCLASSIFIED",
+    "risk_class": "R0",
     "complexity_factors": {
       "production_modules": 0,
       "contract_schema_families": 0,

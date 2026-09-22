@@ -83,7 +83,7 @@
     ]
   },
   "planning": {
-    "risk_class": "UNCLASSIFIED",
+    "risk_class": "R1",
     "complexity_score": 2,
     "split_required": false,
     "context_budget": {

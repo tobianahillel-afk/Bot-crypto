@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "policy_kind": "awu_risk_policy_v1",
+  "order": [
+    "R0",
+    "R1",
+    "R2",
+    "R3"
+  ],
+  "executable_statuses": [
+    "READY",
+    "IN_PROGRESS",
+    "DONE"
+  ],
+  "unclassified_allowed_statuses": [
+    "PLANNED",
+    "BLOCKED"
+  ],
+  "exact_class_required": true,
+  "thresholds": {
+    "r2_complexity_score_min": 9
+  },
+  "critical_path_prefixes": [
+    "src/crypto_quant_bot/risk/",
+    "src/crypto_quant_bot/execution/",
+    "src/crypto_quant_bot/oms/",
+    "src/crypto_quant_bot/ems/"
+  ],
+  "reason_to_class": {
+    "PRODUCTION_MODULE_CHANGE": "R1",
+    "CONTRACT_OR_SCHEMA_CHANGE": "R1",
+    "POLICY_OR_CONFIG_CHANGE": "R1",
+    "CI_EVIDENCE_TOPOLOGY_CHANGE": "R1",
+    "PERSISTENCE_OR_CHECKSUM_BOUNDARY": "R2",
+    "MATH_OR_NUMERIC_SEMANTICS": "R2",
+    "TEMPORAL_OR_LINEAGE_SEMANTICS": "R2",
+    "CROSS_DOMAIN_INTERFACE": "R2",
+    "STATE_MACHINE_OR_CONCURRENCY": "R2",
+    "SECURITY_OR_TRUST_BOUNDARY": "R2",
+    "DEPENDENCY_CHANGE": "R2",
+    "HIGH_COMPLEXITY_SCORE": "R2",
+    "RISK_OR_EXECUTION_PERMISSION": "R3",
+    "CRITICAL_EXECUTION_SCOPE": "R3"
+  }
+}

@@ -64,6 +64,12 @@ jobs:
       - name: Run AWU split adversarial self-tests
         run: python scripts/governance/selftest_awu_split.py
 
+      - name: Validate deterministic AWU risk classification
+        run: python scripts/governance/validate_awu_risk.py
+
+      - name: Run AWU risk adversarial self-tests
+        run: python scripts/governance/selftest_awu_risk.py
+
       - name: Validate handoff
         run: python scripts/governance/validate_handoff.py
 
