@@ -107,4 +107,12 @@ Aucun score, forecast ou vote entre horizons ne neutralise un veto critique.
 
 ## 8. État actuel
 
-Lots 0–25 implémentent uniquement une fondation offline descriptive. Lot 26, continuous state, order book, forecasting, participant inference, risk approval, protective orders et execution restent non implémentés jusqu'à leurs gates respectifs.
+La baseline métier fusionnée et certifiée atteint **Lot44**. Le gate d'implémentation Lot45
+est fusionné, mais l'implémentation Lot45 reste une PR candidate non fusionnée et le
+développement métier est actuellement en pause pendant la construction du Development
+Engine. Lot46 reste verrouillé.
+
+Cette section ne doit pas servir de state machine : `engineering/STATE.json` est l'autorité
+opérationnelle pour déterminer le travail actuellement autorisé. Les parties ci-dessus
+décrivent l'architecture cible et les responsabilités, pas une affirmation que toutes les
+capacités futures sont déjà actives.
