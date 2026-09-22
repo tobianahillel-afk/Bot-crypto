@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "policy_kind": "awu_complexity_policy_v1",
+  "score_rule": "SUM(weight * count_or_boolean)",
+  "factors": {
+    "production_modules": {
+      "kind": "count",
+      "weight": 1,
+      "description": "Production modules intentionally changed."
+    },
+    "contract_schema_families": {
+      "kind": "count",
+      "weight": 1,
+      "description": "Independent contract/schema families changed."
+    },
+    "policy_config_families": {
+      "kind": "count",
+      "weight": 1,
+      "description": "Independent policy/config families changed."
+    },
+    "persistence_checksum_boundary": {
+      "kind": "boolean",
+      "weight": 1,
+      "description": "Persistence, serialization, canonicalization or checksum boundary changes."
+    },
+    "math_numeric_semantics": {
+      "kind": "boolean",
+      "weight": 2,
+      "description": "Mathematical or numeric semantics change."
+    },
+    "temporal_lineage_semantics": {
+      "kind": "boolean",
+      "weight": 2,
+      "description": "Time availability, freshness, lineage or anti-lookahead semantics change."
+    },
+    "cross_domain_interfaces": {
+      "kind": "count",
+      "weight": 2,
+      "description": "Cross-domain interfaces intentionally modified."
+    },
+    "state_machine_or_concurrency": {
+      "kind": "boolean",
+      "weight": 2,
+      "description": "State-machine, idempotency or concurrency semantics change."
+    },
+    "security_trust_boundary": {
+      "kind": "boolean",
+      "weight": 2,
+      "description": "Security, permission or trust-boundary semantics change."
+    },
+    "risk_execution_permission": {
+      "kind": "boolean",
+      "weight": 3,
+      "description": "Risk, execution, order authority or permission-to-trade boundary changes."
+    },
+    "dependency_change": {
+      "kind": "boolean",
+      "weight": 1,
+      "description": "Runtime/dev dependency set or pinning changes."
+    },
+    "ci_evidence_topology_change": {
+      "kind": "boolean",
+      "weight": 1,
+      "description": "CI topology, evidence routing or certification workflow changes."
+    }
+  },
+  "underdeclaration_checks": [
+    {
+      "code": "SCHEMA_OUTPUT_REQUIRES_CONTRACT_FACTOR",
+      "rule": "Any SCHEMA or CONTRACT output requires contract_schema_families >= 1."
+    },
+    {
+      "code": "WORKFLOW_SCOPE_REQUIRES_CI_FACTOR",
+      "rule": "Any allowed path under .github/workflows requires ci_evidence_topology_change=true."
+    },
+    {
+      "code": "PRODUCTION_SCOPE_REQUIRES_PRODUCTION_FACTOR",
+      "rule": "Any allowed path under src/crypto_quant_bot requires production_modules >= 1."
+    }
+  ]
+}

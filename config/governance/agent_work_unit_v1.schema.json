@@ -178,6 +178,7 @@
       "additionalProperties": false,
       "required": [
         "risk_class",
+        "complexity_factors",
         "complexity_score",
         "split_required",
         "context_budget"
@@ -193,10 +194,7 @@
           ]
         },
         "complexity_score": {
-          "type": [
-            "integer",
-            "null"
-          ],
+          "type": "integer",
           "minimum": 0
         },
         "split_required": {
@@ -234,6 +232,66 @@
                 "null"
               ],
               "minimum": 1
+            }
+          }
+        },
+        "complexity_factors": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "production_modules",
+            "contract_schema_families",
+            "policy_config_families",
+            "persistence_checksum_boundary",
+            "math_numeric_semantics",
+            "temporal_lineage_semantics",
+            "cross_domain_interfaces",
+            "state_machine_or_concurrency",
+            "security_trust_boundary",
+            "risk_execution_permission",
+            "dependency_change",
+            "ci_evidence_topology_change"
+          ],
+          "properties": {
+            "production_modules": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "contract_schema_families": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "policy_config_families": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "persistence_checksum_boundary": {
+              "type": "boolean"
+            },
+            "math_numeric_semantics": {
+              "type": "boolean"
+            },
+            "temporal_lineage_semantics": {
+              "type": "boolean"
+            },
+            "cross_domain_interfaces": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "state_machine_or_concurrency": {
+              "type": "boolean"
+            },
+            "security_trust_boundary": {
+              "type": "boolean"
+            },
+            "risk_execution_permission": {
+              "type": "boolean"
+            },
+            "dependency_change": {
+              "type": "boolean"
+            },
+            "ci_evidence_topology_change": {
+              "type": "boolean"
             }
           }
         }
