@@ -30,8 +30,8 @@
     "ENG-00 Repository Truth Recovery completed with canonical baseline validated on workflow run 35792439447",
     "ENG-01 Agent Bootstrap & Canonical State completed; permanent state, state machine, fresh-agent startup, evidence policy and live state-drift qualification validated on workflow run 35794262132"
   ],
-  "current_objective": "ENG-02.2: implement dependency DAG validation for Agent Work Units.",
-  "next_action": "Add AWU-set DAG validation for unique IDs, missing dependencies, cycles and predecessor completion before READY/IN_PROGRESS/DONE.",
+  "current_objective": "ENG-02.3: implement deterministic Agent Work Unit complexity scoring.",
+  "next_action": "Define versioned complexity factors/weights, extend AWU planning contract, and verify declared scores are exactly reproducible.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -111,6 +111,12 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35797881430",
       "note": "Exact head 886fd48509fa5c73746fd6ef8eb94f5e24006733 validated AWU V1 contract, 6 adversarial AWU probes, live drift checks and permanent cold start."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35798119375",
+      "note": "Exact head 9244955f3fcc89fbf99d9fe898ec9b21aefad8c2 validated AWU dependency DAG semantics and 5 adversarial graph scenarios."
     }
   ],
   "stale_when": [
@@ -123,7 +129,7 @@
   ],
   "next_engineering": {
     "active_lot": "ENG-02",
-    "active_task": "ENG-02.2",
+    "active_task": "ENG-02.3",
     "active_manifest": "engineering/lots/ENG-02.json"
   }
 }

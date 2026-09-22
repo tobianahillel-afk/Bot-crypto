@@ -32,12 +32,12 @@
     },
     {
       "id": "ENG-02.2",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Implement dependency DAG validation and cycle/missing-dependency rejection."
     },
     {
       "id": "ENG-02.3",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Implement deterministic cognitive/technical complexity scoring."
     },
     {
