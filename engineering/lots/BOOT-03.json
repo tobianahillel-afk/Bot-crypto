@@ -3,7 +3,7 @@
   "kind": "bootstrap_work_item",
   "id": "BOOT-03",
   "title": "Sub-Lot and Work-Item Standard",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "objective": "Define the minimal bounded machine-readable manifest used by BOOT and future ENG work.",
   "depends_on": [
     "BOOT-02"
@@ -43,7 +43,7 @@
     },
     {
       "id": "BOOT-03.5",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Add deterministic standard-library manifest validation."
     }
   ],

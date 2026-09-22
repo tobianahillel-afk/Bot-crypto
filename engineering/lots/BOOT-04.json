@@ -3,7 +3,7 @@
   "kind": "bootstrap_work_item",
   "id": "BOOT-04",
   "title": "Agent Bootstrap Protocol",
-  "status": "PLANNED",
+  "status": "IN_PROGRESS",
   "objective": "Make context-free agent startup deterministic and capability-aware.",
   "depends_on": [
     "BOOT-03"
@@ -24,7 +24,7 @@
   "tasks": [
     {
       "id": "BOOT-04.1",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Finalize root AGENTS bootstrap protocol."
     },
     {

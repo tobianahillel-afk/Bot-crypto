@@ -1,45 +1,37 @@
 schema_version: 1
 handoff_kind: bootstrap_engine_handoff
-
 workstream: BOOTSTRAP_ENGINE
 status: IN_PROGRESS
-
 baseline:
   main_sha: 390d0779f2be257fa8134faf8f02193a760a09c3
   engineering_branch: engineering/bootstrap-development-engine
-
 completed:
   - id: BOOT-00
-    result: baseline frozen and business hold established
+    result: baseline frozen
   - id: BOOT-01
-    result: Development Engine master plan created
+    result: master plan created
   - id: BOOT-02
-    result: canonical bootstrap state and state validator implemented
-  - id: BOOT-03.1-BOOT-03.4
-    result: canonical JSON work-item format, dependency/scope/task semantics defined
-
+    result: canonical state and state validator created
+  - id: BOOT-03
+    result: canonical JSON work-item standard and validator created
 current:
-  lot: BOOT-03
-  task: BOOT-03.5
-  objective: validate the full bootstrap manifest set with the standard-library work-item validator
-
+  lot: BOOT-04
+  task: BOOT-04.1
+  objective: finalize deterministic context-free agent startup protocol
 next_actions:
-  - verify all BOOT-00 through BOOT-07 JSON manifests
-  - fix any schema/lifecycle/dependency inconsistency
-  - mark BOOT-03 DONE only when validation is clean
-  - activate BOOT-04 agent bootstrap protocol
-
+  - finalize root AGENTS startup sequence
+  - formalize source-of-truth precedence
+  - formalize capability/tool-honesty profiles
+  - formalize STATE_DRIFT stop conditions
 known_constraints:
-  - business development remains paused
-  - PR66 remains isolated
-  - Lot46 remains locked
-  - mandatory development path remains free and LLM-independent
-
+  - business development paused
+  - PR66 isolated
+  - Lot46 locked
+  - mandatory path free and LLM-independent
 blockers: []
-
 resume_protocol:
   - read /AGENTS.md
   - read engineering/STATE.json
-  - read engineering/WORK_ITEM_STANDARD.md
-  - read engineering/lots/BOOT-03.json
-  - continue BOOT-03.5
+  - verify declared Git reality
+  - read engineering/lots/BOOT-04.json
+  - continue BOOT-04.1
