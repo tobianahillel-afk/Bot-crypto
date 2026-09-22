@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cold-start qualification for the Bootstrap Engineering Engine."""
+"""Cold-start qualification for bootstrap-building and post-bootstrap routing."""
 
 from __future__ import annotations
 
@@ -40,39 +40,35 @@ def _expect(exc_type: type[Exception], fn: Any, label: str) -> None:
 
 
 def main() -> int:
-    state_validator = _module(
-        "cold_state_validator", ROOT / "scripts/governance/validate_bootstrap_state.py"
-    )
-    handoff_validator = _module(
-        "cold_handoff_validator", ROOT / "scripts/governance/validate_handoff.py"
-    )
+    state_validator = _module("cold_state", ROOT / "scripts/governance/validate_bootstrap_state.py")
+    handoff_validator = _module("cold_handoff", ROOT / "scripts/governance/validate_handoff.py")
     resolver = _module("cold_resolver", ROOT / "scripts/governance/resolve_next_work.py")
 
     state = _json(ROOT / "engineering/STATE.json")
     policy = _json(ROOT / "engineering/STATE_TRANSITIONS.json")
     capabilities = _json(ROOT / "engineering/AGENT_CAPABILITIES.json")
     handoff = _json(ROOT / "engineering/handoff/CURRENT.json")
-    manifest = _json(ROOT / state["bootstrap_engine"]["active_manifest"])
 
-    # Scenario 1: a context-free GitHub-only agent resolves one exact next action.
+    phase = state["bootstrap_engine"]["phase"]
+    active_engine = state["bootstrap_engine"] if phase == "BUILDING" else state["engineering_engine"]
+    manifest = _json(ROOT / active_engine["active_manifest"])
+
     state_validator.validate_state(state, policy, manifest)
     handoff_validator.validate_handoff(state, handoff)
     resolved = resolver.resolve(state, capabilities, "GITHUB_CONNECTOR_ONLY")
-    assert resolved["active_lot"] == state["bootstrap_engine"]["active_lot"]
-    assert resolved["active_task"] == state["bootstrap_engine"]["active_task"]
+    assert resolved["active_lot"] == active_engine["active_lot"]
+    assert resolved["active_task"] == active_engine["active_task"]
     assert resolved["capabilities"]["local_execution"] is False
     assert resolved["capabilities"]["may_claim_local_test_pass"] is False
 
-    # Scenario 2: stale handoff fails closed.
     stale = copy.deepcopy(handoff)
-    stale["state_snapshot"]["active_task"] = "BOOT-07.99"
+    stale["state_snapshot"]["phase"] = "CORRUPT"
     _expect(
         handoff_validator.HandoffError,
         lambda: handoff_validator.validate_handoff(state, stale),
         "stale handoff",
     )
 
-    # Scenario 3: Lot46 unlock fails closed.
     unsafe_lot46 = copy.deepcopy(state)
     unsafe_lot46["business_track"]["next_lot"]["status"] = "UNLOCKED"
     _expect(
@@ -81,7 +77,6 @@ def main() -> int:
         "Lot46 unlock",
     )
 
-    # Scenario 4: mandatory paid/LLM dependency fails closed.
     paid = copy.deepcopy(state)
     paid["mandatory_cost_policy"]["paid_llm_required"] = True
     _expect(
@@ -91,9 +86,9 @@ def main() -> int:
     )
 
     print(
-        "BOOTSTRAP_COLD_START_PASS "
-        f"track={resolved['track']} lot={resolved['active_lot']} task={resolved['active_task']} "
-        "scenarios=4"
+        "COLD_START_PASS "
+        f"track={resolved['track']} lot={resolved['active_lot']} "
+        f"task={resolved['active_task']} phase={phase} scenarios=4"
     )
     return 0
 
