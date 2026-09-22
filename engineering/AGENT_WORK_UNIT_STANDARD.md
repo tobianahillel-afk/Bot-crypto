@@ -1,48 +1,37 @@
 # Agent Work Unit Standard V1
 
 An **Agent Work Unit (AWU)** is the smallest machine-readable unit an implementation agent
-may execute. It is deliberately smaller than an ENG/BOOT/AUD work-item.
-
-## Hierarchy
-
-```text
-Roadmap / business lot
-  -> ENG/BOOT/AUD work-item
-    -> work-item task
-      -> one or more Agent Work Units
-```
-
-The parent work-item remains the roadmap/state-machine unit. An AWU only bounds one
-implementation slice.
-
-## Required execution contract
-
-Every AWU declares one parent task, objective/non-goals, dependencies, I/O, exact scope
-base, allowed/forbidden scope, invariants, acceptance criteria, planning data, validation
-targets and done conditions.
+may execute, below an ENG/BOOT/AUD work-item task.
 
 ## Planning progression
 
-- ENG-02.1 introduced fail-closed placeholders.
-- ENG-02.3 makes `complexity_score` deterministic and non-null.
-- `split_required` remains null until ENG-02.4.
-- `risk_class` may remain `UNCLASSIFIED` until ENG-02.5.
-- context budgets may remain null until ENG-02.6.
+- ENG-02.3: deterministic complexity score.
+- ENG-02.4: deterministic mandatory split decision.
+- ENG-02.5: risk class R0-R3.
+- ENG-02.6: context budget.
 
-### Complexity
+### Mandatory split
 
-`planning.complexity_factors` is a closed 12-factor declaration. The authoritative weights
-live in `config/governance/awu_complexity_policy_v1.json`.
+`planning.size_estimate` declares bounded structural estimates. CI combines those estimates
+with the verified complexity score and applies
+`config/governance/awu_split_policy_v1.json`.
 
-The stored `complexity_score` is not trusted: CI recalculates it. Basic under-declaration
-checks also bind schema/contract outputs, workflow scope and production scope to their
-minimum factors.
+Current mandatory split triggers include:
 
-ENG-02.3 defines **score only**. Mandatory split thresholds are ENG-02.4.
+- complexity score > 10;
+- >1 business domain;
+- >15 touched files;
+- >800 executable LOC changed;
+- >1 new public behavior;
+- >1 contract family;
+- >1 independent algorithm;
+- >1 state machine;
+- >1 trust boundary;
+- >1 new dependency;
+- >1 cross-domain interface.
 
-## Source files
+`split_reasons` must exactly equal the deterministic reason list. If a split is required,
+the AWU may only remain `PLANNED` or `BLOCKED`; it cannot be executable or completed.
 
-- AWU schema: `config/governance/agent_work_unit_v1.schema.json`
-- individual validator: `scripts/governance/validate_agent_work_unit.py`
-- complexity policy: `config/governance/awu_complexity_policy_v1.json`
-- complexity validator: `scripts/governance/validate_awu_complexity.py`
+This turns “massive changes must be separated” into a machine-enforced rule rather than
+reviewer discretion.

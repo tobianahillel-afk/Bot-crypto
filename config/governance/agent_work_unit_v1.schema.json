@@ -180,7 +180,9 @@
         "risk_class",
         "complexity_factors",
         "complexity_score",
+        "size_estimate",
         "split_required",
+        "split_reasons",
         "context_budget"
       ],
       "properties": {
@@ -198,10 +200,7 @@
           "minimum": 0
         },
         "split_required": {
-          "type": [
-            "boolean",
-            "null"
-          ]
+          "type": "boolean"
         },
         "context_budget": {
           "type": "object",
@@ -293,6 +292,67 @@
             "ci_evidence_topology_change": {
               "type": "boolean"
             }
+          }
+        },
+        "size_estimate": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "business_domains",
+            "files_touched",
+            "executable_loc_changed",
+            "new_public_behaviors",
+            "contract_families",
+            "independent_algorithms",
+            "state_machines",
+            "trust_boundaries",
+            "new_dependencies"
+          ],
+          "properties": {
+            "business_domains": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "files_touched": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "executable_loc_changed": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "new_public_behaviors": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "contract_families": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "independent_algorithms": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "state_machines": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "trust_boundaries": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "new_dependencies": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "split_reasons": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
           }
         }
       }

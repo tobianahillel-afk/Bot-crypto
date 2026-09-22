@@ -58,6 +58,12 @@ jobs:
       - name: Run AWU complexity adversarial self-tests
         run: python scripts/governance/selftest_awu_complexity.py
 
+      - name: Validate mandatory AWU split decisions
+        run: python scripts/governance/validate_awu_split.py
+
+      - name: Run AWU split adversarial self-tests
+        run: python scripts/governance/selftest_awu_split.py
+
       - name: Validate handoff
         run: python scripts/governance/validate_handoff.py
 

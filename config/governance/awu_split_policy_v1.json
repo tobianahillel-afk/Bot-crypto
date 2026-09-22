@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "policy_kind": "awu_mandatory_split_policy_v1",
+  "rules": [
+    {
+      "code": "COMPLEXITY_SCORE_GT_10",
+      "source": "complexity_score",
+      "operator": "GT",
+      "threshold": 10
+    },
+    {
+      "code": "BUSINESS_DOMAINS_GT_1",
+      "source": "business_domains",
+      "operator": "GT",
+      "threshold": 1
+    },
+    {
+      "code": "FILES_TOUCHED_GT_15",
+      "source": "files_touched",
+      "operator": "GT",
+      "threshold": 15
+    },
+    {
+      "code": "EXECUTABLE_LOC_GT_800",
+      "source": "executable_loc_changed",
+      "operator": "GT",
+      "threshold": 800
+    },
+    {
+      "code": "PUBLIC_BEHAVIORS_GT_1",
+      "source": "new_public_behaviors",
+      "operator": "GT",
+      "threshold": 1
+    },
+    {
+      "code": "CONTRACT_FAMILIES_GT_1",
+      "source": "contract_families",
+      "operator": "GT",
+      "threshold": 1
+    },
+    {
+      "code": "ALGORITHMS_GT_1",
+      "source": "independent_algorithms",
+      "operator": "GT",
+      "threshold": 1
+    },
+    {
+      "code": "STATE_MACHINES_GT_1",
+      "source": "state_machines",
+      "operator": "GT",
+      "threshold": 1
+    },
+    {
+      "code": "TRUST_BOUNDARIES_GT_1",
+      "source": "trust_boundaries",
+      "operator": "GT",
+      "threshold": 1
+    },
+    {
+      "code": "NEW_DEPENDENCIES_GT_1",
+      "source": "new_dependencies",
+      "operator": "GT",
+      "threshold": 1
+    },
+    {
+      "code": "CROSS_DOMAIN_INTERFACES_GT_1",
+      "source": "cross_domain_interfaces",
+      "operator": "GT",
+      "threshold": 1
+    }
+  ],
+  "executable_statuses": [
+    "READY",
+    "IN_PROGRESS",
+    "DONE"
+  ],
+  "split_required_allowed_statuses": [
+    "PLANNED",
+    "BLOCKED"
+  ]
+}

@@ -85,7 +85,7 @@
   "planning": {
     "risk_class": "UNCLASSIFIED",
     "complexity_score": 2,
-    "split_required": null,
+    "split_required": false,
     "context_budget": {
       "max_primary_files": null,
       "max_reference_files": null,
@@ -104,7 +104,19 @@
       "risk_execution_permission": false,
       "dependency_change": false,
       "ci_evidence_topology_change": true
-    }
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 6,
+      "executable_loc_changed": 500,
+      "new_public_behaviors": 1,
+      "contract_families": 1,
+      "independent_algorithms": 0,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
   },
   "validation": {
     "required_tiers": [
