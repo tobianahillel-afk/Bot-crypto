@@ -3,7 +3,7 @@
   "kind": "bootstrap_work_item",
   "id": "BOOT-05",
   "title": "Handoff and Resume",
-  "status": "PLANNED",
+  "status": "IN_PROGRESS",
   "objective": "Make interruption and context loss recoverable without trusting stale summaries.",
   "depends_on": [
     "BOOT-04"
@@ -24,7 +24,7 @@
   "tasks": [
     {
       "id": "BOOT-05.1",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Define handoff fields and schema."
     },
     {

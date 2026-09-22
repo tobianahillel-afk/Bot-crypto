@@ -1,78 +1,92 @@
 # Agent Bootstrap — Crypto Quant Bot V3.1-Ops
 
-This file is the first entry point for any coding or audit agent working in this repository.
+This file is the mandatory first entry point for any coding or audit agent.
 
-## 1. Canonical identity
-
-- Project: **Crypto Quant Bot V3.1-Ops**.
-- This is the same project that has existed since the beginning.
-- Do not rename, fork into a new product identity, or infer identity from stale status text.
-- Real trading remains disabled unless a future certified governance state explicitly says otherwise.
-
-## 2. Current bootstrap rule
-
-The repository is currently building its permanent Development Engine.
-
-Before any implementation work:
+## Start here
 
 1. Read `engineering/STATE.json`.
-2. Read `engineering/MASTER_PLAN.md`.
-3. Read `engineering/handoff/CURRENT.yaml`.
-4. Read the manifest for the active BOOT/ENG work item.
-5. Verify the declared Git/PR state against GitHub before writing.
-6. Continue only the declared active task.
+2. Verify the declared GitHub reality before writing:
+   - default branch and declared main SHA;
+   - active engineering branch;
+   - declared business candidate PR/ref when relevant.
+3. If reality disagrees with canonical state, stop with `STATE_DRIFT`.
+4. Read only:
+   - `engineering/MASTER_PLAN.md`;
+   - the active manifest named by `bootstrap_engine.active_manifest`;
+   - `engineering/handoff/CURRENT.*`;
+   - additional files explicitly required by the active work item/protocol.
+5. Continue only `bootstrap_engine.active_task`.
+6. Respect `allowed_paths`, `forbidden_scope`, dependencies and stop conditions.
+7. Run only validation relevant to the current work stage.
+8. Leave an updated handoff before ending work.
 
-Do **not** infer the next task from README text, an old PR description, chat history, or model memory.
+Do not reconstruct project state from chat history, model memory, README status text,
+old PR descriptions, or comments when a higher-authority source exists.
 
-## 3. Business-development hold
+## Canonical identity
 
-While `engineering/STATE.json` declares `business_development: PAUSED`:
+- Project: **Crypto Quant Bot V3.1-Ops**.
+- Same project since inception; do not rename or fork its identity.
+- Real trading remains disabled unless a future certified governance state explicitly unlocks it.
 
-- do not merge or extend Lot45 as part of engineering-engine work;
-- do not start Lot46;
-- do not activate networking, exchange connectivity, trading, leverage, withdrawals, risk authority, order authority, or execution authority;
-- do not rewrite or delete frozen historical evidence.
+## Current authority order
 
-Lot44 is the current merged certified business baseline. PR #66 is a separate Lot45 candidate and must remain isolated unless the canonical state explicitly unlocks it.
-
-## 4. Source-of-truth precedence during bootstrap
-
-1. Frozen historical evidence for facts about past certification.
-2. `engineering/STATE.json` for current engineering/bootstrap state.
-3. Active work-item manifest for allowed current work.
-4. Normative project standards in `docs/`.
+1. Frozen historical evidence for facts about past certifications.
+2. `engineering/STATE.json` for current bootstrap/engineering state.
+3. Active work-item manifest for current allowed work.
+4. Normative project standards under `docs/`.
 5. `engineering/MASTER_PLAN.md` for planned engineering sequence.
-6. Generated/readme/status summaries.
-7. PR descriptions and comments.
-8. Chat history or model memory.
+6. Handoff/status summaries.
+7. PR descriptions/comments.
+8. Chat history/model memory.
 
-If two higher-authority sources conflict, stop implementation and record `STATE_DRIFT`.
+Conflicts between higher-authority sources are fail-closed and become `STATE_DRIFT`.
 
-## 5. Development principles
+## Business-development hold
 
-The Development Engine must be:
+While canonical state says `business_development = PAUSED`:
 
-- security-first and fail-closed;
-- free-by-construction for the mandatory path;
-- independent of paid LLM/API tokens;
-- incremental, diff-aware and risk-aware;
-- fast on ordinary changes;
-- heavy only when the risk or certification stage requires it;
-- resumable by a fresh agent with no chat context;
-- evidence-driven: summaries are not certification evidence.
+- do not merge, extend, or remediate Lot45 as part of engine work;
+- do not start or unlock Lot46;
+- do not change frozen historical evidence;
+- do not enable network/exchange execution, trading, leverage, withdrawals, signal authority,
+  risk authority, order authority or live execution.
 
-## 6. Tool honesty
+## Capability honesty
 
-An agent must never claim a local test was executed if it only has GitHub access.
-When only GitHub tools are available, use GitHub Actions or repository evidence and state that boundary accurately.
+Identify the actual execution profile before claiming evidence:
 
-## 7. Completion and handoff
+- `GITHUB_CONNECTOR_ONLY`: may inspect/write GitHub resources; local commands were not run.
+- `LOCAL_REPOSITORY`: may claim local commands only when actually executed.
+- `CI_EXECUTION`: may rely on CI only for the exact commit/run proved by GitHub evidence.
+- `READ_ONLY_AUDITOR`: must not mutate repository state.
 
-At the end of a work session:
+Never convert an unavailable capability into an assumed PASS.
 
-- update the active manifest/task state when appropriate;
-- update `engineering/handoff/CURRENT.yaml`;
-- record the last verified commit/ref and blockers;
-- do not choose or unlock future business work outside the state machine.
+## Mandatory-cost rule
 
-The permanent Development Engine will eventually supersede this minimal bootstrap protocol. Until then, these rules are authoritative for engineering-engine work.
+The mandatory path must require:
+
+- zero paid LLM/API tokens;
+- zero paid SaaS dependency;
+- zero paid GitHub larger runner;
+- zero external paid service.
+
+Optional tools may never become prerequisites for progress.
+
+## Stop immediately on
+
+- `STATE_DRIFT`;
+- business scope touched without explicit unlock;
+- frozen evidence mutation;
+- Lot46 unlock attempt;
+- mandatory paid dependency introduction;
+- an active task whose dependencies or manifest do not validate.
+
+## Handoff
+
+A handoff accelerates resume but is not evidence. A fresh agent must bind it to Git reality
+before trusting it. Update the canonical handoff with current task, last verified ref,
+completed work, blockers and exact next action before ending a work session.
+
+Deep startup/recovery semantics live in `engineering/AGENT_PROTOCOL.md`.

@@ -11,18 +11,20 @@ completed:
   - id: BOOT-01
     result: master plan created
   - id: BOOT-02
-    result: canonical state and state validator created
+    result: canonical bootstrap state and state validator created
   - id: BOOT-03
     result: canonical JSON work-item standard and validator created
+  - id: BOOT-04
+    result: deterministic agent startup, capability honesty, authority and drift protocol defined
 current:
-  lot: BOOT-04
-  task: BOOT-04.1
-  objective: finalize deterministic context-free agent startup protocol
+  lot: BOOT-05
+  task: BOOT-05.1
+  objective: replace prose-only handoff with a machine-readable Git-bound resume contract
 next_actions:
-  - finalize root AGENTS startup sequence
-  - formalize source-of-truth precedence
-  - formalize capability/tool-honesty profiles
-  - formalize STATE_DRIFT stop conditions
+  - define canonical handoff JSON fields
+  - bind handoff to exact verified Git ref
+  - add stale-handoff validator
+  - define recovery sequence
 known_constraints:
   - business development paused
   - PR66 isolated
@@ -33,5 +35,6 @@ resume_protocol:
   - read /AGENTS.md
   - read engineering/STATE.json
   - verify declared Git reality
-  - read engineering/lots/BOOT-04.json
-  - continue BOOT-04.1
+  - read engineering/AGENT_PROTOCOL.md
+  - read engineering/lots/BOOT-05.json
+  - continue BOOT-05.1

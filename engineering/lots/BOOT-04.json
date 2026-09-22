@@ -3,7 +3,7 @@
   "kind": "bootstrap_work_item",
   "id": "BOOT-04",
   "title": "Agent Bootstrap Protocol",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "objective": "Make context-free agent startup deterministic and capability-aware.",
   "depends_on": [
     "BOOT-03"
@@ -24,22 +24,22 @@
   "tasks": [
     {
       "id": "BOOT-04.1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Finalize root AGENTS bootstrap protocol."
     },
     {
       "id": "BOOT-04.2",
-      "status": "PLANNED",
+      "status": "DONE",
       "description": "Formalize source-of-truth precedence."
     },
     {
       "id": "BOOT-04.3",
-      "status": "PLANNED",
+      "status": "DONE",
       "description": "Formalize GitHub-only capability and tool-honesty rules."
     },
     {
       "id": "BOOT-04.4",
-      "status": "PLANNED",
+      "status": "DONE",
       "description": "Define stop and STATE_DRIFT conditions."
     }
   ],
