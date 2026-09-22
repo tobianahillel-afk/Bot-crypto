@@ -41,12 +41,12 @@
     },
     {
       "id": "ENG-01.4",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Migrate the agent startup protocol to the permanent state."
     },
     {
       "id": "ENG-01.5",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Formalize GitHub-only execution and evidence rules in the permanent engine."
     },
     {

@@ -29,8 +29,8 @@
     "BOOT-07 cold-start qualification passed on workflow run 35776801100",
     "ENG-00 Repository Truth Recovery completed with canonical baseline validated on workflow run 35792439447"
   ],
-  "current_objective": "ENG-01.4: migrate context-free agent startup to config/governance/project_state.json.",
-  "next_action": "Update AGENTS, agent protocol, resolver and cold-start flow so the permanent project state is the first authority.",
+  "current_objective": "ENG-01.5: formalize GitHub-only execution and evidence rules in the permanent engine.",
+  "next_action": "Upgrade agent capability policy with machine-readable claim/evidence rules and validate impossible-claim rejection.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -86,6 +86,12 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35793352838",
       "note": "Exact head 03bed8b5f3164cdab1d1d0e326e7e2029f5ca54d validated permanent state transitions, adversarial state-machine probes, active scope and cold start."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35793777054",
+      "note": "Exact head 5ffe1f6711cee629a6cdcc2c351f4079a5afb2a5 validated permanent-state fresh-agent startup and 5 cold-start scenarios."
     }
   ],
   "stale_when": [
@@ -98,7 +104,7 @@
   ],
   "next_engineering": {
     "active_lot": "ENG-01",
-    "active_task": "ENG-01.4",
+    "active_task": "ENG-01.5",
     "active_manifest": "engineering/lots/ENG-01.json"
   }
 }
