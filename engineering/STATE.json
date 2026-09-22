@@ -42,13 +42,14 @@
       "BOOT-02",
       "BOOT-03",
       "BOOT-04",
-      "BOOT-05"
+      "BOOT-05",
+      "BOOT-06"
     ],
-    "active_lot": "BOOT-06",
-    "active_task": "BOOT-06.4",
-    "next_lot": "BOOT-07",
+    "active_lot": "BOOT-07",
+    "active_task": "BOOT-07.1",
+    "next_lot": null,
     "blockers": [],
-    "active_manifest": "engineering/lots/BOOT-06.json"
+    "active_manifest": "engineering/lots/BOOT-07.json"
   },
   "mandatory_cost_policy": {
     "paid_external_api_required": false,
@@ -62,7 +63,7 @@
     "master_plan": "engineering/MASTER_PLAN.md",
     "handoff": "engineering/handoff/CURRENT.json",
     "bootstrap_protocol": "engineering/BOOTSTRAP.md",
-    "active_manifest": "engineering/lots/BOOT-06.json"
+    "active_manifest": "engineering/lots/BOOT-07.json"
   },
   "stop_conditions": [
     "STATE_DRIFT",

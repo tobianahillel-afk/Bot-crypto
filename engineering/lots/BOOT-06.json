@@ -3,7 +3,7 @@
   "kind": "bootstrap_work_item",
   "id": "BOOT-06",
   "title": "Minimal Validation",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "objective": "Validate bootstrap state and manifests cheaply without invoking heavy bot CI.",
   "depends_on": [
     "BOOT-05"
@@ -39,7 +39,7 @@
     },
     {
       "id": "BOOT-06.4",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Validate bootstrap allowed-path boundary and run lightweight CI."
     }
   ],

@@ -3,7 +3,7 @@
   "kind": "bootstrap_work_item",
   "id": "BOOT-07",
   "title": "Cold-Start Qualification",
-  "status": "PLANNED",
+  "status": "IN_PROGRESS",
   "objective": "Prove a context-free agent can resume engine work safely and efficiently.",
   "depends_on": [
     "BOOT-06"
@@ -24,7 +24,7 @@
   "tasks": [
     {
       "id": "BOOT-07.1",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Cold-start continue-engine scenario."
     },
     {
