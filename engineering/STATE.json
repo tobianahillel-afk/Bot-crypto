@@ -34,7 +34,7 @@
     "withdrawals": "FORBIDDEN"
   },
   "bootstrap_engine": {
-    "phase": "BUILDING",
+    "phase": "STABLE",
     "branch": "engineering/bootstrap-development-engine",
     "completed": [
       "BOOT-00",
@@ -43,13 +43,29 @@
       "BOOT-03",
       "BOOT-04",
       "BOOT-05",
-      "BOOT-06"
+      "BOOT-06",
+      "BOOT-07"
     ],
-    "active_lot": "BOOT-07",
-    "active_task": "BOOT-07.5",
+    "active_lot": null,
+    "active_task": null,
     "next_lot": null,
     "blockers": [],
-    "active_manifest": "engineering/lots/BOOT-07.json"
+    "active_manifest": null,
+    "qualification": {
+      "head_sha": "8cf72a4008e2984189652782e9d8c3697f88cef0",
+      "workflow_run_id": 35776801100,
+      "conclusion": "success",
+      "qualified_scenarios": 4
+    }
+  },
+  "engineering_engine": {
+    "phase": "BUILDING",
+    "completed": [],
+    "active_lot": "ENG-00",
+    "active_task": "ENG-00.1",
+    "next_lot": "ENG-01",
+    "active_manifest": "engineering/lots/ENG-00.json",
+    "blockers": []
   },
   "mandatory_cost_policy": {
     "paid_external_api_required": false,
@@ -63,7 +79,7 @@
     "master_plan": "engineering/MASTER_PLAN.md",
     "handoff": "engineering/handoff/CURRENT.json",
     "bootstrap_protocol": "engineering/BOOTSTRAP.md",
-    "active_manifest": "engineering/lots/BOOT-07.json"
+    "active_manifest": "engineering/lots/ENG-00.json"
   },
   "stop_conditions": [
     "STATE_DRIFT",

@@ -16,7 +16,8 @@
     "next_action",
     "blockers",
     "validation_evidence",
-    "stale_when"
+    "stale_when",
+    "next_engineering"
   ],
   "properties": {
     "schema_version": {
@@ -77,6 +78,9 @@
       "items": {
         "type": "string"
       }
+    },
+    "next_engineering": {
+      "type": "object"
     }
   }
 }

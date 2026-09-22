@@ -5,20 +5,23 @@ This file is the mandatory first entry point for any coding or audit agent.
 ## Start here
 
 1. Read `engineering/STATE.json`.
-2. Verify the declared GitHub reality before writing:
+2. Select the active track:
+   - if `bootstrap_engine.phase = BUILDING`, use `bootstrap_engine.active_*`;
+   - if `bootstrap_engine.phase = STABLE`, use `engineering_engine.active_*`.
+3. Verify the declared GitHub reality before writing:
    - default branch and declared main SHA;
    - active engineering branch;
    - declared business candidate PR/ref when relevant.
-3. If reality disagrees with canonical state, stop with `STATE_DRIFT`.
-4. Read only:
+4. If reality disagrees with canonical state, stop with `STATE_DRIFT`.
+5. Read only:
    - `engineering/MASTER_PLAN.md`;
-   - the active manifest named by `bootstrap_engine.active_manifest`;
+   - the selected track's active manifest;
    - `engineering/handoff/CURRENT.json`;
    - additional files explicitly required by the active work item/protocol.
-5. Continue only `bootstrap_engine.active_task`.
-6. Respect `allowed_paths`, `forbidden_scope`, dependencies and stop conditions.
-7. Run only validation relevant to the current work stage.
-8. Leave an updated handoff before ending work.
+6. Continue only the selected track's `active_task`.
+7. Respect `allowed_paths`, `forbidden_scope`, dependencies and stop conditions.
+8. Run only validation relevant to the current work stage.
+9. Leave an updated handoff before ending work.
 
 Do not reconstruct project state from chat history, model memory, README status text,
 old PR descriptions, or comments when a higher-authority source exists.
@@ -65,14 +68,8 @@ Never convert an unavailable capability into an assumed PASS.
 
 ## Mandatory-cost rule
 
-The mandatory path must require:
-
-- zero paid LLM/API tokens;
-- zero paid SaaS dependency;
-- zero paid GitHub larger runner;
-- zero external paid service.
-
-Optional tools may never become prerequisites for progress.
+The mandatory path must require zero paid LLM/API tokens, zero paid SaaS dependency,
+zero paid GitHub larger runner and zero external paid service.
 
 ## Stop immediately on
 
@@ -86,7 +83,7 @@ Optional tools may never become prerequisites for progress.
 ## Handoff
 
 A handoff accelerates resume but is not evidence. A fresh agent must bind it to Git reality
-before trusting it. Update the canonical handoff with current task, last verified ref,
-completed work, blockers and exact next action before ending a work session.
+before trusting it. Update the canonical handoff with current task, blockers and exact next
+action before ending a work session.
 
 Deep startup/recovery semantics live in `engineering/AGENT_PROTOCOL.md`.

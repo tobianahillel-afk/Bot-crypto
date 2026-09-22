@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "kind": "engineering_work_item",
+  "id": "ENG-00",
+  "title": "Repository Truth Recovery",
+  "status": "IN_PROGRESS",
+  "objective": "Reconcile repository identity, status, Git reality and historical authority before permanent Development Engine automation expands.",
+  "depends_on": [
+    "BOOT-07"
+  ],
+  "allowed_paths": [
+    "AGENTS.md",
+    "README.md",
+    "pyproject.toml",
+    "docs/**",
+    "config/governance/**",
+    "engineering/**",
+    "scripts/governance/**",
+    ".github/workflows/engineering-bootstrap.yml"
+  ],
+  "forbidden_scope": [
+    "src/crypto_quant_bot/** business implementation changes",
+    "Lot45 candidate branch changes",
+    "Lot46 implementation",
+    "frozen historical evidence mutation",
+    "runtime capability activation",
+    "mandatory paid or LLM-backed dependency"
+  ],
+  "tasks": [
+    {
+      "id": "ENG-00.1",
+      "status": "IN_PROGRESS",
+      "description": "Inventory and classify authoritative, normative, generated and stale repository truth sources."
+    },
+    {
+      "id": "ENG-00.2",
+      "status": "PLANNED",
+      "description": "Reconcile project identity, version and current-status drift without rewriting historical evidence."
+    },
+    {
+      "id": "ENG-00.3",
+      "status": "PLANNED",
+      "description": "Map current Git, PR and certification reality into the permanent-state design."
+    },
+    {
+      "id": "ENG-00.4",
+      "status": "PLANNED",
+      "description": "Define explicit protection boundaries for frozen historical evidence."
+    },
+    {
+      "id": "ENG-00.5",
+      "status": "PLANNED",
+      "description": "Produce and validate the canonical baseline consumed by ENG-01."
+    }
+  ],
+  "done_when": [
+    "all current truth sources are classified by authority",
+    "identity and status drift has a bounded remediation plan",
+    "Lot44 Lot45 and Lot46 reality is represented without ambiguity",
+    "historical evidence protection boundary is explicit",
+    "ENG-01 has one canonical baseline to consume"
+  ]
+}
