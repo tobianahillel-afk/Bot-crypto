@@ -60,11 +60,13 @@
   },
   "engineering_engine": {
     "phase": "BUILDING",
-    "completed": [],
-    "active_lot": "ENG-00",
-    "active_task": "ENG-00.5",
-    "next_lot": "ENG-01",
-    "active_manifest": "engineering/lots/ENG-00.json",
+    "completed": [
+      "ENG-00"
+    ],
+    "active_lot": "ENG-01",
+    "active_task": "ENG-01.1",
+    "next_lot": "ENG-02",
+    "active_manifest": "engineering/lots/ENG-01.json",
     "blockers": []
   },
   "mandatory_cost_policy": {
@@ -79,7 +81,7 @@
     "master_plan": "engineering/MASTER_PLAN.md",
     "handoff": "engineering/handoff/CURRENT.json",
     "bootstrap_protocol": "engineering/BOOTSTRAP.md",
-    "active_manifest": "engineering/lots/ENG-00.json"
+    "active_manifest": "engineering/lots/ENG-01.json"
   },
   "stop_conditions": [
     "STATE_DRIFT",

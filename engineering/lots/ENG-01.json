@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "kind": "engineering_work_item",
+  "id": "ENG-01",
+  "title": "Agent Bootstrap & Canonical State",
+  "status": "IN_PROGRESS",
+  "objective": "Replace bootstrap-only state with the permanent multi-track project state and deterministic context-free startup protocol.",
+  "depends_on": [
+    "ENG-00"
+  ],
+  "allowed_paths": [
+    "AGENTS.md",
+    "config/governance/**",
+    "engineering/**",
+    "scripts/governance/**",
+    ".github/workflows/engineering-bootstrap.yml"
+  ],
+  "forbidden_scope": [
+    "src/crypto_quant_bot/** business implementation changes",
+    "Lot45 candidate branch changes",
+    "Lot46 implementation",
+    "frozen historical evidence mutation",
+    "runtime capability activation",
+    "mandatory paid or LLM-backed dependency"
+  ],
+  "tasks": [
+    {
+      "id": "ENG-01.1",
+      "status": "IN_PROGRESS",
+      "description": "Define the permanent project-state schema from the certified ENG-00 baseline."
+    },
+    {
+      "id": "ENG-01.2",
+      "status": "PLANNED",
+      "description": "Implement independent BUSINESS / ENGINEERING / AUDIT tracks."
+    },
+    {
+      "id": "ENG-01.3",
+      "status": "PLANNED",
+      "description": "Define and enforce the permanent state machine and legal transitions."
+    },
+    {
+      "id": "ENG-01.4",
+      "status": "PLANNED",
+      "description": "Migrate the agent startup protocol to the permanent state."
+    },
+    {
+      "id": "ENG-01.5",
+      "status": "PLANNED",
+      "description": "Formalize GitHub-only execution and evidence rules in the permanent engine."
+    },
+    {
+      "id": "ENG-01.6",
+      "status": "PLANNED",
+      "description": "Implement permanent state-drift detection and qualification."
+    }
+  ],
+  "done_when": [
+    "one permanent machine-readable project state exists",
+    "business engineering and audit tracks are independent and unambiguous",
+    "legal transitions fail closed",
+    "fresh agents resolve exactly one authorized task",
+    "GitHub-only agents cannot claim unavailable local evidence",
+    "external Git drift is detected before work begins"
+  ]
+}

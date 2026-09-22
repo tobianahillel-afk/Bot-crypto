@@ -26,10 +26,11 @@
     "BOOT-04 deterministic agent startup protocol created",
     "BOOT-05 machine-readable handoff and stale-state detection created",
     "BOOT-06 lightweight zero-dependency CI passed",
-    "BOOT-07 cold-start qualification passed on workflow run 35776801100"
+    "BOOT-07 cold-start qualification passed on workflow run 35776801100",
+    "ENG-00 Repository Truth Recovery completed with canonical baseline validated on workflow run 35792439447"
   ],
-  "current_objective": "ENG-00.5: produce and validate the canonical baseline consumed by ENG-01.",
-  "next_action": "Create the machine-readable ENG-00 canonical baseline, validate it against current state/design/truth/evidence protection, then close ENG-00.",
+  "current_objective": "ENG-01 Agent Bootstrap & Canonical State is active; build the permanent project-state schema from the certified ENG-00 baseline.",
+  "next_action": "Continue DEVELOPMENT_ENGINE ENG-01.1: define and validate the permanent project-state schema.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -61,6 +62,12 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35792145392",
       "note": "Exact head e34e07d5818fb1a03363c45ba442dd6f04ee4e26 validated historical evidence protection and all prior governance checks."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35792439447",
+      "note": "Exact head b830dc3c94e8abd2d15723fc0e156f188cd10936 validated the ENG-00 canonical baseline and transition-compatible validator."
     }
   ],
   "stale_when": [
@@ -72,8 +79,8 @@
     "Lot46 is no longer LOCKED before explicit unlock"
   ],
   "next_engineering": {
-    "active_lot": "ENG-00",
-    "active_task": "ENG-00.5",
-    "active_manifest": "engineering/lots/ENG-00.json"
+    "active_lot": "ENG-01",
+    "active_task": "ENG-01.1",
+    "active_manifest": "engineering/lots/ENG-01.json"
   }
 }

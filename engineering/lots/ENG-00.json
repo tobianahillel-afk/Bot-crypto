@@ -3,7 +3,7 @@
   "kind": "engineering_work_item",
   "id": "ENG-00",
   "title": "Repository Truth Recovery",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "objective": "Reconcile repository identity, status, Git reality and historical authority before permanent Development Engine automation expands.",
   "depends_on": [
     "BOOT-07"
@@ -49,7 +49,7 @@
     },
     {
       "id": "ENG-00.5",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Produce and validate the canonical baseline consumed by ENG-01."
     }
   ],
