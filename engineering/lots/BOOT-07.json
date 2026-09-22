@@ -24,27 +24,27 @@
   "tasks": [
     {
       "id": "BOOT-07.1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Cold-start continue-engine scenario."
     },
     {
       "id": "BOOT-07.2",
-      "status": "PLANNED",
+      "status": "DONE",
       "description": "State-drift and stale-handoff recovery scenario."
     },
     {
       "id": "BOOT-07.3",
-      "status": "PLANNED",
+      "status": "DONE",
       "description": "Forbidden Lot46 progression scenario."
     },
     {
       "id": "BOOT-07.4",
-      "status": "PLANNED",
+      "status": "DONE",
       "description": "GitHub-only tool-honesty scenario."
     },
     {
       "id": "BOOT-07.5",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Declare Bootstrap Engine STABLE only if all scenarios pass."
     }
   ],

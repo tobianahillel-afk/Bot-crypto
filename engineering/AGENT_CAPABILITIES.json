@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "profiles": {
+    "GITHUB_CONNECTOR_ONLY": {
+      "github_read": true,
+      "github_write": "AUTHORIZED_ONLY",
+      "local_execution": false,
+      "ci_execution": false,
+      "may_claim_local_test_pass": false,
+      "valid_evidence": [
+        "EXACT_GITHUB_REF",
+        "EXACT_GITHUB_ACTIONS_RUN",
+        "REPOSITORY_ARTIFACT"
+      ]
+    },
+    "LOCAL_REPOSITORY": {
+      "github_read": "OPTIONAL",
+      "github_write": "OPTIONAL",
+      "local_execution": true,
+      "ci_execution": false,
+      "may_claim_local_test_pass": "ONLY_IF_EXECUTED",
+      "valid_evidence": [
+        "LOCAL_COMMAND_OUTPUT",
+        "EXACT_GITHUB_REF"
+      ]
+    },
+    "CI_EXECUTION": {
+      "github_read": true,
+      "github_write": "WORKFLOW_PERMISSION_ONLY",
+      "local_execution": "WORKFLOW_ONLY",
+      "ci_execution": true,
+      "may_claim_local_test_pass": false,
+      "valid_evidence": [
+        "EXACT_GITHUB_ACTIONS_RUN",
+        "EXACT_HEAD_SHA"
+      ]
+    },
+    "READ_ONLY_AUDITOR": {
+      "github_read": true,
+      "github_write": false,
+      "local_execution": "OPTIONAL_READ_ONLY",
+      "ci_execution": false,
+      "may_claim_local_test_pass": "ONLY_IF_EXECUTED",
+      "valid_evidence": [
+        "OBSERVATION",
+        "EXACT_GITHUB_REF"
+      ]
+    }
+  }
+}

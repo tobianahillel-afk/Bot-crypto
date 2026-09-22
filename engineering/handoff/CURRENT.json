@@ -13,7 +13,7 @@
   "state_snapshot": {
     "phase": "BUILDING",
     "active_lot": "BOOT-07",
-    "active_task": "BOOT-07.1",
+    "active_task": "BOOT-07.5",
     "active_manifest": "engineering/lots/BOOT-07.json",
     "business_development": "PAUSED",
     "lot46_status": "LOCKED"
@@ -27,8 +27,8 @@
     "BOOT-05 machine-readable handoff and stale-state semantics created",
     "BOOT-06 lightweight zero-dependency CI validated on run 35775848267"
   ],
-  "current_objective": "Prove a context-free agent can resume safely and reject forbidden or stale states.",
-  "next_action": "Implement BOOT-07 cold-start qualification scenarios in task order.",
+  "current_objective": "Run deterministic cold-start qualification and prepare the handoff to permanent-engine ENG-00.",
+  "next_action": "Inspect the exact cold-start CI run; if PASS, freeze bootstrap as STABLE and activate ENG-00.",
   "blockers": [],
   "validation_evidence": [
     {

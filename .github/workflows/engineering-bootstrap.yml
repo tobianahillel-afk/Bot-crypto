@@ -47,3 +47,6 @@ jobs:
 
       - name: Enforce bootstrap diff boundary
         run: python scripts/governance/validate_bootstrap_diff.py --base origin/main
+
+      - name: Cold-start qualification
+        run: python scripts/governance/cold_start_qualification.py
