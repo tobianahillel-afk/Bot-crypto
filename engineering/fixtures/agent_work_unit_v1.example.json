@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-02-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-02",
+    "task_id": "ENG-02.1",
+    "manifest": "engineering/lots/ENG-02.json"
+  },
+  "title": "Define Agent Work Unit V1 contract",
+  "objective": "Define the strict child execution contract used to bound one agent implementation unit without replacing the parent engineering work item.",
+  "non_goals": [
+    "implement dependency DAG traversal",
+    "calculate final complexity scores",
+    "classify production risk beyond the UNCLASSIFIED placeholder",
+    "implement context routing",
+    "change business implementation"
+  ],
+  "depends_on": [],
+  "inputs": [
+    {
+      "name": "Work Item V1 standard",
+      "kind": "CONTRACT",
+      "locator": "engineering/WORK_ITEM_STANDARD.md"
+    },
+    {
+      "name": "Active ENG-02 manifest",
+      "kind": "STATE",
+      "locator": "engineering/lots/ENG-02.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Agent Work Unit schema",
+      "kind": "SCHEMA",
+      "locator": "config/governance/agent_work_unit_v1.schema.json"
+    },
+    {
+      "name": "Agent Work Unit executable semantics",
+      "kind": "CONTRACT",
+      "locator": "scripts/governance/validate_agent_work_unit.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "3cc5ec94d8ef7101428eb1c1a1e76c44ba4b9b2b",
+    "allowed_paths": [
+      "config/governance/agent_work_unit_v1.schema.json",
+      "engineering/AGENT_WORK_UNIT_STANDARD.md",
+      "engineering/fixtures/agent_work_unit_v1.example.json",
+      "scripts/governance/validate_agent_work_unit.py",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "AWU is a child execution unit and does not replace the parent work-item manifest",
+      "one AWU has one parent task",
+      "scope base is an exact SHA-40",
+      "allowed paths are explicit and non-empty",
+      "non-goals and forbidden semantics are explicit",
+      "planning placeholders remain fail-closed until later ENG-02 tasks classify them"
+    ],
+    "acceptance_criteria": [
+      "reference fixture passes executable validator",
+      "unknown top-level keys are rejected",
+      "parent task must belong to parent work item",
+      "self-dependency is rejected",
+      "duplicate path and contract entries are rejected",
+      "DONE requires fully classified planning fields"
+    ]
+  },
+  "planning": {
+    "risk_class": "UNCLASSIFIED",
+    "complexity_score": null,
+    "split_required": null,
+    "context_budget": {
+      "max_primary_files": null,
+      "max_reference_files": null,
+      "max_total_kib": null
+    }
+  },
+  "validation": {
+    "required_tiers": [
+      "T0"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_agent_work_unit.py engineering/fixtures/agent_work_unit_v1.example.json"
+    ]
+  },
+  "done_when": [
+    "schema and executable validator agree on required structure",
+    "reference fixture is valid",
+    "invalid bounded-contract scenarios fail closed"
+  ]
+}
