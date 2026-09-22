@@ -48,6 +48,9 @@ jobs:
       - name: Validate permanent state design
         run: python scripts/governance/validate_permanent_state_design.py
 
+      - name: Validate historical evidence protection
+        run: python scripts/governance/validate_historical_evidence_protection.py
+
       - name: Run negative validator self-tests
         run: python scripts/governance/selftest_bootstrap_validators.py
 
