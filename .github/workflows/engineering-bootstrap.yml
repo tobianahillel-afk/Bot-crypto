@@ -66,6 +66,12 @@ jobs:
       - name: Run state-machine adversarial self-tests
         run: python scripts/governance/selftest_project_state_machine.py
 
+      - name: Validate agent execution evidence policy
+        run: python scripts/governance/validate_agent_evidence_policy.py
+
+      - name: Run agent evidence adversarial self-tests
+        run: python scripts/governance/selftest_agent_evidence_policy.py
+
       - name: Run negative validator self-tests
         run: python scripts/governance/selftest_bootstrap_validators.py
 
