@@ -29,8 +29,8 @@
     "BOOT-07 cold-start qualification passed on workflow run 35776801100",
     "ENG-00 Repository Truth Recovery completed with canonical baseline validated on workflow run 35792439447"
   ],
-  "current_objective": "ENG-01.2: implement independent BUSINESS / ENGINEERING / AUDIT tracks in the permanent project state.",
-  "next_action": "Create config/governance/project_state.json from the certified baseline and validate parity with the compatibility bootstrap state.",
+  "current_objective": "ENG-01.3: define and enforce the permanent project-state machine and legal transitions.",
+  "next_action": "Add transition policy and HEAD^ to HEAD state-transition validation for BUSINESS / ENGINEERING / AUDIT.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -74,6 +74,12 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35792801422",
       "note": "Exact head c7dcb948472e0fe856ef907a4b12374d68de9a84 validated the permanent project-state V1 schema, active work scope and cold-start chain."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35793071593",
+      "note": "Exact head 5544d8ed448d579bf27bf376770714403edb8293 validated the permanent multi-track project state and migration parity."
     }
   ],
   "stale_when": [
@@ -86,7 +92,7 @@
   ],
   "next_engineering": {
     "active_lot": "ENG-01",
-    "active_task": "ENG-01.2",
+    "active_task": "ENG-01.3",
     "active_manifest": "engineering/lots/ENG-01.json"
   }
 }

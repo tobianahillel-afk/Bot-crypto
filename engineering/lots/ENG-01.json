@@ -31,12 +31,12 @@
     },
     {
       "id": "ENG-01.2",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Implement independent BUSINESS / ENGINEERING / AUDIT tracks."
     },
     {
       "id": "ENG-01.3",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Define and enforce the permanent state machine and legal transitions."
     },
     {
