@@ -165,7 +165,11 @@
         "current status says Lot37/version 0.37.0/next Lot38"
       ],
       "mutation_policy": "RECONCILE_IN_ENG-00.2_THEN_GENERATE",
-      "status": "STALE"
+      "status": "RECONCILED_VIEW",
+      "reconciliation": {
+        "engineering_task": "ENG-00.2",
+        "rule": "Current-status claims reconciled to certified Lot44 baseline and canonical V3.1-Ops identity; historical narrative preserved."
+      }
     },
     {
       "id": "VIEW-ROADMAP-STATUS",
@@ -183,7 +187,11 @@
         "state block stops at Lot37 and locks Lots38-177"
       ],
       "mutation_policy": "PRESERVE_ROADMAP_STRUCTURE_RECONCILE_STATUS_IN_ENG-00.2",
-      "status": "PARTIALLY_STALE"
+      "status": "RECONCILED_VIEW",
+      "reconciliation": {
+        "engineering_task": "ENG-00.2",
+        "rule": "Current-status claims reconciled to certified Lot44 baseline and canonical V3.1-Ops identity; historical narrative preserved."
+      }
     },
     {
       "id": "VIEW-PACKAGE-METADATA",
@@ -202,7 +210,11 @@
         "description says V4.1-Ops and Lot43"
       ],
       "mutation_policy": "RECONCILE_METADATA_IN_ENG-00.2",
-      "status": "PARTIALLY_STALE"
+      "status": "RECONCILED_METADATA",
+      "reconciliation": {
+        "engineering_task": "ENG-00.2",
+        "rule": "Current-status claims reconciled to certified Lot44 baseline and canonical V3.1-Ops identity; historical narrative preserved."
+      }
     },
     {
       "id": "VIEW-FUNCTIONAL-COVERAGE",
@@ -219,7 +231,11 @@
         "V3 and V4 marked PLANNED_LOCKED despite later certified work"
       ],
       "mutation_policy": "RECONCILE_STATUS_IN_ENG-00.2",
-      "status": "PARTIALLY_STALE"
+      "status": "RECONCILED_VIEW",
+      "reconciliation": {
+        "engineering_task": "ENG-00.2",
+        "rule": "Current-status claims reconciled to certified Lot44 baseline and canonical V3.1-Ops identity; historical narrative preserved."
+      }
     },
     {
       "id": "VIEW-SYSTEM-EXECUTION-STATE",
@@ -235,7 +251,11 @@
         "section 8 says Lots0-25 only and Lot26/order-book non-implemented"
       ],
       "mutation_policy": "RECONCILE_STATUS_ONLY_IN_ENG-00.2",
-      "status": "PARTIALLY_STALE"
+      "status": "RECONCILED_VIEW",
+      "reconciliation": {
+        "engineering_task": "ENG-00.2",
+        "rule": "Current-status claims reconciled to certified Lot44 baseline and canonical V3.1-Ops identity; historical narrative preserved."
+      }
     },
     {
       "id": "GIT-MAIN",
@@ -268,17 +288,18 @@
       "status": "SUSPENDED_CANDIDATE"
     }
   ],
-  "known_drift_targets": [
-    "README.md",
-    "docs/ROADMAP_V1_TO_V21.md",
-    "pyproject.toml",
-    "docs/FUNCTIONAL_COVERAGE_REGISTRY.md",
-    "docs/SYSTEM_EXECUTION_ARCHITECTURE.md"
-  ],
+  "known_drift_targets": [],
   "invariants": [
     "historical evidence is never rewritten merely to match current status",
     "current operational state does not retroactively redefine past certifications",
     "human-readable status views cannot outrank canonical operational state",
     "candidate PR state cannot become merged truth before an authorized merge and certification transition"
+  ],
+  "resolved_drift_targets": [
+    "README.md",
+    "docs/ROADMAP_V1_TO_V21.md",
+    "pyproject.toml",
+    "docs/FUNCTIONAL_COVERAGE_REGISTRY.md",
+    "docs/SYSTEM_EXECUTION_ARCHITECTURE.md"
   ]
 }
