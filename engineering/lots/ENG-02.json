@@ -42,12 +42,12 @@
     },
     {
       "id": "ENG-02.4",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Enforce mandatory split rules for oversized or cross-boundary work."
     },
     {
       "id": "ENG-02.5",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Define and validate risk classes R0 through R3."
     },
     {

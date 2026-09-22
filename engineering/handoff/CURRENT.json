@@ -30,8 +30,8 @@
     "ENG-00 Repository Truth Recovery completed with canonical baseline validated on workflow run 35792439447",
     "ENG-01 Agent Bootstrap & Canonical State completed; permanent state, state machine, fresh-agent startup, evidence policy and live state-drift qualification validated on workflow run 35794262132"
   ],
-  "current_objective": "ENG-02.4: enforce mandatory split rules for oversized or cross-boundary Agent Work Units.",
-  "next_action": "Extend AWU planning with deterministic size estimates and split reasons; block executable states when mandatory split is true.",
+  "current_objective": "ENG-02.5: define and enforce deterministic AWU risk classes R0 through R3.",
+  "next_action": "Add versioned minimum-risk rules and reject executable AWUs that are unclassified or below their computed minimum class.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -123,6 +123,12 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35798699760",
       "note": "Exact head d51ceb4b8dc40e44e217f86f94f2cb663866b9e2 validated deterministic 12-factor AWU complexity scoring and adversarial under-declaration checks."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35799056965",
+      "note": "Exact head 0eec28b192457a3453759afcde5ce2a0df59586b validated mandatory AWU split decisions and 6 adversarial split scenarios."
     }
   ],
   "stale_when": [
@@ -135,7 +141,7 @@
   ],
   "next_engineering": {
     "active_lot": "ENG-02",
-    "active_task": "ENG-02.4",
+    "active_task": "ENG-02.5",
     "active_manifest": "engineering/lots/ENG-02.json"
   }
 }
