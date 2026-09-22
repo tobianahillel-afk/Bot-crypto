@@ -47,12 +47,12 @@
     },
     {
       "id": "ENG-02.5",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Define and validate risk classes R0 through R3."
     },
     {
       "id": "ENG-02.6",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Implement context routing and bounded context budgets."
     },
     {
