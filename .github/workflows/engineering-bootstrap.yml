@@ -1,0 +1,49 @@
+name: Engineering Bootstrap
+
+on:
+  push:
+    branches:
+      - engineering/bootstrap-development-engine
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engineering-bootstrap-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bootstrap:
+    name: Bootstrap governance
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact head
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.11.9"
+
+      - name: Compile governance scripts
+        run: python -m compileall -q scripts/governance
+
+      - name: Validate canonical state
+        run: python scripts/governance/validate_bootstrap_state.py
+
+      - name: Validate work-item set
+        run: python scripts/governance/validate_work_item.py
+
+      - name: Validate handoff
+        run: python scripts/governance/validate_handoff.py
+
+      - name: Run negative validator self-tests
+        run: python scripts/governance/selftest_bootstrap_validators.py
+
+      - name: Enforce bootstrap diff boundary
+        run: python scripts/governance/validate_bootstrap_diff.py --base origin/main

@@ -24,22 +24,22 @@
   "tasks": [
     {
       "id": "BOOT-06.1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Validate JSON state and manifest structure."
     },
     {
       "id": "BOOT-06.2",
-      "status": "PLANNED",
+      "status": "DONE",
       "description": "Validate single active work item and dependency consistency."
     },
     {
       "id": "BOOT-06.3",
-      "status": "PLANNED",
+      "status": "DONE",
       "description": "Validate next-task existence and no active/completed contradiction."
     },
     {
       "id": "BOOT-06.4",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Validate bootstrap allowed-path boundary and run lightweight CI."
     }
   ],

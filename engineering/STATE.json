@@ -45,7 +45,7 @@
       "BOOT-05"
     ],
     "active_lot": "BOOT-06",
-    "active_task": "BOOT-06.1",
+    "active_task": "BOOT-06.4",
     "next_lot": "BOOT-07",
     "blockers": [],
     "active_manifest": "engineering/lots/BOOT-06.json"
