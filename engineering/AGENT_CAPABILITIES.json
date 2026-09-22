@@ -1,5 +1,82 @@
 {
   "schema_version": 1,
+  "policy_kind": "agent_execution_evidence_policy_v1",
+  "mandatory_cost_policy": {
+    "paid_external_api_required": false,
+    "paid_llm_required": false,
+    "paid_saas_required": false,
+    "paid_runner_required": false
+  },
+  "evidence_classes": {
+    "EXACT_GITHUB_REF": {
+      "required_fields": [
+        "ref",
+        "sha"
+      ],
+      "purpose": "Bind an observation to an exact Git ref and SHA."
+    },
+    "EXACT_GITHUB_ACTIONS_RUN": {
+      "required_fields": [
+        "run_id",
+        "head_sha",
+        "conclusion"
+      ],
+      "purpose": "Bind a CI claim to one inspected workflow run and exact head."
+    },
+    "REPOSITORY_ARTIFACT": {
+      "required_fields": [
+        "path",
+        "identity"
+      ],
+      "purpose": "Bind a claim to a repository or downloaded workflow artifact identity."
+    },
+    "LOCAL_COMMAND_OUTPUT": {
+      "required_fields": [
+        "command",
+        "exit_code",
+        "executed"
+      ],
+      "purpose": "Prove a command was actually executed in a local repository context."
+    },
+    "OBSERVATION": {
+      "required_fields": [
+        "description"
+      ],
+      "purpose": "Record a read-only observation that is not itself execution proof."
+    }
+  },
+  "claim_rules": {
+    "GIT_STATE_OBSERVED": {
+      "allowed_evidence": [
+        "EXACT_GITHUB_REF",
+        "OBSERVATION"
+      ]
+    },
+    "CI_PASS": {
+      "allowed_evidence": [
+        "EXACT_GITHUB_ACTIONS_RUN"
+      ],
+      "requires_success_conclusion": true
+    },
+    "ARTIFACT_VERIFIED": {
+      "allowed_evidence": [
+        "REPOSITORY_ARTIFACT",
+        "EXACT_GITHUB_ACTIONS_RUN"
+      ]
+    },
+    "LOCAL_TEST_PASS": {
+      "allowed_evidence": [
+        "LOCAL_COMMAND_OUTPUT"
+      ],
+      "requires_executed_local_command": true,
+      "requires_exit_code_zero": true
+    },
+    "REPOSITORY_MUTATION": {
+      "allowed_evidence": [
+        "EXACT_GITHUB_REF"
+      ]
+    }
+  },
   "profiles": {
     "GITHUB_CONNECTOR_ONLY": {
       "github_read": true,
@@ -7,10 +84,22 @@
       "local_execution": false,
       "ci_execution": false,
       "may_claim_local_test_pass": false,
+      "may_claim_ci_pass": "ONLY_IF_EXACT_RUN_INSPECTED",
+      "may_mutate_repository": "ONLY_IF_AUTHORIZED",
+      "allowed_claim_kinds": [
+        "GIT_STATE_OBSERVED",
+        "CI_PASS",
+        "ARTIFACT_VERIFIED",
+        "REPOSITORY_MUTATION"
+      ],
+      "forbidden_claim_kinds": [
+        "LOCAL_TEST_PASS"
+      ],
       "valid_evidence": [
         "EXACT_GITHUB_REF",
         "EXACT_GITHUB_ACTIONS_RUN",
-        "REPOSITORY_ARTIFACT"
+        "REPOSITORY_ARTIFACT",
+        "OBSERVATION"
       ]
     },
     "LOCAL_REPOSITORY": {
@@ -19,9 +108,22 @@
       "local_execution": true,
       "ci_execution": false,
       "may_claim_local_test_pass": "ONLY_IF_EXECUTED",
+      "may_claim_ci_pass": "ONLY_IF_EXACT_RUN_INSPECTED",
+      "may_mutate_repository": "IF_AUTHORIZED",
+      "allowed_claim_kinds": [
+        "GIT_STATE_OBSERVED",
+        "CI_PASS",
+        "ARTIFACT_VERIFIED",
+        "LOCAL_TEST_PASS",
+        "REPOSITORY_MUTATION"
+      ],
+      "forbidden_claim_kinds": [],
       "valid_evidence": [
         "LOCAL_COMMAND_OUTPUT",
-        "EXACT_GITHUB_REF"
+        "EXACT_GITHUB_REF",
+        "EXACT_GITHUB_ACTIONS_RUN",
+        "REPOSITORY_ARTIFACT",
+        "OBSERVATION"
       ]
     },
     "CI_EXECUTION": {
@@ -30,9 +132,22 @@
       "local_execution": "WORKFLOW_ONLY",
       "ci_execution": true,
       "may_claim_local_test_pass": false,
+      "may_claim_ci_pass": "OWN_EXACT_RUN_ONLY",
+      "may_mutate_repository": "WORKFLOW_PERMISSION_ONLY",
+      "allowed_claim_kinds": [
+        "GIT_STATE_OBSERVED",
+        "CI_PASS",
+        "ARTIFACT_VERIFIED",
+        "REPOSITORY_MUTATION"
+      ],
+      "forbidden_claim_kinds": [
+        "LOCAL_TEST_PASS"
+      ],
       "valid_evidence": [
         "EXACT_GITHUB_ACTIONS_RUN",
-        "EXACT_HEAD_SHA"
+        "EXACT_GITHUB_REF",
+        "REPOSITORY_ARTIFACT",
+        "OBSERVATION"
       ]
     },
     "READ_ONLY_AUDITOR": {
@@ -40,11 +155,33 @@
       "github_write": false,
       "local_execution": "OPTIONAL_READ_ONLY",
       "ci_execution": false,
-      "may_claim_local_test_pass": "ONLY_IF_EXECUTED",
+      "may_claim_local_test_pass": "ONLY_IF_EXECUTED_READ_ONLY",
+      "may_claim_ci_pass": "ONLY_IF_EXACT_RUN_INSPECTED",
+      "may_mutate_repository": false,
+      "allowed_claim_kinds": [
+        "GIT_STATE_OBSERVED",
+        "CI_PASS",
+        "ARTIFACT_VERIFIED",
+        "LOCAL_TEST_PASS"
+      ],
+      "forbidden_claim_kinds": [
+        "REPOSITORY_MUTATION"
+      ],
       "valid_evidence": [
         "OBSERVATION",
-        "EXACT_GITHUB_REF"
+        "EXACT_GITHUB_REF",
+        "EXACT_GITHUB_ACTIONS_RUN",
+        "REPOSITORY_ARTIFACT",
+        "LOCAL_COMMAND_OUTPUT"
       ]
     }
-  }
+  },
+  "global_rules": [
+    "never claim local execution from GitHub connector activity",
+    "never claim CI PASS without an inspected exact run id and head SHA",
+    "never reuse a CI PASS after the candidate head changes",
+    "never infer an artifact PASS from its filename or PR prose alone",
+    "read-only profiles may not claim repository mutation",
+    "unavailable capability is reported as unavailable rather than assumed successful"
+  ]
 }

@@ -62,7 +62,7 @@ Use only evidence the current session can actually produce or inspect:
 - `CI_EXECUTION`: evidence only for the exact workflow run/head inspected.
 - `READ_ONLY_AUDITOR`: no repository mutation.
 
-Never convert an unavailable capability into an assumed PASS.
+Never convert an unavailable capability into an assumed PASS. Machine-readable capability/evidence rules live in `engineering/AGENT_CAPABILITIES.json`.
 
 ## Mandatory-cost rule
 

@@ -7,7 +7,7 @@ without reconstructing history from chat, README prose or old PR descriptions.
 
 ## S0 — Declare actual capability profile
 
-Use the closest profile from `engineering/AGENT_CAPABILITIES.json`:
+Use the closest profile from `engineering/AGENT_CAPABILITIES.json`. That file is the machine-readable execution/evidence policy and is validated in CI:
 `GITHUB_CONNECTOR_ONLY`, `LOCAL_REPOSITORY`, `CI_EXECUTION`, or
 `READ_ONLY_AUDITOR`.
 
