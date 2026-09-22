@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "bootstrap_work_item",
+  "id": "BOOT-03",
+  "title": "Sub-Lot and Work-Item Standard",
+  "status": "IN_PROGRESS",
+  "objective": "Define the minimal bounded machine-readable manifest used by BOOT and future ENG work.",
+  "depends_on": [
+    "BOOT-02"
+  ],
+  "allowed_paths": [
+    "AGENTS.md",
+    "engineering/**",
+    "scripts/governance/**"
+  ],
+  "forbidden_scope": [
+    "business source changes",
+    "Lot45 candidate changes",
+    "Lot46 implementation",
+    "frozen historical evidence mutation",
+    "mandatory paid or LLM-backed dependency"
+  ],
+  "tasks": [
+    {
+      "id": "BOOT-03.1",
+      "status": "IN_PROGRESS",
+      "description": "Define required manifest fields and one canonical JSON representation."
+    },
+    {
+      "id": "BOOT-03.2",
+      "status": "PLANNED",
+      "description": "Define dependency semantics."
+    },
+    {
+      "id": "BOOT-03.3",
+      "status": "PLANNED",
+      "description": "Define allowed and forbidden path semantics."
+    },
+    {
+      "id": "BOOT-03.4",
+      "status": "PLANNED",
+      "description": "Define task status and completion semantics."
+    },
+    {
+      "id": "BOOT-03.5",
+      "status": "PLANNED",
+      "description": "Add deterministic standard-library manifest validation."
+    }
+  ],
+  "done_when": [
+    "one canonical JSON work-item format exists",
+    "all bootstrap manifests use it",
+    "dependencies and scope boundaries are explicit",
+    "task lifecycle semantics are deterministic",
+    "manifest validation requires no third-party parser"
+  ]
+}

@@ -3,7 +3,7 @@
   "kind": "bootstrap_work_item",
   "id": "BOOT-02",
   "title": "Engineering State",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "objective": "Make current, next and forbidden bootstrap work unambiguous and machine-checkable.",
   "depends_on": [
     "BOOT-01"
@@ -37,7 +37,7 @@
     },
     {
       "id": "BOOT-02.4",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Implement and validate a cheap deterministic standard-library state validator."
     }
   ],
