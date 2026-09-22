@@ -45,6 +45,9 @@ jobs:
       - name: Validate repository truth registry
         run: python scripts/governance/validate_truth_registry.py
 
+      - name: Validate permanent state design
+        run: python scripts/governance/validate_permanent_state_design.py
+
       - name: Run negative validator self-tests
         run: python scripts/governance/selftest_bootstrap_validators.py
 
