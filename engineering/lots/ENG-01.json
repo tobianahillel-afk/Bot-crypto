@@ -36,12 +36,12 @@
     },
     {
       "id": "ENG-01.3",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Define and enforce the permanent state machine and legal transitions."
     },
     {
       "id": "ENG-01.4",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Migrate the agent startup protocol to the permanent state."
     },
     {
