@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "policy_kind": "historical_evidence_protection",
+  "comparison_base": "origin/main",
+  "principle": "Protect exact certified anchors and explicitly frozen current-tree paths; do not blanket-freeze evolving status views.",
+  "anchors": [
+    {
+      "id": "LOT44_POST_MERGE_CERTIFICATION",
+      "type": "IMMUTABLE_GIT_ANCHOR",
+      "source_head": "d3cc4cf916ecea5166716746143a593f01b1d051",
+      "certification_anchor": "720b6f895672b650a7c7df96cdf68524479ae3f4",
+      "evidence_head": "8ca3edadb7e811bad428575cfe236b20dd5ed62f",
+      "frozen_validator_head": "888fbf696432bec1a5f9d3e4f9c09279ed569325",
+      "implementation_merge": "5c5d3c388abaf10e2e81593a6a3918375a0c0e19",
+      "post_merge_audit_merge": "1fd85f26102f94d4c42a8f515b522c23028bac89",
+      "verdict": "GO_LOT44_POST_MERGE"
+    },
+    {
+      "id": "LOT45_ENTRY_GATE",
+      "type": "IMMUTABLE_GIT_ANCHOR",
+      "prerequisite_merge": "1fd85f26102f94d4c42a8f515b522c23028bac89",
+      "gate_pr_head": "36a575f2f27da07625875b6fbb579aa75fe4d429",
+      "gate_merge": "390d0779f2be257fa8134faf8f02193a760a09c3",
+      "verdict": "GO_LOT45_IMPLEMENTATION_ENTRY"
+    }
+  ],
+  "protected_current_tree_paths": [
+    ".github/workflows/lot44-mutation-assurance.yml",
+    ".github/workflows/lot44-trades-aggressor-classification.yml",
+    ".github/workflows/lot44-frozen-evidence.yml",
+    ".github/workflows/lot44-post-merge-audit.yml",
+    "config/microstructure/trades_and_aggressor_classification_schema_v1.json",
+    "contracts/schemas/classified_trade_v1.schema.json",
+    "contracts/schemas/aggressor_confidence_state_v1.schema.json",
+    "contracts/schemas/trades_aggressor_classification_schema_state_v1.schema.json",
+    "contracts/schemas/trades_aggressor_classification_schema_audit_v1.schema.json",
+    "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py",
+    "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py",
+    "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py",
+    "scripts/run_lot44_trades_and_aggressor_classification_schema.py",
+    "scripts/validate_lot44.py",
+    "scripts/validate_lot44_no_connectivity.py",
+    "scripts/validate_lot44_frozen_evidence.py",
+    "scripts/validate_lot44_post_merge.py",
+    "tests/test_lot44_trades_and_aggressor_classification_schema.py",
+    "tests/test_lot44_schema_contracts.py",
+    "tests/test_lot44_causal_guards.py",
+    "tests/test_lot44_runtime_confidence_version.py",
+    "docs/LOT_44_TRADES_AND_AGGRESSOR_CLASSIFICATION_SCHEMA.md",
+    "docs/ACCEPTANCE_CRITERIA_LOT_44.md",
+    "reports/lot_44_trades_and_aggressor_classification_schema_report.md",
+    "data/audit/trades_and_aggressor_classification_schema_lot44.json",
+    "data/audit/trades_and_aggressor_classification_schema_audit_lot44.json",
+    "data/audit/aggressor_confidence_state_lot44.json",
+    "reports/lot44/coverage_summary.json",
+    "reports/lot44/mutation_summary.json",
+    ".github/workflows/lot44-entry-gate.yml",
+    ".github/workflows/lot45-entry-gate.yml",
+    "contracts/schemas/lot45_v4_entry_gate_v1.schema.json",
+    "data/audit/lot45_v4_entry_gate.json",
+    "docs/LOT_45_V4_ENTRY_GATE.md",
+    "reports/lot_45_v4_entry_gate_report.md",
+    "scripts/validate_lot45_entry_gate.py",
+    "tests/test_lot45_v4_entry_gate.py"
+  ],
+  "intentionally_mutable_views": [
+    "README.md",
+    "docs/ROADMAP_V1_TO_V21.md",
+    "docs/FUNCTIONAL_COVERAGE_REGISTRY.md",
+    "docs/SYSTEM_EXECUTION_ARCHITECTURE.md",
+    "pyproject.toml"
+  ],
+  "rules": [
+    "protected current-tree paths must not differ from origin/main during engineering foundation work",
+    "historical Git anchors are never rewritten; newer reconciliation creates new commits instead",
+    "status views may change when they do not mutate certified frozen evidence",
+    "a required historical correction must use a separately approved migration/remediation work item rather than silent edit"
+  ]
+}
