@@ -46,6 +46,12 @@ jobs:
       - name: Run Agent Work Unit adversarial self-tests
         run: python scripts/governance/selftest_agent_work_unit.py
 
+      - name: Validate Agent Work Unit dependency DAG
+        run: python scripts/governance/validate_agent_work_unit_graph.py
+
+      - name: Run Agent Work Unit DAG adversarial self-tests
+        run: python scripts/governance/selftest_agent_work_unit_graph.py
+
       - name: Validate handoff
         run: python scripts/governance/validate_handoff.py
 

@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-02-DAG-WU01",
+  "status": "DONE",
+  "parent": {
+    "work_item_id": "ENG-02",
+    "task_id": "ENG-02.2",
+    "manifest": "engineering/lots/ENG-02.json"
+  },
+  "title": "Dependency DAG fixture ENG-02-DAG-WU01",
+  "objective": "Provide a valid DAG node for ENG-02-DAG-WU01.",
+  "non_goals": [
+    "business implementation",
+    "complexity scoring",
+    "risk classification"
+  ],
+  "depends_on": [],
+  "inputs": [
+    {
+      "name": "Active ENG-02 manifest",
+      "kind": "STATE",
+      "locator": "engineering/lots/ENG-02.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "DAG root",
+      "kind": "OTHER",
+      "locator": "engineering/fixtures/awu_graph_valid/ENG-02-DAG-WU01.json"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "55baac717c4d1b22af902f816d5cda8a528d0e63",
+    "allowed_paths": [
+      "engineering/fixtures/awu_graph_valid/**"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "Lot46 unlock"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "all declared AWU dependencies exist in the validated graph",
+      "dependency graph is acyclic"
+    ],
+    "acceptance_criteria": [
+      "graph validator accepts this node in the valid fixture set"
+    ]
+  },
+  "planning": {
+    "risk_class": "R0",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 1,
+      "max_reference_files": 1,
+      "max_total_kib": 64
+    }
+  },
+  "validation": {
+    "required_tiers": [
+      "T0"
+    ],
+    "target_commands": []
+  },
+  "done_when": [
+    "dependency semantics are satisfied"
+  ]
+}
