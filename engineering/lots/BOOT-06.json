@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "kind": "bootstrap_work_item",
+  "id": "BOOT-06",
+  "title": "Minimal Validation",
+  "status": "PLANNED",
+  "objective": "Validate bootstrap state and manifests cheaply without invoking heavy bot CI.",
+  "depends_on": [
+    "BOOT-05"
+  ],
+  "allowed_paths": [
+    "AGENTS.md",
+    "engineering/**",
+    "scripts/governance/**",
+    ".github/workflows/engineering-bootstrap.yml"
+  ],
+  "forbidden_scope": [
+    "business source changes",
+    "Lot45 candidate changes",
+    "Lot46 implementation",
+    "frozen historical evidence mutation",
+    "mandatory paid or LLM-backed dependency"
+  ],
+  "tasks": [
+    {
+      "id": "BOOT-06.1",
+      "status": "PLANNED",
+      "description": "Validate JSON state and manifest structure."
+    },
+    {
+      "id": "BOOT-06.2",
+      "status": "PLANNED",
+      "description": "Validate single active work item and dependency consistency."
+    },
+    {
+      "id": "BOOT-06.3",
+      "status": "PLANNED",
+      "description": "Validate next-task existence and no active/completed contradiction."
+    },
+    {
+      "id": "BOOT-06.4",
+      "status": "PLANNED",
+      "description": "Validate bootstrap allowed-path boundary and run lightweight CI."
+    }
+  ],
+  "done_when": [
+    "bootstrap validators execute with Python standard library only",
+    "bootstrap CI is path-scoped and lightweight"
+  ]
+}

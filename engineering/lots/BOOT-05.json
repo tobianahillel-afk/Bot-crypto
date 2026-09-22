@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "kind": "bootstrap_work_item",
+  "id": "BOOT-05",
+  "title": "Handoff and Resume",
+  "status": "PLANNED",
+  "objective": "Make interruption and context loss recoverable without trusting stale summaries.",
+  "depends_on": [
+    "BOOT-04"
+  ],
+  "allowed_paths": [
+    "AGENTS.md",
+    "engineering/**",
+    "scripts/governance/**",
+    ".github/workflows/engineering-bootstrap.yml"
+  ],
+  "forbidden_scope": [
+    "business source changes",
+    "Lot45 candidate changes",
+    "Lot46 implementation",
+    "frozen historical evidence mutation",
+    "mandatory paid or LLM-backed dependency"
+  ],
+  "tasks": [
+    {
+      "id": "BOOT-05.1",
+      "status": "PLANNED",
+      "description": "Define handoff fields and schema."
+    },
+    {
+      "id": "BOOT-05.2",
+      "status": "PLANNED",
+      "description": "Bind handoff to a last verified Git ref."
+    },
+    {
+      "id": "BOOT-05.3",
+      "status": "PLANNED",
+      "description": "Detect stale handoffs."
+    },
+    {
+      "id": "BOOT-05.4",
+      "status": "PLANNED",
+      "description": "Define deterministic recovery sequence."
+    }
+  ],
+  "done_when": [
+    "handoff is machine-readable",
+    "stale handoff cannot silently override Git reality",
+    "resume sequence is deterministic"
+  ]
+}

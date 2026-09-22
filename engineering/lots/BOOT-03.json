@@ -23,27 +23,27 @@
   "tasks": [
     {
       "id": "BOOT-03.1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Define required manifest fields and one canonical JSON representation."
     },
     {
       "id": "BOOT-03.2",
-      "status": "PLANNED",
+      "status": "DONE",
       "description": "Define dependency semantics."
     },
     {
       "id": "BOOT-03.3",
-      "status": "PLANNED",
+      "status": "DONE",
       "description": "Define allowed and forbidden path semantics."
     },
     {
       "id": "BOOT-03.4",
-      "status": "PLANNED",
+      "status": "DONE",
       "description": "Define task status and completion semantics."
     },
     {
       "id": "BOOT-03.5",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Add deterministic standard-library manifest validation."
     }
   ],

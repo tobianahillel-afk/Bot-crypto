@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "kind": "bootstrap_work_item",
+  "id": "BOOT-07",
+  "title": "Cold-Start Qualification",
+  "status": "PLANNED",
+  "objective": "Prove a context-free agent can resume engine work safely and efficiently.",
+  "depends_on": [
+    "BOOT-06"
+  ],
+  "allowed_paths": [
+    "AGENTS.md",
+    "engineering/**",
+    "scripts/governance/**",
+    ".github/workflows/engineering-bootstrap.yml"
+  ],
+  "forbidden_scope": [
+    "business source changes",
+    "Lot45 candidate changes",
+    "Lot46 implementation",
+    "frozen historical evidence mutation",
+    "mandatory paid or LLM-backed dependency"
+  ],
+  "tasks": [
+    {
+      "id": "BOOT-07.1",
+      "status": "PLANNED",
+      "description": "Cold-start continue-engine scenario."
+    },
+    {
+      "id": "BOOT-07.2",
+      "status": "PLANNED",
+      "description": "State-drift and stale-handoff recovery scenario."
+    },
+    {
+      "id": "BOOT-07.3",
+      "status": "PLANNED",
+      "description": "Forbidden Lot46 progression scenario."
+    },
+    {
+      "id": "BOOT-07.4",
+      "status": "PLANNED",
+      "description": "GitHub-only tool-honesty scenario."
+    },
+    {
+      "id": "BOOT-07.5",
+      "status": "PLANNED",
+      "description": "Declare Bootstrap Engine STABLE only if all scenarios pass."
+    }
+  ],
+  "done_when": [
+    "all cold-start scenarios pass",
+    "bootstrap can be frozen as STABLE"
+  ]
+}

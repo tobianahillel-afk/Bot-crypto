@@ -10,35 +10,36 @@ baseline:
 
 completed:
   - id: BOOT-00
-    result: exact main/Lot45 separation verified and business hold established
+    result: baseline frozen and business hold established
   - id: BOOT-01
-    result: Development Engine master plan and ENG-00 through ENG-09 decomposition created
+    result: Development Engine master plan created
   - id: BOOT-02
-    result: canonical state, legal transitions, active-manifest binding and standard-library state validator implemented
+    result: canonical bootstrap state and state validator implemented
+  - id: BOOT-03.1-BOOT-03.4
+    result: canonical JSON work-item format, dependency/scope/task semantics defined
 
 current:
   lot: BOOT-03
-  task: BOOT-03.1
-  objective: define and migrate to one bounded machine-readable JSON work-item standard
+  task: BOOT-03.5
+  objective: validate the full bootstrap manifest set with the standard-library work-item validator
 
 next_actions:
-  - define canonical work-item fields and task lifecycle
-  - convert remaining BOOT manifests from YAML to JSON
-  - add deterministic manifest validator
-  - activate BOOT-04 only after the manifest standard is internally consistent
+  - verify all BOOT-00 through BOOT-07 JSON manifests
+  - fix any schema/lifecycle/dependency inconsistency
+  - mark BOOT-03 DONE only when validation is clean
+  - activate BOOT-04 agent bootstrap protocol
 
 known_constraints:
-  - do not modify PR66 Lot45 code/evidence
-  - do not start Lot46
-  - no mandatory paid or LLM-backed tooling
-  - keep the work-item format small and reusable
+  - business development remains paused
+  - PR66 remains isolated
+  - Lot46 remains locked
+  - mandatory development path remains free and LLM-independent
 
 blockers: []
 
 resume_protocol:
   - read /AGENTS.md
   - read engineering/STATE.json
-  - verify declared Git reality
-  - read engineering/MASTER_PLAN.md
+  - read engineering/WORK_ITEM_STANDARD.md
   - read engineering/lots/BOOT-03.json
-  - continue BOOT-03.1
+  - continue BOOT-03.5

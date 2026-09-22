@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "kind": "bootstrap_work_item",
+  "id": "BOOT-00",
+  "title": "Freeze and Inventory",
+  "status": "DONE",
+  "objective": "Establish the exact engineering starting point without changing business code.",
+  "depends_on": [],
+  "allowed_paths": [
+    "AGENTS.md",
+    "engineering/**",
+    "scripts/governance/**",
+    ".github/workflows/engineering-bootstrap.yml"
+  ],
+  "forbidden_scope": [
+    "business source changes",
+    "Lot45 candidate changes",
+    "Lot46 implementation",
+    "frozen historical evidence mutation",
+    "mandatory paid or LLM-backed dependency"
+  ],
+  "tasks": [
+    {
+      "id": "BOOT-00.1",
+      "status": "DONE",
+      "description": "Verify repository identity, permissions and default branch."
+    },
+    {
+      "id": "BOOT-00.2",
+      "status": "DONE",
+      "description": "Verify exact main SHA and merged certified business baseline."
+    },
+    {
+      "id": "BOOT-00.3",
+      "status": "DONE",
+      "description": "Verify PR66 remains separate and Lot46 remains locked."
+    },
+    {
+      "id": "BOOT-00.4",
+      "status": "DONE",
+      "description": "Check for pre-existing agent/bootstrap control files."
+    },
+    {
+      "id": "BOOT-00.5",
+      "status": "DONE",
+      "description": "Establish business-development hold for engine construction."
+    }
+  ],
+  "done_when": [
+    "baseline is unambiguous",
+    "no business source or frozen evidence is modified"
+  ]
+}

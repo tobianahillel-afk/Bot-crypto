@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "kind": "bootstrap_work_item",
+  "id": "BOOT-04",
+  "title": "Agent Bootstrap Protocol",
+  "status": "PLANNED",
+  "objective": "Make context-free agent startup deterministic and capability-aware.",
+  "depends_on": [
+    "BOOT-03"
+  ],
+  "allowed_paths": [
+    "AGENTS.md",
+    "engineering/**",
+    "scripts/governance/**",
+    ".github/workflows/engineering-bootstrap.yml"
+  ],
+  "forbidden_scope": [
+    "business source changes",
+    "Lot45 candidate changes",
+    "Lot46 implementation",
+    "frozen historical evidence mutation",
+    "mandatory paid or LLM-backed dependency"
+  ],
+  "tasks": [
+    {
+      "id": "BOOT-04.1",
+      "status": "PLANNED",
+      "description": "Finalize root AGENTS bootstrap protocol."
+    },
+    {
+      "id": "BOOT-04.2",
+      "status": "PLANNED",
+      "description": "Formalize source-of-truth precedence."
+    },
+    {
+      "id": "BOOT-04.3",
+      "status": "PLANNED",
+      "description": "Formalize GitHub-only capability and tool-honesty rules."
+    },
+    {
+      "id": "BOOT-04.4",
+      "status": "PLANNED",
+      "description": "Define stop and STATE_DRIFT conditions."
+    }
+  ],
+  "done_when": [
+    "a context-free agent has one deterministic startup route",
+    "capability boundaries and stop conditions are explicit"
+  ]
+}
