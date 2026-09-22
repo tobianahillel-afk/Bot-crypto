@@ -39,12 +39,12 @@
     },
     {
       "id": "ENG-00.3",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Map current Git, PR and certification reality into the permanent-state design."
     },
     {
       "id": "ENG-00.4",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Define explicit protection boundaries for frozen historical evidence."
     },
     {
