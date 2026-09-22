@@ -1,4 +1,4 @@
-# Crypto Quant Bot V4.1-Ops
+# Crypto Quant Bot V3.1-Ops
 
 Plateforme quantitative crypto défensive, déterministe, extensible et auditable.
 
@@ -6,10 +6,11 @@ Plateforme quantitative crypto défensive, déterministe, extensible et auditabl
 
 | Élément | État |
 |---|---|
-| Dernier lot implémenté et validé | **Lot 37 — Microstructure Scope & Offline Data Contracts** |
-| Version | **0.37.0** |
-| Baseline qualité | **P0 institutionnel fusionné** |
-| Prochain lot planifié | **Lot 38 — Order Book L2 Snapshot Engine**, `PLANNED_LOCKED` |
+| Dernier lot métier fusionné et certifié | **Lot 44 — Trades & Aggressor Classification Schema** |
+| Version de baseline métier | **0.44.0** |
+| Gate suivant fusionné | **Lot 45 implementation entry gate — `GO_LOT45_IMPLEMENTATION_ENTRY`** |
+| Candidat métier non fusionné | **Lot 45 — PR #66, suspendue pendant la construction du Development Engine** |
+| Lot suivant | **Lot 46 — `LOCKED`** |
 | Runtime maximal | `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY` |
 | Trading | **désactivé** |
 | Connectivité exchange | **désactivée** |
@@ -24,6 +25,10 @@ live_execution = DISABLED
 leverage = FORBIDDEN
 withdrawals = FORBIDDEN
 ```
+
+> **Autorité d’état courant :** `engineering/STATE.json`. Les descriptions détaillées
+> de lots ci-dessous conservent du contexte historique et ne doivent pas être utilisées
+> seules pour décider du prochain travail autorisé.
 
 Le Lot 29 prouve que les artefacts certifiés des Lots 21 à 28 forment une chaîne ordonnée,
 déterministe et non exécutable. Le Lot 30 clôture V2 en revérifiant les huit artefacts,
@@ -126,7 +131,7 @@ V4 — Lots 37–52 possède :
 - OI, funding, basis et liquidations ;
 - Game Theory et scénarios concurrents.
 
-Le Lot 37 ne fait qu'établir le périmètre et les contrats offline de cette version. Les capacités analytiques ci-dessus restent des lots futurs verrouillés.
+Le Lot 37 a établi le périmètre et les contrats offline de cette version. Les capacités des Lots 38 à 44 ont ensuite été développées selon leurs gates respectifs ; l'état opérationnel exact est porté par `engineering/STATE.json`.
 
 Les zones futures sont explicitement typées :
 
