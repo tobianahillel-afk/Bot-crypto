@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-03.7-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-03",
+    "task_id": "ENG-03.7",
+    "manifest": "engineering/lots/ENG-03.json"
+  },
+  "title": "Implement exact-input proof reuse semantics",
+  "objective": "Define deterministic tamper-evident proof fingerprints and fail-closed reuse decisions bound to exact relevant files, policy, implementation, parameters and environment, while forbidding reuse for certification-sensitive tiers.",
+  "non_goals": [
+    "persist cache in a paid external service",
+    "reuse T4 exact-head certification",
+    "reuse live external-state observations",
+    "execute T3 assurance or T4 certification",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-03.6-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "T3/T4 selector",
+      "kind": "FILE",
+      "locator": "scripts/governance/select_t3_t4.py"
+    },
+    {
+      "name": "T2 runner",
+      "kind": "FILE",
+      "locator": "scripts/governance/run_t2.py"
+    },
+    {
+      "name": "Active ENG-03 manifest",
+      "kind": "STATE",
+      "locator": "engineering/lots/ENG-03.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Proof reuse policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/proof_reuse_policy_v1.json"
+    },
+    {
+      "name": "Proof fingerprint and reuse engine",
+      "kind": "FILE",
+      "locator": "scripts/governance/proof_reuse.py"
+    },
+    {
+      "name": "Proof reuse adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_proof_reuse.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "346a2327eb4a30743726d606ddf6ae5f4558c1dc",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-03.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-03.6-WU01.json",
+      "engineering/work_units/ENG-03.7-WU01.json",
+      "config/governance/proof_reuse_policy_v1.json",
+      "scripts/governance/proof_reuse.py",
+      "scripts/governance/selftest_proof_reuse.py",
+      "engineering/PROOF_REUSE.md",
+      "AGENTS.md",
+      "engineering/AGENT_PROTOCOL.md",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "T4 reuse",
+      "live external-state proof reuse",
+      "security scanner execution",
+      "full certification execution",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "proof key is SHA-256 over canonical JSON with exact content digests not timestamps",
+      "proof binds subject tier/id relevant input files policy files implementation files parameters and environment",
+      "repository paths are relative regular non-symlink files and cannot escape the repository",
+      "only PASS evidence is reusable",
+      "candidate proof key must exactly equal the freshly recomputed expected proof key",
+      "T4 and live-external-state subjects are never reusable",
+      "tampered stale incomplete or differently-environmented proof fails closed"
+    ],
+    "acceptance_criteria": [
+      "identical exact inputs produce identical proof key",
+      "changing one bound input byte changes proof key",
+      "changing policy implementation parameters or environment changes proof key",
+      "timestamps/source-head metadata do not affect proof key for explicitly reusable subjects",
+      "failed evidence cannot be reused",
+      "T4 subject reuse is rejected regardless of matching key",
+      "path traversal symlink and missing-file bindings are rejected",
+      "proof JSON tampering is detected"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 3,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": true,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 13,
+      "executable_loc_changed": 760,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/proof_reuse.py --self-check",
+      "python scripts/governance/selftest_proof_reuse.py"
+    ]
+  },
+  "done_when": [
+    "proof fingerprints bind every declared relevant input exactly",
+    "reuse is deterministic tamper-evident and environment-bound",
+    "unsafe/certification/live-state subjects cannot be reused",
+    "proof cache semantics require no paid service and no network"
+  ]
+}
