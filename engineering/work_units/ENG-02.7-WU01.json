@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-02.7-WU01",
+  "status": "PLANNED",
+  "parent": {
+    "work_item_id": "ENG-02",
+    "task_id": "ENG-02.7",
+    "manifest": "engineering/lots/ENG-02.json"
+  },
+  "title": "Bind active Git diff to active AWU scope",
+  "objective": "Make the active AWU, not the broad ENG work item, the executable Git diff boundary while retaining the parent work item as an upper scope bound.",
+  "non_goals": [
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock",
+    "ENG-02.8 end-to-end qualification",
+    "runtime capability activation",
+    "new paid dependency"
+  ],
+  "depends_on": [],
+  "inputs": [
+    {
+      "name": "Permanent project state",
+      "kind": "STATE",
+      "locator": "config/governance/project_state.json"
+    },
+    {
+      "name": "Active ENG-02 manifest",
+      "kind": "STATE",
+      "locator": "engineering/lots/ENG-02.json"
+    },
+    {
+      "name": "AWU standard",
+      "kind": "CONTRACT",
+      "locator": "engineering/AGENT_WORK_UNIT_STANDARD.md"
+    },
+    {
+      "name": "Historical evidence protection",
+      "kind": "CONFIG",
+      "locator": "engineering/HISTORICAL_EVIDENCE_PROTECTION.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Active AWU resolver",
+      "kind": "FILE",
+      "locator": "scripts/governance/resolve_active_awu.py"
+    },
+    {
+      "name": "AWU-aware diff validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_bootstrap_diff.py"
+    },
+    {
+      "name": "AWU scope adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_active_awu_scope.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "0819db599f68585b998191ca6dc564ce8f82b7cb",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-02.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-02.7-WU01.json",
+      "scripts/governance/resolve_active_awu.py",
+      "scripts/governance/validate_bootstrap_diff.py",
+      "scripts/governance/selftest_active_awu_scope.py",
+      "engineering/AWU_ACTIVE_SCOPE.md",
+      "engineering/AGENT_WORK_UNIT_STANDARD.md",
+      "AGENTS.md",
+      "engineering/AGENT_PROTOCOL.md",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "historical evidence mutation",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "exactly one IN_PROGRESS AWU matches the permanent state's active engineering task",
+      "active AWU parent work item and manifest match permanent state",
+      "AWU allowed paths are a subset of the parent work-item allowlist",
+      "actual changed paths since AWU scope base stay inside AWU allowed paths",
+      "actual changed paths never match AWU forbidden paths",
+      "AWU scope base resolves to an ancestor commit",
+      "active AWU passes contract complexity split risk and context validation"
+    ],
+    "acceptance_criteria": [
+      "resolver returns one and only one active AWU",
+      "missing or duplicate active AWU fails closed",
+      "foreign parent task fails closed",
+      "changed path outside AWU allowlist fails closed",
+      "changed path matching forbidden path fails closed",
+      "invalid or non-ancestor AWU scope base fails closed",
+      "existing broad work-item scope can no longer authorize a path omitted by active AWU"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 3,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 13,
+      "executable_loc_changed": 550,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0"
+    ],
+    "target_commands": [
+      "python scripts/governance/resolve_active_awu.py",
+      "python scripts/governance/validate_bootstrap_diff.py",
+      "python scripts/governance/selftest_active_awu_scope.py"
+    ]
+  },
+  "done_when": [
+    "active AWU is deterministically resolved from permanent state and work-unit manifests",
+    "Git diff scope is enforced against AWU scope rather than only the parent ENG manifest",
+    "AWU parent manifest remains an upper-bound allowlist",
+    "negative scope scenarios fail closed"
+  ]
+}
