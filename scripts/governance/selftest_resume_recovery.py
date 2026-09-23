@@ -38,7 +38,10 @@ def main() -> int:
 
     normal = mod.repository_recover()
     assert normal["authority"] == "config/governance/project_state.json"
-    assert normal["active_awu_id"] == "ENG-05.5-WU01"
+    expected_awu = handoff["active_checkpoint"]["awu_id"]
+    expected_task = handoff["state_snapshot"]["active_task"]
+    assert normal["active_awu_id"] == expected_awu
+    assert normal["active_task"] == expected_task
     assert normal["write_authorized"] is False
     assert normal["state_auto_healed"] is False
     assert normal["conversational_context_required"] is False
@@ -82,8 +85,8 @@ def main() -> int:
     )
     assert result["handoff_status"] == "STALE"
     assert result["context_map_status"] == "STALE"
-    assert result["active_task"] == "ENG-05.5"
-    assert result["active_awu_id"] == "ENG-05.5-WU01"
+    assert result["active_task"] == normal["active_task"]
+    assert result["active_awu_id"] == normal["active_awu_id"]
 
     assert "engineering/STATE.json" not in normal["recovered_read_order"]
     assert "chat_history" not in normal["recovered_read_order"]
