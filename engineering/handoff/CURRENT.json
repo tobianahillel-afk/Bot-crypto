@@ -31,8 +31,8 @@
     "ENG-01 Agent Bootstrap & Canonical State completed; permanent state, state machine, fresh-agent startup, evidence policy and live state-drift qualification validated on workflow run 35794262132",
     "ENG-02 Work Decomposition & Context Engine completed; end-to-end AWU DAG, complexity, split, risk, context, scope and cold-start qualification passed on workflow run 35833639230"
   ],
-  "current_objective": "ENG-03.5: implement conditional targeted T2 domain validation.",
-  "next_action": "Map T1-uncovered domain impacts to bounded pytest target groups; do not install or invoke pytest when no T2 domain group is selected.",
+  "current_objective": "ENG-03.6: select T3 assurance and T4 certification only when residual impact or risk requires them.",
+  "next_action": "Implement symbolic execution-free T3/T4 requirement selection; do not install or execute ENG-04 security scanners or certification suites.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -178,6 +178,12 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35838479239",
       "note": "Exact head d70b7b3179475088f3567674dc30fb4564d79534 passed targeted T1 and 10 adversarial T1 scenarios. Real T1 executed 3 allowlisted checks in 65.831 ms, no full suite/network, leaving only ACTIONS_SECURITY and WORKFLOW_SYNTAX uncovered."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35838907544",
+      "note": "Exact head 4eced6fbf83c856271796d774fd615bf7d30d1a5 passed conditional T2 and 10 adversarial T2 scenarios. Real T2 completed in 86.19 ms with selected_groups=[], pytest_invoked=false, no full suite/network, leaving ACTIONS_SECURITY and WORKFLOW_SYNTAX for T3+."
     }
   ],
   "stale_when": [
@@ -190,7 +196,7 @@
   ],
   "next_engineering": {
     "active_lot": "ENG-03",
-    "active_task": "ENG-03.5",
+    "active_task": "ENG-03.6",
     "active_manifest": "engineering/lots/ENG-03.json"
   }
 }

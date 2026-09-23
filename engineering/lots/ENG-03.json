@@ -47,12 +47,12 @@
     },
     {
       "id": "ENG-03.5",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Define and enforce T2 domain validation checks."
     },
     {
       "id": "ENG-03.6",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Select T3 assurance and T4 certification only when risk requires them."
     },
     {

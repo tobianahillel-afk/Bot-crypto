@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-03.6-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-03",
+    "task_id": "ENG-03.6",
+    "manifest": "engineering/lots/ENG-03.json"
+  },
+  "title": "Select T3 assurance and T4 certification requirements",
+  "objective": "Deterministically select deep-assurance and exact-head certification requirements from T2 residual impacts, certification-sensitive impacts and active AWU risk without executing scanners or full suites.",
+  "non_goals": [
+    "execute CodeQL Semgrep Bandit actionlint zizmor or other security scanners",
+    "execute mutation testing or full regression",
+    "perform exact-head certification",
+    "proof caching",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-03.5-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "T2 runner",
+      "kind": "FILE",
+      "locator": "scripts/governance/run_t2.py"
+    },
+    {
+      "name": "Active AWU resolver",
+      "kind": "FILE",
+      "locator": "scripts/governance/resolve_active_awu.py"
+    },
+    {
+      "name": "Active ENG-03 manifest",
+      "kind": "STATE",
+      "locator": "engineering/lots/ENG-03.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "T3/T4 selection policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/validation_t3_t4_policy_v1.json"
+    },
+    {
+      "name": "T3/T4 selector",
+      "kind": "FILE",
+      "locator": "scripts/governance/select_t3_t4.py"
+    },
+    {
+      "name": "T3/T4 selector adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_t3_t4_selector.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "4eced6fbf83c856271796d774fd615bf7d30d1a5",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-03.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-03.5-WU01.json",
+      "engineering/work_units/ENG-03.6-WU01.json",
+      "config/governance/validation_t3_t4_policy_v1.json",
+      "scripts/governance/select_t3_t4.py",
+      "scripts/governance/selftest_t3_t4_selector.py",
+      "engineering/VALIDATION_T3_T4.md",
+      "AGENTS.md",
+      "engineering/AGENT_PROTOCOL.md",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "security scanner execution",
+      "full certification execution",
+      "mutation testing",
+      "full historical regression",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "selector consumes T2 results and active AWU risk without reclassifying Git paths",
+      "T3 and T4 requirements are symbolic ids only and never executable commands",
+      "R3 always requires T4 exact-head certification",
+      "certification-sensitive provenance impact always requires T4 exact-head certification",
+      "workflow security static-analysis unknown and human-review residual impacts require T3",
+      "documentation-only low-risk work requires neither T3 nor T4",
+      "selection never claims assurance or certification has been executed"
+    ],
+    "acceptance_criteria": [
+      "ACTIONS_SECURITY and WORKFLOW_SYNTAX select workflow assurance at T3 but not T4 for R1",
+      "SECURITY_STATIC_ANALYSIS or SECRET_CONTROLS select security assurance at T3",
+      "STATIC_ANALYSIS selects static-analysis assurance at T3",
+      "CONSERVATIVE_BROAD_IMPACT or HUMAN_REVIEW_REQUIRED selects manual/deep review at T3",
+      "R3 selects exact-head certification at T4 even with no residual impact",
+      "EVIDENCE_PROVENANCE in T2-covered impacts selects exact-head provenance certification at T4",
+      "R0/R1 with no residual or certification-sensitive impact selects no T3/T4"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 2,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 13,
+      "executable_loc_changed": 700,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/select_t3_t4.py",
+      "python scripts/governance/selftest_t3_t4_selector.py"
+    ]
+  },
+  "done_when": [
+    "deep assurance requirements are selected deterministically from residual impact",
+    "R3 and provenance-sensitive work cannot bypass T4",
+    "low-risk fully covered work avoids unnecessary T3/T4",
+    "selection remains execution-free zero-cost and auditable"
+  ]
+}
