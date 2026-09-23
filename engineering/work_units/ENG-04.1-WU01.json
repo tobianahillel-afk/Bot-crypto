@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-04.1-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-04",
+    "task_id": "ENG-04.1",
+    "manifest": "engineering/lots/ENG-04.json"
+  },
+  "title": "Implement zero-cost pinned secret controls",
+  "objective": "Add an exact-version Gitleaks secret-scanning control with least-privilege GitHub Actions integration, explicit redaction/no-comment behavior, configuration validation, and synthetic detection qualification.",
+  "non_goals": [
+    "dependency vulnerability scanning",
+    "general SAST",
+    "GitHub Actions hardening beyond this workflow",
+    "repository branch-protection mutation",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-03.8-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "ENG-04 master-plan requirements",
+      "kind": "FILE",
+      "locator": "engineering/MASTER_PLAN.md"
+    },
+    {
+      "name": "Incremental T3/T4 selector",
+      "kind": "FILE",
+      "locator": "scripts/governance/select_t3_t4.py"
+    },
+    {
+      "name": "Current project state",
+      "kind": "STATE",
+      "locator": "config/governance/project_state.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Gitleaks config",
+      "kind": "CONFIG",
+      "locator": ".gitleaks.toml"
+    },
+    {
+      "name": "Secret-control policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/secret_control_policy_v1.json"
+    },
+    {
+      "name": "Secret scan workflow",
+      "kind": "FILE",
+      "locator": ".github/workflows/security-secrets.yml"
+    },
+    {
+      "name": "Secret-control validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_secret_controls.py"
+    },
+    {
+      "name": "Secret-control adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_secret_controls.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "e5f6c953191d55933355e293d9f1b574659d0328",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-03.json",
+      "engineering/lots/ENG-04.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-03.8-WU01.json",
+      "engineering/work_units/ENG-04.1-WU01.json",
+      ".gitleaks.toml",
+      "config/governance/secret_control_policy_v1.json",
+      ".github/workflows/security-secrets.yml",
+      ".github/workflows/engineering-bootstrap.yml",
+      "scripts/governance/validate_secret_controls.py",
+      "scripts/governance/selftest_secret_controls.py",
+      "engineering/SECRET_CONTROLS.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "dependency scanner integration",
+      "general SAST integration",
+      "branch protection mutation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "Gitleaks integration is pinned to exact action commit and exact CLI version",
+      "workflow permissions are read-only and PR comments/artifact uploads are disabled",
+      "scanner output is redacted",
+      "current working tree and introduced Git history are both covered",
+      "synthetic qualification generates test secret material only at runtime and never commits it",
+      "no allowlist is introduced without explicit finding-specific justification",
+      "secret-control workflow requires no paid license API SaaS LLM or larger runner"
+    ],
+    "acceptance_criteria": [
+      "workflow pin equals audited gitleaks-action v3.0.0 commit",
+      "GITLEAKS_VERSION equals audited CLI v8.30.1",
+      "default Gitleaks rules remain enabled",
+      "workflow uses fetch-depth 0 and least-privilege permissions",
+      "synthetic secret fixture is detected and removed within the job",
+      "clean repository scan passes with redaction enabled",
+      "validator fails on floating action tags disabled redaction comments/uploads or paid-license dependency"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 5,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": true,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 14,
+      "executable_loc_changed": 700,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 1
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_secret_controls.py",
+      "python scripts/governance/selftest_secret_controls.py",
+      "GitHub Actions security-secrets workflow"
+    ]
+  },
+  "done_when": [
+    "secret scanning is exact-version pinned and least privilege",
+    "synthetic positive-control detection proves scanner effectiveness",
+    "repository scan is clean or findings are explicitly triaged without exposing secret values",
+    "mandatory secret-control path remains zero-cost"
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "kind": "engineering_work_item",
+  "id": "ENG-04",
+  "title": "Security & Supply Chain Engine",
+  "status": "IN_PROGRESS",
+  "objective": "Add zero-cost, pinned, risk-proportional security and supply-chain controls without weakening runtime safety or turning every routine change into a full security certification.",
+  "depends_on": [
+    "ENG-03"
+  ],
+  "allowed_paths": [
+    "AGENTS.md",
+    ".gitleaks.toml",
+    "config/governance/**",
+    "engineering/**",
+    "scripts/governance/**",
+    ".github/workflows/engineering-bootstrap.yml",
+    ".github/workflows/security-secrets.yml",
+    ".github/workflows/security-dependencies.yml",
+    ".github/workflows/security-sast.yml",
+    ".github/workflows/security-actions.yml",
+    ".github/workflows/security-supply-chain.yml"
+  ],
+  "forbidden_scope": [
+    "src/crypto_quant_bot/** business implementation changes",
+    "Lot45 candidate branch changes",
+    "Lot46 implementation or unlock",
+    "frozen historical evidence mutation",
+    "runtime capability activation",
+    "mandatory paid or LLM-backed dependency",
+    "live trading execution enablement"
+  ],
+  "tasks": [
+    {
+      "id": "ENG-04.1",
+      "status": "IN_PROGRESS",
+      "description": "Implement secret controls with a pinned zero-cost Gitleaks integration and adversarial qualification."
+    },
+    {
+      "id": "ENG-04.2",
+      "status": "PLANNED",
+      "description": "Implement dependency vulnerability and dependency-diff controls."
+    },
+    {
+      "id": "ENG-04.3",
+      "status": "PLANNED",
+      "description": "Implement SAST with audited pinned tools."
+    },
+    {
+      "id": "ENG-04.4",
+      "status": "PLANNED",
+      "description": "Implement GitHub Actions syntax and security controls."
+    },
+    {
+      "id": "ENG-04.5",
+      "status": "PLANNED",
+      "description": "Implement supply-chain pinning and third-party action verification."
+    },
+    {
+      "id": "ENG-04.6",
+      "status": "PLANNED",
+      "description": "Minimize permissions and remediate repository protection gaps where accessible."
+    },
+    {
+      "id": "ENG-04.7",
+      "status": "PLANNED",
+      "description": "Verify the security engine remains zero-cost and risk-proportional."
+    }
+  ],
+  "done_when": [
+    "secret controls detect current and newly introduced hardcoded secrets with redacted output",
+    "dependency changes and known vulnerabilities receive bounded automated checks",
+    "SAST and workflow-security controls are pinned and selectively executed",
+    "third-party actions and supply-chain dependencies are explicitly pinned and audited",
+    "workflow permissions follow least privilege",
+    "mandatory path requires no paid API SaaS LLM or larger runner",
+    "sensitive changes cannot bypass T3 assurance while routine low-risk changes avoid unnecessary deep scans"
+  ],
+  "extensions": {
+    "scope_base_sha": "e5f6c953191d55933355e293d9f1b574659d0328",
+    "scope_base_kind": "PREVIOUS_ENGINEERING_CERTIFIED_HEAD",
+    "scope_base_evidence_run": 35840677829
+  }
+}

@@ -3,7 +3,7 @@
   "kind": "engineering_work_item",
   "id": "ENG-03",
   "title": "Incremental Validation Engine",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "objective": "Classify diffs and select the minimum safe validation depth so routine development stays fast while sensitive changes receive stronger assurance.",
   "depends_on": [
     "ENG-02"
@@ -62,7 +62,7 @@
     },
     {
       "id": "ENG-03.8",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Measure validation overhead and prove incremental checks avoid unnecessary work."
     }
   ],

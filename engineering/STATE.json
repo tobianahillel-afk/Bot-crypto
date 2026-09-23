@@ -63,12 +63,13 @@
     "completed": [
       "ENG-00",
       "ENG-01",
-      "ENG-02"
+      "ENG-02",
+      "ENG-03"
     ],
-    "active_lot": "ENG-03",
-    "active_task": "ENG-03.8",
-    "next_lot": "ENG-04",
-    "active_manifest": "engineering/lots/ENG-03.json",
+    "active_lot": "ENG-04",
+    "active_task": "ENG-04.1",
+    "next_lot": "ENG-05",
+    "active_manifest": "engineering/lots/ENG-04.json",
     "blockers": []
   },
   "mandatory_cost_policy": {
@@ -83,7 +84,7 @@
     "master_plan": "engineering/MASTER_PLAN.md",
     "handoff": "engineering/handoff/CURRENT.json",
     "bootstrap_protocol": "engineering/BOOTSTRAP.md",
-    "active_manifest": "engineering/lots/ENG-03.json"
+    "active_manifest": "engineering/lots/ENG-04.json"
   },
   "stop_conditions": [
     "STATE_DRIFT",

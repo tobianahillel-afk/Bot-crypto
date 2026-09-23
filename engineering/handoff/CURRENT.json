@@ -29,10 +29,11 @@
     "BOOT-07 cold-start qualification passed on workflow run 35776801100",
     "ENG-00 Repository Truth Recovery completed with canonical baseline validated on workflow run 35792439447",
     "ENG-01 Agent Bootstrap & Canonical State completed; permanent state, state machine, fresh-agent startup, evidence policy and live state-drift qualification validated on workflow run 35794262132",
-    "ENG-02 Work Decomposition & Context Engine completed; end-to-end AWU DAG, complexity, split, risk, context, scope and cold-start qualification passed on workflow run 35833639230"
+    "ENG-02 Work Decomposition & Context Engine completed; end-to-end AWU DAG, complexity, split, risk, context, scope and cold-start qualification passed on workflow run 35833639230",
+    "ENG-03 Incremental Validation Engine completed; exact head e5f6c953191d55933355e293d9f1b574659d0328 passed run 35840677829 with single-pass elapsed 58.109 ms, 6 avoided tier recomputations (60%), no pytest/full-suite/network/T3/T4 execution on the routine path."
   ],
-  "current_objective": "ENG-03.8: eliminate repeated prerequisite execution and measure single-pass incremental validation overhead.",
-  "next_action": "Refactor T1/T2/T3-T4 APIs to accept precomputed prior-tier results, add one orchestrator, and replace redundant production tier steps in engineering CI while preserving tier selftests.",
+  "current_objective": "ENG-04.1: implement zero-cost pinned secret controls.",
+  "next_action": "Integrate Gitleaks v8.30.1 through gitleaks-action v3.0.0 pinned to exact commit e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e, with read-only permissions, redaction, no comments/uploads, and synthetic positive-control qualification.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -196,6 +197,12 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35840156811",
       "note": "Exact head 385a676bae9c612a8e055dea3f044ddc2f0cf54c passed exact-input proof reuse semantics, 10 adversarial reuse scenarios, work decomposition and cold start."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35840677829",
+      "note": "Exact head e5f6c953191d55933355e293d9f1b574659d0328 completed ENG-03.8. Single-pass validation took 58.109 ms, computed T0/T1/T2/selector once each, avoided 6 nested recomputations (60%), and ran no pytest/full suite/network/deep assurance/certification."
     }
   ],
   "stale_when": [
@@ -207,8 +214,8 @@
     "Lot46 is no longer LOCKED before explicit unlock"
   ],
   "next_engineering": {
-    "active_lot": "ENG-03",
-    "active_task": "ENG-03.8",
-    "active_manifest": "engineering/lots/ENG-03.json"
+    "active_lot": "ENG-04",
+    "active_task": "ENG-04.1",
+    "active_manifest": "engineering/lots/ENG-04.json"
   }
 }
