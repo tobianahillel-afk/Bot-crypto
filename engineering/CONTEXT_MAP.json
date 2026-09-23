@@ -2,7 +2,7 @@
   "active_work": {
     "awu_id": "ENG-05.6-WU01",
     "awu_path": "engineering/work_units/ENG-05.6-WU01.json",
-    "complexity_score": 2,
+    "complexity_score": 1,
     "lot": "ENG-05",
     "manifest": "engineering/lots/ENG-05.json",
     "risk_class": "R1",
@@ -42,16 +42,16 @@
       "engineering/lots/ENG-05.json",
       "engineering/work_units/ENG-05.6-WU01.json",
       "engineering/handoff/CURRENT.json",
-      "scripts/governance/validate_documentation_consistency.py",
-      "config/governance/generated_status_policy_v1.json",
-      "config/governance/context_map_policy_v1.json"
+      "scripts/governance/resolve_active_awu.py",
+      "scripts/governance/resume_recovery_qualification.py",
+      "scripts/governance/selftest_resume_recovery.py"
     ],
     "reference_count": 2,
     "reference_files": [
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 46
+    "total_kib_ceil": 55
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -67,9 +67,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "ENG-05.6 WU01: evaluate DocGuard, Vale and lychee deterministically before any documentation-tool adoption.",
+    "current_objective": "ENG-05.6 WU01: remove task-specific assumptions from resume/recovery qualification before evaluating documentation tools.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Record exact current release/commit/license/runtime/network facts for DocGuard, Vale and lychee; derive bounded verdicts and reject any mandatory paid, authority-conflicting or network-dependent integration."
+    "next_action": "Make resume/recovery assertions derive the active task and AWU dynamically, rerun adversarial recovery tests and cold-start, then open a separate WU02 for DocGuard/Vale/lychee evaluation."
   },
   "safety": {
     "execution_allowed": false,
