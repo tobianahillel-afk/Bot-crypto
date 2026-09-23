@@ -30,8 +30,8 @@
     "ENG-00 Repository Truth Recovery completed with canonical baseline validated on workflow run 35792439447",
     "ENG-01 Agent Bootstrap & Canonical State completed; permanent state, state machine, fresh-agent startup, evidence policy and live state-drift qualification validated on workflow run 35794262132"
   ],
-  "current_objective": "ENG-02.7: harden actual Git diff and scope validation around the active Agent Work Unit.",
-  "next_action": "Activate ENG-02.7-WU01, make the active AWU the executable scope boundary, and reject paths outside its allowlist or inside forbidden paths.",
+  "current_objective": "ENG-02.8: qualify the complete work-decomposition and context engine end to end.",
+  "next_action": "Integrate active AWU into next-work/cold-start resolution and run adversarial qualification for oversized, dependency-invalid, unclassified, over-budget and out-of-scope work.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -141,6 +141,12 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35799782804",
       "note": "Exact head 0819db599f68585b998191ca6dc564ce8f82b7cb validated AWU context routing and adversarial context-budget checks."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35832962970",
+      "note": "Exact head 87ec4003e67ecb387d79e5b505a8e07b4d85a46f validated active AWU resolution, AWU/parent diff boundaries, 7 adversarial scope probes and cold start."
     }
   ],
   "stale_when": [
@@ -153,7 +159,7 @@
   ],
   "next_engineering": {
     "active_lot": "ENG-02",
-    "active_task": "ENG-02.7",
+    "active_task": "ENG-02.8",
     "active_manifest": "engineering/lots/ENG-02.json"
   }
 }

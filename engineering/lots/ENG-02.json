@@ -57,12 +57,12 @@
     },
     {
       "id": "ENG-02.7",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Harden active-work diff/scope validation around AWU contracts."
     },
     {
       "id": "ENG-02.8",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Qualify work decomposition with adversarial cold-start and oversize-work scenarios."
     }
   ],

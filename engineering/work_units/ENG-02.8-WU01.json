@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-02.8-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-02",
+    "task_id": "ENG-02.8",
+    "manifest": "engineering/lots/ENG-02.json"
+  },
+  "title": "Qualify work decomposition end to end",
+  "objective": "Prove that a context-free agent resolves one bounded AWU and rejects oversized, dependency-invalid, unclassified, over-budget, ambiguous or out-of-scope work before implementation.",
+  "non_goals": [
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock",
+    "ENG-03 incremental validation implementation",
+    "runtime capability activation",
+    "paid review dependency"
+  ],
+  "depends_on": [
+    "ENG-02.7-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Active AWU resolver",
+      "kind": "FILE",
+      "locator": "scripts/governance/resolve_active_awu.py"
+    },
+    {
+      "name": "AWU DAG validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_agent_work_unit_graph.py"
+    },
+    {
+      "name": "AWU complexity validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_awu_complexity.py"
+    },
+    {
+      "name": "AWU split validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_awu_split.py"
+    },
+    {
+      "name": "AWU risk validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_awu_risk.py"
+    },
+    {
+      "name": "AWU context validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_awu_context.py"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Work decomposition qualification",
+      "kind": "TEST",
+      "locator": "scripts/governance/qualify_work_decomposition.py"
+    },
+    {
+      "name": "AWU-aware next-work resolver",
+      "kind": "FILE",
+      "locator": "scripts/governance/resolve_next_work.py"
+    },
+    {
+      "name": "AWU-aware cold start",
+      "kind": "TEST",
+      "locator": "scripts/governance/cold_start_qualification.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "87ec4003e67ecb387d79e5b505a8e07b4d85a46f",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-02.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-02.7-WU01.json",
+      "engineering/work_units/ENG-02.8-WU01.json",
+      "scripts/governance/qualify_work_decomposition.py",
+      "scripts/governance/resolve_next_work.py",
+      "scripts/governance/cold_start_qualification.py",
+      "engineering/WORK_DECOMPOSITION_QUALIFICATION.md",
+      "engineering/AGENT_WORK_UNIT_STANDARD.md",
+      "AGENTS.md",
+      "engineering/AGENT_PROTOCOL.md",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "historical evidence mutation",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "operational AWU DAG is valid and every executable dependency is DONE",
+      "exactly one active AWU matches permanent state",
+      "oversized AWUs cannot reach executable status",
+      "executable AWUs have deterministic risk and complete context budgets",
+      "fresh-agent resolution includes the active AWU and bounded context route",
+      "Git diff remains inside active AWU scope"
+    ],
+    "acceptance_criteria": [
+      "operational AWU graph validates with ENG-02.7-WU01 DONE before ENG-02.8-WU01",
+      "fresh resolver returns ENG-02.8-WU01",
+      "oversized executable AWU fails closed",
+      "missing dependency and dependency cycle fail closed",
+      "UNCLASSIFIED executable AWU fails closed",
+      "context budget mismatch fails closed",
+      "duplicate active AWU fails closed",
+      "out-of-scope diff fails closed"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 3,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 14,
+      "executable_loc_changed": 700,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_agent_work_unit_graph.py engineering/work_units/*.json",
+      "python scripts/governance/qualify_work_decomposition.py",
+      "python scripts/governance/cold_start_qualification.py"
+    ]
+  },
+  "done_when": [
+    "operational work-unit graph passes end-to-end qualification",
+    "fresh-agent next-work output contains exactly one active AWU and context route",
+    "oversized ambiguous dependency-invalid and out-of-scope work fail closed",
+    "ENG-02 done_when criteria are all demonstrably satisfied"
+  ]
+}
