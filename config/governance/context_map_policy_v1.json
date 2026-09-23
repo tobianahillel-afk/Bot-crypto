@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "policy_kind": "context_map_policy_v1",
+  "semantics": "GENERATED_PROGRESSIVE_DISCLOSURE_FROM_ACTIVE_AWU",
+  "state_source": "config/governance/project_state.json",
+  "active_awu_resolver": "scripts/governance/resolve_active_awu.py",
+  "handoff_source": "engineering/handoff/CURRENT.json",
+  "machine_output": "engineering/CONTEXT_MAP.json",
+  "human_output": "engineering/CONTEXT_MAP.md",
+  "bootstrap_read_order": [
+    "AGENTS.md",
+    "config/governance/project_state.json",
+    "engineering/CONTEXT_MAP.json"
+  ],
+  "non_authoritative_sources": [
+    "engineering/STATE.json",
+    "chat_history",
+    "model_memory"
+  ],
+  "implicit_expansion": "FORBIDDEN",
+  "max_bootstrap_files": 3
+}
