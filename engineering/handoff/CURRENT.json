@@ -36,10 +36,11 @@
     "ENG-04.3 SAST Controls completed on exact head 8ad397ceb4dfe3ad2a429b295270ebf46afbff2f: Engineering Bootstrap run 35850772829 PASS and Security SAST run 35850772820 PASS. CodeQL Action v4.38.1 exact commit 1c5b675653bb5c22dbe9b12b556ec555138e09fd used CLI 2.27.0, security-extended, local SARIF fail-closed gate, 1 SARIF and 0 findings.",
     "ENG-04.4 Workflow Security Controls completed on exact head 2f0160884c2ee191ab1881a5caf9335b6c1fd15b: Security Actions run 35855698512 PASS and Engineering Bootstrap run 35855698513 PASS. actionlint v1.7.12 and zizmor v1.30.1 release asset SHA-256 checks passed; zizmor positive control found 2 issues; ACTIONLINT_TARGET_COUNT=1; ZIZMOR_TARGET_COUNT=1; both targeted .github/workflows/security-actions.yml; real ZIZMOR_FINDINGS=0.",
     "ENG-04.5 WU01 completed on exact head 32c877028597dc4b3bca7e34f32d8b834c306742: legacy inventory measured 211 floating refs across only actions/checkout@v4 (82), actions/setup-python@v5 (82), and actions/upload-artifact@v4 (47); changed-workflow anti-regression gate PASS.",
-    "ENG-04.5 WU02 completed on exact head ea0e9b111347b5f676b3c0874e09f3e395a97db2: Engineering Bootstrap run 35873024923 PASS with action supply-chain auditor, 13 supply-chain probes, approved six-repository pin registry, 10 pin-registry adversarial probes and cold-start; Security Secrets run 35873024947 PASS."
+    "ENG-04.5 WU02 completed on exact head ea0e9b111347b5f676b3c0874e09f3e395a97db2: Engineering Bootstrap run 35873024923 PASS with action supply-chain auditor, 13 supply-chain probes, approved six-repository pin registry, 10 pin-registry adversarial probes and cold-start; Security Secrets run 35873024947 PASS.",
+    "ENG-04.6 WU01 completed on exact head 494e9304be401559b5cc8c15f98257678b8ab255: Engineering Bootstrap run 35879192229 PASS and Security Supply Chain run 35879192165 PASS. Permission inventory found 88 workflows, 88 explicit top-level permission declarations, 0 missing declarations, 0 legacy permission debt; changed gate PASS."
   ],
-  "current_objective": "ENG-04.6 WU01: enforce least-privilege GitHub Actions permissions incrementally.",
-  "next_action": "Inventory repository-wide workflow token permissions, then gate only added/modified workflows against explicit least-privilege policy; do not bulk-rewrite legacy workflows.",
+  "current_objective": "ENG-04.6 WU02: codify repository protection as a fail-closed business-unlock requirement.",
+  "next_action": "Record live main protected=false, rulesets_count=0 and GitHub App protection endpoint 403; implement offline policy/unlock validator and runbook without mutating administration settings.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -293,6 +294,18 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35873024923",
       "note": "Exact head ea0e9b111347b5f676b3c0874e09f3e395a97db2 passed action supply-chain inventory, registry validation, adversarial probes and cold-start."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35879192229",
+      "note": "ENG-04.6 WU01 bootstrap qualification including permission inventory and 11 adversarial probes."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35879192165",
+      "note": "ENG-04.6 WU01 supply-chain workflow: 88/88 workflows have explicit top-level permissions; changed workflow permission gate PASS."
     }
   ],
   "stale_when": [

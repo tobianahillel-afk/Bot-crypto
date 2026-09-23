@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-04.6-WU02",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-04",
+    "task_id": "ENG-04.6",
+    "manifest": "engineering/lots/ENG-04.json"
+  },
+  "title": "Codify repository protection unlock blocker",
+  "objective": "Capture the live unprotected-main observation, define fail-closed repository protection requirements for business unlock, and qualify the policy without pretending to mutate inaccessible GitHub administration settings.",
+  "non_goals": [
+    "branch protection mutation through an unavailable administration API",
+    "ruleset creation through an unavailable administration API",
+    "bulk historical workflow rewrite",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-04.6-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Current project state",
+      "kind": "STATE",
+      "locator": "config/governance/project_state.json"
+    },
+    {
+      "name": "ENG-04.6 WU01 evidence",
+      "kind": "EVIDENCE",
+      "locator": "GitHub Actions runs 35879192229 and 35879192165"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Repository protection policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/repository_protection_policy_v1.json"
+    },
+    {
+      "name": "Repository protection observation",
+      "kind": "STATE",
+      "locator": "engineering/REPOSITORY_PROTECTION_STATUS.json"
+    },
+    {
+      "name": "Protection validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_repository_protection.py"
+    },
+    {
+      "name": "Protection adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_repository_protection.py"
+    },
+    {
+      "name": "Protection runbook",
+      "kind": "FILE",
+      "locator": "engineering/REPOSITORY_PROTECTION.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "494e9304be401559b5cc8c15f98257678b8ab255",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-04.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-04.6-WU01.json",
+      "engineering/work_units/ENG-04.6-WU02.json",
+      "config/governance/repository_protection_policy_v1.json",
+      "engineering/REPOSITORY_PROTECTION_STATUS.json",
+      "scripts/governance/validate_repository_protection.py",
+      "scripts/governance/selftest_repository_protection.py",
+      "engineering/REPOSITORY_PROTECTION.md",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/lot*/**"
+    ],
+    "forbidden_semantics": [
+      "branch protection mutation",
+      "ruleset mutation",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "current observation must preserve main protected=false and rulesets_count=0 until a fresh live verification proves otherwise",
+      "GitHub App administration endpoint inaccessibility is recorded explicitly rather than interpreted as protection",
+      "business unlock validation fails unless main is verified protected by a ruleset or branch protection mechanism",
+      "manual administration requirement does not block continued engineering work",
+      "protection policy requires pull-request based changes and blocks force-push/delete semantics before business unlock",
+      "state finding BOOT-FINDING-001 remains unresolved while current observation is unprotected"
+    ],
+    "acceptance_criteria": [
+      "current observation validates as coherent but business unlock mode fails",
+      "synthetic protected observation passes unlock mode",
+      "synthetic unprotected ruleset-free observation fails unlock mode",
+      "unverifiable administration evidence cannot be upgraded to protected",
+      "removing BOOT-FINDING-001 while current observation is unprotected fails policy validation",
+      "mandatory protection policy requires no paid API SaaS LLM or runner"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 4,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 12,
+      "executable_loc_changed": 650,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_repository_protection.py --mode policy",
+      "python scripts/governance/selftest_repository_protection.py"
+    ]
+  },
+  "done_when": [
+    "unprotected main remains an explicit business-unlock blocker",
+    "the exact manual administration requirement is documented",
+    "policy and observation are machine-readable and adversarially qualified",
+    "engineering can continue without weakening the future unlock gate"
+  ]
+}
