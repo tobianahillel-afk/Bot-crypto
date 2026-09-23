@@ -9,10 +9,10 @@ The dedicated workflow installs the exact `requirements-dev.lock` and executes t
 declared `pip-audit==2.9.0` with:
 
 ```text
--r requirements-dev.lock --disable-pip --strict --progress-spinner off
+-r requirements-dev.lock --no-deps --disable-pip --strict --progress-spinner off
 ```
 
-`--disable-pip` prevents dependency re-resolution during the audit. The workflow runs only
+`--no-deps --disable-pip` is valid because the lock already contains the complete transitive closure; it prevents dependency re-resolution during the audit. The workflow runs only
 when dependency/control files change, on manual dispatch, and once per week so newly published
 advisories are still detected even when the lock has not changed.
 
