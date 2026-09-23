@@ -114,7 +114,7 @@
   },
   "planning": {
     "risk_class": "R1",
-    "complexity_score": 3,
+    "complexity_score": 4,
     "split_required": false,
     "context_budget": {
       "max_primary_files": 10,
