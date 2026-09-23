@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-04.5-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-04",
+    "task_id": "ENG-04.5",
+    "manifest": "engineering/lots/ENG-04.json"
+  },
+  "title": "Inventory action supply chain and block new floating refs",
+  "objective": "Create a zero-dependency repository-wide GitHub Actions uses inventory and a changed-workflow anti-regression gate that blocks newly introduced mutable remote action refs while reporting legacy debt for bounded remediation WUs.",
+  "non_goals": [
+    "rewrite every legacy workflow in one work unit",
+    "resolve or update all third-party action versions",
+    "permission hardening",
+    "secret dependency or SAST changes",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-04.4-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "GitHub workflows",
+      "kind": "FILE",
+      "locator": ".github/workflows/"
+    },
+    {
+      "name": "Certified workflow security gate",
+      "kind": "FILE",
+      "locator": ".github/workflows/security-actions.yml"
+    },
+    {
+      "name": "ENG-04.4 evidence",
+      "kind": "EVIDENCE",
+      "locator": "GitHub Actions runs 35855698512 and 35855698513"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Supply-chain policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/action_supply_chain_policy_v1.json"
+    },
+    {
+      "name": "Action uses inventory engine",
+      "kind": "FILE",
+      "locator": "scripts/governance/audit_action_supply_chain.py"
+    },
+    {
+      "name": "Supply-chain adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_action_supply_chain.py"
+    },
+    {
+      "name": "Supply-chain workflow",
+      "kind": "FILE",
+      "locator": ".github/workflows/security-supply-chain.yml"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "2f0160884c2ee191ab1881a5caf9335b6c1fd15b",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-04.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-04.4-WU02.json",
+      "engineering/work_units/ENG-04.5-WU01.json",
+      "config/governance/action_supply_chain_policy_v1.json",
+      "scripts/governance/audit_action_supply_chain.py",
+      "scripts/governance/selftest_action_supply_chain.py",
+      ".github/workflows/security-supply-chain.yml",
+      ".github/workflows/engineering-bootstrap.yml",
+      "engineering/ACTION_SUPPLY_CHAIN.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "bulk legacy workflow rewrite",
+      "automatic action version upgrade",
+      "permission hardening",
+      "secret dependency or SAST scanner changes",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "inventory parses uses clauses deterministically without executing workflow code",
+      "remote actions are immutable only when ref is exactly 40 hexadecimal characters",
+      "local ./ actions and docker:// images are classified separately and never mistaken for pinned remote actions",
+      "repository-wide legacy floating refs are reported with file line owner repo subpath and ref but WU01 does not silently certify them",
+      "changed workflows fail closed if they introduce or retain a remote floating ref in their changed version",
+      "new remote refs require later registry verification of repository tag commit and license before legacy remediation can mark them approved",
+      "mandatory gate uses no network paid API SaaS LLM or external dependency"
+    ],
+    "acceptance_criteria": [
+      "full inventory emits deterministic counts of pinned floating local and docker uses",
+      "changed-workflow mode returns nonzero for @v4 @main @master branch or semver tag refs",
+      "changed-workflow mode accepts full 40-hex remote SHA refs",
+      "dynamic or malformed uses expressions fail closed",
+      "synthetic tests cover local action docker image SHA tag ref expression and malformed clauses",
+      "workflow runs only on .github workflow/action changes plus weekly/manual inventory",
+      "legacy debt output is machine-readable and can drive bounded remediation WUs"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 4,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 12,
+      "executable_loc_changed": 720,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/audit_action_supply_chain.py --mode inventory",
+      "python scripts/governance/selftest_action_supply_chain.py",
+      "GitHub Actions Security Supply Chain workflow"
+    ]
+  },
+  "done_when": [
+    "repository-wide uses debt is deterministically inventoried",
+    "new or changed floating remote action refs are blocked",
+    "legacy debt is not hidden and is ready for bounded remediation",
+    "inventory/gate remains zero-dependency zero-cost and non-executing"
+  ]
+}

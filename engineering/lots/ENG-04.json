@@ -49,12 +49,12 @@
     },
     {
       "id": "ENG-04.4",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Implement GitHub Actions syntax and security controls."
     },
     {
       "id": "ENG-04.5",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Implement supply-chain pinning and third-party action verification."
     },
     {
