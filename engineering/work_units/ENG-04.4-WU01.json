@@ -8,9 +8,10 @@
     "task_id": "ENG-04.4",
     "manifest": "engineering/lots/ENG-04.json"
   },
-  "title": "Implement changed-workflow syntax and security gates",
-  "objective": "Add zero-cost fail-closed GitHub Actions syntax/security checks for changed workflow/action definitions using exact-digest actionlint and zizmor release binaries, while leaving repository-wide legacy supply-chain remediation to ENG-04.5.",
+  "title": "Implement changed-workflow syntax gate with actionlint",
+  "objective": "Add a zero-cost fail-closed changed-workflow syntax and expression gate using exact-digest actionlint v1.7.12, leaving zizmor security analysis to ENG-04.4-WU02.",
   "non_goals": [
+    "zizmor security analysis",
     "repository-wide action ref pin remediation",
     "secret scanning changes",
     "dependency scanning changes",
@@ -46,17 +47,17 @@
       "locator": "config/governance/workflow_security_policy_v1.json"
     },
     {
-      "name": "Workflow security gate",
+      "name": "Workflow syntax gate",
       "kind": "FILE",
       "locator": ".github/workflows/security-actions.yml"
     },
     {
-      "name": "Workflow security validator",
+      "name": "Workflow syntax validator",
       "kind": "FILE",
       "locator": "scripts/governance/validate_workflow_security_controls.py"
     },
     {
-      "name": "Workflow security adversarial tests",
+      "name": "Workflow syntax adversarial tests",
       "kind": "TEST",
       "locator": "scripts/governance/selftest_workflow_security_controls.py"
     }
@@ -97,23 +98,20 @@
   },
   "contracts": {
     "required_invariants": [
-      "actionlint and zizmor versions tags source commits release assets and SHA-256 digests are explicit",
-      "workflow downloads only exact GitHub release asset URLs and verifies SHA-256 before extraction",
-      "zizmor runs offline without GitHub token or online audits",
-      "changed workflow/action definitions fail closed on actionlint or zizmor findings",
-      "runtime synthetic malformed/insecure workflow must be rejected by both control layers as applicable",
+      "actionlint version tag source commit release asset and SHA-256 digest are explicit",
+      "workflow downloads only the exact GitHub release asset URL and verifies SHA-256 before extraction",
+      "changed workflow definitions fail closed on actionlint syntax expression action-usage or injection findings",
+      "runtime synthetic malformed workflow must be rejected",
       "legacy unchanged workflows are not made an implicit blocker before ENG-04.5",
       "workflow permissions remain contents read only with checkout credential persistence disabled",
-      "no continue-on-error warn-only no-exit-codes or broad ignore configuration is allowed"
+      "no continue-on-error warn-only or broad ignore configuration is allowed"
     ],
     "acceptance_criteria": [
-      "actionlint v1.7.12 commit 914e7df21a07ef503a81201c76d2b11c789d3fca asset SHA-256 is enforced",
-      "zizmor v1.30.1 commit 99a054ed9283c90abdd2d5b9fb5101d27dde9783 asset SHA-256 is enforced",
-      "push and PR changes under .github workflow/action paths are scanned",
-      "workflow discovery derives targets from Git diff and never scans unrelated business changes",
-      "actionlint detects malformed synthetic workflow",
-      "zizmor detects insecure synthetic workflow in offline strict mode",
-      "changed current ENG workflow files pass the real gate or produce actionable metadata without secret values"
+      "actionlint v1.7.12 commit 914e7df21a07ef503a81201c76d2b11c789d3fca Linux amd64 asset SHA-256 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8 is enforced",
+      "push and PR changes under .github workflow paths are scanned",
+      "workflow discovery derives workflow targets from Git diff and never scans unrelated business changes",
+      "actionlint detects a malformed runtime-only synthetic workflow",
+      "changed current ENG workflow files pass the real syntax gate or produce actionable file/line findings"
     ]
   },
   "planning": {
@@ -142,13 +140,13 @@
     "size_estimate": {
       "business_domains": 1,
       "files_touched": 12,
-      "executable_loc_changed": 760,
+      "executable_loc_changed": 520,
       "new_public_behaviors": 1,
       "contract_families": 0,
       "independent_algorithms": 1,
       "state_machines": 0,
       "trust_boundaries": 1,
-      "new_dependencies": 2
+      "new_dependencies": 1
     },
     "split_reasons": []
   },
@@ -162,13 +160,13 @@
     "target_commands": [
       "python scripts/governance/validate_workflow_security_controls.py",
       "python scripts/governance/selftest_workflow_security_controls.py",
-      "GitHub Actions security-actions workflow"
+      "GitHub Actions security-actions actionlint workflow"
     ]
   },
   "done_when": [
-    "changed GitHub workflow/action definitions are syntax and security checked",
-    "tool binaries are exact-digest verified and zero-cost",
-    "legacy unchanged workflow debt remains explicit for ENG-04.5 rather than silently ignored",
-    "mandatory workflow security path requires no paid service token or LLM"
+    "changed GitHub workflow definitions are syntax and expression checked",
+    "actionlint binary is exact-digest verified and zero-cost",
+    "legacy unchanged workflow debt remains explicit for later work rather than silently ignored",
+    "mandatory syntax-security path requires no paid service token or LLM"
   ]
 }
