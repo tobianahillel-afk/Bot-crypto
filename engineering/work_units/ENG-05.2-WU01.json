@@ -103,7 +103,8 @@
       "docs/FUNCTIONAL_COVERAGE_REGISTRY.md",
       "docs/SYSTEM_EXECUTION_ARCHITECTURE.md",
       ".github/workflows/engineering-bootstrap.yml",
-      "scripts/governance/selftest_current_status.py"
+      "scripts/governance/selftest_current_status.py",
+      "scripts/governance/validate_truth_registry.py"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -131,7 +132,8 @@
       "roadmap coverage registry and execution architecture agree on Lot44 baseline Lot45 suspended candidate Lot46 lock and business pause",
       "historical lot documents are not mass-scanned or rewritten by this AWU",
       "generated status documents remain validated by ENG-05.1",
-      "consistency validation is standard-library offline read-only and zero-cost"
+      "consistency validation is standard-library offline read-only and zero-cost",
+      "legacy truth validator must enforce canonical authority pointers instead of requiring duplicated current-status prose in roadmap or architecture"
     ],
     "acceptance_criteria": [
       "three stale engineering/STATE.json current-authority references are replaced by canonical project_state references",
@@ -140,7 +142,8 @@
       "legacy authority pointer engineering/STATE.json presented as current authority fails",
       "Lot44/Lot45/Lot46 status contradiction fails",
       "historical documents outside the registry do not create false positives",
-      "bootstrap runs consistency validation without network or external packages"
+      "bootstrap runs consistency validation without network or external packages",
+      "repository truth validator accepts roadmap and architecture authority-pointer semantics and rejects reintroduced duplicated current-state blocks"
     ]
   },
   "planning": {
