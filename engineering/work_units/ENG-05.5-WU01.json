@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-05.5-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-05",
+    "task_id": "ENG-05.5",
+    "manifest": "engineering/lots/ENG-05.json"
+  },
+  "title": "Qualify interruption resume and recovery",
+  "objective": "Prove that an agent with lost conversational context can recover the unique authorized engineering work from permanent state and the active AWU, treat handoff as a non-authoritative hint, and fail closed until live Git reality is reverified.",
+  "non_goals": [
+    "change canonical project-state or Handoff V2 schemas",
+    "auto-heal permanent state from stale handoff or Git movement",
+    "documentation tooling adoption",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-05.4-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    },
+    {
+      "name": "Permanent next-work resolver",
+      "kind": "FILE",
+      "locator": "scripts/governance/resolve_next_work.py"
+    },
+    {
+      "name": "Existing cold-start qualification",
+      "kind": "TEST",
+      "locator": "scripts/governance/cold_start_qualification.py"
+    },
+    {
+      "name": "Handoff V2 validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_handoff.py"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Resume recovery qualification",
+      "kind": "TEST",
+      "locator": "scripts/governance/resume_recovery_qualification.py"
+    },
+    {
+      "name": "Resume recovery adversarial selftests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_resume_recovery.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "a9d712cc0f455a70ed9c39f35791e64cec1f58e7",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-05.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-05.4-WU02.json",
+      "engineering/work_units/ENG-05.5-WU01.json",
+      "AGENTS.md",
+      "README.md",
+      "engineering/CURRENT_STATUS.md",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "scripts/governance/resume_recovery_qualification.py",
+      "scripts/governance/selftest_resume_recovery.py",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/lot*/**"
+    ],
+    "forbidden_semantics": [
+      "handoff becomes authorization source",
+      "automatic permanent-state healing",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "permanent project state remains the sole current-work authority",
+      "handoff may be VALID STALE or MISSING but never authorizes work",
+      "stale or missing handoff still allows bounded work reconstruction from state plus the active AWU",
+      "no recovered session is write-authorized until live external Git reality is reverified",
+      "state drift ambiguous AWU unsafe Lot46 or mandatory paid dependency fails closed",
+      "recovery never expands beyond the active AWU context route",
+      "qualification remains offline standard-library zero-cost"
+    ],
+    "acceptance_criteria": [
+      "valid handoff recovers ENG-05.5-WU01 and marks live Git reverify required",
+      "stale handoff recovers the same canonical AWU but is not trusted",
+      "missing handoff recovers the same canonical AWU without chat or model memory",
+      "stale context-map hint cannot override the resolver",
+      "ambiguous active AWU fails closed",
+      "unsafe Lot46 state fails closed",
+      "mandatory paid LLM state fails closed",
+      "full Engineering Bootstrap reaches cold-start after resume/recovery qualification"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 14,
+      "executable_loc_changed": 500,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1"
+    ],
+    "target_commands": [
+      "python scripts/governance/resume_recovery_qualification.py",
+      "python scripts/governance/selftest_resume_recovery.py",
+      "python scripts/governance/cold_start_qualification.py"
+    ]
+  },
+  "done_when": [
+    "context-free interrupted sessions reconstruct the exact active work without trusting chat memory",
+    "stale or missing handoff cannot authorize writes and cannot force repository-wide context reload",
+    "unsafe or ambiguous recovery scenarios fail closed"
+  ]
+}
