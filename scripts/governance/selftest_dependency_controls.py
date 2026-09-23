@@ -61,7 +61,7 @@ def main() -> int:
     writable = workflow.replace("contents: read", "contents: write")
     _expect(mod.DependencyControlError, lambda: mod.validate_workflow(policy, writable), "write permission")
 
-    resolver = workflow.replace("--disable-pip --strict", "--strict")
+    resolver = workflow.replace("--no-deps --disable-pip --strict", "--strict")
     _expect(mod.DependencyControlError, lambda: mod.validate_workflow(policy, resolver), "pip resolution re-enabled")
 
     paid = copy.deepcopy(policy)
