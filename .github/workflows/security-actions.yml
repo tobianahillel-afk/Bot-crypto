@@ -38,7 +38,10 @@ jobs:
       ACTIONLINT_ASSET: "actionlint_1.7.12_linux_amd64.tar.gz"
       ACTIONLINT_SHA256: "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8"
       PR_BASE_SHA: "${{ github.event.pull_request.base.sha }}"
-      PUSH_BEFORE_SHA: "${{ github.event.before }}"\n      ZIZMOR_VERSION: "1.30.1"\n      ZIZMOR_ASSET: "zizmor-x86_64-unknown-linux-gnu.tar.gz"\n      ZIZMOR_SHA256: "e65324f4430c2717591937edcec90ccbefaf14c174f8ec9415e03ca875b46e1a"
+      PUSH_BEFORE_SHA: "${{ github.event.before }}"
+      ZIZMOR_VERSION: "1.30.1"
+      ZIZMOR_ASSET: "zizmor-x86_64-unknown-linux-gnu.tar.gz"
+      ZIZMOR_SHA256: "e65324f4430c2717591937edcec90ccbefaf14c174f8ec9415e03ca875b46e1a"
     steps:
       - name: Checkout full history
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -117,16 +120,19 @@ jobs:
           from pathlib import Path
 
           expression = "$" + "{{ github.event.pull_request.title }}"
+          trigger = "pull_request" + "_target"
+          permission = "contents" + ": write"
           text = """name: insecure-positive-control
-on: pull_request_target
-jobs:
-  dangerous:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - run: echo \"EXPRESSION\"
-"""
+          on: TRIGGER
+          jobs:
+            dangerous:
+              runs-on: ubuntu-latest
+              permissions:
+                PERMISSION
+              steps:
+                - run: echo \"EXPRESSION\"
+          """
+          text = text.replace("TRIGGER", trigger).replace("PERMISSION", permission)
           Path(sys.argv[1]).write_text(text.replace("EXPRESSION", expression), encoding="utf-8")
           PY
           set +e
