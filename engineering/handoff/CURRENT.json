@@ -28,10 +28,11 @@
     "BOOT-06 lightweight zero-dependency CI passed",
     "BOOT-07 cold-start qualification passed on workflow run 35776801100",
     "ENG-00 Repository Truth Recovery completed with canonical baseline validated on workflow run 35792439447",
-    "ENG-01 Agent Bootstrap & Canonical State completed; permanent state, state machine, fresh-agent startup, evidence policy and live state-drift qualification validated on workflow run 35794262132"
+    "ENG-01 Agent Bootstrap & Canonical State completed; permanent state, state machine, fresh-agent startup, evidence policy and live state-drift qualification validated on workflow run 35794262132",
+    "ENG-02 Work Decomposition & Context Engine completed; end-to-end AWU DAG, complexity, split, risk, context, scope and cold-start qualification passed on workflow run 35833639230"
   ],
-  "current_objective": "ENG-02.8: qualify the complete work-decomposition and context engine end to end.",
-  "next_action": "Integrate active AWU into next-work/cold-start resolution and run adversarial qualification for oversized, dependency-invalid, unclassified, over-budget and out-of-scope work.",
+  "current_objective": "ENG-03.1: implement deterministic conservative multi-label Git diff classification.",
+  "next_action": "Implement path-based diff classification only; do not yet map labels to tests or execute validation tiers.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -147,6 +148,12 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35832962970",
       "note": "Exact head 87ec4003e67ecb387d79e5b505a8e07b4d85a46f validated active AWU resolution, AWU/parent diff boundaries, 7 adversarial scope probes and cold start."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35833639230",
+      "note": "Exact head 67e74c8ce12c91e1a3a00859224a06251653b768 passed operational AWU DAG, end-to-end decomposition qualification, AWU scope enforcement and AWU-aware cold start."
     }
   ],
   "stale_when": [
@@ -158,8 +165,8 @@
     "Lot46 is no longer LOCKED before explicit unlock"
   ],
   "next_engineering": {
-    "active_lot": "ENG-02",
-    "active_task": "ENG-02.8",
-    "active_manifest": "engineering/lots/ENG-02.json"
+    "active_lot": "ENG-03",
+    "active_task": "ENG-03.1",
+    "active_manifest": "engineering/lots/ENG-03.json"
   }
 }

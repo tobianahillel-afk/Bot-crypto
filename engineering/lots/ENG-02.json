@@ -3,7 +3,7 @@
   "kind": "engineering_work_item",
   "id": "ENG-02",
   "title": "Work Decomposition & Context Engine",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "objective": "Turn business/engineering objectives into bounded, dependency-aware, risk-scored work units with deterministic context routing and machine-enforced split/scope limits.",
   "depends_on": [
     "ENG-01"
@@ -62,7 +62,7 @@
     },
     {
       "id": "ENG-02.8",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Qualify work decomposition with adversarial cold-start and oversize-work scenarios."
     }
   ],

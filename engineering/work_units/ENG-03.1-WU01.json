@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-03.1-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-03",
+    "task_id": "ENG-03.1",
+    "manifest": "engineering/lots/ENG-03.json"
+  },
+  "title": "Deterministic multi-label diff classifier",
+  "objective": "Classify changed repository paths conservatively into deterministic validation-impact labels without selecting or executing tests yet.",
+  "non_goals": [
+    "test dependency mapping",
+    "T0 T1 T2 execution",
+    "T3 or T4 certification selection",
+    "proof caching",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-02.8-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Permanent project state",
+      "kind": "STATE",
+      "locator": "config/governance/project_state.json"
+    },
+    {
+      "name": "Active ENG-03 manifest",
+      "kind": "STATE",
+      "locator": "engineering/lots/ENG-03.json"
+    },
+    {
+      "name": "AWU standard",
+      "kind": "CONTRACT",
+      "locator": "engineering/AGENT_WORK_UNIT_STANDARD.md"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Diff classifier policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/diff_classifier_policy_v1.json"
+    },
+    {
+      "name": "Diff classifier",
+      "kind": "FILE",
+      "locator": "scripts/governance/classify_diff.py"
+    },
+    {
+      "name": "Classifier adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_diff_classifier.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "67e74c8ce12c91e1a3a00859224a06251653b768",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-02.json",
+      "engineering/lots/ENG-03.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-02.8-WU01.json",
+      "engineering/work_units/ENG-03.1-WU01.json",
+      "config/governance/diff_classifier_policy_v1.json",
+      "scripts/governance/classify_diff.py",
+      "scripts/governance/selftest_diff_classifier.py",
+      "engineering/DIFF_CLASSIFIER.md",
+      "AGENTS.md",
+      "engineering/AGENT_PROTOCOL.md",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "test execution selection",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "classification is deterministic and standard-library only",
+      "one path may receive multiple labels",
+      "unknown repository paths receive a conservative UNKNOWN_REQUIRES_REVIEW label",
+      "risk execution OMS EMS paths receive a critical label",
+      "mixed docs and production changes are never classified as documentation-only",
+      "classifier output does not itself authorize skipping validation"
+    ],
+    "acceptance_criteria": [
+      "docs-only paths classify as DOC_ONLY without production labels",
+      "workflow changes include CI_WORKFLOW",
+      "contract/schema paths include CONTRACT_SCHEMA",
+      "security-sensitive paths include SECURITY",
+      "risk/execution paths include RISK_EXECUTION_CRITICAL",
+      "mixed diffs retain all relevant labels and are not DOC_ONLY",
+      "unknown paths fail conservatively via UNKNOWN_REQUIRES_REVIEW"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 2,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 14,
+      "executable_loc_changed": 650,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0"
+    ],
+    "target_commands": [
+      "python scripts/governance/classify_diff.py --self-check",
+      "python scripts/governance/selftest_diff_classifier.py"
+    ]
+  },
+  "done_when": [
+    "policy and classifier produce stable multi-label output",
+    "unknown paths classify conservatively",
+    "critical execution paths cannot be downgraded",
+    "classifier remains classification-only and zero-cost"
+  ]
+}

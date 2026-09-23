@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "kind": "engineering_work_item",
+  "id": "ENG-03",
+  "title": "Incremental Validation Engine",
+  "status": "IN_PROGRESS",
+  "objective": "Classify diffs and select the minimum safe validation depth so routine development stays fast while sensitive changes receive stronger assurance.",
+  "depends_on": [
+    "ENG-02"
+  ],
+  "allowed_paths": [
+    "AGENTS.md",
+    "config/governance/**",
+    "engineering/**",
+    "scripts/governance/**",
+    ".github/workflows/engineering-bootstrap.yml"
+  ],
+  "forbidden_scope": [
+    "src/crypto_quant_bot/** business implementation changes",
+    "Lot45 candidate branch changes",
+    "Lot46 implementation or unlock",
+    "frozen historical evidence mutation",
+    "runtime capability activation",
+    "mandatory paid or LLM-backed dependency",
+    "ENG-04 security-toolchain implementation beyond interfaces needed by ENG-03"
+  ],
+  "tasks": [
+    {
+      "id": "ENG-03.1",
+      "status": "IN_PROGRESS",
+      "description": "Implement a deterministic multi-label Git diff classifier."
+    },
+    {
+      "id": "ENG-03.2",
+      "status": "PLANNED",
+      "description": "Implement impact and test-dependency mapping from diff classes."
+    },
+    {
+      "id": "ENG-03.3",
+      "status": "PLANNED",
+      "description": "Define and enforce T0 instant validation checks."
+    },
+    {
+      "id": "ENG-03.4",
+      "status": "PLANNED",
+      "description": "Define and enforce T1 targeted validation checks."
+    },
+    {
+      "id": "ENG-03.5",
+      "status": "PLANNED",
+      "description": "Define and enforce T2 domain validation checks."
+    },
+    {
+      "id": "ENG-03.6",
+      "status": "PLANNED",
+      "description": "Select T3 assurance and T4 certification only when risk requires them."
+    },
+    {
+      "id": "ENG-03.7",
+      "status": "PLANNED",
+      "description": "Implement safe exact-input proof reuse and cache semantics."
+    },
+    {
+      "id": "ENG-03.8",
+      "status": "PLANNED",
+      "description": "Measure validation overhead and prove incremental checks avoid unnecessary work."
+    }
+  ],
+  "done_when": [
+    "every changed path receives deterministic conservative diff labels",
+    "impact mapping selects only relevant tests/check families without weakening risk floors",
+    "T0 T1 and T2 are explicit and machine-selected",
+    "T3/T4 cannot be bypassed for sensitive changes",
+    "safe proof reuse is bound to exact relevant inputs",
+    "documentation-only work does not trigger execution-domain certification",
+    "measured routine validation overhead stays materially below blanket full-suite execution"
+  ],
+  "extensions": {
+    "scope_base_sha": "67e74c8ce12c91e1a3a00859224a06251653b768",
+    "scope_base_kind": "PREVIOUS_ENGINEERING_CERTIFIED_HEAD",
+    "scope_base_evidence_run": 35833639230
+  }
+}
