@@ -22,7 +22,7 @@
   "state_snapshot": {
     "engineering_phase": "BUILDING",
     "active_lot": "ENG-05",
-    "active_task": "ENG-05.4",
+    "active_task": "ENG-05.5",
     "active_manifest": "engineering/lots/ENG-05.json",
     "business_development": "PAUSED",
     "lot46_status": "LOCKED",
@@ -36,10 +36,10 @@
   },
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-05.4-WU02",
-    "awu_path": "engineering/work_units/ENG-05.4-WU02.json",
+    "awu_id": "ENG-05.5-WU01",
+    "awu_path": "engineering/work_units/ENG-05.5-WU01.json",
     "parent_manifest": "engineering/lots/ENG-05.json",
-    "scope_base_sha": "b98ba29f2428f175dd186dc4a170d8f57a7b06cd",
+    "scope_base_sha": "a9d712cc0f455a70ed9c39f35791e64cec1f58e7",
     "risk_class": "R1",
     "complexity_score": 1
   },
@@ -54,10 +54,11 @@
     "ENG-05.1 generated current-status views completed on exact head 1acc3d5c1043f532a1ac5f2c17c0e7bc72ed37f7.",
     "ENG-05.2 documentation consistency completed on exact head 365bd0a4a2afa63557cb580331ed887cbf7cd067.",
     "ENG-05.3 bounded Context Map completed on exact head 1c292cacae3f38b8025eaf1b0d5b215d2458b741.",
-    "ENG-05.4 WU01 Handoff V2 validator and 12 adversarial probes passed on head b98ba29f2428f175dd186dc4a170d8f57a7b06cd; legacy bootstrap compatibility repair isolated to WU02."
+    "ENG-05.4 WU01 Handoff V2 validator and 12 adversarial probes passed on head b98ba29f2428f175dd186dc4a170d8f57a7b06cd; legacy bootstrap compatibility repair isolated to WU02.",
+    "ENG-05.4 WU02 permanent-handoff bootstrap compatibility completed on exact head a9d712cc0f455a70ed9c39f35791e64cec1f58e7; run 35920389779 passed negative validators, context-map checks and full cold-start qualification."
   ],
-  "current_objective": "ENG-05.4 WU02: repair the legacy bootstrap negative-validator harness without restoring engineering/STATE.json as handoff authority.",
-  "next_action": "Run the permanent-state-compatible bootstrap negative selftests and full cold-start chain; if green, close ENG-05.4 and activate ENG-05.5 resume/recovery qualification.",
+  "current_objective": "ENG-05.5: qualify deterministic resume/recovery after interruption or context loss without trusting conversational memory.",
+  "next_action": "Implement resume/recovery qualification and adversarial probes that reconstruct the active AWU from permanent state, tolerate stale/missing handoff only as a non-authoritative hint, and require live Git reverification before writes.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -80,6 +81,13 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35919130265",
       "head_sha": "b98ba29f2428f175dd186dc4a170d8f57a7b06cd",
       "scope": "SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35920389779",
+      "head_sha": "a9d712cc0f455a70ed9c39f35791e64cec1f58e7",
+      "scope": "ENG-05.4-WU02_BOOTSTRAP_COLD_START"
     }
   ],
   "stop_conditions": [
@@ -100,7 +108,7 @@
   ],
   "next_engineering": {
     "active_lot": "ENG-05",
-    "active_task": "ENG-05.4",
+    "active_task": "ENG-05.5",
     "active_manifest": "engineering/lots/ENG-05.json"
   }
 }
