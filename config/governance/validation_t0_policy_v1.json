@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "policy_kind": "validation_t0_policy_v1",
+  "semantics": "CHEAP_CHANGED_FILE_GATE_ONLY",
+  "max_changed_files": 500,
+  "max_parse_bytes_per_file": 2097152,
+  "parsers": {
+    ".py": "PYTHON_COMPILE",
+    ".json": "JSON_PARSE",
+    ".toml": "TOML_PARSE"
+  },
+  "prohibited_commands": [
+    "pytest",
+    "mutmut",
+    "mypy",
+    "ruff",
+    "bandit",
+    "pip-audit",
+    "git fetch",
+    "curl",
+    "wget",
+    "network access",
+    "replay execution"
+  ],
+  "escalation": {
+    "classifier_critical_labels": [
+      "RISK_EXECUTION_CRITICAL",
+      "SECURITY",
+      "UNKNOWN_REQUIRES_REVIEW"
+    ],
+    "impact_sensitivities": [
+      "ELEVATED",
+      "CRITICAL"
+    ]
+  },
+  "invariants": [
+    "T0 operates only on the active AWU scope-base diff",
+    "T0 never imports changed project modules",
+    "T0 only compiles Python source and parses JSON/TOML through the Python standard library",
+    "T0 skips parsing deleted files",
+    "T0 never invokes test suites static analyzers mutation replay or network validation",
+    "T0 reports escalation metadata but never selects deeper validation tiers"
+  ]
+}

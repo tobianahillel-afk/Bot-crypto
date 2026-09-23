@@ -147,6 +147,12 @@ jobs:
       - name: Run diff impact adversarial self-tests
         run: python scripts/governance/selftest_diff_impact.py
 
+      - name: Run universal T0 changed-file gate
+        run: python scripts/governance/run_t0.py
+
+      - name: Run T0 adversarial self-tests
+        run: python scripts/governance/selftest_t0.py
+
       - name: Qualify work decomposition engine
         run: python scripts/governance/qualify_work_decomposition.py
 
