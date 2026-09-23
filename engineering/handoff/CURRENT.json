@@ -30,8 +30,8 @@
     "ENG-00 Repository Truth Recovery completed with canonical baseline validated on workflow run 35792439447",
     "ENG-01 Agent Bootstrap & Canonical State completed; permanent state, state machine, fresh-agent startup, evidence policy and live state-drift qualification validated on workflow run 35794262132"
   ],
-  "current_objective": "ENG-02.6: implement deterministic AWU context routing and bounded context budgets.",
-  "next_action": "Define risk-aware context ceilings, require executable AWUs to have complete budgets, and build a deterministic context manifest from state/parent/AWU inputs.",
+  "current_objective": "ENG-02.7: harden actual Git diff and scope validation around the active Agent Work Unit.",
+  "next_action": "Activate ENG-02.7-WU01, make the active AWU the executable scope boundary, and reject paths outside its allowlist or inside forbidden paths.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -135,6 +135,12 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35799488660",
       "note": "Exact head 0a712f238d26c11542ef2630717bbd343e2eb18b validated deterministic AWU risk classes R0-R3 and 7 adversarial risk scenarios."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35799782804",
+      "note": "Exact head 0819db599f68585b998191ca6dc564ce8f82b7cb validated AWU context routing and adversarial context-budget checks."
     }
   ],
   "stale_when": [
@@ -147,7 +153,7 @@
   ],
   "next_engineering": {
     "active_lot": "ENG-02",
-    "active_task": "ENG-02.6",
+    "active_task": "ENG-02.7",
     "active_manifest": "engineering/lots/ENG-02.json"
   }
 }

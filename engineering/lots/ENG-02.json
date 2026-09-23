@@ -52,12 +52,12 @@
     },
     {
       "id": "ENG-02.6",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Implement context routing and bounded context budgets."
     },
     {
       "id": "ENG-02.7",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Harden active-work diff/scope validation around AWU contracts."
     },
     {
