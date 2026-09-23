@@ -41,7 +41,7 @@
     "parent_manifest": "engineering/lots/ENG-05.json",
     "scope_base_sha": "48b32eb43f778d2da364725974e1805bd2660837",
     "risk_class": "R1",
-    "complexity_score": 2
+    "complexity_score": 1
   },
   "resume_read_order": [
     "AGENTS.md",
@@ -58,8 +58,8 @@
     "ENG-05.4 WU02 permanent-handoff bootstrap compatibility completed on exact head a9d712cc0f455a70ed9c39f35791e64cec1f58e7; run 35920389779 passed negative validators, context-map checks and full cold-start qualification.",
     "ENG-05.5 resume/recovery completed on exact head 48b32eb43f778d2da364725974e1805bd2660837; run 35930055502 passed recovery qualification, 9 adversarial probes and cold-start qualification."
   ],
-  "current_objective": "ENG-05.6 WU01: evaluate DocGuard, Vale and lychee deterministically before any documentation-tool adoption.",
-  "next_action": "Record exact current release/commit/license/runtime/network facts for DocGuard, Vale and lychee; derive bounded verdicts and reject any mandatory paid, authority-conflicting or network-dependent integration.",
+  "current_objective": "ENG-05.6 WU01: remove task-specific assumptions from resume/recovery qualification before evaluating documentation tools.",
+  "next_action": "Make resume/recovery assertions derive the active task and AWU dynamically, rerun adversarial recovery tests and cold-start, then open a separate WU02 for DocGuard/Vale/lychee evaluation.",
   "blockers": [],
   "validation_evidence": [
     {
