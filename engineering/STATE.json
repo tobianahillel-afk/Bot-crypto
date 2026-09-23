@@ -68,7 +68,7 @@
       "ENG-04"
     ],
     "active_lot": "ENG-05",
-    "active_task": "ENG-05.2",
+    "active_task": "ENG-05.3",
     "next_lot": "ENG-06",
     "active_manifest": "engineering/lots/ENG-05.json",
     "blockers": []
@@ -80,7 +80,7 @@
     "paid_runner_required": false
   },
   "authority": {
-    "current_state": "engineering/STATE.json",
+    "current_state": "config/governance/project_state.json",
     "transition_policy": "engineering/STATE_TRANSITIONS.json",
     "master_plan": "engineering/MASTER_PLAN.md",
     "handoff": "engineering/handoff/CURRENT.json",

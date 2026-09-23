@@ -33,12 +33,12 @@
     },
     {
       "id": "ENG-05.2",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Detect and prevent documentation consistency/status drift."
     },
     {
       "id": "ENG-05.3",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Build a concise context map/index with progressive disclosure."
     },
     {

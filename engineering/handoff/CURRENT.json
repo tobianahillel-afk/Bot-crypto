@@ -39,10 +39,11 @@
     "ENG-04.5 WU02 completed on exact head ea0e9b111347b5f676b3c0874e09f3e395a97db2: Engineering Bootstrap run 35873024923 PASS with action supply-chain auditor, 13 supply-chain probes, approved six-repository pin registry, 10 pin-registry adversarial probes and cold-start; Security Secrets run 35873024947 PASS.",
     "ENG-04.6 WU01 completed on exact head 494e9304be401559b5cc8c15f98257678b8ab255: Engineering Bootstrap run 35879192229 PASS and Security Supply Chain run 35879192165 PASS. Permission inventory found 88 workflows, 88 explicit top-level permission declarations, 0 missing declarations, 0 legacy permission debt; changed gate PASS.",
     "ENG-04.6 WU02 completed on exact head cc2c4e2a4c3f4ea962302a1e2709e96a4101731a: Engineering Bootstrap run 35879970764 PASS and Security Supply Chain run 35879970595 PASS. Repository protection policy/selftests PASS; live observation remains main protected=false, rulesets_count=0, branch-protection detail 403 to integration, so business unlock remains fail-closed.",
-    "ENG-04 Security & Supply Chain Engine completed on exact head dae1d5a920307586bcbe2cccbe11b0caba7c0869: Engineering Bootstrap run 35885215524 PASS with final PASS_ENGINEERING_SECURITY verifier and 8 adversarial probes; Security Secrets run 35885215485 PASS in RANGE mode with 0 findings and full-tree/full-history steps skipped on routine push; Security Actions and Security Supply Chain PASS. Business unlock remains blocked by BOOT-FINDING-001 because main protection is not verified."
+    "ENG-04 Security & Supply Chain Engine completed on exact head dae1d5a920307586bcbe2cccbe11b0caba7c0869: Engineering Bootstrap run 35885215524 PASS with final PASS_ENGINEERING_SECURITY verifier and 8 adversarial probes; Security Secrets run 35885215485 PASS in RANGE mode with 0 findings and full-tree/full-history steps skipped on routine push; Security Actions and Security Supply Chain PASS. Business unlock remains blocked by BOOT-FINDING-001 because main protection is not verified.",
+    "ENG-05.2 Documentation Consistency completed on exact head 365bd0a4a2afa63557cb580331ed887cbf7cd067: Engineering Bootstrap run 35908255388 PASS and Security Secrets run 35908255391 PASS. Repository truth and documentation validators enforce project_state authority and reject duplicated/stale bridge status."
   ],
-  "current_objective": "ENG-05.2: enforce documentation consistency and canonical authority pointers.",
-  "next_action": "Register current-authority documentation, correct stale engineering/STATE.json authority claims, and add an offline fail-closed consistency validator with adversarial probes.",
+  "current_objective": "ENG-05.3: generate a bounded progressive-disclosure context map for context-free agents.",
+  "next_action": "Generate CONTEXT_MAP.json/.md from canonical state, active AWU resolver route and handoff; validate exact read order, bounded paths and stale-state failures.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -338,6 +339,18 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35886777610",
       "note": "Exact head 1acc3d5c1043f532a1ac5f2c17c0e7bc72ed37f7 passed generated current-status --check, 9 adversarial status probes, decomposition qualification and cold-start. Security Secrets run 35886777802 also passed."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35908255388",
+      "note": "Exact head 365bd0a4a2afa63557cb580331ed887cbf7cd067 passed repository truth, generated status, documentation consistency, all governance/security controls, work decomposition and cold-start."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35908255391",
+      "note": "Exact head 365bd0a4a2afa63557cb580331ed887cbf7cd067 retained clean Security Secrets validation."
     }
   ],
   "stale_when": [
@@ -350,7 +363,7 @@
   ],
   "next_engineering": {
     "active_lot": "ENG-05",
-    "active_task": "ENG-05.2",
+    "active_task": "ENG-05.3",
     "active_manifest": "engineering/lots/ENG-05.json"
   }
 }

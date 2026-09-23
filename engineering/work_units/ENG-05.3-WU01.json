@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-05.3-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-05",
+    "task_id": "ENG-05.3",
+    "manifest": "engineering/lots/ENG-05.json"
+  },
+  "title": "Generate bounded progressive-disclosure context map",
+  "objective": "Generate and validate a concise startup context index from canonical project state, the single active AWU, its deterministic context route and the current handoff so a fresh agent knows exactly what to read first and what not to load by default.",
+  "non_goals": [
+    "redesign the handoff schema",
+    "resume/recovery qualification",
+    "adopt external documentation tooling",
+    "scan the whole repository at startup",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-05.2-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Canonical project state",
+      "kind": "STATE",
+      "locator": "config/governance/project_state.json"
+    },
+    {
+      "name": "Active AWU resolver",
+      "kind": "FILE",
+      "locator": "scripts/governance/resolve_active_awu.py"
+    },
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    },
+    {
+      "name": "AWU context policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/awu_context_policy_v1.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Context map policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/context_map_policy_v1.json"
+    },
+    {
+      "name": "Machine-readable context map",
+      "kind": "STATE",
+      "locator": "engineering/CONTEXT_MAP.json"
+    },
+    {
+      "name": "Human-readable context map",
+      "kind": "FILE",
+      "locator": "engineering/CONTEXT_MAP.md"
+    },
+    {
+      "name": "Context map renderer",
+      "kind": "FILE",
+      "locator": "scripts/governance/render_context_map.py"
+    },
+    {
+      "name": "Context map adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_context_map.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "365bd0a4a2afa63557cb580331ed887cbf7cd067",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-05.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-05.2-WU01.json",
+      "engineering/work_units/ENG-05.3-WU01.json",
+      "AGENTS.md",
+      "README.md",
+      "engineering/CURRENT_STATUS.md",
+      "config/governance/context_map_policy_v1.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "scripts/governance/render_context_map.py",
+      "scripts/governance/selftest_context_map.py",
+      ".github/workflows/engineering-bootstrap.yml",
+      "engineering/AGENT_PROTOCOL.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/lot*/**"
+    ],
+    "forbidden_semantics": [
+      "repository-wide startup scan",
+      "hidden chat context as authority",
+      "handoff schema redesign",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "AGENTS.md and config/governance/project_state.json are the first two startup authorities",
+      "context map active lot task manifest and AWU exactly match canonical state and resolver output",
+      "context map execution route exactly reuses the deterministic AWU primary/reference route instead of inventing a second router",
+      "engineering/handoff/CURRENT.json is explicit resume context but never overrides canonical state",
+      "context map paths are unique repository-relative existing control-plane files",
+      "historical evidence and business implementation files are not part of the default startup route",
+      "map size and routed context remain within the active AWU risk budget",
+      "generation and validation are offline standard-library zero-cost"
+    ],
+    "acceptance_criteria": [
+      "generated JSON and Markdown are deterministic and --check detects staleness",
+      "fresh-agent startup order is explicit and begins AGENTS then project_state",
+      "active manifest and active AWU are explicitly named",
+      "primary/reference route matches validate_awu_context output byte-for-byte by path order",
+      "handoff active task mismatch fails closed",
+      "duplicate path or repository-escape path fails closed",
+      "chat history and engineering/STATE.json are explicitly marked non-authoritative for startup",
+      "bootstrap validates the generated context map without network or external packages"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 2,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 16,
+      "executable_loc_changed": 650,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1"
+    ],
+    "target_commands": [
+      "python scripts/governance/render_context_map.py --check",
+      "python scripts/governance/selftest_context_map.py"
+    ]
+  },
+  "done_when": [
+    "a fresh agent can identify exact startup read order and bounded execution context from repository files alone",
+    "context routing remains a single deterministic mechanism",
+    "no whole-repository read is required for ordinary continue-development startup"
+  ]
+}
