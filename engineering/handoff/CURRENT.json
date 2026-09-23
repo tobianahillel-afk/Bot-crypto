@@ -31,8 +31,8 @@
     "ENG-01 Agent Bootstrap & Canonical State completed; permanent state, state machine, fresh-agent startup, evidence policy and live state-drift qualification validated on workflow run 35794262132",
     "ENG-02 Work Decomposition & Context Engine completed; end-to-end AWU DAG, complexity, split, risk, context, scope and cold-start qualification passed on workflow run 35833639230"
   ],
-  "current_objective": "ENG-03.7: implement safe exact-input proof fingerprints and reuse decisions.",
-  "next_action": "Implement canonical proof keys over exact file/policy/implementation/parameter/environment bindings; T4 and live-state proofs must remain non-reusable.",
+  "current_objective": "ENG-03.8: eliminate repeated prerequisite execution and measure single-pass incremental validation overhead.",
+  "next_action": "Refactor T1/T2/T3-T4 APIs to accept precomputed prior-tier results, add one orchestrator, and replace redundant production tier steps in engineering CI while preserving tier selftests.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -190,6 +190,12 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35839566858",
       "note": "Exact head 346a2327eb4a30743726d606ddf6ae5f4558c1dc passed symbolic T3/T4 selection and 10 adversarial selector scenarios. Real selection took 96.71 ms, required T3 SECURITY_ASSURANCE and WORKFLOW_ASSURANCE, no T4, and executed no assurance/certification."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35840156811",
+      "note": "Exact head 385a676bae9c612a8e055dea3f044ddc2f0cf54c passed exact-input proof reuse semantics, 10 adversarial reuse scenarios, work decomposition and cold start."
     }
   ],
   "stale_when": [
@@ -202,7 +208,7 @@
   ],
   "next_engineering": {
     "active_lot": "ENG-03",
-    "active_task": "ENG-03.7",
+    "active_task": "ENG-03.8",
     "active_manifest": "engineering/lots/ENG-03.json"
   }
 }

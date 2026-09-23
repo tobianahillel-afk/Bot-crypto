@@ -57,12 +57,12 @@
     },
     {
       "id": "ENG-03.7",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Implement safe exact-input proof reuse and cache semantics."
     },
     {
       "id": "ENG-03.8",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Measure validation overhead and prove incremental checks avoid unnecessary work."
     }
   ],

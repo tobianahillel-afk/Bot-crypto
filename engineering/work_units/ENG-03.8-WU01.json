@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-03.8-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-03",
+    "task_id": "ENG-03.8",
+    "manifest": "engineering/lots/ENG-03.json"
+  },
+  "title": "Eliminate tier recomputation and measure incremental overhead",
+  "objective": "Run T0→T1→T2→T3/T4 selection once per validation chain by passing prior-tier results forward, measure actual overhead, and prove routine governance work avoids pytest/full-suite/network/deep-assurance execution.",
+  "non_goals": [
+    "execute T3 security tooling",
+    "execute T4 certification",
+    "benchmark full historical regression on every change",
+    "mutation testing",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-03.7-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "T0 runner",
+      "kind": "FILE",
+      "locator": "scripts/governance/run_t0.py"
+    },
+    {
+      "name": "T1 runner",
+      "kind": "FILE",
+      "locator": "scripts/governance/run_t1.py"
+    },
+    {
+      "name": "T2 runner",
+      "kind": "FILE",
+      "locator": "scripts/governance/run_t2.py"
+    },
+    {
+      "name": "T3/T4 selector",
+      "kind": "FILE",
+      "locator": "scripts/governance/select_t3_t4.py"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Incremental validation policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/incremental_validation_policy_v1.json"
+    },
+    {
+      "name": "Single-pass validation orchestrator",
+      "kind": "FILE",
+      "locator": "scripts/governance/run_incremental_validation.py"
+    },
+    {
+      "name": "Incremental validation adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_incremental_validation.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "385a676bae9c612a8e055dea3f044ddc2f0cf54c",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-03.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-03.7-WU01.json",
+      "engineering/work_units/ENG-03.8-WU01.json",
+      "config/governance/incremental_validation_policy_v1.json",
+      "scripts/governance/run_t1.py",
+      "scripts/governance/run_t2.py",
+      "scripts/governance/select_t3_t4.py",
+      "scripts/governance/run_incremental_validation.py",
+      "scripts/governance/selftest_incremental_validation.py",
+      "engineering/INCREMENTAL_VALIDATION_PERFORMANCE.md",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "T3 assurance execution",
+      "T4 certification execution",
+      "full historical regression benchmark on every push",
+      "mutation testing",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "single-pass orchestrator invokes T0 exactly once T1 exactly once T2 exactly once and selector exactly once",
+      "T1 may consume a supplied T0 result without recomputing T0",
+      "T2 may consume a supplied T1 result without recomputing T1",
+      "selector may consume a supplied T2 result without recomputing T2",
+      "standalone tier CLIs remain backward-compatible and may compute prerequisites themselves",
+      "metrics report selected checks groups pytest invocation full-suite network and deep-tier execution",
+      "routine governance path must execute no pytest full suite network T3 or T4 work"
+    ],
+    "acceptance_criteria": [
+      "instrumented single-pass selftest observes one call per tier",
+      "standalone T1 T2 selector behavior remains valid",
+      "current governance diff completes incremental chain without pytest",
+      "current governance diff selects bounded T1 checks and zero T2 groups",
+      "current governance diff selects T3 requirements symbolically without executing them",
+      "orchestrator emits elapsed_ms and avoided_work counters",
+      "workflow no longer runs separate production T0/T1/T2/selector steps redundantly"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 4,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 1,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 14,
+      "executable_loc_changed": 780,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/run_incremental_validation.py",
+      "python scripts/governance/selftest_incremental_validation.py"
+    ]
+  },
+  "done_when": [
+    "incremental production chain computes each tier once",
+    "routine validation overhead is directly measured",
+    "routine governance work avoids unnecessary pytest/full-suite/network/deep-tier execution",
+    "standalone tier interfaces remain usable for debugging and targeted invocation"
+  ]
+}
