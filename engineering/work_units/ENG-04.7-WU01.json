@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-04.7-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-04",
+    "task_id": "ENG-04.7",
+    "manifest": "engineering/lots/ENG-04.json"
+  },
+  "title": "Verify and optimize security-engine cost proportionality",
+  "objective": "Audit the complete ENG-04 security engine for zero-cost, least-privilege and risk-proportional execution; remove avoidable repeated heavy work while preserving or strengthening security coverage, then emit a machine-readable final ENG-04 verdict.",
+  "non_goals": [
+    "resolve main branch protection without administration access",
+    "weaken secret SAST dependency workflow or supply-chain coverage",
+    "bulk rewrite historical lot workflows",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-04.6-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "Secret controls",
+      "kind": "FILE",
+      "locator": ".github/workflows/security-secrets.yml"
+    },
+    {
+      "name": "Dependency controls",
+      "kind": "FILE",
+      "locator": ".github/workflows/security-dependencies.yml"
+    },
+    {
+      "name": "SAST controls",
+      "kind": "FILE",
+      "locator": ".github/workflows/security-sast.yml"
+    },
+    {
+      "name": "Workflow security controls",
+      "kind": "FILE",
+      "locator": ".github/workflows/security-actions.yml"
+    },
+    {
+      "name": "Supply-chain controls",
+      "kind": "FILE",
+      "locator": ".github/workflows/security-supply-chain.yml"
+    },
+    {
+      "name": "Repository protection status",
+      "kind": "STATE",
+      "locator": "engineering/REPOSITORY_PROTECTION_STATUS.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Security-engine verification policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/security_engine_verification_policy_v1.json"
+    },
+    {
+      "name": "Security-engine verifier",
+      "kind": "FILE",
+      "locator": "scripts/governance/verify_security_engine.py"
+    },
+    {
+      "name": "Security-engine adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_security_engine.py"
+    },
+    {
+      "name": "Security-engine verification result",
+      "kind": "EVIDENCE",
+      "locator": "engineering/SECURITY_ENGINE_VERIFICATION.json"
+    },
+    {
+      "name": "Security-engine final report",
+      "kind": "FILE",
+      "locator": "engineering/SECURITY_ENGINE_VERIFICATION.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "cc2c4e2a4c3f4ea962302a1e2709e96a4101731a",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-04.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-04.6-WU02.json",
+      "engineering/work_units/ENG-04.7-WU01.json",
+      "config/governance/security_engine_verification_policy_v1.json",
+      "scripts/governance/verify_security_engine.py",
+      "scripts/governance/selftest_security_engine.py",
+      "engineering/SECURITY_ENGINE_VERIFICATION.json",
+      "engineering/SECURITY_ENGINE_VERIFICATION.md",
+      ".github/workflows/security-secrets.yml",
+      ".github/workflows/security-dependencies.yml",
+      ".github/workflows/security-sast.yml",
+      ".github/workflows/security-actions.yml",
+      ".github/workflows/security-supply-chain.yml",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/lot*/**"
+    ],
+    "forbidden_semantics": [
+      "branch protection mutation",
+      "ruleset mutation",
+      "security coverage reduction",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "all mandatory ENG-04 controls remain zero-cost and LLM-independent",
+      "all ENG-04 workflows remain least privilege and exact-pin compliant",
+      "dependency SAST workflow-security and supply-chain checks remain event/path scoped to relevant changes",
+      "secret scanning remains universal for push and pull-request changes but routine runs must not rescan full repository history when an exact changed commit range is available",
+      "full secret-history assurance remains scheduled or manually invocable",
+      "main branch protection blocker remains explicit and prevents business unlock",
+      "final ENG-04 verdict distinguishes engineering security completion from external repository-admin blocker"
+    ],
+    "acceptance_criteria": [
+      "routine secret push/PR scans only the introduced Git range plus positive control",
+      "scheduled/manual secret scan covers full Git history",
+      "all security policy cost flags remain false",
+      "all security workflows use explicit least-privilege permissions",
+      "all remote actions in changed security workflows are approved exact SHA pins",
+      "final verification emits PASS_ENGINEERING_SECURITY with BUSINESS_UNLOCK_BLOCKED_EXTERNAL_PROTECTION",
+      "no paid API SaaS LLM or larger runner is introduced"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 6,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 1,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 15,
+      "executable_loc_changed": 780,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/verify_security_engine.py",
+      "python scripts/governance/selftest_security_engine.py"
+    ]
+  },
+  "done_when": [
+    "ENG-04 controls are jointly verified zero-cost least-privilege and risk-proportional",
+    "routine secret scans avoid redundant full-history work without losing introduced-secret coverage",
+    "full-history assurance remains available on schedule/manual dispatch",
+    "final machine-readable ENG-04 verdict is emitted with external branch-protection blocker preserved"
+  ]
+}

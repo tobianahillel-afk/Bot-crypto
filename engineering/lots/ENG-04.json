@@ -59,12 +59,12 @@
     },
     {
       "id": "ENG-04.6",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Minimize permissions and remediate repository protection gaps where accessible."
     },
     {
       "id": "ENG-04.7",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Verify the security engine remains zero-cost and risk-proportional."
     }
   ],
