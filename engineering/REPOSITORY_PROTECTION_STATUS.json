@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "status_kind": "repository_protection_status_v1",
+  "repository": "tobianahillel-afk/Bot-crypto",
+  "default_branch": "main",
+  "observation_id": "ENG-04.6-LIVE-OBS-001",
+  "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+  "branch_resource": {
+    "protected": false,
+    "source": "GET /repos/{owner}/{repo}/branches/main"
+  },
+  "rulesets": {
+    "count": 0,
+    "source": "GET /repos/{owner}/{repo}/rulesets"
+  },
+  "branch_protection_detail": {
+    "state": "UNAVAILABLE_403_INTEGRATION_PERMISSION",
+    "source": "GET /repos/{owner}/{repo}/branches/main/protection"
+  },
+  "enforcement": {
+    "mechanism": "NONE_VERIFIED",
+    "pull_request_required": "UNVERIFIED",
+    "required_status_checks": "UNVERIFIED",
+    "force_pushes_blocked": "UNVERIFIED",
+    "branch_deletions_blocked": "UNVERIFIED"
+  },
+  "overall_status": "UNPROTECTED",
+  "business_unlock_allowed": false,
+  "manual_admin_action_required": true,
+  "blocking_finding_id": "BOOT-FINDING-001",
+  "note": "GitHub branch resource reports protected=false and rulesets list is empty. The connected GitHub App cannot access branch-protection administration details."
+}

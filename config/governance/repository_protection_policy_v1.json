@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "policy_kind": "repository_protection_policy_v1",
+  "semantics": "BUSINESS_UNLOCK_REQUIRES_VERIFIED_MAIN_PROTECTION",
+  "repository": "tobianahillel-afk/Bot-crypto",
+  "default_branch": "main",
+  "required_enforcement": {
+    "branch_is_protected": true,
+    "pull_request_required": true,
+    "required_status_checks": true,
+    "force_pushes_blocked": true,
+    "branch_deletions_blocked": true
+  },
+  "accepted_mechanisms": [
+    "BRANCH_PROTECTION",
+    "REPOSITORY_RULESET"
+  ],
+  "current_connector_capability": {
+    "administration_mutation_available": false,
+    "branch_resource_read_available": true,
+    "ruleset_list_read_available": true,
+    "branch_protection_detail_read_available": false
+  },
+  "unlock_behavior": {
+    "fail_closed_on_unprotected": true,
+    "fail_closed_on_unverifiable": true,
+    "fresh_live_verification_required": true,
+    "unresolved_finding_id": "BOOT-FINDING-001"
+  },
+  "cost_policy": {
+    "paid_api_required": false,
+    "paid_saas_required": false,
+    "paid_llm_required": false,
+    "paid_runner_required": false
+  },
+  "invariants": [
+    "business unlock requires verified main protection",
+    "a 403 administration endpoint is never treated as evidence of protection",
+    "at least one accepted enforcement mechanism must be positively observed",
+    "pull-request enforcement status checks force-push blocking and deletion blocking must be verified",
+    "current engineering may continue while the business unlock blocker remains open",
+    "protection verification requires no paid external service"
+  ]
+}
