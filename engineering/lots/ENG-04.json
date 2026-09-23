@@ -34,12 +34,12 @@
   "tasks": [
     {
       "id": "ENG-04.1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Implement secret controls with a pinned zero-cost Gitleaks integration and adversarial qualification."
     },
     {
       "id": "ENG-04.2",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Implement dependency vulnerability and dependency-diff controls."
     },
     {

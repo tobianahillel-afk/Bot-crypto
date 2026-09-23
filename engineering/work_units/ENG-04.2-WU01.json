@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-04.2-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-04",
+    "task_id": "ENG-04.2",
+    "manifest": "engineering/lots/ENG-04.json"
+  },
+  "title": "Implement dependency vulnerability and dependency-diff controls",
+  "objective": "Add bounded zero-cost dependency security controls by reusing the existing pinned pip-audit toolchain for the current Python lock and adding an exact-SHA GitHub Dependency Review gate for newly introduced dependencies.",
+  "non_goals": [
+    "automatic dependency updates",
+    "Dependabot or Renovate rollout",
+    "general SAST",
+    "GitHub Actions security linting",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-04.1-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Existing dev dependency source",
+      "kind": "FILE",
+      "locator": "requirements-dev.in"
+    },
+    {
+      "name": "Existing fully pinned dev lock",
+      "kind": "FILE",
+      "locator": "requirements-dev.lock"
+    },
+    {
+      "name": "Project dependency declaration",
+      "kind": "FILE",
+      "locator": "pyproject.toml"
+    },
+    {
+      "name": "Existing pip-audit gate",
+      "kind": "FILE",
+      "locator": ".github/workflows/code-quality.yml"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Dependency control policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/dependency_control_policy_v1.json"
+    },
+    {
+      "name": "Dependency security workflow",
+      "kind": "FILE",
+      "locator": ".github/workflows/security-dependencies.yml"
+    },
+    {
+      "name": "Dependency control validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_dependency_controls.py"
+    },
+    {
+      "name": "Dependency control adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_dependency_controls.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "431aa76a1fbd5faecb622231497a8f0915a465c2",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-04.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-04.1-WU01.json",
+      "engineering/work_units/ENG-04.2-WU01.json",
+      "config/governance/dependency_control_policy_v1.json",
+      ".github/workflows/security-dependencies.yml",
+      ".github/workflows/engineering-bootstrap.yml",
+      "scripts/governance/validate_dependency_controls.py",
+      "scripts/governance/selftest_dependency_controls.py",
+      "engineering/DEPENDENCY_CONTROLS.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "project dependency version changes",
+      "automatic dependency update bot rollout",
+      "general SAST integration",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "requirements-dev.in and pyproject dev dependencies remain exact-version equivalent",
+      "requirements-dev.txt remains a one-line reference to requirements-dev.lock",
+      "every requirements-dev.lock package remains exact-version pinned with no VCS URL editable or floating specifier",
+      "pip-audit version remains the already locked 2.9.0 during this AWU",
+      "GitHub Dependency Review is pinned to exact v5.0.0 commit",
+      "dependency review fails from low severity across runtime development and unknown scopes",
+      "dependency-review PR comments and warn-only mode remain disabled",
+      "routine non-dependency commits do not trigger the dedicated dependency workflow",
+      "weekly/current-lock auditing requires no paid API SaaS LLM or larger runner"
+    ],
+    "acceptance_criteria": [
+      "static validator proves direct dev dependency parity and lock exactness",
+      "dependency workflow is path-filtered to dependency/control files plus weekly/manual execution",
+      "current lock audit runs pip-audit against requirements-dev.lock",
+      "pull requests additionally execute dependency-review-action v5.0.0 pinned at a1d282b36b6f3519aa1f3fc636f609c47dddb294",
+      "dependency review uses fail-on-severity low and fail-on-scopes runtime,development,unknown",
+      "workflow has contents read only and no PR write permission",
+      "current dependency lock passes live audit or produces a fail-closed vulnerability finding"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 5,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": true,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 12,
+      "executable_loc_changed": 700,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 1
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_dependency_controls.py",
+      "python scripts/governance/selftest_dependency_controls.py",
+      "GitHub Actions security-dependencies workflow"
+    ]
+  },
+  "done_when": [
+    "current lock is vulnerability-audited by the dedicated bounded workflow",
+    "new PR dependency changes are checked by exact-SHA GitHub Dependency Review",
+    "dependency manifests and direct dev pins cannot silently drift",
+    "dependency security path remains zero-cost and does not run on unrelated commits"
+  ]
+}

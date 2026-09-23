@@ -30,10 +30,11 @@
     "ENG-00 Repository Truth Recovery completed with canonical baseline validated on workflow run 35792439447",
     "ENG-01 Agent Bootstrap & Canonical State completed; permanent state, state machine, fresh-agent startup, evidence policy and live state-drift qualification validated on workflow run 35794262132",
     "ENG-02 Work Decomposition & Context Engine completed; end-to-end AWU DAG, complexity, split, risk, context, scope and cold-start qualification passed on workflow run 35833639230",
-    "ENG-03 Incremental Validation Engine completed; exact head e5f6c953191d55933355e293d9f1b574659d0328 passed run 35840677829 with single-pass elapsed 58.109 ms, 6 avoided tier recomputations (60%), no pytest/full-suite/network/T3/T4 execution on the routine path."
+    "ENG-03 Incremental Validation Engine completed; exact head e5f6c953191d55933355e293d9f1b574659d0328 passed run 35840677829 with single-pass elapsed 58.109 ms, 6 avoided tier recomputations (60%), no pytest/full-suite/network/T3/T4 execution on the routine path.",
+    "ENG-04.1 Secret Controls completed on exact head 431aa76a1fbd5faecb622231497a8f0915a465c2: Engineering Bootstrap run 35848165705 PASS and Security Secrets run 35848165662 PASS, including pinned MIT Gitleaks v8.30.1 build, runtime-only positive control, current-tree scan, full-history scan, and two blob-bound vetted false-positive fingerprints."
   ],
-  "current_objective": "ENG-04.1: implement zero-cost pinned secret controls.",
-  "next_action": "Integrate Gitleaks v8.30.1 through gitleaks-action v3.0.0 pinned to exact commit e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e, with read-only permissions, redaction, no comments/uploads, and synthetic positive-control qualification.",
+  "current_objective": "ENG-04.2: implement dependency vulnerability and dependency-diff controls.",
+  "next_action": "Reuse the existing pip-audit 2.9.0 lock audit, add exact-SHA Dependency Review v5.0.0 for PR dependency diffs, and statically enforce manifest/lock parity without changing project dependency versions.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -203,6 +204,18 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35840677829",
       "note": "Exact head e5f6c953191d55933355e293d9f1b574659d0328 completed ENG-03.8. Single-pass validation took 58.109 ms, computed T0/T1/T2/selector once each, avoided 6 nested recomputations (60%), and ran no pytest/full suite/network/deep assurance/certification."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35848165705",
+      "note": "Exact head 431aa76a1fbd5faecb622231497a8f0915a465c2 passed all bootstrap governance including secret-control validator and 13 adversarial secret-control probes."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35848165662",
+      "note": "Exact head 431aa76a1fbd5faecb622231497a8f0915a465c2 passed pinned MIT Gitleaks positive-control, current-tree, full-history and clean-scan enforcement."
     }
   ],
   "stale_when": [
@@ -215,7 +228,7 @@
   ],
   "next_engineering": {
     "active_lot": "ENG-04",
-    "active_task": "ENG-04.1",
+    "active_task": "ENG-04.2",
     "active_manifest": "engineering/lots/ENG-04.json"
   }
 }
