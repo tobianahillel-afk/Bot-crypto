@@ -183,6 +183,12 @@ jobs:
       - name: Run SAST control adversarial self-tests
         run: python scripts/governance/selftest_sast_controls.py
 
+      - name: Validate workflow security controls
+        run: python scripts/governance/validate_workflow_security_controls.py
+
+      - name: Run workflow security adversarial self-tests
+        run: python scripts/governance/selftest_workflow_security_controls.py
+
       - name: Validate exact-input proof reuse semantics
         run: python scripts/governance/proof_reuse.py --self-check
 

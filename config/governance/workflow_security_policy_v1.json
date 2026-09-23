@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "policy_kind": "workflow_security_policy_v1",
+  "semantics": "CHANGED_WORKFLOW_ACTIONLINT_FAIL_CLOSED_V1",
+  "workflow_path": ".github/workflows/security-actions.yml",
+  "actionlint": {
+    "repository": "rhysd/actionlint",
+    "tag": "v1.7.12",
+    "commit": "914e7df21a07ef503a81201c76d2b11c789d3fca",
+    "version": "1.7.12",
+    "license": "MIT",
+    "asset_name": "actionlint_1.7.12_linux_amd64.tar.gz",
+    "asset_url": "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz",
+    "asset_sha256": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8"
+  },
+  "toolchain": {
+    "checkout_action_sha": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+    "checkout_version_comment": "v7.0.1"
+  },
+  "changed_target_globs": [
+    ".github/workflows/**/*.yml",
+    ".github/workflows/**/*.yaml"
+  ],
+  "trigger_paths": [
+    ".github/workflows/**/*.yml",
+    ".github/workflows/**/*.yaml",
+    ".github/actions/**",
+    "config/governance/workflow_security_policy_v1.json",
+    "scripts/governance/validate_workflow_security_controls.py"
+  ],
+  "scan_semantics": {
+    "pull_request": "merge-base(base_sha, HEAD) to HEAD",
+    "push": "before_sha to HEAD; fallback HEAD^ when before is unavailable/all-zero",
+    "workflow_dispatch": "HEAD^ to HEAD; fallback tracked workflow files when no parent",
+    "unchanged_legacy_blocking": false
+  },
+  "cost_policy": {
+    "paid_api_required": false,
+    "paid_saas_required": false,
+    "paid_llm_required": false,
+    "paid_runner_required": false
+  },
+  "invariants": [
+    "actionlint release tag and source commit are audited and the exact Linux asset SHA-256 is enforced",
+    "only changed workflow definitions are scanned on push and pull request",
+    "workflow_dispatch scans only the latest commit delta unless no parent exists",
+    "runtime malformed positive control must be rejected by actionlint",
+    "tool and validation path require no token paid API SaaS LLM or larger runner",
+    "legacy unchanged workflow debt remains explicit for ENG-04.5 and is not silently treated as clean",
+    "workflow uses contents read only and checkout does not persist credentials"
+  ]
+}

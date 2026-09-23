@@ -1,0 +1,126 @@
+name: Security Actions
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/**/*.yml"
+      - ".github/workflows/**/*.yaml"
+      - ".github/actions/**"
+      - "config/governance/workflow_security_policy_v1.json"
+      - "scripts/governance/validate_workflow_security_controls.py"
+  push:
+    branches:
+      - main
+      - engineering/bootstrap-development-engine
+    paths:
+      - ".github/workflows/**/*.yml"
+      - ".github/workflows/**/*.yaml"
+      - ".github/actions/**"
+      - "config/governance/workflow_security_policy_v1.json"
+      - "scripts/governance/validate_workflow_security_controls.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-actions-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  actionlint:
+    name: actionlint changed workflows
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      ACTIONLINT_VERSION: "1.7.12"
+      ACTIONLINT_ASSET: "actionlint_1.7.12_linux_amd64.tar.gz"
+      ACTIONLINT_SHA256: "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8"
+      PR_BASE_SHA: "${{ github.event.pull_request.base.sha }}"
+      PUSH_BEFORE_SHA: "${{ github.event.before }}"
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install exact actionlint release
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="${RUNNER_TEMP}/${ACTIONLINT_ASSET}"
+          bin_dir="${RUNNER_TEMP}/actionlint-bin"
+          url="https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/${ACTIONLINT_ASSET}"
+          curl --fail --location --silent --show-error "${url}" --output "${archive}"
+          printf '%s  %s\n' "${ACTIONLINT_SHA256}" "${archive}" | sha256sum --check --strict
+          mkdir -p "${bin_dir}"
+          tar -xzf "${archive}" -C "${bin_dir}" actionlint
+          printf 'ACTIONLINT_BIN=%s\n' "${bin_dir}/actionlint" >> "${GITHUB_ENV}"
+          version="$("${bin_dir}/actionlint" -version)"
+          printf '%s\n' "${version}" | grep -F "${ACTIONLINT_VERSION}" >/dev/null
+
+      - name: Prove actionlint rejects malformed workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          fixture="$(mktemp)"
+          cleanup() { rm -f "${fixture}"; }
+          trap cleanup EXIT
+          cat >"${fixture}" <<'YAML'
+          name: invalid-positive-control
+          on:
+            push:
+              branch: main
+          jobs:
+            test:
+              runs-on: ubuntu-latest
+              steps:
+                - run: echo test
+          YAML
+          set +e
+          "${ACTIONLINT_BIN}" "${fixture}" >"${RUNNER_TEMP}/actionlint-positive.log" 2>&1
+          status=$?
+          set -e
+          if [ "${status}" -eq 0 ]; then
+            cat "${RUNNER_TEMP}/actionlint-positive.log"
+            echo "actionlint positive control unexpectedly passed" >&2
+            exit 1
+          fi
+
+      - name: Discover and lint changed workflows
+        shell: bash
+        run: |
+          set -euo pipefail
+          zero="0000000000000000000000000000000000000000"
+          event="${GITHUB_EVENT_NAME}"
+          base=""
+
+          if [ "${event}" = "pull_request" ] && [ -n "${PR_BASE_SHA}" ]; then
+            base="$(git merge-base "${PR_BASE_SHA}" HEAD)"
+          elif [ "${event}" = "push" ] && [ -n "${PUSH_BEFORE_SHA}" ] && [ "${PUSH_BEFORE_SHA}" != "${zero}" ]; then
+            base="${PUSH_BEFORE_SHA}"
+          elif git rev-parse HEAD^ >/dev/null 2>&1; then
+            base="$(git rev-parse HEAD^)"
+          fi
+
+          if [ -n "${base}" ]; then
+            mapfile -t targets < <(
+              git diff --name-only --diff-filter=ACMR "${base}...HEAD" -- \
+                '.github/workflows/**/*.yml' '.github/workflows/**/*.yaml' |
+              sort -u
+            )
+          else
+            mapfile -t targets < <(
+              git ls-files '.github/workflows/**/*.yml' '.github/workflows/**/*.yaml' |
+              sort -u
+            )
+          fi
+
+          printf 'ACTIONLINT_TARGET_COUNT=%s\n' "${#targets[@]}"
+          if (("${#targets[@]}" == 0)); then
+            echo "No changed workflow definitions"
+            exit 0
+          fi
+          printf 'ACTIONLINT_TARGET=%s\n' "${targets[@]}"
+          "${ACTIONLINT_BIN}" "${targets[@]}"
