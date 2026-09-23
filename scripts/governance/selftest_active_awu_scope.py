@@ -70,7 +70,9 @@ def main() -> int:
     )
 
     foreign = copy.deepcopy(active)
-    foreign["parent"]["task_id"] = "ENG-02.8"
+    current_task = state["engineering_track"]["active_task"]
+    foreign_task = "ENG-02.1" if current_task != "ENG-02.1" else "ENG-02.2"
+    foreign["parent"]["task_id"] = foreign_task
     _expect(
         resolver.ActiveAwuError,
         lambda: resolver.validate_parent_binding(state, path, foreign),
