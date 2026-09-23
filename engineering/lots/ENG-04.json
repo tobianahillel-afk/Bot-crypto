@@ -44,12 +44,12 @@
     },
     {
       "id": "ENG-04.3",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Implement SAST with audited pinned tools."
     },
     {
       "id": "ENG-04.4",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Implement GitHub Actions syntax and security controls."
     },
     {

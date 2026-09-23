@@ -32,10 +32,11 @@
     "ENG-02 Work Decomposition & Context Engine completed; end-to-end AWU DAG, complexity, split, risk, context, scope and cold-start qualification passed on workflow run 35833639230",
     "ENG-03 Incremental Validation Engine completed; exact head e5f6c953191d55933355e293d9f1b574659d0328 passed run 35840677829 with single-pass elapsed 58.109 ms, 6 avoided tier recomputations (60%), no pytest/full-suite/network/T3/T4 execution on the routine path.",
     "ENG-04.1 Secret Controls completed on exact head 431aa76a1fbd5faecb622231497a8f0915a465c2: Engineering Bootstrap run 35848165705 PASS and Security Secrets run 35848165662 PASS, including pinned MIT Gitleaks v8.30.1 build, runtime-only positive control, current-tree scan, full-history scan, and two blob-bound vetted false-positive fingerprints.",
-    "ENG-04.2 Dependency Controls completed on exact head bc626d4fc13a1ebb9125540fbcea91c14d0dcb59: Engineering Bootstrap run 35849667705 PASS, Security Dependencies run 35849667715 PASS with no known vulnerabilities in requirements-dev.lock, and Security Secrets run 35849667729 PASS. Dependency Review v5.0.0 is pinned to a1d282b36b6f3519aa1f3fc636f609c47dddb294 for PR dependency diffs."
+    "ENG-04.2 Dependency Controls completed on exact head bc626d4fc13a1ebb9125540fbcea91c14d0dcb59: Engineering Bootstrap run 35849667705 PASS, Security Dependencies run 35849667715 PASS with no known vulnerabilities in requirements-dev.lock, and Security Secrets run 35849667729 PASS. Dependency Review v5.0.0 is pinned to a1d282b36b6f3519aa1f3fc636f609c47dddb294 for PR dependency diffs.",
+    "ENG-04.3 SAST Controls completed on exact head 8ad397ceb4dfe3ad2a429b295270ebf46afbff2f: Engineering Bootstrap run 35850772829 PASS and Security SAST run 35850772820 PASS. CodeQL Action v4.38.1 exact commit 1c5b675653bb5c22dbe9b12b556ec555138e09fd used CLI 2.27.0, security-extended, local SARIF fail-closed gate, 1 SARIF and 0 findings."
   ],
-  "current_objective": "ENG-04.3: implement layered zero-cost SAST.",
-  "next_action": "Audit the current CodeQL action/tooling and choose the minimum-permission exact-SHA deep Python analysis mode that complements the existing Bandit 1.8.0 gate without running on unrelated changes.",
+  "current_objective": "ENG-04.4: enforce changed-workflow GitHub Actions syntax and security.",
+  "next_action": "Implement exact-digest actionlint v1.7.12 and zizmor v1.30.1 changed-file gate with offline zizmor, runtime positive controls, and no broad ignores.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -235,6 +236,18 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35849667729",
       "note": "Exact head bc626d4fc13a1ebb9125540fbcea91c14d0dcb59 retained clean pinned Gitleaks secret scans."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35850772820",
+      "note": "Exact head 8ad397ceb4dfe3ad2a429b295270ebf46afbff2f passed CodeQL Python security-extended using CLI 2.27.0 with local SARIF gate: CODEQL_SARIF_FILES=1, CODEQL_FINDINGS=0."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35850772829",
+      "note": "Exact head 8ad397ceb4dfe3ad2a429b295270ebf46afbff2f passed all bootstrap SAST validator and adversarial controls."
     }
   ],
   "stale_when": [
@@ -247,7 +260,7 @@
   ],
   "next_engineering": {
     "active_lot": "ENG-04",
-    "active_task": "ENG-04.3",
+    "active_task": "ENG-04.4",
     "active_manifest": "engineering/lots/ENG-04.json"
   }
 }

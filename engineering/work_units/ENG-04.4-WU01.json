@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-04.4-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-04",
+    "task_id": "ENG-04.4",
+    "manifest": "engineering/lots/ENG-04.json"
+  },
+  "title": "Implement changed-workflow syntax and security gates",
+  "objective": "Add zero-cost fail-closed GitHub Actions syntax/security checks for changed workflow/action definitions using exact-digest actionlint and zizmor release binaries, while leaving repository-wide legacy supply-chain remediation to ENG-04.5.",
+  "non_goals": [
+    "repository-wide action ref pin remediation",
+    "secret scanning changes",
+    "dependency scanning changes",
+    "SAST changes",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-04.3-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Existing GitHub workflows",
+      "kind": "FILES",
+      "locator": ".github/workflows/"
+    },
+    {
+      "name": "ENG-04 manifest",
+      "kind": "STATE",
+      "locator": "engineering/lots/ENG-04.json"
+    },
+    {
+      "name": "Security SAST evidence",
+      "kind": "EVIDENCE",
+      "locator": "GitHub Actions run 35850772820"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Workflow security policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/workflow_security_policy_v1.json"
+    },
+    {
+      "name": "Workflow security gate",
+      "kind": "FILE",
+      "locator": ".github/workflows/security-actions.yml"
+    },
+    {
+      "name": "Workflow security validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_workflow_security_controls.py"
+    },
+    {
+      "name": "Workflow security adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_workflow_security_controls.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "8ad397ceb4dfe3ad2a429b295270ebf46afbff2f",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-04.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-04.3-WU01.json",
+      "engineering/work_units/ENG-04.4-WU01.json",
+      "config/governance/workflow_security_policy_v1.json",
+      ".github/workflows/security-actions.yml",
+      ".github/workflows/engineering-bootstrap.yml",
+      "scripts/governance/validate_workflow_security_controls.py",
+      "scripts/governance/selftest_workflow_security_controls.py",
+      "engineering/WORKFLOW_SECURITY_CONTROLS.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "repository-wide action ref rewrite",
+      "secret scanner changes",
+      "dependency scanner changes",
+      "SAST changes",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "actionlint and zizmor versions tags source commits release assets and SHA-256 digests are explicit",
+      "workflow downloads only exact GitHub release asset URLs and verifies SHA-256 before extraction",
+      "zizmor runs offline without GitHub token or online audits",
+      "changed workflow/action definitions fail closed on actionlint or zizmor findings",
+      "runtime synthetic malformed/insecure workflow must be rejected by both control layers as applicable",
+      "legacy unchanged workflows are not made an implicit blocker before ENG-04.5",
+      "workflow permissions remain contents read only with checkout credential persistence disabled",
+      "no continue-on-error warn-only no-exit-codes or broad ignore configuration is allowed"
+    ],
+    "acceptance_criteria": [
+      "actionlint v1.7.12 commit 914e7df21a07ef503a81201c76d2b11c789d3fca asset SHA-256 is enforced",
+      "zizmor v1.30.1 commit 99a054ed9283c90abdd2d5b9fb5101d27dde9783 asset SHA-256 is enforced",
+      "push and PR changes under .github workflow/action paths are scanned",
+      "workflow discovery derives targets from Git diff and never scans unrelated business changes",
+      "actionlint detects malformed synthetic workflow",
+      "zizmor detects insecure synthetic workflow in offline strict mode",
+      "changed current ENG workflow files pass the real gate or produce actionable metadata without secret values"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 5,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": true,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 12,
+      "executable_loc_changed": 760,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 2
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_workflow_security_controls.py",
+      "python scripts/governance/selftest_workflow_security_controls.py",
+      "GitHub Actions security-actions workflow"
+    ]
+  },
+  "done_when": [
+    "changed GitHub workflow/action definitions are syntax and security checked",
+    "tool binaries are exact-digest verified and zero-cost",
+    "legacy unchanged workflow debt remains explicit for ENG-04.5 rather than silently ignored",
+    "mandatory workflow security path requires no paid service token or LLM"
+  ]
+}
