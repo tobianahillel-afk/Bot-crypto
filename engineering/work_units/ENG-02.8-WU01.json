@@ -86,7 +86,8 @@
       "engineering/AGENT_WORK_UNIT_STANDARD.md",
       "AGENTS.md",
       "engineering/AGENT_PROTOCOL.md",
-      ".github/workflows/engineering-bootstrap.yml"
+      ".github/workflows/engineering-bootstrap.yml",
+      "scripts/governance/selftest_active_awu_scope.py"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -148,7 +149,7 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 14,
+      "files_touched": 15,
       "executable_loc_changed": 700,
       "new_public_behaviors": 1,
       "contract_families": 0,
