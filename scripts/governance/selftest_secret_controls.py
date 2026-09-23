@@ -37,7 +37,8 @@ def main() -> int:
     policy = mod._json(mod.POLICY_PATH)
     workflow = (ROOT / policy["workflow_path"]).read_text(encoding="utf-8")
     config = (ROOT / ".gitleaks.toml").read_text(encoding="utf-8")
-    mod.validate_documents(policy, workflow, config)
+    ignore = (ROOT / ".gitleaksignore").read_text(encoding="utf-8")
+    mod.validate_documents(policy, workflow, config, ignore)
 
     floating_checkout = workflow.replace(
         "actions/checkout@" + policy["toolchain"]["checkout_action_sha"],
@@ -97,7 +98,21 @@ def main() -> int:
     )
 
     allowlisted = config + '\n[[allowlists]]\npaths = ["""tests/.*"""]\n'
-    _expect(mod.SecretControlError, lambda: mod.validate_config(allowlisted), "broad allowlist")
+    _expect(mod.SecretControlError, lambda: mod.validate_config(allowlisted), "broad TOML allowlist")
+
+    extra_ignore = ignore + "other.txt:generic-api-key:1\n"
+    _expect(
+        mod.SecretControlError,
+        lambda: mod.validate_false_positive_registry(policy, extra_ignore),
+        "unregistered ignore fingerprint",
+    )
+
+    shifted_ignore = ignore.replace(":120", ":121", 1)
+    _expect(
+        mod.SecretControlError,
+        lambda: mod.validate_false_positive_registry(policy, shifted_ignore),
+        "shifted ignore fingerprint",
+    )
 
     bad_pin = copy.deepcopy(policy)
     bad_pin["gitleaks"]["commit"] = "0" * 40
@@ -107,7 +122,7 @@ def main() -> int:
     paid_policy["cost_policy"]["paid_saas_required"] = True
     _expect(mod.SecretControlError, lambda: mod.validate_policy(paid_policy), "paid SaaS")
 
-    print("SECRET_CONTROLS_SELFTEST_PASS probes=11")
+    print("SECRET_CONTROLS_SELFTEST_PASS probes=13")
     return 0
 
 
