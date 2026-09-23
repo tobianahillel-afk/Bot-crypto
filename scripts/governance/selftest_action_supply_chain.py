@@ -36,6 +36,7 @@ def main() -> int:
     mod = _module()
     policy = mod._json(mod.POLICY_PATH)
     mod.validate_policy(policy)
+    registry = mod.load_pin_registry(policy)
 
     pinned = mod.classify_uses(
         "actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
@@ -90,7 +91,7 @@ jobs:
             "REMOTE_PINNED_SHA",
         ]
         result = mod.audit([workflow], policy, root=root)
-        blocked = mod.changed_gate(result)
+        blocked = mod.changed_gate(result, registry)
         assert len(blocked) == 1
         assert blocked[0]["classification"] == "REMOTE_FLOATING_REF"
 
@@ -99,7 +100,19 @@ jobs:
             "steps:\n  - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065\n",
             encoding="utf-8",
         )
-        assert mod.changed_gate(mod.audit([safe], policy, root=root)) == []
+        assert mod.changed_gate(mod.audit([safe], policy, root=root), registry) == []
+
+        unknown = root / ".github" / "workflows" / "unknown.yml"
+        unknown.write_text(
+            "steps:\n  - uses: actions/checkout@0000000000000000000000000000000000000000\n",
+            encoding="utf-8",
+        )
+        unknown_blocked = mod.changed_gate(
+            mod.audit([unknown], policy, root=root),
+            registry,
+        )
+        assert len(unknown_blocked) == 1
+        assert unknown_blocked[0]["blocked_reason"] == "UNAPPROVED_REMOTE_SHA"
 
     broken = dict(policy)
     broken["immutable_remote_ref_regex"] = "^v\\d+$"
@@ -109,7 +122,7 @@ jobs:
         "mutable immutable-ref policy",
     )
 
-    print("ACTION_SUPPLY_CHAIN_SELFTEST_PASS probes=12")
+    print("ACTION_SUPPLY_CHAIN_SELFTEST_PASS probes=13")
     return 0
 
 
