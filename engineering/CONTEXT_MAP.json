@@ -1,7 +1,7 @@
 {
   "active_work": {
-    "awu_id": "ENG-05.6-WU03",
-    "awu_path": "engineering/work_units/ENG-05.6-WU03.json",
+    "awu_id": "ENG-05.6-WU04",
+    "awu_path": "engineering/work_units/ENG-05.6-WU04.json",
     "complexity_score": 5,
     "lot": "ENG-05",
     "manifest": "engineering/lots/ENG-05.json",
@@ -40,7 +40,7 @@
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-05.json",
-      "engineering/work_units/ENG-05.6-WU03.json",
+      "engineering/work_units/ENG-05.6-WU04.json",
       "config/governance/documentation_tooling_candidates_v1.json",
       "config/governance/action_pin_registry_v1.json",
       "config/governance/workflow_security_policy_v1.json",
@@ -67,9 +67,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "ENG-05.6 WU03: benchmark exact pinned Vale and lychee binaries in offline modes without slowing the routine bootstrap.",
+    "current_objective": "ENG-05.6 WU04: benchmark exact pinned Vale v3.22.0 offline as a one-dependency work unit.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Create an isolated path-scoped benchmark workflow that verifies GitHub release SHA-256 digests, proves synthetic detection, measures representative docs, and records the adoption decision."
+    "next_action": "Validate the split transition, then create a path-scoped Vale-only benchmark workflow that verifies the release SHA-256 before execution, uses only temporary local rules, and measures synthetic plus representative-doc behavior."
   },
   "safety": {
     "execution_allowed": false,
