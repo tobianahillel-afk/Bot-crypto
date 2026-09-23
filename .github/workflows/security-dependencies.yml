@@ -57,7 +57,7 @@ jobs:
 
       - name: Audit exact dependency lock
         run: |
-          pip-audit -r requirements-dev.lock --disable-pip --strict --progress-spinner off
+          pip-audit -r requirements-dev.lock --no-deps --disable-pip --strict --progress-spinner off
 
   dependency-review:
     name: Review introduced dependencies
