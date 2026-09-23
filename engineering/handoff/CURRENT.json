@@ -41,7 +41,7 @@
     "parent_manifest": "engineering/lots/ENG-05.json",
     "scope_base_sha": "1f40aee0580e75b3f5404bb27be6a654c37dedc3",
     "risk_class": "R2",
-    "complexity_score": 4
+    "complexity_score": 5
   },
   "resume_read_order": [
     "AGENTS.md",
