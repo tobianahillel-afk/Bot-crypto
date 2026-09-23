@@ -184,17 +184,21 @@ def select_requirements(
     }
 
 
-def repository_run() -> dict[str, Any]:
+def repository_run(t2_result: dict[str, Any] | None = None) -> dict[str, Any]:
     started=time.perf_counter()
     policy=_json(POLICY_PATH)
     validate_policy(policy)
 
-    t2=_module("t3t4_prerequisite_t2", ROOT / "scripts/governance/run_t2.py")
+    precomputed=t2_result is not None
+    if t2_result is None:
+        t2=_module("t3t4_prerequisite_t2", ROOT / "scripts/governance/run_t2.py")
+        try:
+            t2_result=t2.repository_run()
+        except t2.T2Error as exc:
+            raise T3T4SelectionError(f"T2 prerequisite failed: {exc}") from exc
+    elif not isinstance(t2_result,dict):
+        raise T3T4SelectionError("precomputed T2 result must be an object")
     active=_module("t3t4_active_awu", ROOT / "scripts/governance/resolve_active_awu.py")
-    try:
-        t2_result=t2.repository_run()
-    except t2.T2Error as exc:
-        raise T3T4SelectionError(f"T2 prerequisite failed: {exc}") from exc
     try:
         _path, awu, _evidence=active.resolve_active_awu()
     except active.ActiveAwuError as exc:
@@ -205,6 +209,7 @@ def repository_run() -> dict[str, Any]:
     result.update({
         "active_awu":awu["id"],
         "scope_base_sha":awu["scope"]["scope_base_sha"],
+        "prerequisite_t2_source":"PRECOMPUTED" if precomputed else "COMPUTED",
         "t2_remaining_uncovered_impacts":t2_result["remaining_uncovered_impacts"],
         "t2_covered_impacts":t2_result["t2_covered_impacts"],
         "selected_validation_tiers":["T0","T1","T2"]

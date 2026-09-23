@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "policy_kind": "incremental_validation_policy_v1",
+  "semantics": "SINGLE_PASS_NO_PREREQUISITE_RECOMPUTATION",
+  "expected_stage_order": [
+    "T0",
+    "T1",
+    "T2",
+    "T3_T4_SELECTOR"
+  ],
+  "nested_baseline_invocations": {
+    "T0": 4,
+    "T1": 3,
+    "T2": 2,
+    "T3_T4_SELECTOR": 1
+  },
+  "single_pass_invocations": {
+    "T0": 1,
+    "T1": 1,
+    "T2": 1,
+    "T3_T4_SELECTOR": 1
+  },
+  "expected_avoided_invocations": 6,
+  "minimum_recomputation_reduction_ratio": 0.5,
+  "routine_max_elapsed_ms": 2000,
+  "routine_forbidden_work": [
+    "pytest",
+    "full_suite",
+    "network",
+    "T3_execution",
+    "T4_execution"
+  ],
+  "invariants": [
+    "production incremental chain computes each stage exactly once",
+    "precomputed prior-tier objects are passed forward in memory",
+    "standalone T1 T2 and selector CLIs preserve prerequisite-computing behavior",
+    "selftests remain separate from production-chain timing",
+    "elapsed time is measured rather than inferred",
+    "routine path never executes pytest full suite network T3 assurance or T4 certification"
+  ]
+}

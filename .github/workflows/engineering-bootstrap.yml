@@ -147,29 +147,23 @@ jobs:
       - name: Run diff impact adversarial self-tests
         run: python scripts/governance/selftest_diff_impact.py
 
-      - name: Run universal T0 changed-file gate
-        run: python scripts/governance/run_t0.py
+      - name: Run single-pass incremental validation
+        run: python scripts/governance/run_incremental_validation.py
 
       - name: Run T0 adversarial self-tests
         run: python scripts/governance/selftest_t0.py
 
-      - name: Run targeted T1 validation
-        run: python scripts/governance/run_t1.py
-
       - name: Run T1 adversarial self-tests
         run: python scripts/governance/selftest_t1.py
-
-      - name: Run conditional T2 domain validation
-        run: python scripts/governance/run_t2.py
 
       - name: Run T2 adversarial self-tests
         run: python scripts/governance/selftest_t2.py
 
-      - name: Select T3/T4 assurance requirements
-        run: python scripts/governance/select_t3_t4.py
-
       - name: Run T3/T4 selector adversarial self-tests
         run: python scripts/governance/selftest_t3_t4_selector.py
+
+      - name: Run incremental validation adversarial self-tests
+        run: python scripts/governance/selftest_incremental_validation.py
 
       - name: Validate exact-input proof reuse semantics
         run: python scripts/governance/proof_reuse.py --self-check

@@ -245,16 +245,20 @@ def execute_pytest(targets: list[str], timeout_seconds: int) -> dict[str, Any]:
     }
 
 
-def repository_run() -> dict[str, Any]:
+def repository_run(t1_result: dict[str, Any] | None = None) -> dict[str, Any]:
     started = time.perf_counter()
     policy = _json(POLICY_PATH)
     validate_policy(policy)
 
-    t1 = _module("t2_prerequisite_t1", ROOT / "scripts/governance/run_t1.py")
-    try:
-        t1_result = t1.repository_run()
-    except t1.T1Error as exc:
-        raise T2Error(f"T1 prerequisite failed: {exc}") from exc
+    precomputed = t1_result is not None
+    if t1_result is None:
+        t1 = _module("t2_prerequisite_t1", ROOT / "scripts/governance/run_t1.py")
+        try:
+            t1_result = t1.repository_run()
+        except t1.T1Error as exc:
+            raise T2Error(f"T1 prerequisite failed: {exc}") from exc
+    elif not isinstance(t1_result, dict):
+        raise T2Error("precomputed T1 result must be an object")
 
     selection = select_groups(t1_result, policy)
 
@@ -275,6 +279,7 @@ def repository_run() -> dict[str, Any]:
         "t2_version": 1,
         "active_awu": awu["id"],
         "scope_base_sha": awu["scope"]["scope_base_sha"],
+        "prerequisite_t1_source": "PRECOMPUTED" if precomputed else "COMPUTED",
         **selection,
         **plan,
         "pytest": execution,

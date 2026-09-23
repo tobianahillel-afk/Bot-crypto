@@ -204,16 +204,20 @@ def execute_checks(selected: list[str], base: str) -> list[dict[str, Any]]:
     return results
 
 
-def repository_run() -> dict[str, Any]:
+def repository_run(t0_result: dict[str, Any] | None = None) -> dict[str, Any]:
     started = time.perf_counter()
     policy = _json(POLICY_PATH)
     validate_policy(policy, set(CHECKS))
 
-    t0 = _module("t1_prerequisite_t0", ROOT / "scripts/governance/run_t0.py")
-    try:
-        t0_result = t0.repository_run()
-    except t0.T0Error as exc:
-        raise T1Error(f"T0 prerequisite failed: {exc}") from exc
+    precomputed = t0_result is not None
+    if t0_result is None:
+        t0 = _module("t1_prerequisite_t0", ROOT / "scripts/governance/run_t0.py")
+        try:
+            t0_result = t0.repository_run()
+        except t0.T0Error as exc:
+            raise T1Error(f"T0 prerequisite failed: {exc}") from exc
+    elif not isinstance(t0_result, dict):
+        raise T1Error("precomputed T0 result must be an object")
 
     selection = select_checks(t0_result, policy)
     base = t0_result["scope_base_sha"]
@@ -224,6 +228,7 @@ def repository_run() -> dict[str, Any]:
         "active_awu": t0_result["active_awu"],
         "scope_base_sha": base,
         "t0_elapsed_ms": t0_result["elapsed_ms"],
+        "prerequisite_t0_source": "PRECOMPUTED" if precomputed else "COMPUTED",
         **selection,
         "executed_checks": executed,
         "requires_deeper_validation": bool(selection["uncovered_impacts"]),
