@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "registry_kind": "documentation_tooling_candidates_v1",
+  "semantics": "AUDIT_BEFORE_ADOPTION_NO_EXTERNAL_EXECUTION",
+  "observed_on": "2026-09-24",
+  "verdicts": [
+    "ADOPT",
+    "ADOPT_PARTIALLY",
+    "COPY_PATTERN",
+    "REJECT"
+  ],
+  "project_constraints": {
+    "mandatory_path_zero_cost": true,
+    "mandatory_path_network_allowed": false,
+    "external_tool_authority_allowed": false,
+    "external_execution_performed_in_this_awu": false,
+    "spec_kit_artifacts_present": false,
+    "existing_correctness_controls": [
+      "generated current status",
+      "documentation consistency",
+      "bounded context map",
+      "machine-readable handoff",
+      "resume/recovery qualification"
+    ],
+    "currently_missing_capabilities": [
+      "PROSE_STYLE_LINT",
+      "LOCAL_LINK_INTEGRITY"
+    ]
+  },
+  "candidates": [
+    {
+      "id": "DOCGUARD",
+      "display_name": "DocGuard",
+      "repository": "raccioly/docguard",
+      "release": {
+        "tag": "v0.42.1",
+        "published_at": "2026-09-22T16:40:18Z",
+        "tag_object_sha": "20fd6d32d82b2160aacb2018100e4229d5b00ab0",
+        "source_commit": "90684da66d52230b462e92a3f5f0e35e84ead9c5",
+        "tag_verification": "UNSIGNED"
+      },
+      "license": {
+        "spdx": "MIT",
+        "permissive": true
+      },
+      "runtime": {
+        "kind": "NODE_CLI",
+        "minimum": "Node.js >=18",
+        "package": "docguard-cli@0.42.1",
+        "pinned_runtime_dependencies": [
+          "@babel/parser@7.29.8"
+        ],
+        "python_wrapper_delegates_to_npx": true,
+        "install_scripts_declared": false
+      },
+      "network": {
+        "install_or_resolution_may_require_network": true,
+        "core_validation_can_be_local_after_pinned_install": true,
+        "mandatory_mode_network_required": false
+      },
+      "capabilities": [
+        "canonical documentation validation",
+        "documentation/code drift checks",
+        "Spec Kit artifact validation",
+        "structured findings and deterministic checks"
+      ],
+      "overlap_with_current_engine": "HIGH",
+      "authority_role": "NON_AUTHORITATIVE",
+      "cost": {
+        "paid_license": false,
+        "paid_api": false,
+        "paid_saas": false,
+        "paid_runner": false
+      },
+      "verdict": "COPY_PATTERN",
+      "rationale": "The current engine already owns canonical state, generated status, context, handoff and drift checks, while no Spec Kit artifacts are present. Installing DocGuard now would duplicate governance and add Node/npm surface before its strongest integration is needed.",
+      "proposed_scope": "Reuse selected deterministic evidence/guard/lifecycle patterns only; reconsider a pinned runtime integration if Spec Kit artifacts become active.",
+      "mandatory_path": false,
+      "benchmark_followup": false,
+      "revisit_when": "SPEC_KIT_ARTIFACTS_PRESENT",
+      "rollback": "No runtime adoption in this phase; copied patterns remain project-owned."
+    },
+    {
+      "id": "VALE",
+      "display_name": "Vale",
+      "repository": "vale-cli/vale",
+      "release": {
+        "tag": "v3.22.0",
+        "published_at": "2026-09-17T15:23:38Z",
+        "source_commit": "e109c06297dc58a513f10691a275f3a9465584a1",
+        "tag_verification": "LIGHTWEIGHT_TAG_DIRECT_COMMIT"
+      },
+      "license": {
+        "spdx": "MIT",
+        "permissive": true
+      },
+      "runtime": {
+        "kind": "STATIC_GO_BINARY",
+        "source_toolchain": "Go 1.25.7",
+        "prebuilt_release_binary_available": true,
+        "project_local_rules_required": true
+      },
+      "network": {
+        "core_lint_offline": true,
+        "package_sync_optional_and_networked": true,
+        "mandatory_mode_network_required": false
+      },
+      "capabilities": [
+        "prose style lint",
+        "terminology enforcement",
+        "project-local deterministic writing rules"
+      ],
+      "overlap_with_current_engine": "LOW",
+      "authority_role": "NON_AUTHORITATIVE",
+      "cost": {
+        "paid_license": false,
+        "paid_api": false,
+        "paid_saas": false,
+        "paid_runner": false
+      },
+      "verdict": "ADOPT_PARTIALLY",
+      "rationale": "Vale fills the currently missing prose-style layer and can run fully offline, but useful behavior depends on carefully designed local rules; remote style-package sync would add avoidable network and drift.",
+      "proposed_scope": "Benchmark a pinned binary with project-local rules on changed Markdown only; no vale sync in the mandatory path and no authority over factual/canonical state.",
+      "mandatory_path": false,
+      "benchmark_followup": true,
+      "revisit_when": null,
+      "rollback": "Remove the optional binary/config/rules without changing canonical documentation authority."
+    },
+    {
+      "id": "LYCHEE",
+      "display_name": "lychee",
+      "repository": "lycheeverse/lychee",
+      "release": {
+        "tag": "lychee-v0.24.2",
+        "published_at": "2026-05-01T15:41:38Z",
+        "tag_object_sha": "e85aaf5524b2f808e63bae55e594c843220f10f2",
+        "source_commit": "2bba271688c1abb1503097a064e6c3bc1d1b6a9b",
+        "tag_verification": "UNSIGNED"
+      },
+      "license": {
+        "spdx": "MIT OR Apache-2.0",
+        "permissive": true
+      },
+      "runtime": {
+        "kind": "STATIC_RUST_BINARY",
+        "prebuilt_release_binary_available": true,
+        "source_workspace_version": "0.24.2"
+      },
+      "network": {
+        "offline_flag_supported": true,
+        "offline_semantics": "Only check local files and block network requests",
+        "external_link_check_requires_network": true,
+        "mandatory_mode_network_required": false
+      },
+      "capabilities": [
+        "Markdown/HTML link integrity",
+        "local relative-link checking",
+        "optional external URL checking"
+      ],
+      "overlap_with_current_engine": "LOW",
+      "authority_role": "NON_AUTHORITATIVE",
+      "cost": {
+        "paid_license": false,
+        "paid_api": false,
+        "paid_saas": false,
+        "paid_runner": false
+      },
+      "verdict": "ADOPT_PARTIALLY",
+      "rationale": "lychee fills the missing link-integrity layer. Its --offline mode can make local-link checks deterministic; external URL health is network-dependent and therefore unsuitable as a mandatory per-change gate.",
+      "proposed_scope": "Benchmark a pinned binary with --offline on changed documentation for local links; keep external URL checks scheduled/advisory only.",
+      "mandatory_path": false,
+      "benchmark_followup": true,
+      "revisit_when": null,
+      "rollback": "Remove the optional binary/config/workflow step; canonical docs and state remain unaffected."
+    }
+  ],
+  "follow_up": {
+    "benchmark_aw_u_required": true,
+    "proposed_aw_u_id": "ENG-05.6-WU03",
+    "benchmark_candidates": [
+      "VALE",
+      "LYCHEE"
+    ],
+    "benchmark_constraints": [
+      "exact source/release pin",
+      "checksum or source-commit verification before execution",
+      "zero paid services",
+      "no external network in mandatory benchmark modes",
+      "measure startup/runtime and false-positive noise on representative project docs",
+      "do not make either tool authoritative"
+    ],
+    "docguard_revisit_condition": "SPEC_KIT_ARTIFACTS_PRESENT"
+  }
+}
