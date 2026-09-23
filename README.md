@@ -2,34 +2,26 @@
 
 Plateforme quantitative crypto défensive, déterministe, extensible et auditable.
 
-## État courant
+<!-- BEGIN GENERATED CURRENT STATUS -->
+## Current project status (generated)
 
-| Élément | État |
-|---|---|
-| Dernier lot métier fusionné et certifié | **Lot 44 — Trades & Aggressor Classification Schema** |
-| Version de baseline métier | **0.44.0** |
-| Gate suivant fusionné | **Lot 45 implementation entry gate — `GO_LOT45_IMPLEMENTATION_ENTRY`** |
-| Candidat métier non fusionné | **Lot 45 — PR #66, suspendue pendant la construction du Development Engine** |
-| Lot suivant | **Lot 46 — `LOCKED`** |
-| Runtime maximal | `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY` |
-| Trading | **désactivé** |
-| Connectivité exchange | **désactivée** |
+> Generated from `config/governance/project_state.json`. Do not edit this block manually.
 
-```text
-TradingDecision = WAIT
-SystemDecision = BLOCK_TRADING
-trade_allowed = false
-execution_allowed = false
-approved_size = 0
-live_execution = DISABLED
-leverage = FORBIDDEN
-withdrawals = FORBIDDEN
-```
-
-> **Autorité d’état courant :** `engineering/STATE.json`. Les descriptions détaillées
-> de lots ci-dessous conservent du contexte historique et ne doivent pas être utilisées
-> seules pour décider du prochain travail autorisé.
-
+- Project: **Crypto Quant Bot V3.1-Ops**
+- Business development: **PAUSED**
+- Certified business baseline: **Lot 44 / 0.44.0 / GO_LOT44_POST_MERGE**
+- Suspended business candidate: **Lot 45 / PR #66 / SUSPENDED_CANDIDATE**
+- Next business lot: **Lot 46 / LOCKED**
+- Engineering: **ENG-05 / ENG-05.1 / BUILDING**
+- Next engineering lot: **ENG-06**
+- Runtime maximum: `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY`
+- Trading allowed: `false`
+- Execution allowed: `false`
+- Live execution: `DISABLED`
+- Leverage: `FORBIDDEN`
+- Withdrawals: `FORBIDDEN`
+- Open blocking findings: `BOOT-FINDING-001` (MAIN_BRANCH_UNPROTECTED; before BUSINESS_DEVELOPMENT_UNLOCK)
+<!-- END GENERATED CURRENT STATUS -->
 Le Lot 29 prouve que les artefacts certifiés des Lots 21 à 28 forment une chaîne ordonnée,
 déterministe et non exécutable. Le Lot 30 clôture V2 en revérifiant les huit artefacts,
 les preuves Lot 29, deux replays identiques du validateur et cinq contrôles négatifs

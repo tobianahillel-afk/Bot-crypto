@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "policy_kind": "generated_status_policy_v1",
+  "semantics": "CANONICAL_STATE_TO_BOUNDED_DOC_BLOCKS",
+  "source": "config/governance/project_state.json",
+  "generated_page": "engineering/CURRENT_STATUS.md",
+  "managed_documents": [
+    {
+      "path": "README.md",
+      "start_marker": "<!-- BEGIN GENERATED CURRENT STATUS -->",
+      "end_marker": "<!-- END GENERATED CURRENT STATUS -->"
+    },
+    {
+      "path": "AGENTS.md",
+      "start_marker": "<!-- BEGIN GENERATED CURRENT STATUS -->",
+      "end_marker": "<!-- END GENERATED CURRENT STATUS -->"
+    }
+  ],
+  "generated_page_header": "# Current Project Status",
+  "forbidden_content_patterns": [
+    "generated_at",
+    "timestamp",
+    "updated_at",
+    "current time"
+  ],
+  "invariants": [
+    "canonical project_state is the only mutable current-status source",
+    "generated content contains no wall-clock timestamp",
+    "managed documents contain exactly one bounded generated status block",
+    "generated page is fully generated and includes do-not-edit notice",
+    "update mode is deterministic and idempotent",
+    "check mode writes nothing and fails on stale missing duplicate or malformed markers",
+    "business pause candidate suspension Lot46 lock and runtime safety fields are rendered exactly"
+  ]
+}

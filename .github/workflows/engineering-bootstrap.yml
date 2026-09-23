@@ -165,6 +165,12 @@ jobs:
       - name: Run incremental validation adversarial self-tests
         run: python scripts/governance/selftest_incremental_validation.py
 
+      - name: Validate generated current status
+        run: python scripts/governance/render_current_status.py --check
+
+      - name: Run current-status adversarial self-tests
+        run: python scripts/governance/selftest_current_status.py
+
       - name: Validate secret controls
         run: python scripts/governance/validate_secret_controls.py
 
