@@ -145,11 +145,16 @@ def validate(registry: dict[str, Any]) -> None:
     roadmap = _text("docs/ROADMAP_V1_TO_V21.md")
     for marker in (
         "Projet : **Crypto Quant Bot V3.1-Ops**",
-        "Dernier lot métier fusionné et certifié : **Lot 44",
-        "Lot 46",
+        "## Autorité d’état courant",
+        "config/governance/project_state.json",
+        "engineering/CURRENT_STATUS.md",
     ):
         if marker not in roadmap:
-            raise TruthRegistryError(f"roadmap reconciliation missing {marker!r}")
+            raise TruthRegistryError(f"roadmap authority reconciliation missing {marker!r}")
+    if "## État actuel" in roadmap:
+        raise TruthRegistryError("roadmap must not duplicate current operational status")
+    if "engineering/STATE.json" in roadmap:
+        raise TruthRegistryError("roadmap must not present migration bridge as current authority")
 
     pyproject = _text("pyproject.toml")
     if 'version = "0.44.0"' not in pyproject:
@@ -163,8 +168,21 @@ def validate(registry: dict[str, Any]) -> None:
             raise TruthRegistryError(f"functional coverage reconciliation missing {marker!r}")
 
     architecture = _text("docs/SYSTEM_EXECUTION_ARCHITECTURE.md")
-    if "baseline métier fusionnée et certifiée atteint **Lot44**" not in architecture:
-        raise TruthRegistryError("system execution current-state section is not reconciled")
+    for marker in (
+        "## 8. Autorité d’état courant",
+        "config/governance/project_state.json",
+        "engineering/CURRENT_STATUS.md",
+    ):
+        if marker not in architecture:
+            raise TruthRegistryError(
+                f"system execution authority reconciliation missing {marker!r}"
+            )
+    if "## 8. État actuel" in architecture:
+        raise TruthRegistryError("system execution architecture must not duplicate current state")
+    if "engineering/STATE.json" in architecture:
+        raise TruthRegistryError(
+            "system execution architecture must not present migration bridge as current authority"
+        )
 
 
 def main() -> int:
