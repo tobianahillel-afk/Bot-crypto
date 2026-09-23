@@ -31,8 +31,8 @@
     "ENG-01 Agent Bootstrap & Canonical State completed; permanent state, state machine, fresh-agent startup, evidence policy and live state-drift qualification validated on workflow run 35794262132",
     "ENG-02 Work Decomposition & Context Engine completed; end-to-end AWU DAG, complexity, split, risk, context, scope and cold-start qualification passed on workflow run 35833639230"
   ],
-  "current_objective": "ENG-03.3: implement universal T0 instant changed-file checks.",
-  "next_action": "Implement standard-library changed-file syntax/parse checks plus classification/impact metadata; do not execute test suites or deeper tiers.",
+  "current_objective": "ENG-03.4: execute only impact-justified T1 targeted checks.",
+  "next_action": "Implement an allowlisted symbolic T1 check registry consuming T0 impact output; report uncovered impact families for later tiers instead of running a blanket suite.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -166,6 +166,12 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35834604408",
       "note": "Exact head d51d53ba4c5db65e857f531cbc009d5e3d753e49 validated execution-free diff impact mapping and 10 adversarial impact scenarios."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35837759102",
+      "note": "Exact head f49b3ec732efd172ebf67a5ec526a7be8c72707c passed T0, 10 adversarial T0 scenarios, work-decomposition qualification and cold start. Real T0 processed 11 changed files in 12.97 ms with no test suite, deeper tier or network execution."
     }
   ],
   "stale_when": [
@@ -178,7 +184,7 @@
   ],
   "next_engineering": {
     "active_lot": "ENG-03",
-    "active_task": "ENG-03.3",
+    "active_task": "ENG-03.4",
     "active_manifest": "engineering/lots/ENG-03.json"
   }
 }

@@ -37,12 +37,12 @@
     },
     {
       "id": "ENG-03.3",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Define and enforce T0 instant validation checks."
     },
     {
       "id": "ENG-03.4",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Define and enforce T1 targeted validation checks."
     },
     {
