@@ -1,0 +1,4 @@
+title = "Crypto Quant Bot secret detection"
+
+[extend]
+useDefault = true
