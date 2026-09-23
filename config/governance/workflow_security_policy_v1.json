@@ -18,8 +18,8 @@
     "checkout_version_comment": "v7.0.1"
   },
   "changed_target_globs": [
-    ".github/workflows/**/*.yml",
-    ".github/workflows/**/*.yaml"
+    ".github/workflows/*.yml",
+    ".github/workflows/*.yaml"
   ],
   "trigger_paths": [
     ".github/workflows/**/*.yml",
