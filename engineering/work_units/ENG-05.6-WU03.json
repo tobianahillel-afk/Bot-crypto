@@ -2,14 +2,14 @@
   "schema_version": 1,
   "kind": "agent_work_unit",
   "id": "ENG-05.6-WU03",
-  "status": "IN_PROGRESS",
+  "status": "BLOCKED",
   "parent": {
     "work_item_id": "ENG-05",
     "task_id": "ENG-05.6",
     "manifest": "engineering/lots/ENG-05.json"
   },
-  "title": "Benchmark pinned Vale and lychee offline",
-  "objective": "Benchmark exact pinned Vale and lychee release binaries on deterministic local fixtures and representative project documentation without networked lint behavior, then decide whether either tool should be adopted in the mandatory changed-doc path.",
+  "title": "Split parent: benchmark pinned Vale and lychee offline",
+  "objective": "Record the mandatory split of the two-tool benchmark into one-dependency child work units so no executable AWU introduces more than one new third-party dependency.",
   "non_goals": [
     "run DocGuard",
     "perform external URL health checks",
@@ -120,7 +120,7 @@
   "planning": {
     "risk_class": "R2",
     "complexity_score": 5,
-    "split_required": false,
+    "split_required": true,
     "context_budget": {
       "max_primary_files": 12,
       "max_reference_files": 16,
@@ -151,7 +151,9 @@
       "trust_boundaries": 1,
       "new_dependencies": 2
     },
-    "split_reasons": []
+    "split_reasons": [
+      "NEW_DEPENDENCIES_GT_1"
+    ]
   },
   "validation": {
     "required_tiers": [
@@ -165,9 +167,8 @@
     ]
   },
   "done_when": [
-    "both release archives are cryptographically verified before execution",
-    "offline positive controls prove both tools work",
-    "representative-doc runtime/noise is measured",
-    "adoption decision preserves zero-cost and no-authority constraints"
+    "the two-dependency benchmark remains non-executable",
+    "Vale and lychee are benchmarked in separate bounded child AWUs",
+    "no guard is weakened to avoid the mandatory split"
   ]
 }
