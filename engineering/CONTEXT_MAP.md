@@ -12,22 +12,22 @@
 
 - Track: ENGINEERING
 - Work item: ENG-05
-- Task: ENG-05.5
-- AWU: ENG-05.5-WU01
+- Task: ENG-05.6
+- AWU: ENG-05.6-WU01
 - Risk: R1
 - Manifest: engineering/lots/ENG-05.json
-- AWU file: engineering/work_units/ENG-05.5-WU01.json
+- AWU file: engineering/work_units/ENG-05.6-WU01.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-05.json
-- engineering/work_units/ENG-05.5-WU01.json
+- engineering/work_units/ENG-05.6-WU01.json
 - engineering/handoff/CURRENT.json
-- scripts/governance/resolve_next_work.py
-- scripts/governance/cold_start_qualification.py
-- scripts/governance/validate_handoff.py
+- scripts/governance/validate_documentation_consistency.py
+- config/governance/generated_status_policy_v1.json
+- config/governance/context_map_policy_v1.json
 
 ## Execution context — reference
 
@@ -38,14 +38,14 @@
 
 - Primary: 8 / 10 files
 - Reference: 2 / 12 files
-- Routed size: 56 / 768 KiB
+- Routed size: 46 / 768 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-05.5: qualify deterministic resume/recovery after interruption or context loss without trusting conversational memory.
-- Next action: Implement resume/recovery qualification and adversarial probes that reconstruct the active AWU from permanent state, tolerate stale/missing handoff only as a non-authoritative hint, and require live Git reverification before writes.
+- Objective: ENG-05.6 WU01: evaluate DocGuard, Vale and lychee deterministically before any documentation-tool adoption.
+- Next action: Record exact current release/commit/license/runtime/network facts for DocGuard, Vale and lychee; derive bounded verdicts and reject any mandatory paid, authority-conflicting or network-dependent integration.
 
 ## Non-authoritative sources
 
