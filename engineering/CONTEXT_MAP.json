@@ -1,11 +1,11 @@
 {
   "active_work": {
-    "awu_id": "ENG-05.6-WU02",
-    "awu_path": "engineering/work_units/ENG-05.6-WU02.json",
-    "complexity_score": 2,
+    "awu_id": "ENG-05.6-WU03",
+    "awu_path": "engineering/work_units/ENG-05.6-WU03.json",
+    "complexity_score": 5,
     "lot": "ENG-05",
     "manifest": "engineering/lots/ENG-05.json",
-    "risk_class": "R1",
+    "risk_class": "R2",
     "task": "ENG-05.6",
     "track": "ENGINEERING"
   },
@@ -30,9 +30,9 @@
   },
   "execution_context": {
     "budget": {
-      "max_primary_files": 10,
-      "max_reference_files": 12,
-      "max_total_kib": 768
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
     },
     "implicit_expansion": "FORBIDDEN",
     "primary_count": 8,
@@ -40,18 +40,18 @@
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-05.json",
-      "engineering/work_units/ENG-05.6-WU02.json",
-      "engineering/handoff/CURRENT.json",
-      "scripts/governance/validate_documentation_consistency.py",
-      "config/governance/generated_status_policy_v1.json",
-      "config/governance/context_map_policy_v1.json"
+      "engineering/work_units/ENG-05.6-WU03.json",
+      "config/governance/documentation_tooling_candidates_v1.json",
+      "config/governance/action_pin_registry_v1.json",
+      "config/governance/workflow_security_policy_v1.json",
+      "engineering/handoff/CURRENT.json"
     ],
     "reference_count": 2,
     "reference_files": [
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 46
+    "total_kib_ceil": 50
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -67,9 +67,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "ENG-05.6 WU02: evaluate DocGuard, Vale and lychee deterministically before any third-party documentation-tool adoption.",
+    "current_objective": "ENG-05.6 WU03: benchmark exact pinned Vale and lychee binaries in offline modes without slowing the routine bootstrap.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Encode the externally audited release/commit/license/runtime/network facts, validate bounded verdict rules offline, and record whether a separate benchmark/adoption WU is justified."
+    "next_action": "Create an isolated path-scoped benchmark workflow that verifies GitHub release SHA-256 digests, proves synthetic detection, measures representative docs, and records the adoption decision."
   },
   "safety": {
     "execution_allowed": false,
