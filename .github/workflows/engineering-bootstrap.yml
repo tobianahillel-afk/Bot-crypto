@@ -123,8 +123,14 @@ jobs:
       - name: Run negative validator self-tests
         run: python scripts/governance/selftest_bootstrap_validators.py
 
-      - name: Enforce active work-item boundary
-        run: python scripts/governance/validate_bootstrap_diff.py --base origin/main
+      - name: Resolve active Agent Work Unit
+        run: python scripts/governance/resolve_active_awu.py
+
+      - name: Enforce active Agent Work Unit boundary
+        run: python scripts/governance/validate_bootstrap_diff.py
+
+      - name: Run active AWU scope adversarial self-tests
+        run: python scripts/governance/selftest_active_awu_scope.py
 
       - name: Cold-start qualification
         run: python scripts/governance/cold_start_qualification.py

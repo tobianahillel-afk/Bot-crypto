@@ -1,41 +1,37 @@
 #!/usr/bin/env python3
-"""Fail closed if the active work item changes files outside its declared scope."""
+"""Fail closed when the Git diff escapes the active Agent Work Unit scope."""
 
 from __future__ import annotations
 
-import argparse
 import fnmatch
-import json
+import importlib.util
 import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any
+from types import ModuleType
 
+ROOT = Path(__file__).resolve().parents[2]
 SHA40_RE = re.compile(r"^[0-9a-f]{40}$")
 
 
 class DiffScopeError(ValueError):
-    """Raised when the active work-item diff escapes its allowlist."""
+    pass
 
 
-def _load(path: Path) -> dict[str, Any]:
-    try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        raise DiffScopeError(f"cannot load {path}: {exc}") from exc
-    if not isinstance(value, dict):
-        raise DiffScopeError(f"{path} must contain an object")
-    return value
+def _module(name: str, path: Path) -> ModuleType:
+    spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None or spec.loader is None:
+        raise DiffScopeError(f"cannot import {path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
 
 
-def _git(root: Path, *args: str) -> subprocess.CompletedProcess[str]:
+def _git(*args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        ["git", *args],
-        cwd=root,
-        check=False,
-        capture_output=True,
-        text=True,
+        ["git", *args], cwd=ROOT, check=False, capture_output=True, text=True
     )
 
 
@@ -43,78 +39,72 @@ def _matches(path: str, patterns: list[str]) -> bool:
     return any(path == pattern or fnmatch.fnmatchcase(path, pattern) for pattern in patterns)
 
 
-def _active_engine(state: dict[str, Any]) -> dict[str, Any]:
-    bootstrap = state.get("bootstrap_engine", {})
-    if bootstrap.get("phase") == "BUILDING":
-        return bootstrap
-    engineering = state.get("engineering_engine")
-    if not isinstance(engineering, dict):
-        raise DiffScopeError("STABLE bootstrap requires engineering_engine")
-    return engineering
+def resolve_scope_base(sha: str) -> str:
+    if not isinstance(sha, str) or SHA40_RE.fullmatch(sha) is None:
+        raise DiffScopeError("AWU scope_base_sha must be lowercase SHA-40")
+    if _git("cat-file", "-e", f"{sha}^{{commit}}").returncode != 0:
+        raise DiffScopeError(f"AWU scope base does not resolve to a commit: {sha}")
+    if _git("merge-base", "--is-ancestor", sha, "HEAD").returncode != 0:
+        raise DiffScopeError(f"AWU scope base is not an ancestor of HEAD: {sha}")
+    return sha
 
 
-def _resolve_scope_base(root: Path, manifest: dict[str, Any], fallback: str) -> str:
-    extensions = manifest.get("extensions", {})
-    if not isinstance(extensions, dict):
-        raise DiffScopeError("manifest extensions must be an object")
-    declared = extensions.get("scope_base_sha")
-    if declared is None:
-        return fallback
-    if not isinstance(declared, str) or SHA40_RE.fullmatch(declared) is None:
-        raise DiffScopeError("extensions.scope_base_sha must be a lowercase SHA-40")
-    exists = _git(root, "cat-file", "-e", f"{declared}^{{commit}}")
-    if exists.returncode != 0:
-        raise DiffScopeError(f"scope base does not resolve to a commit: {declared}")
-    ancestor = _git(root, "merge-base", "--is-ancestor", declared, "HEAD")
-    if ancestor.returncode != 0:
-        raise DiffScopeError(f"scope base is not an ancestor of HEAD: {declared}")
-    return declared
-
-
-def changed_files(root: Path, base: str) -> list[str]:
-    result = _git(root, "diff", "--name-only", f"{base}...HEAD")
+def changed_files(base: str) -> list[str]:
+    result = _git("diff", "--name-only", f"{base}...HEAD")
     if result.returncode != 0:
         raise DiffScopeError(f"git diff failed: {result.stderr.strip()}")
     return [line.strip() for line in result.stdout.splitlines() if line.strip()]
 
 
-def validate_scope(files: list[str], allowed_paths: list[str]) -> None:
-    escaped = sorted(path for path in files if not _matches(path, allowed_paths))
-    if escaped:
-        raise DiffScopeError(f"changed files outside active allowlist: {escaped}")
+def validate_scope(
+    files: list[str],
+    awu_allowed: list[str],
+    awu_forbidden: list[str],
+    parent_allowed: list[str],
+) -> None:
+    escaped_awu = sorted(path for path in files if not _matches(path, awu_allowed))
+    if escaped_awu:
+        raise DiffScopeError(f"changed files outside active AWU allowlist: {escaped_awu}")
+
+    forbidden = sorted(path for path in files if _matches(path, awu_forbidden))
+    if forbidden:
+        raise DiffScopeError(f"changed files match active AWU forbidden paths: {forbidden}")
+
+    escaped_parent = sorted(path for path in files if not _matches(path, parent_allowed))
+    if escaped_parent:
+        raise DiffScopeError(f"changed files outside parent work-item allowlist: {escaped_parent}")
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    root = Path(__file__).resolve().parents[2]
-    parser.add_argument(
-        "--base",
-        default="origin/main",
-        help="Fallback base only for legacy manifests without extensions.scope_base_sha.",
-    )
-    parser.add_argument("--manifest", type=Path, default=None)
-    args = parser.parse_args()
-
     try:
-        state = _load(root / "engineering" / "STATE.json")
-        manifest_path = args.manifest
-        if manifest_path is None:
-            declared = _active_engine(state).get("active_manifest")
-            if not isinstance(declared, str):
-                raise DiffScopeError("active engine does not declare active_manifest")
-            manifest_path = root / declared
-        manifest = _load(manifest_path)
-        allowed = manifest.get("allowed_paths")
-        if not isinstance(allowed, list) or not allowed:
-            raise DiffScopeError("active manifest allowed_paths is invalid")
-        base = _resolve_scope_base(root, manifest, args.base)
-        files = changed_files(root, base)
-        validate_scope(files, allowed)
+        resolver = _module(
+            "active_awu_resolver_for_diff",
+            ROOT / "scripts/governance/resolve_active_awu.py",
+        )
+        try:
+            awu_path, awu, evidence = resolver.resolve_active_awu()
+        except resolver.ActiveAwuError as exc:
+            raise DiffScopeError(str(exc)) from exc
+
+        scope = awu["scope"]
+        base = resolve_scope_base(scope["scope_base_sha"])
+        files = changed_files(base)
+        parent_allowed = evidence["parent_manifest"]["allowed_paths"]
+        validate_scope(
+            files,
+            scope["allowed_paths"],
+            scope["forbidden_paths"],
+            parent_allowed,
+        )
     except DiffScopeError as exc:
-        print(f"ACTIVE_WORK_SCOPE_INVALID: {exc}", file=sys.stderr)
+        print(f"ACTIVE_AWU_SCOPE_INVALID: {exc}", file=sys.stderr)
         return 1
 
-    print(f"ACTIVE_WORK_SCOPE_VALID base={base} changed_files={len(files)}")
+    print(
+        "ACTIVE_AWU_SCOPE_VALID "
+        f"awu={awu['id']} path={awu_path.relative_to(ROOT)} "
+        f"base={base} changed_files={len(files)}"
+    )
     return 0
 
 
