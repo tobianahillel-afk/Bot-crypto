@@ -36,12 +36,12 @@
   },
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-05.6-WU01",
-    "awu_path": "engineering/work_units/ENG-05.6-WU01.json",
+    "awu_id": "ENG-05.6-WU02",
+    "awu_path": "engineering/work_units/ENG-05.6-WU02.json",
     "parent_manifest": "engineering/lots/ENG-05.json",
-    "scope_base_sha": "48b32eb43f778d2da364725974e1805bd2660837",
+    "scope_base_sha": "4b1d5e417eb64461781b77de32e3d59ab423c761",
     "risk_class": "R1",
-    "complexity_score": 1
+    "complexity_score": 2
   },
   "resume_read_order": [
     "AGENTS.md",
@@ -56,10 +56,11 @@
     "ENG-05.3 bounded Context Map completed on exact head 1c292cacae3f38b8025eaf1b0d5b215d2458b741.",
     "ENG-05.4 WU01 Handoff V2 validator and 12 adversarial probes passed on head b98ba29f2428f175dd186dc4a170d8f57a7b06cd; legacy bootstrap compatibility repair isolated to WU02.",
     "ENG-05.4 WU02 permanent-handoff bootstrap compatibility completed on exact head a9d712cc0f455a70ed9c39f35791e64cec1f58e7; run 35920389779 passed negative validators, context-map checks and full cold-start qualification.",
-    "ENG-05.5 resume/recovery completed on exact head 48b32eb43f778d2da364725974e1805bd2660837; run 35930055502 passed recovery qualification, 9 adversarial probes and cold-start qualification."
+    "ENG-05.5 resume/recovery completed on exact head 48b32eb43f778d2da364725974e1805bd2660837; run 35930055502 passed recovery qualification, 9 adversarial probes and cold-start qualification.",
+    "ENG-05.6 WU01 recovery harness genericity repair completed on exact head 4b1d5e417eb64461781b77de32e3d59ab423c761; run 35930906226 passed resume/recovery, adversarial recovery and cold-start."
   ],
-  "current_objective": "ENG-05.6 WU01: remove task-specific assumptions from resume/recovery qualification before evaluating documentation tools.",
-  "next_action": "Make resume/recovery assertions derive the active task and AWU dynamically, rerun adversarial recovery tests and cold-start, then open a separate WU02 for DocGuard/Vale/lychee evaluation.",
+  "current_objective": "ENG-05.6 WU02: evaluate DocGuard, Vale and lychee deterministically before any third-party documentation-tool adoption.",
+  "next_action": "Encode the externally audited release/commit/license/runtime/network facts, validate bounded verdict rules offline, and record whether a separate benchmark/adoption WU is justified.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -96,6 +97,13 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35930055502",
       "head_sha": "48b32eb43f778d2da364725974e1805bd2660837",
       "scope": "ENG-05.5_RESUME_RECOVERY_COLD_START"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35930906226",
+      "head_sha": "4b1d5e417eb64461781b77de32e3d59ab423c761",
+      "scope": "ENG-05.6-WU01_GENERIC_RECOVERY"
     }
   ],
   "stop_conditions": [
