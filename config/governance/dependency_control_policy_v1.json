@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "policy_kind": "dependency_control_policy_v1",
+  "semantics": "PINNED_LOCK_PLUS_PR_DIFF_FAIL_CLOSED",
+  "manifests": [
+    "pyproject.toml",
+    "requirements.txt",
+    "requirements-dev.in",
+    "requirements-dev.txt",
+    "requirements-dev.lock"
+  ],
+  "runtime_dependencies_expected_empty": true,
+  "dev_lock": "requirements-dev.lock",
+  "pip_audit": {
+    "version": "2.9.0",
+    "direct_requirement": "pip-audit==2.9.0",
+    "arguments": [
+      "-r",
+      "requirements-dev.lock",
+      "--disable-pip",
+      "--strict",
+      "--progress-spinner",
+      "off"
+    ]
+  },
+  "dependency_review": {
+    "action": "actions/dependency-review-action",
+    "version": "v5.0.0",
+    "commit": "a1d282b36b6f3519aa1f3fc636f609c47dddb294",
+    "fail_on_severity": "low",
+    "fail_on_scopes": "runtime,development,unknown",
+    "vulnerability_check": true,
+    "license_check": false,
+    "comment_summary_in_pr": "never",
+    "warn_only": false,
+    "show_openssf_scorecard": false
+  },
+  "toolchain": {
+    "python_version": "3.11.9",
+    "checkout_action_sha": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+    "checkout_version_comment": "v7.0.1",
+    "setup_python_action_sha": "5fda3b95a4ea91299a34e894583c3862153e4b97",
+    "setup_python_version_comment": "v7.0.0"
+  },
+  "schedule": {
+    "cadence": "WEEKLY",
+    "cron": "23 4 * * 1"
+  },
+  "cost_policy": {
+    "paid_api_required": false,
+    "paid_saas_required": false,
+    "paid_llm_required": false,
+    "paid_runner_required": false
+  },
+  "invariants": [
+    "pyproject dev dependencies and requirements-dev.in are exact-version equivalent",
+    "requirements-dev.txt only includes requirements-dev.lock",
+    "requirements-dev.lock contains only exact package pins",
+    "all direct dev requirements are present at the same version in requirements-dev.lock",
+    "pip-audit remains pinned to the pre-existing version 2.9.0 for this AWU",
+    "pip-audit uses --disable-pip and --strict against the exact lock",
+    "Dependency Review is exact-SHA pinned and blocks vulnerabilities from low severity across all scopes",
+    "Dependency Review comments write permissions license checks and warn-only mode are disabled",
+    "dedicated dependency workflow is path-filtered plus weekly/manual",
+    "mandatory dependency-security path remains zero-cost"
+  ]
+}
