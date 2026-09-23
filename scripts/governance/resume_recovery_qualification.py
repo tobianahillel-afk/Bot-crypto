@@ -240,7 +240,10 @@ def main() -> int:
     normal = repository_recover()
     assert normal["handoff_status"] == "VALID"
     assert normal["context_map_status"] == "VALID"
-    assert normal["active_awu_id"] == "ENG-05.5-WU01"
+    expected_awu = handoff["active_checkpoint"]["awu_id"]
+    expected_task = state["engineering_track"]["active_task"]
+    assert normal["active_awu_id"] == expected_awu
+    assert normal["active_task"] == expected_task
     assert normal["write_authorized"] is False
     assert normal["required_before_write"] == ["LIVE_GIT_REVERIFY_REQUIRED"]
     assert normal["conversational_context_required"] is False
@@ -283,7 +286,7 @@ def main() -> int:
     _path, current = active.select_active_awu(units)
     duplicate = dict(units)
     second = copy.deepcopy(current)
-    second["id"] = "ENG-05.5-WU99"
+    second["id"] = f"{current['parent']['task_id']}-WU99"
     duplicate[ROOT / "engineering/work_units/resume-duplicate.json"] = second
     _expect(
         active.ActiveAwuError,
