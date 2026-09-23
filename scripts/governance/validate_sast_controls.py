@@ -76,7 +76,15 @@ def _require(text: str, needle: str, label: str) -> None:
 
 def validate_existing_bandit(policy: dict[str, Any], quality_text: str) -> None:
     fast = policy["fast_sast"]
-    _require(quality_text, fast["command"], "existing Bandit gate")
+    commands = [
+        line.strip()
+        for line in quality_text.splitlines()
+        if line.strip().startswith("bandit ")
+    ]
+    if commands != [fast["command"]]:
+        raise SastControlError(
+            f"existing Bandit gate must be exactly {fast['command']!r}, got {commands!r}"
+        )
     _require(quality_text, "python -m pip install -r requirements-dev.lock", "locked quality install")
 
 
