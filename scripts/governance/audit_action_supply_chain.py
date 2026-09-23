@@ -229,11 +229,15 @@ def _git_changed_files(base: str, head: str, policy: dict[str, Any]) -> list[Pat
     return sorted(set(result), key=lambda path: path.relative_to(ROOT).as_posix())
 
 
-def audit(files: Iterable[Path], policy: dict[str, Any]) -> dict[str, Any]:
+def audit(
+    files: Iterable[Path],
+    policy: dict[str, Any],
+    root: Path = ROOT,
+) -> dict[str, Any]:
     file_list = list(files)
     records: list[UseRecord] = []
     for path in file_list:
-        records.extend(parse_file(path, policy))
+        records.extend(parse_file(path, policy, root=root))
 
     counts = {name: 0 for name in policy["classifications"]}
     for record in records:
