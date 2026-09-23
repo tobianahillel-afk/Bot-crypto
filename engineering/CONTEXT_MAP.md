@@ -13,21 +13,21 @@
 - Track: ENGINEERING
 - Work item: ENG-05
 - Task: ENG-05.6
-- AWU: ENG-05.6-WU02
-- Risk: R1
+- AWU: ENG-05.6-WU03
+- Risk: R2
 - Manifest: engineering/lots/ENG-05.json
-- AWU file: engineering/work_units/ENG-05.6-WU02.json
+- AWU file: engineering/work_units/ENG-05.6-WU03.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-05.json
-- engineering/work_units/ENG-05.6-WU02.json
+- engineering/work_units/ENG-05.6-WU03.json
+- config/governance/documentation_tooling_candidates_v1.json
+- config/governance/action_pin_registry_v1.json
+- config/governance/workflow_security_policy_v1.json
 - engineering/handoff/CURRENT.json
-- scripts/governance/validate_documentation_consistency.py
-- config/governance/generated_status_policy_v1.json
-- config/governance/context_map_policy_v1.json
 
 ## Execution context — reference
 
@@ -36,16 +36,16 @@
 
 ## Budget
 
-- Primary: 8 / 10 files
-- Reference: 2 / 12 files
-- Routed size: 46 / 768 KiB
+- Primary: 8 / 12 files
+- Reference: 2 / 16 files
+- Routed size: 50 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-05.6 WU02: evaluate DocGuard, Vale and lychee deterministically before any third-party documentation-tool adoption.
-- Next action: Encode the externally audited release/commit/license/runtime/network facts, validate bounded verdict rules offline, and record whether a separate benchmark/adoption WU is justified.
+- Objective: ENG-05.6 WU03: benchmark exact pinned Vale and lychee binaries in offline modes without slowing the routine bootstrap.
+- Next action: Create an isolated path-scoped benchmark workflow that verifies GitHub release SHA-256 digests, proves synthetic detection, measures representative docs, and records the adoption decision.
 
 ## Non-authoritative sources
 
