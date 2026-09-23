@@ -117,9 +117,9 @@
     "complexity_score": 3,
     "split_required": false,
     "context_budget": {
-      "max_primary_files": 10,
-      "max_reference_files": 12,
-      "max_total_kib": 768
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
     },
     "complexity_factors": {
       "production_modules": 0,
