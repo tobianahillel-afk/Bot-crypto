@@ -28,7 +28,8 @@
   "changed_mode": {
     "fail_on_remote_floating": true,
     "fail_on_dynamic_or_malformed": true,
-    "deleted_files_ignored": true
+    "deleted_files_ignored": true,
+    "require_registered_remote_sha": true
   },
   "workflow": {
     "path": ".github/workflows/security-supply-chain.yml",
@@ -54,6 +55,8 @@
     "changed workflow files fail closed on floating dynamic or malformed uses",
     "deleted workflow files do not create stale-content failures",
     "mandatory gate uses only Python standard library and local git",
-    "new remote action references require later registry verification before approval"
-  ]
+    "new remote action references require later registry verification before approval",
+    "changed remote SHA pins must be approved for their exact owner/repository in the offline registry"
+  ],
+  "approved_pin_registry": "config/governance/action_pin_registry_v1.json"
 }
