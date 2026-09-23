@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-05.6-WU03",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-05",
+    "task_id": "ENG-05.6",
+    "manifest": "engineering/lots/ENG-05.json"
+  },
+  "title": "Benchmark pinned Vale and lychee offline",
+  "objective": "Benchmark exact pinned Vale and lychee release binaries on deterministic local fixtures and representative project documentation without networked lint behavior, then decide whether either tool should be adopted in the mandatory changed-doc path.",
+  "non_goals": [
+    "run DocGuard",
+    "perform external URL health checks",
+    "make style/link tools authoritative",
+    "business implementation",
+    "Lot45 remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-05.6-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "Tooling candidate registry",
+      "kind": "CONFIG",
+      "locator": "config/governance/documentation_tooling_candidates_v1.json"
+    },
+    {
+      "name": "Approved action pin registry",
+      "kind": "CONFIG",
+      "locator": "config/governance/action_pin_registry_v1.json"
+    },
+    {
+      "name": "Workflow security policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/workflow_security_policy_v1.json"
+    },
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Benchmark policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/documentation_tooling_benchmark_v1.json"
+    },
+    {
+      "name": "Offline benchmark runner",
+      "kind": "FILE",
+      "locator": "scripts/governance/benchmark_documentation_tools.py"
+    },
+    {
+      "name": "Benchmark workflow",
+      "kind": "FILE",
+      "locator": ".github/workflows/documentation-tooling-benchmark.yml"
+    },
+    {
+      "name": "Benchmark decision report",
+      "kind": "FILE",
+      "locator": "engineering/DOCUMENTATION_TOOLING_BENCHMARK.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "1f40aee0580e75b3f5404bb27be6a654c37dedc3",
+    "allowed_paths": [
+      "engineering/lots/ENG-05.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-05.6-WU02.json",
+      "engineering/work_units/ENG-05.6-WU03.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "config/governance/documentation_tooling_benchmark_v1.json",
+      "scripts/governance/benchmark_documentation_tools.py",
+      ".github/workflows/documentation-tooling-benchmark.yml",
+      "engineering/DOCUMENTATION_TOOLING_BENCHMARK.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      "config/governance/project_state.json",
+      "engineering/STATE.json"
+    ],
+    "forbidden_semantics": [
+      "unverified third-party binary execution",
+      "networked lint behavior",
+      "external tool authority",
+      "business implementation",
+      "Lot45 remediation",
+      "Lot46 unlock",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "Vale Linux x86_64 asset SHA-256 equals 52f5cd0314a1b7384cac6aa102a68193977312f6ba9c9f3ae001b5deec8e3a10",
+      "lychee Linux x86_64 GNU asset SHA-256 equals 1f4e0ef7f6554a6ed33dd7ac144fb2e1bbed98598e7af973042fc5cd43951c9a",
+      "workflow uses only approved exact checkout action pins",
+      "tool execution occurs only after archive digest verification",
+      "Vale uses only temporary project-local rules with no vale sync",
+      "lychee runs with --offline so external network requests are blocked",
+      "benchmark workflow is isolated from routine engineering bootstrap",
+      "benchmark findings are evidence only and cannot alter canonical documentation authority"
+    ],
+    "acceptance_criteria": [
+      "synthetic Vale violation is detected",
+      "synthetic broken local link is detected by lychee offline",
+      "representative project docs are benchmarked with elapsed time and finding counts",
+      "no external URL request is required for benchmark success",
+      "benchmark workflow needs no paid token service or larger runner",
+      "final report records ADOPT PARTIALLY or REJECT for each benchmarked tool based on bounded evidence"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 4,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": true,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 10,
+      "executable_loc_changed": 550,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 2
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/benchmark_documentation_tools.py --self-check",
+      "GitHub Actions documentation-tooling-benchmark workflow"
+    ]
+  },
+  "done_when": [
+    "both release archives are cryptographically verified before execution",
+    "offline positive controls prove both tools work",
+    "representative-doc runtime/noise is measured",
+    "adoption decision preserves zero-cost and no-authority constraints"
+  ]
+}
