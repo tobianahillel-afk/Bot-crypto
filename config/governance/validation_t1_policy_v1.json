@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "policy_kind": "validation_t1_policy_v1",
+  "semantics": "ALLOWLISTED_IMPACT_TARGETED_CHECKS",
+  "check_ids": [
+    "DIFF_CHECK",
+    "GOVERNANCE_ACTIVE_SCOPE",
+    "SELFTEST_ENTRYPOINT_CHECK"
+  ],
+  "t0_sufficient_impacts": [
+    "DOC_CONSISTENCY"
+  ],
+  "impact_to_checks": {
+    "DOC_CONSISTENCY": [],
+    "GOVERNANCE_VALIDATORS": [
+      "DIFF_CHECK",
+      "GOVERNANCE_ACTIVE_SCOPE"
+    ],
+    "WORKFLOW_SYNTAX": [],
+    "ACTIONS_SECURITY": [],
+    "CONTRACT_SCHEMA_VALIDATION": [],
+    "CONTRACT_COMPATIBILITY": [],
+    "CONFIG_POLICY_VALIDATION": [
+      "DIFF_CHECK",
+      "GOVERNANCE_ACTIVE_SCOPE"
+    ],
+    "TEST_HARNESS_INTEGRITY": [
+      "DIFF_CHECK",
+      "SELFTEST_ENTRYPOINT_CHECK"
+    ],
+    "STATIC_ANALYSIS": [],
+    "UNIT_BEHAVIOR": [],
+    "DATA_CONTRACTS": [],
+    "TEMPORAL_CAUSALITY": [],
+    "DETERMINISTIC_REPLAY": [],
+    "SECURITY_STATIC_ANALYSIS": [],
+    "SECRET_CONTROLS": [],
+    "RISK_INVARIANTS": [],
+    "EXECUTION_SAFETY": [],
+    "EVIDENCE_PROVENANCE": [],
+    "CONSERVATIVE_BROAD_IMPACT": [],
+    "HUMAN_REVIEW_REQUIRED": []
+  },
+  "invariants": [
+    "T1 consumes a successful T0 result",
+    "check selection is a deterministic union over impact families",
+    "only hardcoded symbolic check ids may execute",
+    "policy contains no executable command strings",
+    "DOC_CONSISTENCY is fully satisfied by T0 and selects zero T1 checks",
+    "unmapped or zero-check non-T0-sufficient impacts remain uncovered",
+    "T1 never claims T2 T3 or T4 completion"
+  ]
+}
