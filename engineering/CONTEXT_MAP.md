@@ -13,17 +13,17 @@
 - Track: ENGINEERING
 - Work item: ENG-05
 - Task: ENG-05.6
-- AWU: ENG-05.6-WU03
+- AWU: ENG-05.6-WU04
 - Risk: R2
 - Manifest: engineering/lots/ENG-05.json
-- AWU file: engineering/work_units/ENG-05.6-WU03.json
+- AWU file: engineering/work_units/ENG-05.6-WU04.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-05.json
-- engineering/work_units/ENG-05.6-WU03.json
+- engineering/work_units/ENG-05.6-WU04.json
 - config/governance/documentation_tooling_candidates_v1.json
 - config/governance/action_pin_registry_v1.json
 - config/governance/workflow_security_policy_v1.json
@@ -44,8 +44,8 @@
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-05.6 WU03: benchmark exact pinned Vale and lychee binaries in offline modes without slowing the routine bootstrap.
-- Next action: Create an isolated path-scoped benchmark workflow that verifies GitHub release SHA-256 digests, proves synthetic detection, measures representative docs, and records the adoption decision.
+- Objective: ENG-05.6 WU04: benchmark exact pinned Vale v3.22.0 offline as a one-dependency work unit.
+- Next action: Validate the split transition, then create a path-scoped Vale-only benchmark workflow that verifies the release SHA-256 before execution, uses only temporary local rules, and measures synthetic plus representative-doc behavior.
 
 ## Non-authoritative sources
 
