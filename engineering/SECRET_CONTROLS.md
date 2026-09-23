@@ -24,8 +24,26 @@ Qualification is fail-closed:
 3. the current repository tree is scanned;
 4. the complete Git history is scanned.
 
-No allowlist is present. If a real historical finding appears, it must be triaged explicitly
-instead of being globally suppressed.
+No TOML allowlist is present. Real findings are triaged explicitly instead of being broadly
+suppressed.
+
+## Vetted historical false positives
+
+The first real scan found two `generic-api-key` findings in the immutable roadmap audit
+artifact `data/audit/product_scope_roadmap_lot21.jsonl`, on the Lot 119 and Lot 151 records.
+Qualification showed that the captures are adjacent **contract identifiers** in their
+`output_contracts` arrays, not credentials.
+
+The exception mechanism is deliberately narrow:
+
+- `.gitleaksignore` contains exactly two global fingerprints and no wildcard;
+- their rationale is recorded in
+  `config/governance/secret_false_positive_registry_v1.json`;
+- the registry is bound to the exact historical Git blob
+  `84de51bda788a8d124fb7d344419c4a4b12030b5`;
+- the validator recomputes that Git blob SHA and checks the exact Lot identity plus contract
+  identifier arrays;
+- any byte change to the historical artifact invalidates the exception before scanning.
 
 Policy: `config/governance/secret_control_policy_v1.json`
 Workflow: `.github/workflows/security-secrets.yml`
