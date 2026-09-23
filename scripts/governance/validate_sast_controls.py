@@ -79,11 +79,12 @@ def validate_existing_bandit(policy: dict[str, Any], quality_text: str) -> None:
     commands = [
         line.strip()
         for line in quality_text.splitlines()
-        if line.strip().startswith("bandit ")
+        if line.strip().startswith("run: bandit ")
     ]
-    if commands != [fast["command"]]:
+    expected = "run: " + fast["command"]
+    if commands != [expected]:
         raise SastControlError(
-            f"existing Bandit gate must be exactly {fast['command']!r}, got {commands!r}"
+            f"existing Bandit gate must be exactly {expected!r}, got {commands!r}"
         )
     _require(quality_text, "python -m pip install -r requirements-dev.lock", "locked quality install")
 
