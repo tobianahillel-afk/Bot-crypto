@@ -89,7 +89,7 @@ jobs:
             "DOCKER_IMAGE",
             "REMOTE_PINNED_SHA",
         ]
-        result = mod.audit([workflow], policy)
+        result = mod.audit([workflow], policy, root=root)
         blocked = mod.changed_gate(result)
         assert len(blocked) == 1
         assert blocked[0]["classification"] == "REMOTE_FLOATING_REF"
@@ -99,7 +99,7 @@ jobs:
             "steps:\n  - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065\n",
             encoding="utf-8",
         )
-        assert mod.changed_gate(mod.audit([safe], policy)) == []
+        assert mod.changed_gate(mod.audit([safe], policy, root=root)) == []
 
     broken = dict(policy)
     broken["immutable_remote_ref_regex"] = "^v\\d+$"
