@@ -38,12 +38,12 @@
     },
     {
       "id": "ENG-05.3",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Build a concise context map/index with progressive disclosure."
     },
     {
       "id": "ENG-05.4",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Harden the machine-readable and human-readable handoff format."
     },
     {

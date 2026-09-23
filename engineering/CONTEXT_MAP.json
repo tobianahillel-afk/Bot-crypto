@@ -1,12 +1,12 @@
 {
   "active_work": {
-    "awu_id": "ENG-05.3-WU01",
-    "awu_path": "engineering/work_units/ENG-05.3-WU01.json",
-    "complexity_score": 2,
+    "awu_id": "ENG-05.4-WU01",
+    "awu_path": "engineering/work_units/ENG-05.4-WU01.json",
+    "complexity_score": 3,
     "lot": "ENG-05",
     "manifest": "engineering/lots/ENG-05.json",
     "risk_class": "R1",
-    "task": "ENG-05.3",
+    "task": "ENG-05.4",
     "track": "ENGINEERING"
   },
   "authority": {
@@ -40,17 +40,17 @@
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-05.json",
-      "engineering/work_units/ENG-05.3-WU01.json",
-      "scripts/governance/resolve_active_awu.py",
+      "engineering/work_units/ENG-05.4-WU01.json",
       "engineering/handoff/CURRENT.json",
-      "config/governance/awu_context_policy_v1.json"
+      "engineering/HANDOFF_SCHEMA.json",
+      "scripts/governance/validate_handoff.py"
     ],
     "reference_count": 2,
     "reference_files": [
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 61
+    "total_kib_ceil": 51
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -66,9 +66,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "ENG-05.3: generate a bounded progressive-disclosure context map for context-free agents.",
+    "current_objective": "ENG-05.4: harden the bounded machine-readable handoff against permanent state and the active AWU.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Generate CONTEXT_MAP.json/.md from canonical state, active AWU resolver route and handoff; validate exact read order, bounded paths and stale-state failures."
+    "next_action": "Validate Handoff V2, stale-checkpoint probes and permanent-state cold start; then close ENG-05.4 and proceed to ENG-05.5 resume/recovery qualification."
   },
   "safety": {
     "execution_allowed": false,

@@ -12,21 +12,21 @@
 
 - Track: ENGINEERING
 - Work item: ENG-05
-- Task: ENG-05.3
-- AWU: ENG-05.3-WU01
+- Task: ENG-05.4
+- AWU: ENG-05.4-WU01
 - Risk: R1
 - Manifest: engineering/lots/ENG-05.json
-- AWU file: engineering/work_units/ENG-05.3-WU01.json
+- AWU file: engineering/work_units/ENG-05.4-WU01.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-05.json
-- engineering/work_units/ENG-05.3-WU01.json
-- scripts/governance/resolve_active_awu.py
+- engineering/work_units/ENG-05.4-WU01.json
 - engineering/handoff/CURRENT.json
-- config/governance/awu_context_policy_v1.json
+- engineering/HANDOFF_SCHEMA.json
+- scripts/governance/validate_handoff.py
 
 ## Execution context — reference
 
@@ -37,14 +37,14 @@
 
 - Primary: 7 / 10 files
 - Reference: 2 / 12 files
-- Routed size: 61 / 768 KiB
+- Routed size: 51 / 768 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-05.3: generate a bounded progressive-disclosure context map for context-free agents.
-- Next action: Generate CONTEXT_MAP.json/.md from canonical state, active AWU resolver route and handoff; validate exact read order, bounded paths and stale-state failures.
+- Objective: ENG-05.4: harden the bounded machine-readable handoff against permanent state and the active AWU.
+- Next action: Validate Handoff V2, stale-checkpoint probes and permanent-state cold start; then close ENG-05.4 and proceed to ENG-05.5 resume/recovery qualification.
 
 ## Non-authoritative sources
 

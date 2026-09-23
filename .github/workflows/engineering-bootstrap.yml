@@ -77,7 +77,9 @@ jobs:
         run: python scripts/governance/selftest_awu_context.py
 
       - name: Validate handoff
-        run: python scripts/governance/validate_handoff.py
+        run: |
+          python scripts/governance/validate_handoff.py
+          python scripts/governance/validate_handoff.py --self-check
 
       - name: Validate repository truth registry
         run: python scripts/governance/validate_truth_registry.py

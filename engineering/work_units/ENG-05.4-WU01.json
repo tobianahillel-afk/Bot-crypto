@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-05.4-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-05",
+    "task_id": "ENG-05.4",
+    "manifest": "engineering/lots/ENG-05.json"
+  },
+  "title": "Harden bounded engineering handoff format",
+  "objective": "Replace the legacy bootstrap handoff with a compact permanent-state-bound V2 resume checkpoint that records the exact active AWU, recent verified evidence, external Git observations, safety/stop conditions and next action without becoming an authorization source.",
+  "non_goals": [
+    "resume/recovery qualification beyond handoff validation",
+    "external documentation tooling adoption",
+    "repository-wide history recap",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-05.3-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Canonical project state",
+      "kind": "STATE",
+      "locator": "config/governance/project_state.json"
+    },
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    },
+    {
+      "name": "Handoff schema",
+      "kind": "SCHEMA",
+      "locator": "engineering/HANDOFF_SCHEMA.json"
+    },
+    {
+      "name": "Handoff validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_handoff.py"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Handoff V2 schema",
+      "kind": "SCHEMA",
+      "locator": "engineering/HANDOFF_SCHEMA.json"
+    },
+    {
+      "name": "Bounded current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    },
+    {
+      "name": "Permanent-state handoff validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_handoff.py"
+    },
+    {
+      "name": "Cold-start permanent handoff binding",
+      "kind": "TEST",
+      "locator": "scripts/governance/cold_start_qualification.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "1c292cacae3f38b8025eaf1b0d5b215d2458b741",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-05.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-05.3-WU01.json",
+      "engineering/work_units/ENG-05.4-WU01.json",
+      "engineering/HANDOFF_SCHEMA.json",
+      "scripts/governance/validate_handoff.py",
+      "scripts/governance/cold_start_qualification.py",
+      "AGENTS.md",
+      "README.md",
+      "engineering/CURRENT_STATUS.md",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/lot*/**"
+    ],
+    "forbidden_semantics": [
+      "handoff as authorization authority",
+      "unbounded historical recap",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "config/governance/project_state.json is the only current authorization state consumed by the handoff validator",
+      "handoff explicitly declares itself RESUME_HINT_NOT_AUTHORITY",
+      "handoff active checkpoint exactly matches the single active AWU and its scope base risk and complexity",
+      "handoff external Git observation exactly matches canonical recorded observations",
+      "handoff safety snapshot blockers findings and stop conditions exactly match canonical state",
+      "handoff recent_completed and validation_evidence are bounded",
+      "at least one PASS evidence record is bound to the active AWU scope_base_sha",
+      "engineering/STATE.json remains compatibility-only and is not accepted as handoff authority",
+      "cold-start validates the handoff against permanent state",
+      "validation is offline standard-library zero-cost"
+    ],
+    "acceptance_criteria": [
+      "legacy bootstrap_handoff schema_version 1 is rejected",
+      "valid V2 handoff passes",
+      "stale active task or next_engineering fails closed",
+      "stale AWU id scope base risk or complexity fails closed",
+      "stale main or Lot45 head observation fails closed",
+      "bridge authority substitution fails closed",
+      "malformed or unbound validation evidence fails closed",
+      "stop-condition or safety drift fails closed",
+      "recent history remains bounded to at most 8 entries",
+      "bootstrap runs handoff self-check probes"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 3,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 1,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 15,
+      "executable_loc_changed": 760,
+      "new_public_behaviors": 1,
+      "contract_families": 1,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_handoff.py",
+      "python scripts/governance/validate_handoff.py --self-check",
+      "python scripts/governance/cold_start_qualification.py"
+    ]
+  },
+  "done_when": [
+    "a future agent can resume from a compact checkpoint without chat history",
+    "handoff cannot override canonical state or active AWU resolution",
+    "legacy bridge is removed from handoff validation authority",
+    "staleness and evidence-binding failures are adversarially qualified"
+  ]
+}

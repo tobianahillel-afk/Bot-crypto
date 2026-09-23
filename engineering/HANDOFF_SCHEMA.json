@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Crypto Quant Bot Bootstrap Handoff V1",
+  "title": "Crypto Quant Bot Engineering Handoff V2",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -8,26 +8,30 @@
     "kind",
     "workstream",
     "status",
+    "authority",
     "external_git_observation",
     "engineering_branch",
     "state_snapshot",
-    "completed",
+    "active_checkpoint",
+    "resume_read_order",
+    "recent_completed",
     "current_objective",
     "next_action",
     "blockers",
     "validation_evidence",
+    "stop_conditions",
     "stale_when",
     "next_engineering"
   ],
   "properties": {
     "schema_version": {
-      "const": 1
+      "const": 2
     },
     "kind": {
-      "const": "bootstrap_handoff"
+      "const": "engineering_handoff"
     },
     "workstream": {
-      "const": "BOOTSTRAP_ENGINE"
+      "const": "DEVELOPMENT_ENGINE"
     },
     "status": {
       "enum": [
@@ -36,51 +40,307 @@
         "COMPLETE"
       ]
     },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state_source",
+        "context_map",
+        "handoff_role"
+      ],
+      "properties": {
+        "state_source": {
+          "const": "config/governance/project_state.json"
+        },
+        "context_map": {
+          "const": "engineering/CONTEXT_MAP.json"
+        },
+        "handoff_role": {
+          "const": "RESUME_HINT_NOT_AUTHORITY"
+        }
+      }
+    },
     "external_git_observation": {
-      "type": "object"
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "default_branch",
+        "main_sha",
+        "main_branch_protected",
+        "rulesets_count",
+        "lot45_pr",
+        "lot45_head_sha",
+        "lot45_state",
+        "lot45_merged"
+      ],
+      "properties": {
+        "default_branch": {
+          "const": "main"
+        },
+        "main_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "main_branch_protected": {
+          "type": "boolean"
+        },
+        "rulesets_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "lot45_pr": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "lot45_head_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "lot45_state": {
+          "enum": [
+            "open",
+            "closed"
+          ]
+        },
+        "lot45_merged": {
+          "type": "boolean"
+        }
+      }
     },
     "engineering_branch": {
       "type": "string",
       "minLength": 1
     },
     "state_snapshot": {
-      "type": "object"
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engineering_phase",
+        "active_lot",
+        "active_task",
+        "active_manifest",
+        "business_development",
+        "lot46_status",
+        "runtime_max",
+        "trade_allowed",
+        "execution_allowed",
+        "live_execution",
+        "open_findings"
+      ],
+      "properties": {
+        "engineering_phase": {
+          "type": "string",
+          "minLength": 1
+        },
+        "active_lot": {
+          "type": "string",
+          "minLength": 1
+        },
+        "active_task": {
+          "type": "string",
+          "minLength": 1
+        },
+        "active_manifest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "business_development": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lot46_status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "runtime_max": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trade_allowed": {
+          "type": "boolean"
+        },
+        "execution_allowed": {
+          "type": "boolean"
+        },
+        "live_execution": {
+          "type": "string",
+          "minLength": 1
+        },
+        "open_findings": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
     },
-    "completed": {
+    "active_checkpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "track",
+        "awu_id",
+        "awu_path",
+        "parent_manifest",
+        "scope_base_sha",
+        "risk_class",
+        "complexity_score"
+      ],
+      "properties": {
+        "track": {
+          "const": "ENGINEERING"
+        },
+        "awu_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "awu_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parent_manifest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope_base_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "risk_class": {
+          "enum": [
+            "R0",
+            "R1",
+            "R2",
+            "R3"
+          ]
+        },
+        "complexity_score": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "resume_read_order": {
       "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "uniqueItems": true,
       "items": {
-        "type": "string"
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "recent_completed": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 500
       }
     },
     "current_objective": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "maxLength": 2000
     },
     "next_action": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "maxLength": 2000
     },
     "blockers": {
       "type": "array",
+      "maxItems": 20,
+      "uniqueItems": true,
       "items": {
-        "type": "string"
+        "type": "string",
+        "minLength": 1
       }
     },
     "validation_evidence": {
       "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
       "items": {
-        "type": "object"
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "class",
+          "status",
+          "ref",
+          "head_sha",
+          "scope"
+        ],
+        "properties": {
+          "class": {
+            "const": "GITHUB_ACTIONS"
+          },
+          "status": {
+            "const": "PASS"
+          },
+          "ref": {
+            "type": "string",
+            "pattern": "^https://github\\.com/tobianahillel-afk/Bot-crypto/actions/runs/[0-9]+$"
+          },
+          "head_sha": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "scope": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          }
+        }
+      }
+    },
+    "stop_conditions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
       }
     },
     "stale_when": {
       "type": "array",
       "minItems": 1,
+      "maxItems": 12,
+      "uniqueItems": true,
       "items": {
-        "type": "string"
+        "type": "string",
+        "minLength": 1
       }
     },
     "next_engineering": {
-      "type": "object"
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "active_lot",
+        "active_task",
+        "active_manifest"
+      ],
+      "properties": {
+        "active_lot": {
+          "type": "string",
+          "minLength": 1
+        },
+        "active_task": {
+          "type": "string",
+          "minLength": 1
+        },
+        "active_manifest": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
     }
   }
 }

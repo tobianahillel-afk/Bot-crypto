@@ -1,369 +1,105 @@
 {
-  "schema_version": 1,
-  "kind": "bootstrap_handoff",
-  "workstream": "BOOTSTRAP_ENGINE",
-  "status": "COMPLETE",
+  "schema_version": 2,
+  "kind": "engineering_handoff",
+  "workstream": "DEVELOPMENT_ENGINE",
+  "status": "IN_PROGRESS",
+  "authority": {
+    "state_source": "config/governance/project_state.json",
+    "context_map": "engineering/CONTEXT_MAP.json",
+    "handoff_role": "RESUME_HINT_NOT_AUTHORITY"
+  },
   "external_git_observation": {
     "default_branch": "main",
     "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "main_branch_protected": false,
+    "rulesets_count": 0,
     "lot45_pr": 66,
-    "lot45_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133"
+    "lot45_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "lot45_state": "open",
+    "lot45_merged": false
   },
   "engineering_branch": "engineering/bootstrap-development-engine",
   "state_snapshot": {
-    "phase": "STABLE",
-    "active_lot": null,
-    "active_task": null,
-    "active_manifest": null,
+    "engineering_phase": "BUILDING",
+    "active_lot": "ENG-05",
+    "active_task": "ENG-05.4",
+    "active_manifest": "engineering/lots/ENG-05.json",
     "business_development": "PAUSED",
-    "lot46_status": "LOCKED"
+    "lot46_status": "LOCKED",
+    "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED",
+    "open_findings": [
+      "BOOT-FINDING-001"
+    ]
   },
-  "completed": [
-    "BOOT-00 baseline frozen",
-    "BOOT-01 Development Engine master plan created",
-    "BOOT-02 canonical state and legal transition validation created",
-    "BOOT-03 bounded JSON work-item standard created",
-    "BOOT-04 deterministic agent startup protocol created",
-    "BOOT-05 machine-readable handoff and stale-state detection created",
-    "BOOT-06 lightweight zero-dependency CI passed",
-    "BOOT-07 cold-start qualification passed on workflow run 35776801100",
-    "ENG-00 Repository Truth Recovery completed with canonical baseline validated on workflow run 35792439447",
-    "ENG-01 Agent Bootstrap & Canonical State completed; permanent state, state machine, fresh-agent startup, evidence policy and live state-drift qualification validated on workflow run 35794262132",
-    "ENG-02 Work Decomposition & Context Engine completed; end-to-end AWU DAG, complexity, split, risk, context, scope and cold-start qualification passed on workflow run 35833639230",
-    "ENG-03 Incremental Validation Engine completed; exact head e5f6c953191d55933355e293d9f1b574659d0328 passed run 35840677829 with single-pass elapsed 58.109 ms, 6 avoided tier recomputations (60%), no pytest/full-suite/network/T3/T4 execution on the routine path.",
-    "ENG-04.1 Secret Controls completed on exact head 431aa76a1fbd5faecb622231497a8f0915a465c2: Engineering Bootstrap run 35848165705 PASS and Security Secrets run 35848165662 PASS, including pinned MIT Gitleaks v8.30.1 build, runtime-only positive control, current-tree scan, full-history scan, and two blob-bound vetted false-positive fingerprints.",
-    "ENG-04.2 Dependency Controls completed on exact head bc626d4fc13a1ebb9125540fbcea91c14d0dcb59: Engineering Bootstrap run 35849667705 PASS, Security Dependencies run 35849667715 PASS with no known vulnerabilities in requirements-dev.lock, and Security Secrets run 35849667729 PASS. Dependency Review v5.0.0 is pinned to a1d282b36b6f3519aa1f3fc636f609c47dddb294 for PR dependency diffs.",
-    "ENG-04.3 SAST Controls completed on exact head 8ad397ceb4dfe3ad2a429b295270ebf46afbff2f: Engineering Bootstrap run 35850772829 PASS and Security SAST run 35850772820 PASS. CodeQL Action v4.38.1 exact commit 1c5b675653bb5c22dbe9b12b556ec555138e09fd used CLI 2.27.0, security-extended, local SARIF fail-closed gate, 1 SARIF and 0 findings.",
-    "ENG-04.4 Workflow Security Controls completed on exact head 2f0160884c2ee191ab1881a5caf9335b6c1fd15b: Security Actions run 35855698512 PASS and Engineering Bootstrap run 35855698513 PASS. actionlint v1.7.12 and zizmor v1.30.1 release asset SHA-256 checks passed; zizmor positive control found 2 issues; ACTIONLINT_TARGET_COUNT=1; ZIZMOR_TARGET_COUNT=1; both targeted .github/workflows/security-actions.yml; real ZIZMOR_FINDINGS=0.",
-    "ENG-04.5 WU01 completed on exact head 32c877028597dc4b3bca7e34f32d8b834c306742: legacy inventory measured 211 floating refs across only actions/checkout@v4 (82), actions/setup-python@v5 (82), and actions/upload-artifact@v4 (47); changed-workflow anti-regression gate PASS.",
-    "ENG-04.5 WU02 completed on exact head ea0e9b111347b5f676b3c0874e09f3e395a97db2: Engineering Bootstrap run 35873024923 PASS with action supply-chain auditor, 13 supply-chain probes, approved six-repository pin registry, 10 pin-registry adversarial probes and cold-start; Security Secrets run 35873024947 PASS.",
-    "ENG-04.6 WU01 completed on exact head 494e9304be401559b5cc8c15f98257678b8ab255: Engineering Bootstrap run 35879192229 PASS and Security Supply Chain run 35879192165 PASS. Permission inventory found 88 workflows, 88 explicit top-level permission declarations, 0 missing declarations, 0 legacy permission debt; changed gate PASS.",
-    "ENG-04.6 WU02 completed on exact head cc2c4e2a4c3f4ea962302a1e2709e96a4101731a: Engineering Bootstrap run 35879970764 PASS and Security Supply Chain run 35879970595 PASS. Repository protection policy/selftests PASS; live observation remains main protected=false, rulesets_count=0, branch-protection detail 403 to integration, so business unlock remains fail-closed.",
-    "ENG-04 Security & Supply Chain Engine completed on exact head dae1d5a920307586bcbe2cccbe11b0caba7c0869: Engineering Bootstrap run 35885215524 PASS with final PASS_ENGINEERING_SECURITY verifier and 8 adversarial probes; Security Secrets run 35885215485 PASS in RANGE mode with 0 findings and full-tree/full-history steps skipped on routine push; Security Actions and Security Supply Chain PASS. Business unlock remains blocked by BOOT-FINDING-001 because main protection is not verified.",
-    "ENG-05.2 Documentation Consistency completed on exact head 365bd0a4a2afa63557cb580331ed887cbf7cd067: Engineering Bootstrap run 35908255388 PASS and Security Secrets run 35908255391 PASS. Repository truth and documentation validators enforce project_state authority and reject duplicated/stale bridge status."
+  "active_checkpoint": {
+    "track": "ENGINEERING",
+    "awu_id": "ENG-05.4-WU01",
+    "awu_path": "engineering/work_units/ENG-05.4-WU01.json",
+    "parent_manifest": "engineering/lots/ENG-05.json",
+    "scope_base_sha": "1c292cacae3f38b8025eaf1b0d5b215d2458b741",
+    "risk_class": "R1",
+    "complexity_score": 3
+  },
+  "resume_read_order": [
+    "AGENTS.md",
+    "config/governance/project_state.json",
+    "engineering/CONTEXT_MAP.json",
+    "engineering/handoff/CURRENT.json"
   ],
-  "current_objective": "ENG-05.3: generate a bounded progressive-disclosure context map for context-free agents.",
-  "next_action": "Generate CONTEXT_MAP.json/.md from canonical state, active AWU resolver route and handoff; validate exact read order, bounded paths and stale-state failures.",
+  "recent_completed": [
+    "ENG-04 Security & Supply Chain Engine completed on exact head dae1d5a920307586bcbe2cccbe11b0caba7c0869.",
+    "ENG-05.1 generated current-status views completed on exact head 1acc3d5c1043f532a1ac5f2c17c0e7bc72ed37f7.",
+    "ENG-05.2 documentation consistency completed on exact head 365bd0a4a2afa63557cb580331ed887cbf7cd067.",
+    "ENG-05.3 bounded Context Map completed on exact head 1c292cacae3f38b8025eaf1b0d5b215d2458b741."
+  ],
+  "current_objective": "ENG-05.4: harden the bounded machine-readable handoff against permanent state and the active AWU.",
+  "next_action": "Validate Handoff V2, stale-checkpoint probes and permanent-state cold start; then close ENG-05.4 and proceed to ENG-05.5 resume/recovery qualification.",
   "blockers": [],
   "validation_evidence": [
     {
       "class": "GITHUB_ACTIONS",
       "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35776801100",
-      "note": "Exact head 8cf72a4008e2984189652782e9d8c3697f88cef0 passed all governance and cold-start checks."
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35910739713",
+      "head_sha": "1c292cacae3f38b8025eaf1b0d5b215d2458b741",
+      "scope": "ENG-05.3_CONTEXT_MAP"
     },
     {
       "class": "GITHUB_ACTIONS",
       "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35777380265",
-      "note": "Exact head 9986a964a96b9dffc7ab5a1f552af037abe15db5 validated the repository truth registry and all governance gates."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35777868752",
-      "note": "Exact head 21bbb4cac96a9db4b4b1b99ecaa78ca97575ff8c validated all ENG-00.2 reconciled truth views."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35778141468",
-      "note": "Exact head f2de5e4e40e4479742e099beb096688a51f294dc validated permanent multi-track state design."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35792145392",
-      "note": "Exact head e34e07d5818fb1a03363c45ba442dd6f04ee4e26 validated historical evidence protection and all prior governance checks."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35792439447",
-      "note": "Exact head b830dc3c94e8abd2d15723fc0e156f188cd10936 validated the ENG-00 canonical baseline and transition-compatible validator."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35792801422",
-      "note": "Exact head c7dcb948472e0fe856ef907a4b12374d68de9a84 validated the permanent project-state V1 schema, active work scope and cold-start chain."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35793071593",
-      "note": "Exact head 5544d8ed448d579bf27bf376770714403edb8293 validated the permanent multi-track project state and migration parity."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35793352838",
-      "note": "Exact head 03bed8b5f3164cdab1d1d0e326e7e2029f5ca54d validated permanent state transitions, adversarial state-machine probes, active scope and cold start."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35793777054",
-      "note": "Exact head 5ffe1f6711cee629a6cdcc2c351f4079a5afb2a5 validated permanent-state fresh-agent startup and 5 cold-start scenarios."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35794013765",
-      "note": "Exact head 835d966ccd7ea2957cd6b6f79be4c609816a4484 validated execution/evidence policy, adversarial evidence claims and permanent cold start."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35794262132",
-      "note": "Exact head 63047d1a62cc0e91ea9e7341b5c5e9b53c650c8c passed live GitHub drift verification, 7 adversarial drift probes, permanent cold-start and all ENG-01 governance gates."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35797881430",
-      "note": "Exact head 886fd48509fa5c73746fd6ef8eb94f5e24006733 validated AWU V1 contract, 6 adversarial AWU probes, live drift checks and permanent cold start."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35798119375",
-      "note": "Exact head 9244955f3fcc89fbf99d9fe898ec9b21aefad8c2 validated AWU dependency DAG semantics and 5 adversarial graph scenarios."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35798699760",
-      "note": "Exact head d51ceb4b8dc40e44e217f86f94f2cb663866b9e2 validated deterministic 12-factor AWU complexity scoring and adversarial under-declaration checks."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35799056965",
-      "note": "Exact head 0eec28b192457a3453759afcde5ce2a0df59586b validated mandatory AWU split decisions and 6 adversarial split scenarios."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35799488660",
-      "note": "Exact head 0a712f238d26c11542ef2630717bbd343e2eb18b validated deterministic AWU risk classes R0-R3 and 7 adversarial risk scenarios."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35799782804",
-      "note": "Exact head 0819db599f68585b998191ca6dc564ce8f82b7cb validated AWU context routing and adversarial context-budget checks."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35832962970",
-      "note": "Exact head 87ec4003e67ecb387d79e5b505a8e07b4d85a46f validated active AWU resolution, AWU/parent diff boundaries, 7 adversarial scope probes and cold start."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35833639230",
-      "note": "Exact head 67e74c8ce12c91e1a3a00859224a06251653b768 passed operational AWU DAG, end-to-end decomposition qualification, AWU scope enforcement and AWU-aware cold start."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35834191954",
-      "note": "Exact head 99e07c9af5a4a6c8e94849f894cc95cf45b0b7da validated deterministic conservative multi-label diff classification and 11 adversarial classifier scenarios."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35834604408",
-      "note": "Exact head d51d53ba4c5db65e857f531cbc009d5e3d753e49 validated execution-free diff impact mapping and 10 adversarial impact scenarios."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35837759102",
-      "note": "Exact head f49b3ec732efd172ebf67a5ec526a7be8c72707c passed T0, 10 adversarial T0 scenarios, work-decomposition qualification and cold start. Real T0 processed 11 changed files in 12.97 ms with no test suite, deeper tier or network execution."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35838479239",
-      "note": "Exact head d70b7b3179475088f3567674dc30fb4564d79534 passed targeted T1 and 10 adversarial T1 scenarios. Real T1 executed 3 allowlisted checks in 65.831 ms, no full suite/network, leaving only ACTIONS_SECURITY and WORKFLOW_SYNTAX uncovered."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35838907544",
-      "note": "Exact head 4eced6fbf83c856271796d774fd615bf7d30d1a5 passed conditional T2 and 10 adversarial T2 scenarios. Real T2 completed in 86.19 ms with selected_groups=[], pytest_invoked=false, no full suite/network, leaving ACTIONS_SECURITY and WORKFLOW_SYNTAX for T3+."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35839566858",
-      "note": "Exact head 346a2327eb4a30743726d606ddf6ae5f4558c1dc passed symbolic T3/T4 selection and 10 adversarial selector scenarios. Real selection took 96.71 ms, required T3 SECURITY_ASSURANCE and WORKFLOW_ASSURANCE, no T4, and executed no assurance/certification."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35840156811",
-      "note": "Exact head 385a676bae9c612a8e055dea3f044ddc2f0cf54c passed exact-input proof reuse semantics, 10 adversarial reuse scenarios, work decomposition and cold start."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35840677829",
-      "note": "Exact head e5f6c953191d55933355e293d9f1b574659d0328 completed ENG-03.8. Single-pass validation took 58.109 ms, computed T0/T1/T2/selector once each, avoided 6 nested recomputations (60%), and ran no pytest/full suite/network/deep assurance/certification."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35848165705",
-      "note": "Exact head 431aa76a1fbd5faecb622231497a8f0915a465c2 passed all bootstrap governance including secret-control validator and 13 adversarial secret-control probes."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35848165662",
-      "note": "Exact head 431aa76a1fbd5faecb622231497a8f0915a465c2 passed pinned MIT Gitleaks positive-control, current-tree, full-history and clean-scan enforcement."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35849667705",
-      "note": "Exact head bc626d4fc13a1ebb9125540fbcea91c14d0dcb59 passed bootstrap dependency-control validator and 11 adversarial dependency-control probes."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35849667715",
-      "note": "Exact head bc626d4fc13a1ebb9125540fbcea91c14d0dcb59 passed current-lock pip-audit in non-resolving strict mode; no known vulnerabilities found."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35849667729",
-      "note": "Exact head bc626d4fc13a1ebb9125540fbcea91c14d0dcb59 retained clean pinned Gitleaks secret scans."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35850772820",
-      "note": "Exact head 8ad397ceb4dfe3ad2a429b295270ebf46afbff2f passed CodeQL Python security-extended using CLI 2.27.0 with local SARIF gate: CODEQL_SARIF_FILES=1, CODEQL_FINDINGS=0."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35850772829",
-      "note": "Exact head 8ad397ceb4dfe3ad2a429b295270ebf46afbff2f passed all bootstrap SAST validator and adversarial controls."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35854596744",
-      "note": "ENG-04.4 WU01 exact head 326b9bb21f4a96b12519fba8d60b13b2f158cf86: actionlint v1.7.12 digest verified; positive control PASS; ACTIONLINT_TARGET_COUNT=1; target .github/workflows/security-actions.yml; real lint PASS."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35854596802",
-      "note": "ENG-04.4 WU01 exact head 326b9bb21f4a96b12519fba8d60b13b2f158cf86: Engineering Bootstrap PASS including workflow-security validator/adversarial probes."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35855698512",
-      "note": "ENG-04.4 exact head 2f0160884c2ee191ab1881a5caf9335b6c1fd15b: actionlint and zizmor exact-digest installs PASS, zizmor runtime positive control found 2 findings, ACTIONLINT_TARGET_COUNT=1, ZIZMOR_TARGET_COUNT=1, both target security-actions.yml, real ZIZMOR_FINDINGS=0."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35855698513",
-      "note": "ENG-04.4 exact head 2f0160884c2ee191ab1881a5caf9335b6c1fd15b: Engineering Bootstrap PASS including 18 workflow-security adversarial probes."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35857436826",
-      "note": "ENG-04.5 WU01 supply-chain inventory PASS: 88 workflow files, 224 uses, 13 pinned SHA, 211 legacy floating refs, 0 dynamic/malformed; changed gate scanned 2 modified workflows with 3 pinned refs and zero debt."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35857691546",
-      "note": "Exact head 32c877028597dc4b3bca7e34f32d8b834c306742 passed Engineering Bootstrap including action supply-chain inventory and 12 adversarial supply-chain probes."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35873024923",
-      "note": "Exact head ea0e9b111347b5f676b3c0874e09f3e395a97db2 passed action supply-chain inventory, registry validation, adversarial probes and cold-start."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35879192229",
-      "note": "ENG-04.6 WU01 bootstrap qualification including permission inventory and 11 adversarial probes."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35879192165",
-      "note": "ENG-04.6 WU01 supply-chain workflow: 88/88 workflows have explicit top-level permissions; changed workflow permission gate PASS."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35879970764",
-      "note": "ENG-04.6 WU02 protection policy and 9 adversarial scenarios passed on exact head cc2c4e2a4c3f4ea962302a1e2709e96a4101731a."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35879970595",
-      "note": "ENG-04.6 WU02 workflow supply-chain and permission changed gates passed."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35885215524",
-      "note": "Exact head dae1d5a920307586bcbe2cccbe11b0caba7c0869 passed final ENG-04 bootstrap verification, evidence binding and 8 security-engine adversarial probes."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35885215485",
-      "note": "Exact head dae1d5a920307586bcbe2cccbe11b0caba7c0869 passed Gitleaks positive control and routine introduced-range scan: RANGE bc0d205f..dae1d5a9, 0 findings, full current-tree/history scans skipped."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35886777610",
-      "note": "Exact head 1acc3d5c1043f532a1ac5f2c17c0e7bc72ed37f7 passed generated current-status --check, 9 adversarial status probes, decomposition qualification and cold-start. Security Secrets run 35886777802 also passed."
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35910739464",
+      "head_sha": "1c292cacae3f38b8025eaf1b0d5b215d2458b741",
+      "scope": "SECURITY_SECRETS"
     },
     {
       "class": "GITHUB_ACTIONS",
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35908255388",
-      "note": "Exact head 365bd0a4a2afa63557cb580331ed887cbf7cd067 passed repository truth, generated status, documentation consistency, all governance/security controls, work decomposition and cold-start."
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35908255391",
-      "note": "Exact head 365bd0a4a2afa63557cb580331ed887cbf7cd067 retained clean Security Secrets validation."
+      "head_sha": "365bd0a4a2afa63557cb580331ed887cbf7cd067",
+      "scope": "ENG-05.2_DOCUMENTATION_CONSISTENCY"
     }
   ],
+  "stop_conditions": [
+    "STATE_DRIFT",
+    "BUSINESS_SCOPE_TOUCHED_WITHOUT_UNLOCK",
+    "FROZEN_EVIDENCE_MUTATION",
+    "LOT46_UNLOCK_ATTEMPT",
+    "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
+  ],
   "stale_when": [
-    "bootstrap phase is no longer STABLE without an authorized transition",
-    "engineering active lot or task differs from next_engineering before this handoff is superseded",
-    "main SHA differs without authorized reconciliation",
-    "Lot45 candidate head differs without reconciliation",
-    "business development is no longer PAUSED before explicit unlock",
-    "Lot46 is no longer LOCKED before explicit unlock"
+    "STATE_ACTIVE_WORK_MISMATCH",
+    "ACTIVE_AWU_MISMATCH",
+    "MAIN_SHA_MISMATCH",
+    "BUSINESS_CANDIDATE_HEAD_MISMATCH",
+    "BUSINESS_HOLD_CHANGED",
+    "SAFETY_SNAPSHOT_CHANGED",
+    "STOP_CONDITIONS_CHANGED"
   ],
   "next_engineering": {
     "active_lot": "ENG-05",
-    "active_task": "ENG-05.3",
+    "active_task": "ENG-05.4",
     "active_manifest": "engineering/lots/ENG-05.json"
   }
 }

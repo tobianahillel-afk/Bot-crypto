@@ -81,13 +81,13 @@ def main() -> int:
     assert bridge_engineering["active_lot"] == engineering["active_lot"]
     assert bridge_engineering["active_task"] == engineering["active_task"]
     assert bridge_engineering["active_manifest"] == engineering["active_manifest"]
-    handoff_validator.validate_handoff(bridge, handoff)
+    handoff_validator.validate_handoff(state, handoff)
 
     stale = copy.deepcopy(handoff)
     stale["next_engineering"]["active_task"] = "ENG-99.99"
     _expect(
         handoff_validator.HandoffError,
-        lambda: handoff_validator.validate_handoff(bridge, stale),
+        lambda: handoff_validator.validate_handoff(state, stale),
         "stale handoff",
     )
 
