@@ -45,6 +45,7 @@ def main() -> int:
     handoff_mod = _module("handoff_validator", ROOT / "scripts/governance/validate_handoff.py")
 
     state = _json(ROOT / "engineering/STATE.json")
+    permanent_state = _json(ROOT / "config/governance/project_state.json")
     policy = _json(ROOT / "engineering/STATE_TRANSITIONS.json")
     phase = state["bootstrap_engine"]["phase"]
     engine = state["bootstrap_engine"] if phase == "BUILDING" else state["engineering_engine"]
@@ -53,7 +54,7 @@ def main() -> int:
 
     state_mod.validate_state(state, policy, active_manifest)
     item_mod.validate_manifest(active_manifest, source=active_manifest["id"])
-    handoff_mod.validate_handoff(state, handoff)
+    handoff_mod.validate_handoff(permanent_state, handoff)
 
     unsafe_state = copy.deepcopy(state)
     unsafe_state["safety"]["trade_allowed"] = True
@@ -80,10 +81,10 @@ def main() -> int:
     )
 
     stale_handoff = copy.deepcopy(handoff)
-    stale_handoff["state_snapshot"]["phase"] = "CORRUPT"
+    stale_handoff["state_snapshot"]["engineering_phase"] = "CORRUPT"
     _expect_failure(
         handoff_mod.HandoffError,
-        lambda: handoff_mod.validate_handoff(state, stale_handoff),
+        lambda: handoff_mod.validate_handoff(permanent_state, stale_handoff),
         "stale handoff",
     )
 

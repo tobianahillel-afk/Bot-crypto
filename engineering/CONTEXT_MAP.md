@@ -13,20 +13,20 @@
 - Track: ENGINEERING
 - Work item: ENG-05
 - Task: ENG-05.4
-- AWU: ENG-05.4-WU01
+- AWU: ENG-05.4-WU02
 - Risk: R1
 - Manifest: engineering/lots/ENG-05.json
-- AWU file: engineering/work_units/ENG-05.4-WU01.json
+- AWU file: engineering/work_units/ENG-05.4-WU02.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-05.json
-- engineering/work_units/ENG-05.4-WU01.json
-- engineering/handoff/CURRENT.json
-- engineering/HANDOFF_SCHEMA.json
+- engineering/work_units/ENG-05.4-WU02.json
+- scripts/governance/selftest_bootstrap_validators.py
 - scripts/governance/validate_handoff.py
+- engineering/handoff/CURRENT.json
 
 ## Execution context — reference
 
@@ -37,14 +37,14 @@
 
 - Primary: 7 / 10 files
 - Reference: 2 / 12 files
-- Routed size: 51 / 768 KiB
+- Routed size: 46 / 768 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-05.4: harden the bounded machine-readable handoff against permanent state and the active AWU.
-- Next action: Validate Handoff V2, stale-checkpoint probes and permanent-state cold start; then close ENG-05.4 and proceed to ENG-05.5 resume/recovery qualification.
+- Objective: ENG-05.4 WU02: repair the legacy bootstrap negative-validator harness without restoring engineering/STATE.json as handoff authority.
+- Next action: Run the permanent-state-compatible bootstrap negative selftests and full cold-start chain; if green, close ENG-05.4 and activate ENG-05.5 resume/recovery qualification.
 
 ## Non-authoritative sources
 

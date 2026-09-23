@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-05.4-WU02",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-05",
+    "task_id": "ENG-05.4",
+    "manifest": "engineering/lots/ENG-05.json"
+  },
+  "title": "Repair permanent-handoff bootstrap compatibility",
+  "objective": "Migrate the legacy bootstrap negative-validator harness to validate Handoff V2 against permanent project state while preserving its legacy bridge-specific bootstrap tests.",
+  "non_goals": [
+    "change Handoff V2 schema or validator semantics",
+    "resume/recovery qualification",
+    "documentation tooling adoption",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-05.4-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Legacy bootstrap negative validator harness",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_bootstrap_validators.py"
+    },
+    {
+      "name": "Permanent handoff validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_handoff.py"
+    },
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Permanent-state-compatible bootstrap negative harness",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_bootstrap_validators.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "b98ba29f2428f175dd186dc4a170d8f57a7b06cd",
+    "allowed_paths": [
+      "engineering/work_units/ENG-05.4-WU01.json",
+      "engineering/work_units/ENG-05.4-WU02.json",
+      "engineering/handoff/CURRENT.json",
+      "scripts/governance/selftest_bootstrap_validators.py",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/lot*/**"
+    ],
+    "forbidden_semantics": [
+      "handoff authority regression to engineering/STATE.json",
+      "Handoff V2 schema weakening",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "legacy bootstrap-state tests continue using engineering/STATE.json only for bootstrap compatibility checks",
+      "handoff validation uses config/governance/project_state.json exclusively",
+      "stale handoff negative probe mutates the V2 engineering_phase field",
+      "WU01 remains immutable except lifecycle status DONE",
+      "no Handoff V2 schema or validator weakening is introduced",
+      "validation remains offline standard-library zero-cost"
+    ],
+    "acceptance_criteria": [
+      "selftest_bootstrap_validators passes",
+      "legacy bootstrap safety and completed-prefix probes still pass",
+      "handoff normal validation and stale-handoff negative probe use permanent project state",
+      "active AWU resolver selects only ENG-05.4-WU02",
+      "generated Context Map names WU02 and remains inside R1 budget",
+      "full Engineering Bootstrap reaches cold-start qualification"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 6,
+      "executable_loc_changed": 120,
+      "new_public_behaviors": 0,
+      "contract_families": 0,
+      "independent_algorithms": 0,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1"
+    ],
+    "target_commands": [
+      "python scripts/governance/selftest_bootstrap_validators.py",
+      "python scripts/governance/validate_handoff.py",
+      "python scripts/governance/cold_start_qualification.py"
+    ]
+  },
+  "done_when": [
+    "bootstrap legacy negative tests no longer pass the compatibility bridge into Handoff V2",
+    "full bootstrap passes without restoring legacy handoff authority"
+  ]
+}
