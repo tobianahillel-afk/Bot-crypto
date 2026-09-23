@@ -75,7 +75,10 @@ def main() -> int:
     _expect(mod.WorkflowSecurityError, lambda: mod.validate_workflow(policy, configured), "zizmor config enabled")
     tokenized = workflow + "\n# GITHUB_TOKEN\n"
     _expect(mod.WorkflowSecurityError, lambda: mod.validate_workflow(policy, tokenized), "zizmor token introduced")
-    no_zizmor_positive = workflow.replace("on: pull_request_target", "on: pull_request")
+    no_zizmor_positive = workflow.replace(
+        'trigger = "pull_request" + "_target"',
+        'trigger = "pull_request"',
+    )
     _expect(mod.WorkflowSecurityError, lambda: mod.validate_workflow(policy, no_zizmor_positive), "zizmor positive control weakened")
     no_exit = workflow.replace("--format=json-v1", "--no-exit-codes --format=json-v1")
     _expect(mod.WorkflowSecurityError, lambda: mod.validate_workflow(policy, no_exit), "zizmor exit codes disabled")
