@@ -39,12 +39,12 @@
     },
     {
       "id": "ENG-04.2",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Implement dependency vulnerability and dependency-diff controls."
     },
     {
       "id": "ENG-04.3",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Implement SAST with audited pinned tools."
     },
     {

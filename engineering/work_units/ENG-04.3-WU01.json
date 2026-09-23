@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-04.3-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-04",
+    "task_id": "ENG-04.3",
+    "manifest": "engineering/lots/ENG-04.json"
+  },
+  "title": "Implement layered static application security testing",
+  "objective": "Create a bounded zero-cost SAST layer that reuses the repository's locked Bandit gate for fast Python findings and adds a deeper pinned CodeQL analysis only on security-relevant code changes, schedules, or manual runs.",
+  "non_goals": [
+    "secret scanning changes",
+    "dependency scanning changes",
+    "GitHub Actions workflow security linting",
+    "supply-chain action pin audit",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-04.2-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Existing Bandit dependency",
+      "kind": "FILE",
+      "locator": "requirements-dev.lock"
+    },
+    {
+      "name": "Existing institutional Bandit gate",
+      "kind": "FILE",
+      "locator": ".github/workflows/code-quality.yml"
+    },
+    {
+      "name": "T3 security requirement selector",
+      "kind": "FILE",
+      "locator": "scripts/governance/select_t3_t4.py"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "SAST control policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/sast_control_policy_v1.json"
+    },
+    {
+      "name": "SAST workflow",
+      "kind": "FILE",
+      "locator": ".github/workflows/security-sast.yml"
+    },
+    {
+      "name": "SAST control validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_sast_controls.py"
+    },
+    {
+      "name": "SAST adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_sast_controls.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "bc626d4fc13a1ebb9125540fbcea91c14d0dcb59",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-04.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-04.2-WU01.json",
+      "engineering/work_units/ENG-04.3-WU01.json",
+      "config/governance/sast_control_policy_v1.json",
+      ".github/workflows/security-sast.yml",
+      ".github/workflows/engineering-bootstrap.yml",
+      "scripts/governance/validate_sast_controls.py",
+      "scripts/governance/selftest_sast_controls.py",
+      "engineering/SAST_CONTROLS.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "secret scanner changes",
+      "dependency scanner changes",
+      "workflow security linter integration",
+      "supply-chain pin remediation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "existing Bandit 1.8.0 capability is reused rather than duplicated by another Python-only scanner",
+      "deep SAST tool is exact-version pinned and zero-cost for this public repository",
+      "deep SAST only runs on production/security-relevant code paths, weekly schedule, or manual dispatch",
+      "SAST workflow does not activate business runtime capabilities",
+      "SAST result permissions are the minimum required by the selected tool mode",
+      "no external SaaS token paid API LLM or larger runner is required",
+      "static validator fails floating action refs weakened scan scope or warn-only behavior"
+    ],
+    "acceptance_criteria": [
+      "Bandit medium/high scan remains fail-closed for src",
+      "CodeQL or equivalent deep analysis is exact-SHA pinned after tool audit",
+      "deep analysis covers Python production code without running on documentation-only changes",
+      "SAST workflow has bounded timeout and path filters",
+      "bootstrap adversarial probes catch floating refs removed Bandit gate disabled deep analysis or unauthorized paid dependency",
+      "live SAST workflow passes current repository or reports actionable findings without suppressing them broadly"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 5,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": true,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 12,
+      "executable_loc_changed": 750,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 1
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_sast_controls.py",
+      "python scripts/governance/selftest_sast_controls.py",
+      "GitHub Actions security-sast workflow"
+    ]
+  },
+  "done_when": [
+    "fast and deep SAST are layered without redundant Python-only scanners",
+    "deep SAST is exact-pinned bounded and risk-proportional",
+    "current repository receives a real deep SAST qualification",
+    "mandatory SAST path remains zero-cost"
+  ]
+}
