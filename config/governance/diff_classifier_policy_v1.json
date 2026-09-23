@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "policy_kind": "diff_classifier_policy_v1",
+  "classifier_semantics": "MULTI_LABEL_CONSERVATIVE",
+  "labels": [
+    "DOCUMENTATION",
+    "GOVERNANCE_CONTROL",
+    "CI_WORKFLOW",
+    "CONTRACT_SCHEMA",
+    "CONFIG_POLICY",
+    "TEST_ONLY",
+    "BUSINESS_PRODUCTION",
+    "DATA_PIPELINE",
+    "SECURITY",
+    "RISK_EXECUTION_CRITICAL",
+    "CERTIFICATION_EVIDENCE",
+    "UNKNOWN_REQUIRES_REVIEW"
+  ],
+  "critical_labels": [
+    "RISK_EXECUTION_CRITICAL",
+    "SECURITY",
+    "UNKNOWN_REQUIRES_REVIEW"
+  ],
+  "rules": [
+    {
+      "code": "CRITICAL_RISK",
+      "label": "RISK_EXECUTION_CRITICAL",
+      "patterns": [
+        "src/crypto_quant_bot/risk/**",
+        "src/crypto_quant_bot/execution/**",
+        "src/crypto_quant_bot/oms/**",
+        "src/crypto_quant_bot/ems/**"
+      ]
+    },
+    {
+      "code": "SECURITY",
+      "label": "SECURITY",
+      "patterns": [
+        "SECURITY.md",
+        ".github/CODEOWNERS",
+        "src/crypto_quant_bot/security/**",
+        "config/security/**",
+        "scripts/security/**"
+      ]
+    },
+    {
+      "code": "CI",
+      "label": "CI_WORKFLOW",
+      "patterns": [
+        ".github/workflows/**"
+      ]
+    },
+    {
+      "code": "CONTRACT",
+      "label": "CONTRACT_SCHEMA",
+      "patterns": [
+        "contracts/**",
+        "**/*.schema.json"
+      ]
+    },
+    {
+      "code": "CONFIG",
+      "label": "CONFIG_POLICY",
+      "patterns": [
+        "config/**"
+      ]
+    },
+    {
+      "code": "TEST",
+      "label": "TEST_ONLY",
+      "patterns": [
+        "tests/**",
+        "scripts/governance/selftest_*.py",
+        "scripts/governance/qualify_*.py"
+      ]
+    },
+    {
+      "code": "GOVERNANCE",
+      "label": "GOVERNANCE_CONTROL",
+      "patterns": [
+        "AGENTS.md",
+        "engineering/**",
+        "scripts/governance/**"
+      ]
+    },
+    {
+      "code": "DATA",
+      "label": "DATA_PIPELINE",
+      "patterns": [
+        "src/crypto_quant_bot/data/**",
+        "src/crypto_quant_bot/market_data/**"
+      ]
+    },
+    {
+      "code": "PRODUCTION",
+      "label": "BUSINESS_PRODUCTION",
+      "patterns": [
+        "src/crypto_quant_bot/**"
+      ]
+    },
+    {
+      "code": "EVIDENCE",
+      "label": "CERTIFICATION_EVIDENCE",
+      "patterns": [
+        "data/audit/**",
+        "reports/**"
+      ]
+    },
+    {
+      "code": "DOCS",
+      "label": "DOCUMENTATION",
+      "patterns": [
+        "README.md",
+        "CONTRIBUTING.md",
+        "docs/**",
+        "**/*.md"
+      ]
+    }
+  ],
+  "aggregate_rules": {
+    "docs_only": {
+      "output_label": "DOC_ONLY",
+      "allowed_file_labels": [
+        "DOCUMENTATION"
+      ],
+      "require_every_file_documentation": true
+    },
+    "unknown_fallback": "UNKNOWN_REQUIRES_REVIEW"
+  },
+  "rules_invariants": [
+    "rules are additive; matching one rule never suppresses another label",
+    "a path with no matching rule receives UNKNOWN_REQUIRES_REVIEW",
+    "DOC_ONLY is aggregate-only and appears only when every changed path is documentation and has no other label",
+    "classification never selects or executes tests",
+    "critical labels can only be added by classification and are never downgraded by lower-risk labels"
+  ]
+}
