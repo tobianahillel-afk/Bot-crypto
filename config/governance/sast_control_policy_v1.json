@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "policy_kind": "sast_control_policy_v1",
+  "semantics": "LAYERED_BANDIT_PLUS_PINNED_CODEQL_LOCAL_SARIF_GATE",
+  "fast_sast": {
+    "tool": "bandit",
+    "version": "1.8.0",
+    "source": "requirements-dev.lock",
+    "existing_workflow": ".github/workflows/code-quality.yml",
+    "command": "bandit -q -r src -ll"
+  },
+  "deep_sast": {
+    "action": "github/codeql-action",
+    "tag": "v4",
+    "commit": "1c5b675653bb5c22dbe9b12b556ec555138e09fd",
+    "license": "MIT",
+    "default_bundle": "codeql-bundle-v2.27.0",
+    "default_cli_version": "2.27.0",
+    "language": "python",
+    "queries": "security-extended",
+    "source_root": "src/crypto_quant_bot",
+    "upload": "never",
+    "output": "codeql-results"
+  },
+  "toolchain": {
+    "checkout_action_sha": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+    "checkout_version_comment": "v7.0.1"
+  },
+  "trigger_paths": [
+    "src/**/*.py",
+    ".github/workflows/security-sast.yml",
+    "config/governance/sast_control_policy_v1.json",
+    "scripts/governance/validate_sast_controls.py"
+  ],
+  "schedule": {
+    "cadence": "WEEKLY",
+    "cron": "37 4 * * 3"
+  },
+  "cost_policy": {
+    "paid_api_required": false,
+    "paid_saas_required": false,
+    "paid_llm_required": false,
+    "paid_runner_required": false
+  },
+  "invariants": [
+    "existing Bandit 1.8.0 medium-high gate remains fail-closed in institutional code quality",
+    "CodeQL Action is pinned to exact commit 1c5b675653bb5c22dbe9b12b556ec555138e09fd",
+    "pinned CodeQL Action defaults are audited as bundle v2.27.0 and CLI 2.27.0",
+    "CodeQL analyzes Python security-extended queries rooted at src/crypto_quant_bot",
+    "CodeQL SARIF upload is disabled and workflow token permissions remain contents read only",
+    "local SARIF parser fails closed on any CodeQL result",
+    "deep SAST is path-filtered plus weekly/manual and never runs for documentation-only changes",
+    "mandatory SAST path requires no paid API SaaS LLM or larger runner"
+  ]
+}
