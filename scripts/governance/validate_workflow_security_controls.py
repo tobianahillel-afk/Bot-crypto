@@ -62,8 +62,8 @@ def validate_policy(policy: dict[str, Any]) -> None:
     if re.fullmatch(r"[0-9a-f]{40}", str(checkout)) is None:
         raise WorkflowSecurityError("checkout action must be exact SHA")
     if policy.get("changed_target_globs") != [
-        ".github/workflows/**/*.yml",
-        ".github/workflows/**/*.yaml",
+        ".github/workflows/*.yml",
+        ".github/workflows/*.yaml",
     ]:
         raise WorkflowSecurityError("changed workflow target globs drift")
     if policy.get("scan_semantics", {}).get("unchanged_legacy_blocking") is not False:
