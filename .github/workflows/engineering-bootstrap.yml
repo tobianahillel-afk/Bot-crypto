@@ -141,6 +141,12 @@ jobs:
       - name: Run diff classifier adversarial self-tests
         run: python scripts/governance/selftest_diff_classifier.py
 
+      - name: Validate deterministic diff impact mapping
+        run: python scripts/governance/map_diff_impact.py --self-check
+
+      - name: Run diff impact adversarial self-tests
+        run: python scripts/governance/selftest_diff_impact.py
+
       - name: Qualify work decomposition engine
         run: python scripts/governance/qualify_work_decomposition.py
 

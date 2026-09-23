@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "policy_kind": "diff_impact_policy_v1",
+  "semantics": "LABEL_TO_IMPACT_UNION_NO_EXECUTION",
+  "impact_families": [
+    "DOC_CONSISTENCY",
+    "GOVERNANCE_VALIDATORS",
+    "WORKFLOW_SYNTAX",
+    "ACTIONS_SECURITY",
+    "CONTRACT_SCHEMA_VALIDATION",
+    "CONTRACT_COMPATIBILITY",
+    "CONFIG_POLICY_VALIDATION",
+    "TEST_HARNESS_INTEGRITY",
+    "STATIC_ANALYSIS",
+    "UNIT_BEHAVIOR",
+    "DATA_CONTRACTS",
+    "TEMPORAL_CAUSALITY",
+    "DETERMINISTIC_REPLAY",
+    "SECURITY_STATIC_ANALYSIS",
+    "SECRET_CONTROLS",
+    "RISK_INVARIANTS",
+    "EXECUTION_SAFETY",
+    "EVIDENCE_PROVENANCE",
+    "CONSERVATIVE_BROAD_IMPACT",
+    "HUMAN_REVIEW_REQUIRED"
+  ],
+  "domains": [
+    "DOCUMENTATION",
+    "GOVERNANCE",
+    "CI",
+    "CONTRACTS",
+    "CONFIGURATION",
+    "TESTS",
+    "BUSINESS",
+    "DATA",
+    "SECURITY",
+    "RISK_EXECUTION",
+    "EVIDENCE",
+    "UNKNOWN"
+  ],
+  "mappings": {
+    "DOCUMENTATION": {
+      "impact_families": [
+        "DOC_CONSISTENCY"
+      ],
+      "domains": [
+        "DOCUMENTATION"
+      ],
+      "sensitivity": "LOW"
+    },
+    "DOC_ONLY": {
+      "impact_families": [
+        "DOC_CONSISTENCY"
+      ],
+      "domains": [
+        "DOCUMENTATION"
+      ],
+      "sensitivity": "LOW"
+    },
+    "GOVERNANCE_CONTROL": {
+      "impact_families": [
+        "GOVERNANCE_VALIDATORS",
+        "CONFIG_POLICY_VALIDATION"
+      ],
+      "domains": [
+        "GOVERNANCE"
+      ],
+      "sensitivity": "NORMAL"
+    },
+    "CI_WORKFLOW": {
+      "impact_families": [
+        "WORKFLOW_SYNTAX",
+        "ACTIONS_SECURITY"
+      ],
+      "domains": [
+        "CI",
+        "SECURITY"
+      ],
+      "sensitivity": "ELEVATED"
+    },
+    "CONTRACT_SCHEMA": {
+      "impact_families": [
+        "CONTRACT_SCHEMA_VALIDATION",
+        "CONTRACT_COMPATIBILITY"
+      ],
+      "domains": [
+        "CONTRACTS"
+      ],
+      "sensitivity": "ELEVATED"
+    },
+    "CONFIG_POLICY": {
+      "impact_families": [
+        "CONFIG_POLICY_VALIDATION"
+      ],
+      "domains": [
+        "CONFIGURATION"
+      ],
+      "sensitivity": "NORMAL"
+    },
+    "TEST_ONLY": {
+      "impact_families": [
+        "TEST_HARNESS_INTEGRITY"
+      ],
+      "domains": [
+        "TESTS"
+      ],
+      "sensitivity": "NORMAL"
+    },
+    "BUSINESS_PRODUCTION": {
+      "impact_families": [
+        "STATIC_ANALYSIS",
+        "UNIT_BEHAVIOR"
+      ],
+      "domains": [
+        "BUSINESS"
+      ],
+      "sensitivity": "NORMAL"
+    },
+    "DATA_PIPELINE": {
+      "impact_families": [
+        "DATA_CONTRACTS",
+        "TEMPORAL_CAUSALITY",
+        "DETERMINISTIC_REPLAY"
+      ],
+      "domains": [
+        "DATA"
+      ],
+      "sensitivity": "ELEVATED"
+    },
+    "SECURITY": {
+      "impact_families": [
+        "SECURITY_STATIC_ANALYSIS",
+        "SECRET_CONTROLS"
+      ],
+      "domains": [
+        "SECURITY"
+      ],
+      "sensitivity": "CRITICAL"
+    },
+    "RISK_EXECUTION_CRITICAL": {
+      "impact_families": [
+        "RISK_INVARIANTS",
+        "EXECUTION_SAFETY",
+        "SECURITY_STATIC_ANALYSIS",
+        "DETERMINISTIC_REPLAY"
+      ],
+      "domains": [
+        "RISK_EXECUTION",
+        "SECURITY"
+      ],
+      "sensitivity": "CRITICAL"
+    },
+    "CERTIFICATION_EVIDENCE": {
+      "impact_families": [
+        "EVIDENCE_PROVENANCE"
+      ],
+      "domains": [
+        "EVIDENCE"
+      ],
+      "sensitivity": "ELEVATED"
+    },
+    "UNKNOWN_REQUIRES_REVIEW": {
+      "impact_families": [
+        "CONSERVATIVE_BROAD_IMPACT",
+        "HUMAN_REVIEW_REQUIRED"
+      ],
+      "domains": [
+        "UNKNOWN"
+      ],
+      "sensitivity": "CRITICAL"
+    }
+  },
+  "sensitivity_order": [
+    "LOW",
+    "NORMAL",
+    "ELEVATED",
+    "CRITICAL"
+  ],
+  "invariants": [
+    "mapping is a deterministic union over classifier labels",
+    "mapping never executes commands",
+    "mapping never selects T0 T1 T2 T3 or T4",
+    "UNKNOWN_REQUIRES_REVIEW always produces CONSERVATIVE_BROAD_IMPACT and HUMAN_REVIEW_REQUIRED",
+    "RISK_EXECUTION_CRITICAL always includes RISK_INVARIANTS and EXECUTION_SAFETY",
+    "DOC_ONLY may only produce documentation-domain impact when the classifier also reports docs_only=true"
+  ]
+}
