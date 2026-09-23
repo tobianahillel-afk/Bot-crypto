@@ -123,7 +123,7 @@ V4 — Lots 37–52 possède :
 - OI, funding, basis et liquidations ;
 - Game Theory et scénarios concurrents.
 
-Le Lot 37 a établi le périmètre et les contrats offline de cette version. Les capacités des Lots 38 à 44 ont ensuite été développées selon leurs gates respectifs ; l'état opérationnel exact est porté par `engineering/STATE.json`.
+Le Lot 37 a établi le périmètre et les contrats offline de cette version. Les capacités des Lots 38 à 44 ont ensuite été développées selon leurs gates respectifs ; l'état opérationnel exact et l'autorisation courante sont portés par `config/governance/project_state.json`.
 
 Les zones futures sont explicitement typées :
 
