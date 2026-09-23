@@ -177,6 +177,12 @@ jobs:
       - name: Run documentation consistency adversarial self-tests
         run: python scripts/governance/selftest_documentation_consistency.py
 
+      - name: Validate generated context map
+        run: python scripts/governance/render_context_map.py --check
+
+      - name: Run context map adversarial self-tests
+        run: python scripts/governance/selftest_context_map.py
+
       - name: Validate secret controls
         run: python scripts/governance/validate_secret_controls.py
 

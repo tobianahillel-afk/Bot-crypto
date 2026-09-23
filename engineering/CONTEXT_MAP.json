@@ -1,0 +1,87 @@
+{
+  "active_work": {
+    "awu_id": "ENG-05.3-WU01",
+    "awu_path": "engineering/work_units/ENG-05.3-WU01.json",
+    "complexity_score": 2,
+    "lot": "ENG-05",
+    "manifest": "engineering/lots/ENG-05.json",
+    "risk_class": "R1",
+    "task": "ENG-05.3",
+    "track": "ENGINEERING"
+  },
+  "authority": {
+    "current_state": "config/governance/project_state.json",
+    "resume_hint": "engineering/handoff/CURRENT.json",
+    "resume_hint_is_authoritative": false
+  },
+  "bootstrap_read_order": [
+    "AGENTS.md",
+    "config/governance/project_state.json",
+    "engineering/CONTEXT_MAP.json"
+  ],
+  "business_hold": {
+    "candidate_lot": 45,
+    "candidate_status": "SUSPENDED_CANDIDATE",
+    "development_status": "PAUSED",
+    "next_lot": {
+      "lot": 46,
+      "status": "LOCKED"
+    }
+  },
+  "execution_context": {
+    "budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "implicit_expansion": "FORBIDDEN",
+    "primary_count": 7,
+    "primary_files": [
+      "AGENTS.md",
+      "config/governance/project_state.json",
+      "engineering/lots/ENG-05.json",
+      "engineering/work_units/ENG-05.3-WU01.json",
+      "scripts/governance/resolve_active_awu.py",
+      "engineering/handoff/CURRENT.json",
+      "config/governance/awu_context_policy_v1.json"
+    ],
+    "reference_count": 2,
+    "reference_files": [
+      "engineering/MASTER_PLAN.md",
+      "engineering/AGENT_PROTOCOL.md"
+    ],
+    "total_kib_ceil": 61
+  },
+  "instructions": [
+    "verify external Git reality before writing",
+    "continue only the active AWU",
+    "do not recursively load the repository at startup",
+    "load additional files only when the active AWU or validated dependency requires them"
+  ],
+  "map_kind": "active_agent_context_map_v1",
+  "non_authoritative_sources": [
+    "engineering/STATE.json",
+    "chat_history",
+    "model_memory"
+  ],
+  "project": "Crypto Quant Bot V3.1-Ops",
+  "resume": {
+    "current_objective": "ENG-05.3: generate a bounded progressive-disclosure context map for context-free agents.",
+    "handoff": "engineering/handoff/CURRENT.json",
+    "next_action": "Generate CONTEXT_MAP.json/.md from canonical state, active AWU resolver route and handoff; validate exact read order, bounded paths and stale-state failures."
+  },
+  "safety": {
+    "execution_allowed": false,
+    "live_execution": "DISABLED",
+    "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "trade_allowed": false
+  },
+  "schema_version": 1,
+  "stop_conditions": [
+    "STATE_DRIFT",
+    "BUSINESS_SCOPE_TOUCHED_WITHOUT_UNLOCK",
+    "FROZEN_EVIDENCE_MUTATION",
+    "LOT46_UNLOCK_ATTEMPT",
+    "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
+  ]
+}
