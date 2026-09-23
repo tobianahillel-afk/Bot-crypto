@@ -66,3 +66,31 @@ jobs:
             --mode changed \
             --base "${SUPPLY_BASE}" \
             --head "${SUPPLY_HEAD}"
+
+      - name: Inventory workflow token permissions
+        run: |
+          python3 scripts/governance/audit_workflow_permissions.py \
+            --mode inventory \
+            --output "${RUNNER_TEMP}/workflow-permission-inventory.json"
+
+      - name: Gate changed workflow permissions on pull requests
+        if: github.event_name == 'pull_request'
+        env:
+          PERMISSION_BASE: ${{ github.event.pull_request.base.sha }}
+          PERMISSION_HEAD: ${{ github.sha }}
+        run: |
+          python3 scripts/governance/audit_workflow_permissions.py \
+            --mode changed \
+            --base "${PERMISSION_BASE}" \
+            --head "${PERMISSION_HEAD}"
+
+      - name: Gate changed workflow permissions on pushes
+        if: github.event_name == 'push'
+        env:
+          PERMISSION_BASE: ${{ github.event.before }}
+          PERMISSION_HEAD: ${{ github.sha }}
+        run: |
+          python3 scripts/governance/audit_workflow_permissions.py \
+            --mode changed \
+            --base "${PERMISSION_BASE}" \
+            --head "${PERMISSION_HEAD}"
