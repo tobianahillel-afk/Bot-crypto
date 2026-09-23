@@ -1,4 +1,4 @@
-# ENG-04.4 WU01: exact-digest changed-workflow syntax gate.
+# ENG-04.4 WU02: exact-digest changed-workflow syntax + offline security gate.
 name: Security Actions
 
 on:
