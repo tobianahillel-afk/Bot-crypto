@@ -1,8 +1,8 @@
 {
   "active_work": {
-    "awu_id": "ENG-05.6-WU01",
-    "awu_path": "engineering/work_units/ENG-05.6-WU01.json",
-    "complexity_score": 1,
+    "awu_id": "ENG-05.6-WU02",
+    "awu_path": "engineering/work_units/ENG-05.6-WU02.json",
+    "complexity_score": 2,
     "lot": "ENG-05",
     "manifest": "engineering/lots/ENG-05.json",
     "risk_class": "R1",
@@ -40,18 +40,18 @@
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-05.json",
-      "engineering/work_units/ENG-05.6-WU01.json",
+      "engineering/work_units/ENG-05.6-WU02.json",
       "engineering/handoff/CURRENT.json",
-      "scripts/governance/resolve_active_awu.py",
-      "scripts/governance/resume_recovery_qualification.py",
-      "scripts/governance/selftest_resume_recovery.py"
+      "scripts/governance/validate_documentation_consistency.py",
+      "config/governance/generated_status_policy_v1.json",
+      "config/governance/context_map_policy_v1.json"
     ],
     "reference_count": 2,
     "reference_files": [
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 55
+    "total_kib_ceil": 46
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -67,9 +67,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "ENG-05.6 WU01: remove task-specific assumptions from resume/recovery qualification before evaluating documentation tools.",
+    "current_objective": "ENG-05.6 WU02: evaluate DocGuard, Vale and lychee deterministically before any third-party documentation-tool adoption.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Make resume/recovery assertions derive the active task and AWU dynamically, rerun adversarial recovery tests and cold-start, then open a separate WU02 for DocGuard/Vale/lychee evaluation."
+    "next_action": "Encode the externally audited release/commit/license/runtime/network facts, validate bounded verdict rules offline, and record whether a separate benchmark/adoption WU is justified."
   },
   "safety": {
     "execution_allowed": false,
