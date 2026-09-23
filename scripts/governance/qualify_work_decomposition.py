@@ -134,7 +134,7 @@ def main() -> int:
     _expect(
         diff_mod.DiffScopeError,
         lambda: diff_mod.validate_scope(
-            ["README.md"],
+            ["docs/outside-awu.md"],
             active["scope"]["allowed_paths"],
             active["scope"]["forbidden_paths"],
             evidence["parent_manifest"]["allowed_paths"],

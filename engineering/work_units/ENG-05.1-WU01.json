@@ -93,7 +93,8 @@
       "README.md",
       "AGENTS.md",
       ".github/workflows/engineering-bootstrap.yml",
-      "scripts/governance/selftest_active_awu_scope.py"
+      "scripts/governance/selftest_active_awu_scope.py",
+      "scripts/governance/qualify_work_decomposition.py"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
