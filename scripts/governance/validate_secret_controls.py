@@ -120,6 +120,14 @@ def validate_workflow(policy: dict[str, Any], workflow_text: str) -> None:
         raise SecretControlError("all three scans must use full redaction")
     _require(workflow_text, '"${GITLEAKS_BIN}" dir', "directory scan")
     _require(workflow_text, '"${GITLEAKS_BIN}" git', "Git history scan")
+    _require(workflow_text, "--report-format json", "ephemeral JSON report")
+    _require(workflow_text, "path.unlink(missing_ok=True)", "ephemeral report deletion")
+    _require(workflow_text, "GITLEAKS_CURRENT_STATUS", "current-scan status binding")
+    _require(workflow_text, "GITLEAKS_HISTORY_STATUS", "history-scan status binding")
+    _require(workflow_text, "Enforce clean secret scans", "fail-closed final gate")
+    for forbidden_field in ('finding.get("Secret")', 'finding.get("Match")'):
+        if forbidden_field in workflow_text:
+            raise SecretControlError("workflow must not print secret or match values")
     _require(workflow_text, "fetch-depth: 0", "full checkout history")
     _require(workflow_text, "persist-credentials: false", "credential persistence disabled")
     _require(workflow_text, 'token = "gh" + "p_" + suffix', "runtime-only positive control")
