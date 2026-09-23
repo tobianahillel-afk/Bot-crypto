@@ -36,6 +36,11 @@
       "name": "Current handoff",
       "kind": "STATE",
       "locator": "engineering/handoff/CURRENT.json"
+    },
+    {
+      "name": "Context-map adversarial harness",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_context_map.py"
     }
   ],
   "outputs": [
@@ -53,7 +58,8 @@
       "engineering/handoff/CURRENT.json",
       "scripts/governance/selftest_bootstrap_validators.py",
       "engineering/CONTEXT_MAP.json",
-      "engineering/CONTEXT_MAP.md"
+      "engineering/CONTEXT_MAP.md",
+      "scripts/governance/selftest_context_map.py"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -79,7 +85,8 @@
       "stale handoff negative probe mutates the V2 engineering_phase field",
       "WU01 remains immutable except lifecycle status DONE",
       "no Handoff V2 schema or validator weakening is introduced",
-      "validation remains offline standard-library zero-cost"
+      "validation remains offline standard-library zero-cost",
+      "context-map selftest derives expected AWU identity from the active AWU resolver rather than a task-specific hardcode"
     ],
     "acceptance_criteria": [
       "selftest_bootstrap_validators passes",
@@ -87,7 +94,8 @@
       "handoff normal validation and stale-handoff negative probe use permanent project state",
       "active AWU resolver selects only ENG-05.4-WU02",
       "generated Context Map names WU02 and remains inside R1 budget",
-      "full Engineering Bootstrap reaches cold-start qualification"
+      "full Engineering Bootstrap reaches cold-start qualification",
+      "context-map adversarial selftest remains valid across active AWU transitions"
     ]
   },
   "planning": {
@@ -115,8 +123,8 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 6,
-      "executable_loc_changed": 120,
+      "files_touched": 7,
+      "executable_loc_changed": 150,
       "new_public_behaviors": 0,
       "contract_families": 0,
       "independent_algorithms": 0,
@@ -134,7 +142,8 @@
     "target_commands": [
       "python scripts/governance/selftest_bootstrap_validators.py",
       "python scripts/governance/validate_handoff.py",
-      "python scripts/governance/cold_start_qualification.py"
+      "python scripts/governance/cold_start_qualification.py",
+      "python scripts/governance/selftest_context_map.py"
     ]
   },
   "done_when": [

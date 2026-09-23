@@ -35,7 +35,7 @@
       "max_total_kib": 768
     },
     "implicit_expansion": "FORBIDDEN",
-    "primary_count": 7,
+    "primary_count": 8,
     "primary_files": [
       "AGENTS.md",
       "config/governance/project_state.json",
@@ -43,14 +43,15 @@
       "engineering/work_units/ENG-05.4-WU02.json",
       "scripts/governance/selftest_bootstrap_validators.py",
       "scripts/governance/validate_handoff.py",
-      "engineering/handoff/CURRENT.json"
+      "engineering/handoff/CURRENT.json",
+      "scripts/governance/selftest_context_map.py"
     ],
     "reference_count": 2,
     "reference_files": [
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 46
+    "total_kib_ceil": 50
   },
   "instructions": [
     "verify external Git reality before writing",

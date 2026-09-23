@@ -43,7 +43,12 @@ def main() -> int:
     assert value["bootstrap_read_order"] == [
         "AGENTS.md", "config/governance/project_state.json", "engineering/CONTEXT_MAP.json"
     ]
-    assert value["active_work"]["awu_id"] == "ENG-05.3-WU01"
+    resolver = mod._module(
+        "context_map_selftest_active_awu",
+        ROOT / "scripts/governance/resolve_active_awu.py",
+    )
+    _path, active_awu, _evidence = resolver.resolve_active_awu()
+    assert value["active_work"]["awu_id"] == active_awu["id"]
     assert value["execution_context"]["primary_files"][:2] == [
         "AGENTS.md", "config/governance/project_state.json"
     ]

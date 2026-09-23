@@ -27,6 +27,7 @@
 - scripts/governance/selftest_bootstrap_validators.py
 - scripts/governance/validate_handoff.py
 - engineering/handoff/CURRENT.json
+- scripts/governance/selftest_context_map.py
 
 ## Execution context — reference
 
@@ -35,9 +36,9 @@
 
 ## Budget
 
-- Primary: 7 / 10 files
+- Primary: 8 / 10 files
 - Reference: 2 / 12 files
-- Routed size: 46 / 768 KiB
+- Routed size: 50 / 768 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
