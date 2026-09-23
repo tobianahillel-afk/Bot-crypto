@@ -195,6 +195,12 @@ jobs:
       - name: Run action supply-chain adversarial self-tests
         run: python scripts/governance/selftest_action_supply_chain.py
 
+      - name: Validate approved action pin registry
+        run: python scripts/governance/validate_action_pin_registry.py
+
+      - name: Run action pin registry adversarial self-tests
+        run: python scripts/governance/selftest_action_pin_registry.py
+
       - name: Validate exact-input proof reuse semantics
         run: python scripts/governance/proof_reuse.py --self-check
 
