@@ -113,7 +113,7 @@
   },
   "planning": {
     "risk_class": "R1",
-    "complexity_score": 1,
+    "complexity_score": 2,
     "split_required": false,
     "context_budget": {
       "max_primary_files": 10,
@@ -132,7 +132,7 @@
       "security_trust_boundary": false,
       "risk_execution_permission": false,
       "dependency_change": false,
-      "ci_evidence_topology_change": false
+      "ci_evidence_topology_change": true
     },
     "size_estimate": {
       "business_domains": 1,
