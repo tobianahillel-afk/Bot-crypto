@@ -59,6 +59,16 @@ def main() -> int:
         "floating setup-go action",
     )
 
+    no_ldflags = workflow.replace(
+        "github.com/zricethezav/gitleaks/v8/version.Version=${GITLEAKS_TAG}",
+        "github.com/zricethezav/gitleaks/v8/version.Version=dev",
+    )
+    _expect(
+        mod.SecretControlError,
+        lambda: mod.validate_workflow(policy, no_ldflags),
+        "version ldflags removed",
+    )
+
     no_redact = workflow.replace("--redact=100", "--redact=0")
     _expect(mod.SecretControlError, lambda: mod.validate_workflow(policy, no_redact), "redaction off")
 
@@ -97,7 +107,7 @@ def main() -> int:
     paid_policy["cost_policy"]["paid_saas_required"] = True
     _expect(mod.SecretControlError, lambda: mod.validate_policy(paid_policy), "paid SaaS")
 
-    print("SECRET_CONTROLS_SELFTEST_PASS probes=10")
+    print("SECRET_CONTROLS_SELFTEST_PASS probes=11")
     return 0
 
 

@@ -110,6 +110,11 @@ def validate_workflow(policy: dict[str, Any], workflow_text: str) -> None:
     )
     _require(workflow_text, 'git -C "${src}" rev-parse HEAD', "source commit verification")
     _require(workflow_text, 'test "${actual}" = "${GITLEAKS_COMMIT}"', "commit equality check")
+    _require(
+        workflow_text,
+        "github.com/zricethezav/gitleaks/v8/version.Version=${GITLEAKS_TAG}",
+        "official version ldflags",
+    )
     _require(workflow_text, "--redact=100", "full redaction")
     if workflow_text.count("--redact=100") < 3:
         raise SecretControlError("all three scans must use full redaction")
