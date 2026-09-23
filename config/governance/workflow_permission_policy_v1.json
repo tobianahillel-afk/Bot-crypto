@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "policy_kind": "workflow_permission_policy_v1",
+  "semantics": "INVENTORY_LEGACY_DEBT_BLOCK_CHANGED_PERMISSION_EXPANSION",
+  "scan_root": ".github/workflows",
+  "workflow_extensions": [
+    ".yml",
+    ".yaml"
+  ],
+  "allowed_read_scopes": [
+    "actions",
+    "attestations",
+    "checks",
+    "contents",
+    "deployments",
+    "discussions",
+    "issues",
+    "models",
+    "packages",
+    "pages",
+    "pull-requests",
+    "repository-projects",
+    "security-events",
+    "statuses"
+  ],
+  "changed_mode": {
+    "require_top_level_permissions": true,
+    "allow_empty_permissions": true,
+    "allow_read_all": false,
+    "allow_write_all": false,
+    "allow_dynamic_permissions": false,
+    "require_job_scope_subset_of_top_level": true,
+    "deleted_files_ignored": true
+  },
+  "approved_write_scopes": [],
+  "inventory_mode": {
+    "fail_on_legacy_debt": false,
+    "emit_machine_readable_debt": true
+  },
+  "cost_policy": {
+    "paid_api_required": false,
+    "paid_saas_required": false,
+    "paid_llm_required": false,
+    "paid_runner_required": false,
+    "runtime_dependency_install_required": false,
+    "network_required": false
+  },
+  "invariants": [
+    "inventory is offline and never executes workflows",
+    "changed workflows require explicit top-level permissions",
+    "read-all and write-all are forbidden in changed workflows",
+    "write scopes are denied unless an exact workflow path plus scope approval exists",
+    "job-level permissions cannot add a scope absent from the top-level mapping",
+    "dynamic or structurally ambiguous permissions fail closed in changed mode",
+    "legacy permission debt is reported without bulk rewriting historical workflows",
+    "deleted workflow files do not create stale-content failures"
+  ]
+}\n
