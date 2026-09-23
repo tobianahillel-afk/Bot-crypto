@@ -64,6 +64,16 @@
       "name": "Secret-control adversarial tests",
       "kind": "TEST",
       "locator": "scripts/governance/selftest_secret_controls.py"
+    },
+    {
+      "name": "Vetted secret false-positive registry",
+      "kind": "CONFIG",
+      "locator": "config/governance/secret_false_positive_registry_v1.json"
+    },
+    {
+      "name": "Exact Gitleaks ignore fingerprints",
+      "kind": "CONFIG",
+      "locator": ".gitleaksignore"
     }
   ],
   "scope": {
@@ -82,7 +92,9 @@
       ".github/workflows/engineering-bootstrap.yml",
       "scripts/governance/validate_secret_controls.py",
       "scripts/governance/selftest_secret_controls.py",
-      "engineering/SECRET_CONTROLS.md"
+      "engineering/SECRET_CONTROLS.md",
+      ".gitleaksignore",
+      "config/governance/secret_false_positive_registry_v1.json"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -108,17 +120,18 @@
       "scanner output is redacted",
       "current working tree and introduced Git history are both covered",
       "synthetic qualification generates test secret material only at runtime and never commits it",
-      "no allowlist is introduced without explicit finding-specific justification",
-      "secret-control workflow requires no paid license API SaaS LLM or larger runner"
+      "secret-control workflow requires no paid license API SaaS LLM or larger runner",
+      "Gitleaks TOML allowlists remain forbidden; any false-positive suppression must be an exact .gitleaksignore fingerprint bound to an immutable audited artifact blob and machine-readable justification"
     ],
     "acceptance_criteria": [
-      "workflow pin equals audited gitleaks-action v3.0.0 commit",
+      "Gitleaks CLI source tag v8.30.1 resolves to audited commit 83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
       "GITLEAKS_VERSION equals audited CLI v8.30.1",
       "default Gitleaks rules remain enabled",
       "workflow uses fetch-depth 0 and least-privilege permissions",
       "synthetic secret fixture is detected and removed within the job",
       "clean repository scan passes with redaction enabled",
-      "validator fails on floating action tags disabled redaction comments/uploads or paid-license dependency"
+      "validator fails on floating action tags disabled redaction comments/uploads or paid-license dependency",
+      "the only accepted false positives are the two exact generic-api-key fingerprints on immutable roadmap audit records for Lots 119 and 151"
     ]
   },
   "planning": {
