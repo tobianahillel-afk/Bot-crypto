@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-05.6-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-05",
+    "task_id": "ENG-05.6",
+    "manifest": "engineering/lots/ENG-05.json"
+  },
+  "title": "Evaluate deterministic documentation tooling candidates",
+  "objective": "Evaluate DocGuard, Vale and lychee against the project's deterministic, bounded, zero-cost documentation-governance requirements before any external tooling is adopted or installed.",
+  "non_goals": [
+    "install or execute third-party documentation tools",
+    "make any third-party tool a source of authorization",
+    "introduce mandatory network-dependent documentation checks",
+    "change canonical project state or handoff schemas",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-05.5-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    },
+    {
+      "name": "Documentation consistency validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_documentation_consistency.py"
+    },
+    {
+      "name": "Generated status policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/generated_status_policy_v1.json"
+    },
+    {
+      "name": "Context-map policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/context_map_policy_v1.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Documentation tooling candidate registry",
+      "kind": "CONFIG",
+      "locator": "config/governance/documentation_tooling_candidates_v1.json"
+    },
+    {
+      "name": "Documentation tooling evaluator",
+      "kind": "FILE",
+      "locator": "scripts/governance/evaluate_documentation_tooling.py"
+    },
+    {
+      "name": "Documentation tooling evaluation report",
+      "kind": "FILE",
+      "locator": "engineering/DOCUMENTATION_TOOLING_EVALUATION.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "48b32eb43f778d2da364725974e1805bd2660837",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-05.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-05.5-WU01.json",
+      "engineering/work_units/ENG-05.6-WU01.json",
+      "AGENTS.md",
+      "README.md",
+      "engineering/CURRENT_STATUS.md",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "config/governance/documentation_tooling_candidates_v1.json",
+      "scripts/governance/evaluate_documentation_tooling.py",
+      "engineering/DOCUMENTATION_TOOLING_EVALUATION.md",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/lot*/**"
+    ],
+    "forbidden_semantics": [
+      "third-party documentation tool becomes current-state authority",
+      "unreviewed external tool installation",
+      "mandatory network-dependent documentation validation",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "candidate facts are bound to explicit repository release tags and exact commits",
+      "only permissively licensed zero-cost candidates may receive a non-REJECT verdict",
+      "no candidate may override canonical project state handoff context map or generated status authority",
+      "network-dependent behavior cannot become mandatory per-change validation",
+      "new runtime or package-manager requirements cannot be silently introduced",
+      "evaluation verdicts are limited to ADOPT ADOPT_PARTIALLY COPY_PATTERN or REJECT",
+      "actual third-party execution or installation is deferred to a separately bounded AWU"
+    ],
+    "acceptance_criteria": [
+      "DocGuard current release license runtime dependency and Spec Kit overlap are recorded",
+      "Vale current release license offline capability and local-style requirement are recorded",
+      "lychee current release dual license and offline link-check mode are recorded",
+      "each candidate has explicit benefits risks overlap network behavior rollback and proposed scope",
+      "evaluation identifies whether a second adoption/benchmark AWU is justified",
+      "evaluator rejects floating versions missing commit pins paid requirements authority conflicts and mandatory network checks",
+      "evaluation remains standard-library zero-cost and does not contact external services at runtime"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 2,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 15,
+      "executable_loc_changed": 550,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1"
+    ],
+    "target_commands": [
+      "python scripts/governance/evaluate_documentation_tooling.py --check",
+      "python scripts/governance/evaluate_documentation_tooling.py --self-check"
+    ]
+  },
+  "done_when": [
+    "all three candidates have deterministic auditable verdicts",
+    "no external documentation tool has been installed or made mandatory without a second bounded decision",
+    "a concrete follow-up adoption/benchmark decision is recorded"
+  ]
+}
