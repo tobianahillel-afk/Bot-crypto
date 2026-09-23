@@ -32,12 +32,12 @@
     },
     {
       "id": "ENG-03.2",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Implement impact and test-dependency mapping from diff classes."
     },
     {
       "id": "ENG-03.3",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Define and enforce T0 instant validation checks."
     },
     {

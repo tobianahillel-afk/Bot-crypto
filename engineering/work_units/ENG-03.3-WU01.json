@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-03.3-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-03",
+    "task_id": "ENG-03.3",
+    "manifest": "engineering/lots/ENG-03.json"
+  },
+  "title": "Implement T0 instant changed-file checks",
+  "objective": "Execute only cheap deterministic changed-file syntax/parse/scope/classification checks as the universal T0 gate, with no test-suite or certification execution.",
+  "non_goals": [
+    "pytest or domain test execution",
+    "T1 targeted test selection",
+    "T2 domain validation",
+    "T3 assurance or T4 certification",
+    "proof caching",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-03.2-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Diff classifier",
+      "kind": "FILE",
+      "locator": "scripts/governance/classify_diff.py"
+    },
+    {
+      "name": "Diff impact mapper",
+      "kind": "FILE",
+      "locator": "scripts/governance/map_diff_impact.py"
+    },
+    {
+      "name": "Active AWU resolver",
+      "kind": "FILE",
+      "locator": "scripts/governance/resolve_active_awu.py"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "T0 policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/validation_t0_policy_v1.json"
+    },
+    {
+      "name": "T0 runner",
+      "kind": "FILE",
+      "locator": "scripts/governance/run_t0.py"
+    },
+    {
+      "name": "T0 adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_t0.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "d51d53ba4c5db65e857f531cbc009d5e3d753e49",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-03.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-03.2-WU01.json",
+      "engineering/work_units/ENG-03.3-WU01.json",
+      "config/governance/validation_t0_policy_v1.json",
+      "scripts/governance/run_t0.py",
+      "scripts/governance/selftest_t0.py",
+      "engineering/VALIDATION_T0.md",
+      "AGENTS.md",
+      "engineering/AGENT_PROTOCOL.md",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "pytest execution",
+      "domain test execution",
+      "deep assurance",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "T0 inspects only files changed from the active AWU scope base",
+      "Python files are compiled without importing project modules",
+      "JSON and TOML files are parsed with Python standard library",
+      "deleted files do not trigger stale-file parse failures",
+      "T0 invokes deterministic classification and impact mapping but does not select T1-T4",
+      "T0 never launches pytest mutation replay or network-dependent validation",
+      "unknown or critical classification is reported as escalation metadata rather than silently downgraded"
+    ],
+    "acceptance_criteria": [
+      "valid changed Python JSON and TOML files pass",
+      "invalid Python JSON or TOML content fails",
+      "documentation-only diff avoids executable parser work",
+      "deleted files are handled deterministically",
+      "unknown path produces escalation metadata",
+      "critical risk/execution path produces escalation metadata",
+      "T0 result reports elapsed time and exact changed paths"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 2,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 13,
+      "executable_loc_changed": 750,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0"
+    ],
+    "target_commands": [
+      "python scripts/governance/run_t0.py",
+      "python scripts/governance/selftest_t0.py"
+    ]
+  },
+  "done_when": [
+    "T0 performs only cheap changed-file checks",
+    "malformed changed source/config fails before heavier validation",
+    "T0 emits escalation metadata without running deeper tiers",
+    "T0 mandatory path remains zero-dependency and zero-cost"
+  ]
+}
