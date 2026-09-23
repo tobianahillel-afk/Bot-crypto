@@ -25,7 +25,7 @@
   "inputs": [
     {
       "name": "Existing GitHub workflows",
-      "kind": "FILES",
+      "kind": "FILE",
       "locator": ".github/workflows/"
     },
     {
