@@ -36,8 +36,8 @@
   },
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-05.6-WU03",
-    "awu_path": "engineering/work_units/ENG-05.6-WU03.json",
+    "awu_id": "ENG-05.6-WU04",
+    "awu_path": "engineering/work_units/ENG-05.6-WU04.json",
     "parent_manifest": "engineering/lots/ENG-05.json",
     "scope_base_sha": "1f40aee0580e75b3f5404bb27be6a654c37dedc3",
     "risk_class": "R2",
@@ -59,8 +59,8 @@
     "ENG-05.6 WU01 recovery harness genericity repair completed on exact head 4b1d5e417eb64461781b77de32e3d59ab423c761; run 35930906226 passed resume/recovery, adversarial recovery and cold-start.",
     "ENG-05.6 WU02 documentation tooling evaluation completed on exact head 1f40aee0580e75b3f5404bb27be6a654c37dedc3; bootstrap 35931507203 plus Security Actions, Supply Chain and Secrets all passed. Verdicts: DocGuard COPY_PATTERN; Vale and lychee ADOPT_PARTIALLY pending benchmark."
   ],
-  "current_objective": "ENG-05.6 WU03: benchmark exact pinned Vale and lychee binaries in offline modes without slowing the routine bootstrap.",
-  "next_action": "Create an isolated path-scoped benchmark workflow that verifies GitHub release SHA-256 digests, proves synthetic detection, measures representative docs, and records the adoption decision.",
+  "current_objective": "ENG-05.6 WU04: benchmark exact pinned Vale v3.22.0 offline as a one-dependency work unit.",
+  "next_action": "Validate the split transition, then create a path-scoped Vale-only benchmark workflow that verifies the release SHA-256 before execution, uses only temporary local rules, and measures synthetic plus representative-doc behavior.",
   "blockers": [],
   "validation_evidence": [
     {
