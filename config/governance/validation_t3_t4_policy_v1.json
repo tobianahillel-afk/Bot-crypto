@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "policy_kind": "validation_t3_t4_policy_v1",
+  "semantics": "SYMBOLIC_ASSURANCE_CERTIFICATION_SELECTION_ONLY",
+  "risk_order": [
+    "R0",
+    "R1",
+    "R2",
+    "R3"
+  ],
+  "t3_requirement_ids": [
+    "WORKFLOW_ASSURANCE",
+    "SECURITY_ASSURANCE",
+    "STATIC_ANALYSIS_ASSURANCE",
+    "RISK_EXECUTION_ASSURANCE",
+    "MANUAL_DEEP_REVIEW"
+  ],
+  "t4_requirement_ids": [
+    "EXACT_HEAD_CERTIFICATION",
+    "PROVENANCE_CERTIFICATION",
+    "R3_FULL_CERTIFICATION_CHAIN"
+  ],
+  "residual_impact_to_t3": {
+    "DOC_CONSISTENCY": [],
+    "GOVERNANCE_VALIDATORS": [],
+    "WORKFLOW_SYNTAX": [
+      "WORKFLOW_ASSURANCE"
+    ],
+    "ACTIONS_SECURITY": [
+      "WORKFLOW_ASSURANCE",
+      "SECURITY_ASSURANCE"
+    ],
+    "CONTRACT_SCHEMA_VALIDATION": [],
+    "CONTRACT_COMPATIBILITY": [],
+    "CONFIG_POLICY_VALIDATION": [],
+    "TEST_HARNESS_INTEGRITY": [],
+    "STATIC_ANALYSIS": [
+      "STATIC_ANALYSIS_ASSURANCE"
+    ],
+    "UNIT_BEHAVIOR": [],
+    "DATA_CONTRACTS": [],
+    "TEMPORAL_CAUSALITY": [],
+    "DETERMINISTIC_REPLAY": [],
+    "SECURITY_STATIC_ANALYSIS": [
+      "SECURITY_ASSURANCE"
+    ],
+    "SECRET_CONTROLS": [
+      "SECURITY_ASSURANCE"
+    ],
+    "RISK_INVARIANTS": [],
+    "EXECUTION_SAFETY": [],
+    "EVIDENCE_PROVENANCE": [],
+    "CONSERVATIVE_BROAD_IMPACT": [
+      "MANUAL_DEEP_REVIEW"
+    ],
+    "HUMAN_REVIEW_REQUIRED": [
+      "MANUAL_DEEP_REVIEW"
+    ]
+  },
+  "risk_to_t3": {
+    "R0": [],
+    "R1": [],
+    "R2": [],
+    "R3": [
+      "RISK_EXECUTION_ASSURANCE"
+    ]
+  },
+  "risk_to_t4": {
+    "R0": [],
+    "R1": [],
+    "R2": [],
+    "R3": [
+      "EXACT_HEAD_CERTIFICATION",
+      "R3_FULL_CERTIFICATION_CHAIN"
+    ]
+  },
+  "certification_sensitive_covered_impacts": {
+    "EVIDENCE_PROVENANCE": [
+      "EXACT_HEAD_CERTIFICATION",
+      "PROVENANCE_CERTIFICATION"
+    ]
+  },
+  "invariants": [
+    "selection consumes T2 result and active AWU risk only",
+    "requirements are symbolic ids and never executable commands",
+    "R3 always selects EXACT_HEAD_CERTIFICATION and R3_FULL_CERTIFICATION_CHAIN",
+    "EVIDENCE_PROVENANCE always selects exact-head provenance certification",
+    "workflow security static-analysis unknown and human-review residual impacts cannot disappear",
+    "selection never claims any T3 or T4 requirement has executed",
+    "fully covered low-risk work selects neither T3 nor T4"
+  ]
+}

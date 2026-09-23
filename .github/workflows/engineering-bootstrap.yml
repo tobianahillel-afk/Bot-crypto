@@ -165,6 +165,12 @@ jobs:
       - name: Run T2 adversarial self-tests
         run: python scripts/governance/selftest_t2.py
 
+      - name: Select T3/T4 assurance requirements
+        run: python scripts/governance/select_t3_t4.py
+
+      - name: Run T3/T4 selector adversarial self-tests
+        run: python scripts/governance/selftest_t3_t4_selector.py
+
       - name: Qualify work decomposition engine
         run: python scripts/governance/qualify_work_decomposition.py
 
