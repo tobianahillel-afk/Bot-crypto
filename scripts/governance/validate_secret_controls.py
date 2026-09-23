@@ -3,9 +3,9 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 import re
+import subprocess
 import sys
 import tomllib
 from pathlib import Path
@@ -85,9 +85,27 @@ def validate_config(config_text: str) -> None:
         raise SecretControlError("secret allowlists require separate finding-specific review")
 
 
-def _git_blob_sha(data: bytes) -> str:
-    prefix = f"blob {len(data)}\\0".encode("ascii")
-    return hashlib.sha1(prefix + data, usedforsecurity=False).hexdigest()
+def _head_blob_sha(path: str) -> str:
+    proc = subprocess.run(
+        ["git", "rev-parse", f"HEAD:{path}"],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if proc.returncode != 0:
+        raise SecretControlError(f"cannot resolve HEAD blob for {path}: {proc.stderr.strip()}")
+    blob = proc.stdout.strip()
+    if re.fullmatch(r"[0-9a-f]{40}", blob) is None:
+        raise SecretControlError(f"invalid HEAD blob SHA for {path}: {blob!r}")
+    diff = subprocess.run(
+        ["git", "diff", "--quiet", "HEAD", "--", path],
+        cwd=ROOT,
+        check=False,
+    )
+    if diff.returncode != 0:
+        raise SecretControlError(f"bound audit artifact has working-tree changes: {path}")
+    return blob
 
 
 def validate_false_positive_registry(policy: dict[str, Any], ignore_text: str) -> None:
@@ -115,7 +133,7 @@ def validate_false_positive_registry(policy: dict[str, Any], ignore_text: str) -
         data = full.read_bytes()
     except OSError as exc:
         raise SecretControlError(f"cannot read bound audit artifact: {exc}") from exc
-    actual_blob = _git_blob_sha(data)
+    actual_blob = _head_blob_sha(artifact_path)
     if actual_blob != artifact.get("git_blob_sha"):
         raise SecretControlError(
             f"false-positive artifact blob changed: {actual_blob} != {artifact.get('git_blob_sha')}"
