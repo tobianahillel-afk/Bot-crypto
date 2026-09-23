@@ -114,7 +114,7 @@
   },
   "planning": {
     "risk_class": "R1",
-    "complexity_score": 4,
+    "complexity_score": 2,
     "split_required": false,
     "context_budget": {
       "max_primary_files": 10,
@@ -130,7 +130,7 @@
       "temporal_lineage_semantics": false,
       "cross_domain_interfaces": 0,
       "state_machine_or_concurrency": false,
-      "security_trust_boundary": true,
+      "security_trust_boundary": false,
       "risk_execution_permission": false,
       "dependency_change": false,
       "ci_evidence_topology_change": true
@@ -143,7 +143,7 @@
       "contract_families": 0,
       "independent_algorithms": 1,
       "state_machines": 0,
-      "trust_boundaries": 1,
+      "trust_boundaries": 0,
       "new_dependencies": 0
     },
     "split_reasons": []
