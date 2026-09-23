@@ -44,12 +44,13 @@
       "ENG-00",
       "ENG-01",
       "ENG-02",
-      "ENG-03"
+      "ENG-03",
+      "ENG-04"
     ],
-    "active_lot": "ENG-04",
-    "active_task": "ENG-04.7",
-    "next_lot": "ENG-05",
-    "active_manifest": "engineering/lots/ENG-04.json",
+    "active_lot": "ENG-05",
+    "active_task": "ENG-05.1",
+    "next_lot": "ENG-06",
+    "active_manifest": "engineering/lots/ENG-05.json",
     "branch": "engineering/bootstrap-development-engine",
     "blockers": []
   },
@@ -82,7 +83,7 @@
     "repository_truth_registry": "engineering/REPOSITORY_TRUTH_REGISTRY.json",
     "historical_evidence_protection": "engineering/HISTORICAL_EVIDENCE_PROTECTION.json",
     "master_plan": "engineering/MASTER_PLAN.md",
-    "active_manifest": "engineering/lots/ENG-04.json"
+    "active_manifest": "engineering/lots/ENG-05.json"
   },
   "external_observations": {
     "main": {

@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "kind": "engineering_work_item",
+  "id": "ENG-05",
+  "title": "Documentation, Context & Handoff",
+  "status": "IN_PROGRESS",
+  "objective": "Make current status, documentation consistency, context routing, handoff and resume/recovery deterministic so a fresh agent can continue correctly from GitHub without hidden conversational context.",
+  "depends_on": [
+    "ENG-04"
+  ],
+  "allowed_paths": [
+    "AGENTS.md",
+    "README.md",
+    "docs/**",
+    "config/governance/**",
+    "engineering/**",
+    "scripts/governance/**",
+    ".github/workflows/engineering-bootstrap.yml"
+  ],
+  "forbidden_scope": [
+    "src/crypto_quant_bot/** business implementation changes",
+    "Lot45 candidate branch changes",
+    "Lot46 implementation or unlock",
+    "frozen historical evidence mutation",
+    "runtime capability activation",
+    "mandatory paid or LLM-backed dependency"
+  ],
+  "tasks": [
+    {
+      "id": "ENG-05.1",
+      "status": "IN_PROGRESS",
+      "description": "Generate deterministic current-status blocks from canonical project state."
+    },
+    {
+      "id": "ENG-05.2",
+      "status": "PLANNED",
+      "description": "Detect and prevent documentation consistency/status drift."
+    },
+    {
+      "id": "ENG-05.3",
+      "status": "PLANNED",
+      "description": "Build a concise context map/index with progressive disclosure."
+    },
+    {
+      "id": "ENG-05.4",
+      "status": "PLANNED",
+      "description": "Harden the machine-readable and human-readable handoff format."
+    },
+    {
+      "id": "ENG-05.5",
+      "status": "PLANNED",
+      "description": "Qualify resume/recovery after interruption or context loss."
+    },
+    {
+      "id": "ENG-05.6",
+      "status": "PLANNED",
+      "description": "Evaluate deterministic documentation tooling such as DocGuard, Vale and lychee before adoption."
+    }
+  ],
+  "done_when": [
+    "current project status is generated from canonical state rather than manually duplicated",
+    "documentation drift is detected deterministically",
+    "fresh agents have a bounded context map and exact read order",
+    "handoff records identify exact next action scope evidence and stop conditions",
+    "interruption/recovery works without conversational memory",
+    "documentation tooling remains zero-cost and does not require an LLM"
+  ],
+  "extensions": {
+    "scope_base_sha": "dae1d5a920307586bcbe2cccbe11b0caba7c0869",
+    "scope_base_kind": "PREVIOUS_ENGINEERING_CERTIFIED_HEAD",
+    "scope_base_evidence_run": 35885215524
+  }
+}

@@ -3,7 +3,7 @@
   "kind": "engineering_work_item",
   "id": "ENG-04",
   "title": "Security & Supply Chain Engine",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "objective": "Add zero-cost, pinned, risk-proportional security and supply-chain controls without weakening runtime safety or turning every routine change into a full security certification.",
   "depends_on": [
     "ENG-03"
@@ -64,7 +64,7 @@
     },
     {
       "id": "ENG-04.7",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Verify the security engine remains zero-cost and risk-proportional."
     }
   ],
