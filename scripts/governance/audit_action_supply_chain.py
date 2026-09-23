@@ -75,6 +75,10 @@ def validate_policy(policy: dict[str, Any]) -> None:
         raise ActionSupplyChainError("changed floating refs must fail closed")
     if changed.get("fail_on_dynamic_or_malformed") is not True:
         raise ActionSupplyChainError("changed dynamic/malformed uses must fail closed")
+    if changed.get("require_registered_remote_sha") is not True:
+        raise ActionSupplyChainError("changed remote SHA pins must require registry approval")
+    if policy.get("approved_pin_registry") != "config/governance/action_pin_registry_v1.json":
+        raise ActionSupplyChainError("approved pin registry path drift")
     cost = policy.get("cost_policy")
     if not isinstance(cost, dict) or any(cost.values()):
         raise ActionSupplyChainError("mandatory supply-chain path must remain zero-cost")
@@ -262,13 +266,59 @@ def audit(
     }
 
 
-def changed_gate(result: dict[str, Any]) -> list[dict[str, Any]]:
+def load_pin_registry(policy: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
+    registry = _json(root / policy["approved_pin_registry"])
+    if registry.get("schema_version") != 1:
+        raise ActionSupplyChainError("unsupported action pin registry schema_version")
+    if registry.get("registry_kind") != "action_pin_registry_v1":
+        raise ActionSupplyChainError("invalid action pin registry kind")
+    entries = registry.get("entries")
+    if not isinstance(entries, list) or not entries:
+        raise ActionSupplyChainError("action pin registry entries missing")
+    return registry
+
+
+def approved_pin_index(registry: dict[str, Any]) -> dict[str, set[str]]:
+    index: dict[str, set[str]] = {}
+    for entry in registry.get("entries", []):
+        repository = entry.get("repository")
+        sha = entry.get("approved_commit_sha")
+        if not isinstance(repository, str) or not isinstance(sha, str):
+            raise ActionSupplyChainError("invalid action pin registry entry")
+        index.setdefault(repository, set()).add(sha)
+    return index
+
+
+def unapproved_pins(
+    result: dict[str, Any],
+    registry: dict[str, Any],
+) -> list[dict[str, Any]]:
+    approved = approved_pin_index(registry)
+    violations: list[dict[str, Any]] = []
+    for record in result["records"]:
+        if record["classification"] != "REMOTE_PINNED_SHA":
+            continue
+        repository = f"{record['owner']}/{record['repo']}"
+        if record["ref"] not in approved.get(repository, set()):
+            item = dict(record)
+            item["blocked_reason"] = "UNAPPROVED_REMOTE_SHA"
+            violations.append(item)
+    return violations
+
+
+def changed_gate(
+    result: dict[str, Any],
+    registry: dict[str, Any],
+) -> list[dict[str, Any]]:
     blocked = {"REMOTE_FLOATING_REF", "DYNAMIC_EXPRESSION", "MALFORMED_USES"}
-    return [
-        record
-        for record in result["records"]
-        if record["classification"] in blocked
-    ]
+    violations: list[dict[str, Any]] = []
+    for record in result["records"]:
+        if record["classification"] in blocked:
+            item = dict(record)
+            item["blocked_reason"] = record["classification"]
+            violations.append(item)
+    violations.extend(unapproved_pins(result, registry))
+    return violations
 
 
 def _print_summary(mode: str, result: dict[str, Any], emit_debt: bool) -> None:
@@ -278,6 +328,7 @@ def _print_summary(mode: str, result: dict[str, Any], emit_debt: bool) -> None:
         "uses_total": result["uses_total"],
         "counts": result["counts"],
         "debt_count": result["debt_count"],
+        "unapproved_pinned_count": result.get("unapproved_pinned_count", 0),
         "remote_repository_count": len(result["remote_repositories"]),
     }
     print(json.dumps(summary, sort_keys=True))
@@ -298,6 +349,7 @@ def main() -> int:
     try:
         policy = _json(POLICY_PATH)
         validate_policy(policy)
+        registry = load_pin_registry(policy)
         files = (
             discover_files(policy)
             if args.mode == "inventory"
@@ -305,6 +357,8 @@ def main() -> int:
         )
         result = audit(files, policy)
         result["mode"] = args.mode
+        result["unapproved_pinned"] = unapproved_pins(result, registry)
+        result["unapproved_pinned_count"] = len(result["unapproved_pinned"])
         _print_summary(args.mode, result, args.emit_debt)
         if args.output is not None:
             args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -313,7 +367,7 @@ def main() -> int:
                 encoding="utf-8",
             )
         if args.mode == "changed":
-            blocked = changed_gate(result)
+            blocked = changed_gate(result, registry)
             if blocked:
                 for item in blocked:
                     print(json.dumps({"blocked_uses": item}, sort_keys=True), file=sys.stderr)
