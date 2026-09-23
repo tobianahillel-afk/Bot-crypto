@@ -80,7 +80,7 @@ def main() -> int:
     )
 
     parent_escape = copy.deepcopy(active)
-    parent_escape["scope"]["allowed_paths"].append("README.md")
+    parent_escape["scope"]["allowed_paths"].append("outside-parent-scope.txt")
     _expect(
         resolver.ActiveAwuError,
         lambda: resolver.validate_parent_binding(state, path, parent_escape),
@@ -92,7 +92,7 @@ def main() -> int:
     parent_allowed = evidence["parent_manifest"]["allowed_paths"]
     _expect(
         diff.DiffScopeError,
-        lambda: diff.validate_scope(["README.md"], allowed, forbidden, parent_allowed),
+        lambda: diff.validate_scope(["docs/outside-awu.md"], allowed, forbidden, parent_allowed),
         "diff outside AWU allowlist",
     )
     _expect(

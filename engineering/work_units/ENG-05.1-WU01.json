@@ -92,7 +92,8 @@
       "engineering/CURRENT_STATUS.md",
       "README.md",
       "AGENTS.md",
-      ".github/workflows/engineering-bootstrap.yml"
+      ".github/workflows/engineering-bootstrap.yml",
+      "scripts/governance/selftest_active_awu_scope.py"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
