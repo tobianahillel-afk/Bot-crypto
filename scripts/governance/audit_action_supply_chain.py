@@ -282,10 +282,22 @@ def approved_pin_index(registry: dict[str, Any]) -> dict[str, set[str]]:
     index: dict[str, set[str]] = {}
     for entry in registry.get("entries", []):
         repository = entry.get("repository")
-        sha = entry.get("approved_commit_sha")
-        if not isinstance(repository, str) or not isinstance(sha, str):
+        pins = entry.get("approved_pins")
+        if not isinstance(repository, str) or not isinstance(pins, list) or not pins:
             raise ActionSupplyChainError("invalid action pin registry entry")
-        index.setdefault(repository, set()).add(sha)
+        approved: set[str] = set()
+        for pin in pins:
+            if not isinstance(pin, dict):
+                raise ActionSupplyChainError("invalid action pin registry pin")
+            sha = pin.get("approved_commit_sha")
+            if not isinstance(sha, str) or re.fullmatch(r"[0-9a-f]{40}", sha) is None:
+                raise ActionSupplyChainError("invalid approved action pin SHA")
+            if sha in approved:
+                raise ActionSupplyChainError(
+                    f"duplicate approved action pin for {repository}: {sha}"
+                )
+            approved.add(sha)
+        index[repository] = approved
     return index
 
 
