@@ -55,4 +55,4 @@
     "legacy permission debt is reported without bulk rewriting historical workflows",
     "deleted workflow files do not create stale-content failures"
   ]
-}\n
+}
