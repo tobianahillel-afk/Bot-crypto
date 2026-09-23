@@ -107,12 +107,12 @@ jobs:
           if [ -n "${base}" ]; then
             mapfile -t targets < <(
               git diff --name-only --diff-filter=ACMR "${base}...HEAD" -- \
-                '.github/workflows/**/*.yml' '.github/workflows/**/*.yaml' |
+                '.github/workflows/*.yml' '.github/workflows/*.yaml' |
               sort -u
             )
           else
             mapfile -t targets < <(
-              git ls-files '.github/workflows/**/*.yml' '.github/workflows/**/*.yaml' |
+              git ls-files '.github/workflows/*.yml' '.github/workflows/*.yaml' |
               sort -u
             )
           fi
