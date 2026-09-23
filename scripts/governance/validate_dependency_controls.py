@@ -76,7 +76,7 @@ def validate_policy(policy: dict[str, Any]) -> None:
     if audit.get("direct_requirement") != "pip-audit==2.9.0":
         raise DependencyControlError("pip-audit direct requirement drift")
     if audit.get("arguments") != [
-        "-r","requirements-dev.lock","--disable-pip","--strict","--progress-spinner","off"
+        "-r","requirements-dev.lock","--no-deps","--disable-pip","--strict","--progress-spinner","off"
     ]:
         raise DependencyControlError("pip-audit arguments drift")
     review = policy.get("dependency_review")
@@ -189,7 +189,7 @@ def validate_workflow(policy: dict[str, Any], text: str) -> None:
     _require(text, "python -m pip install --disable-pip-version-check -r requirements-dev.lock", "lock install")
     _require(
         text,
-        "pip-audit -r requirements-dev.lock --disable-pip --strict --progress-spinner off",
+        "pip-audit -r requirements-dev.lock --no-deps --disable-pip --strict --progress-spinner off",
         "exact lock audit",
     )
     _require(text, 'cron: "23 4 * * 1"', "weekly audit")
