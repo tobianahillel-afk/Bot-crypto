@@ -1,12 +1,12 @@
 {
   "active_work": {
-    "awu_id": "ENG-05.4-WU02",
-    "awu_path": "engineering/work_units/ENG-05.4-WU02.json",
+    "awu_id": "ENG-05.5-WU01",
+    "awu_path": "engineering/work_units/ENG-05.5-WU01.json",
     "complexity_score": 1,
     "lot": "ENG-05",
     "manifest": "engineering/lots/ENG-05.json",
     "risk_class": "R1",
-    "task": "ENG-05.4",
+    "task": "ENG-05.5",
     "track": "ENGINEERING"
   },
   "authority": {
@@ -40,18 +40,18 @@
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-05.json",
-      "engineering/work_units/ENG-05.4-WU02.json",
-      "scripts/governance/selftest_bootstrap_validators.py",
-      "scripts/governance/validate_handoff.py",
+      "engineering/work_units/ENG-05.5-WU01.json",
       "engineering/handoff/CURRENT.json",
-      "scripts/governance/selftest_context_map.py"
+      "scripts/governance/resolve_next_work.py",
+      "scripts/governance/cold_start_qualification.py",
+      "scripts/governance/validate_handoff.py"
     ],
     "reference_count": 2,
     "reference_files": [
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 50
+    "total_kib_ceil": 56
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -67,9 +67,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "ENG-05.4 WU02: repair the legacy bootstrap negative-validator harness without restoring engineering/STATE.json as handoff authority.",
+    "current_objective": "ENG-05.5: qualify deterministic resume/recovery after interruption or context loss without trusting conversational memory.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Run the permanent-state-compatible bootstrap negative selftests and full cold-start chain; if green, close ENG-05.4 and activate ENG-05.5 resume/recovery qualification."
+    "next_action": "Implement resume/recovery qualification and adversarial probes that reconstruct the active AWU from permanent state, tolerate stale/missing handoff only as a non-authoritative hint, and require live Git reverification before writes."
   },
   "safety": {
     "execution_allowed": false,
