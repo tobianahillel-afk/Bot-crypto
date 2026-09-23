@@ -185,6 +185,12 @@ jobs:
       - name: Run context map adversarial self-tests
         run: python scripts/governance/selftest_context_map.py
 
+      - name: Validate documentation tooling evaluation
+        run: python scripts/governance/evaluate_documentation_tooling.py --check
+
+      - name: Run documentation tooling evaluation adversarial self-check
+        run: python scripts/governance/evaluate_documentation_tooling.py --self-check
+
       - name: Validate secret controls
         run: python scripts/governance/validate_secret_controls.py
 
