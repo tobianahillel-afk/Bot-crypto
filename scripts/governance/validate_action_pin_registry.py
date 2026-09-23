@@ -158,10 +158,13 @@ def validate_registry_only(registry: dict[str, Any]) -> None:
                 raise ActionPinRegistryError(f"{repository}@{source_ref} direct ref mismatch")
             if ref_type == "tag" and pin.get("dereferenced_commit_sha") != approved_sha:
                 raise ActionPinRegistryError(f"{repository}@{source_ref} annotated tag mismatch")
-            if not str(pin.get("license_url", "")).startswith(
-                "https://raw.githubusercontent.com/"
-            ):
-                raise ActionPinRegistryError(f"{repository}@{source_ref} license URL invalid")
+            expected_license_url = (
+                f"https://raw.githubusercontent.com/{repository}/{source_ref}/LICENSE"
+            )
+            if pin.get("license_url") != expected_license_url:
+                raise ActionPinRegistryError(
+                    f"{repository}@{source_ref} license URL provenance drift"
+                )
 
         approved = {item["approved_commit_sha"] for item in pins}
         for floating_ref, replacement_sha in entry["legacy_replacements"].items():
