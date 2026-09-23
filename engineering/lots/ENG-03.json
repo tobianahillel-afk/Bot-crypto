@@ -27,12 +27,12 @@
   "tasks": [
     {
       "id": "ENG-03.1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Implement a deterministic multi-label Git diff classifier."
     },
     {
       "id": "ENG-03.2",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Implement impact and test-dependency mapping from diff classes."
     },
     {

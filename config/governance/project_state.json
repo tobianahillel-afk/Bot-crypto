@@ -46,7 +46,7 @@
       "ENG-02"
     ],
     "active_lot": "ENG-03",
-    "active_task": "ENG-03.1",
+    "active_task": "ENG-03.2",
     "next_lot": "ENG-04",
     "active_manifest": "engineering/lots/ENG-03.json",
     "branch": "engineering/bootstrap-development-engine",
