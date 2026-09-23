@@ -48,12 +48,12 @@
     },
     {
       "id": "ENG-05.5",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Qualify resume/recovery after interruption or context loss."
     },
     {
       "id": "ENG-05.6",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Evaluate deterministic documentation tooling such as DocGuard, Vale and lychee before adoption."
     }
   ],
