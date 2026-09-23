@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cold-start qualification using permanent project state as primary authority."""
+"""Cold-start qualification using permanent state plus the active AWU."""
 
 from __future__ import annotations
 
@@ -52,6 +52,10 @@ def main() -> int:
         "cold_permanent_resolver",
         ROOT / "scripts/governance/resolve_next_work.py",
     )
+    active_awu = _module(
+        "cold_active_awu_resolver",
+        ROOT / "scripts/governance/resolve_active_awu.py",
+    )
 
     state = _json(ROOT / "config/governance/project_state.json")
     policy = _json(ROOT / "config/governance/project_state_transitions_v1.json")
@@ -59,35 +63,34 @@ def main() -> int:
     bridge = _json(ROOT / "engineering/STATE.json")
     handoff = _json(ROOT / "engineering/handoff/CURRENT.json")
 
-    # Scenario 1: a fresh GitHub-only agent resolves exactly the permanent ENGINEERING task.
     state_machine.validate_current(state, policy)
-    resolved = resolver.resolve(state, capabilities, "GITHUB_CONNECTOR_ONLY", "engineering")
+    resolved = resolver.repository_resolve("GITHUB_CONNECTOR_ONLY", "engineering")
     engineering = state["engineering_track"]
     assert resolved["track"] == "DEVELOPMENT_ENGINE"
     assert resolved["active_lot"] == engineering["active_lot"]
     assert resolved["active_task"] == engineering["active_task"]
     assert resolved["active_manifest"] == engineering["active_manifest"]
-    assert resolved["required_read_order"][1] == "config/governance/project_state.json"
+    assert resolved["active_awu"] is not None
+    assert resolved["active_awu"]["split_required"] is False
+    assert resolved["active_awu"]["path"] in resolved["required_read_order"]
+    assert resolved["required_read_order"][0] == "AGENTS.md"
     assert resolved["capabilities"]["local_execution"] is False
     assert resolved["capabilities"]["may_claim_local_test_pass"] is False
 
-    # Compatibility bridge remains secondary but must still agree while migration is active.
     bridge_engineering = bridge["engineering_engine"]
     assert bridge_engineering["active_lot"] == engineering["active_lot"]
     assert bridge_engineering["active_task"] == engineering["active_task"]
     assert bridge_engineering["active_manifest"] == engineering["active_manifest"]
     handoff_validator.validate_handoff(bridge, handoff)
 
-    # Scenario 2: stale handoff fails closed.
     stale = copy.deepcopy(handoff)
-    stale["next_engineering"]["active_task"] = "ENG-01.99"
+    stale["next_engineering"]["active_task"] = "ENG-99.99"
     _expect(
         handoff_validator.HandoffError,
         lambda: handoff_validator.validate_handoff(bridge, stale),
         "stale handoff",
     )
 
-    # Scenario 3: Lot46 unlock fails current-state invariants.
     unsafe_lot46 = copy.deepcopy(state)
     unsafe_lot46["business_track"]["next_lot"]["status"] = "OPEN"
     _expect(
@@ -96,7 +99,6 @@ def main() -> int:
         "Lot46 unlock",
     )
 
-    # Scenario 4: mandatory paid LLM dependency fails current-state invariants.
     paid = copy.deepcopy(state)
     paid["cost_policy"]["paid_llm_required"] = True
     _expect(
@@ -105,17 +107,28 @@ def main() -> int:
         "mandatory paid LLM",
     )
 
-    # Scenario 5: inactive audit track cannot be selected as work.
     _expect(
         resolver.ResolveError,
         lambda: resolver.resolve(state, capabilities, "READ_ONLY_AUDITOR", "audit"),
         "inactive audit track",
     )
 
+    units = active_awu.load_work_units()
+    path, current = active_awu.select_active_awu(units)
+    duplicate = dict(units)
+    second = copy.deepcopy(current)
+    second["id"] = "ENG-02.8-WU99"
+    duplicate[ROOT / "engineering/work_units/cold-duplicate.json"] = second
+    _expect(
+        active_awu.ActiveAwuError,
+        lambda: active_awu.select_active_awu(duplicate),
+        "ambiguous active AWU",
+    )
+
     print(
         "PERMANENT_COLD_START_PASS "
         f"track={resolved['track']} lot={resolved['active_lot']} "
-        f"task={resolved['active_task']} scenarios=5"
+        f"task={resolved['active_task']} awu={resolved['active_awu']['id']} scenarios=6"
     )
     return 0
 

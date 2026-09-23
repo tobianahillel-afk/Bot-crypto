@@ -51,6 +51,11 @@
       "name": "AWU context validator",
       "kind": "FILE",
       "locator": "scripts/governance/validate_awu_context.py"
+    },
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
     }
   ],
   "outputs": [

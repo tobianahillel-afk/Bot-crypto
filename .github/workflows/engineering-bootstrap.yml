@@ -132,5 +132,11 @@ jobs:
       - name: Run active AWU scope adversarial self-tests
         run: python scripts/governance/selftest_active_awu_scope.py
 
+      - name: Validate operational AWU dependency DAG
+        run: python scripts/governance/validate_agent_work_unit_graph.py engineering/work_units/*.json
+
+      - name: Qualify work decomposition engine
+        run: python scripts/governance/qualify_work_decomposition.py
+
       - name: Cold-start qualification
         run: python scripts/governance/cold_start_qualification.py

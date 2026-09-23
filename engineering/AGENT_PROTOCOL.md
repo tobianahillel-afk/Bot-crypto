@@ -44,7 +44,7 @@ Before any write, verify the external facts that can stale the state:
 Compare them with `external_observations`. An unexpected mismatch is `STATE_DRIFT`.
 Never silently rewrite state to match surprise Git movement. The canonical executable check is `python scripts/governance/verify_external_git_state.py --mode github` when live GitHub access is available.
 
-## S3 — Resolve exactly one work item
+## S3 — Resolve exactly one work item and one AWU
 
 For ENGINEERING:
 - `engineering_track.active_lot`;
@@ -53,25 +53,16 @@ For ENGINEERING:
 
 For AUDIT, use the equivalent active batch/task/manifest only when that track is active.
 
-The manifest must agree with state, dependencies must be satisfied, and the task must be
-the single `IN_PROGRESS` task.
+The manifest must agree with state and the task must be the single `IN_PROGRESS` task. For ENGINEERING, `scripts/governance/resolve_active_awu.py` must then resolve exactly one `IN_PROGRESS` AWU whose parent matches that task. The AWU dependency DAG, split decision, risk class and context route must all validate.
 
 ## S4 — Load bounded context
 
-Read only:
-1. root `AGENTS.md`;
-2. permanent state;
-3. `engineering/MASTER_PLAN.md`;
-4. active manifest;
-5. current handoff;
-6. task-relevant normative/contracts/evidence.
-
-Do not recursively read the whole repository as a startup ritual.
+Use the deterministic `context_route` returned for the active AWU. Its primary and reference files are the bounded context budget. Do not recursively read the whole repository as a startup ritual.
 
 ## S5 — Authorize the intended diff
 
 Before writing:
-- intended paths fit `allowed_paths`;
+- intended paths fit the active AWU `allowed_paths` and also the parent manifest upper bound;
 - semantics do not enter `forbidden_scope`;
 - no stop condition is true;
 - BUSINESS remains isolated while paused;
@@ -81,7 +72,7 @@ If authorization is ambiguous, stop rather than broadening scope.
 
 ## S6 — Execute minimally
 
-Implement only the active task. Do not opportunistically implement later tasks.
+Implement only the active AWU. Do not opportunistically implement sibling AWUs or later tasks.
 Use the cheapest validation tier that proves the current change; deep certification belongs
 to later assurance/certification stages.
 

@@ -8,18 +8,18 @@ This file is the mandatory first entry point for any coding or audit agent.
 2. Resolve the requested track:
    - ordinary `continue` / development work → `engineering_track`;
    - historical audit work → `audit_track`, only when explicitly active/authorized.
-3. Read the active manifest declared by that track.
+3. Read the active manifest declared by that track, then resolve the single active AWU with `python scripts/governance/resolve_active_awu.py`.
 4. Verify external Git reality before writing:
    - `main` still matches the recorded observation or an authorized transition;
    - the active engineering branch exists;
    - the recorded business candidate PR/head still matches when relevant.
 5. Any unexpected mismatch is `STATE_DRIFT`; do not auto-heal state. When execution is available, `python scripts/governance/verify_external_git_state.py --mode github` is the canonical live check.
-6. Read only the bounded context required by the active work item:
+6. Read only the bounded context returned by the active AWU route:
    - `engineering/MASTER_PLAN.md`;
    - active manifest;
    - `engineering/handoff/CURRENT.json`;
    - task-relevant normative files.
-7. Continue only the active task; respect allowed paths, forbidden scope and dependencies.
+7. Continue only the active AWU; its allowlist is the executable boundary and the parent work-item manifest is only an upper bound.
 8. Run the assurance level appropriate to the current work stage.
 9. Update the handoff before ending a work session.
 
@@ -36,7 +36,7 @@ source of current authorization.
 
 - Historical certification fact → immutable historical Git/evidence anchors.
 - Current work authorization → `config/governance/project_state.json`.
-- Current allowed paths/tasks → active work-item manifest.
+- Current task → active work-item manifest; executable paths/context → active AWU.
 - System rules/architecture → normative documents and contracts.
 - Human summaries/handoffs → convenience only; never override higher authority.
 - Chat history/model memory → never a source of authorization.
