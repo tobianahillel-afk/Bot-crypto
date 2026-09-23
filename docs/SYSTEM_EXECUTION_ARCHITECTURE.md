@@ -105,14 +105,13 @@ KILL_SWITCH > PAUSE > BLOCK_TRADING > WAIT > APPROVE
 
 Aucun score, forecast ou vote entre horizons ne neutralise un veto critique.
 
-## 8. État actuel
+## 8. Autorité d’état courant
 
-La baseline métier fusionnée et certifiée atteint **Lot44**. Le gate d'implémentation Lot45
-est fusionné, mais l'implémentation Lot45 reste une PR candidate non fusionnée et le
-développement métier est actuellement en pause pendant la construction du Development
-Engine. Lot46 reste verrouillé.
+Cette architecture décrit les responsabilités et la chaîne cible ; elle ne duplique pas
+l’état opérationnel courant.
 
-Cette section ne doit pas servir de state machine : `engineering/STATE.json` est l'autorité
-opérationnelle pour déterminer le travail actuellement autorisé. Les parties ci-dessus
-décrivent l'architecture cible et les responsabilités, pas une affirmation que toutes les
-capacités futures sont déjà actives.
+- Source machine d’autorisation et de statut : `config/governance/project_state.json`.
+- Vue humaine générée : `engineering/CURRENT_STATUS.md`.
+
+Les capacités décrites dans les sections précédentes ne sont actives que lorsqu’un gate
+certifié et l’état canonique les autorisent explicitement.

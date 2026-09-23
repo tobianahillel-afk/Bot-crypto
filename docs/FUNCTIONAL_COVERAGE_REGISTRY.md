@@ -8,9 +8,10 @@
 
 ## Couverture par version
 
-> Statut courant dérivé de la baseline métier fusionnée : Lot44 certifié. Le gate Lot45 est
-> fusionné mais son implémentation reste candidate/non fusionnée. Pour l'autorisation de
-> travail courante, consulter `engineering/STATE.json`.
+> **Snapshot de couverture métier : baseline certifiée Lot 44 (`0.44.0`).**
+> Ce tableau décrit cette baseline de référence ; il n’est pas une source d’autorisation
+> courante. Source machine d’état courant : `config/governance/project_state.json`.
+> Vue humaine générée : `engineering/CURRENT_STATUS.md`.
 
 | Version | Lots | Owner | Package | Mode maximal | Statut |
 |---:|---:|---|---|---|---|

@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "policy_kind": "documentation_consistency_policy_v1",
+  "semantics": "REGISTERED_CURRENT_AUTHORITY_DOCS_FAIL_CLOSED",
+  "state_source": "config/governance/project_state.json",
+  "authority_registry": "engineering/DOCUMENTATION_AUTHORITY_REGISTRY.json",
+  "generated_status_policy": "config/governance/generated_status_policy_v1.json",
+  "generated_status_renderer": "scripts/governance/render_current_status.py",
+  "canonical_identity_field": "project.canonical_name",
+  "forbidden_identity_aliases": [
+    "Crypto Quant Bot V4.1-Ops"
+  ],
+  "status_snapshot": {
+    "baseline_lot_field": "business_track.merged_certified_baseline.lot",
+    "baseline_version_field": "business_track.merged_certified_baseline.version"
+  },
+  "scan_scope": "REGISTERED_DOCUMENTS_ONLY",
+  "cost_policy": {
+    "paid_external_api_required": false,
+    "paid_llm_required": false,
+    "paid_saas_required": false,
+    "paid_runner_required": false
+  },
+  "invariants": [
+    "only registered current-authority/reference documents are scanned",
+    "historical lot documents outside the registry are not interpreted as current status",
+    "project_state is the single current status and authorization authority",
+    "engineering/STATE.json can appear only in COMPATIBILITY_ONLY registered documents",
+    "generated current views must pass the ENG-05.1 renderer check",
+    "reference baseline snapshots must be labeled as snapshots not current authorization",
+    "validation is offline standard-library and read-only"
+  ]
+}

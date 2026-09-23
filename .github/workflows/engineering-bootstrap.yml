@@ -171,6 +171,12 @@ jobs:
       - name: Run current-status adversarial self-tests
         run: python scripts/governance/selftest_current_status.py
 
+      - name: Validate documentation consistency
+        run: python scripts/governance/validate_documentation_consistency.py
+
+      - name: Run documentation consistency adversarial self-tests
+        run: python scripts/governance/selftest_documentation_consistency.py
+
       - name: Validate secret controls
         run: python scripts/governance/validate_secret_controls.py
 

@@ -2,28 +2,17 @@
 
 Projet : **Crypto Quant Bot V3.1-Ops**
 
-## État actuel
+## Autorité d’état courant
 
-> L'autorité opérationnelle courante est `engineering/STATE.json`. Cette roadmap reste
-> normative pour l'ordre et le contenu des Lots 0–177 ; son bloc d'état résume la baseline
-> métier fusionnée et ne transforme pas une PR candidate en état certifié.
+Cette roadmap est normative pour **l’ordre et le contenu des Lots 0–177**, mais elle ne
+duplique pas l’état opérationnel courant.
 
-- Dernier lot métier fusionné et certifié : **Lot 44 — Trades & Aggressor Classification Schema**.
-- Version de baseline métier : `0.44.0`.
-- Lot 44 : post-merge audit certifié `GO_LOT44_POST_MERGE`.
-- Gate d'implémentation Lot 45 : fusionné, `GO_LOT45_IMPLEMENTATION_ENTRY`.
-- Lot 45 : implémentation candidate dans la PR #66, **non fusionnée** et suspendue pendant la construction du Development Engine.
-- Lot 46 : `LOCKED`.
-- Développement métier : `PAUSED`.
-- V2 Market Analysis Offline : fermée pour les Lots 21–30.
-- V3 Market Data Governance : fermée et auditée pour les Lots 31–36.
-- V4 Microstructure : progression fusionnée/certifiée jusqu'au Lot 44 ; Lot45 n'est pas encore une baseline fusionnée.
-- Forecast, alpha, paper, sandbox, capital réel et live : non autorisés par cette baseline.
-- Runtime maximal : `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY`.
-
-La preuve historique Lot44 et le gate Lot45 certifié prévalent sur les anciens résumés de
-statut. Les preuves historiques restent immuables ; les vues de statut doivent être dérivées
-de l'état canonique à terme.
+- Source machine d’autorisation et de statut : `config/governance/project_state.json`.
+- Vue humaine générée : `engineering/CURRENT_STATUS.md`.
+- Les preuves historiques de lots restent immuables et conservent leur sens au commit où
+  elles ont été certifiées.
+- Une PR candidate n’est jamais une baseline certifiée tant qu’une transition gouvernée ne
+  l’a pas promue.
 
 ## Documents normatifs transverses
 
