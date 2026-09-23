@@ -88,8 +88,7 @@
       "engineering/CONTEXT_MAP.md",
       "scripts/governance/render_context_map.py",
       "scripts/governance/selftest_context_map.py",
-      ".github/workflows/engineering-bootstrap.yml",
-      "engineering/AGENT_PROTOCOL.md"
+      ".github/workflows/engineering-bootstrap.yml"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -156,7 +155,7 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 16,
+      "files_touched": 15,
       "executable_loc_changed": 650,
       "new_public_behaviors": 1,
       "contract_families": 0,
