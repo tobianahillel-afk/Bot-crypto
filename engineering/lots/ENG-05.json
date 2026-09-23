@@ -15,7 +15,8 @@
     "config/governance/**",
     "engineering/**",
     "scripts/governance/**",
-    ".github/workflows/engineering-bootstrap.yml"
+    ".github/workflows/engineering-bootstrap.yml",
+    ".github/workflows/documentation-tooling-benchmark.yml"
   ],
   "forbidden_scope": [
     "src/crypto_quant_bot/** business implementation changes",
