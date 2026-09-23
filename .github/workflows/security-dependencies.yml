@@ -57,6 +57,7 @@ jobs:
 
       - name: Audit exact dependency lock
         run: |
+          # requirements-dev.lock already contains the full transitive closure; never re-resolve here.
           pip-audit -r requirements-dev.lock --no-deps --disable-pip --strict --progress-spinner off
 
   dependency-review:
