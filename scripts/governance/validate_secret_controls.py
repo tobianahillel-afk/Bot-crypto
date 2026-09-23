@@ -122,7 +122,8 @@ def validate_workflow(policy: dict[str, Any], workflow_text: str) -> None:
     _require(workflow_text, '"${GITLEAKS_BIN}" git', "Git history scan")
     _require(workflow_text, "fetch-depth: 0", "full checkout history")
     _require(workflow_text, "persist-credentials: false", "credential persistence disabled")
-    _require(workflow_text, 'token = "gh" + "p_" + ("A" * 36)', "runtime-only positive control")
+    _require(workflow_text, 'token = "gh" + "p_" + suffix', "runtime-only positive control")
+    _require(workflow_text, "for i in range(36)", "high-entropy synthetic suffix")
     if "ghp_" in workflow_text:
         raise SecretControlError("synthetic secret literal must not be committed")
     for trigger in ("push:", "pull_request:", "workflow_dispatch:"):
