@@ -248,5 +248,11 @@ jobs:
       - name: Qualify work decomposition engine
         run: python scripts/governance/qualify_work_decomposition.py
 
+      - name: Resume/recovery qualification
+        run: python scripts/governance/resume_recovery_qualification.py
+
+      - name: Run resume/recovery adversarial self-tests
+        run: python scripts/governance/selftest_resume_recovery.py
+
       - name: Cold-start qualification
         run: python scripts/governance/cold_start_qualification.py
