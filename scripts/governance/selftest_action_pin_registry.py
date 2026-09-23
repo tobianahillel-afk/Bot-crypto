@@ -42,7 +42,7 @@ def main() -> int:
     mod.validate_registry_only(registry)
 
     bad_sha = copy.deepcopy(registry)
-    _entry(bad_sha, "actions/checkout")["approved_commit_sha"] = "0" * 40
+    _entry(bad_sha, "actions/checkout")["approved_pins"][0]["approved_commit_sha"] = "0" * 40
     _expect(mod.ActionPinRegistryError, lambda: mod.validate_registry_only(bad_sha), "checkout SHA")
 
     bad_license = copy.deepcopy(registry)
@@ -54,11 +54,11 @@ def main() -> int:
     _expect(mod.ActionPinRegistryError, lambda: mod.validate_registry_only(bad_owner), "owner")
 
     bad_ref = copy.deepcopy(registry)
-    _entry(bad_ref, "actions/setup-go")["source_ref"] = "main"
+    _entry(bad_ref, "actions/setup-go")["approved_pins"][0]["source_ref"] = "main"
     _expect(mod.ActionPinRegistryError, lambda: mod.validate_registry_only(bad_ref), "source ref")
 
     bad_tag = copy.deepcopy(registry)
-    _entry(bad_tag, "github/codeql-action")["dereferenced_commit_sha"] = "1" * 40
+    _entry(bad_tag, "github/codeql-action")["approved_pins"][0]["dereferenced_commit_sha"] = "1" * 40
     _expect(mod.ActionPinRegistryError, lambda: mod.validate_registry_only(bad_tag), "annotated tag")
 
     missing = copy.deepcopy(registry)
@@ -70,14 +70,22 @@ def main() -> int:
     _expect(mod.ActionPinRegistryError, lambda: mod.validate_registry_only(duplicate), "duplicate repo")
 
     bad_legacy = copy.deepcopy(registry)
-    _entry(bad_legacy, "actions/checkout")["legacy_floating_refs"] = []
+    _entry(bad_legacy, "actions/checkout")["legacy_replacements"]["v4"] = "0" * 40
     _expect(mod.ActionPinRegistryError, lambda: mod.validate_registry_only(bad_legacy), "legacy map")
 
     bad_state = copy.deepcopy(registry)
     _entry(bad_state, "actions/setup-python")["archived"] = True
     _expect(mod.ActionPinRegistryError, lambda: mod.validate_registry_only(bad_state), "repo state")
 
-    print("ACTION_PIN_REGISTRY_SELFTEST_PASS probes=9")
+    bad_license_url = copy.deepcopy(registry)
+    _entry(bad_license_url, "actions/setup-go")["approved_pins"][0]["license_url"] = "https://example.com/LICENSE"
+    _expect(
+        mod.ActionPinRegistryError,
+        lambda: mod.validate_registry_only(bad_license_url),
+        "license URL provenance",
+    )
+
+    print("ACTION_PIN_REGISTRY_SELFTEST_PASS probes=10")
     return 0
 
 
