@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "policy_kind": "validation_t2_policy_v1",
+  "semantics": "CONDITIONAL_BOUNDED_DOMAIN_TESTS",
+  "group_ids": [
+    "CONTRACT_TESTS",
+    "DATA_TESTS",
+    "CHANGED_DOMAIN_TESTS",
+    "RISK_EXECUTION_TESTS",
+    "EVIDENCE_TESTS"
+  ],
+  "impact_to_groups": {
+    "DOC_CONSISTENCY": [],
+    "GOVERNANCE_VALIDATORS": [],
+    "WORKFLOW_SYNTAX": [],
+    "ACTIONS_SECURITY": [],
+    "CONTRACT_SCHEMA_VALIDATION": [
+      "CONTRACT_TESTS"
+    ],
+    "CONTRACT_COMPATIBILITY": [
+      "CONTRACT_TESTS"
+    ],
+    "CONFIG_POLICY_VALIDATION": [],
+    "TEST_HARNESS_INTEGRITY": [],
+    "STATIC_ANALYSIS": [],
+    "UNIT_BEHAVIOR": [
+      "CHANGED_DOMAIN_TESTS"
+    ],
+    "DATA_CONTRACTS": [
+      "DATA_TESTS"
+    ],
+    "TEMPORAL_CAUSALITY": [
+      "DATA_TESTS"
+    ],
+    "DETERMINISTIC_REPLAY": [
+      "DATA_TESTS"
+    ],
+    "SECURITY_STATIC_ANALYSIS": [],
+    "SECRET_CONTROLS": [],
+    "RISK_INVARIANTS": [
+      "RISK_EXECUTION_TESTS"
+    ],
+    "EXECUTION_SAFETY": [
+      "RISK_EXECUTION_TESTS"
+    ],
+    "EVIDENCE_PROVENANCE": [
+      "EVIDENCE_TESTS"
+    ],
+    "CONSERVATIVE_BROAD_IMPACT": [],
+    "HUMAN_REVIEW_REQUIRED": []
+  },
+  "groups": {
+    "CONTRACT_TESTS": {
+      "mode": "KEYWORDS",
+      "keywords": [
+        "contract",
+        "schema"
+      ]
+    },
+    "DATA_TESTS": {
+      "mode": "KEYWORDS",
+      "keywords": [
+        "data",
+        "temporal",
+        "replay",
+        "lineage",
+        "market_data",
+        "ingestion"
+      ]
+    },
+    "CHANGED_DOMAIN_TESTS": {
+      "mode": "CHANGED_SOURCE_TOKENS",
+      "keywords": []
+    },
+    "RISK_EXECUTION_TESTS": {
+      "mode": "KEYWORDS",
+      "keywords": [
+        "risk",
+        "execution",
+        "oms",
+        "ems",
+        "order",
+        "fill"
+      ]
+    },
+    "EVIDENCE_TESTS": {
+      "mode": "KEYWORDS",
+      "keywords": [
+        "evidence",
+        "provenance",
+        "audit"
+      ]
+    }
+  },
+  "max_targets_per_group": 24,
+  "max_total_targets": 40,
+  "pytest_timeout_seconds": 180,
+  "invariants": [
+    "T2 consumes only T1-uncovered impacts",
+    "T2 groups are symbolic ids and policy contains no executable command",
+    "pytest runs only when at least one group is selected",
+    "every selected group must discover at least one explicit test file",
+    "target sets are bounded and never fall back to the whole tests directory",
+    "security workflow static-analysis unknown and human-review impacts remain uncovered",
+    "T2 cannot claim T3 or T4 completion"
+  ]
+}

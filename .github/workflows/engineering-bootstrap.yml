@@ -159,6 +159,12 @@ jobs:
       - name: Run T1 adversarial self-tests
         run: python scripts/governance/selftest_t1.py
 
+      - name: Run conditional T2 domain validation
+        run: python scripts/governance/run_t2.py
+
+      - name: Run T2 adversarial self-tests
+        run: python scripts/governance/selftest_t2.py
+
       - name: Qualify work decomposition engine
         run: python scripts/governance/qualify_work_decomposition.py
 
