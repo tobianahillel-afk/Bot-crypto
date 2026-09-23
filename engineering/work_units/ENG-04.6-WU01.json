@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-04.6-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-04",
+    "task_id": "ENG-04.6",
+    "manifest": "engineering/lots/ENG-04.json"
+  },
+  "title": "Enforce least-privilege workflow permissions incrementally",
+  "objective": "Inventory GitHub Actions token permissions repository-wide and fail closed on newly added or modified workflows that omit explicit permissions, use write-all, or request unapproved write scopes.",
+  "non_goals": [
+    "GitHub branch protection or ruleset mutation",
+    "bulk rewrite of historical workflows",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock",
+    "paid security service integration"
+  ],
+  "depends_on": [
+    "ENG-04.5-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "Workflow supply-chain auditor",
+      "kind": "FILE",
+      "locator": "scripts/governance/audit_action_supply_chain.py"
+    },
+    {
+      "name": "Workflow security controls",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_workflow_security_controls.py"
+    },
+    {
+      "name": "ENG-04.5 evidence",
+      "kind": "EVIDENCE",
+      "locator": "GitHub Actions run 35873024923"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Workflow permission policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/workflow_permission_policy_v1.json"
+    },
+    {
+      "name": "Workflow permission auditor",
+      "kind": "FILE",
+      "locator": "scripts/governance/audit_workflow_permissions.py"
+    },
+    {
+      "name": "Workflow permission adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_workflow_permissions.py"
+    },
+    {
+      "name": "Workflow permission documentation",
+      "kind": "FILE",
+      "locator": "engineering/WORKFLOW_PERMISSIONS.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "ea0e9b111347b5f676b3c0874e09f3e395a97db2",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-04.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-04.5-WU02.json",
+      "engineering/work_units/ENG-04.6-WU01.json",
+      "config/governance/workflow_permission_policy_v1.json",
+      "scripts/governance/audit_workflow_permissions.py",
+      "scripts/governance/selftest_workflow_permissions.py",
+      "engineering/WORKFLOW_PERMISSIONS.md",
+      ".github/workflows/engineering-bootstrap.yml",
+      ".github/workflows/security-supply-chain.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/lot*/**"
+    ],
+    "forbidden_semantics": [
+      "branch protection mutation",
+      "ruleset mutation",
+      "bulk historical workflow rewrite",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "inventory mode reports legacy workflow permission debt without blocking the repository",
+      "changed-workflow mode requires an explicit permissions declaration",
+      "permissions write-all is always forbidden",
+      "write scopes are denied by default and require exact policy allowlisting",
+      "read-only scopes may be explicitly allowlisted",
+      "changed-workflow permission parsing is deterministic offline and standard-library only",
+      "deleted workflow files do not create stale failures"
+    ],
+    "acceptance_criteria": [
+      "a changed workflow with contents read passes",
+      "a changed workflow with no permissions block fails",
+      "a changed workflow with write-all fails",
+      "a changed workflow with contents write fails unless explicitly allowlisted",
+      "job-level permissions cannot silently widen a stricter top-level declaration",
+      "legacy inventory emits counts without forcing a bulk rewrite",
+      "mandatory permission gate requires no network paid API SaaS LLM or package install"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 4,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 12,
+      "executable_loc_changed": 760,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/audit_workflow_permissions.py --mode inventory",
+      "python scripts/governance/selftest_workflow_permissions.py"
+    ]
+  },
+  "done_when": [
+    "repository-wide permission debt is measured",
+    "changed workflows cannot omit explicit token permissions",
+    "new write permissions fail closed unless explicitly approved",
+    "permission enforcement remains offline zero-cost and incremental"
+  ]
+}

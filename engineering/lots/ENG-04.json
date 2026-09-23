@@ -54,12 +54,12 @@
     },
     {
       "id": "ENG-04.5",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Implement supply-chain pinning and third-party action verification."
     },
     {
       "id": "ENG-04.6",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Minimize permissions and remediate repository protection gaps where accessible."
     },
     {
