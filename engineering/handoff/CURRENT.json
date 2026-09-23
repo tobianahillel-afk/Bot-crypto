@@ -22,7 +22,7 @@
   "state_snapshot": {
     "engineering_phase": "BUILDING",
     "active_lot": "ENG-05",
-    "active_task": "ENG-05.5",
+    "active_task": "ENG-05.6",
     "active_manifest": "engineering/lots/ENG-05.json",
     "business_development": "PAUSED",
     "lot46_status": "LOCKED",
@@ -36,10 +36,10 @@
   },
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-05.5-WU01",
-    "awu_path": "engineering/work_units/ENG-05.5-WU01.json",
+    "awu_id": "ENG-05.6-WU01",
+    "awu_path": "engineering/work_units/ENG-05.6-WU01.json",
     "parent_manifest": "engineering/lots/ENG-05.json",
-    "scope_base_sha": "a9d712cc0f455a70ed9c39f35791e64cec1f58e7",
+    "scope_base_sha": "48b32eb43f778d2da364725974e1805bd2660837",
     "risk_class": "R1",
     "complexity_score": 2
   },
@@ -55,10 +55,11 @@
     "ENG-05.2 documentation consistency completed on exact head 365bd0a4a2afa63557cb580331ed887cbf7cd067.",
     "ENG-05.3 bounded Context Map completed on exact head 1c292cacae3f38b8025eaf1b0d5b215d2458b741.",
     "ENG-05.4 WU01 Handoff V2 validator and 12 adversarial probes passed on head b98ba29f2428f175dd186dc4a170d8f57a7b06cd; legacy bootstrap compatibility repair isolated to WU02.",
-    "ENG-05.4 WU02 permanent-handoff bootstrap compatibility completed on exact head a9d712cc0f455a70ed9c39f35791e64cec1f58e7; run 35920389779 passed negative validators, context-map checks and full cold-start qualification."
+    "ENG-05.4 WU02 permanent-handoff bootstrap compatibility completed on exact head a9d712cc0f455a70ed9c39f35791e64cec1f58e7; run 35920389779 passed negative validators, context-map checks and full cold-start qualification.",
+    "ENG-05.5 resume/recovery completed on exact head 48b32eb43f778d2da364725974e1805bd2660837; run 35930055502 passed recovery qualification, 9 adversarial probes and cold-start qualification."
   ],
-  "current_objective": "ENG-05.5: qualify deterministic resume/recovery after interruption or context loss without trusting conversational memory.",
-  "next_action": "Implement resume/recovery qualification and adversarial probes that reconstruct the active AWU from permanent state, tolerate stale/missing handoff only as a non-authoritative hint, and require live Git reverification before writes.",
+  "current_objective": "ENG-05.6 WU01: evaluate DocGuard, Vale and lychee deterministically before any documentation-tool adoption.",
+  "next_action": "Record exact current release/commit/license/runtime/network facts for DocGuard, Vale and lychee; derive bounded verdicts and reject any mandatory paid, authority-conflicting or network-dependent integration.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -88,6 +89,13 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35920389779",
       "head_sha": "a9d712cc0f455a70ed9c39f35791e64cec1f58e7",
       "scope": "ENG-05.4-WU02_BOOTSTRAP_COLD_START"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35930055502",
+      "head_sha": "48b32eb43f778d2da364725974e1805bd2660837",
+      "scope": "ENG-05.5_RESUME_RECOVERY_COLD_START"
     }
   ],
   "stop_conditions": [
@@ -108,7 +116,7 @@
   ],
   "next_engineering": {
     "active_lot": "ENG-05",
-    "active_task": "ENG-05.5",
+    "active_task": "ENG-05.6",
     "active_manifest": "engineering/lots/ENG-05.json"
   }
 }
