@@ -213,6 +213,12 @@ jobs:
       - name: Run repository protection adversarial self-tests
         run: python scripts/governance/selftest_repository_protection.py
 
+      - name: Verify complete ENG-04 security engine
+        run: python scripts/governance/verify_security_engine.py --check-evidence
+
+      - name: Run security-engine adversarial self-tests
+        run: python scripts/governance/selftest_security_engine.py
+
       - name: Validate exact-input proof reuse semantics
         run: python scripts/governance/proof_reuse.py --self-check
 
