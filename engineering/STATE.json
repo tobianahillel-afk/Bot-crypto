@@ -68,7 +68,7 @@
       "ENG-04"
     ],
     "active_lot": "ENG-05",
-    "active_task": "ENG-05.1",
+    "active_task": "ENG-05.2",
     "next_lot": "ENG-06",
     "active_manifest": "engineering/lots/ENG-05.json",
     "blockers": []

@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-05.2-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-05",
+    "task_id": "ENG-05.2",
+    "manifest": "engineering/lots/ENG-05.json"
+  },
+  "title": "Enforce documentation consistency and authority",
+  "objective": "Define and enforce deterministic consistency rules for current-authority documentation, correct stale authority pointers without rewriting historical evidence, and fail closed on future identity/status/authority drift.",
+  "non_goals": [
+    "rewrite historical lot specifications or evidence",
+    "build the context map",
+    "redesign handoff",
+    "adopt external documentation tooling",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-05.1-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Canonical project state",
+      "kind": "STATE",
+      "locator": "config/governance/project_state.json"
+    },
+    {
+      "name": "Generated current status",
+      "kind": "FILE",
+      "locator": "engineering/CURRENT_STATUS.md"
+    },
+    {
+      "name": "Project identity",
+      "kind": "FILE",
+      "locator": "docs/PROJECT_IDENTITY.md"
+    },
+    {
+      "name": "Canonical roadmap",
+      "kind": "FILE",
+      "locator": "docs/ROADMAP_V1_TO_V21.md"
+    },
+    {
+      "name": "Functional coverage registry",
+      "kind": "FILE",
+      "locator": "docs/FUNCTIONAL_COVERAGE_REGISTRY.md"
+    },
+    {
+      "name": "Execution architecture",
+      "kind": "FILE",
+      "locator": "docs/SYSTEM_EXECUTION_ARCHITECTURE.md"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Documentation authority registry",
+      "kind": "CONFIG",
+      "locator": "engineering/DOCUMENTATION_AUTHORITY_REGISTRY.json"
+    },
+    {
+      "name": "Documentation consistency policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/documentation_consistency_policy_v1.json"
+    },
+    {
+      "name": "Documentation consistency validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_documentation_consistency.py"
+    },
+    {
+      "name": "Documentation consistency adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_documentation_consistency.py"
+    },
+    {
+      "name": "Documentation consistency report",
+      "kind": "FILE",
+      "locator": "engineering/DOCUMENTATION_CONSISTENCY.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "1acc3d5c1043f532a1ac5f2c17c0e7bc72ed37f7",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-05.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-05.1-WU01.json",
+      "engineering/work_units/ENG-05.2-WU01.json",
+      "README.md",
+      "AGENTS.md",
+      "engineering/CURRENT_STATUS.md",
+      "engineering/DOCUMENTATION_AUTHORITY_REGISTRY.json",
+      "config/governance/documentation_consistency_policy_v1.json",
+      "scripts/governance/validate_documentation_consistency.py",
+      "scripts/governance/selftest_documentation_consistency.py",
+      "engineering/DOCUMENTATION_CONSISTENCY.md",
+      "docs/PROJECT_IDENTITY.md",
+      "docs/ROADMAP_V1_TO_V21.md",
+      "docs/FUNCTIONAL_COVERAGE_REGISTRY.md",
+      "docs/SYSTEM_EXECUTION_ARCHITECTURE.md",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/lot*/**"
+    ],
+    "forbidden_semantics": [
+      "historical evidence rewrite",
+      "business implementation",
+      "context-map redesign",
+      "handoff redesign",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "config/governance/project_state.json is the only current authorization/status authority",
+      "engineering/STATE.json may be referenced only as a migration compatibility bridge not current authority",
+      "current-authority docs use canonical project identity Crypto Quant Bot V3.1-Ops",
+      "roadmap coverage registry and execution architecture agree on Lot44 baseline Lot45 suspended candidate Lot46 lock and business pause",
+      "historical lot documents are not mass-scanned or rewritten by this AWU",
+      "generated status documents remain validated by ENG-05.1",
+      "consistency validation is standard-library offline read-only and zero-cost"
+    ],
+    "acceptance_criteria": [
+      "three stale engineering/STATE.json current-authority references are replaced by canonical project_state references",
+      "validator passes on all registered current-authority documents",
+      "old project identity V4.1-Ops fails in current-authority documents",
+      "legacy authority pointer engineering/STATE.json presented as current authority fails",
+      "Lot44/Lot45/Lot46 status contradiction fails",
+      "historical documents outside the registry do not create false positives",
+      "bootstrap runs consistency validation without network or external packages"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 2,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 15,
+      "executable_loc_changed": 650,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_documentation_consistency.py",
+      "python scripts/governance/selftest_documentation_consistency.py"
+    ]
+  },
+  "done_when": [
+    "current-authority documentation cannot silently contradict canonical identity authority or business status",
+    "legacy bridge references cannot be mistaken for current authorization",
+    "historical documents remain untouched unless explicitly registered as current-authority docs"
+  ]
+}

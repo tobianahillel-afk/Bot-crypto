@@ -41,8 +41,8 @@
     "ENG-04.6 WU02 completed on exact head cc2c4e2a4c3f4ea962302a1e2709e96a4101731a: Engineering Bootstrap run 35879970764 PASS and Security Supply Chain run 35879970595 PASS. Repository protection policy/selftests PASS; live observation remains main protected=false, rulesets_count=0, branch-protection detail 403 to integration, so business unlock remains fail-closed.",
     "ENG-04 Security & Supply Chain Engine completed on exact head dae1d5a920307586bcbe2cccbe11b0caba7c0869: Engineering Bootstrap run 35885215524 PASS with final PASS_ENGINEERING_SECURITY verifier and 8 adversarial probes; Security Secrets run 35885215485 PASS in RANGE mode with 0 findings and full-tree/full-history steps skipped on routine push; Security Actions and Security Supply Chain PASS. Business unlock remains blocked by BOOT-FINDING-001 because main protection is not verified."
   ],
-  "current_objective": "ENG-05.1: generate deterministic current-status blocks from canonical project state.",
-  "next_action": "Implement a standard-library status renderer with idempotent update/check modes for README.md, AGENTS.md and engineering/CURRENT_STATUS.md; do not add timestamps, network reads or manual duplicate status.",
+  "current_objective": "ENG-05.2: enforce documentation consistency and canonical authority pointers.",
+  "next_action": "Register current-authority documentation, correct stale engineering/STATE.json authority claims, and add an offline fail-closed consistency validator with adversarial probes.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -332,6 +332,12 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35885215485",
       "note": "Exact head dae1d5a920307586bcbe2cccbe11b0caba7c0869 passed Gitleaks positive control and routine introduced-range scan: RANGE bc0d205f..dae1d5a9, 0 findings, full current-tree/history scans skipped."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35886777610",
+      "note": "Exact head 1acc3d5c1043f532a1ac5f2c17c0e7bc72ed37f7 passed generated current-status --check, 9 adversarial status probes, decomposition qualification and cold-start. Security Secrets run 35886777802 also passed."
     }
   ],
   "stale_when": [
@@ -344,7 +350,7 @@
   ],
   "next_engineering": {
     "active_lot": "ENG-05",
-    "active_task": "ENG-05.1",
+    "active_task": "ENG-05.2",
     "active_manifest": "engineering/lots/ENG-05.json"
   }
 }

@@ -28,12 +28,12 @@
   "tasks": [
     {
       "id": "ENG-05.1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Generate deterministic current-status blocks from canonical project state."
     },
     {
       "id": "ENG-05.2",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Detect and prevent documentation consistency/status drift."
     },
     {
