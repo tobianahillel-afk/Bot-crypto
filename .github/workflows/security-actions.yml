@@ -1,3 +1,4 @@
+# ENG-04.4 WU01: exact-digest changed-workflow syntax gate.
 name: Security Actions
 
 on:
