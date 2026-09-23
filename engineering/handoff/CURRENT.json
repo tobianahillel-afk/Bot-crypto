@@ -34,10 +34,11 @@
     "ENG-04.1 Secret Controls completed on exact head 431aa76a1fbd5faecb622231497a8f0915a465c2: Engineering Bootstrap run 35848165705 PASS and Security Secrets run 35848165662 PASS, including pinned MIT Gitleaks v8.30.1 build, runtime-only positive control, current-tree scan, full-history scan, and two blob-bound vetted false-positive fingerprints.",
     "ENG-04.2 Dependency Controls completed on exact head bc626d4fc13a1ebb9125540fbcea91c14d0dcb59: Engineering Bootstrap run 35849667705 PASS, Security Dependencies run 35849667715 PASS with no known vulnerabilities in requirements-dev.lock, and Security Secrets run 35849667729 PASS. Dependency Review v5.0.0 is pinned to a1d282b36b6f3519aa1f3fc636f609c47dddb294 for PR dependency diffs.",
     "ENG-04.3 SAST Controls completed on exact head 8ad397ceb4dfe3ad2a429b295270ebf46afbff2f: Engineering Bootstrap run 35850772829 PASS and Security SAST run 35850772820 PASS. CodeQL Action v4.38.1 exact commit 1c5b675653bb5c22dbe9b12b556ec555138e09fd used CLI 2.27.0, security-extended, local SARIF fail-closed gate, 1 SARIF and 0 findings.",
-    "ENG-04.4 Workflow Security Controls completed on exact head 2f0160884c2ee191ab1881a5caf9335b6c1fd15b: Security Actions run 35855698512 PASS and Engineering Bootstrap run 35855698513 PASS. actionlint v1.7.12 and zizmor v1.30.1 release asset SHA-256 checks passed; zizmor positive control found 2 issues; ACTIONLINT_TARGET_COUNT=1; ZIZMOR_TARGET_COUNT=1; both targeted .github/workflows/security-actions.yml; real ZIZMOR_FINDINGS=0."
+    "ENG-04.4 Workflow Security Controls completed on exact head 2f0160884c2ee191ab1881a5caf9335b6c1fd15b: Security Actions run 35855698512 PASS and Engineering Bootstrap run 35855698513 PASS. actionlint v1.7.12 and zizmor v1.30.1 release asset SHA-256 checks passed; zizmor positive control found 2 issues; ACTIONLINT_TARGET_COUNT=1; ZIZMOR_TARGET_COUNT=1; both targeted .github/workflows/security-actions.yml; real ZIZMOR_FINDINGS=0.",
+    "ENG-04.5 WU01 completed on exact head 32c877028597dc4b3bca7e34f32d8b834c306742: legacy inventory measured 211 floating refs across only actions/checkout@v4 (82), actions/setup-python@v5 (82), and actions/upload-artifact@v4 (47); changed-workflow anti-regression gate PASS."
   ],
-  "current_objective": "ENG-04.5 WU01: inventory action supply-chain debt and prevent new floating remote action refs.",
-  "next_action": "Implement a zero-dependency uses-clause inventory plus changed-workflow fail-closed gate; report legacy floating refs for later bounded remediation instead of rewriting all workflows at once.",
+  "current_objective": "ENG-04.5 WU02: verify and register approved remote action pins.",
+  "next_action": "Create an offline action-pin registry for all 6 remote repositories, validate tag/license provenance, and require changed-workflow SHA pins to be registered.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -273,6 +274,18 @@
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35855698513",
       "note": "ENG-04.4 exact head 2f0160884c2ee191ab1881a5caf9335b6c1fd15b: Engineering Bootstrap PASS including 18 workflow-security adversarial probes."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35857436826",
+      "note": "ENG-04.5 WU01 supply-chain inventory PASS: 88 workflow files, 224 uses, 13 pinned SHA, 211 legacy floating refs, 0 dynamic/malformed; changed gate scanned 2 modified workflows with 3 pinned refs and zero debt."
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35857691546",
+      "note": "Exact head 32c877028597dc4b3bca7e34f32d8b834c306742 passed Engineering Bootstrap including action supply-chain inventory and 12 adversarial supply-chain probes."
     }
   ],
   "stale_when": [

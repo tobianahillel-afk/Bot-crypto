@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-04.5-WU02",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-04",
+    "task_id": "ENG-04.5",
+    "manifest": "engineering/lots/ENG-04.json"
+  },
+  "title": "Verify and register approved remote action pins",
+  "objective": "Create an offline-verifiable approval registry for every remote action repository currently used, bind each approved SHA to observed GitHub tag provenance and MIT licensing, and make changed-workflow enforcement reject unregistered SHA pins.",
+  "non_goals": [
+    "bulk rewrite legacy workflows",
+    "automatic action version upgrades",
+    "permission hardening",
+    "network calls in the mandatory CI validator",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-04.5-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Supply-chain inventory",
+      "kind": "FILE",
+      "locator": "scripts/governance/audit_action_supply_chain.py"
+    },
+    {
+      "name": "WU01 evidence",
+      "kind": "EVIDENCE",
+      "locator": "GitHub Actions runs 35857436826 and 35857691546"
+    },
+    {
+      "name": "Live tag/license observations",
+      "kind": "EVIDENCE",
+      "locator": "GitHub connector observations for 6 remote action repositories on 2026-09-23"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Approved action pin registry",
+      "kind": "CONFIG",
+      "locator": "config/governance/action_pin_registry_v1.json"
+    },
+    {
+      "name": "Action pin registry validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_action_pin_registry.py"
+    },
+    {
+      "name": "Action pin registry adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_action_pin_registry.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "32c877028597dc4b3bca7e34f32d8b834c306742",
+    "allowed_paths": [
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-04.5-WU01.json",
+      "engineering/work_units/ENG-04.5-WU02.json",
+      "config/governance/action_supply_chain_policy_v1.json",
+      "config/governance/action_pin_registry_v1.json",
+      "scripts/governance/audit_action_supply_chain.py",
+      "scripts/governance/selftest_action_supply_chain.py",
+      "scripts/governance/validate_action_pin_registry.py",
+      "scripts/governance/selftest_action_pin_registry.py",
+      ".github/workflows/engineering-bootstrap.yml",
+      "engineering/ACTION_SUPPLY_CHAIN.md",
+      "engineering/ACTION_PIN_REGISTRY.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/lot*/**"
+    ],
+    "forbidden_semantics": [
+      "bulk legacy workflow rewrite",
+      "automatic action version upgrade",
+      "permission hardening",
+      "network-dependent mandatory registry validation",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "registry covers every remote action repository currently present in inventory",
+      "approved commit SHAs are exact lowercase 40-hex values",
+      "each registry entry records source ref provenance and MIT license evidence",
+      "annotated tags record both tag-object SHA and dereferenced commit SHA",
+      "current floating legacy refs must map to an approved replacement SHA",
+      "current pinned refs must already be present in the registry",
+      "changed-workflow mode rejects a 40-hex SHA when it is not registered for that repository",
+      "mandatory validator is offline standard-library only"
+    ],
+    "acceptance_criteria": [
+      "registry contains checkout setup-python upload-artifact setup-go dependency-review-action and codeql-action",
+      "checkout v4 maps to 11d5960a326750d5838078e36cf38b85af677262",
+      "setup-python v5 maps to a26af69be951a213d495a4c3e4e4022e16d87065",
+      "upload-artifact v4 maps to ea165f8d65b6e75b540449e92b4886f43607fa02",
+      "setup-go v7.0.0 maps to b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
+      "dependency-review-action v5.0.0 maps to a1d282b36b6f3519aa1f3fc636f609c47dddb294",
+      "codeql-action v4.38.1 annotated tag dereferences to 1c5b675653bb5c22dbe9b12b556ec555138e09fd",
+      "tampered SHA owner license tag provenance or unregistered pinned action fails closed"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 4,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 12,
+      "executable_loc_changed": 720,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_action_pin_registry.py",
+      "python scripts/governance/selftest_action_pin_registry.py",
+      "python scripts/governance/selftest_action_supply_chain.py"
+    ]
+  },
+  "done_when": [
+    "all current remote action repositories have approved exact SHAs and provenance",
+    "legacy floating refs have deterministic approved replacements",
+    "unregistered SHA pins are rejected on changed workflows",
+    "registry validation remains offline zero-cost and auditable"
+  ]
+}
