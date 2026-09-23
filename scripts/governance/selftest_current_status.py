@@ -48,7 +48,7 @@ def main() -> int:
     assert "Trading allowed: `false`" in first
 
     changed = json.loads(json.dumps(state))
-    changed["engineering_track"]["active_task"] = "ENG-05.2"
+    changed["engineering_track"]["active_task"] = "ENG-TEST-SENTINEL"
     assert mod.render_block(changed) != first
 
     _expect(
