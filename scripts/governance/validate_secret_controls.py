@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import sys
@@ -13,6 +14,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 POLICY_PATH = ROOT / "config" / "governance" / "secret_control_policy_v1.json"
 CONFIG_PATH = ROOT / ".gitleaks.toml"
+IGNORE_PATH = ROOT / ".gitleaksignore"
 
 
 class SecretControlError(ValueError):
@@ -63,6 +65,12 @@ def validate_policy(policy: dict[str, Any]) -> None:
         "SYNTHETIC_POSITIVE_CONTROL", "CURRENT_TREE", "FULL_GIT_HISTORY"
     ]:
         raise SecretControlError("required scan set drift")
+    if policy.get("false_positive_policy") != "EXACT_FINGERPRINT_PLUS_IMMUTABLE_GIT_BLOB_BINDING_ONLY":
+        raise SecretControlError("false-positive policy drift")
+    if policy.get("false_positive_registry") != "config/governance/secret_false_positive_registry_v1.json":
+        raise SecretControlError("false-positive registry path drift")
+    if policy.get("gitleaks_ignore_path") != ".gitleaksignore":
+        raise SecretControlError("Gitleaks ignore path drift")
 
 
 def validate_config(config_text: str) -> None:
@@ -75,6 +83,88 @@ def validate_config(config_text: str) -> None:
         raise SecretControlError("default Gitleaks rules must remain enabled")
     if "allowlist" in config_text.lower():
         raise SecretControlError("secret allowlists require separate finding-specific review")
+
+
+def _git_blob_sha(data: bytes) -> str:
+    prefix = f"blob {len(data)}\\0".encode("ascii")
+    return hashlib.sha1(prefix + data, usedforsecurity=False).hexdigest()
+
+
+def validate_false_positive_registry(policy: dict[str, Any], ignore_text: str) -> None:
+    registry = _json(ROOT / policy["false_positive_registry"])
+    if registry.get("schema_version") != 1:
+        raise SecretControlError("unsupported false-positive registry version")
+    if registry.get("registry_kind") != "secret_false_positive_registry_v1":
+        raise SecretControlError("invalid false-positive registry kind")
+    if registry.get("semantics") != "EXACT_FINGERPRINT_BOUND_TO_IMMUTABLE_AUDIT_BLOB":
+        raise SecretControlError("false-positive registry semantics drift")
+
+    artifact = registry.get("artifact")
+    if not isinstance(artifact, dict):
+        raise SecretControlError("false-positive artifact binding missing")
+    artifact_path = artifact.get("path")
+    if artifact_path != "data/audit/product_scope_roadmap_lot21.jsonl":
+        raise SecretControlError("false-positive artifact path drift")
+    if artifact.get("historical_evidence") is not True:
+        raise SecretControlError("false-positive artifact must remain historical evidence")
+    if artifact.get("mutation_forbidden_in_awu") != "ENG-04.1-WU01":
+        raise SecretControlError("historical mutation prohibition drift")
+
+    full = ROOT / artifact_path
+    try:
+        data = full.read_bytes()
+    except OSError as exc:
+        raise SecretControlError(f"cannot read bound audit artifact: {exc}") from exc
+    actual_blob = _git_blob_sha(data)
+    if actual_blob != artifact.get("git_blob_sha"):
+        raise SecretControlError(
+            f"false-positive artifact blob changed: {actual_blob} != {artifact.get('git_blob_sha')}"
+        )
+
+    entries = registry.get("entries")
+    if not isinstance(entries, list) or len(entries) != 2:
+        raise SecretControlError("exactly two vetted false-positive entries are required")
+
+    lines = data.decode("utf-8").splitlines()
+    expected_fingerprints: list[str] = []
+    for entry in entries:
+        if not isinstance(entry, dict):
+            raise SecretControlError("false-positive entry must be an object")
+        line_no = entry.get("line")
+        if not isinstance(line_no, int) or not 1 <= line_no <= len(lines):
+            raise SecretControlError("false-positive line out of range")
+        fingerprint = f"{artifact_path}:generic-api-key:{line_no}"
+        if entry.get("fingerprint") != fingerprint:
+            raise SecretControlError("false-positive fingerprint does not match bound line")
+        if entry.get("classification") != "FALSE_POSITIVE_CONTRACT_IDENTIFIER_ADJACENCY":
+            raise SecretControlError("false-positive classification drift")
+        if entry.get("json_field") != "output_contracts":
+            raise SecretControlError("false-positive must remain bound to output_contracts")
+        try:
+            record = json.loads(lines[line_no - 1])
+        except json.JSONDecodeError as exc:
+            raise SecretControlError(f"bound audit line is not JSON: {line_no}") from exc
+        if record.get("lot_id") != entry.get("lot_id") or record.get("title") != entry.get("title"):
+            raise SecretControlError("false-positive lot identity drift")
+        contracts = record.get("output_contracts")
+        if contracts != entry.get("expected_contract_identifiers"):
+            raise SecretControlError("false-positive contract identifiers drift")
+        if not isinstance(contracts, list) or not all(
+            isinstance(name, str) and re.fullmatch(r"[A-Z][A-Za-z0-9]+V1", name)
+            for name in contracts
+        ):
+            raise SecretControlError("vetted false-positive values must remain contract identifiers")
+        expected_fingerprints.append(fingerprint)
+
+    active = [
+        line.strip()
+        for line in ignore_text.splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    if active != expected_fingerprints:
+        raise SecretControlError(
+            f".gitleaksignore must exactly equal vetted registry fingerprints: {active}"
+        )
 
 
 def _require(text: str, needle: str, label: str) -> None:
@@ -115,6 +205,9 @@ def validate_workflow(policy: dict[str, Any], workflow_text: str) -> None:
         "github.com/zricethezav/gitleaks/v8/version.Version=${GITLEAKS_TAG}",
         "official version ldflags",
     )
+    _require(workflow_text, "--gitleaks-ignore-path .gitleaksignore", "explicit vetted ignore path")
+    if workflow_text.count("--gitleaks-ignore-path .gitleaksignore") < 3:
+        raise SecretControlError("all three scans must use the vetted ignore file")
     _require(workflow_text, "--redact=100", "full redaction")
     if workflow_text.count("--redact=100") < 3:
         raise SecretControlError("all three scans must use full redaction")
@@ -138,9 +231,15 @@ def validate_workflow(policy: dict[str, Any], workflow_text: str) -> None:
         _require(workflow_text, trigger, f"{trigger} trigger")
 
 
-def validate_documents(policy: dict[str, Any], workflow_text: str, config_text: str) -> None:
+def validate_documents(
+    policy: dict[str, Any],
+    workflow_text: str,
+    config_text: str,
+    ignore_text: str,
+) -> None:
     validate_policy(policy)
     validate_config(config_text)
+    validate_false_positive_registry(policy, ignore_text)
     validate_workflow(policy, workflow_text)
 
 
@@ -150,7 +249,8 @@ def main() -> int:
         workflow_path = ROOT / policy["workflow_path"]
         workflow_text = workflow_path.read_text(encoding="utf-8")
         config_text = CONFIG_PATH.read_text(encoding="utf-8")
-        validate_documents(policy, workflow_text, config_text)
+        ignore_text = IGNORE_PATH.read_text(encoding="utf-8")
+        validate_documents(policy, workflow_text, config_text, ignore_text)
     except (SecretControlError, OSError, KeyError) as exc:
         print(f"SECRET_CONTROLS_INVALID: {exc}", file=sys.stderr)
         return 1
