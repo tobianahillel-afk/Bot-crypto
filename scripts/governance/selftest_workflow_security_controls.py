@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Adversarial qualification for ENG-04.4 actionlint controls."""
+"""Adversarial qualification for ENG-04.4 actionlint plus zizmor controls."""
 
 from __future__ import annotations
 
@@ -65,6 +65,20 @@ def main() -> int:
         '"${ACTIONLINT_BIN}" -ignore ".*" "${targets[@]}"',
     )
     _expect(mod.WorkflowSecurityError, lambda: mod.validate_workflow(policy, ignored), "broad actionlint ignore")
+    wrong_zizmor = workflow.replace(policy["zizmor"]["asset_sha256"], "0" * 64)
+    _expect(mod.WorkflowSecurityError, lambda: mod.validate_workflow(policy, wrong_zizmor), "zizmor digest drift")
+    online = workflow.replace("--offline --strict-collection", "--strict-collection")
+    _expect(mod.WorkflowSecurityError, lambda: mod.validate_workflow(policy, online), "zizmor offline removed")
+    no_strict = workflow.replace("--offline --strict-collection --no-config", "--offline --no-config")
+    _expect(mod.WorkflowSecurityError, lambda: mod.validate_workflow(policy, no_strict), "zizmor strict collection removed")
+    configured = workflow.replace("--no-config --format=json-v1", "--config zizmor.yml --format=json-v1")
+    _expect(mod.WorkflowSecurityError, lambda: mod.validate_workflow(policy, configured), "zizmor config enabled")
+    tokenized = workflow + "\n# GITHUB_TOKEN\n"
+    _expect(mod.WorkflowSecurityError, lambda: mod.validate_workflow(policy, tokenized), "zizmor token introduced")
+    no_zizmor_positive = workflow.replace("on: pull_request_target", "on: pull_request")
+    _expect(mod.WorkflowSecurityError, lambda: mod.validate_workflow(policy, no_zizmor_positive), "zizmor positive control weakened")
+    no_exit = workflow.replace("--format=json-v1", "--no-exit-codes --format=json-v1")
+    _expect(mod.WorkflowSecurityError, lambda: mod.validate_workflow(policy, no_exit), "zizmor exit codes disabled")
     paid = copy.deepcopy(policy)
     paid["cost_policy"]["paid_saas_required"] = True
     _expect(mod.WorkflowSecurityError, lambda: mod.validate_policy(paid), "paid SaaS")
@@ -72,7 +86,7 @@ def main() -> int:
     broad["scan_semantics"]["unchanged_legacy_blocking"] = True
     _expect(mod.WorkflowSecurityError, lambda: mod.validate_policy(broad), "legacy scope broadened")
 
-    print("WORKFLOW_SECURITY_SELFTEST_PASS probes=11")
+    print("WORKFLOW_SECURITY_SELFTEST_PASS probes=18")
     return 0
 
 

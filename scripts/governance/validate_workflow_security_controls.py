@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate ENG-04.4 WU01 actionlint workflow controls."""
+"""Validate ENG-04.4 actionlint plus zizmor workflow controls."""
 
 from __future__ import annotations
 
@@ -38,7 +38,7 @@ def validate_policy(policy: dict[str, Any]) -> None:
         raise WorkflowSecurityError("unsupported workflow-security policy version")
     if policy.get("policy_kind") != "workflow_security_policy_v1":
         raise WorkflowSecurityError("invalid workflow-security policy kind")
-    if policy.get("semantics") != "CHANGED_WORKFLOW_ACTIONLINT_FAIL_CLOSED_V1":
+    if policy.get("semantics") != "CHANGED_WORKFLOW_ACTIONLINT_ZIZMOR_FAIL_CLOSED_V1":
         raise WorkflowSecurityError("workflow-security semantics drift")
     actionlint = policy.get("actionlint")
     if not isinstance(actionlint, dict):
@@ -56,6 +56,30 @@ def validate_policy(policy: dict[str, Any]) -> None:
     for key, value in expected.items():
         if actionlint.get(key) != value:
             raise WorkflowSecurityError(f"actionlint policy drift: {key}")
+    zizmor = policy.get("zizmor")
+    if not isinstance(zizmor, dict):
+        raise WorkflowSecurityError("zizmor policy missing")
+    expected_zizmor = {
+        "repository":"zizmorcore/zizmor",
+        "tag":"v1.30.1",
+        "commit":"99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+        "version":"1.30.1",
+        "license":"MIT",
+        "asset_name":"zizmor-x86_64-unknown-linux-gnu.tar.gz",
+        "asset_url":"https://github.com/zizmorcore/zizmor/releases/download/v1.30.1/zizmor-x86_64-unknown-linux-gnu.tar.gz",
+        "asset_sha256":"e65324f4430c2717591937edcec90ccbefaf14c174f8ec9415e03ca875b46e1a",
+        "mode":["--offline","--strict-collection","--no-config","--format=json-v1"],
+    }
+    for key, value in expected_zizmor.items():
+        if zizmor.get(key) != value:
+            raise WorkflowSecurityError(f"zizmor policy drift: {key}")
+    if policy.get("zizmor_target_patterns") != [
+        ".github/workflows/*.yml",
+        ".github/workflows/*.yaml",
+        ".github/actions/*/action.yml",
+        ".github/actions/*/action.yaml",
+    ]:
+        raise WorkflowSecurityError("zizmor target patterns drift")
     checkout = policy.get("toolchain", {}).get("checkout_action_sha")
     if checkout != "3d3c42e5aac5ba805825da76410c181273ba90b1":
         raise WorkflowSecurityError("checkout action pin drift")
@@ -85,6 +109,13 @@ def validate_workflow(policy: dict[str, Any], text: str) -> None:
         "|| true",
         "-ignore ",
         "-ignore=",
+        "--no-exit-codes",
+        "# zizmor: ignore",
+        "ZIZMOR_CONFIG",
+        "GH_TOKEN",
+        "GITHUB_TOKEN",
+        "ZIZMOR_GITHUB_TOKEN",
+        "continue-on-error: true",
     ):
         if forbidden in text:
             raise WorkflowSecurityError(f"forbidden workflow weakening token: {forbidden}")
@@ -109,6 +140,22 @@ def validate_workflow(policy: dict[str, Any], text: str) -> None:
     _require(text, "git merge-base", "pull-request merge-base semantics")
     _require(text, "git ls-files", "root fallback")
     _require(text, '"${ACTIONLINT_BIN}" "${targets[@]}"', "fail-closed real actionlint execution")
+    zizmor = policy["zizmor"]
+    _require(text, zizmor["asset_sha256"], "zizmor asset SHA-256")
+    _require(text, zizmor["asset_name"], "zizmor exact asset")
+    _require(text, "https://github.com/zizmorcore/zizmor/releases/download/v${ZIZMOR_VERSION}/${ZIZMOR_ASSET}", "zizmor exact release URL")
+    _require(text, '"${bin_dir}/zizmor" --version', "zizmor version verification")
+    _require(text, "Prove zizmor rejects dangerous workflow", "zizmor positive control")
+    _require(text, 'expression = "$" + "{{ github.event.pull_request.title }}"', "runtime-only unsafe expression")
+    _require(text, "on: pull_request_target", "dangerous trigger positive control")
+    _require(text, "--offline --strict-collection --no-config --format=json-v1", "strict offline zizmor mode")
+    _require(text, "ZIZMOR_OFFLINE=1", "zizmor offline environment")
+    _require(text, ".github/actions/*/action.yml", "local action target discovery")
+    _require(text, "WORKFLOW_SECURITY_TARGET_FILE", "shared target discovery")
+    _require(text, "ZIZMOR_FINDINGS=", "safe finding count")
+    _require(text, '"ident": item.get("ident")', "safe finding rule metadata")
+    if 'item.get("feature")' in text:
+        raise WorkflowSecurityError("zizmor logs must not expose feature/snippet content")
     for trigger_path in policy["trigger_paths"]:
         if trigger_path not in text:
             raise WorkflowSecurityError(f"workflow trigger path missing: {trigger_path}")

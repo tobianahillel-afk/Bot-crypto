@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy_kind": "workflow_security_policy_v1",
-  "semantics": "CHANGED_WORKFLOW_ACTIONLINT_FAIL_CLOSED_V1",
+  "semantics": "CHANGED_WORKFLOW_ACTIONLINT_ZIZMOR_FAIL_CLOSED_V1",
   "workflow_path": ".github/workflows/security-actions.yml",
   "actionlint": {
     "repository": "rhysd/actionlint",
@@ -47,6 +47,32 @@
     "runtime malformed positive control must be rejected by actionlint",
     "tool and validation path require no token paid API SaaS LLM or larger runner",
     "legacy unchanged workflow debt remains explicit for ENG-04.5 and is not silently treated as clean",
-    "workflow uses contents read only and checkout does not persist credentials"
+    "workflow uses contents read only and checkout does not persist credentials",
+    "zizmor release tag and source commit are audited and the exact Linux asset SHA-256 is enforced",
+    "zizmor runs offline with strict collection no configuration no token and fail-closed exit codes",
+    "changed local action definitions are included in zizmor targets",
+    "zizmor finding logs expose metadata only and never workflow feature/snippet content"
+  ],
+  "zizmor": {
+    "repository": "zizmorcore/zizmor",
+    "tag": "v1.30.1",
+    "commit": "99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+    "version": "1.30.1",
+    "license": "MIT",
+    "asset_name": "zizmor-x86_64-unknown-linux-gnu.tar.gz",
+    "asset_url": "https://github.com/zizmorcore/zizmor/releases/download/v1.30.1/zizmor-x86_64-unknown-linux-gnu.tar.gz",
+    "asset_sha256": "e65324f4430c2717591937edcec90ccbefaf14c174f8ec9415e03ca875b46e1a",
+    "mode": [
+      "--offline",
+      "--strict-collection",
+      "--no-config",
+      "--format=json-v1"
+    ]
+  },
+  "zizmor_target_patterns": [
+    ".github/workflows/*.yml",
+    ".github/workflows/*.yaml",
+    ".github/actions/*/action.yml",
+    ".github/actions/*/action.yaml"
   ]
 }
