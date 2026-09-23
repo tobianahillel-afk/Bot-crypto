@@ -5,6 +5,11 @@ on:
     paths:
       - ".github/workflows/**"
       - ".github/actions/**"
+      - "scripts/governance/audit_action_supply_chain.py"
+      - "scripts/governance/audit_workflow_permissions.py"
+      - "config/governance/action_supply_chain_policy_v1.json"
+      - "config/governance/action_pin_registry_v1.json"
+      - "config/governance/workflow_permission_policy_v1.json"
   push:
     branches:
       - main
@@ -12,6 +17,11 @@ on:
     paths:
       - ".github/workflows/**"
       - ".github/actions/**"
+      - "scripts/governance/audit_action_supply_chain.py"
+      - "scripts/governance/audit_workflow_permissions.py"
+      - "config/governance/action_supply_chain_policy_v1.json"
+      - "config/governance/action_pin_registry_v1.json"
+      - "config/governance/workflow_permission_policy_v1.json"
   schedule:
     - cron: "17 4 * * 1"
   workflow_dispatch:
