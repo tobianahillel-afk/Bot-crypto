@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "policy_kind": "security_engine_verification_policy_v1",
+  "semantics": "ZERO_COST_RISK_PROPORTIONAL_FINAL_VERDICT",
+  "security_workflows": [
+    ".github/workflows/security-secrets.yml",
+    ".github/workflows/security-dependencies.yml",
+    ".github/workflows/security-sast.yml",
+    ".github/workflows/security-actions.yml",
+    ".github/workflows/security-supply-chain.yml"
+  ],
+  "path_scoped_workflows": [
+    ".github/workflows/security-dependencies.yml",
+    ".github/workflows/security-sast.yml",
+    ".github/workflows/security-actions.yml",
+    ".github/workflows/security-supply-chain.yml"
+  ],
+  "secret_workflow": ".github/workflows/security-secrets.yml",
+  "secret_weekly_cron": "41 4 * * 1",
+  "cost_policy_files": [
+    "config/governance/secret_control_policy_v1.json",
+    "config/governance/dependency_control_policy_v1.json",
+    "config/governance/sast_control_policy_v1.json",
+    "config/governance/workflow_security_policy_v1.json",
+    "config/governance/action_supply_chain_policy_v1.json",
+    "config/governance/workflow_permission_policy_v1.json",
+    "config/governance/repository_protection_policy_v1.json"
+  ],
+  "workflow_permission_policy": "config/governance/workflow_permission_policy_v1.json",
+  "action_supply_chain_policy": "config/governance/action_supply_chain_policy_v1.json",
+  "action_pin_registry": "config/governance/action_pin_registry_v1.json",
+  "repository_protection_status": "engineering/REPOSITORY_PROTECTION_STATUS.json",
+  "expected": {
+    "engineering_verdict": "PASS_ENGINEERING_SECURITY",
+    "business_unlock_status": "BUSINESS_UNLOCK_BLOCKED_EXTERNAL_PROTECTION",
+    "blocking_finding_id": "BOOT-FINDING-001",
+    "protection_status": "UNPROTECTED"
+  },
+  "invariants": [
+    "all cost_policy values across ENG-04 control policies are false",
+    "all five security workflows pass existing least-privilege permission policy",
+    "all remote action uses in security workflows are exact registered SHA pins",
+    "dependency SAST workflow-security and supply-chain workflows are push/PR path scoped",
+    "secret workflow is universal on push and pull_request without path filtering",
+    "routine secret scans use introduced Git ranges and never execute full-tree/full-history steps",
+    "scheduled/manual secret assurance executes current-tree plus full-history scans",
+    "zero-base or unavailable routine range fails safe to full-history scanning",
+    "repository protection blocker remains explicit and business unlock remains denied",
+    "verification requires no network paid service LLM or scanner execution"
+  ]
+}
