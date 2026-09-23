@@ -17,6 +17,7 @@
     "arguments": [
       "-r",
       "requirements-dev.lock",
+      "--no-deps",
       "--disable-pip",
       "--strict",
       "--progress-spinner",
@@ -58,7 +59,7 @@
     "requirements-dev.lock contains only exact package pins",
     "all direct dev requirements are present at the same version in requirements-dev.lock",
     "pip-audit remains pinned to the pre-existing version 2.9.0 for this AWU",
-    "pip-audit uses --disable-pip and --strict against the exact lock",
+    "pip-audit uses --no-deps --disable-pip and --strict against the exact fully pinned transitive lock",
     "Dependency Review is exact-SHA pinned and blocks vulnerabilities from low severity across all scopes",
     "Dependency Review comments write permissions license checks and warn-only mode are disabled",
     "dedicated dependency workflow is path-filtered plus weekly/manual",
