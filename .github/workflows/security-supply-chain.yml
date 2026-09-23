@@ -1,0 +1,68 @@
+name: Security Supply Chain
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+      - ".github/actions/**"
+  push:
+    branches:
+      - main
+      - engineering/bootstrap-development-engine
+    paths:
+      - ".github/workflows/**"
+      - ".github/actions/**"
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-supply-chain-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  action-supply-chain:
+    name: Action supply-chain inventory
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Compile supply-chain auditor
+        run: python3 -m py_compile scripts/governance/audit_action_supply_chain.py
+
+      - name: Inventory all action uses
+        run: |
+          python3 scripts/governance/audit_action_supply_chain.py \
+            --mode inventory \
+            --emit-debt \
+            --output "${RUNNER_TEMP}/action-supply-chain-inventory.json"
+
+      - name: Gate changed workflow refs on pull requests
+        if: github.event_name == 'pull_request'
+        env:
+          SUPPLY_BASE: ${{ github.event.pull_request.base.sha }}
+          SUPPLY_HEAD: ${{ github.sha }}
+        run: |
+          python3 scripts/governance/audit_action_supply_chain.py \
+            --mode changed \
+            --base "${SUPPLY_BASE}" \
+            --head "${SUPPLY_HEAD}"
+
+      - name: Gate changed workflow refs on pushes
+        if: github.event_name == 'push'
+        env:
+          SUPPLY_BASE: ${{ github.event.before }}
+          SUPPLY_HEAD: ${{ github.sha }}
+        run: |
+          python3 scripts/governance/audit_action_supply_chain.py \
+            --mode changed \
+            --base "${SUPPLY_BASE}" \
+            --head "${SUPPLY_HEAD}"

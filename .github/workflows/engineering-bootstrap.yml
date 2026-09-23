@@ -189,6 +189,12 @@ jobs:
       - name: Run workflow security adversarial self-tests
         run: python scripts/governance/selftest_workflow_security_controls.py
 
+      - name: Validate action supply-chain controls
+        run: python scripts/governance/audit_action_supply_chain.py --mode inventory
+
+      - name: Run action supply-chain adversarial self-tests
+        run: python scripts/governance/selftest_action_supply_chain.py
+
       - name: Validate exact-input proof reuse semantics
         run: python scripts/governance/proof_reuse.py --self-check
 

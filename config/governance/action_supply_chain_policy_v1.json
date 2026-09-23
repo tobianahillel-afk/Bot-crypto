@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "policy_kind": "action_supply_chain_policy_v1",
+  "semantics": "INVENTORY_LEGACY_DEBT_BLOCK_CHANGED_FLOATING_REFS",
+  "scan_roots": [
+    ".github/workflows",
+    ".github/actions"
+  ],
+  "workflow_extensions": [
+    ".yml",
+    ".yaml"
+  ],
+  "immutable_remote_ref_regex": "^[0-9a-fA-F]{40}$",
+  "remote_uses_regex": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+(?:/[^@\\s]+)?@([^@\\s]+)$",
+  "classifications": [
+    "REMOTE_PINNED_SHA",
+    "REMOTE_FLOATING_REF",
+    "LOCAL_ACTION_OR_WORKFLOW",
+    "DOCKER_IMAGE",
+    "DYNAMIC_EXPRESSION",
+    "MALFORMED_USES"
+  ],
+  "inventory_mode": {
+    "fail_on_legacy_floating": false,
+    "fail_on_dynamic_or_malformed": false,
+    "emit_machine_readable_debt": true
+  },
+  "changed_mode": {
+    "fail_on_remote_floating": true,
+    "fail_on_dynamic_or_malformed": true,
+    "deleted_files_ignored": true
+  },
+  "workflow": {
+    "path": ".github/workflows/security-supply-chain.yml",
+    "checkout_action_sha": "11d5960a326750d5838078e36cf38b85af677262",
+    "checkout_version_comment": "v4",
+    "permissions": [
+      "contents: read"
+    ],
+    "weekly_cron": "17 4 * * 1"
+  },
+  "cost_policy": {
+    "paid_api_required": false,
+    "paid_saas_required": false,
+    "paid_llm_required": false,
+    "paid_runner_required": false,
+    "runtime_dependency_install_required": false
+  },
+  "invariants": [
+    "inventory never executes referenced actions",
+    "remote refs are immutable only when exactly 40 hexadecimal characters",
+    "local ./ uses and docker:// uses are classified separately",
+    "inventory reports legacy debt without blocking the repository",
+    "changed workflow files fail closed on floating dynamic or malformed uses",
+    "deleted workflow files do not create stale-content failures",
+    "mandatory gate uses only Python standard library and local git",
+    "new remote action references require later registry verification before approval"
+  ]
+}
