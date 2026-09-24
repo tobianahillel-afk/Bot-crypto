@@ -456,9 +456,9 @@ def synthetic_fixture(policy: dict[str, Any]) -> dict[str, Any]:
             "NO_OPEN_BLOCKER":"REPOSITORY_ARTIFACT",
         },
         "required_t3":required_t3,
-        "satisfied_t3:list(required_t3),
+        "satisfied_t3":list(required_t3),
         "required_t4":required_t4,
-        "satisfied_t4:list(required_t4),
+        "satisfied_t4":list(required_t4),
     }
     input_material = {
         "material_version":1,
