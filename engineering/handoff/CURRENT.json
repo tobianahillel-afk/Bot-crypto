@@ -34,7 +34,6 @@
     "active_manifest": "engineering/lots/ENG-07.json"
   },
   "recent_completed": [
-    "ENG-06.4 WU02 native GitHub attestation transport completed on exact head c887b5ebbdd870d1351a1f909a88454d1beb9a1c; Certification Provenance run 35987439933 plus bootstrap, Security Actions, Supply Chain and Secrets passed with exact actions/attest v4.2.2 pin and least-privilege OIDC/attestations writes.",
     "ENG-06.5 WU01 fail-closed promotion rules completed on exact head ec68b30b81092bada16b6bba69ffae3e621a7a6b; bootstrap 35990718163, Security Actions 35990718141, Supply Chain 35990718255 and Secrets 35990718137 all passed on the same head; promotion self-check and 17 adversarial probes passed.",
     "ENG-06.6 post-merge tree-equivalence reuse completed on exact head 04493b7c237f9f87ac427f572beb545c7ee18682; bootstrap 35991702019, Security Actions 35991702024, Supply Chain 35991702020 and Secrets 35991702101 all passed; post-merge self-check and 14 adversarial probes passed.",
     "ENG-07.1 WU01 deterministic batching core implemented on exact head 095dde63c24f0f79d54d29b9ea797a2fbd78bac1; bootstrap 36004957596 and Security Secrets 36004957679 passed. CI execution of the new planner selftests is delegated to WU02.",
@@ -84,20 +83,6 @@
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
   ],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "head_sha": "04493b7c237f9f87ac427f572beb545c7ee18682",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35991702101",
-      "scope": "ENG-06.6-WU01_SECRETS",
-      "status": "PASS"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36004957596",
-      "head_sha": "095dde63c24f0f79d54d29b9ea797a2fbd78bac1",
-      "scope": "ENG-07.1-WU01_BOOTSTRAP"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "status": "PASS",
