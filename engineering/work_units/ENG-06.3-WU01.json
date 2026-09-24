@@ -171,7 +171,7 @@
     ],
     "scope_base_sha": "883e887545801355734ed700dad1f7a5af6dc31b"
   },
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "title": "Satisfy selected T3 assurance with existing exact-head controls",
   "validation": {
     "required_tiers": [

@@ -53,12 +53,12 @@
     {
       "description": "Execute risk-proportional deep assurance only when selected by policy.",
       "id": "ENG-06.3",
-      "status": "IN_PROGRESS"
+      "status": "DONE"
     },
     {
       "description": "Implement provenance and attestation semantics without replacing domain integrity hashes.",
       "id": "ENG-06.4",
-      "status": "PLANNED"
+      "status": "IN_PROGRESS"
     },
     {
       "description": "Define fail-closed promotion rules from candidate to certified state.",
