@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "policy_kind": "mandatory_cost_zero_policy_v1",
+  "semantics": "STATIC_ZERO_PAID_REQUIREMENTS_WITH_VISIBILITY_UNVERIFIED",
+  "mandatory_workflows": [
+    ".github/workflows/engineering-bootstrap.yml",
+    ".github/workflows/security-secrets.yml",
+    ".github/workflows/security-dependencies.yml",
+    ".github/workflows/security-sast.yml",
+    ".github/workflows/security-actions.yml",
+    ".github/workflows/security-supply-chain.yml"
+  ],
+  "source_security_policy": "config/governance/security_engine_verification_policy_v1.json",
+  "project_state": "config/governance/project_state.json",
+  "agent_capabilities": "engineering/AGENT_CAPABILITIES.json",
+  "action_pin_registry": "config/governance/action_pin_registry_v1.json",
+  "governance_cost_policy_files": [
+    "config/governance/secret_control_policy_v1.json",
+    "config/governance/dependency_control_policy_v1.json",
+    "config/governance/sast_control_policy_v1.json",
+    "config/governance/workflow_security_policy_v1.json",
+    "config/governance/action_supply_chain_policy_v1.json",
+    "config/governance/workflow_permission_policy_v1.json",
+    "config/governance/repository_protection_policy_v1.json"
+  ],
+  "allowed_runner_labels": [
+    "ubuntu-latest"
+  ],
+  "zero_cost_action_allowlist": {
+    "actions/checkout": {
+      "classification": "PUBLIC_MIT_NO_SEPARATE_PAID_CREDENTIAL",
+      "paid_secret_required": false,
+      "paid_service_required": false
+    },
+    "actions/setup-python": {
+      "classification": "PUBLIC_MIT_NO_SEPARATE_PAID_CREDENTIAL",
+      "paid_secret_required": false,
+      "paid_service_required": false
+    },
+    "actions/setup-go": {
+      "classification": "PUBLIC_MIT_NO_SEPARATE_PAID_CREDENTIAL",
+      "paid_secret_required": false,
+      "paid_service_required": false
+    },
+    "actions/dependency-review-action": {
+      "classification": "PUBLIC_MIT_NO_SEPARATE_PAID_CREDENTIAL",
+      "paid_secret_required": false,
+      "paid_service_required": false
+    },
+    "github/codeql-action": {
+      "classification": "PUBLIC_MIT_NO_SEPARATE_PAID_CREDENTIAL",
+      "paid_secret_required": false,
+      "paid_service_required": false
+    }
+  },
+  "allowed_builtin_credentials": [
+    "github.token"
+  ],
+  "forbidden_secret_names": [
+    "OPENAI_API_KEY",
+    "ANTHROPIC_API_KEY",
+    "GOOGLE_API_KEY",
+    "GEMINI_API_KEY",
+    "MISTRAL_API_KEY",
+    "COHERE_API_KEY",
+    "GROQ_API_KEY",
+    "SNYK_TOKEN",
+    "SEMGREP_APP_TOKEN",
+    "SONAR_TOKEN",
+    "GITLEAKS_LICENSE"
+  ],
+  "forbidden_runner_markers": [
+    "self-hosted",
+    "larger-runner",
+    "xlarge",
+    "gpu"
+  ],
+  "visibility_binding": {
+    "wu01_repository_visibility": "UNVERIFIED",
+    "total_runner_cost_claim_allowed": false,
+    "wu02_requires_public_repository_evidence": true
+  },
+  "expected_static_verdict": "PASS_WITH_VISIBILITY_UNVERIFIED",
+  "invariants": [
+    "mandatory workflow set is explicit and bounded",
+    "every mandatory workflow runner label is explicitly allowed",
+    "every remote action is pinned to an approved 40-hex commit SHA",
+    "every remote action repository is explicitly classified as requiring no separate paid credential or service",
+    "mandatory workflows may use github.token but no repository secret",
+    "all project capability and ENG-04 governance cost-policy values are boolean false",
+    "WU01 never infers GitHub-hosted runner cost from static repository files",
+    "WU01 performs no billing API query and requires no network access"
+  ]
+}

@@ -349,6 +349,9 @@ jobs:
       - name: Verify complete ENG-04 security engine
         run: python scripts/governance/verify_security_engine.py --check-evidence
 
+      - name: Verify mandatory path static zero-cost inventory
+        run: python scripts/governance/verify_mandatory_cost_zero.py --static
+
       - name: Run security-engine adversarial self-tests
         run: python scripts/governance/selftest_security_engine.py
 
