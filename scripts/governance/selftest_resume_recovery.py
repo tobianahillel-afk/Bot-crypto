@@ -44,16 +44,28 @@ def _expect(exc_type: type[Exception], fn: Any, label: str) -> None:
 def main() -> int:
     started = time.perf_counter()
     mod = _module()
+    state = _json(ROOT / "config/governance/project_state.json")
     handoff = _json(ROOT / "engineering/handoff/CURRENT.json")
     context = _json(ROOT / "engineering/CONTEXT_MAP.json")
+    active = mod._module(
+        "resume_recovery_selftest_active",
+        ROOT / "scripts/governance/resolve_active_awu.py",
+    )
+    try:
+        _active_path, expected_awu, _active_evidence = active.resolve_active_awu()
+    except active.ActiveAwuError as exc:
+        raise AssertionError(str(exc)) from exc
+    expected_task = state["engineering_track"]["active_task"]
+    assert expected_awu["parent"]["task_id"] == expected_task
+    expected_awu_id = expected_awu["id"]
     probes = 0
 
     normal = mod.repository_recover()
     probes += 1
     assert normal["authority"] == "config/governance/project_state.json"
     assert normal["recovery_version"] == 2
-    assert normal["active_awu_id"] == "ENG-08.6-WU01"
-    assert normal["active_task"] == "ENG-08.6"
+    assert normal["active_awu_id"] == expected_awu_id
+    assert normal["active_task"] == expected_task
     assert normal["write_authorized"] is False
     assert normal["live_git_reverify_satisfied"] is False
     assert normal["state_auto_healed"] is False
