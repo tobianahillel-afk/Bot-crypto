@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "policy_kind": "proof_reuse_effectiveness_policy_v1",
+  "semantics": "MEASURE_EXECUTOR_SUPPRESSION_WITH_EXACT_INPUT_PROOFS",
+  "certified_engine": "scripts/governance/proof_reuse.py",
+  "certified_policy": "config/governance/proof_reuse_policy_v1.json",
+  "measurement_subject": {
+    "tier": "T1",
+    "subject_id": "SELFTEST_ENTRYPOINT_CHECK"
+  },
+  "exact_match_scenario": {
+    "request_count": 2,
+    "baseline_executions": 2,
+    "expected_actual_executions": 1,
+    "minimum_avoided_executions": 1,
+    "expected_reuse_hits": 1
+  },
+  "required_metrics": [
+    "request_count",
+    "baseline_executions",
+    "actual_executions",
+    "avoided_executions",
+    "reuse_hits",
+    "reuse_misses",
+    "reuse_rejections",
+    "request_reuse_hit_rate",
+    "candidate_hit_rate",
+    "lookup_elapsed_ms",
+    "executor_elapsed_ms"
+  ],
+  "forbidden_reuse_tiers": [
+    "T0",
+    "T3",
+    "T4"
+  ],
+  "cost_policy": {
+    "network_required": false,
+    "external_storage_required": false,
+    "paid_api_required": false,
+    "paid_saas_required": false,
+    "paid_runner_required": false
+  },
+  "claims_policy": {
+    "executor_calls_avoided": "DIRECTLY_MEASURED",
+    "proof_lookup_elapsed_ms": "DIRECTLY_MEASURED",
+    "executor_elapsed_ms": "DIRECTLY_MEASURED",
+    "saved_elapsed_ms": "FORBIDDEN_NOT_MEASURED"
+  },
+  "invariants": [
+    "the certified proof reuse engine and policy are consumed without modification",
+    "a request may skip its executor only after evaluate_reuse returns reusable=true",
+    "the first request without a candidate proof always executes",
+    "a rejected or mismatched candidate always executes",
+    "only a PASS proof may produce a reuse hit",
+    "T0 T3 T4 and forbidden subjects remain ineligible",
+    "avoided executions equal baseline executions minus actual executor calls",
+    "no saved wall-clock duration is inferred from executor timing",
+    "measurement requires no network external storage paid service or larger runner"
+  ]
+}
