@@ -12,21 +12,25 @@
 
 - Track: ENGINEERING
 - Work item: ENG-08
-- Task: ENG-08.6
-- AWU: ENG-08.6-WU01
-- Risk: R1
+- Task: ENG-08.7
+- AWU: ENG-08.7-WU01
+- Risk: R2
 - Manifest: engineering/lots/ENG-08.json
-- AWU file: engineering/work_units/ENG-08.6-WU01.json
+- AWU file: engineering/work_units/ENG-08.7-WU01.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-08.json
-- engineering/work_units/ENG-08.6-WU01.json
-- scripts/governance/resume_recovery_qualification.py
-- scripts/governance/resolve_next_work.py
-- engineering/AGENT_CAPABILITIES.json
+- engineering/work_units/ENG-08.7-WU01.json
+- scripts/governance/select_t3_t4.py
+- config/governance/validation_t3_t4_policy_v1.json
+- scripts/governance/selftest_t3_t4_selector.py
+- scripts/governance/validate_certification_deep_assurance.py
+- config/governance/certification_deep_assurance_v1.json
+- scripts/governance/validate_certification_exact_head_binding.py
+- config/governance/certification_exact_head_binding_v1.json
 
 ## Execution context — reference
 
@@ -35,16 +39,16 @@
 
 ## Budget
 
-- Primary: 7 / 10 files
-- Reference: 2 / 12 files
-- Routed size: 62 / 768 KiB
+- Primary: 11 / 12 files
+- Reference: 2 / 16 files
+- Routed size: 93 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-08.6: prove interrupted work resumes deterministically from permanent repository authority without conversational context.
-- Next action: Strengthen the permanent resume/recovery qualification with interruption timing, simultaneous stale/missing hint scenarios, bounded-route checks, safety preservation and mandatory LIVE_GIT_REVERIFY_REQUIRED before writes.
+- Objective: ENG-08.7: prove critical R3 work cannot bypass T3 risk/execution assurance or T4 exact-head/full-chain certification.
+- Next action: Harden the existing selector, deep-assurance and exact-head validators against R3 floor removal; qualify policy-mutation bypass attempts without changing business code, runtime permissions or workflow topology.
 
 ## Non-authoritative sources
 
