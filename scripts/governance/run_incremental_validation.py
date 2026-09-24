@@ -129,9 +129,22 @@ def run_chain(
             f"routine incremental chain exceeded {policy['routine_max_elapsed_ms']} ms: {elapsed}"
         )
 
+    impact = t0.get("impact")
+    if not isinstance(impact, dict):
+        raise IncrementalValidationError("T0 impact metadata missing from single-pass result")
+    impact_families = impact.get("impact_families")
+    if not isinstance(impact_families, list) or not impact_families:
+        raise IncrementalValidationError("T0 impact families missing from single-pass result")
+    risk_class = selector.get("risk_class")
+    if not isinstance(risk_class, str) or not risk_class:
+        raise IncrementalValidationError("selector risk class missing from single-pass result")
+
     return {
         "incremental_validation_version":1,
+        "trace_version":1,
         "active_awu":selector.get("active_awu") or t2.get("active_awu"),
+        "impact_families":sorted(set(impact_families)),
+        "risk_class":risk_class,
         "stage_invocations":calls,
         "nested_baseline_invocations":policy["nested_baseline_invocations"],
         "avoided_stage_invocations":avoided,

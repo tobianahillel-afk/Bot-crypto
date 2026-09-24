@@ -161,6 +161,15 @@ jobs:
           python scripts/governance/validate_validation_timing_budgets.py
           --measurement "${RUNNER_TEMP}/incremental-validation.json"
 
+      - name: Detect unnecessary or missing validation work
+        run: |
+          python scripts/governance/detect_unnecessary_checks.py --self-check
+          python scripts/governance/detect_unnecessary_checks.py \
+            --trace "${RUNNER_TEMP}/incremental-validation.json"
+
+      - name: Run unnecessary-check adversarial self-tests
+        run: python scripts/governance/selftest_unnecessary_checks.py
+
       - name: Run validation timing budget adversarial self-tests
         run: python scripts/governance/selftest_validation_timing_budgets.py
 

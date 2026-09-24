@@ -40,3 +40,19 @@ pass.
 
 Policy: `config/governance/unnecessary_check_policy_v1.json`
 Detector: `scripts/governance/detect_unnecessary_checks.py`
+
+
+## Bootstrap integration
+
+WU02 reuses the JSON already emitted by the single-pass incremental validator. The runner adds
+only three trace fields that are already available in memory: `trace_version`,
+`impact_families`, and `risk_class`.
+
+The bootstrap then:
+
+1. runs the single-pass validator once and stores its JSON in `RUNNER_TEMP`;
+2. applies the existing timing budget to that same JSON;
+3. runs the unnecessary-check detector against that same JSON;
+4. runs synthetic adversarial detector tests.
+
+No T0/T1/T2/selector stage is executed a second time for overvalidation detection.
