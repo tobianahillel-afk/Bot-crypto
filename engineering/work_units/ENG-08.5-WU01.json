@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-08.5-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-08",
+    "task_id": "ENG-08.5",
+    "manifest": "engineering/lots/ENG-08.json"
+  },
+  "title": "Qualify context-free bounded cold start",
+  "objective": "Prove that a fresh GITHUB_CONNECTOR_ONLY agent with no chat history or model memory can recover canonical identity, safety state, active engineering work and an exact bounded read route from repository authority alone, within explicit context and timing budgets.",
+  "non_goals": [
+    "interruption or stale-context recovery qualification (ENG-08.6)",
+    "modify resolver or state-machine semantics",
+    "modify mandatory workflow topology",
+    "require local repository execution",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-08.4-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "Permanent cold-start qualifier",
+      "kind": "FILE",
+      "locator": "scripts/governance/cold_start_qualification.py"
+    },
+    {
+      "name": "Canonical next-work resolver",
+      "kind": "FILE",
+      "locator": "scripts/governance/resolve_next_work.py"
+    },
+    {
+      "name": "Agent capabilities",
+      "kind": "CONFIG",
+      "locator": "engineering/AGENT_CAPABILITIES.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Strengthened context-free cold-start qualifier",
+      "kind": "FILE",
+      "locator": "scripts/governance/cold_start_qualification.py"
+    },
+    {
+      "name": "Cold-start qualification evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/COLD_START_QUALIFICATION_EVIDENCE.json"
+    },
+    {
+      "name": "Cold-start qualification design",
+      "kind": "FILE",
+      "locator": "engineering/COLD_START_QUALIFICATION.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "ac5433357f8784dc1e0499f7440b7527e0d1792d",
+    "allowed_paths": [
+      "AGENTS.md",
+      "README.md",
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-08.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-08.4-WU02.json",
+      "engineering/work_units/ENG-08.5-WU01.json",
+      "scripts/governance/cold_start_qualification.py",
+      "engineering/COLD_START_QUALIFICATION_EVIDENCE.json",
+      "engineering/COLD_START_QUALIFICATION.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/**"
+    ],
+    "forbidden_semantics": [
+      "resume recovery implementation",
+      "state machine semantic change",
+      "resolver semantic change",
+      "mandatory workflow mutation",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "cold start authority is canonical project_state plus exactly one active AWU; chat history model memory and engineering/STATE never authorize work",
+      "GITHUB_CONNECTOR_ONLY cold start never claims local execution or local test evidence",
+      "required read order starts from AGENTS.md and contains the active AWU route",
+      "implicit repository expansion remains forbidden",
+      "primary reference and total routed context remain within the active AWU budget",
+      "business development remains PAUSED Lot46 remains LOCKED and trading/execution remain disabled",
+      "ambiguous active AWU stale handoff unsafe Lot46 state paid mandatory LLM and inactive audit routing fail closed",
+      "cold-start qualification measures elapsed time and stays below a generous fail-closed 1000 ms CI budget"
+    ],
+    "acceptance_criteria": [
+      "qualification prints CONTEXT_FREE_COLD_START_PASS for ENG-08.5-WU01",
+      "resolved authority is config/governance/project_state.json and active work is ENG-08/ENG-08.5",
+      "required read order contains neither chat_history model_memory nor engineering/STATE.json",
+      "context route primary_count <= 10 reference_count <= 12 and routed size <= 768 KiB",
+      "GITHUB_CONNECTOR_ONLY reports local_execution=false and may_claim_local_test_pass=false",
+      "at least eight negative/context-bound scenarios pass fail-closed",
+      "measured cold-start elapsed_ms < 1000 on CI",
+      "Bootstrap and Security Secrets pass on the same exact head"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 13,
+      "executable_loc_changed": 500,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/cold_start_qualification.py"
+    ]
+  },
+  "done_when": [
+    "fresh-agent authority and bounded context are proven without conversational state",
+    "cold-start timing and context budgets pass fail-closed qualification",
+    "all unsafe ambiguous and non-authoritative routes are rejected",
+    "Bootstrap and Security Secrets pass on one exact head"
+  ]
+}
