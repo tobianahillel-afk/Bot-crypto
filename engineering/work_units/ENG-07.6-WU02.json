@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-07.6-WU02",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-07",
+    "task_id": "ENG-07.6",
+    "manifest": "engineering/lots/ENG-07.json"
+  },
+  "title": "Qualify audit-engine immutable-evidence protection adversarially and in CI",
+  "objective": "Execute the ENG-07.6 evidence-protection validator, add focused synthetic attacks against write authority, validator source safety, AWU scope isolation and remediation-queue authority, and wire exactly two checks into the existing bootstrap.",
+  "non_goals": [
+    "replace or edit canonical historical evidence protection",
+    "execute historical audits",
+    "perform remediation",
+    "modify protected evidence business code contracts data/audit or certified reports",
+    "create a new workflow",
+    "change protection semantics except to fix a demonstrated validator defect",
+    "audit Lot45 candidate",
+    "unlock Lot46",
+    "change runtime authority",
+    "add dependency or paid/LLM-backed service"
+  ],
+  "depends_on": [
+    "ENG-07.6-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Audit evidence protection validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_historical_audit_evidence_protection.py"
+    },
+    {
+      "name": "Audit evidence protection policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/historical_audit_evidence_protection_policy_v1.json"
+    },
+    {
+      "name": "Canonical historical evidence protection",
+      "kind": "CONFIG",
+      "locator": "engineering/HISTORICAL_EVIDENCE_PROTECTION.json"
+    },
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Audit evidence protection adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_historical_audit_evidence_protection.py"
+    },
+    {
+      "name": "Bootstrap qualification integration",
+      "kind": "FILE",
+      "locator": ".github/workflows/engineering-bootstrap.yml"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "00ca474f9690667326e88a8a55ef9d432033b87f",
+    "allowed_paths": [
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-07.6-WU01.json",
+      "engineering/work_units/ENG-07.6-WU02.json",
+      "config/governance/historical_audit_evidence_protection_policy_v1.json",
+      "scripts/governance/validate_historical_audit_evidence_protection.py",
+      "scripts/governance/selftest_historical_audit_evidence_protection.py",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      "engineering/HISTORICAL_EVIDENCE_PROTECTION.json"
+    ],
+    "forbidden_semantics": [
+      "historical audit execution",
+      "historical evidence mutation",
+      "historical certification fact mutation",
+      "remediation execution",
+      "write-capable remediation authority",
+      "canonical evidence protection weakening",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "canonical historical evidence protection remains byte-untouched by WU02",
+      "validator --check and --self-check execute in bootstrap before WU completion",
+      "adversarial tests cover writable authority permission drift dangerous imports write primitives protected scope queue write fields canonical binding and Lot45/Lot46 isolation",
+      "qualification is synthetic and read-only",
+      "CI adds exactly the evidence-protection check and adversarial test steps without a new workflow",
+      "no dependency installation network access or paid service is introduced",
+      "any validator correction remains inside the WU01 policy/validator family and preserves fail-closed semantics"
+    ],
+    "acceptance_criteria": [
+      "validator --check passes against canonical protection and current ENG-07 scopes",
+      "validator --self-check passes",
+      "adversarial suite passes with at least 16 focused probes",
+      "writable mutation authority or findings/report permission fails closed",
+      "dangerous import or filesystem write primitive in any audit validator fails closed",
+      "ENG-07 AWU access to protected path or forbidden business/evidence prefix fails closed",
+      "remediation queue command patch target-path branch or write-authority field fails closed",
+      "canonical protection path kind comparison base anchor or protected-path drift remains fail closed through the canonical validator",
+      "bootstrap and Security Secrets pass on the same exact head"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 9,
+      "executable_loc_changed": 550,
+      "new_public_behaviors": 0,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_historical_audit_evidence_protection.py --check",
+      "python scripts/governance/validate_historical_audit_evidence_protection.py --self-check",
+      "python scripts/governance/selftest_historical_audit_evidence_protection.py"
+    ]
+  },
+  "done_when": [
+    "audit evidence protection validator and adversarial suite pass on exact head in bootstrap",
+    "Security Secrets passes on the same exact head",
+    "canonical historical evidence protection and all frozen evidence remain unmodified",
+    "ENG-07 can be closed and transition to ENG-08 planning without unlocking business development"
+  ]
+}
