@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-07.5-WU02",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-07",
+    "task_id": "ENG-07.5",
+    "manifest": "engineering/lots/ENG-07.json"
+  },
+  "title": "Qualify historical audit reports adversarially and in CI",
+  "objective": "Execute the ENG-07.5 report validator self-check, add focused synthetic adversarial qualification, and wire both checks into the existing bootstrap without executing real historical audits or remediation.",
+  "non_goals": [
+    "execute historical audits",
+    "populate or persist real historical findings reports or remediation queues",
+    "perform remediation",
+    "change report or findings semantics except to fix a demonstrated validator defect",
+    "modify immutable historical evidence business code contracts or reports",
+    "create a new workflow",
+    "audit Lot45 candidate",
+    "unlock Lot46",
+    "change runtime authority",
+    "add dependency or paid/LLM-backed service"
+  ],
+  "depends_on": [
+    "ENG-07.5-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Historical audit report validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_historical_audit_report.py"
+    },
+    {
+      "name": "Historical audit report schema",
+      "kind": "SCHEMA",
+      "locator": "config/governance/historical_audit_report_schema_v1.json"
+    },
+    {
+      "name": "Historical audit report policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/historical_audit_report_policy_v1.json"
+    },
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Historical audit report adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_historical_audit_report.py"
+    },
+    {
+      "name": "Bootstrap qualification integration",
+      "kind": "FILE",
+      "locator": ".github/workflows/engineering-bootstrap.yml"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "2781939a1a537c214435b66b05748eb55d8f79a9",
+    "allowed_paths": [
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-07.5-WU01.json",
+      "engineering/work_units/ENG-07.5-WU02.json",
+      "scripts/governance/validate_historical_audit_report.py",
+      "config/governance/historical_audit_report_schema_v1.json",
+      "config/governance/historical_audit_report_policy_v1.json",
+      "scripts/governance/selftest_historical_audit_report.py",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "historical audit execution",
+      "real historical findings report or remediation queue population",
+      "historical evidence mutation",
+      "historical certification fact mutation",
+      "remediation execution",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "report validator self-check executes in bootstrap before WU completion",
+      "adversarial tests cover source bindings counts status queue completeness priority ordering owner triage action identity and Lot45 exclusion",
+      "qualification uses synthetic findings registries reports mappings manifests and plans only",
+      "CI adds exactly the report self-check and report adversarial test steps without a new workflow",
+      "no dependency installation network access or paid service is introduced",
+      "no real historical report or remediation queue is created by qualification",
+      "any core correction remains within the WU01 schema policy validator family and preserves declared semantics"
+    ],
+    "acceptance_criteria": [
+      "validator --self-check passes for CLEAN BLOCKED ACTION_REQUIRED and RESOLVED",
+      "adversarial suite passes with at least 16 focused probes",
+      "forged registry manifest mapping plan batch lot or audit-result bindings fail closed",
+      "forged finding/open/closed/severity counts fail closed",
+      "forged report status queue priority triage action owner or report identity fails closed",
+      "queue omission duplication reordering extra entries or non-contiguous queue ids fail closed",
+      "closed findings never enter remediation queue and every OPEN finding does",
+      "Lot45 or later report fails closed through validated source binding",
+      "bootstrap executes both report qualification steps successfully",
+      "Security Secrets remains green on the same exact head"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 10,
+      "executable_loc_changed": 550,
+      "new_public_behaviors": 0,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_historical_audit_report.py --self-check",
+      "python scripts/governance/selftest_historical_audit_report.py"
+    ]
+  },
+  "done_when": [
+    "report validator self-check and adversarial suite pass on exact head in bootstrap",
+    "Security Secrets passes on the same exact head",
+    "no real historical audit report remediation queue or remediation occurred",
+    "ENG-07.5 can transition to ENG-07.6"
+  ]
+}
