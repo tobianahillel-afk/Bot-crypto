@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-06.6-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-06",
+    "task_id": "ENG-06.6",
+    "manifest": "engineering/lots/ENG-06.json"
+  },
+  "title": "Define post-merge certification equivalence and proof-reuse rules",
+  "objective": "Define a pure fail-closed post-merge verifier that reuses prior certification only when the merged target is cryptographically tree-equivalent to the certified candidate and all promotion/provenance identities remain intact; otherwise require bounded revalidation instead of automatically rerunning the full suite.",
+  "non_goals": [
+    "merge a pull request or mutate main",
+    "update the certified business baseline",
+    "unlock business development or Lot46",
+    "execute T4 certification",
+    "rerun the full historical test chain",
+    "change canonical domain integrity semantics",
+    "change runtime execution authority",
+    "business implementation",
+    "mandatory paid dependency"
+  ],
+  "depends_on": [
+    "ENG-06.5-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Promotion policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/certification_promotion_v1.json"
+    },
+    {
+      "name": "Exact-head binding policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/certification_exact_head_binding_v1.json"
+    },
+    {
+      "name": "Canonical provenance policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/certification_provenance_v1.json"
+    },
+    {
+      "name": "Proof reuse policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/proof_reuse_policy_v1.json"
+    },
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Post-merge verification policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/certification_post_merge_v1.json"
+    },
+    {
+      "name": "Post-merge verifier",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_certification_post_merge.py"
+    },
+    {
+      "name": "Post-merge adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_certification_post_merge.py"
+    },
+    {
+      "name": "Post-merge semantics documentation",
+      "kind": "FILE",
+      "locator": "engineering/CERTIFICATION_POST_MERGE.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "ec68b30b81092bada16b6bba69ffae3e621a7a6b",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-06.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "AGENTS.md",
+      "README.md",
+      "engineering/CURRENT_STATUS.md",
+      "engineering/work_units/ENG-06.5-WU01.json",
+      "engineering/work_units/ENG-06.6-WU01.json",
+      "config/governance/certification_post_merge_v1.json",
+      "scripts/governance/validate_certification_post_merge.py",
+      "scripts/governance/selftest_certification_post_merge.py",
+      "engineering/CERTIFICATION_POST_MERGE.md",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/lot*/**"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "actual PR merge",
+      "main branch mutation",
+      "certified baseline mutation",
+      "T4 execution",
+      "business certification claim for Lot45",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "post-merge verification is pure and never mutates Git PR lifecycle canonical business state or runtime authority",
+      "prior promotion decision must be PROMOTION_ALLOWED and bind the exact certified candidate head",
+      "merged target branch must be main and merged head/tree identifiers must be lowercase SHA-40",
+      "tree-equivalence reuse requires merged tree SHA to equal the certified candidate tree SHA exactly",
+      "candidate promotion provenance and certification verdict identities remain immutable inputs to the post-merge record",
+      "merge metadata must bind the source candidate id head and PR identity without ambiguity",
+      "tree mismatch candidate mismatch missing promotion evidence or unknown merge method returns REVALIDATION_REQUIRED",
+      "tree-equivalent merge may reuse prior certification semantics without rerunning full regression or T4",
+      "post-merge equivalence record is a new SHA-256 identity and never rewrites prior certification provenance",
+      "post-merge result never unlocks business Lot46 trading execution leverage or withdrawals"
+    ],
+    "acceptance_criteria": [
+      "synthetic tree-equivalent merge produces POST_MERGE_VERIFIED_REUSE",
+      "different merged tree produces REVALIDATION_REQUIRED",
+      "non-PROMOTION_ALLOWED source produces REVALIDATION_REQUIRED",
+      "candidate id or head mismatch produces REVALIDATION_REQUIRED",
+      "wrong target branch produces REVALIDATION_REQUIRED",
+      "unsupported merge method fails closed",
+      "post-merge identity changes when merged head or merge metadata changes",
+      "reuse result explicitly records full_regression_rerun=false and t4_rerun=false",
+      "revalidation result never claims prior certification covers changed tree",
+      "no main PR business state Lot46 or runtime authority is mutated during qualification"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 7,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": true,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": true,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 15,
+      "executable_loc_changed": 720,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 1,
+      "trust_boundaries": 1,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_certification_post_merge.py --self-check",
+      "python scripts/governance/selftest_certification_post_merge.py"
+    ]
+  },
+  "done_when": [
+    "tree-equivalent post-merge reuse is deterministic and cryptographically bound",
+    "any content drift fails closed to revalidation rather than automatic reuse",
+    "post-merge verification avoids redundant full-suite and T4 reruns only when equivalence is exact",
+    "business and runtime safety state remain unchanged"
+  ]
+}
