@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "policy_kind": "certification_provenance_v1",
+  "semantics": "CANONICAL_PROVENANCE_ENVELOPE_PRESERVES_DOMAIN_INTEGRITY_DIGESTS",
+  "lifecycle_policy_source": "config/governance/certification_candidate_lifecycle_v1.json",
+  "exact_head_policy_source": "config/governance/certification_exact_head_binding_v1.json",
+  "deep_assurance_policy_source": "config/governance/certification_deep_assurance_v1.json",
+  "evidence_policy_source": "engineering/AGENT_CAPABILITIES.json",
+  "canonical_repository": "tobianahillel-afk/Bot-crypto",
+  "provenance_hash_algorithm": "sha256",
+  "domain_digest_algorithms": [
+    "sha256"
+  ],
+  "attestation_subject": {
+    "name": "certification-provenance-envelope.json",
+    "digest_algorithm": "sha256"
+  },
+  "workflow_identity_fields": [
+    "repository",
+    "workflow_path",
+    "workflow_ref",
+    "workflow_sha",
+    "run_id",
+    "run_attempt"
+  ],
+  "domain_integrity_fields": [
+    "path",
+    "algorithm",
+    "digest"
+  ],
+  "non_identity_metadata_fields": [
+    "created_at_utc",
+    "producer_url",
+    "notes"
+  ],
+  "max_domain_integrity_refs": 128,
+  "invariants": [
+    "provenance identity is SHA-256 over canonical semantic material only",
+    "candidate identity must agree with exact-input binding and deep-assurance plan candidate head",
+    "deep assurance must be satisfied with status PASS or NOT_REQUIRED",
+    "deep-assurance verdict must bind the exact plan identity supplied to provenance",
+    "producing workflow repository is canonical and workflow SHA equals candidate head",
+    "workflow path ref run id and run attempt are explicit provenance identity",
+    "domain integrity digests are preserved as separate sorted references and never replaced by provenance identity",
+    "attestation subject SHA-256 equals provenance envelope identity rather than any domain digest",
+    "timestamps producer URLs notes and transport metadata never alter provenance identity",
+    "duplicate unsafe malformed or tampered domain references fail closed",
+    "provenance validation requires no paid service or mandatory LLM"
+  ]
+}

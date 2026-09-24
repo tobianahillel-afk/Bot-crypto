@@ -182,6 +182,12 @@ jobs:
       - name: Run certification deep assurance adversarial self-tests
         run: python scripts/governance/selftest_certification_deep_assurance.py
 
+      - name: Validate canonical certification provenance
+        run: python scripts/governance/validate_certification_provenance.py --self-check
+
+      - name: Run certification provenance adversarial self-tests
+        run: python scripts/governance/selftest_certification_provenance.py
+
       - name: Run incremental validation adversarial self-tests
         run: python scripts/governance/selftest_incremental_validation.py
 
