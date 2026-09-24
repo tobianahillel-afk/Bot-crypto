@@ -340,8 +340,16 @@ def _synthetic_bundle() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]
         "historical_mapping_manifest_fixture",
         ROOT / "scripts" / "governance" / "validate_historical_audit_manifest.py",
     )
-    plan = manifest_mod._synthetic_plan()
-    manifest = manifest_mod._valid_manifest(plan)
+    planner = manifest_mod._load_planner()
+    plan = planner.plan_batches(
+        planner.synthetic_request(),
+        planner._load(planner.POLICY_PATH),
+    )
+    manifest = manifest_mod.build_manifest(
+        batch=plan["batches"][0],
+        plan_identity_sha256=plan["plan_identity_sha256"],
+        source_head_sha="a" * 40,
+    )
     lot = manifest["lots"][0]
     requirement = {
         "requirement_id": f"LOT{lot:02d}-REQ-SYNTHETIC",
