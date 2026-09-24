@@ -176,6 +176,12 @@ jobs:
       - name: Run exact-head certification binding adversarial self-tests
         run: python scripts/governance/selftest_certification_exact_head_binding.py
 
+      - name: Validate risk-proportional certification deep assurance
+        run: python scripts/governance/validate_certification_deep_assurance.py --self-check
+
+      - name: Run certification deep assurance adversarial self-tests
+        run: python scripts/governance/selftest_certification_deep_assurance.py
+
       - name: Run incremental validation adversarial self-tests
         run: python scripts/governance/selftest_incremental_validation.py
 
