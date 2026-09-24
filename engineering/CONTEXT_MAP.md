@@ -12,22 +12,22 @@
 
 - Track: ENGINEERING
 - Work item: ENG-07
-- Task: ENG-07.2
-- AWU: ENG-07.2-WU02
-- Risk: R1
+- Task: ENG-07.3
+- AWU: ENG-07.3-WU01
+- Risk: R2
 - Manifest: engineering/lots/ENG-07.json
-- AWU file: engineering/work_units/ENG-07.2-WU02.json
+- AWU file: engineering/work_units/ENG-07.3-WU01.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-07.json
-- engineering/work_units/ENG-07.2-WU02.json
-- config/governance/historical_audit_manifest_schema_v1.json
-- config/governance/historical_audit_lifecycle_v1.json
+- engineering/work_units/ENG-07.3-WU01.json
 - scripts/governance/validate_historical_audit_manifest.py
-- scripts/governance/selftest_historical_audit_manifest.py
+- config/governance/historical_audit_manifest_schema_v1.json
+- docs/DECISION_AUDITABILITY_AND_TRACEABILITY_STANDARD.md
+- docs/ROADMAP_TRACEABILITY_MATRIX.md
 - engineering/handoff/CURRENT.json
 
 ## Execution context — reference
@@ -37,16 +37,16 @@
 
 ## Budget
 
-- Primary: 9 / 10 files
-- Reference: 2 / 12 files
-- Routed size: 65 / 768 KiB
+- Primary: 9 / 12 files
+- Reference: 2 / 16 files
+- Routed size: 97 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-07.2 WU02: integrate and qualify the source-bound read-only historical audit manifest and lifecycle.
-- Next action: Wire the existing manifest self-check and 15 adversarial probes into Engineering Bootstrap; do not change manifest/lifecycle semantics or execute historical audits.
+- Objective: ENG-07.3 WU01: define a source-bound read-only historical requirement/code/test/contract/evidence mapping contract.
+- Next action: Implement the mapping schema, policy, pure validator and adversarial tests; do not populate real historical mappings, record findings, remediate code, or change CI.
 
 ## Non-authoritative sources
 
