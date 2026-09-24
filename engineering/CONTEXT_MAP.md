@@ -12,23 +12,22 @@
 
 - Track: ENGINEERING
 - Work item: ENG-06
-- Task: ENG-06.5
-- AWU: ENG-06.5-WU01
+- Task: ENG-06.6
+- AWU: ENG-06.6-WU01
 - Risk: R2
 - Manifest: engineering/lots/ENG-06.json
-- AWU file: engineering/work_units/ENG-06.5-WU01.json
+- AWU file: engineering/work_units/ENG-06.6-WU01.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-06.json
-- engineering/work_units/ENG-06.5-WU01.json
-- config/governance/certification_candidate_lifecycle_v1.json
+- engineering/work_units/ENG-06.6-WU01.json
+- config/governance/certification_promotion_v1.json
 - config/governance/certification_exact_head_binding_v1.json
-- config/governance/certification_deep_assurance_v1.json
 - config/governance/certification_provenance_v1.json
-- config/governance/certification_attestation_transport_v1.json
+- config/governance/proof_reuse_policy_v1.json
 - engineering/handoff/CURRENT.json
 
 ## Execution context — reference
@@ -38,16 +37,16 @@
 
 ## Budget
 
-- Primary: 10 / 12 files
+- Primary: 9 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 53 / 1024 KiB
+- Routed size: 47 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-06.5 WU01: define pure fail-closed certification promotion rules without promoting any business candidate.
-- Next action: Implement certification_promotion_v1 policy plus validator/selftests that require CERTIFICATION_READY, exact-head PASS evidence, satisfied selected assurance, canonical provenance, matching native attestation and explicit PASS verdict; do not mutate Lot45 or unlock Lot46.
+- Objective: ENG-06.6 WU01: define fail-closed post-merge tree-equivalence and certification-reuse rules without merging or certifying any business candidate.
+- Next action: Implement certification_post_merge_v1 policy plus pure validator/selftests: allow reuse only when main post-merge tree exactly equals the certified candidate tree and promotion/candidate metadata agree; otherwise require revalidation, with no full-suite/T4 rerun on exact equivalence.
 
 ## Non-authoritative sources
 
