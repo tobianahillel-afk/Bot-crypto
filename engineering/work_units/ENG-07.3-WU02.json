@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-07.3-WU02",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-07",
+    "task_id": "ENG-07.3",
+    "manifest": "engineering/lots/ENG-07.json"
+  },
+  "title": "Integrate and qualify historical traceability mapping",
+  "objective": "Wire the completed ENG-07.3 mapping validator and adversarial suite into the existing engineering bootstrap and obtain exact-head executable evidence without changing mapping semantics or executing any historical audit.",
+  "non_goals": [
+    "change traceability mapping schema policy or status semantics",
+    "populate real historical mappings",
+    "execute historical audits",
+    "record findings",
+    "perform remediation",
+    "modify data/audit reports contracts or business code",
+    "audit Lot45 candidate",
+    "unlock Lot46",
+    "change runtime authority",
+    "add paid or LLM-backed dependency"
+  ],
+  "depends_on": [
+    "ENG-07.3-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Historical traceability mapping schema",
+      "kind": "SCHEMA",
+      "locator": "config/governance/historical_audit_mapping_schema_v1.json"
+    },
+    {
+      "name": "Historical traceability mapping policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/historical_audit_mapping_policy_v1.json"
+    },
+    {
+      "name": "Historical traceability mapping validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_historical_audit_mapping.py"
+    },
+    {
+      "name": "Historical traceability mapping selftests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_historical_audit_mapping.py"
+    },
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Bootstrap qualification integration",
+      "kind": "FILE",
+      "locator": ".github/workflows/engineering-bootstrap.yml"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "84b57bafdb6632210f0fa1cea8f0f05a8a1a76ed",
+    "allowed_paths": [
+      "engineering/work_units/ENG-07.3-WU01.json",
+      "engineering/work_units/ENG-07.3-WU02.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/lot*/**"
+    ],
+    "forbidden_semantics": [
+      "traceability mapping semantic change",
+      "historical audit execution",
+      "real historical mapping population",
+      "historical evidence mutation",
+      "findings recording",
+      "remediation",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "WU02 only wires existing WU01 mapping validation commands into engineering bootstrap",
+      "mapping self-check runs before adversarial mapping selftests",
+      "qualification executes no historical audit and writes no historical mapping or evidence",
+      "mapping schema policy identity and coverage semantics are unchanged in WU02",
+      "no new dependency action paid service or LLM is introduced",
+      "exact-head bootstrap and Security Secrets evidence are required before ENG-07.3 can complete"
+    ],
+    "acceptance_criteria": [
+      "engineering bootstrap runs validate_historical_audit_mapping.py --self-check",
+      "engineering bootstrap runs selftest_historical_audit_mapping.py",
+      "self-check and all 15 adversarial probes pass on the same exact head",
+      "active AWU scope context map and cold-start qualification remain green",
+      "Security Secrets remains green on the exact head"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 6,
+      "executable_loc_changed": 40,
+      "new_public_behaviors": 0,
+      "contract_families": 0,
+      "independent_algorithms": 0,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_historical_audit_mapping.py --self-check",
+      "python scripts/governance/selftest_historical_audit_mapping.py"
+    ]
+  },
+  "done_when": [
+    "historical traceability mapping self-check and adversarial probes execute in CI",
+    "exact-head bootstrap and Security Secrets workflows pass",
+    "no historical audit mapping/evidence or business/runtime state is modified"
+  ]
+}
