@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "agent_work_unit",
   "id": "ENG-07.5-WU02",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "parent": {
     "work_item_id": "ENG-07",
     "task_id": "ENG-07.5",

@@ -50,12 +50,12 @@
     },
     {
       "id": "ENG-07.5",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Define isolated remediation workflow separate from historical evidence."
     },
     {
       "id": "ENG-07.6",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Re-qualify immutable historical evidence protection under the audit engine."
     }
   ],

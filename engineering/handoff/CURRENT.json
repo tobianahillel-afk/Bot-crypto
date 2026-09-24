@@ -1,12 +1,12 @@
 {
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-07.5-WU02",
-    "awu_path": "engineering/work_units/ENG-07.5-WU02.json",
+    "awu_id": "ENG-07.6-WU01",
+    "awu_path": "engineering/work_units/ENG-07.6-WU01.json",
     "parent_manifest": "engineering/lots/ENG-07.json",
-    "scope_base_sha": "2781939a1a537c214435b66b05748eb55d8f79a9",
-    "risk_class": "R1",
-    "complexity_score": 1
+    "scope_base_sha": "f8cda9500c79981c4ffb91774108830aff884d73",
+    "risk_class": "R2",
+    "complexity_score": 3
   },
   "authority": {
     "context_map": "engineering/CONTEXT_MAP.json",
@@ -14,7 +14,7 @@
     "state_source": "config/governance/project_state.json"
   },
   "blockers": [],
-  "current_objective": "ENG-07.5 WU02: qualify deterministic historical audit reports adversarially and in CI.",
+  "current_objective": "ENG-07.6 WU01: bind the historical audit engine to the canonical immutable-evidence protection boundary.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -27,21 +27,21 @@
     "rulesets_count": 0
   },
   "kind": "engineering_handoff",
-  "next_action": "Execute the report validator self-check, add a focused synthetic adversarial suite, and integrate exactly two report qualification steps into the existing bootstrap; do not execute real audits or remediation.",
+  "next_action": "Implement only the audit-engine evidence-protection policy and validator with a built-in synthetic self-check; do not modify canonical frozen evidence or add CI until WU02.",
   "next_engineering": {
     "active_lot": "ENG-07",
-    "active_task": "ENG-07.5",
+    "active_task": "ENG-07.6",
     "active_manifest": "engineering/lots/ENG-07.json"
   },
   "recent_completed": [
-    "ENG-07.1 historical audit batching completed on exact head 9295cfb39ddc4dcefbc8300b13500d736e9e9302; bootstrap 36005319976 and Security Secrets 36005319563 passed, including planner self-check and 12 adversarial batching probes.",
     "ENG-07.2 WU01 read-only historical audit manifest/lifecycle implemented and strengthened on exact head 4d631406b780f77f462af89d78da0c9992e08b62; bootstrap 36012819304 and Security Secrets 36012818993 passed. Manifest validation now replays the bound ENG-07.1 plan and rejects forged plan/batch identities; executable qualification is delegated to WU02.",
     "ENG-07.2 historical audit manifest/lifecycle completed on exact head abb82c1e0aba4c3fa6d19d40d7ad5cb4dc934617; bootstrap 36013581902, Security Secrets 36013581917, Security Actions 36013581897 and Supply Chain 36013582179 passed, including manifest self-check, 15 adversarial probes, context-map and cold-start qualification.",
     "ENG-07.3 WU01 historical traceability mapping core implemented on exact head 84b57bafdb6632210f0fa1cea8f0f05a8a1a76ed; bootstrap 36014657705 and Security Secrets 36014657332 passed. Mapping semantics explicitly separate MAPPED, JUSTIFIED_NON_CODE and UNRESOLVED; executable qualification is delegated to WU02.",
     "ENG-07.3 historical traceability mapping completed on exact head 5b0441a96200cbc33838e25d262fae2c001094c9; bootstrap 36015519896 and Security Secrets 36015519763 passed on the same head, including mapping self-check, all 15 adversarial probes, context-map and cold-start qualification.",
     "ENG-07.4 WU01 historical findings registry core completed on exact head ec37b1ca0a19678ce2a899180594f7786992a740; bootstrap 36018843074 and Security Secrets 36018843013 passed. Schema, policy and validator are defined; executable adversarial qualification is delegated to WU02.",
     "ENG-07.4 historical findings registry completed on exact head 46ae234723edea0359402f879e3eb3539ebd5fc3; Bootstrap 36019390205, Security Actions 36019390215, Supply Chain 36019390146 and Security Secrets 36019390229 all passed, including findings validator self-check and adversarial qualification.",
-    "ENG-07.5 WU01 deterministic historical audit report/owner-bound remediation queue core implemented on exact head 2781939a1a537c214435b66b05748eb55d8f79a9; bootstrap 36029467281 and Security Secrets 36029466643 passed. Executable adversarial qualification is delegated to WU02."
+    "ENG-07.5 WU01 deterministic historical audit report/owner-bound remediation queue core implemented on exact head 2781939a1a537c214435b66b05748eb55d8f79a9; bootstrap 36029467281 and Security Secrets 36029466643 passed. Executable adversarial qualification is delegated to WU02.",
+    "ENG-07.5 deterministic historical audit reporting/remediation queue completed on exact head f8cda9500c79981c4ffb91774108830aff884d73; Bootstrap 36030405795, Security Secrets 36030406256, Security Actions 36030405755 and Supply Chain 36030405694 passed, including report self-check and 28 adversarial negative scenarios plus composite positive qualification."
   ],
   "resume_read_order": [
     "AGENTS.md",
@@ -62,7 +62,7 @@
   "state_snapshot": {
     "active_lot": "ENG-07",
     "active_manifest": "engineering/lots/ENG-07.json",
-    "active_task": "ENG-07.5",
+    "active_task": "ENG-07.6",
     "business_development": "PAUSED",
     "engineering_phase": "BUILDING",
     "execution_allowed": false,
@@ -83,34 +83,6 @@
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
   ],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36014657332",
-      "head_sha": "84b57bafdb6632210f0fa1cea8f0f05a8a1a76ed",
-      "scope": "ENG-07.3-WU01_SECURITY_SECRETS"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36014974132",
-      "head_sha": "d809be0d4a1a5bf34a00e8a04401c44e83508750",
-      "scope": "ENG-07.3-WU03_SCOPE_BASE_SECURITY_SECRETS"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36015519896",
-      "head_sha": "5b0441a96200cbc33838e25d262fae2c001094c9",
-      "scope": "ENG-07.3-WU03_BOOTSTRAP"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36015519763",
-      "head_sha": "5b0441a96200cbc33838e25d262fae2c001094c9",
-      "scope": "ENG-07.3-WU03_SECURITY_SECRETS"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "status": "PASS",
@@ -166,6 +138,34 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36029466643",
       "head_sha": "2781939a1a537c214435b66b05748eb55d8f79a9",
       "scope": "ENG-07.5-WU01_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36030405795",
+      "head_sha": "f8cda9500c79981c4ffb91774108830aff884d73",
+      "scope": "ENG-07.5-WU02_BOOTSTRAP"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36030406256",
+      "head_sha": "f8cda9500c79981c4ffb91774108830aff884d73",
+      "scope": "ENG-07.5-WU02_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36030405755",
+      "head_sha": "f8cda9500c79981c4ffb91774108830aff884d73",
+      "scope": "ENG-07.5-WU02_SECURITY_ACTIONS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36030405694",
+      "head_sha": "f8cda9500c79981c4ffb91774108830aff884d73",
+      "scope": "ENG-07.5-WU02_SUPPLY_CHAIN"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"

@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-07.6-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-07",
+    "task_id": "ENG-07.6",
+    "manifest": "engineering/lots/ENG-07.json"
+  },
+  "title": "Bind the historical audit engine to immutable evidence protection",
+  "objective": "Define a fail-closed requalification layer that binds ENG-07 read-only audit artifacts and remediation metadata to the existing historical evidence protection authority, proving that audit findings reports and queues cannot authorize mutation of certified evidence.",
+  "non_goals": [
+    "replace or weaken engineering/HISTORICAL_EVIDENCE_PROTECTION.json",
+    "execute historical audits",
+    "perform remediation or create write-capable remediation tooling",
+    "modify protected current-tree evidence",
+    "modify Lot44 or Lot45 certification facts",
+    "modify business code contracts data/audit or certified reports",
+    "integrate new CI steps in this WU",
+    "audit Lot45 candidate",
+    "unlock Lot46",
+    "change runtime authority",
+    "add dependency or paid/LLM-backed service"
+  ],
+  "depends_on": [
+    "ENG-07.5-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "Canonical historical evidence protection policy",
+      "kind": "CONFIG",
+      "locator": "engineering/HISTORICAL_EVIDENCE_PROTECTION.json"
+    },
+    {
+      "name": "Canonical historical evidence protection validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_historical_evidence_protection.py"
+    },
+    {
+      "name": "Historical findings policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/historical_audit_findings_policy_v1.json"
+    },
+    {
+      "name": "Historical report policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/historical_audit_report_policy_v1.json"
+    },
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Historical audit evidence protection policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/historical_audit_evidence_protection_policy_v1.json"
+    },
+    {
+      "name": "Historical audit evidence protection validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_historical_audit_evidence_protection.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "f8cda9500c79981c4ffb91774108830aff884d73",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-07.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "AGENTS.md",
+      "README.md",
+      "engineering/CURRENT_STATUS.md",
+      "engineering/work_units/ENG-07.5-WU02.json",
+      "engineering/work_units/ENG-07.6-WU01.json",
+      "config/governance/historical_audit_evidence_protection_policy_v1.json",
+      "scripts/governance/validate_historical_audit_evidence_protection.py"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/**",
+      "engineering/HISTORICAL_EVIDENCE_PROTECTION.json"
+    ],
+    "forbidden_semantics": [
+      "historical audit execution",
+      "historical evidence mutation",
+      "historical certification fact mutation",
+      "remediation execution",
+      "write-capable remediation authority",
+      "existing evidence protection weakening",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency",
+      "CI topology change"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "engineering/HISTORICAL_EVIDENCE_PROTECTION.json remains the canonical historical immutability authority",
+      "canonical Lot44 and Lot45 Git anchors and protected current-tree paths must pass the existing evidence-protection validator unchanged",
+      "all historical findings and report mutation permissions remain false",
+      "remediation queue data is advisory metadata and conveys no repository write authority",
+      "ENG-07 audit validators contain no filesystem repository network or subprocess mutation primitive",
+      "every ENG-07 operational AWU keeps business code contracts data/audit and certified report paths outside its allowed scope",
+      "future remediation requires a separate explicitly authorized work item and may not silently rewrite certified historical evidence",
+      "Lot45 candidate and Lot46 remain outside the historical audit engine authority"
+    ],
+    "acceptance_criteria": [
+      "existing historical evidence protection validates unchanged",
+      "audit findings/report policies are confirmed read-only with all mutation permissions false",
+      "audit validators are statically qualified as no-write governance code",
+      "all ENG-07 AWU allowlists are disjoint from frozen evidence prefixes",
+      "report queue schema/policy exposes no command patch target-path branch or write-authority field",
+      "forged writable permissions write primitive protected-path scope or weakened canonical anchor binding fails closed in built-in synthetic self-check",
+      "no protected evidence file is modified by WU01",
+      "adversarial test module and CI integration are deferred to ENG-07.6-WU02"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 3,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 13,
+      "executable_loc_changed": 650,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_historical_audit_evidence_protection.py --self-check"
+    ]
+  },
+  "done_when": [
+    "audit-engine read-only semantics are explicitly bound to canonical historical evidence protection",
+    "no-write validator and AWU-scope requalification is deterministic and fail closed",
+    "canonical evidence anchors remain unchanged",
+    "adversarial qualification and CI integration are delegated to ENG-07.6-WU02"
+  ]
+}
