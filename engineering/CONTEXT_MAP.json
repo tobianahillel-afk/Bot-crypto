@@ -1,12 +1,12 @@
 {
   "active_work": {
-    "awu_id": "ENG-08.3-WU02",
-    "awu_path": "engineering/work_units/ENG-08.3-WU02.json",
+    "awu_id": "ENG-08.4-WU01",
+    "awu_path": "engineering/work_units/ENG-08.4-WU01.json",
     "complexity_score": 1,
     "lot": "ENG-08",
     "manifest": "engineering/lots/ENG-08.json",
     "risk_class": "R1",
-    "task": "ENG-08.3",
+    "task": "ENG-08.4",
     "track": "ENGINEERING"
   },
   "authority": {
@@ -35,25 +35,22 @@
       "max_total_kib": 768
     },
     "implicit_expansion": "FORBIDDEN",
-    "primary_count": 10,
+    "primary_count": 7,
     "primary_files": [
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-08.json",
-      "engineering/work_units/ENG-08.3-WU02.json",
-      "scripts/governance/measure_proof_reuse_effectiveness.py",
-      "scripts/governance/proof_reuse.py",
-      "config/governance/proof_reuse_policy_v1.json",
-      "scripts/governance/run_t1.py",
-      "config/governance/validation_t1_policy_v1.json",
-      "config/governance/proof_reuse_effectiveness_policy_v1.json"
+      "engineering/work_units/ENG-08.4-WU01.json",
+      "config/governance/security_engine_verification_policy_v1.json",
+      "config/governance/action_pin_registry_v1.json",
+      "engineering/AGENT_CAPABILITIES.json"
     ],
     "reference_count": 2,
     "reference_files": [
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 77
+    "total_kib_ceil": 44
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -69,9 +66,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "ENG-08.3 WU02: qualify exact-input proof reuse against the real T1 SELFTEST_ENTRYPOINT_CHECK without integrating a production cache.",
+    "current_objective": "ENG-08.4 WU01: define a deterministic mandatory-path zero-cost inventory without querying billing services.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Bind active state/AWU, changed governance selftests, T1/proof policies and transitive T1 implementation into proof material; execute the real SELFTEST_ENTRYPOINT_CHECK once, reuse the exact PASS proof for the identical second request, add adversarial probes, and run all qualification in bootstrap."
+    "next_action": "Implement a static auditor over the bounded Development Engine workflow set, approved action registry and governance cost policies; prove no paid API/LLM/SaaS/license/larger-runner requirement and report repository visibility as unverified until WU02."
   },
   "safety": {
     "execution_allowed": false,

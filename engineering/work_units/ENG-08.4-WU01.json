@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-08.4-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-08",
+    "task_id": "ENG-08.4",
+    "manifest": "engineering/lots/ENG-08.json"
+  },
+  "title": "Define mandatory zero-cost execution inventory",
+  "objective": "Define a deterministic static cost auditor for every mandatory Development Engine workflow and governance cost policy, proving the path contains no paid API, paid LLM, paid SaaS, paid license dependency, self-hosted/larger runner requirement, or hidden paid secret while deferring live public-repository visibility qualification to WU02.",
+  "non_goals": [
+    "query billing APIs or account balances",
+    "change GitHub plan or repository visibility",
+    "modify mandatory workflows in WU01",
+    "infer public-repository pricing without runtime evidence",
+    "integrate a paid cost-monitoring service",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-08.3-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "Security-engine verification policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/security_engine_verification_policy_v1.json"
+    },
+    {
+      "name": "Approved action pin registry",
+      "kind": "CONFIG",
+      "locator": "config/governance/action_pin_registry_v1.json"
+    },
+    {
+      "name": "Agent capability and cost rules",
+      "kind": "CONFIG",
+      "locator": "engineering/AGENT_CAPABILITIES.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Mandatory zero-cost policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/mandatory_cost_zero_policy_v1.json"
+    },
+    {
+      "name": "Mandatory zero-cost auditor",
+      "kind": "FILE",
+      "locator": "scripts/governance/verify_mandatory_cost_zero.py"
+    },
+    {
+      "name": "Mandatory zero-cost design",
+      "kind": "FILE",
+      "locator": "engineering/MANDATORY_COST_ZERO.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "62fbd6c34dd95d683368e93739df34bed5f34148",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-08.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-08.3-WU02.json",
+      "engineering/work_units/ENG-08.4-WU01.json",
+      "config/governance/mandatory_cost_zero_policy_v1.json",
+      "scripts/governance/verify_mandatory_cost_zero.py",
+      "engineering/MANDATORY_COST_ZERO.md",
+      "AGENTS.md",
+      "README.md",
+      "engineering/CURRENT_STATUS.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "billing API access",
+      "paid monitoring integration",
+      "mandatory paid API",
+      "mandatory paid LLM",
+      "mandatory paid SaaS",
+      "mandatory paid license",
+      "mandatory larger runner",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "canonical project cost_policy keeps paid_external_api_required paid_llm_required paid_runner_required and paid_saas_required false",
+      "mandatory engine workflow set is explicit and bounded rather than all historical lot workflows",
+      "every mandatory workflow uses only explicitly allowed standard runner labels",
+      "self-hosted larger-runner and paid-runner markers are forbidden",
+      "cloud LLM provider secrets paid license secrets and paid SaaS credentials are forbidden on the mandatory path",
+      "every third-party action used by mandatory workflows must be present in the approved action pin registry and in an explicit zero-cost action allowlist",
+      "governance policies for secrets dependencies SAST workflow security supply chain and complete security engine must each declare a zero-paid-cost path",
+      "WU01 reports repository visibility as UNVERIFIED rather than assuming GitHub-hosted runner cost",
+      "no network billing query paid service or external cache is required"
+    ],
+    "acceptance_criteria": [
+      "static auditor inventories the complete mandatory workflow set and all uses/runs-on declarations",
+      "all mandatory workflows use standard allowed runners only",
+      "no forbidden paid credential/provider marker is present",
+      "all mandatory action repositories are explicitly classified zero-cost",
+      "all referenced governance cost policies declare no paid requirement",
+      "project cost policy remains all false",
+      "static result is PASS_WITH_VISIBILITY_UNVERIFIED rather than an unsupported total-cost claim",
+      "WU02 can bind repository.public evidence and adversarially qualify failure scenarios"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 14,
+      "executable_loc_changed": 550,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/verify_mandatory_cost_zero.py --static"
+    ]
+  },
+  "done_when": [
+    "mandatory Development Engine workflows and governance cost policies have a deterministic static inventory",
+    "all paid-provider runner license and SaaS dependencies fail closed",
+    "static zero-cost evidence is honest about unresolved repository visibility",
+    "WU02 can qualify public-repository zero-cost execution without changing workflows"
+  ]
+}

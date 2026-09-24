@@ -40,12 +40,12 @@
     },
     {
       "id": "ENG-08.3",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Measure and qualify proof-reuse effectiveness."
     },
     {
       "id": "ENG-08.4",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Prove mandatory execution cost remains zero."
     },
     {
