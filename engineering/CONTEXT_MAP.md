@@ -11,22 +11,21 @@
 ## Active work
 
 - Track: ENGINEERING
-- Work item: ENG-07
-- Task: ENG-07.6
-- AWU: ENG-07.6-WU02
+- Work item: ENG-08
+- Task: ENG-08.1
+- AWU: ENG-08.1-WU01
 - Risk: R1
-- Manifest: engineering/lots/ENG-07.json
-- AWU file: engineering/work_units/ENG-07.6-WU02.json
+- Manifest: engineering/lots/ENG-08.json
+- AWU file: engineering/work_units/ENG-08.1-WU01.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
-- engineering/lots/ENG-07.json
-- engineering/work_units/ENG-07.6-WU02.json
-- scripts/governance/validate_historical_audit_evidence_protection.py
-- config/governance/historical_audit_evidence_protection_policy_v1.json
-- engineering/HISTORICAL_EVIDENCE_PROTECTION.json
+- engineering/lots/ENG-08.json
+- engineering/work_units/ENG-08.1-WU01.json
+- config/governance/incremental_validation_policy_v1.json
+- scripts/governance/run_incremental_validation.py
 - engineering/handoff/CURRENT.json
 
 ## Execution context — reference
@@ -36,16 +35,16 @@
 
 ## Budget
 
-- Primary: 8 / 10 files
+- Primary: 7 / 10 files
 - Reference: 2 / 12 files
-- Routed size: 61 / 768 KiB
+- Routed size: 45 / 768 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-07.6 WU02: adversarially qualify the audit engine against immutable historical evidence protection.
-- Next action: Run the audit evidence-protection validator, add focused synthetic no-write/scope/queue attacks, and integrate exactly two qualification steps into the existing bootstrap; do not modify canonical historical evidence.
+- Objective: ENG-08.1 WU01: define deterministic routine-path timing budgets for T0/T1/T2 and the single-pass validation chain.
+- Next action: Add the timing-budget policy and zero-dependency validator only; do not change validation-tier semantics or benchmark pytest-backed T2 in WU01.
 
 ## Non-authoritative sources
 
