@@ -111,8 +111,37 @@ The same offline mode then measures local-link findings in:
 No GitHub token, external URL health check, cache, paid API, SaaS, LLM, or larger runner is
 required.
 
-## Runtime evidence
+## Runtime evidence — lychee
 
-Pending the first successful WU05 workflow execution. The workflow emits a bounded
-`LYCHEE_BENCHMARK_SUMMARY` containing only synthetic/representative error counts, elapsed
-lychee runtime and document count.
+Validated workflow run: `35972772349` on source head
+`b61e6f3db7e72c66f811f4d2ab089825de364cdc`.
+
+Measured lychee execution:
+
+- lychee version: `0.24.2`
+- Synthetic missing local link: **1 error**, exit code **2**, **13.170 ms**
+- Synthetic valid local link: **0 errors**, exit code **0**, **13.510 ms**
+- Representative documents: **4**
+- Representative links checked: **67**
+- Representative errors: **0**
+- Representative timeouts/unknown/unsupported: **0 / 0 / 0**
+- Representative elapsed time: **15.097 ms**
+- Total lychee benchmark time: **41.777 ms**
+- `--offline`: **required and used**
+- External URL health checks: **false**
+- GitHub token used by lychee: **false**
+- Paid dependency: **false**
+
+The release archive SHA-256 matched
+`1f4e0ef7f6554a6ed33dd7ac144fb2e1bbed98598e7af973042fc5cd43951c9a`
+before extraction or execution.
+
+### lychee benchmark verdict
+
+**ADOPT_PARTIALLY is supported.** The pinned binary is fast, correctly distinguishes valid
+and missing local links, and found no local-link defects across the bounded representative
+documentation set while network access was blocked by `--offline`.
+
+A future integration should therefore be restricted to local-link integrity on changed
+documentation (or another bounded local file set). External URL health checking remains
+outside the mandatory path because it adds network variability, latency and rate-limit risk.
