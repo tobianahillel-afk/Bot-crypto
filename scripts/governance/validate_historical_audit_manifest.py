@@ -109,7 +109,72 @@ def manifest_material(manifest: dict[str, Any]) -> dict[str, Any]:
     return {key: value for key, value in manifest.items() if key != "manifest_identity_sha256"}
 
 
-def validate_manifest(manifest: dict[str, Any]) -> None:
+def _load_planner() -> Any:
+    import importlib.util
+
+    planner_path = ROOT / "scripts" / "governance" / "plan_historical_audit_batches.py"
+    spec = importlib.util.spec_from_file_location("historical_manifest_planner_binding", planner_path)
+    if spec is None or spec.loader is None:
+        raise HistoricalAuditManifestError("cannot import historical batch planner")
+    planner = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = planner
+    spec.loader.exec_module(planner)
+    return planner
+
+
+def validate_plan_binding(
+    manifest: dict[str, Any],
+    plan: dict[str, Any],
+    batching: dict[str, Any],
+) -> None:
+    batches = plan.get("batches")
+    if not isinstance(batches, list) or not batches:
+        raise HistoricalAuditManifestError("ENG-07.1 plan batches missing")
+
+    descriptors: list[dict[str, int]] = []
+    for expected_index, batch in enumerate(batches, 1):
+        if not isinstance(batch, dict):
+            raise HistoricalAuditManifestError("ENG-07.1 batch must be an object")
+        if batch.get("batch_index") != expected_index:
+            raise HistoricalAuditManifestError("ENG-07.1 batch index drift")
+        lots = batch.get("lots")
+        if not isinstance(lots, list) or not lots:
+            raise HistoricalAuditManifestError("ENG-07.1 batch lots missing")
+        for descriptor in lots:
+            if not isinstance(descriptor, dict) or set(descriptor) != {"lot", "complexity"}:
+                raise HistoricalAuditManifestError("ENG-07.1 lot descriptor shape drift")
+            descriptors.append(dict(descriptor))
+
+    request = {
+        "schema_version": 1,
+        "request_kind": "historical_audit_batch_request_v1",
+        "lots": descriptors,
+    }
+    planner = _load_planner()
+    try:
+        replay = planner.plan_batches(request, batching)
+    except planner.HistoricalAuditBatchingError as exc:
+        raise HistoricalAuditManifestError(f"ENG-07.1 plan replay failed: {exc}") from exc
+    if _canonical(plan) != _canonical(replay):
+        raise HistoricalAuditManifestError("ENG-07.1 plan identity/content replay mismatch")
+
+    if manifest["plan_identity_sha256"] != replay["plan_identity_sha256"]:
+        raise HistoricalAuditManifestError("manifest plan identity does not bind ENG-07.1 plan")
+    batch_index = manifest["batch_index"]
+    if batch_index > replay["batch_count"]:
+        raise HistoricalAuditManifestError("manifest batch index outside ENG-07.1 plan")
+    batch = replay["batches"][batch_index - 1]
+    if manifest["batch_identity_sha256"] != batch["batch_identity_sha256"]:
+        raise HistoricalAuditManifestError("manifest batch identity does not bind ENG-07.1 batch")
+    if manifest["lots"] != [item["lot"] for item in batch["lots"]]:
+        raise HistoricalAuditManifestError("manifest lots drift from bound ENG-07.1 batch")
+    if manifest["complexity_total"] != batch["complexity_total"]:
+        raise HistoricalAuditManifestError("manifest complexity drifts from bound ENG-07.1 batch")
+    if manifest["isolated_oversized"] != batch["isolated_oversized"]:
+        raise HistoricalAuditManifestError("manifest oversized flag drifts from bound ENG-07.1 batch")
+
+
+def validate_manifest(manifest: dict[str, Any], plan: dict[str, Any]) -> None:
     schema = _load(SCHEMA_PATH)
     lifecycle = _load(LIFECYCLE_PATH)
     batching = _load(BATCHING_PATH)
@@ -201,6 +266,8 @@ def validate_manifest(manifest: dict[str, Any]) -> None:
     elif blockers:
         raise HistoricalAuditManifestError("non-BLOCKED manifest cannot carry blockers")
 
+    validate_plan_binding(manifest, plan, batching)
+
     expected_identity = _sha256(manifest_material(manifest))
     if manifest["manifest_identity_sha256"] != expected_identity:
         raise HistoricalAuditManifestError("manifest identity mismatch")
@@ -263,21 +330,14 @@ def build_manifest(
 
 
 def self_check() -> None:
-    planner_path = ROOT / "scripts" / "governance" / "plan_historical_audit_batches.py"
-    import importlib.util
-    spec = importlib.util.spec_from_file_location("historical_manifest_planner", planner_path)
-    if spec is None or spec.loader is None:
-        raise HistoricalAuditManifestError("cannot import historical batch planner")
-    planner = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = planner
-    spec.loader.exec_module(planner)
+    planner = _load_planner()
     plan = planner.plan_batches(planner.synthetic_request(), planner._load(planner.POLICY_PATH))
     manifest = build_manifest(
         batch=plan["batches"][0],
         plan_identity_sha256=plan["plan_identity_sha256"],
         source_head_sha="a" * 40,
     )
-    validate_manifest(manifest)
+    validate_manifest(manifest, plan)
     replay = build_manifest(
         batch=plan["batches"][0],
         plan_identity_sha256=plan["plan_identity_sha256"],
@@ -293,16 +353,19 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--self-check", action="store_true")
     parser.add_argument("--manifest", type=Path)
+    parser.add_argument("--plan", type=Path)
     parser.add_argument("--transition", nargs=2, metavar=("SOURCE", "TARGET"))
     args = parser.parse_args()
     try:
         selected = sum(bool(x) for x in (args.self_check, args.manifest, args.transition))
         if selected != 1:
             raise HistoricalAuditManifestError("select exactly one validation mode")
+        if bool(args.manifest) != bool(args.plan):
+            raise HistoricalAuditManifestError("--manifest and --plan must be provided together")
         if args.self_check:
             self_check()
         elif args.manifest:
-            validate_manifest(_load(args.manifest))
+            validate_manifest(_load(args.manifest), _load(args.plan))
             print("HISTORICAL_AUDIT_MANIFEST_VALID")
         else:
             validate_transition(args.transition[0], args.transition[1], _load(LIFECYCLE_PATH))
