@@ -1,7 +1,14 @@
 {
-  "schema_version": 1,
-  "map_kind": "active_agent_context_map_v1",
-  "project": "Crypto Quant Bot V3.1-Ops",
+  "active_work": {
+    "awu_id": "ENG-07.4-WU01",
+    "awu_path": "engineering/work_units/ENG-07.4-WU01.json",
+    "complexity_score": 3,
+    "lot": "ENG-07",
+    "manifest": "engineering/lots/ENG-07.json",
+    "risk_class": "R2",
+    "task": "ENG-07.4",
+    "track": "ENGINEERING"
+  },
   "authority": {
     "current_state": "config/governance/project_state.json",
     "resume_hint": "engineering/handoff/CURRENT.json",
@@ -12,17 +19,23 @@
     "config/governance/project_state.json",
     "engineering/CONTEXT_MAP.json"
   ],
-  "active_work": {
-    "track": "ENGINEERING",
-    "lot": "ENG-07",
-    "task": "ENG-07.4",
-    "manifest": "engineering/lots/ENG-07.json",
-    "awu_id": "ENG-07.4-WU01",
-    "awu_path": "engineering/work_units/ENG-07.4-WU01.json",
-    "risk_class": "R2",
-    "complexity_score": 3
+  "business_hold": {
+    "candidate_lot": 45,
+    "candidate_status": "SUSPENDED_CANDIDATE",
+    "development_status": "PAUSED",
+    "next_lot": {
+      "lot": 46,
+      "status": "LOCKED"
+    }
   },
   "execution_context": {
+    "budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "implicit_expansion": "FORBIDDEN",
+    "primary_count": 8,
     "primary_files": [
       "AGENTS.md",
       "config/governance/project_state.json",
@@ -33,56 +46,43 @@
       "scripts/governance/validate_historical_audit_manifest.py",
       "engineering/handoff/CURRENT.json"
     ],
+    "reference_count": 2,
     "reference_files": [
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "primary_count": 8,
-    "reference_count": 2,
-    "total_kib_ceil": 78,
-    "budget": {
-      "max_primary_files": 12,
-      "max_reference_files": 16,
-      "max_total_kib": 1024
-    },
-    "implicit_expansion": "FORBIDDEN"
+    "total_kib_ceil": 78
   },
+  "instructions": [
+    "verify external Git reality before writing",
+    "continue only the active AWU",
+    "do not recursively load the repository at startup",
+    "load additional files only when the active AWU or validated dependency requires them"
+  ],
+  "map_kind": "active_agent_context_map_v1",
+  "non_authoritative_sources": [
+    "engineering/STATE.json",
+    "chat_history",
+    "model_memory"
+  ],
+  "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "handoff": "engineering/handoff/CURRENT.json",
     "current_objective": "ENG-07.4 WU01: define the source-bound read-only historical audit findings registry contract.",
+    "handoff": "engineering/handoff/CURRENT.json",
     "next_action": "Implement only findings schema/policy/validator with built-in deterministic self-check, bound to validated manifest and mapping identities; defer adversarial test module and CI integration to ENG-07.4-WU02."
   },
-  "business_hold": {
-    "development_status": "PAUSED",
-    "candidate_lot": 45,
-    "candidate_status": "SUSPENDED_CANDIDATE",
-    "next_lot": {
-      "lot": 46,
-      "status": "LOCKED"
-    }
-  },
   "safety": {
-    "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
-    "trade_allowed": false,
     "execution_allowed": false,
-    "live_execution": "DISABLED"
+    "live_execution": "DISABLED",
+    "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "trade_allowed": false
   },
+  "schema_version": 1,
   "stop_conditions": [
     "STATE_DRIFT",
     "BUSINESS_SCOPE_TOUCHED_WITHOUT_UNLOCK",
     "FROZEN_EVIDENCE_MUTATION",
     "LOT46_UNLOCK_ATTEMPT",
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
-  ],
-  "non_authoritative_sources": [
-    "engineering/STATE.json",
-    "chat_history",
-    "model_memory"
-  ],
-  "instructions": [
-    "verify external Git reality before writing",
-    "continue only the active AWU",
-    "do not recursively load the repository at startup",
-    "load additional files only when the active AWU or validated dependency requires them"
   ]
 }
