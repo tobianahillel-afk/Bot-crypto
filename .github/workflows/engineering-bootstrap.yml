@@ -234,6 +234,13 @@ jobs:
       - name: Run historical audit findings adversarial self-tests
         run: python scripts/governance/selftest_historical_audit_findings.py
 
+      # ENG-07.5 WU02 exact-head qualification boundary: synthetic reports/queues only, no historical audit or remediation.
+      - name: Validate historical audit report and remediation queue
+        run: python scripts/governance/validate_historical_audit_report.py --self-check
+
+      - name: Run historical audit report adversarial self-tests
+        run: python scripts/governance/selftest_historical_audit_report.py
+
       - name: Run incremental validation adversarial self-tests
         run: python scripts/governance/selftest_incremental_validation.py
 
