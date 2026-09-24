@@ -169,7 +169,7 @@
     ],
     "scope_base_sha": "220ec5c15c3a14fb73c0d83f75455e1247a36566"
   },
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "title": "Bind certification evidence to exact candidate head",
   "validation": {
     "required_tiers": [

@@ -48,12 +48,12 @@
     {
       "description": "Bind certification evidence to the exact candidate head and immutable input identity.",
       "id": "ENG-06.2",
-      "status": "IN_PROGRESS"
+      "status": "DONE"
     },
     {
       "description": "Execute risk-proportional deep assurance only when selected by policy.",
       "id": "ENG-06.3",
-      "status": "PLANNED"
+      "status": "IN_PROGRESS"
     },
     {
       "description": "Implement provenance and attestation semantics without replacing domain integrity hashes.",

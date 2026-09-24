@@ -12,22 +12,22 @@
 
 - Track: ENGINEERING
 - Work item: ENG-06
-- Task: ENG-06.2
-- AWU: ENG-06.2-WU01
+- Task: ENG-06.3
+- AWU: ENG-06.3-WU01
 - Risk: R2
 - Manifest: engineering/lots/ENG-06.json
-- AWU file: engineering/work_units/ENG-06.2-WU01.json
+- AWU file: engineering/work_units/ENG-06.3-WU01.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-06.json
-- engineering/work_units/ENG-06.2-WU01.json
-- config/governance/certification_candidate_lifecycle_v1.json
-- engineering/AGENT_CAPABILITIES.json
-- config/governance/proof_reuse_policy_v1.json
+- engineering/work_units/ENG-06.3-WU01.json
 - config/governance/validation_t3_t4_policy_v1.json
+- config/governance/certification_exact_head_binding_v1.json
+- config/governance/security_engine_verification_policy_v1.json
+- engineering/AGENT_CAPABILITIES.json
 - engineering/handoff/CURRENT.json
 
 ## Execution context — reference
@@ -45,8 +45,8 @@
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-06.2: bind certification evidence to one exact candidate head and immutable declared-input identity.
-- Next action: Implement the exact-head binding policy, local-Git input identity, exact-run evidence validator and adversarial tests; do not execute T3/T4 or issue attestations.
+- Objective: ENG-06.3: satisfy selected T3 assurance using existing ENG-04 controls and exact-head run evidence only.
+- Next action: Implement reason-to-control planning and exact-head assurance evidence verification; reuse existing Security Actions, Supply Chain, SAST, Secrets and Bootstrap workflows without duplicating scanners or executing T4.
 
 ## Non-authoritative sources
 

@@ -50,7 +50,7 @@
   "engineering_engine": {
     "active_lot": "ENG-06",
     "active_manifest": "engineering/lots/ENG-06.json",
-    "active_task": "ENG-06.2",
+    "active_task": "ENG-06.3",
     "blockers": [],
     "completed": [
       "ENG-00",

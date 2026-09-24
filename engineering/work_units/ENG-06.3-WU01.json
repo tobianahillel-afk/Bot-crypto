@@ -1,0 +1,188 @@
+{
+  "contracts": {
+    "acceptance_criteria": [
+      "no T3 requirements yields NOT_REQUIRED with zero controls",
+      "WORKFLOW_SYNTAX selects Security Actions only",
+      "ACTIONS_SECURITY selects Security Actions plus Security Supply Chain",
+      "SECURITY_STATIC_ANALYSIS and STATIC_ANALYSIS select Security SAST",
+      "SECRET_CONTROLS selects Security Secrets",
+      "R3 risk selection requires Engineering Bootstrap Security SAST and Security Secrets",
+      "manual deep review yields MANUAL_REVIEW_REQUIRED and cannot auto-pass",
+      "exact matching successful run evidence satisfies automatic controls",
+      "wrong head failed conclusion duplicate control missing control and extra unselected control fail closed",
+      "validator and adversarial tests remain deterministic zero-cost and offline"
+    ],
+    "required_invariants": [
+      "T3 assurance plan is derived only from validated selector requirements and selection reasons",
+      "each automatic assurance control reuses an existing ENG-04 workflow instead of duplicating scanner logic",
+      "automatic assurance evidence must be a unique successful exact-head GitHub Actions run for the expected workflow",
+      "unselected controls are not required and cannot be used to claim selected assurance",
+      "manual deep review is never converted into an automatic PASS or LLM requirement",
+      "R3 risk-execution assurance requires bootstrap domain assurance plus SAST and secrets evidence",
+      "missing failed stale duplicate or wrong-workflow evidence leaves assurance unsatisfied",
+      "assurance planning and verification require no paid service and no mandatory LLM"
+    ]
+  },
+  "depends_on": [
+    "ENG-06.2-WU01"
+  ],
+  "done_when": [
+    "selected automatic T3 assurance is satisfiable only with exact-head successful evidence from existing controls",
+    "unselected assurance incurs no new scanner execution",
+    "manual review stays explicit and non-automated",
+    "ENG-06.4 can consume an exact assurance verdict without redefining T3 selection"
+  ],
+  "id": "ENG-06.3-WU01",
+  "inputs": [
+    {
+      "kind": "CONFIG",
+      "locator": "config/governance/validation_t3_t4_policy_v1.json",
+      "name": "T3/T4 selection policy"
+    },
+    {
+      "kind": "CONFIG",
+      "locator": "config/governance/certification_exact_head_binding_v1.json",
+      "name": "Exact-head binding policy"
+    },
+    {
+      "kind": "CONFIG",
+      "locator": "config/governance/security_engine_verification_policy_v1.json",
+      "name": "ENG-04 security engine policy"
+    },
+    {
+      "kind": "CONFIG",
+      "locator": "engineering/AGENT_CAPABILITIES.json",
+      "name": "Agent evidence policy"
+    },
+    {
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json",
+      "name": "Current handoff"
+    }
+  ],
+  "kind": "agent_work_unit",
+  "non_goals": [
+    "introduce a new scanner",
+    "duplicate Gitleaks CodeQL actionlint zizmor dependency-review or supply-chain execution",
+    "execute T4 certification",
+    "issue provenance attestations",
+    "promote a candidate",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock",
+    "runtime capability activation"
+  ],
+  "objective": "Map T3 selection reasons to the existing zero-cost ENG-04 security workflows and require only exact-head successful evidence for selected controls, while keeping manual deep review explicitly non-automatable and avoiding blanket scanner reruns.",
+  "outputs": [
+    {
+      "kind": "CONFIG",
+      "locator": "config/governance/certification_deep_assurance_v1.json",
+      "name": "Deep assurance policy"
+    },
+    {
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_certification_deep_assurance.py",
+      "name": "Deep assurance validator"
+    },
+    {
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_certification_deep_assurance.py",
+      "name": "Deep assurance adversarial tests"
+    }
+  ],
+  "parent": {
+    "manifest": "engineering/lots/ENG-06.json",
+    "task_id": "ENG-06.3",
+    "work_item_id": "ENG-06"
+  },
+  "planning": {
+    "complexity_factors": {
+      "ci_evidence_topology_change": true,
+      "contract_schema_families": 0,
+      "cross_domain_interfaces": 0,
+      "dependency_change": false,
+      "math_numeric_semantics": false,
+      "persistence_checksum_boundary": false,
+      "policy_config_families": 1,
+      "production_modules": 0,
+      "risk_execution_permission": false,
+      "security_trust_boundary": true,
+      "state_machine_or_concurrency": false,
+      "temporal_lineage_semantics": false
+    },
+    "complexity_score": 4,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "risk_class": "R2",
+    "size_estimate": {
+      "business_domains": 1,
+      "contract_families": 0,
+      "executable_loc_changed": 780,
+      "files_touched": 15,
+      "independent_algorithms": 1,
+      "new_dependencies": 0,
+      "new_public_behaviors": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1
+    },
+    "split_reasons": [],
+    "split_required": false
+  },
+  "schema_version": 1,
+  "scope": {
+    "allowed_paths": [
+      "AGENTS.md",
+      "README.md",
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-06.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/CURRENT_STATUS.md",
+      "engineering/work_units/ENG-06.2-WU01.json",
+      "engineering/work_units/ENG-06.3-WU01.json",
+      "config/governance/certification_deep_assurance_v1.json",
+      "scripts/governance/validate_certification_deep_assurance.py",
+      "scripts/governance/selftest_certification_deep_assurance.py",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/lot*/**"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "new scanner integration",
+      "blanket full-suite rerun",
+      "T4 certification execution",
+      "provenance attestation issuance",
+      "evidence fabrication",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ],
+    "scope_base_sha": "883e887545801355734ed700dad1f7a5af6dc31b"
+  },
+  "status": "IN_PROGRESS",
+  "title": "Satisfy selected T3 assurance with existing exact-head controls",
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_certification_deep_assurance.py --self-check",
+      "python scripts/governance/selftest_certification_deep_assurance.py"
+    ]
+  }
+}
