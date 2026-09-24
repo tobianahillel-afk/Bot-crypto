@@ -34,7 +34,6 @@
     "active_manifest": "engineering/lots/ENG-07.json"
   },
   "recent_completed": [
-    "ENG-07.1 WU01 deterministic batching core implemented on exact head 095dde63c24f0f79d54d29b9ea797a2fbd78bac1; bootstrap 36004957596 and Security Secrets 36004957679 passed. CI execution of the new planner selftests is delegated to WU02.",
     "ENG-07.1 historical audit batching completed on exact head 9295cfb39ddc4dcefbc8300b13500d736e9e9302; bootstrap 36005319976 and Security Secrets 36005319563 passed, including planner self-check and 12 adversarial batching probes.",
     "ENG-07.2 WU01 read-only historical audit manifest/lifecycle implemented and strengthened on exact head 4d631406b780f77f462af89d78da0c9992e08b62; bootstrap 36012819304 and Security Secrets 36012818993 passed. Manifest validation now replays the bound ENG-07.1 plan and rejects forged plan/batch identities; executable qualification is delegated to WU02.",
     "ENG-07.2 historical audit manifest/lifecycle completed on exact head abb82c1e0aba4c3fa6d19d40d7ad5cb4dc934617; bootstrap 36013581902, Security Secrets 36013581917, Security Actions 36013581897 and Supply Chain 36013582179 passed, including manifest self-check, 15 adversarial probes, context-map and cold-start qualification.",
@@ -84,20 +83,6 @@
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
   ],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36013581917",
-      "head_sha": "abb82c1e0aba4c3fa6d19d40d7ad5cb4dc934617",
-      "scope": "ENG-07.2-WU02_SECURITY_SECRETS"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36014657705",
-      "head_sha": "84b57bafdb6632210f0fa1cea8f0f05a8a1a76ed",
-      "scope": "ENG-07.3-WU01_BOOTSTRAP"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "status": "PASS",
