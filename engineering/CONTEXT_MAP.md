@@ -12,21 +12,21 @@
 
 - Track: ENGINEERING
 - Work item: ENG-07
-- Task: ENG-07.3
-- AWU: ENG-07.3-WU03
-- Risk: R0
+- Task: ENG-07.4
+- AWU: ENG-07.4-WU01
+- Risk: R2
 - Manifest: engineering/lots/ENG-07.json
-- AWU file: engineering/work_units/ENG-07.3-WU03.json
+- AWU file: engineering/work_units/ENG-07.4-WU01.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-07.json
-- engineering/work_units/ENG-07.3-WU03.json
+- engineering/work_units/ENG-07.4-WU01.json
 - scripts/governance/validate_historical_audit_mapping.py
+- config/governance/historical_audit_mapping_policy_v1.json
 - scripts/governance/validate_historical_audit_manifest.py
-- scripts/governance/selftest_historical_audit_mapping.py
 - engineering/handoff/CURRENT.json
 
 ## Execution context — reference
@@ -36,16 +36,16 @@
 
 ## Budget
 
-- Primary: 8 / 8 files
-- Reference: 2 / 8 files
-- Routed size: 80 / 512 KiB
+- Primary: 8 / 12 files
+- Reference: 2 / 16 files
+- Routed size: 79 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-07.3 WU03: repair only the synthetic mapping qualification fixture compatibility.
-- Next action: Update the mapping synthetic bundle to use current planner.synthetic_request()/plan_batches() and manifest build_manifest(); do not alter mapping schema, policy, status semantics or CI topology.
+- Objective: ENG-07.4 WU01: define the source-bound read-only historical audit findings registry contract.
+- Next action: Implement only findings schema/policy/validator/selftests bound to validated manifest and mapping identities; do not execute audits, populate real findings, remediate, or change CI topology.
 
 ## Non-authoritative sources
 
