@@ -30,12 +30,12 @@
   "tasks": [
     {
       "id": "ENG-07.1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Define complexity-aware historical audit batching and qualification."
     },
     {
       "id": "ENG-07.2",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Define the historical audit manifest and read-only batch lifecycle."
     },
     {

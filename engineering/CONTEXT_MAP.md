@@ -12,21 +12,20 @@
 
 - Track: ENGINEERING
 - Work item: ENG-07
-- Task: ENG-07.1
-- AWU: ENG-07.1-WU02
-- Risk: R1
+- Task: ENG-07.2
+- AWU: ENG-07.2-WU01
+- Risk: R2
 - Manifest: engineering/lots/ENG-07.json
-- AWU file: engineering/work_units/ENG-07.1-WU02.json
+- AWU file: engineering/work_units/ENG-07.2-WU01.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-07.json
-- engineering/work_units/ENG-07.1-WU02.json
+- engineering/work_units/ENG-07.2-WU01.json
 - config/governance/historical_audit_batching_v1.json
-- scripts/governance/plan_historical_audit_batches.py
-- scripts/governance/selftest_historical_audit_batching.py
+- engineering/HISTORICAL_EVIDENCE_PROTECTION.json
 - engineering/handoff/CURRENT.json
 
 ## Execution context — reference
@@ -36,16 +35,16 @@
 
 ## Budget
 
-- Primary: 8 / 10 files
-- Reference: 2 / 12 files
-- Routed size: 54 / 768 KiB
+- Primary: 7 / 12 files
+- Reference: 2 / 16 files
+- Routed size: 44 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-07.1 WU02: integrate and qualify the historical audit batching core in CI without executing historical audits.
-- Next action: Run the WU01 planner self-check and 12 adversarial probes from engineering bootstrap on one exact head; do not change batching semantics or historical evidence.
+- Objective: ENG-07.2 WU01: define a source-bound tamper-evident read-only historical audit manifest and fail-closed batch lifecycle.
+- Next action: Implement the historical audit manifest schema, lifecycle policy, pure validator and adversarial tests; do not execute audits, record findings, remediate code, or mutate historical evidence. CI integration is a separate WU.
 
 ## Non-authoritative sources
 
