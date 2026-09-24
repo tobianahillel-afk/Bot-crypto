@@ -13,19 +13,21 @@
 - Track: ENGINEERING
 - Work item: ENG-07
 - Task: ENG-07.2
-- AWU: ENG-07.2-WU01
-- Risk: R2
+- AWU: ENG-07.2-WU02
+- Risk: R1
 - Manifest: engineering/lots/ENG-07.json
-- AWU file: engineering/work_units/ENG-07.2-WU01.json
+- AWU file: engineering/work_units/ENG-07.2-WU02.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-07.json
-- engineering/work_units/ENG-07.2-WU01.json
-- config/governance/historical_audit_batching_v1.json
-- engineering/HISTORICAL_EVIDENCE_PROTECTION.json
+- engineering/work_units/ENG-07.2-WU02.json
+- config/governance/historical_audit_manifest_schema_v1.json
+- config/governance/historical_audit_lifecycle_v1.json
+- scripts/governance/validate_historical_audit_manifest.py
+- scripts/governance/selftest_historical_audit_manifest.py
 - engineering/handoff/CURRENT.json
 
 ## Execution context — reference
@@ -35,16 +37,16 @@
 
 ## Budget
 
-- Primary: 7 / 12 files
-- Reference: 2 / 16 files
-- Routed size: 44 / 1024 KiB
+- Primary: 9 / 10 files
+- Reference: 2 / 12 files
+- Routed size: 66 / 768 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-07.2 WU01: define a source-bound tamper-evident read-only historical audit manifest and fail-closed batch lifecycle.
-- Next action: Implement the historical audit manifest schema, lifecycle policy, pure validator and adversarial tests; do not execute audits, record findings, remediate code, or mutate historical evidence. CI integration is a separate WU.
+- Objective: ENG-07.2 WU02: integrate and qualify the source-bound read-only historical audit manifest and lifecycle.
+- Next action: Wire the existing manifest self-check and 15 adversarial probes into Engineering Bootstrap; do not change manifest/lifecycle semantics or execute historical audits.
 
 ## Non-authoritative sources
 
