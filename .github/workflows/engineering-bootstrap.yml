@@ -194,6 +194,12 @@ jobs:
       - name: Run native attestation transport adversarial self-tests
         run: python scripts/governance/selftest_certification_attestation_transport.py
 
+      - name: Validate fail-closed certification promotion rules
+        run: python scripts/governance/validate_certification_promotion.py --self-check
+
+      - name: Run certification promotion adversarial self-tests
+        run: python scripts/governance/selftest_certification_promotion.py
+
       - name: Run incremental validation adversarial self-tests
         run: python scripts/governance/selftest_incremental_validation.py
 
