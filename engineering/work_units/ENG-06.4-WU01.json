@@ -170,7 +170,7 @@
     ],
     "scope_base_sha": "59985cfaf33c81ab9b4a185c624a2f1ca1ed5b4c"
   },
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "title": "Define canonical certification provenance envelope",
   "validation": {
     "required_tiers": [

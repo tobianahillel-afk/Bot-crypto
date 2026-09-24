@@ -1,11 +1,11 @@
 {
   "active_checkpoint": {
-    "awu_id": "ENG-06.4-WU01",
-    "awu_path": "engineering/work_units/ENG-06.4-WU01.json",
-    "complexity_score": 5,
+    "awu_id": "ENG-06.4-WU02",
+    "awu_path": "engineering/work_units/ENG-06.4-WU02.json",
+    "complexity_score": 8,
     "parent_manifest": "engineering/lots/ENG-06.json",
     "risk_class": "R2",
-    "scope_base_sha": "59985cfaf33c81ab9b4a185c624a2f1ca1ed5b4c",
+    "scope_base_sha": "ea39c36a5d882ced48ad34b6c95c6c720d42aebf",
     "track": "ENGINEERING"
   },
   "authority": {
@@ -14,7 +14,7 @@
     "state_source": "config/governance/project_state.json"
   },
   "blockers": [],
-  "current_objective": "ENG-06.4 WU01: define the canonical provenance envelope and attestation subject without replacing domain integrity hashes.",
+  "current_objective": "ENG-06.4 WU02: qualify native GitHub attestation transport without redefining provenance or executing business/T4 certification.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -27,21 +27,21 @@
     "rulesets_count": 0
   },
   "kind": "engineering_handoff",
-  "next_action": "Implement deterministic provenance-envelope semantics over exact-head input identity plus satisfied assurance and workflow identity; do not issue remote attestations in WU01.",
+  "next_action": "Register the exact actions/attest v4.2.2 commit and only the two required write scopes, then issue one engineering-only exact-head attestation probe over the canonical WU01 provenance envelope.",
   "next_engineering": {
     "active_lot": "ENG-06",
     "active_manifest": "engineering/lots/ENG-06.json",
     "active_task": "ENG-06.4"
   },
   "recent_completed": [
-    "ENG-05.5 resume/recovery completed on exact head 48b32eb43f778d2da364725974e1805bd2660837; run 35930055502 passed recovery qualification, 9 adversarial probes and cold-start qualification.",
     "ENG-05.6 WU01 recovery harness genericity repair completed on exact head 4b1d5e417eb64461781b77de32e3d59ab423c761; run 35930906226 passed resume/recovery, adversarial recovery and cold-start.",
     "ENG-05.6 WU02 documentation tooling evaluation completed on exact head 1f40aee0580e75b3f5404bb27be6a654c37dedc3; bootstrap 35931507203 plus Security Actions, Supply Chain and Secrets all passed. Verdicts: DocGuard COPY_PATTERN; Vale and lychee ADOPT_PARTIALLY pending benchmark.",
     "ENG-05.6 WU04 Vale v3.22.0 offline benchmark completed on exact head c6ae1454fb959009efea9d054d6db836fcd00153; benchmark 35971826612, bootstrap 35971826361 and Security Secrets 35971826327 all passed. Vale lint time 34.631 ms with 1 expected synthetic finding and 0 findings across 4 representative docs.",
     "ENG-05.6 WU05 lychee v0.24.2 offline benchmark completed on exact head 8edbe4cd4a9f03974356f17753101668f07d314a; benchmark 35972886401, bootstrap 35972886436 and Security Secrets 35972886267 passed. lychee checked 67 representative local links with 0 errors in 41.777 ms total benchmark time.",
     "ENG-06.1 certification-candidate lifecycle completed on exact head 220ec5c15c3a14fb73c0d83f75455e1247a36566; bootstrap run 35973940464 passed lifecycle validation, 12 adversarial probes, scope checks and cold-start qualification.",
     "ENG-06.2 exact-head evidence binding completed on exact head 883e887545801355734ed700dad1f7a5af6dc31b; bootstrap run 35981610621 passed self-check, 12 adversarial probes, cold-start and exact-head validation.",
-    "ENG-06.3 risk-proportional deep assurance completed on exact head 59985cfaf33c81ab9b4a185c624a2f1ca1ed5b4c; bootstrap 35982509927 passed policy plus 16 probes, while selected T3 controls Security Actions 35982509888 and Security Supply Chain 35982509911 passed on the same head."
+    "ENG-06.3 risk-proportional deep assurance completed on exact head 59985cfaf33c81ab9b4a185c624a2f1ca1ed5b4c; bootstrap 35982509927 passed policy plus 16 probes, while selected T3 controls Security Actions 35982509888 and Security Supply Chain 35982509911 passed on the same head.",
+    "ENG-06.4 WU01 canonical provenance semantics completed on exact head ea39c36a5d882ced48ad34b6c95c6c720d42aebf; bootstrap 35983241823 passed provenance validation, 12 adversarial probes, scope and cold-start qualification."
   ],
   "resume_read_order": [
     "AGENTS.md",
@@ -83,13 +83,6 @@
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
   ],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "head_sha": "1f40aee0580e75b3f5404bb27be6a654c37dedc3",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35931507203",
-      "scope": "ENG-05.6-WU02_TOOLING_EVALUATION",
-      "status": "PASS"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "head_sha": "c6ae1454fb959009efea9d054d6db836fcd00153",
@@ -165,6 +158,13 @@
       "head_sha": "59985cfaf33c81ab9b4a185c624a2f1ca1ed5b4c",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35982509927",
       "scope": "ENG-06.3_DEEP_ASSURANCE",
+      "status": "PASS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "head_sha": "ea39c36a5d882ced48ad34b6c95c6c720d42aebf",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35983241823",
+      "scope": "ENG-06.4-WU01_PROVENANCE_SEMANTICS",
       "status": "PASS"
     }
   ],

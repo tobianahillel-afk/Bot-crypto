@@ -13,21 +13,22 @@
 - Track: ENGINEERING
 - Work item: ENG-06
 - Task: ENG-06.4
-- AWU: ENG-06.4-WU01
+- AWU: ENG-06.4-WU02
 - Risk: R2
 - Manifest: engineering/lots/ENG-06.json
-- AWU file: engineering/work_units/ENG-06.4-WU01.json
+- AWU file: engineering/work_units/ENG-06.4-WU02.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-06.json
-- engineering/work_units/ENG-06.4-WU01.json
-- config/governance/certification_candidate_lifecycle_v1.json
-- config/governance/certification_exact_head_binding_v1.json
-- config/governance/certification_deep_assurance_v1.json
-- engineering/AGENT_CAPABILITIES.json
+- engineering/work_units/ENG-06.4-WU02.json
+- config/governance/certification_provenance_v1.json
+- scripts/governance/validate_certification_provenance.py
+- config/governance/action_pin_registry_v1.json
+- config/governance/workflow_permission_policy_v1.json
+- config/governance/action_supply_chain_policy_v1.json
 - engineering/handoff/CURRENT.json
 
 ## Execution context — reference
@@ -37,16 +38,16 @@
 
 ## Budget
 
-- Primary: 9 / 12 files
+- Primary: 10 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 53 / 1024 KiB
+- Routed size: 66 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-06.4 WU01: define the canonical provenance envelope and attestation subject without replacing domain integrity hashes.
-- Next action: Implement deterministic provenance-envelope semantics over exact-head input identity plus satisfied assurance and workflow identity; do not issue remote attestations in WU01.
+- Objective: ENG-06.4 WU02: qualify native GitHub attestation transport without redefining provenance or executing business/T4 certification.
+- Next action: Register the exact actions/attest v4.2.2 commit and only the two required write scopes, then issue one engineering-only exact-head attestation probe over the canonical WU01 provenance envelope.
 
 ## Non-authoritative sources
 
