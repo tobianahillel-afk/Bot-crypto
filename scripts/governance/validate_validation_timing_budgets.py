@@ -204,22 +204,33 @@ def main() -> int:
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--check", action="store_true")
     group.add_argument("--self-check", action="store_true")
+    group.add_argument("--measurement", type=Path)
     args = parser.parse_args()
     try:
         policy = _json(POLICY_PATH)
         incremental = _json(ROOT / policy["source_incremental_policy"])
+        validate_policy(policy, incremental)
         if args.self_check:
             self_check(policy, incremental)
-        else:
-            validate_policy(policy, incremental)
+            print("VALIDATION_TIMING_BUDGET_SELF_CHECK_VALID")
+            return 0
+        if args.measurement is not None:
+            outcome = validate_measurement(_json(args.measurement), policy)
+            if outcome["status"] == "PASS":
+                print(
+                    "VALIDATION_TIMING_MEASUREMENT_PASS "
+                    + json.dumps(outcome, sort_keys=True, separators=(",", ":"))
+                )
+            else:
+                print(
+                    "VALIDATION_TIMING_MEASUREMENT_NOT_APPLICABLE "
+                    + json.dumps(outcome, sort_keys=True, separators=(",", ":"))
+                )
+            return 0
     except (TimingBudgetError, AssertionError, KeyError) as exc:
         print(f"VALIDATION_TIMING_BUDGET_INVALID: {exc}", file=sys.stderr)
         return 1
-    print(
-        "VALIDATION_TIMING_BUDGET_SELF_CHECK_VALID"
-        if args.self_check
-        else "VALIDATION_TIMING_BUDGET_VALID"
-    )
+    print("VALIDATION_TIMING_BUDGET_VALID")
     return 0
 
 

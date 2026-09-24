@@ -150,7 +150,19 @@ jobs:
         run: python scripts/governance/selftest_diff_impact.py
 
       - name: Run single-pass incremental validation
-        run: python scripts/governance/run_incremental_validation.py
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/governance/run_incremental_validation.py \
+            | tee "${RUNNER_TEMP}/incremental-validation.json"
+
+      - name: Enforce validation timing budgets
+        run: >-
+          python scripts/governance/validate_validation_timing_budgets.py
+          --measurement "${RUNNER_TEMP}/incremental-validation.json"
+
+      - name: Run validation timing budget adversarial self-tests
+        run: python scripts/governance/selftest_validation_timing_budgets.py
 
       - name: Run T0 adversarial self-tests
         run: python scripts/governance/selftest_t0.py
