@@ -12,18 +12,18 @@
 
 - Track: ENGINEERING
 - Work item: ENG-07
-- Task: ENG-07.4
-- AWU: ENG-07.4-WU02
-- Risk: R1
+- Task: ENG-07.5
+- AWU: ENG-07.5-WU01
+- Risk: R2
 - Manifest: engineering/lots/ENG-07.json
-- AWU file: engineering/work_units/ENG-07.4-WU02.json
+- AWU file: engineering/work_units/ENG-07.5-WU01.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-07.json
-- engineering/work_units/ENG-07.4-WU02.json
+- engineering/work_units/ENG-07.5-WU01.json
 - scripts/governance/validate_historical_audit_findings.py
 - config/governance/historical_audit_findings_schema_v1.json
 - config/governance/historical_audit_findings_policy_v1.json
@@ -36,16 +36,16 @@
 
 ## Budget
 
-- Primary: 8 / 10 files
-- Reference: 2 / 12 files
-- Routed size: 65 / 768 KiB
+- Primary: 8 / 12 files
+- Reference: 2 / 16 files
+- Routed size: 66 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-07.4 WU02: qualify the source-bound historical findings registry with synthetic adversarial probes and bootstrap execution.
-- Next action: Add only findings self-check/adversarial qualification to the existing engineering bootstrap; use synthetic registries only and do not execute historical audits or create real findings.
+- Objective: ENG-07.5 WU01: define the deterministic historical audit report and owner-bound remediation queue contract.
+- Next action: Implement only audit report schema/policy/validator with built-in synthetic self-check derived from validated findings; defer adversarial test module and CI integration to ENG-07.5-WU02.
 
 ## Non-authoritative sources
 

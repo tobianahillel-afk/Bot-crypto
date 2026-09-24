@@ -58,7 +58,7 @@
   "engineering_track": {
     "active_lot": "ENG-07",
     "active_manifest": "engineering/lots/ENG-07.json",
-    "active_task": "ENG-07.4",
+    "active_task": "ENG-07.5",
     "blockers": [],
     "branch": "engineering/bootstrap-development-engine",
     "completed": [

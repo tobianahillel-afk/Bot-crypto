@@ -12,7 +12,7 @@ This file is the mandatory first entry point for any coding or audit agent.
 - Certified business baseline: **Lot 44 / 0.44.0 / GO_LOT44_POST_MERGE**
 - Suspended business candidate: **Lot 45 / PR #66 / SUSPENDED_CANDIDATE**
 - Next business lot: **Lot 46 / LOCKED**
-- Engineering: **ENG-07 / ENG-07.4 / BUILDING**
+- Engineering: **ENG-07 / ENG-07.5 / BUILDING**
 - Next engineering lot: **ENG-08**
 - Runtime maximum: `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY`
 - Trading allowed: `false`

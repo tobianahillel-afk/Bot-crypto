@@ -45,12 +45,12 @@
     },
     {
       "id": "ENG-07.4",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Implement the historical audit findings registry."
     },
     {
       "id": "ENG-07.5",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Define isolated remediation workflow separate from historical evidence."
     },
     {

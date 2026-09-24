@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-07.5-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-07",
+    "task_id": "ENG-07.5",
+    "manifest": "engineering/lots/ENG-07.json"
+  },
+  "title": "Define deterministic historical audit report and remediation queue",
+  "objective": "Define a canonical read-only audit report deterministically derived from a validated findings registry, including severity counts, report status and an owner-bound remediation queue, without executing real audits or remediation.",
+  "non_goals": [
+    "execute historical audits",
+    "populate real historical findings or reports",
+    "perform remediation",
+    "change findings registry semantics",
+    "modify immutable historical evidence business code contracts or reports",
+    "integrate new checks into CI in this WU",
+    "audit Lot45 candidate",
+    "unlock Lot46",
+    "change runtime authority",
+    "add dependency or paid/LLM-backed service"
+  ],
+  "depends_on": [
+    "ENG-07.4-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "Historical findings validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_historical_audit_findings.py"
+    },
+    {
+      "name": "Historical findings schema",
+      "kind": "SCHEMA",
+      "locator": "config/governance/historical_audit_findings_schema_v1.json"
+    },
+    {
+      "name": "Historical findings policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/historical_audit_findings_policy_v1.json"
+    },
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Historical audit report schema",
+      "kind": "SCHEMA",
+      "locator": "config/governance/historical_audit_report_schema_v1.json"
+    },
+    {
+      "name": "Historical audit report policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/historical_audit_report_policy_v1.json"
+    },
+    {
+      "name": "Historical audit report validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_historical_audit_report.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "46ae234723edea0359402f879e3eb3539ebd5fc3",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-07.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "AGENTS.md",
+      "README.md",
+      "engineering/CURRENT_STATUS.md",
+      "engineering/work_units/ENG-07.4-WU02.json",
+      "engineering/work_units/ENG-07.5-WU01.json",
+      "config/governance/historical_audit_report_schema_v1.json",
+      "config/governance/historical_audit_report_policy_v1.json",
+      "scripts/governance/validate_historical_audit_report.py"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/**"
+    ],
+    "forbidden_semantics": [
+      "historical audit execution",
+      "real historical findings or report population",
+      "historical evidence mutation",
+      "remediation execution",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency",
+      "CI topology change"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "report is READ_ONLY and deterministically derived from one validated findings registry",
+      "report binds findings registry manifest mapping plan batch and lot identities",
+      "CLEAN registry produces CLEAN report with empty remediation queue",
+      "any open BLOCKER finding produces BLOCKED report status",
+      "open non-blocker findings without an open blocker produce ACTION_REQUIRED status",
+      "non-empty registry with all findings CLOSED produces RESOLVED status",
+      "severity counts and open severity counts exactly equal the bound findings registry",
+      "remediation queue contains every and only OPEN finding",
+      "queue priority is deterministically mapped BLOCKER P0 MAJOR P1 MINOR P2 INFO P3",
+      "queue triage action is derived from the finding disposition and owner is copied exactly",
+      "queue order is priority then finding_id and queue ids are contiguous batch-lot-local identifiers",
+      "report identity is SHA-256 over canonical semantic material excluding only its identity field",
+      "all mutation permissions remain false and validator performs no repository mutation"
+    ],
+    "acceptance_criteria": [
+      "synthetic CLEAN report validates deterministically",
+      "synthetic BLOCKED ACTION_REQUIRED and RESOLVED reports derive correctly",
+      "forged findings registry report binding counts status queue priority owner or identity fails closed",
+      "queue omission duplication reordering or extra entries fail closed",
+      "Lot45 or later report fails closed through bound findings validation",
+      "zero findings never creates a remediation queue",
+      "no real historical artifact report business state or runtime authority is mutated",
+      "separate adversarial test module and CI qualification are deferred to ENG-07.5-WU02"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 3,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 1,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": true,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 14,
+      "executable_loc_changed": 650,
+      "new_public_behaviors": 1,
+      "contract_families": 1,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_historical_audit_report.py --self-check"
+    ]
+  },
+  "done_when": [
+    "report schema policy and validator with deterministic self-check are defined",
+    "report and queue are fully derived from validated findings without mutation authority",
+    "severity ownership and triage rules are deterministic and fail closed",
+    "adversarial test module and CI integration are deferred to ENG-07.5-WU02"
+  ]
+}
