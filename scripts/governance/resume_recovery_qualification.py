@@ -338,14 +338,23 @@ def main() -> int:
     handoff = _json(ROOT / "engineering/handoff/CURRENT.json")
     context = _json(ROOT / "engineering/CONTEXT_MAP.json")
 
+    try:
+        _active_path, expected_awu, _active_evidence = active.resolve_active_awu()
+    except active.ActiveAwuError as exc:
+        raise ResumeRecoveryError(str(exc)) from exc
+    expected_awu_id = expected_awu["id"]
+    expected_task = expected_awu["parent"]["task_id"]
+    if expected_task != state["engineering_track"]["active_task"]:
+        raise ResumeRecoveryError("active AWU task disagrees with canonical engineering task")
+
     scenarios = 0
     normal = repository_recover()
     scenarios += 1
     assert normal["recovery_version"] == 2
     assert normal["handoff_status"] == "VALID"
     assert normal["context_map_status"] == "VALID"
-    assert normal["active_awu_id"] == "ENG-08.6-WU01"
-    assert normal["active_task"] == "ENG-08.6"
+    assert normal["active_awu_id"] == expected_awu_id
+    assert normal["active_task"] == expected_task
     assert normal["write_authorized"] is False
     assert normal["live_git_reverify_satisfied"] is False
     assert normal["required_before_write"] == [WRITE_GATE]
@@ -396,14 +405,14 @@ def main() -> int:
     scenarios += 1
     assert both_stale["handoff_status"] == "STALE"
     assert both_stale["context_map_status"] == "STALE"
-    assert both_stale["active_task"] == "ENG-08.6"
-    assert both_stale["active_awu_id"] == "ENG-08.6-WU01"
+    assert both_stale["active_task"] == expected_task
+    assert both_stale["active_awu_id"] == expected_awu_id
 
     both_missing = repository_recover(handoff_override=None, context_override=None)
     scenarios += 1
     assert both_missing["handoff_status"] == "MISSING"
     assert both_missing["context_map_status"] == "MISSING"
-    assert both_missing["active_task"] == "ENG-08.6"
+    assert both_missing["active_task"] == expected_task
     assert both_missing["state_auto_healed"] is False
 
     stale_safety = copy.deepcopy(handoff)
