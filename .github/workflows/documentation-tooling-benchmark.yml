@@ -1,0 +1,74 @@
+name: Documentation Tooling Benchmark
+
+on:
+  push:
+    branches:
+      - engineering/bootstrap-development-engine
+    paths:
+      - "config/governance/documentation_tooling_benchmark_v1.json"
+      - "scripts/governance/benchmark_documentation_tools.py"
+      - ".github/workflows/documentation-tooling-benchmark.yml"
+      - "engineering/DOCUMENTATION_TOOLING_BENCHMARK.md"
+      - "engineering/work_units/ENG-05.6-WU04.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: documentation-tooling-benchmark-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  vale:
+    name: Vale v3.22.0 offline benchmark
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      VALE_ASSET_URL: "https://github.com/vale-cli/vale/releases/download/v3.22.0/vale_3.22.0_Linux_64-bit.tar.gz"
+      VALE_ASSET_SHA256: "52f5cd0314a1b7384cac6aa102a68193977312f6ba9c9f3ae001b5deec8e3a10"
+      VALE_EXPECTED_VERSION: "3.22.0"
+    steps:
+      - name: Checkout exact head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Validate benchmark policy without Vale
+        run: python3 scripts/governance/benchmark_documentation_tools.py --self-check
+
+      - name: Download and verify exact Vale release
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="${RUNNER_TEMP}/vale.tar.gz"
+          bindir="${RUNNER_TEMP}/vale-bin"
+          mkdir -p "${bindir}"
+          curl --fail --location --silent --show-error             --proto '=https' --tlsv1.2             "${VALE_ASSET_URL}"             --output "${archive}"
+          printf '%s  %s\n' "${VALE_ASSET_SHA256}" "${archive}" | sha256sum --check --strict
+          tar -xzf "${archive}" -C "${bindir}"
+          test -x "${bindir}/vale"
+          version="$("${bindir}/vale" --version)"
+          printf '%s\n' "${version}" | grep -F "${VALE_EXPECTED_VERSION}" >/dev/null
+          printf 'VALE_BIN=%s\n' "${bindir}/vale" >> "${GITHUB_ENV}"
+
+      - name: Run offline local-rule benchmark
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/governance/benchmark_documentation_tools.py             --vale-bin "${VALE_BIN}"             --output "${RUNNER_TEMP}/vale-benchmark.json"
+          python3 - "${RUNNER_TEMP}/vale-benchmark.json" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          data = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          print(
+              "VALE_BENCHMARK_SUMMARY "
+              f"synthetic={data['synthetic']['finding_count']} "
+              f"representative={data['representative']['finding_count']} "
+              f"vale_ms={data['total_vale_elapsed_ms']} "
+              f"docs={len(data['representative']['documents'])}"
+          )
+          PY

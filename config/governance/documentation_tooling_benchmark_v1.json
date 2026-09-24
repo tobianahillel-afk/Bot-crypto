@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "policy_kind": "documentation_tooling_benchmark_v1",
+  "semantics": "VALE_PINNED_OFFLINE_LOCAL_RULES_EVIDENCE_ONLY",
+  "authority_role": "NON_AUTHORITATIVE",
+  "candidate": "VALE",
+  "release": {
+    "repository": "vale-cli/vale",
+    "tag": "v3.22.0",
+    "source_commit": "e109c06297dc58a513f10691a275f3a9465584a1",
+    "immutable_release": true,
+    "asset_name": "vale_3.22.0_Linux_64-bit.tar.gz",
+    "asset_url": "https://github.com/vale-cli/vale/releases/download/v3.22.0/vale_3.22.0_Linux_64-bit.tar.gz",
+    "asset_sha256": "52f5cd0314a1b7384cac6aa102a68193977312f6ba9c9f3ae001b5deec8e3a10",
+    "expected_version": "3.22.0",
+    "license": "MIT"
+  },
+  "workflow": {
+    "path": ".github/workflows/documentation-tooling-benchmark.yml",
+    "checkout_action_sha": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+    "checkout_version_comment": "v7.0.1",
+    "permissions": {
+      "contents": "read"
+    },
+    "benchmark_branch": "engineering/bootstrap-development-engine"
+  },
+  "execution": {
+    "package_sync_allowed": false,
+    "remote_style_packages_allowed": false,
+    "vale_runtime_network_required": false,
+    "download_network_scope": "PINNED_RELEASE_ASSET_ONLY",
+    "paid_api_required": false,
+    "paid_saas_required": false,
+    "paid_llm_required": false,
+    "paid_runner_required": false,
+    "max_representative_docs": 4,
+    "max_vale_elapsed_ms": 5000,
+    "min_synthetic_findings": 1,
+    "max_representative_findings": 0
+  },
+  "local_rule": {
+    "style_name": "CQBBenchmark",
+    "rule_name": "Placeholder",
+    "forbidden_token": "ENGINEBENCHPLACEHOLDER",
+    "replacement": "benchmark wording",
+    "level": "error"
+  },
+  "representative_docs": [
+    "README.md",
+    "AGENTS.md",
+    "engineering/MASTER_PLAN.md",
+    "engineering/DOCUMENTATION_TOOLING_EVALUATION.md"
+  ],
+  "invariants": [
+    "release archive SHA-256 is verified before extraction or execution",
+    "Vale version output must contain 3.22.0",
+    "benchmark rules and config are created in a temporary directory only",
+    "Vale config declares no Packages and no remote style source",
+    "vale sync is never executed",
+    "synthetic positive control must produce at least one configured-rule finding",
+    "representative docs are evidence-only and must not be mutated",
+    "benchmark does not alter canonical documentation authority",
+    "benchmark mandatory cost remains zero"
+  ]
+}
