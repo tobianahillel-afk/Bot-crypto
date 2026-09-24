@@ -39,9 +39,9 @@
     "awu_id": "ENG-06.1-WU01",
     "awu_path": "engineering/work_units/ENG-06.1-WU01.json",
     "parent_manifest": "engineering/lots/ENG-06.json",
-    "scope_base_sha": "8edbe4cd4a9f03974356f17753101668f07d314a",
+    "scope_base_sha": "c1f6d4e37ae66ba23621c3ccc84fef76013bcd0b",
     "risk_class": "R2",
-    "complexity_score": 3
+    "complexity_score": 4
   },
   "resume_read_order": [
     "AGENTS.md",
@@ -60,23 +60,9 @@
     "ENG-05.6 WU05 lychee v0.24.2 offline benchmark completed on exact head 8edbe4cd4a9f03974356f17753101668f07d314a; benchmark 35972886401, bootstrap 35972886436 and Security Secrets 35972886267 passed. lychee checked 67 representative local links with 0 errors in 41.777 ms total benchmark time."
   ],
   "current_objective": "ENG-06.1: define the deterministic fail-closed lifecycle for engineering certification candidates.",
-  "next_action": "Validate the ENG-05 to ENG-06 transition, then implement the candidate lifecycle policy, validator and adversarial tests without executing certification.",
+  "next_action": "Implement the certification candidate lifecycle policy, validator and adversarial tests, wire them into engineering bootstrap, then inspect exact-head CI evidence.",
   "blockers": [],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35919130289",
-      "head_sha": "b98ba29f2428f175dd186dc4a170d8f57a7b06cd",
-      "scope": "SECURITY_SUPPLY_CHAIN"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35919130265",
-      "head_sha": "b98ba29f2428f175dd186dc4a170d8f57a7b06cd",
-      "scope": "SECURITY_SECRETS"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "status": "PASS",
@@ -146,6 +132,20 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35972886267",
       "head_sha": "8edbe4cd4a9f03974356f17753101668f07d314a",
       "scope": "ENG-05.6-WU05_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35973352316",
+      "head_sha": "c1f6d4e37ae66ba23621c3ccc84fef76013bcd0b",
+      "scope": "ENG-06_ACTIVATION_BOOTSTRAP"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35973352066",
+      "head_sha": "c1f6d4e37ae66ba23621c3ccc84fef76013bcd0b",
+      "scope": "ENG-06_ACTIVATION_SECURITY_SECRETS"
     }
   ],
   "stop_conditions": [

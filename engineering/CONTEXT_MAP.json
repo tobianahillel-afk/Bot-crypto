@@ -2,7 +2,7 @@
   "active_work": {
     "awu_id": "ENG-06.1-WU01",
     "awu_path": "engineering/work_units/ENG-06.1-WU01.json",
-    "complexity_score": 3,
+    "complexity_score": 4,
     "lot": "ENG-06",
     "manifest": "engineering/lots/ENG-06.json",
     "risk_class": "R2",
@@ -69,7 +69,7 @@
   "resume": {
     "current_objective": "ENG-06.1: define the deterministic fail-closed lifecycle for engineering certification candidates.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Validate the ENG-05 to ENG-06 transition, then implement the candidate lifecycle policy, validator and adversarial tests without executing certification."
+    "next_action": "Implement the certification candidate lifecycle policy, validator and adversarial tests, wire them into engineering bootstrap, then inspect exact-head CI evidence."
   },
   "safety": {
     "execution_allowed": false,

@@ -45,7 +45,7 @@
 
 - Handoff: engineering/handoff/CURRENT.json
 - Objective: ENG-06.1: define the deterministic fail-closed lifecycle for engineering certification candidates.
-- Next action: Validate the ENG-05 to ENG-06 transition, then implement the candidate lifecycle policy, validator and adversarial tests without executing certification.
+- Next action: Implement the certification candidate lifecycle policy, validator and adversarial tests, wire them into engineering bootstrap, then inspect exact-head CI evidence.
 
 ## Non-authoritative sources
 

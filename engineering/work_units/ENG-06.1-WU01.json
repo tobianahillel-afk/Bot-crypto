@@ -62,23 +62,16 @@
     }
   ],
   "scope": {
-    "scope_base_sha": "8edbe4cd4a9f03974356f17753101668f07d314a",
+    "scope_base_sha": "c1f6d4e37ae66ba23621c3ccc84fef76013bcd0b",
     "allowed_paths": [
-      "config/governance/project_state.json",
-      "engineering/STATE.json",
-      "engineering/lots/ENG-05.json",
-      "engineering/lots/ENG-06.json",
       "engineering/handoff/CURRENT.json",
-      "engineering/work_units/ENG-05.6-WU05.json",
       "engineering/work_units/ENG-06.1-WU01.json",
       "engineering/CONTEXT_MAP.json",
       "engineering/CONTEXT_MAP.md",
-      "README.md",
-      "AGENTS.md",
-      "engineering/CURRENT_STATUS.md",
       "config/governance/certification_candidate_lifecycle_v1.json",
       "scripts/governance/validate_certification_candidate_lifecycle.py",
-      "scripts/governance/selftest_certification_candidate_lifecycle.py"
+      "scripts/governance/selftest_certification_candidate_lifecycle.py",
+      ".github/workflows/engineering-bootstrap.yml"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -120,7 +113,7 @@
   },
   "planning": {
     "risk_class": "R2",
-    "complexity_score": 3,
+    "complexity_score": 4,
     "split_required": false,
     "context_budget": {
       "max_primary_files": 12,
@@ -139,12 +132,12 @@
       "security_trust_boundary": false,
       "risk_execution_permission": false,
       "dependency_change": false,
-      "ci_evidence_topology_change": false
+      "ci_evidence_topology_change": true
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 15,
-      "executable_loc_changed": 600,
+      "files_touched": 8,
+      "executable_loc_changed": 650,
       "new_public_behaviors": 1,
       "contract_families": 0,
       "independent_algorithms": 1,
