@@ -117,7 +117,8 @@
       "BLOCKED manifests require explicit blockers and non-BLOCKED manifests cannot carry blockers",
       "lifecycle transitions are explicit deterministic and fail-closed",
       "COMPLETE cannot be reached directly from PLANNED READY or IN_PROGRESS",
-      "validator is pure and performs no audit or repository mutation"
+      "validator is pure and performs no audit or repository mutation",
+      "manifest validator replays the bound ENG-07.1 plan from its lot-complexity descriptors and requires canonical plan equality"
     ],
     "acceptance_criteria": [
       "valid synthetic batch manifest validates and replays deterministically",
@@ -129,7 +130,8 @@
       "BLOCKED without blocker fails and non-BLOCKED with blocker fails",
       "legal lifecycle transitions pass and skipped/unknown transitions fail",
       "schema and lifecycle policy drift are detected",
-      "no historical evidence or business/runtime state is mutated"
+      "no historical evidence or business/runtime state is mutated",
+      "forged plan identity or forged batch identity fails closed even when the manifest identity is recomputed"
     ]
   },
   "planning": {
