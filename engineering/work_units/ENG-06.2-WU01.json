@@ -119,7 +119,6 @@
     "size_estimate": {
       "business_domains": 1,
       "contract_families": 0,
-      "cross_domain_interfaces": 0,
       "executable_loc_changed": 780,
       "files_touched": 15,
       "independent_algorithms": 1,
