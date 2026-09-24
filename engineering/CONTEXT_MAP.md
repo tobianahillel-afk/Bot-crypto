@@ -12,19 +12,19 @@
 
 - Track: ENGINEERING
 - Work item: ENG-08
-- Task: ENG-08.5
-- AWU: ENG-08.5-WU01
+- Task: ENG-08.6
+- AWU: ENG-08.6-WU01
 - Risk: R1
 - Manifest: engineering/lots/ENG-08.json
-- AWU file: engineering/work_units/ENG-08.5-WU01.json
+- AWU file: engineering/work_units/ENG-08.6-WU01.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-08.json
-- engineering/work_units/ENG-08.5-WU01.json
-- scripts/governance/cold_start_qualification.py
+- engineering/work_units/ENG-08.6-WU01.json
+- scripts/governance/resume_recovery_qualification.py
 - scripts/governance/resolve_next_work.py
 - engineering/AGENT_CAPABILITIES.json
 
@@ -37,14 +37,14 @@
 
 - Primary: 7 / 10 files
 - Reference: 2 / 12 files
-- Routed size: 57 / 768 KiB
+- Routed size: 53 / 768 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-08.5: prove a fresh agent can resume from repository state alone with bounded context and no conversational memory.
-- Next action: Strengthen the permanent cold-start qualification to prove context-free authority resolution, bounded read order/context budget, unique active AWU, safety preservation and cold-start timing without chat/model memory.
+- Objective: ENG-08.6: prove interrupted work resumes deterministically from permanent repository authority without conversational context.
+- Next action: Strengthen the permanent resume/recovery qualification with interruption timing, simultaneous stale/missing hint scenarios, bounded-route checks, safety preservation and mandatory LIVE_GIT_REVERIFY_REQUIRED before writes.
 
 ## Non-authoritative sources
 

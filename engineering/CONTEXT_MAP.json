@@ -1,12 +1,12 @@
 {
   "active_work": {
-    "awu_id": "ENG-08.5-WU01",
-    "awu_path": "engineering/work_units/ENG-08.5-WU01.json",
+    "awu_id": "ENG-08.6-WU01",
+    "awu_path": "engineering/work_units/ENG-08.6-WU01.json",
     "complexity_score": 1,
     "lot": "ENG-08",
     "manifest": "engineering/lots/ENG-08.json",
     "risk_class": "R1",
-    "task": "ENG-08.5",
+    "task": "ENG-08.6",
     "track": "ENGINEERING"
   },
   "authority": {
@@ -40,8 +40,8 @@
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-08.json",
-      "engineering/work_units/ENG-08.5-WU01.json",
-      "scripts/governance/cold_start_qualification.py",
+      "engineering/work_units/ENG-08.6-WU01.json",
+      "scripts/governance/resume_recovery_qualification.py",
       "scripts/governance/resolve_next_work.py",
       "engineering/AGENT_CAPABILITIES.json"
     ],
@@ -50,7 +50,7 @@
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 57
+    "total_kib_ceil": 53
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -66,9 +66,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "ENG-08.5: prove a fresh agent can resume from repository state alone with bounded context and no conversational memory.",
+    "current_objective": "ENG-08.6: prove interrupted work resumes deterministically from permanent repository authority without conversational context.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Strengthen the permanent cold-start qualification to prove context-free authority resolution, bounded read order/context budget, unique active AWU, safety preservation and cold-start timing without chat/model memory."
+    "next_action": "Strengthen the permanent resume/recovery qualification with interruption timing, simultaneous stale/missing hint scenarios, bounded-route checks, safety preservation and mandatory LIVE_GIT_REVERIFY_REQUIRED before writes."
   },
   "safety": {
     "execution_allowed": false,
