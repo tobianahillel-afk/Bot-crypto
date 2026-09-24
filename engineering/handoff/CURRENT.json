@@ -27,7 +27,7 @@
     "rulesets_count": 0
   },
   "kind": "engineering_handoff",
-  "next_action": "Implement only findings schema/policy/validator/selftests bound to validated manifest and mapping identities; do not execute audits, populate real findings, remediate, or change CI topology.",
+  "next_action": "Implement only findings schema/policy/validator with built-in deterministic self-check, bound to validated manifest and mapping identities; defer adversarial test module and CI integration to ENG-07.4-WU02.",
   "next_engineering": {
     "active_lot": "ENG-07",
     "active_task": "ENG-07.4",

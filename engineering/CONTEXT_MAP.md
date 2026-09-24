@@ -45,7 +45,7 @@
 
 - Handoff: engineering/handoff/CURRENT.json
 - Objective: ENG-07.4 WU01: define the source-bound read-only historical audit findings registry contract.
-- Next action: Implement only findings schema/policy/validator/selftests bound to validated manifest and mapping identities; do not execute audits, populate real findings, remediate, or change CI topology.
+- Next action: Implement only findings schema/policy/validator with built-in deterministic self-check, bound to validated manifest and mapping identities; defer adversarial test module and CI integration to ENG-07.4-WU02.
 
 ## Non-authoritative sources
 

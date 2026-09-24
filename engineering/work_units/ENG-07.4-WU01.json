@@ -64,11 +64,6 @@
       "name": "Historical audit findings validator",
       "kind": "FILE",
       "locator": "scripts/governance/validate_historical_audit_findings.py"
-    },
-    {
-      "name": "Historical audit findings adversarial tests",
-      "kind": "TEST",
-      "locator": "scripts/governance/selftest_historical_audit_findings.py"
     }
   ],
   "scope": {
@@ -88,8 +83,7 @@
       "engineering/work_units/ENG-07.4-WU01.json",
       "config/governance/historical_audit_findings_schema_v1.json",
       "config/governance/historical_audit_findings_policy_v1.json",
-      "scripts/governance/validate_historical_audit_findings.py",
-      "scripts/governance/selftest_historical_audit_findings.py"
+      "scripts/governance/validate_historical_audit_findings.py"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -129,8 +123,8 @@
       "mutation permissions remain false and validator performs no repository mutation"
     ],
     "acceptance_criteria": [
-      "clean synthetic registry with zero findings validates deterministically",
-      "synthetic populated registry validates with sorted unique finding ids",
+      "clean synthetic registry with zero findings validates deterministically through validator self-check",
+      "synthetic populated registry validates with sorted unique finding ids through validator self-check",
       "registry bound to forged manifest mapping plan batch or lot identity fails closed",
       "invalid severity status disposition or missing owner fails closed",
       "duplicate or unsorted finding ids fail closed",
@@ -139,7 +133,8 @@
       "identity tampering fails closed",
       "Lot45 or later registry fails closed",
       "absolute traversal or malformed repository references fail closed",
-      "no historical artifact business state or runtime authority is mutated"
+      "no historical artifact business state or runtime authority is mutated",
+      "separate adversarial test module and CI qualification are deferred to ENG-07.4-WU02"
     ]
   },
   "planning": {
@@ -167,8 +162,8 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 16,
-      "executable_loc_changed": 780,
+      "files_touched": 15,
+      "executable_loc_changed": 650,
       "new_public_behaviors": 1,
       "contract_families": 1,
       "independent_algorithms": 1,
@@ -185,14 +180,13 @@
       "T2"
     ],
     "target_commands": [
-      "python scripts/governance/validate_historical_audit_findings.py --self-check",
-      "python scripts/governance/selftest_historical_audit_findings.py"
+      "python scripts/governance/validate_historical_audit_findings.py --self-check"
     ]
   },
   "done_when": [
-    "findings schema policy validator and adversarial tests are defined",
+    "findings schema policy and validator with deterministic self-check are defined",
     "findings remain separate from immutable historical evidence and preserve explicit severity ownership and disposition",
     "all registry identities remain bound to validated historical manifest and mapping identities",
-    "CI integration and executable qualification are deferred to a follow-up WU"
+    "adversarial test module and CI integration are deferred to ENG-07.4-WU02"
   ]
 }
