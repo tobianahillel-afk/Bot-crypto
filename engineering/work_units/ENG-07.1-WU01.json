@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-07.1-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-07",
+    "task_id": "ENG-07.1",
+    "manifest": "engineering/lots/ENG-07.json"
+  },
+  "title": "Define complexity-aware historical audit batching core",
+  "objective": "Define pure deterministic read-only batching semantics for historical Lots 0-44 so later audit work is split into bounded complexity-aware batches without executing audits or mutating historical evidence.",
+  "non_goals": [
+    "execute historical audits",
+    "modify data/audit or historical reports/contracts",
+    "create remediation changes",
+    "audit Lot45 candidate",
+    "unlock Lot46",
+    "change business code",
+    "change runtime authority",
+    "add paid or LLM-backed dependency",
+    "integrate the new checks into CI in this WU"
+  ],
+  "depends_on": [
+    "ENG-06.6-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Historical evidence protection",
+      "kind": "STATE",
+      "locator": "engineering/HISTORICAL_EVIDENCE_PROTECTION.json"
+    },
+    {
+      "name": "Canonical product roadmap",
+      "kind": "FILE",
+      "locator": "docs/ROADMAP_V1_TO_V21.md"
+    },
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Historical audit batching policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/historical_audit_batching_v1.json"
+    },
+    {
+      "name": "Historical audit batch planner",
+      "kind": "FILE",
+      "locator": "scripts/governance/plan_historical_audit_batches.py"
+    },
+    {
+      "name": "Historical audit batching adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_historical_audit_batching.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "04493b7c237f9f87ac427f572beb545c7ee18682",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-06.json",
+      "engineering/lots/ENG-07.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "AGENTS.md",
+      "README.md",
+      "engineering/CURRENT_STATUS.md",
+      "engineering/work_units/ENG-06.6-WU01.json",
+      "engineering/work_units/ENG-07.1-WU01.json",
+      "config/governance/historical_audit_batching_v1.json",
+      "scripts/governance/plan_historical_audit_batches.py",
+      "scripts/governance/selftest_historical_audit_batching.py"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/lot*/**"
+    ],
+    "forbidden_semantics": [
+      "historical audit execution",
+      "historical evidence mutation",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency",
+      "CI topology change"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "planner is pure deterministic and read-only",
+      "only historical certified business lots 0 through 44 are eligible for batching",
+      "Lot45 suspended candidate and Lot46+ are excluded",
+      "every eligible lot appears exactly once in one batch",
+      "batch ordering follows ascending historical lot order",
+      "batch size is bounded by both maximum lot count and cumulative complexity budget",
+      "a single lot above the normal batch budget is isolated rather than dropped",
+      "complexity inputs are explicit integers and unknown/malformed inputs fail closed",
+      "no batching decision mutates historical evidence audit state business state or runtime authority"
+    ],
+    "acceptance_criteria": [
+      "stable identical input produces byte-equivalent plan identity",
+      "Lots 0-44 are covered exactly once with no gaps or duplicates",
+      "Lot45 and later lots cannot enter the plan",
+      "higher-complexity lots cause earlier batch splits",
+      "oversized single lot forms a one-lot isolated batch with explicit reason",
+      "negative duplicate missing or out-of-range lot descriptors fail closed",
+      "batch plan records deterministic per-batch and whole-plan SHA-256 identities"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 15,
+      "executable_loc_changed": 650,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1"
+    ],
+    "target_commands": [
+      "python scripts/governance/plan_historical_audit_batches.py --self-check",
+      "python scripts/governance/selftest_historical_audit_batching.py"
+    ]
+  },
+  "done_when": [
+    "batching policy and pure planner are defined",
+    "adversarial selftests encode coverage ordering and fail-closed rules",
+    "no historical evidence or business/runtime state is mutated",
+    "CI integration and executable qualification are deferred to ENG-07.1-WU02"
+  ]
+}

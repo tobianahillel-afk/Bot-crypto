@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "kind": "engineering_work_item",
+  "id": "ENG-07",
+  "title": "Historical Audit Engine",
+  "status": "IN_PROGRESS",
+  "objective": "Build a read-only, complexity-aware historical audit engine that maps requirements, code, tests and evidence in bounded batches, records findings separately, and never rewrites certified historical evidence.",
+  "depends_on": [
+    "ENG-06"
+  ],
+  "allowed_paths": [
+    "AGENTS.md",
+    "README.md",
+    "config/governance/**",
+    "engineering/**",
+    "scripts/governance/**",
+    ".github/workflows/engineering-bootstrap.yml"
+  ],
+  "forbidden_scope": [
+    "src/crypto_quant_bot/** business implementation changes",
+    "Lot45 candidate branch changes",
+    "Lot46 implementation or unlock",
+    "data/audit/** historical evidence mutation",
+    "reports/lot*/** historical evidence mutation",
+    "contracts/** historical certification mutation",
+    "runtime capability activation",
+    "mandatory paid or LLM-backed dependency",
+    "live trading execution enablement"
+  ],
+  "tasks": [
+    {
+      "id": "ENG-07.1",
+      "status": "IN_PROGRESS",
+      "description": "Define complexity-aware historical audit batching and qualification."
+    },
+    {
+      "id": "ENG-07.2",
+      "status": "PLANNED",
+      "description": "Define the historical audit manifest and read-only batch lifecycle."
+    },
+    {
+      "id": "ENG-07.3",
+      "status": "PLANNED",
+      "description": "Map historical requirements to implementation tests contracts and evidence."
+    },
+    {
+      "id": "ENG-07.4",
+      "status": "PLANNED",
+      "description": "Implement the historical audit findings registry."
+    },
+    {
+      "id": "ENG-07.5",
+      "status": "PLANNED",
+      "description": "Define isolated remediation workflow separate from historical evidence."
+    },
+    {
+      "id": "ENG-07.6",
+      "status": "PLANNED",
+      "description": "Re-qualify immutable historical evidence protection under the audit engine."
+    }
+  ],
+  "done_when": [
+    "historical lots are partitioned into deterministic bounded batches from declared complexity signals",
+    "historical audit execution remains read-only until a separate remediation transition",
+    "requirements code tests contracts and evidence can be mapped without rewriting historical artifacts",
+    "findings are recorded separately with severity ownership and disposition",
+    "remediation cannot mutate frozen evidence or silently change historical certification facts",
+    "audit engine remains zero-cost and context-bounded"
+  ],
+  "extensions": {
+    "scope_base_sha": "04493b7c237f9f87ac427f572beb545c7ee18682",
+    "scope_base_kind": "PREVIOUS_ENGINEERING_CERTIFIED_HEAD",
+    "scope_base_evidence_run": 35991702019
+  }
+}

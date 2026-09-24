@@ -38,7 +38,7 @@
   "kind": "engineering_work_item",
   "objective": "Make candidate lifecycle, exact-head binding, deep assurance selection, provenance, promotion and post-merge verification deterministic and fail-closed without redundant full reruns.",
   "schema_version": 1,
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "tasks": [
     {
       "description": "Define and validate the deterministic certification-candidate lifecycle.",
@@ -68,7 +68,7 @@
     {
       "description": "Verify post-merge state without redundant full reruns when exact reusable evidence remains valid.",
       "id": "ENG-06.6",
-      "status": "IN_PROGRESS"
+      "status": "DONE"
     }
   ],
   "title": "Certification & Provenance"
