@@ -17,7 +17,8 @@
     "auto-heal stale repository state",
     "business implementation",
     "Lot45 candidate remediation",
-    "Lot46 unlock"
+    "Lot46 unlock",
+    "change the cold-start authority model"
   ],
   "depends_on": [
     "ENG-08.5-WU01"
@@ -79,7 +80,8 @@
       "scripts/governance/resume_recovery_qualification.py",
       "scripts/governance/selftest_resume_recovery.py",
       "engineering/INTERRUPTION_RECOVERY_EVIDENCE.json",
-      "engineering/INTERRUPTION_RECOVERY.md"
+      "engineering/INTERRUPTION_RECOVERY.md",
+      "scripts/governance/cold_start_qualification.py"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -150,7 +152,7 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 14,
+      "files_touched": 15,
       "executable_loc_changed": 650,
       "new_public_behaviors": 1,
       "contract_families": 0,
