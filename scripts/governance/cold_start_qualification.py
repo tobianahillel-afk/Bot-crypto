@@ -66,16 +66,18 @@ def validate_context_free_contract(
     )
     _require(resolved.get("project") == "Crypto Quant Bot V3.1-Ops", "resolved project drift")
     _require(resolved.get("track") == "DEVELOPMENT_ENGINE", "cold start must resolve engineering")
-    _require(resolved.get("active_lot") == "ENG-08", "cold-start active lot drift")
-    _require(resolved.get("active_task") == "ENG-08.5", "cold-start active task drift")
+    engineering = state.get("engineering_track")
+    _require(isinstance(engineering, dict), "engineering state missing")
+    _require(resolved.get("active_lot") == engineering.get("active_lot"), "cold-start active lot drift")
+    _require(resolved.get("active_task") == engineering.get("active_task"), "cold-start active task drift")
     _require(
-        resolved.get("active_manifest") == "engineering/lots/ENG-08.json",
+        resolved.get("active_manifest") == engineering.get("active_manifest"),
         "cold-start manifest drift",
     )
 
     active = resolved.get("active_awu")
     _require(isinstance(active, dict), "cold-start active AWU missing")
-    _require(active.get("id") == "ENG-08.5-WU01", "cold-start active AWU drift")
+    _require(active.get("id") == awu.get("id"), "cold-start active AWU drift")
     _require(active.get("split_required") is False, "cold-start AWU unexpectedly requires split")
     route = active.get("context_route")
     _require(isinstance(route, dict), "cold-start context route missing")
@@ -92,9 +94,10 @@ def validate_context_free_contract(
         primary[:2] == ["AGENTS.md", "config/governance/project_state.json"],
         "authority prefix drift",
     )
+    active_manifest = engineering.get("active_manifest")
+    active_awu_path = active.get("path")
     _require(
-        "engineering/lots/ENG-08.json" in primary
-        and "engineering/work_units/ENG-08.5-WU01.json" in primary,
+        active_manifest in primary and active_awu_path in primary,
         "active manifest/AWU absent from primary route",
     )
 
@@ -105,14 +108,9 @@ def validate_context_free_contract(
         _require(source not in expected_read_order, f"non-authoritative source entered read order: {source}")
 
     budget = awu.get("planning", {}).get("context_budget")
-    _require(
-        budget == {
-            "max_primary_files": 10,
-            "max_reference_files": 12,
-            "max_total_kib": 768,
-        },
-        "ENG-08.5 cold-start context budget drift",
-    )
+    _require(isinstance(budget, dict), "active AWU context budget missing")
+    for field in ("max_primary_files", "max_reference_files", "max_total_kib"):
+        _require(isinstance(budget.get(field), int) and budget[field] > 0, f"invalid context budget: {field}")
     _require(len(primary) <= budget["max_primary_files"], "primary context budget exceeded")
     _require(len(reference) <= budget["max_reference_files"], "reference context budget exceeded")
     total_kib = route.get("total_kib_ceil")
@@ -292,7 +290,7 @@ def main() -> int:
     units = active_awu.load_work_units()
     duplicate = dict(units)
     second = copy.deepcopy(awu)
-    second["id"] = "ENG-08.5-WU99"
+    second["id"] = f"{awu['parent']['task_id']}-WU99"
     duplicate[ROOT / "engineering/work_units/cold-duplicate.json"] = second
     _expect(
         active_awu.ActiveAwuError,
@@ -329,7 +327,9 @@ def main() -> int:
     probes += 1
 
     oversized = copy.deepcopy(resolved)
-    oversized["active_awu"]["context_route"]["total_kib_ceil"] = 769
+    oversized["active_awu"]["context_route"]["total_kib_ceil"] = (
+        awu["planning"]["context_budget"]["max_total_kib"] + 1
+    )
     _expect(
         ColdStartError,
         lambda: validate_context_free_contract(state, oversized, context, awu),
