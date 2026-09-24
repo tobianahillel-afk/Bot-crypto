@@ -1,13 +1,13 @@
 {
   "active_work": {
-    "track": "ENGINEERING",
-    "lot": "ENG-08",
-    "task": "ENG-08.5",
-    "manifest": "engineering/lots/ENG-08.json",
     "awu_id": "ENG-08.5-WU01",
     "awu_path": "engineering/work_units/ENG-08.5-WU01.json",
+    "complexity_score": 1,
+    "lot": "ENG-08",
+    "manifest": "engineering/lots/ENG-08.json",
     "risk_class": "R1",
-    "complexity_score": 1
+    "task": "ENG-08.5",
+    "track": "ENGINEERING"
   },
   "authority": {
     "current_state": "config/governance/project_state.json",
@@ -66,8 +66,8 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "handoff": "engineering/handoff/CURRENT.json",
     "current_objective": "ENG-08.5: prove a fresh agent can resume from repository state alone with bounded context and no conversational memory.",
+    "handoff": "engineering/handoff/CURRENT.json",
     "next_action": "Strengthen the permanent cold-start qualification to prove context-free authority resolution, bounded read order/context budget, unique active AWU, safety preservation and cold-start timing without chat/model memory."
   },
   "safety": {
