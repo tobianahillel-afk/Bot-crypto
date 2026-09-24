@@ -47,7 +47,7 @@ def main() -> int:
         plan_identity_sha256=plan["plan_identity_sha256"],
         source_head_sha="b" * 40,
     )
-    mod.validate_manifest(manifest)
+    mod.validate_manifest(manifest, plan)
     replay = mod.build_manifest(
         batch=batch,
         plan_identity_sha256=plan["plan_identity_sha256"],
@@ -57,37 +57,66 @@ def main() -> int:
 
     tampered = copy.deepcopy(manifest)
     tampered["complexity_total"] += 1
-    _expect(mod.HistoricalAuditManifestError, lambda: mod.validate_manifest(tampered), "identity tamper")
+    _expect(mod.HistoricalAuditManifestError, lambda: mod.validate_manifest(tampered, plan), "identity tamper")
 
     candidate = copy.deepcopy(manifest)
     candidate["lots"] = [45]
     candidate["manifest_identity_sha256"] = mod._sha256(mod.manifest_material(candidate))
-    _expect(mod.HistoricalAuditManifestError, lambda: mod.validate_manifest(candidate), "Lot45 inclusion")
+    _expect(mod.HistoricalAuditManifestError, lambda: mod.validate_manifest(candidate, plan), "Lot45 inclusion")
 
     unordered = copy.deepcopy(manifest)
     unordered["lots"] = [2, 1]
     unordered["manifest_identity_sha256"] = mod._sha256(mod.manifest_material(unordered))
-    _expect(mod.HistoricalAuditManifestError, lambda: mod.validate_manifest(unordered), "unordered lots")
+    _expect(mod.HistoricalAuditManifestError, lambda: mod.validate_manifest(unordered, plan), "unordered lots")
 
     writable = copy.deepcopy(manifest)
     writable["permissions"]["remediation_write"] = True
     writable["manifest_identity_sha256"] = mod._sha256(mod.manifest_material(writable))
-    _expect(mod.HistoricalAuditManifestError, lambda: mod.validate_manifest(writable), "remediation permission")
+    _expect(mod.HistoricalAuditManifestError, lambda: mod.validate_manifest(writable, plan), "remediation permission")
 
     bad_source = copy.deepcopy(manifest)
     bad_source["source_binding"]["source_head_sha"] = "not-a-sha"
     bad_source["manifest_identity_sha256"] = mod._sha256(mod.manifest_material(bad_source))
-    _expect(mod.HistoricalAuditManifestError, lambda: mod.validate_manifest(bad_source), "source sha")
+    _expect(mod.HistoricalAuditManifestError, lambda: mod.validate_manifest(bad_source, plan), "source sha")
 
     blocked = copy.deepcopy(manifest)
     blocked["status"] = "BLOCKED"
     blocked["manifest_identity_sha256"] = mod._sha256(mod.manifest_material(blocked))
-    _expect(mod.HistoricalAuditManifestError, lambda: mod.validate_manifest(blocked), "blocked without blocker")
+    _expect(mod.HistoricalAuditManifestError, lambda: mod.validate_manifest(blocked, plan), "blocked without blocker")
 
     stray = copy.deepcopy(manifest)
     stray["blockers"] = ["unexpected"]
     stray["manifest_identity_sha256"] = mod._sha256(mod.manifest_material(stray))
-    _expect(mod.HistoricalAuditManifestError, lambda: mod.validate_manifest(stray), "nonblocked blocker")
+    _expect(mod.HistoricalAuditManifestError, lambda: mod.validate_manifest(stray, plan), "nonblocked blocker")
+
+    forged_plan = copy.deepcopy(plan)
+    forged_plan["plan_identity_sha256"] = "0" * 64
+    _expect(
+        mod.HistoricalAuditManifestError,
+        lambda: mod.validate_manifest(manifest, forged_plan),
+        "forged plan identity",
+    )
+
+    wrong_batch = copy.deepcopy(manifest)
+    wrong_batch["batch_identity_sha256"] = "0" * 64
+    wrong_batch["manifest_identity_sha256"] = mod._sha256(mod.manifest_material(wrong_batch))
+    _expect(
+        mod.HistoricalAuditManifestError,
+        lambda: mod.validate_manifest(wrong_batch, plan),
+        "forged batch identity",
+    )
+
+    duplicate = copy.deepcopy(manifest)
+    if len(duplicate["lots"]) >= 2:
+        duplicate["lots"][1] = duplicate["lots"][0]
+    else:
+        duplicate["lots"] = [duplicate["lots"][0], duplicate["lots"][0]]
+    duplicate["manifest_identity_sha256"] = mod._sha256(mod.manifest_material(duplicate))
+    _expect(
+        mod.HistoricalAuditManifestError,
+        lambda: mod.validate_manifest(duplicate, plan),
+        "duplicate lots",
+    )
 
     lifecycle = mod._load(mod.LIFECYCLE_PATH)
     for source, target in (
@@ -133,7 +162,7 @@ def main() -> int:
         "schema permits Lot45",
     )
 
-    print("HISTORICAL_AUDIT_MANIFEST_SELFTEST_PASS probes=12")
+    print("HISTORICAL_AUDIT_MANIFEST_SELFTEST_PASS probes=15")
     return 0
 
 
