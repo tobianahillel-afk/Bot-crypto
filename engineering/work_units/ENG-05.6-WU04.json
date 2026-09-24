@@ -71,6 +71,7 @@
     "allowed_paths": [
       "engineering/lots/ENG-05.json",
       "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-05.6-WU02.json",
       "engineering/work_units/ENG-05.6-WU03.json",
       "engineering/work_units/ENG-05.6-WU04.json",
       "engineering/CONTEXT_MAP.json",
