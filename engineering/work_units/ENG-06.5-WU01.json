@@ -92,7 +92,10 @@
       "scripts/governance/validate_certification_promotion.py",
       "scripts/governance/selftest_certification_promotion.py",
       "engineering/CERTIFICATION_PROMOTION.md",
-      ".github/workflows/engineering-bootstrap.yml"
+      ".github/workflows/engineering-bootstrap.yml",
+      "AGENTS.md",
+      "README.md",
+      "engineering/CURRENT_STATUS.md"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -163,7 +166,7 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 13,
+      "files_touched": 15,
       "executable_loc_changed": 760,
       "new_public_behaviors": 1,
       "contract_families": 0,
