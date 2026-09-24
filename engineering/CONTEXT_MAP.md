@@ -11,22 +11,22 @@
 ## Active work
 
 - Track: ENGINEERING
-- Work item: ENG-05
-- Task: ENG-05.6
-- AWU: ENG-05.6-WU05
+- Work item: ENG-06
+- Task: ENG-06.1
+- AWU: ENG-06.1-WU01
 - Risk: R2
-- Manifest: engineering/lots/ENG-05.json
-- AWU file: engineering/work_units/ENG-05.6-WU05.json
+- Manifest: engineering/lots/ENG-06.json
+- AWU file: engineering/work_units/ENG-06.1-WU01.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
-- engineering/lots/ENG-05.json
-- engineering/work_units/ENG-05.6-WU05.json
-- config/governance/documentation_tooling_candidates_v1.json
-- config/governance/action_pin_registry_v1.json
-- config/governance/workflow_security_policy_v1.json
+- engineering/lots/ENG-06.json
+- engineering/work_units/ENG-06.1-WU01.json
+- config/governance/project_state_transitions_v1.json
+- engineering/AGENT_CAPABILITIES.json
+- config/governance/validation_t3_t4_policy_v1.json
 - engineering/handoff/CURRENT.json
 
 ## Execution context — reference
@@ -38,14 +38,14 @@
 
 - Primary: 8 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 51 / 1024 KiB
+- Routed size: 46 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-05.6 WU05: benchmark exact pinned lychee v0.24.2 offline as the second one-dependency child of the mandatory tooling split.
-- Next action: Validate the WU05 transition, then benchmark the exact lychee x86_64 GNU release with SHA-256 verification and --offline using synthetic local-link controls plus representative project Markdown.
+- Objective: ENG-06.1: define the deterministic fail-closed lifecycle for engineering certification candidates.
+- Next action: Validate the ENG-05 to ENG-06 transition, then implement the candidate lifecycle policy, validator and adversarial tests without executing certification.
 
 ## Non-authoritative sources
 

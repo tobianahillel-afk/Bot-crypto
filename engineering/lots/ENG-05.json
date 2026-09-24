@@ -3,7 +3,7 @@
   "kind": "engineering_work_item",
   "id": "ENG-05",
   "title": "Documentation, Context & Handoff",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "objective": "Make current status, documentation consistency, context routing, handoff and resume/recovery deterministic so a fresh agent can continue correctly from GitHub without hidden conversational context.",
   "depends_on": [
     "ENG-04"
@@ -54,7 +54,7 @@
     },
     {
       "id": "ENG-05.6",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Evaluate deterministic documentation tooling such as DocGuard, Vale and lychee before adoption."
     }
   ],

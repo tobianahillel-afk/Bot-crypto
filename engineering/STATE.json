@@ -65,12 +65,13 @@
       "ENG-01",
       "ENG-02",
       "ENG-03",
-      "ENG-04"
+      "ENG-04",
+      "ENG-05"
     ],
-    "active_lot": "ENG-05",
-    "active_task": "ENG-05.6",
-    "next_lot": "ENG-06",
-    "active_manifest": "engineering/lots/ENG-05.json",
+    "active_lot": "ENG-06",
+    "active_task": "ENG-06.1",
+    "next_lot": "ENG-07",
+    "active_manifest": "engineering/lots/ENG-06.json",
     "blockers": []
   },
   "mandatory_cost_policy": {
@@ -85,7 +86,7 @@
     "master_plan": "engineering/MASTER_PLAN.md",
     "handoff": "engineering/handoff/CURRENT.json",
     "bootstrap_protocol": "engineering/BOOTSTRAP.md",
-    "active_manifest": "engineering/lots/ENG-05.json"
+    "active_manifest": "engineering/lots/ENG-06.json"
   },
   "stop_conditions": [
     "STATE_DRIFT",

@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "kind": "engineering_work_item",
+  "id": "ENG-06",
+  "title": "Certification & Provenance",
+  "status": "IN_PROGRESS",
+  "objective": "Make candidate lifecycle, exact-head binding, deep assurance selection, provenance, promotion and post-merge verification deterministic and fail-closed without redundant full reruns.",
+  "depends_on": [
+    "ENG-05"
+  ],
+  "allowed_paths": [
+    "AGENTS.md",
+    "README.md",
+    "config/governance/**",
+    "engineering/**",
+    "scripts/governance/**",
+    ".github/workflows/engineering-bootstrap.yml",
+    ".github/workflows/certification*.yml"
+  ],
+  "forbidden_scope": [
+    "src/crypto_quant_bot/** business implementation changes",
+    "Lot45 candidate branch changes",
+    "Lot46 implementation or unlock",
+    "frozen historical evidence mutation",
+    "runtime capability activation",
+    "mandatory paid or LLM-backed dependency",
+    "live trading execution enablement"
+  ],
+  "tasks": [
+    {
+      "id": "ENG-06.1",
+      "status": "IN_PROGRESS",
+      "description": "Define and validate the deterministic certification-candidate lifecycle."
+    },
+    {
+      "id": "ENG-06.2",
+      "status": "PLANNED",
+      "description": "Bind certification evidence to the exact candidate head and immutable input identity."
+    },
+    {
+      "id": "ENG-06.3",
+      "status": "PLANNED",
+      "description": "Execute risk-proportional deep assurance only when selected by policy."
+    },
+    {
+      "id": "ENG-06.4",
+      "status": "PLANNED",
+      "description": "Implement provenance and attestation semantics without replacing domain integrity hashes."
+    },
+    {
+      "id": "ENG-06.5",
+      "status": "PLANNED",
+      "description": "Define fail-closed promotion rules from candidate to certified state."
+    },
+    {
+      "id": "ENG-06.6",
+      "status": "PLANNED",
+      "description": "Verify post-merge state without redundant full reruns when exact reusable evidence remains valid."
+    }
+  ],
+  "done_when": [
+    "candidate lifecycle states and transitions are explicit deterministic and fail-closed",
+    "certification is bound to an exact immutable candidate head and declared inputs",
+    "T3/T4 requirements are satisfied proportionally to risk rather than blanket reruns",
+    "provenance identifies repository workflow commit and evidence source without weakening canonical domain hashes",
+    "promotion cannot occur with missing stale failed or mismatched evidence",
+    "post-merge verification reuses safe proofs only when exact-input semantics allow it",
+    "mandatory certification path remains zero-cost and requires no LLM reviewer"
+  ],
+  "extensions": {
+    "scope_base_sha": "8edbe4cd4a9f03974356f17753101668f07d314a",
+    "scope_base_kind": "PREVIOUS_ENGINEERING_CERTIFIED_HEAD",
+    "scope_base_evidence_run": 35972886436
+  }
+}
