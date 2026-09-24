@@ -36,10 +36,10 @@
   },
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-05.6-WU04",
-    "awu_path": "engineering/work_units/ENG-05.6-WU04.json",
+    "awu_id": "ENG-05.6-WU05",
+    "awu_path": "engineering/work_units/ENG-05.6-WU05.json",
     "parent_manifest": "engineering/lots/ENG-05.json",
-    "scope_base_sha": "1f40aee0580e75b3f5404bb27be6a654c37dedc3",
+    "scope_base_sha": "c6ae1454fb959009efea9d054d6db836fcd00153",
     "risk_class": "R2",
     "complexity_score": 5
   },
@@ -50,17 +50,17 @@
     "engineering/handoff/CURRENT.json"
   ],
   "recent_completed": [
-    "ENG-05.1 generated current-status views completed on exact head 1acc3d5c1043f532a1ac5f2c17c0e7bc72ed37f7.",
     "ENG-05.2 documentation consistency completed on exact head 365bd0a4a2afa63557cb580331ed887cbf7cd067.",
     "ENG-05.3 bounded Context Map completed on exact head 1c292cacae3f38b8025eaf1b0d5b215d2458b741.",
     "ENG-05.4 WU01 Handoff V2 validator and 12 adversarial probes passed on head b98ba29f2428f175dd186dc4a170d8f57a7b06cd; legacy bootstrap compatibility repair isolated to WU02.",
     "ENG-05.4 WU02 permanent-handoff bootstrap compatibility completed on exact head a9d712cc0f455a70ed9c39f35791e64cec1f58e7; run 35920389779 passed negative validators, context-map checks and full cold-start qualification.",
     "ENG-05.5 resume/recovery completed on exact head 48b32eb43f778d2da364725974e1805bd2660837; run 35930055502 passed recovery qualification, 9 adversarial probes and cold-start qualification.",
     "ENG-05.6 WU01 recovery harness genericity repair completed on exact head 4b1d5e417eb64461781b77de32e3d59ab423c761; run 35930906226 passed resume/recovery, adversarial recovery and cold-start.",
-    "ENG-05.6 WU02 documentation tooling evaluation completed on exact head 1f40aee0580e75b3f5404bb27be6a654c37dedc3; bootstrap 35931507203 plus Security Actions, Supply Chain and Secrets all passed. Verdicts: DocGuard COPY_PATTERN; Vale and lychee ADOPT_PARTIALLY pending benchmark."
+    "ENG-05.6 WU02 documentation tooling evaluation completed on exact head 1f40aee0580e75b3f5404bb27be6a654c37dedc3; bootstrap 35931507203 plus Security Actions, Supply Chain and Secrets all passed. Verdicts: DocGuard COPY_PATTERN; Vale and lychee ADOPT_PARTIALLY pending benchmark.",
+    "ENG-05.6 WU04 Vale v3.22.0 offline benchmark completed on exact head c6ae1454fb959009efea9d054d6db836fcd00153; benchmark 35971826612, bootstrap 35971826361 and Security Secrets 35971826327 all passed. Vale lint time 34.631 ms with 1 expected synthetic finding and 0 findings across 4 representative docs."
   ],
-  "current_objective": "ENG-05.6 WU04: benchmark exact pinned Vale v3.22.0 offline as a one-dependency work unit.",
-  "next_action": "Validate the split transition, then create a path-scoped Vale-only benchmark workflow that verifies the release SHA-256 before execution, uses only temporary local rules, and measures synthetic plus representative-doc behavior.",
+  "current_objective": "ENG-05.6 WU05: benchmark exact pinned lychee v0.24.2 offline as the second one-dependency child of the mandatory tooling split.",
+  "next_action": "Validate the WU05 transition, then benchmark the exact lychee x86_64 GNU release with SHA-256 verification and --offline using synthetic local-link controls plus representative project Markdown.",
   "blockers": [],
   "validation_evidence": [
     {
@@ -111,6 +111,27 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35931507203",
       "head_sha": "1f40aee0580e75b3f5404bb27be6a654c37dedc3",
       "scope": "ENG-05.6-WU02_TOOLING_EVALUATION"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35971826612",
+      "head_sha": "c6ae1454fb959009efea9d054d6db836fcd00153",
+      "scope": "ENG-05.6-WU04_VALE_BENCHMARK"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35971826361",
+      "head_sha": "c6ae1454fb959009efea9d054d6db836fcd00153",
+      "scope": "ENG-05.6-WU04_BOOTSTRAP"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35971826327",
+      "head_sha": "c6ae1454fb959009efea9d054d6db836fcd00153",
+      "scope": "ENG-05.6-WU04_SECURITY_SECRETS"
     }
   ],
   "stop_conditions": [

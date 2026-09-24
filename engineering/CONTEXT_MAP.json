@@ -1,7 +1,7 @@
 {
   "active_work": {
-    "awu_id": "ENG-05.6-WU04",
-    "awu_path": "engineering/work_units/ENG-05.6-WU04.json",
+    "awu_id": "ENG-05.6-WU05",
+    "awu_path": "engineering/work_units/ENG-05.6-WU05.json",
     "complexity_score": 5,
     "lot": "ENG-05",
     "manifest": "engineering/lots/ENG-05.json",
@@ -40,7 +40,7 @@
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-05.json",
-      "engineering/work_units/ENG-05.6-WU04.json",
+      "engineering/work_units/ENG-05.6-WU05.json",
       "config/governance/documentation_tooling_candidates_v1.json",
       "config/governance/action_pin_registry_v1.json",
       "config/governance/workflow_security_policy_v1.json",
@@ -51,7 +51,7 @@
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 50
+    "total_kib_ceil": 51
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -67,9 +67,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "ENG-05.6 WU04: benchmark exact pinned Vale v3.22.0 offline as a one-dependency work unit.",
+    "current_objective": "ENG-05.6 WU05: benchmark exact pinned lychee v0.24.2 offline as the second one-dependency child of the mandatory tooling split.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Validate the split transition, then create a path-scoped Vale-only benchmark workflow that verifies the release SHA-256 before execution, uses only temporary local rules, and measures synthetic plus representative-doc behavior."
+    "next_action": "Validate the WU05 transition, then benchmark the exact lychee x86_64 GNU release with SHA-256 verification and --offline using synthetic local-link controls plus representative project Markdown."
   },
   "safety": {
     "execution_allowed": false,

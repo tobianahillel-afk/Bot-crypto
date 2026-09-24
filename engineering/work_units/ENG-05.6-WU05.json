@@ -1,26 +1,26 @@
 {
   "schema_version": 1,
   "kind": "agent_work_unit",
-  "id": "ENG-05.6-WU04",
-  "status": "DONE",
+  "id": "ENG-05.6-WU05",
+  "status": "IN_PROGRESS",
   "parent": {
     "work_item_id": "ENG-05",
     "task_id": "ENG-05.6",
     "manifest": "engineering/lots/ENG-05.json"
   },
-  "title": "Benchmark pinned Vale offline",
-  "objective": "Benchmark the exact pinned Vale v3.22.0 Linux x86_64 release binary on deterministic local fixtures and representative project Markdown without package sync or networked lint behavior.",
+  "title": "Benchmark pinned lychee offline",
+  "objective": "Benchmark the exact pinned lychee v0.24.2 Linux x86_64 GNU release binary with --offline on deterministic local fixtures and representative project Markdown, measuring local-link detection without external network requests.",
   "non_goals": [
-    "execute lychee",
+    "execute Vale",
     "execute DocGuard",
-    "run vale sync",
-    "make Vale authoritative",
+    "check external URL health",
+    "make lychee authoritative",
     "business implementation",
     "Lot45 remediation",
     "Lot46 unlock"
   ],
   "depends_on": [
-    "ENG-05.6-WU02"
+    "ENG-05.6-WU04"
   ],
   "inputs": [
     {
@@ -46,38 +46,36 @@
   ],
   "outputs": [
     {
-      "name": "Vale benchmark policy",
+      "name": "lychee benchmark policy",
       "kind": "CONFIG",
-      "locator": "config/governance/documentation_tooling_benchmark_v1.json"
+      "locator": "config/governance/documentation_tooling_lychee_benchmark_v1.json"
     },
     {
-      "name": "Vale benchmark runner",
+      "name": "lychee benchmark runner",
       "kind": "FILE",
-      "locator": "scripts/governance/benchmark_documentation_tools.py"
+      "locator": "scripts/governance/benchmark_lychee.py"
     },
     {
-      "name": "Vale benchmark workflow",
+      "name": "lychee benchmark workflow",
       "kind": "FILE",
       "locator": ".github/workflows/documentation-tooling-benchmark.yml"
     },
     {
-      "name": "Vale benchmark evidence report",
+      "name": "documentation tooling benchmark evidence",
       "kind": "FILE",
       "locator": "engineering/DOCUMENTATION_TOOLING_BENCHMARK.md"
     }
   ],
   "scope": {
-    "scope_base_sha": "1f40aee0580e75b3f5404bb27be6a654c37dedc3",
+    "scope_base_sha": "c6ae1454fb959009efea9d054d6db836fcd00153",
     "allowed_paths": [
-      "engineering/lots/ENG-05.json",
       "engineering/handoff/CURRENT.json",
-      "engineering/work_units/ENG-05.6-WU02.json",
-      "engineering/work_units/ENG-05.6-WU03.json",
       "engineering/work_units/ENG-05.6-WU04.json",
+      "engineering/work_units/ENG-05.6-WU05.json",
       "engineering/CONTEXT_MAP.json",
       "engineering/CONTEXT_MAP.md",
-      "config/governance/documentation_tooling_benchmark_v1.json",
-      "scripts/governance/benchmark_documentation_tools.py",
+      "config/governance/documentation_tooling_lychee_benchmark_v1.json",
+      "scripts/governance/benchmark_lychee.py",
       ".github/workflows/documentation-tooling-benchmark.yml",
       "engineering/DOCUMENTATION_TOOLING_BENCHMARK.md"
     ],
@@ -91,9 +89,9 @@
     ],
     "forbidden_semantics": [
       "unverified third-party binary execution",
-      "networked Vale style package resolution",
+      "external network link checking",
       "external tool authority",
-      "lychee execution",
+      "Vale execution",
       "business implementation",
       "Lot45 remediation",
       "Lot46 unlock",
@@ -102,19 +100,21 @@
   },
   "contracts": {
     "required_invariants": [
-      "Vale Linux x86_64 asset SHA-256 equals 52f5cd0314a1b7384cac6aa102a68193977312f6ba9c9f3ae001b5deec8e3a10",
+      "lychee x86_64 GNU asset SHA-256 equals 1f4e0ef7f6554a6ed33dd7ac144fb2e1bbed98598e7af973042fc5cd43951c9a",
       "workflow uses only approved exact checkout action pins",
-      "Vale executes only after archive digest verification",
-      "Vale uses temporary project-local rules only and never runs vale sync",
-      "benchmark workflow is isolated from routine engineering bootstrap",
+      "lychee executes only after archive digest verification",
+      "every lychee benchmark invocation includes --offline",
+      "no GitHub token credential or external URL check is required",
+      "benchmark workflow remains isolated from routine engineering bootstrap",
       "benchmark findings are evidence only and cannot alter canonical documentation authority"
     ],
     "acceptance_criteria": [
-      "synthetic Vale violation is detected",
+      "synthetic missing local link is detected by lychee offline",
+      "synthetic valid local link passes lychee offline",
       "representative project docs are benchmarked with elapsed time and finding count",
-      "benchmark success requires no external style package or URL request",
+      "benchmark success requires no external network request",
       "workflow requires no paid token service or larger runner",
-      "Vale evidence is sufficient to decide whether a later changed-doc integration is justified"
+      "lychee evidence is sufficient to decide whether a later changed-doc local-link integration is justified"
     ]
   },
   "planning": {
@@ -142,8 +142,8 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 10,
-      "executable_loc_changed": 430,
+      "files_touched": 9,
+      "executable_loc_changed": 380,
       "new_public_behaviors": 1,
       "contract_families": 0,
       "independent_algorithms": 1,
@@ -160,14 +160,14 @@
       "T3"
     ],
     "target_commands": [
-      "python scripts/governance/benchmark_documentation_tools.py --self-check",
+      "python scripts/governance/benchmark_lychee.py --self-check",
       "GitHub Actions documentation-tooling-benchmark workflow"
     ]
   },
   "done_when": [
-    "Vale release archive is cryptographically verified before execution",
-    "offline synthetic positive control proves the selected local rule detects a violation",
-    "representative-doc runtime and noise are measured without networked style resolution",
-    "Vale benchmark evidence is recorded for the subsequent lychee/decision work"
+    "lychee release archive is cryptographically verified before execution",
+    "offline synthetic local-link positive and negative controls prove expected behavior",
+    "representative-doc local-link runtime and findings are measured without external requests",
+    "lychee benchmark evidence is recorded for the final ENG-05.6 adoption decision"
   ]
 }

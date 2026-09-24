@@ -13,17 +13,17 @@
 - Track: ENGINEERING
 - Work item: ENG-05
 - Task: ENG-05.6
-- AWU: ENG-05.6-WU04
+- AWU: ENG-05.6-WU05
 - Risk: R2
 - Manifest: engineering/lots/ENG-05.json
-- AWU file: engineering/work_units/ENG-05.6-WU04.json
+- AWU file: engineering/work_units/ENG-05.6-WU05.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-05.json
-- engineering/work_units/ENG-05.6-WU04.json
+- engineering/work_units/ENG-05.6-WU05.json
 - config/governance/documentation_tooling_candidates_v1.json
 - config/governance/action_pin_registry_v1.json
 - config/governance/workflow_security_policy_v1.json
@@ -38,14 +38,14 @@
 
 - Primary: 8 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 50 / 1024 KiB
+- Routed size: 51 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-05.6 WU04: benchmark exact pinned Vale v3.22.0 offline as a one-dependency work unit.
-- Next action: Validate the split transition, then create a path-scoped Vale-only benchmark workflow that verifies the release SHA-256 before execution, uses only temporary local rules, and measures synthetic plus representative-doc behavior.
+- Objective: ENG-05.6 WU05: benchmark exact pinned lychee v0.24.2 offline as the second one-dependency child of the mandatory tooling split.
+- Next action: Validate the WU05 transition, then benchmark the exact lychee x86_64 GNU release with SHA-256 verification and --offline using synthetic local-link controls plus representative project Markdown.
 
 ## Non-authoritative sources
 
