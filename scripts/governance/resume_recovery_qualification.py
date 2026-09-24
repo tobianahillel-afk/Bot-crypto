@@ -64,7 +64,11 @@ def _handoff_status(
     return "VALID"
 
 
-def _context_status(context: dict[str, Any] | None, resolved: dict[str, Any]) -> str:
+def _context_status(
+    context: dict[str, Any] | None,
+    resolved: dict[str, Any],
+    canonical_budget: dict[str, Any],
+) -> str:
     if context is None:
         return "MISSING"
     if not isinstance(context, dict):
@@ -106,7 +110,7 @@ def _context_status(context: dict[str, Any] | None, resolved: dict[str, Any]) ->
     for field in ("primary_files", "reference_files", "primary_count", "reference_count", "total_kib_ceil"):
         if execution.get(field) != route.get(field):
             return "STALE"
-    if execution.get("budget") != route.get("budget"):
+    if execution.get("budget") != canonical_budget:
         return "STALE"
     if execution.get("implicit_expansion") != "FORBIDDEN":
         return "STALE"
@@ -117,15 +121,19 @@ def _context_status(context: dict[str, Any] | None, resolved: dict[str, Any]) ->
     return "VALID"
 
 
-def _validate_recovered_route(awu: dict[str, Any], read_order: list[str]) -> dict[str, Any]:
+def _validate_recovered_route(
+    awu: dict[str, Any],
+    read_order: list[str],
+    canonical_budget: dict[str, Any],
+) -> dict[str, Any]:
     route = awu.get("context_route")
     if not isinstance(route, dict):
         raise ResumeRecoveryError("resolved AWU context route missing")
     primary = route.get("primary_files")
     reference = route.get("reference_files")
-    budget = route.get("budget")
+    budget = canonical_budget
     if not isinstance(primary, list) or not isinstance(reference, list) or not isinstance(budget, dict):
-        raise ResumeRecoveryError("resolved AWU context route malformed")
+        raise ResumeRecoveryError("resolved AWU context route/budget malformed")
     expected = primary + reference
     if read_order != expected:
         raise ResumeRecoveryError("recovered read order is not the exact bounded AWU route")
@@ -202,8 +210,13 @@ def recover(
     except resolver.ResolveError as exc:
         raise ResumeRecoveryError(str(exc)) from exc
 
+    full_awu = awu_bundle[1]
+    canonical_budget = full_awu.get("planning", {}).get("context_budget")
+    if not isinstance(canonical_budget, dict):
+        raise ResumeRecoveryError("canonical AWU context budget missing")
+
     handoff_status = _handoff_status(state, handoff, handoff_validator)
-    context_status = _context_status(context, resolved)
+    context_status = _context_status(context, resolved, canonical_budget)
     awu = resolved.get("active_awu")
     if not isinstance(awu, dict):
         raise ResumeRecoveryError("engineering recovery requires active AWU")
@@ -214,7 +227,7 @@ def recover(
     if read_order[0] != "AGENTS.md":
         raise ResumeRecoveryError("recovered read order must start with AGENTS.md")
 
-    route_metrics = _validate_recovered_route(awu, read_order)
+    route_metrics = _validate_recovered_route(awu, read_order, canonical_budget)
     safety_snapshot = _validate_safety(state, resolved)
     reconciliation = handoff_status != "VALID" or context_status != "VALID"
 
