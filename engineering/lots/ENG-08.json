@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "kind": "engineering_work_item",
+  "id": "ENG-08",
+  "title": "Performance & Cold-Start Qualification",
+  "status": "IN_PROGRESS",
+  "objective": "Prove the Development Engine is both SAFE and FAST by enforcing bounded timing/cost/context budgets, detecting unnecessary validation, qualifying proof reuse, cold-start and recovery, and proving R3 work cannot bypass strengthened assurance.",
+  "depends_on": [
+    "ENG-07"
+  ],
+  "allowed_paths": [
+    "AGENTS.md",
+    "README.md",
+    "config/governance/**",
+    "engineering/**",
+    "scripts/governance/**",
+    ".github/workflows/engineering-bootstrap.yml"
+  ],
+  "forbidden_scope": [
+    "src/crypto_quant_bot/** business implementation changes",
+    "Lot45 candidate branch changes",
+    "Lot46 implementation or unlock",
+    "data/audit/** historical evidence mutation",
+    "reports/lot*/** historical evidence mutation",
+    "contracts/** historical certification mutation",
+    "runtime capability activation",
+    "mandatory paid or LLM-backed dependency",
+    "live trading execution enablement"
+  ],
+  "tasks": [
+    {
+      "id": "ENG-08.1",
+      "status": "IN_PROGRESS",
+      "description": "Define and qualify T0/T1/T2 timing budgets."
+    },
+    {
+      "id": "ENG-08.2",
+      "status": "PLANNED",
+      "description": "Detect unnecessary validation checks and redundant work."
+    },
+    {
+      "id": "ENG-08.3",
+      "status": "PLANNED",
+      "description": "Measure and qualify proof-reuse effectiveness."
+    },
+    {
+      "id": "ENG-08.4",
+      "status": "PLANNED",
+      "description": "Prove mandatory execution cost remains zero."
+    },
+    {
+      "id": "ENG-08.5",
+      "status": "PLANNED",
+      "description": "Run context-free cold-start qualification."
+    },
+    {
+      "id": "ENG-08.6",
+      "status": "PLANNED",
+      "description": "Run interruption and recovery qualification."
+    },
+    {
+      "id": "ENG-08.7",
+      "status": "PLANNED",
+      "description": "Prove critical R3 work cannot bypass strengthened assurance."
+    }
+  ],
+  "done_when": [
+    "T0 T1 and routine T2 have explicit measured fail-closed timing budgets",
+    "unnecessary validation work is detected rather than silently tolerated",
+    "proof reuse measurably avoids safe redundant work without weakening exact-input binding",
+    "mandatory path requires zero paid API SaaS LLM or larger runner",
+    "fresh agents pass bounded context-free cold-start qualification",
+    "interrupted work resumes from permanent state and active AWU without chat history",
+    "R3 work cannot bypass T3/T4 requirements",
+    "Development Engine receives both SAFE and FAST verdicts before ENG-09"
+  ],
+  "extensions": {
+    "scope_base_sha": "9edb0916440832a724698996d6ba6dba5c54d1a6",
+    "scope_base_kind": "PREVIOUS_ENGINEERING_CERTIFIED_HEAD",
+    "scope_base_evidence_run": 36032060794
+  }
+}

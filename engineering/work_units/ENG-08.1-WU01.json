@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-08.1-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-08",
+    "task_id": "ENG-08.1",
+    "manifest": "engineering/lots/ENG-08.json"
+  },
+  "title": "Define deterministic T0/T1/T2 timing budgets",
+  "objective": "Define machine-readable routine-path timing budgets for T0, T1, T2 and the single-pass chain, plus a zero-dependency validator that binds the budgets to existing incremental validation semantics without yet adding adversarial CI qualification.",
+  "non_goals": [
+    "change T0 T1 T2 validation semantics",
+    "execute full regression mutation or historical audits",
+    "benchmark pytest-backed T2 domain tests",
+    "integrate new third-party tooling",
+    "modify security controls",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-07.6-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "Incremental validation policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/incremental_validation_policy_v1.json"
+    },
+    {
+      "name": "Single-pass incremental validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/run_incremental_validation.py"
+    },
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Validation timing budget policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/validation_timing_budget_v1.json"
+    },
+    {
+      "name": "Validation timing budget validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_validation_timing_budgets.py"
+    },
+    {
+      "name": "Timing budget documentation",
+      "kind": "FILE",
+      "locator": "engineering/VALIDATION_TIMING_BUDGETS.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "9edb0916440832a724698996d6ba6dba5c54d1a6",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-07.json",
+      "engineering/lots/ENG-08.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/CURRENT_STATUS.md",
+      "engineering/work_units/ENG-07.6-WU02.json",
+      "engineering/work_units/ENG-08.1-WU01.json",
+      "README.md",
+      "AGENTS.md",
+      "config/governance/validation_timing_budget_v1.json",
+      "scripts/governance/validate_validation_timing_budgets.py",
+      "engineering/VALIDATION_TIMING_BUDGETS.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/**"
+    ],
+    "forbidden_semantics": [
+      "validation semantic weakening",
+      "pytest-backed T2 benchmark",
+      "historical audit execution",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "timing budgets apply only to the routine no-pytest path",
+      "T0 T1 T2 and total single-pass budgets are explicit integer milliseconds",
+      "T0 budget is stricter than T1 T2 and total chain budgets",
+      "existing incremental validation routine_max_elapsed_ms remains an upper bound and may not be relaxed",
+      "budget validation uses only standard-library logic and executes no validation tier itself",
+      "no budget decision depends on wall-clock timestamps paid services or LLM output"
+    ],
+    "acceptance_criteria": [
+      "policy defines finite positive budgets for T0 T1 T2 and total chain",
+      "validator rejects missing negative non-integer or internally inconsistent budgets",
+      "validator rejects any total routine budget greater than the existing 2000 ms incremental policy ceiling",
+      "validator rejects any attempt to apply routine timing budgets to pytest-backed T2",
+      "budget policy requires measured elapsed_ms fields rather than inferred timing",
+      "core policy and validator are ready for adversarial/CI qualification in WU02"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 15,
+      "executable_loc_changed": 450,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0,
+      "cross_domain_interfaces": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_validation_timing_budgets.py --check",
+      "python scripts/governance/validate_validation_timing_budgets.py --self-check"
+    ]
+  },
+  "done_when": [
+    "machine-readable routine-path timing budgets are defined and fail-closed",
+    "budget validator binds to current incremental-validation ceiling without executing tiers",
+    "no validation semantics or business runtime authority changes",
+    "executable adversarial qualification is explicitly delegated to ENG-08.1-WU02"
+  ]
+}

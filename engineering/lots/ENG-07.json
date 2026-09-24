@@ -3,7 +3,7 @@
   "kind": "engineering_work_item",
   "id": "ENG-07",
   "title": "Historical Audit Engine",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "objective": "Build a read-only, complexity-aware historical audit engine that maps requirements, code, tests and evidence in bounded batches, records findings separately, and never rewrites certified historical evidence.",
   "depends_on": [
     "ENG-06"
@@ -55,7 +55,7 @@
     },
     {
       "id": "ENG-07.6",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Re-qualify immutable historical evidence protection under the audit engine."
     }
   ],
