@@ -35,6 +35,9 @@ EXPECTED_PINS = {
     "github/codeql-action": {
         "v4.38.1": ("tag", "c23de5a82f64bb08c6d9f28844551440ca298e76", "1c5b675653bb5c22dbe9b12b556ec555138e09fd"),
     },
+    "actions/attest": {
+        "v4.2.2": ("commit", "1e69f48acb82d1966a394da916b4c1698aa569d6", "1e69f48acb82d1966a394da916b4c1698aa569d6"),
+    },
 }
 
 EXPECTED_LEGACY_REPLACEMENTS = {
@@ -44,6 +47,7 @@ EXPECTED_LEGACY_REPLACEMENTS = {
     "actions/setup-go": {},
     "actions/dependency-review-action": {},
     "github/codeql-action": {},
+    "actions/attest": {},
 }
 
 
@@ -75,7 +79,9 @@ def _auditor() -> ModuleType:
 def _entries_by_repo(registry: dict[str, Any]) -> dict[str, dict[str, Any]]:
     entries = registry.get("entries")
     if not isinstance(entries, list) or len(entries) != len(EXPECTED_PINS):
-        raise ActionPinRegistryError("registry must contain exactly six repositories")
+        raise ActionPinRegistryError(
+            f"registry must contain exactly {len(EXPECTED_PINS)} repositories"
+        )
     by_repo: dict[str, dict[str, Any]] = {}
     for entry in entries:
         if not isinstance(entry, dict):
@@ -117,7 +123,7 @@ def validate_registry_only(registry: dict[str, Any]) -> None:
         raise ActionPinRegistryError("invalid registry kind")
     if registry.get("semantics") != "OFFLINE_APPROVED_REMOTE_ACTION_PINS":
         raise ActionPinRegistryError("registry semantics drift")
-    if registry.get("observed_date") != "2026-09-23":
+    if registry.get("observed_date") != "2026-09-24":
         raise ActionPinRegistryError("registry observation date drift")
     if not isinstance(registry.get("evidence_source"), str) or not registry["evidence_source"]:
         raise ActionPinRegistryError("registry evidence source missing")

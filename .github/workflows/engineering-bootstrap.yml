@@ -188,6 +188,12 @@ jobs:
       - name: Run certification provenance adversarial self-tests
         run: python scripts/governance/selftest_certification_provenance.py
 
+      - name: Validate native certification attestation transport
+        run: python scripts/governance/validate_certification_attestation_transport.py --self-check
+
+      - name: Run native attestation transport adversarial self-tests
+        run: python scripts/governance/selftest_certification_attestation_transport.py
+
       - name: Run incremental validation adversarial self-tests
         run: python scripts/governance/selftest_incremental_validation.py
 

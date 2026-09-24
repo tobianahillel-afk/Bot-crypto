@@ -32,7 +32,18 @@
     "require_job_scope_subset_of_top_level": true,
     "deleted_files_ignored": true
   },
-  "approved_write_scopes": [],
+  "approved_write_scopes": [
+    {
+      "workflow": ".github/workflows/certification-provenance.yml",
+      "scope": "id-token",
+      "rationale": "Required solely to mint the short-lived OIDC signing identity for the ENG-06.4 native attestation transport probe."
+    },
+    {
+      "workflow": ".github/workflows/certification-provenance.yml",
+      "scope": "attestations",
+      "rationale": "Required solely to persist the signed ENG-06.4 transport probe in GitHub native artifact attestations."
+    }
+  ],
   "inventory_mode": {
     "fail_on_legacy_debt": false,
     "emit_machine_readable_debt": true
