@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-08.2-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-08",
+    "task_id": "ENG-08.2",
+    "manifest": "engineering/lots/ENG-08.json"
+  },
+  "title": "Define exact unnecessary-check detection semantics",
+  "objective": "Define a deterministic validation-trace contract and detector that recomputes exact T1/T2/T3/T4 obligations from impact families and risk, flags extra work as overvalidation, flags missing work as undervalidation, and detects repeated stage execution without running validation itself.",
+  "non_goals": [
+    "modify T0 T1 T2 or T3/T4 selection behavior",
+    "integrate the detector into bootstrap",
+    "execute validation tiers",
+    "benchmark performance",
+    "change proof reuse",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-08.1-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "T1 selection policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/validation_t1_policy_v1.json"
+    },
+    {
+      "name": "T2 selection policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/validation_t2_policy_v1.json"
+    },
+    {
+      "name": "T3/T4 selection policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/validation_t3_t4_policy_v1.json"
+    },
+    {
+      "name": "Incremental validation policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/incremental_validation_policy_v1.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Unnecessary-check policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/unnecessary_check_policy_v1.json"
+    },
+    {
+      "name": "Unnecessary-check detector",
+      "kind": "FILE",
+      "locator": "scripts/governance/detect_unnecessary_checks.py"
+    },
+    {
+      "name": "Unnecessary-check documentation",
+      "kind": "FILE",
+      "locator": "engineering/UNNECESSARY_CHECK_DETECTION.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "fca82534bafd7bce5a1a395e6c76aa095222604e",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-08.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/CURRENT_STATUS.md",
+      "engineering/work_units/ENG-08.1-WU02.json",
+      "engineering/work_units/ENG-08.2-WU01.json",
+      "README.md",
+      "AGENTS.md",
+      "config/governance/unnecessary_check_policy_v1.json",
+      "scripts/governance/detect_unnecessary_checks.py",
+      "engineering/UNNECESSARY_CHECK_DETECTION.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/**"
+    ],
+    "forbidden_semantics": [
+      "validation tier execution",
+      "validation semantic weakening",
+      "bootstrap integration",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "expected T1 checks are recomputed only from impact families and the canonical T1 policy",
+      "expected T2 groups are recomputed only from T1-uncovered impacts and the canonical T2 policy",
+      "expected T3/T4 requirements are recomputed only from T2 residual or covered impacts risk class and canonical selector policy",
+      "extra selected checks groups requirements stage invocations pytest full-suite network or deep execution are classified as overvalidation",
+      "missing required checks groups requirements or pytest execution are classified as undervalidation",
+      "detector executes no validation tier subprocess network call or external service",
+      "detector distinguishes exact clean validation from overvalidation and undervalidation"
+    ],
+    "acceptance_criteria": [
+      "documentation-only impact expects zero T1 T2 T3 T4 work for low risk",
+      "governance/config impact expects only the T1 checks mapped by policy",
+      "workflow/security impacts require their mapped T3 requirements but no execution in incremental validation",
+      "risk class changes alter expected T3/T4 requirements exactly through policy",
+      "repeated stage invocation is detected as redundant work",
+      "pytest without a selected T2 group is detected as unnecessary",
+      "synthetic exact trace returns CLEAN and the core is ready for WU02 CI qualification"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 14,
+      "executable_loc_changed": 650,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/detect_unnecessary_checks.py --self-check"
+    ]
+  },
+  "done_when": [
+    "exact expected validation work is deterministically derivable from impact families and risk",
+    "overvalidation and undervalidation are separate fail-closed findings",
+    "core detector is zero-dependency and execution-free",
+    "executable integration and adversarial qualification are delegated to ENG-08.2-WU02"
+  ]
+}

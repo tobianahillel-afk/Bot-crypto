@@ -30,12 +30,12 @@
   "tasks": [
     {
       "id": "ENG-08.1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Define and qualify T0/T1/T2 timing budgets."
     },
     {
       "id": "ENG-08.2",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Detect unnecessary validation checks and redundant work."
     },
     {
