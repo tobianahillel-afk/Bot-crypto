@@ -63,12 +63,12 @@
     {
       "description": "Define fail-closed promotion rules from candidate to certified state.",
       "id": "ENG-06.5",
-      "status": "IN_PROGRESS"
+      "status": "DONE"
     },
     {
       "description": "Verify post-merge state without redundant full reruns when exact reusable evidence remains valid.",
       "id": "ENG-06.6",
-      "status": "PLANNED"
+      "status": "IN_PROGRESS"
     }
   ],
   "title": "Certification & Provenance"
