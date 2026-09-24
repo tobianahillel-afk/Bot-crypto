@@ -12,8 +12,8 @@
 - Certified business baseline: **Lot 44 / 0.44.0 / GO_LOT44_POST_MERGE**
 - Suspended business candidate: **Lot 45 / PR #66 / SUSPENDED_CANDIDATE**
 - Next business lot: **Lot 46 / LOCKED**
-- Engineering: **ENG-06 / ENG-06.6 / BUILDING**
-- Next engineering lot: **ENG-07**
+- Engineering: **ENG-07 / ENG-07.1 / BUILDING**
+- Next engineering lot: **ENG-08**
 - Runtime maximum: `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY`
 - Trading allowed: `false`
 - Execution allowed: `false`
