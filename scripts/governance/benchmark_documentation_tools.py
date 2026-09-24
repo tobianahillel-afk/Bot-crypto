@@ -85,7 +85,7 @@ def validate_policy(policy: dict[str, Any]) -> None:
         "paid_runner_required",
     ):
         if execution.get(key) is not False:
-            raise ValeBenchmarkError(f"{key} must remain false")
+            raise ValeBenchmarkError(f"{key} must remain False")
     if execution.get("download_network_scope") != "PINNED_RELEASE_ASSET_ONLY":
         raise ValeBenchmarkError("download network scope drift")
     if execution.get("max_representative_docs") != 4:
@@ -169,7 +169,7 @@ def _write_local_config(tmp: Path, policy: dict[str, Any]) -> tuple[Path, Path]:
                 "extends: substitution",
                 "message: \"Use '%s' instead of '%s'.\"",
                 f"level: {policy['local_rule']['level']}",
-                "ignorecase: false",
+                "ignorecase: False",
                 "swap:",
                 f"  '{policy['local_rule']['forbidden_token']}': '{policy['local_rule']['replacement']}'",
                 "",
@@ -290,9 +290,9 @@ def benchmark(vale_bin: Path, policy: dict[str, Any]) -> dict[str, Any]:
             "elapsed_ms": representative_ms,
         },
         "total_vale_elapsed_ms": total_vale_ms,
-        "networked_style_resolution": false,
-        "package_sync_executed": false,
-        "paid_dependency": false,
+        "networked_style_resolution": False,
+        "package_sync_executed": False,
+        "paid_dependency": False,
         "authority_role": policy["authority_role"],
         "verdict": "PASS",
     }
