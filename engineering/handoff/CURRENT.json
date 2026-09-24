@@ -34,7 +34,6 @@
     "active_manifest": "engineering/lots/ENG-08.json"
   },
   "recent_completed": [
-    "ENG-08.2 WU01 unnecessary-check detection core implemented on exact head b65bff680215a1b5b2f14df27182e90fe49bff8e; Bootstrap 36046192079 and Security Secrets 36046192289 passed. Pure detector semantics are defined; executable qualification is delegated to WU02.",
     "ENG-08.2 unnecessary-validation qualification completed on exact head 10c469575138b0ef4aa99127dd8d02958f01d307; Bootstrap 36049171919 and Security Secrets 36049171987 passed. Current single-pass trace verdict CLEAN; 31 adversarial unnecessary-check probes passed with T0/T1/T2/selector exactly once and no pytest/full-suite/network/T3/T4 execution.",
     "ENG-08.3 WU01 proof-reuse effectiveness core implemented on exact head 114f0c8c2ad07bb9994d152c445ad84a16a4098b; Bootstrap 36053443968 and Security Secrets 36053444050 passed. Generic measurement primitives are implemented without production cache integration; executable generic/real-subject qualification is delegated to WU02.",
     "ENG-08.3 proof-reuse effectiveness qualification completed on exact head 62fbd6c34dd95d683368e93739df34bed5f34148; Bootstrap 36054501545 and Security Secrets 36054501491 passed. Generic self-check passed 18 probes; real T1 SELFTEST_ENTRYPOINT_CHECK qualification bound 3 inputs, 7 policies and 8 implementations, measured baseline=2 actual=1 avoided=1 with EXACT_INPUT_MATCH (executor 9.138428 ms, lookup 0.043905 ms), and 20 adversarial probes passed. Canonical incremental validation remained CLEAN at 52.81 ms.",
@@ -84,34 +83,6 @@
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
   ],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36053443968",
-      "head_sha": "114f0c8c2ad07bb9994d152c445ad84a16a4098b",
-      "scope": "ENG-08.3-WU01_BOOTSTRAP"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36053444050",
-      "head_sha": "114f0c8c2ad07bb9994d152c445ad84a16a4098b",
-      "scope": "ENG-08.3-WU01_SECURITY_SECRETS"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36054501545",
-      "head_sha": "62fbd6c34dd95d683368e93739df34bed5f34148",
-      "scope": "ENG-08.3-WU02_BOOTSTRAP"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36054501491",
-      "head_sha": "62fbd6c34dd95d683368e93739df34bed5f34148",
-      "scope": "ENG-08.3-WU02_SECURITY_SECRETS"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "status": "PASS",
