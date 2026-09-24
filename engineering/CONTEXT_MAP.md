@@ -12,20 +12,20 @@
 
 - Track: ENGINEERING
 - Work item: ENG-08
-- Task: ENG-08.4
-- AWU: ENG-08.4-WU02
+- Task: ENG-08.5
+- AWU: ENG-08.5-WU01
 - Risk: R1
 - Manifest: engineering/lots/ENG-08.json
-- AWU file: engineering/work_units/ENG-08.4-WU02.json
+- AWU file: engineering/work_units/ENG-08.5-WU01.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-08.json
-- engineering/work_units/ENG-08.4-WU02.json
-- config/governance/mandatory_cost_zero_policy_v1.json
-- scripts/governance/verify_mandatory_cost_zero.py
+- engineering/work_units/ENG-08.5-WU01.json
+- scripts/governance/cold_start_qualification.py
+- scripts/governance/resolve_next_work.py
 - engineering/AGENT_CAPABILITIES.json
 
 ## Execution context — reference
@@ -37,14 +37,14 @@
 
 - Primary: 7 / 10 files
 - Reference: 2 / 12 files
-- Routed size: 55 / 768 KiB
+- Routed size: 47 / 768 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-08.4 WU02: qualify the mandatory zero-paid-requirement claim against live public-repository and current GitHub Actions pricing evidence.
-- Next action: Bind exact public repository evidence and official GitHub Actions billing semantics, then adversarially reject private/paid variants without modifying mandatory workflows.
+- Objective: ENG-08.5: prove a fresh agent can resume from repository state alone with bounded context and no conversational memory.
+- Next action: Strengthen the permanent cold-start qualification to prove context-free authority resolution, bounded read order/context budget, unique active AWU, safety preservation and cold-start timing without chat/model memory.
 
 ## Non-authoritative sources
 
