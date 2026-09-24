@@ -192,7 +192,7 @@ def main() -> int:
     write_source = (
         "from pathlib import Path\n"
         "def validate():\n"
-        f"    getattr(Path('x'), '{write_method}')(b'x')\n"
+        "    Path('x')." + write_method + "(b'x')\n"
     )
     _expect(
         mod.HistoricalAuditEvidenceProtectionError,
