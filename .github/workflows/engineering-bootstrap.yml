@@ -164,6 +164,12 @@ jobs:
       - name: Run T3/T4 selector adversarial self-tests
         run: python scripts/governance/selftest_t3_t4_selector.py
 
+      - name: Validate certification candidate lifecycle
+        run: python scripts/governance/validate_certification_candidate_lifecycle.py
+
+      - name: Run certification candidate lifecycle adversarial self-tests
+        run: python scripts/governance/selftest_certification_candidate_lifecycle.py
+
       - name: Run incremental validation adversarial self-tests
         run: python scripts/governance/selftest_incremental_validation.py
 
