@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "policy_kind": "certification_post_merge_v1",
+  "semantics": "TREE_EQUIVALENCE_REUSE_OR_BOUNDED_REVALIDATION_NO_SIDE_EFFECTS",
+  "promotion_policy_source": "config/governance/certification_promotion_v1.json",
+  "exact_head_policy_source": "config/governance/certification_exact_head_binding_v1.json",
+  "provenance_policy_source": "config/governance/certification_provenance_v1.json",
+  "proof_reuse_policy_source": "config/governance/proof_reuse_policy_v1.json",
+  "target_branch": "main",
+  "allowed_merge_methods": [
+    "MERGE",
+    "SQUASH",
+    "REBASE"
+  ],
+  "reuse_decision": "POST_MERGE_VERIFIED_REUSE",
+  "revalidation_decision": "REVALIDATION_REQUIRED",
+  "revalidation_scope": "RECOMPUTE_DIFF_IMPACT_AND_TIERS",
+  "require_exact_tree_equivalence": true,
+  "forbidden_output_fields": [
+    "business_development_unlock",
+    "lot46_unlock",
+    "trade_allowed",
+    "execution_allowed",
+    "live_execution",
+    "leverage",
+    "withdrawals",
+    "certified_baseline_update"
+  ],
+  "cost_policy": {
+    "paid_api_required": false,
+    "paid_saas_required": false,
+    "paid_llm_required": false,
+    "paid_runner_required": false
+  },
+  "invariants": [
+    "post-merge evaluation is pure and performs no Git PR branch baseline business or runtime mutation",
+    "only a prior PROMOTION_ALLOWED result targeting CERTIFIED is eligible for reuse",
+    "promotion result is bound by a freshly recomputed canonical SHA-256 in the certified candidate record",
+    "merged target branch is exactly main and all Git identities are lowercase SHA-40",
+    "source candidate id and head agree between prior promotion certified candidate record and merge metadata",
+    "reuse requires merged tree SHA to equal certified candidate tree SHA exactly",
+    "MERGE SQUASH and REBASE metadata are accepted only under exact tree equivalence",
+    "tree mismatch never triggers an automatic full rerun; it returns bounded tier reselection",
+    "reuse result records full_regression_rerun=false and t4_rerun=false",
+    "post-merge identity is a new SHA-256 record and never rewrites prior provenance or certification identities",
+    "result grants no business or execution authority"
+  ]
+}

@@ -66,11 +66,6 @@
       "name": "Post-merge adversarial tests",
       "kind": "TEST",
       "locator": "scripts/governance/selftest_certification_post_merge.py"
-    },
-    {
-      "name": "Post-merge semantics documentation",
-      "kind": "FILE",
-      "locator": "engineering/CERTIFICATION_POST_MERGE.md"
     }
   ],
   "scope": {
@@ -90,7 +85,6 @@
       "config/governance/certification_post_merge_v1.json",
       "scripts/governance/validate_certification_post_merge.py",
       "scripts/governance/selftest_certification_post_merge.py",
-      "engineering/CERTIFICATION_POST_MERGE.md",
       ".github/workflows/engineering-bootstrap.yml"
     ],
     "forbidden_paths": [

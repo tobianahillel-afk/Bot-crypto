@@ -201,6 +201,12 @@ jobs:
       - name: Run certification promotion adversarial self-tests
         run: python scripts/governance/selftest_certification_promotion.py
 
+      - name: Validate post-merge certification reuse rules
+        run: python scripts/governance/validate_certification_post_merge.py --self-check
+
+      - name: Run post-merge certification adversarial self-tests
+        run: python scripts/governance/selftest_certification_post_merge.py
+
       - name: Run incremental validation adversarial self-tests
         run: python scripts/governance/selftest_incremental_validation.py
 
