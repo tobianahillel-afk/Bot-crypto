@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-08.4-WU02",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-08",
+    "task_id": "ENG-08.4",
+    "manifest": "engineering/lots/ENG-08.json"
+  },
+  "title": "Qualify mandatory zero-paid-requirement execution",
+  "objective": "Bind the WU01 static inventory to live public-repository evidence and current official GitHub Actions billing semantics, prove that mandatory standard-runner execution requires no paid spend, and adversarially reject private visibility, paid runners, paid provider secrets, unapproved actions, or any cost-policy flip without changing mandatory workflows.",
+  "non_goals": [
+    "claim the entire GitHub account can never incur optional billing",
+    "query billing balances or payment methods",
+    "increase Actions cache or artifact storage limits",
+    "change mandatory workflow definitions",
+    "integrate paid monitoring",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-08.4-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Mandatory zero-cost policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/mandatory_cost_zero_policy_v1.json"
+    },
+    {
+      "name": "Mandatory zero-cost auditor",
+      "kind": "FILE",
+      "locator": "scripts/governance/verify_mandatory_cost_zero.py"
+    },
+    {
+      "name": "Agent capability and cost rules",
+      "kind": "CONFIG",
+      "locator": "engineering/AGENT_CAPABILITIES.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Live zero-cost qualification evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/MANDATORY_COST_ZERO_EVIDENCE.json"
+    },
+    {
+      "name": "Zero-cost qualifier",
+      "kind": "FILE",
+      "locator": "scripts/governance/qualify_mandatory_cost_zero.py"
+    },
+    {
+      "name": "Zero-cost adversarial qualification",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_mandatory_cost_zero.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "e341ad2693e246ddee32939b452c87f5a3ce55a0",
+    "allowed_paths": [
+      "engineering/lots/ENG-08.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-08.4-WU01.json",
+      "engineering/work_units/ENG-08.4-WU02.json",
+      "engineering/MANDATORY_COST_ZERO_EVIDENCE.json",
+      "config/governance/mandatory_cost_zero_policy_v1.json",
+      "scripts/governance/verify_mandatory_cost_zero.py",
+      "scripts/governance/qualify_mandatory_cost_zero.py",
+      "scripts/governance/selftest_mandatory_cost_zero.py",
+      "engineering/MANDATORY_COST_ZERO.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/**"
+    ],
+    "forbidden_semantics": [
+      "billing balance query",
+      "payment method query",
+      "mandatory workflow mutation",
+      "paid monitoring integration",
+      "mandatory paid API",
+      "mandatory paid LLM",
+      "mandatory paid SaaS",
+      "mandatory paid license",
+      "mandatory larger runner",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "WU01 static verdict must be PASS_WITH_VISIBILITY_UNVERIFIED before qualification",
+      "live evidence binds repository id full name default branch visibility and archived state from GitHub connector observation",
+      "repository visibility must be public",
+      "all mandatory runner labels must be standard public GitHub-hosted runner labels covered by the cited GitHub billing rule",
+      "larger runners remain rejected because GitHub bills them even for public repositories",
+      "mandatory workflows may not require Actions artifact storage or a paid cache expansion",
+      "the existing setup-python pip cache is acceptable only because no cache expansion beyond the included repository allowance is required",
+      "qualification verdict is scoped to mandatory execution requirements and never claims account-wide optional spend is impossible",
+      "private repository visibility paid-provider secrets paid runners unapproved actions or any true cost-policy value fail closed"
+    ],
+    "acceptance_criteria": [
+      "exact live repository evidence identifies tobianahillel-afk/Bot-crypto as public id 1322269966",
+      "official GitHub Actions billing evidence states standard GitHub-hosted runners are free for public repositories",
+      "official evidence states larger runners are always charged",
+      "qualified result reports PASS_MANDATORY_PATH_ZERO_PAID_REQUIREMENT",
+      "qualified result explicitly excludes optional account-wide billing and paid cache-limit expansion from its claim",
+      "at least ten adversarial cost scenarios fail closed",
+      "qualification executes through the existing WU01 bootstrap step only while WU02 is active"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 2,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 12,
+      "executable_loc_changed": 650,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/verify_mandatory_cost_zero.py --static",
+      "python scripts/governance/selftest_mandatory_cost_zero.py"
+    ]
+  },
+  "done_when": [
+    "live public-repository evidence is bound to the exact zero-cost qualification",
+    "current official GitHub billing semantics are recorded with source and observation date",
+    "mandatory runner minutes require no paid spend under the public standard-runner rule",
+    "mandatory path requires no paid API LLM SaaS license larger runner or paid cache expansion",
+    "adversarial qualification fails closed on every paid/private variant"
+  ]
+}
