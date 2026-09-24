@@ -67,3 +67,52 @@ before execution.
 the bounded representative set, while the synthetic local rule proved that project-owned
 rules work offline. A future changed-document integration may be justified, but only with
 project-local rules, no package sync, and no authority over canonical/factual state.
+
+
+---
+
+# lychee Offline Benchmark — ENG-05.6 WU05
+
+## Scope
+
+This child benchmarks **lychee v0.24.2 only**. Vale evidence above remains unchanged. lychee
+is evaluated only for local-link integrity and remains non-authoritative.
+
+### Exact candidate
+
+- Release: `lychee-v0.24.2`
+- Audited source commit: `2bba271688c1abb1503097a064e6c3bc1d1b6a9b`
+- Linux x86_64 GNU asset: `lychee-x86_64-unknown-linux-gnu.tar.gz`
+- Required SHA-256:
+  `1f4e0ef7f6554a6ed33dd7ac144fb2e1bbed98598e7af973042fc5cd43951c9a`
+- License: MIT OR Apache-2.0
+- GitHub release mutability observation: **not immutable**
+- Execution trust boundary: the exact asset SHA-256, verified before extraction/execution.
+
+## Offline benchmark design
+
+Every lychee invocation is constructed by the benchmark runner with `--offline`, which
+lychee v0.24.2 defines as checking local files only and blocking network requests. Remote URL
+and `mailto:` inputs are rejected by the runner itself.
+
+Synthetic controls:
+
+1. an existing local Markdown target must pass;
+2. a missing local Markdown target must return lychee's link-failure exit code and at least
+   one JSON `errors` count.
+
+The same offline mode then measures local-link findings in:
+
+- `README.md`
+- `AGENTS.md`
+- `engineering/MASTER_PLAN.md`
+- `engineering/DOCUMENTATION_TOOLING_EVALUATION.md`
+
+No GitHub token, external URL health check, cache, paid API, SaaS, LLM, or larger runner is
+required.
+
+## Runtime evidence
+
+Pending the first successful WU05 workflow execution. The workflow emits a bounded
+`LYCHEE_BENCHMARK_SUMMARY` containing only synthetic/representative error counts, elapsed
+lychee runtime and document count.

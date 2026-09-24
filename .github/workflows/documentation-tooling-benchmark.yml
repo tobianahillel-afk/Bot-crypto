@@ -5,11 +5,11 @@ on:
     branches:
       - engineering/bootstrap-development-engine
     paths:
-      - "config/governance/documentation_tooling_benchmark_v1.json"
-      - "scripts/governance/benchmark_documentation_tools.py"
+      - "config/governance/documentation_tooling_lychee_benchmark_v1.json"
+      - "scripts/governance/benchmark_lychee.py"
       - ".github/workflows/documentation-tooling-benchmark.yml"
       - "engineering/DOCUMENTATION_TOOLING_BENCHMARK.md"
-      - "engineering/work_units/ENG-05.6-WU04.json"
+      - "engineering/work_units/ENG-05.6-WU05.json"
   workflow_dispatch:
 
 permissions:
@@ -20,14 +20,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  vale:
-    name: Vale v3.22.0 offline benchmark
+  lychee:
+    name: lychee v0.24.2 offline benchmark
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
-      VALE_ASSET_URL: "https://github.com/vale-cli/vale/releases/download/v3.22.0/vale_3.22.0_Linux_64-bit.tar.gz"
-      VALE_ASSET_SHA256: "52f5cd0314a1b7384cac6aa102a68193977312f6ba9c9f3ae001b5deec8e3a10"
-      VALE_EXPECTED_VERSION: "3.22.0"
+      LYCHEE_ASSET_URL: "https://github.com/lycheeverse/lychee/releases/download/lychee-v0.24.2/lychee-x86_64-unknown-linux-gnu.tar.gz"
+      LYCHEE_ASSET_SHA256: "1f4e0ef7f6554a6ed33dd7ac144fb2e1bbed98598e7af973042fc5cd43951c9a"
+      LYCHEE_EXPECTED_VERSION: "0.24.2"
     steps:
       - name: Checkout exact head
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -35,40 +35,43 @@ jobs:
           fetch-depth: 1
           persist-credentials: false
 
-      - name: Validate benchmark policy without Vale
-        run: python3 scripts/governance/benchmark_documentation_tools.py --self-check
+      - name: Validate lychee benchmark policy
+        run: python3 scripts/governance/benchmark_lychee.py --self-check
 
-      - name: Download and verify exact Vale release
+      - name: Download and verify exact lychee release
         shell: bash
         run: |
           set -euo pipefail
-          archive="${RUNNER_TEMP}/vale.tar.gz"
-          bindir="${RUNNER_TEMP}/vale-bin"
+          archive="${RUNNER_TEMP}/lychee.tar.gz"
+          bindir="${RUNNER_TEMP}/lychee-bin"
           mkdir -p "${bindir}"
-          curl --fail --location --silent --show-error             --proto '=https' --tlsv1.2             "${VALE_ASSET_URL}"             --output "${archive}"
-          printf '%s  %s\n' "${VALE_ASSET_SHA256}" "${archive}" | sha256sum --check --strict
+          curl --fail --location --silent --show-error             --proto '=https' --tlsv1.2             "${LYCHEE_ASSET_URL}"             --output "${archive}"
+          printf '%s  %s\n' "${LYCHEE_ASSET_SHA256}" "${archive}" | sha256sum --check --strict
           tar -xzf "${archive}" -C "${bindir}"
-          test -x "${bindir}/vale"
-          version="$("${bindir}/vale" --version)"
-          printf '%s\n' "${version}" | grep -F "${VALE_EXPECTED_VERSION}" >/dev/null
-          printf 'VALE_BIN=%s\n' "${bindir}/vale" >> "${GITHUB_ENV}"
+          test -x "${bindir}/lychee"
+          version="$("${bindir}/lychee" --version)"
+          printf '%s\n' "${version}" | grep -F "${LYCHEE_EXPECTED_VERSION}" >/dev/null
+          printf 'LYCHEE_BIN=%s\n' "${bindir}/lychee" >> "${GITHUB_ENV}"
 
-      - name: Run offline local-rule benchmark
+      - name: Run offline local-link benchmark
         shell: bash
+        env:
+          GITHUB_TOKEN: ""
         run: |
           set -euo pipefail
-          python3 scripts/governance/benchmark_documentation_tools.py             --vale-bin "${VALE_BIN}"             --output "${RUNNER_TEMP}/vale-benchmark.json"
-          python3 - "${RUNNER_TEMP}/vale-benchmark.json" <<'PY'
+          python3 scripts/governance/benchmark_lychee.py             --lychee-bin "${LYCHEE_BIN}"             --output "${RUNNER_TEMP}/lychee-benchmark.json"
+          python3 - "${RUNNER_TEMP}/lychee-benchmark.json" <<'PY'
           import json
           import sys
           from pathlib import Path
 
           data = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
           print(
-              "VALE_BENCHMARK_SUMMARY "
-              f"synthetic={data['synthetic']['finding_count']} "
-              f"representative={data['representative']['finding_count']} "
-              f"vale_ms={data['total_vale_elapsed_ms']} "
+              "LYCHEE_BENCHMARK_SUMMARY "
+              f"broken_errors={data['synthetic_broken']['errors']} "
+              f"valid_errors={data['synthetic_valid']['errors']} "
+              f"representative_errors={data['representative']['errors']} "
+              f"lychee_ms={data['total_lychee_elapsed_ms']} "
               f"docs={len(data['representative']['documents'])}"
           )
           PY
