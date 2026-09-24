@@ -39,9 +39,31 @@ checks, context maps and handoff remain authoritative.
 
 Mandatory paid API/SaaS/LLM/larger-runner cost: **0**.
 
-## Runtime evidence
+## Runtime evidence — Vale
 
-Pending the first successful execution of
-`.github/workflows/documentation-tooling-benchmark.yml`. The workflow emits a bounded
-`VALE_BENCHMARK_SUMMARY` containing only finding counts, elapsed Vale runtime and document
-count.
+Validated workflow run: `35971610505` on source head
+`92b0140e394c9e116bc364168046810d302eddf6`.
+
+Measured Vale execution:
+
+- Vale version: `3.22.0`
+- Synthetic finding count: **1** (expected local rule `CQBBenchmark.Placeholder`)
+- Synthetic elapsed time: **11.272 ms**
+- Representative documents: **4**
+- Representative finding count: **0**
+- Representative elapsed time: **23.359 ms**
+- Total Vale lint time: **34.631 ms**
+- Networked style resolution: **false**
+- `vale sync` executed: **false**
+- Paid dependency: **false**
+
+The archive SHA-256 matched
+`52f5cd0314a1b7384cac6aa102a68193977312f6ba9c9f3ae001b5deec8e3a10`
+before execution.
+
+### Vale benchmark verdict
+
+**ADOPT_PARTIALLY remains supported.** The pinned binary is fast and produced zero noise on
+the bounded representative set, while the synthetic local rule proved that project-owned
+rules work offline. A future changed-document integration may be justified, but only with
+project-local rules, no package sync, and no authority over canonical/factual state.
