@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-08.1-WU02",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-08",
+    "task_id": "ENG-08.1",
+    "manifest": "engineering/lots/ENG-08.json"
+  },
+  "title": "Qualify timing budgets on the existing single-pass measurement",
+  "objective": "Extend the timing validator to consume the already-produced incremental-validation JSON, add adversarial budget probes, and wire exactly two bootstrap checks so the routine path is measured once and budget-qualified without rerunning T0/T1/T2.",
+  "non_goals": [
+    "rerun incremental validation for timing qualification",
+    "change T0 T1 T2 semantics",
+    "benchmark pytest-backed T2",
+    "change timing budgets without a demonstrated defect",
+    "add third-party tooling",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-08.1-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Timing budget policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/validation_timing_budget_v1.json"
+    },
+    {
+      "name": "Timing budget validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_validation_timing_budgets.py"
+    },
+    {
+      "name": "Single-pass incremental validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/run_incremental_validation.py"
+    },
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Timing budget adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_validation_timing_budgets.py"
+    },
+    {
+      "name": "Bootstrap timing qualification",
+      "kind": "FILE",
+      "locator": ".github/workflows/engineering-bootstrap.yml"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "229ad24acfc4a1aeda07d8016ef30f77712ba150",
+    "allowed_paths": [
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-08.1-WU01.json",
+      "engineering/work_units/ENG-08.1-WU02.json",
+      "config/governance/validation_timing_budget_v1.json",
+      "scripts/governance/validate_validation_timing_budgets.py",
+      "scripts/governance/selftest_validation_timing_budgets.py",
+      "engineering/VALIDATION_TIMING_BUDGETS.md",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "duplicate T0 T1 T2 execution",
+      "validation semantic weakening",
+      "pytest-backed T2 benchmark",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "the production timing gate consumes the JSON emitted by the existing single-pass step rather than executing validation again",
+      "measurement validation is fail-closed for routine paths and explicitly not-applicable for pytest-backed/non-routine paths",
+      "budget policy remains unchanged unless qualification demonstrates a policy defect",
+      "bootstrap adds exactly one measurement-enforcement step and one adversarial-selftest step",
+      "no new workflow dependency network access or paid service is introduced"
+    ],
+    "acceptance_criteria": [
+      "single-pass step writes its existing JSON output to an ephemeral file with tee",
+      "timing validator accepts a measurement-file mode and validates policy before measurement",
+      "current routine measurement passes T0 T1 T2 and total budgets",
+      "adversarial suite covers each stage over-budget missing/invalid timing non-routine applicability policy ceiling and ordering",
+      "adversarial suite contains at least 12 focused probes",
+      "bootstrap and Security Secrets pass on the same exact head"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 10,
+      "executable_loc_changed": 420,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_validation_timing_budgets.py --check",
+      "python scripts/governance/selftest_validation_timing_budgets.py",
+      "bootstrap measurement enforcement on existing single-pass JSON"
+    ]
+  },
+  "done_when": [
+    "current single-pass routine measurement passes timing budgets without tier recomputation",
+    "at least 12 adversarial timing probes pass",
+    "bootstrap and Security Secrets pass on the same exact head",
+    "ENG-08.1 can transition to ENG-08.2 without changing validation semantics"
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "active_work": {
-    "awu_id": "ENG-08.1-WU01",
-    "awu_path": "engineering/work_units/ENG-08.1-WU01.json",
+    "awu_id": "ENG-08.1-WU02",
+    "awu_path": "engineering/work_units/ENG-08.1-WU02.json",
     "complexity_score": 1,
     "lot": "ENG-08",
     "manifest": "engineering/lots/ENG-08.json",
@@ -35,13 +35,14 @@
       "max_total_kib": 768
     },
     "implicit_expansion": "FORBIDDEN",
-    "primary_count": 7,
+    "primary_count": 8,
     "primary_files": [
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-08.json",
-      "engineering/work_units/ENG-08.1-WU01.json",
-      "config/governance/incremental_validation_policy_v1.json",
+      "engineering/work_units/ENG-08.1-WU02.json",
+      "config/governance/validation_timing_budget_v1.json",
+      "scripts/governance/validate_validation_timing_budgets.py",
       "scripts/governance/run_incremental_validation.py",
       "engineering/handoff/CURRENT.json"
     ],
@@ -50,7 +51,7 @@
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 45
+    "total_kib_ceil": 53
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -66,9 +67,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "ENG-08.1 WU01: define deterministic routine-path timing budgets for T0/T1/T2 and the single-pass validation chain.",
+    "current_objective": "ENG-08.1 WU02: qualify routine timing budgets against the existing single-pass measurement without recomputing T0/T1/T2.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Add the timing-budget policy and zero-dependency validator only; do not change validation-tier semantics or benchmark pytest-backed T2 in WU01."
+    "next_action": "Add measurement-file validation, focused adversarial timing probes, and exactly two bootstrap steps: timing enforcement plus selftest."
   },
   "safety": {
     "execution_allowed": false,

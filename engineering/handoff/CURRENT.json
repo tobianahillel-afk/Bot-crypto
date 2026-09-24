@@ -1,10 +1,10 @@
 {
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-08.1-WU01",
-    "awu_path": "engineering/work_units/ENG-08.1-WU01.json",
+    "awu_id": "ENG-08.1-WU02",
+    "awu_path": "engineering/work_units/ENG-08.1-WU02.json",
     "parent_manifest": "engineering/lots/ENG-08.json",
-    "scope_base_sha": "9edb0916440832a724698996d6ba6dba5c54d1a6",
+    "scope_base_sha": "229ad24acfc4a1aeda07d8016ef30f77712ba150",
     "risk_class": "R1",
     "complexity_score": 1
   },
@@ -14,7 +14,7 @@
     "state_source": "config/governance/project_state.json"
   },
   "blockers": [],
-  "current_objective": "ENG-08.1 WU01: define deterministic routine-path timing budgets for T0/T1/T2 and the single-pass validation chain.",
+  "current_objective": "ENG-08.1 WU02: qualify routine timing budgets against the existing single-pass measurement without recomputing T0/T1/T2.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -27,21 +27,21 @@
     "rulesets_count": 0
   },
   "kind": "engineering_handoff",
-  "next_action": "Add the timing-budget policy and zero-dependency validator only; do not change validation-tier semantics or benchmark pytest-backed T2 in WU01.",
+  "next_action": "Add measurement-file validation, focused adversarial timing probes, and exactly two bootstrap steps: timing enforcement plus selftest.",
   "next_engineering": {
     "active_lot": "ENG-08",
     "active_task": "ENG-08.1",
     "active_manifest": "engineering/lots/ENG-08.json"
   },
   "recent_completed": [
-    "ENG-07.3 WU01 historical traceability mapping core implemented on exact head 84b57bafdb6632210f0fa1cea8f0f05a8a1a76ed; bootstrap 36014657705 and Security Secrets 36014657332 passed. Mapping semantics explicitly separate MAPPED, JUSTIFIED_NON_CODE and UNRESOLVED; executable qualification is delegated to WU02.",
     "ENG-07.3 historical traceability mapping completed on exact head 5b0441a96200cbc33838e25d262fae2c001094c9; bootstrap 36015519896 and Security Secrets 36015519763 passed on the same head, including mapping self-check, all 15 adversarial probes, context-map and cold-start qualification.",
     "ENG-07.4 WU01 historical findings registry core completed on exact head ec37b1ca0a19678ce2a899180594f7786992a740; bootstrap 36018843074 and Security Secrets 36018843013 passed. Schema, policy and validator are defined; executable adversarial qualification is delegated to WU02.",
     "ENG-07.4 historical findings registry completed on exact head 46ae234723edea0359402f879e3eb3539ebd5fc3; Bootstrap 36019390205, Security Actions 36019390215, Supply Chain 36019390146 and Security Secrets 36019390229 all passed, including findings validator self-check and adversarial qualification.",
     "ENG-07.5 WU01 deterministic historical audit report/owner-bound remediation queue core implemented on exact head 2781939a1a537c214435b66b05748eb55d8f79a9; bootstrap 36029467281 and Security Secrets 36029466643 passed. Executable adversarial qualification is delegated to WU02.",
     "ENG-07.5 deterministic historical audit reporting/remediation queue completed on exact head f8cda9500c79981c4ffb91774108830aff884d73; Bootstrap 36030405795, Security Secrets 36030406256, Security Actions 36030405755 and Supply Chain 36030405694 passed, including report self-check and 28 adversarial negative scenarios plus composite positive qualification.",
     "ENG-07.6 WU01 audit-engine immutable-evidence binding implemented on exact head 00ca474f9690667326e88a8a55ef9d432033b87f; Bootstrap 36031261087 and Security Secrets 36031260788 passed. Canonical protection is reused unchanged; adversarial CI qualification is delegated to WU02.",
-    "ENG-07 Historical Audit Engine completed on exact head 9edb0916440832a724698996d6ba6dba5c54d1a6; Bootstrap 36032060794, Security Secrets 36032060848, Security Actions 36032060933 and Supply Chain 36032060898 all passed. ENG-07.6 immutable-evidence qualification passed validator check/self-check plus 21 negative adversarial probes, with no protected evidence path modified."
+    "ENG-07 Historical Audit Engine completed on exact head 9edb0916440832a724698996d6ba6dba5c54d1a6; Bootstrap 36032060794, Security Secrets 36032060848, Security Actions 36032060933 and Supply Chain 36032060898 all passed. ENG-07.6 immutable-evidence qualification passed validator check/self-check plus 21 negative adversarial probes, with no protected evidence path modified.",
+    "ENG-08.1 WU01 timing-budget core completed on exact head 229ad24acfc4a1aeda07d8016ef30f77712ba150; Bootstrap 36044163745 and Security Secrets 36044163773 passed. Budgets are 250/500/750 ms for T0/T1/T2 and 1500 ms total, calibrated from 20.536/22.219/15.782/71.289 ms."
   ],
   "resume_read_order": [
     "AGENTS.md",
@@ -86,30 +86,16 @@
     {
       "class": "GITHUB_ACTIONS",
       "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36032060794",
-      "head_sha": "9edb0916440832a724698996d6ba6dba5c54d1a6",
-      "scope": "ENG-07.6-WU02_BOOTSTRAP"
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36044163745",
+      "head_sha": "229ad24acfc4a1aeda07d8016ef30f77712ba150",
+      "scope": "ENG-08.1-WU01_BOOTSTRAP"
     },
     {
       "class": "GITHUB_ACTIONS",
       "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36032060848",
-      "head_sha": "9edb0916440832a724698996d6ba6dba5c54d1a6",
-      "scope": "ENG-07.6-WU02_SECURITY_SECRETS"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36032060933",
-      "head_sha": "9edb0916440832a724698996d6ba6dba5c54d1a6",
-      "scope": "ENG-07.6-WU02_SECURITY_ACTIONS"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36032060898",
-      "head_sha": "9edb0916440832a724698996d6ba6dba5c54d1a6",
-      "scope": "ENG-07.6-WU02_SUPPLY_CHAIN"
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36044163773",
+      "head_sha": "229ad24acfc4a1aeda07d8016ef30f77712ba150",
+      "scope": "ENG-08.1-WU01_SECURITY_SECRETS"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"
