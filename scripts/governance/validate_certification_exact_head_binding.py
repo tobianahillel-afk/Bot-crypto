@@ -159,6 +159,12 @@ def validate_policy(
 
     if assurance.get("risk_order") != ["R0", "R1", "R2", "R3"]:
         raise ExactHeadBindingError("assurance risk order drift")
+    r3_t3 = set(assurance.get("risk_to_t3", {}).get("R3", []))
+    if "RISK_EXECUTION_ASSURANCE" not in r3_t3:
+        raise ExactHeadBindingError("R3 T3 risk/execution assurance floor missing")
+    r3_t4 = set(assurance.get("risk_to_t4", {}).get("R3", []))
+    if not {"EXACT_HEAD_CERTIFICATION", "R3_FULL_CERTIFICATION_CHAIN"} <= r3_t4:
+        raise ExactHeadBindingError("R3 T4 certification floor missing")
     if "EXACT_HEAD_CERTIFICATION" not in assurance.get("t4_requirement_ids", []):
         raise ExactHeadBindingError("exact-head T4 requirement missing")
 

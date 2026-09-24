@@ -150,6 +150,13 @@ def validate_policy(
     if not isinstance(classes, dict) or "EXACT_GITHUB_ACTIONS_RUN" not in classes:
         raise DeepAssuranceError("agent exact-run evidence class missing")
 
+    r3_t3 = set(selection.get("risk_to_t3", {}).get("R3", []))
+    if "RISK_EXECUTION_ASSURANCE" not in r3_t3:
+        raise DeepAssuranceError("R3 selector T3 assurance floor drift")
+    r3_t4 = set(selection.get("risk_to_t4", {}).get("R3", []))
+    if not {"EXACT_HEAD_CERTIFICATION", "R3_FULL_CERTIFICATION_CHAIN"} <= r3_t4:
+        raise DeepAssuranceError("R3 selector T4 certification floor drift")
+
     r3_controls = set(mapping["RISK_EXECUTION_ASSURANCE"].get("RISK_CLASS:R3", []))
     if r3_controls != {"ENGINEERING_BOOTSTRAP", "SAST", "SECRET_SCANNING"}:
         raise DeepAssuranceError("R3 assurance floor drift")

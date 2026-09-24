@@ -94,6 +94,9 @@ def validate_policy(policy: dict[str, Any]) -> None:
             if not ids <= known:
                 raise T3T4SelectionError(f"{name}[{risk}] references unknown ids")
 
+    r3_t3 = set(policy["risk_to_t3"]["R3"])
+    if "RISK_EXECUTION_ASSURANCE" not in r3_t3:
+        raise T3T4SelectionError("R3 T3 risk/execution assurance floor is missing")
     r3_t4 = set(policy["risk_to_t4"]["R3"])
     if not {"EXACT_HEAD_CERTIFICATION","R3_FULL_CERTIFICATION_CHAIN"} <= r3_t4:
         raise T3T4SelectionError("R3 T4 floor is missing")

@@ -13,15 +13,19 @@ from typing import Any
 ROOT=Path(__file__).resolve().parents[2]
 
 
-def _module() -> ModuleType:
-    path=ROOT/"scripts"/"governance"/"select_t3_t4.py"
-    spec=importlib.util.spec_from_file_location("t3t4_selector_selftest",path)
+def _load_module(name: str, relative: str) -> ModuleType:
+    path=ROOT/relative
+    spec=importlib.util.spec_from_file_location(name,path)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"cannot import {path}")
     module=importlib.util.module_from_spec(spec)
     sys.modules[spec.name]=module
     spec.loader.exec_module(module)
     return module
+
+
+def _module() -> ModuleType:
+    return _load_module("t3t4_selector_selftest","scripts/governance/select_t3_t4.py")
 
 
 def _expect(exc_type:type[Exception],fn:Any,label:str)->None:
@@ -96,9 +100,82 @@ def main()->int:
         "residual impact disappearance",
     )
 
-    bad_r3=copy.deepcopy(policy)
-    bad_r3["risk_to_t4"]["R3"]=[]
-    _expect(mod.T3T4SelectionError,lambda:mod.validate_policy(bad_r3),"R3 floor removal")
+    bad_r3_t3=copy.deepcopy(policy)
+    bad_r3_t3["risk_to_t3"]["R3"]=[]
+    _expect(
+        mod.T3T4SelectionError,
+        lambda:mod.validate_policy(bad_r3_t3),
+        "R3 T3 floor removal",
+    )
+
+    bad_r3_t4=copy.deepcopy(policy)
+    bad_r3_t4["risk_to_t4"]["R3"]=[]
+    _expect(
+        mod.T3T4SelectionError,
+        lambda:mod.validate_policy(bad_r3_t4),
+        "R3 T4 floor removal",
+    )
+
+    deep=_load_module(
+        "t3t4_deep_assurance_crosscheck",
+        "scripts/governance/validate_certification_deep_assurance.py",
+    )
+    deep_policy,deep_selection,deep_exact,deep_security,deep_evidence=deep._load_policies()
+    deep.validate_policy(
+        deep_policy,deep_selection,deep_exact,deep_security,deep_evidence
+    )
+    deep_bad_t3=copy.deepcopy(deep_selection)
+    deep_bad_t3["risk_to_t3"]["R3"]=[]
+    _expect(
+        deep.DeepAssuranceError,
+        lambda:deep.validate_policy(
+            deep_policy,deep_bad_t3,deep_exact,deep_security,deep_evidence
+        ),
+        "deep assurance accepts missing R3 T3 floor",
+    )
+    deep_bad_t4=copy.deepcopy(deep_selection)
+    deep_bad_t4["risk_to_t4"]["R3"]=["EXACT_HEAD_CERTIFICATION"]
+    _expect(
+        deep.DeepAssuranceError,
+        lambda:deep.validate_policy(
+            deep_policy,deep_bad_t4,deep_exact,deep_security,deep_evidence
+        ),
+        "deep assurance accepts incomplete R3 T4 floor",
+    )
+    r3_plan=deep.build_assurance_plan(r3,"a"*40,deep_policy,deep_selection)
+    assert {item["control_id"] for item in r3_plan["material"]["controls"]} == {
+        "ENGINEERING_BOOTSTRAP","SAST","SECRET_SCANNING"
+    }
+    incomplete_r3=deep.evaluate_assurance(r3_plan,[],deep_policy)
+    assert incomplete_r3["status"]=="INCOMPLETE"
+    assert incomplete_r3["satisfied"] is False
+
+    exact=_load_module(
+        "t3t4_exact_head_crosscheck",
+        "scripts/governance/validate_certification_exact_head_binding.py",
+    )
+    exact_policy,lifecycle,evidence_policy,proof_policy,assurance_policy=exact._load_policies()
+    exact.validate_policy(
+        exact_policy,lifecycle,evidence_policy,proof_policy,assurance_policy
+    )
+    exact_bad_t3=copy.deepcopy(assurance_policy)
+    exact_bad_t3["risk_to_t3"]["R3"]=[]
+    _expect(
+        exact.ExactHeadBindingError,
+        lambda:exact.validate_policy(
+            exact_policy,lifecycle,evidence_policy,proof_policy,exact_bad_t3
+        ),
+        "exact-head accepts missing R3 T3 floor",
+    )
+    exact_bad_t4=copy.deepcopy(assurance_policy)
+    exact_bad_t4["risk_to_t4"]["R3"]=["EXACT_HEAD_CERTIFICATION"]
+    _expect(
+        exact.ExactHeadBindingError,
+        lambda:exact.validate_policy(
+            exact_policy,lifecycle,evidence_policy,proof_policy,exact_bad_t4
+        ),
+        "exact-head accepts incomplete R3 T4 floor",
+    )
 
     overlap=_t2(
         remaining=("EVIDENCE_PROVENANCE",),
@@ -110,7 +187,7 @@ def main()->int:
         "covered/uncovered overlap",
     )
 
-    print("T3_T4_SELECTOR_SELFTEST_PASS probes=10")
+    print("T3_T4_SELECTOR_SELFTEST_PASS probes=16")
     return 0
 
 

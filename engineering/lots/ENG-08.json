@@ -55,12 +55,12 @@
     },
     {
       "id": "ENG-08.6",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Run interruption and recovery qualification."
     },
     {
       "id": "ENG-08.7",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Prove critical R3 work cannot bypass strengthened assurance."
     }
   ],

@@ -1,12 +1,12 @@
 {
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-08.6-WU01",
-    "awu_path": "engineering/work_units/ENG-08.6-WU01.json",
+    "awu_id": "ENG-08.7-WU01",
+    "awu_path": "engineering/work_units/ENG-08.7-WU01.json",
     "parent_manifest": "engineering/lots/ENG-08.json",
-    "scope_base_sha": "5ec2ede8c194fbe01e178ae02d9fba5f0d139b2a",
-    "risk_class": "R1",
-    "complexity_score": 1
+    "scope_base_sha": "02c74a40d220ea3b4389f28139422e1c0f769808",
+    "risk_class": "R2",
+    "complexity_score": 2
   },
   "authority": {
     "context_map": "engineering/CONTEXT_MAP.json",
@@ -14,7 +14,7 @@
     "state_source": "config/governance/project_state.json"
   },
   "blockers": [],
-  "current_objective": "ENG-08.6: prove interrupted work resumes deterministically from permanent repository authority without conversational context.",
+  "current_objective": "ENG-08.7: prove critical R3 work cannot bypass T3 risk/execution assurance or T4 exact-head/full-chain certification.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -27,10 +27,10 @@
     "rulesets_count": 0
   },
   "kind": "engineering_handoff",
-  "next_action": "Strengthen the permanent resume/recovery qualification with interruption timing, simultaneous stale/missing hint scenarios, bounded-route checks, safety preservation and mandatory LIVE_GIT_REVERIFY_REQUIRED before writes.",
+  "next_action": "Harden the existing selector, deep-assurance and exact-head validators against R3 floor removal; qualify policy-mutation bypass attempts without changing business code, runtime permissions or workflow topology.",
   "next_engineering": {
     "active_lot": "ENG-08",
-    "active_task": "ENG-08.6",
+    "active_task": "ENG-08.7",
     "active_manifest": "engineering/lots/ENG-08.json"
   },
   "recent_completed": [
@@ -41,7 +41,8 @@
     "ENG-08.3 qualification-only bootstrap hooks were identified as lifecycle-specific after task transition and removed from the permanent mandatory path; this prevents completed proof-reuse qualification from blocking or slowing later AWUs.",
     "ENG-08.4 WU01 mandatory-cost static core completed on exact head e341ad2693e246ddee32939b452c87f5a3ce55a0; Bootstrap 36057570058, Security Secrets 36057570005, Security Actions 36057569995 and Supply Chain 36057570009 passed. Static verdict PASS_WITH_VISIBILITY_UNVERIFIED inventories 6 mandatory workflows, ubuntu-latest only, no repository secrets, approved exact action pins, and all project/ENG-04 cost-policy values false.",
     "ENG-08.4 mandatory zero-paid-requirement qualification completed on exact head ac5433357f8784dc1e0499f7440b7527e0d1792d; Bootstrap 36060138932 and Security Secrets 36060138426 passed. Live repository evidence confirms public repo id 1322269966; official GitHub billing semantics bind standard public ubuntu-latest execution to zero mandatory paid spend. Verdict PASS_MANDATORY_PATH_ZERO_PAID_REQUIREMENT with 21 adversarial probes.",
-    "ENG-08.5 context-free cold-start qualification completed on exact head 5ec2ede8c194fbe01e178ae02d9fba5f0d139b2a; Bootstrap 36063155037 and Security Secrets 36063155021 passed. Fresh GITHUB_CONNECTOR_ONLY recovery used 7 primary + 2 reference files (57 KiB), required no conversational context, passed 10 negative probes and completed in 38.129 ms."
+    "ENG-08.5 context-free cold-start qualification completed on exact head 5ec2ede8c194fbe01e178ae02d9fba5f0d139b2a; Bootstrap 36063155037 and Security Secrets 36063155021 passed. Fresh GITHUB_CONNECTOR_ONLY recovery used 7 primary + 2 reference files (57 KiB), required no conversational context, passed 10 negative probes and completed in 38.129 ms.",
+    "ENG-08.6 interruption/recovery qualification completed on exact head ad131734d7b85fde809d6ab7bd4a89f25321f82f; Bootstrap 36073305546 and Security Secrets 36073305552 passed. Recovery completed in 113.574 ms across 13 scenarios; adversarial selftest passed 17 probes in 177.574 ms; cold-start regression completed in 21.516 ms using 7 primary + 2 reference files (62 KiB). Resumed writes remain blocked pending LIVE_GIT_REVERIFY_REQUIRED; BUSINESS stays PAUSED, Lot46 LOCKED, trading/execution disabled. Evidence anchor commit 02c74a40d220ea3b4389f28139422e1c0f769808 also passed Bootstrap 36073668394 and Security Secrets 36073668282."
   ],
   "resume_read_order": [
     "AGENTS.md",
@@ -62,7 +63,7 @@
   "state_snapshot": {
     "engineering_phase": "BUILDING",
     "active_lot": "ENG-08",
-    "active_task": "ENG-08.6",
+    "active_task": "ENG-08.7",
     "active_manifest": "engineering/lots/ENG-08.json",
     "business_development": "PAUSED",
     "lot46_status": "LOCKED",
@@ -166,6 +167,34 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36063155021",
       "head_sha": "5ec2ede8c194fbe01e178ae02d9fba5f0d139b2a",
       "scope": "ENG-08.5-WU01_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36073305546",
+      "head_sha": "ad131734d7b85fde809d6ab7bd4a89f25321f82f",
+      "scope": "ENG-08.6-WU01_BOOTSTRAP"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36073305552",
+      "head_sha": "ad131734d7b85fde809d6ab7bd4a89f25321f82f",
+      "scope": "ENG-08.6-WU01_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36073668394",
+      "head_sha": "02c74a40d220ea3b4389f28139422e1c0f769808",
+      "scope": "ENG-08.6-WU01_EVIDENCE_BOOTSTRAP"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36073668282",
+      "head_sha": "02c74a40d220ea3b4389f28139422e1c0f769808",
+      "scope": "ENG-08.6-WU01_EVIDENCE_SECURITY_SECRETS"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"
