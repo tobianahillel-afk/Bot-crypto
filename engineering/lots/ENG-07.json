@@ -40,12 +40,12 @@
     },
     {
       "id": "ENG-07.3",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Map historical requirements to implementation tests contracts and evidence."
     },
     {
       "id": "ENG-07.4",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Implement the historical audit findings registry."
     },
     {

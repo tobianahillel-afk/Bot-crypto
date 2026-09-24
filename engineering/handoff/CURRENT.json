@@ -1,12 +1,12 @@
 {
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-07.3-WU03",
-    "awu_path": "engineering/work_units/ENG-07.3-WU03.json",
+    "awu_id": "ENG-07.4-WU01",
+    "awu_path": "engineering/work_units/ENG-07.4-WU01.json",
     "parent_manifest": "engineering/lots/ENG-07.json",
-    "scope_base_sha": "d809be0d4a1a5bf34a00e8a04401c44e83508750",
-    "risk_class": "R0",
-    "complexity_score": 0
+    "scope_base_sha": "5b0441a96200cbc33838e25d262fae2c001094c9",
+    "risk_class": "R2",
+    "complexity_score": 3
   },
   "authority": {
     "context_map": "engineering/CONTEXT_MAP.json",
@@ -14,7 +14,7 @@
     "state_source": "config/governance/project_state.json"
   },
   "blockers": [],
-  "current_objective": "ENG-07.3 WU03: repair only the synthetic mapping qualification fixture compatibility.",
+  "current_objective": "ENG-07.4 WU01: define the source-bound read-only historical audit findings registry contract.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -27,10 +27,10 @@
     "rulesets_count": 0
   },
   "kind": "engineering_handoff",
-  "next_action": "Update the mapping synthetic bundle to use current planner.synthetic_request()/plan_batches() and manifest build_manifest(); do not alter mapping schema, policy, status semantics or CI topology.",
+  "next_action": "Implement only findings schema/policy/validator/selftests bound to validated manifest and mapping identities; do not execute audits, populate real findings, remediate, or change CI topology.",
   "next_engineering": {
     "active_lot": "ENG-07",
-    "active_task": "ENG-07.3",
+    "active_task": "ENG-07.4",
     "active_manifest": "engineering/lots/ENG-07.json"
   },
   "recent_completed": [
@@ -41,7 +41,8 @@
     "ENG-07.1 historical audit batching completed on exact head 9295cfb39ddc4dcefbc8300b13500d736e9e9302; bootstrap 36005319976 and Security Secrets 36005319563 passed, including planner self-check and 12 adversarial batching probes.",
     "ENG-07.2 WU01 read-only historical audit manifest/lifecycle implemented and strengthened on exact head 4d631406b780f77f462af89d78da0c9992e08b62; bootstrap 36012819304 and Security Secrets 36012818993 passed. Manifest validation now replays the bound ENG-07.1 plan and rejects forged plan/batch identities; executable qualification is delegated to WU02.",
     "ENG-07.2 historical audit manifest/lifecycle completed on exact head abb82c1e0aba4c3fa6d19d40d7ad5cb4dc934617; bootstrap 36013581902, Security Secrets 36013581917, Security Actions 36013581897 and Supply Chain 36013582179 passed, including manifest self-check, 15 adversarial probes, context-map and cold-start qualification.",
-    "ENG-07.3 WU01 historical traceability mapping core implemented on exact head 84b57bafdb6632210f0fa1cea8f0f05a8a1a76ed; bootstrap 36014657705 and Security Secrets 36014657332 passed. Mapping semantics explicitly separate MAPPED, JUSTIFIED_NON_CODE and UNRESOLVED; executable qualification is delegated to WU02."
+    "ENG-07.3 WU01 historical traceability mapping core implemented on exact head 84b57bafdb6632210f0fa1cea8f0f05a8a1a76ed; bootstrap 36014657705 and Security Secrets 36014657332 passed. Mapping semantics explicitly separate MAPPED, JUSTIFIED_NON_CODE and UNRESOLVED; executable qualification is delegated to WU02.",
+    "ENG-07.3 historical traceability mapping completed on exact head 5b0441a96200cbc33838e25d262fae2c001094c9; bootstrap 36015519896 and Security Secrets 36015519763 passed on the same head, including mapping self-check, all 15 adversarial probes, context-map and cold-start qualification."
   ],
   "resume_read_order": [
     "AGENTS.md",
@@ -62,7 +63,7 @@
   "state_snapshot": {
     "active_lot": "ENG-07",
     "active_manifest": "engineering/lots/ENG-07.json",
-    "active_task": "ENG-07.3",
+    "active_task": "ENG-07.4",
     "business_development": "PAUSED",
     "engineering_phase": "BUILDING",
     "execution_allowed": false,
@@ -166,6 +167,20 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36014974132",
       "head_sha": "d809be0d4a1a5bf34a00e8a04401c44e83508750",
       "scope": "ENG-07.3-WU03_SCOPE_BASE_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36015519896",
+      "head_sha": "5b0441a96200cbc33838e25d262fae2c001094c9",
+      "scope": "ENG-07.3-WU03_BOOTSTRAP"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36015519763",
+      "head_sha": "5b0441a96200cbc33838e25d262fae2c001094c9",
+      "scope": "ENG-07.3-WU03_SECURITY_SECRETS"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"
