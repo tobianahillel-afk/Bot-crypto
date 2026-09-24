@@ -45,12 +45,12 @@
     },
     {
       "id": "ENG-08.4",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Prove mandatory execution cost remains zero."
     },
     {
       "id": "ENG-08.5",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Run context-free cold-start qualification."
     },
     {
