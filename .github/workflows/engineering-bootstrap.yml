@@ -194,6 +194,7 @@ jobs:
       - name: Run native attestation transport adversarial self-tests
         run: python scripts/governance/selftest_certification_attestation_transport.py
 
+      # ENG-06.5 exact-head T3 assurance boundary: validation only, no promotion side effect.
       - name: Validate fail-closed certification promotion rules
         run: python scripts/governance/validate_certification_promotion.py --self-check
 
