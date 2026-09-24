@@ -1,12 +1,12 @@
 {
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-07.3-WU02",
-    "awu_path": "engineering/work_units/ENG-07.3-WU02.json",
+    "awu_id": "ENG-07.3-WU03",
+    "awu_path": "engineering/work_units/ENG-07.3-WU03.json",
     "parent_manifest": "engineering/lots/ENG-07.json",
-    "scope_base_sha": "84b57bafdb6632210f0fa1cea8f0f05a8a1a76ed",
-    "risk_class": "R1",
-    "complexity_score": 1
+    "scope_base_sha": "d809be0d4a1a5bf34a00e8a04401c44e83508750",
+    "risk_class": "R0",
+    "complexity_score": 0
   },
   "authority": {
     "context_map": "engineering/CONTEXT_MAP.json",
@@ -14,7 +14,7 @@
     "state_source": "config/governance/project_state.json"
   },
   "blockers": [],
-  "current_objective": "ENG-07.3 WU02: integrate and qualify the source-bound historical requirement traceability mapping.",
+  "current_objective": "ENG-07.3 WU03: repair only the synthetic mapping qualification fixture compatibility.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -27,7 +27,7 @@
     "rulesets_count": 0
   },
   "kind": "engineering_handoff",
-  "next_action": "Wire the existing mapping self-check and 15 adversarial probes into Engineering Bootstrap; do not change mapping semantics or execute/populate historical audits.",
+  "next_action": "Update the mapping synthetic bundle to use current planner.synthetic_request()/plan_batches() and manifest build_manifest(); do not alter mapping schema, policy, status semantics or CI topology.",
   "next_engineering": {
     "active_lot": "ENG-07",
     "active_task": "ENG-07.3",
