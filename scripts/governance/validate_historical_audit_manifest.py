@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
-SCHEMA_PATH = ROOT / "config" / "governance" / "historical_audit_manifest_v1.schema.json"
+SCHEMA_PATH = ROOT / "config" / "governance" / "historical_audit_manifest_schema_v1.json"
 LIFECYCLE_PATH = ROOT / "config" / "governance" / "historical_audit_lifecycle_v1.json"
 BATCHING_PATH = ROOT / "config" / "governance" / "historical_audit_batching_v1.json"
 SHA40 = re.compile(r"^[0-9a-f]{40}$")
