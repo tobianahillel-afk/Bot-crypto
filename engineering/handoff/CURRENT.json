@@ -34,7 +34,6 @@
     "active_manifest": "engineering/lots/ENG-08.json"
   },
   "recent_completed": [
-    "ENG-07.4 WU01 historical findings registry core completed on exact head ec37b1ca0a19678ce2a899180594f7786992a740; bootstrap 36018843074 and Security Secrets 36018843013 passed. Schema, policy and validator are defined; executable adversarial qualification is delegated to WU02.",
     "ENG-07.4 historical findings registry completed on exact head 46ae234723edea0359402f879e3eb3539ebd5fc3; Bootstrap 36019390205, Security Actions 36019390215, Supply Chain 36019390146 and Security Secrets 36019390229 all passed, including findings validator self-check and adversarial qualification.",
     "ENG-07.5 WU01 deterministic historical audit report/owner-bound remediation queue core implemented on exact head 2781939a1a537c214435b66b05748eb55d8f79a9; bootstrap 36029467281 and Security Secrets 36029466643 passed. Executable adversarial qualification is delegated to WU02.",
     "ENG-07.5 deterministic historical audit reporting/remediation queue completed on exact head f8cda9500c79981c4ffb91774108830aff884d73; Bootstrap 36030405795, Security Secrets 36030406256, Security Actions 36030405755 and Supply Chain 36030405694 passed, including report self-check and 28 adversarial negative scenarios plus composite positive qualification.",
