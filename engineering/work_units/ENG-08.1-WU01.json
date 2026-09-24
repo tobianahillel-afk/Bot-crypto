@@ -145,8 +145,7 @@
       "independent_algorithms": 1,
       "state_machines": 0,
       "trust_boundaries": 0,
-      "new_dependencies": 0,
-      "cross_domain_interfaces": 0
+      "new_dependencies": 0
     },
     "split_reasons": []
   },
