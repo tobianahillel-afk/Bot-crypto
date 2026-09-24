@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "policy_kind": "historical_audit_findings_policy_v1",
+  "semantics": "SOURCE_BOUND_READ_ONLY_FINDINGS_WITH_EXPLICIT_DISPOSITION",
+  "historical_lot_range": {
+    "min": 0,
+    "max": 44
+  },
+  "registry_mode": "READ_ONLY",
+  "audit_results": [
+    "CLEAN",
+    "FINDINGS"
+  ],
+  "severity_order": [
+    "BLOCKER",
+    "MAJOR",
+    "MINOR",
+    "INFO"
+  ],
+  "finding_types": [
+    "MISSING_IMPLEMENTATION",
+    "MISSING_TEST",
+    "MISSING_CONTRACT",
+    "MISSING_EVIDENCE",
+    "TRACEABILITY_GAP",
+    "SOURCE_DRIFT",
+    "CONTROL_GAP",
+    "OTHER"
+  ],
+  "statuses": [
+    "OPEN",
+    "CLOSED"
+  ],
+  "dispositions": [
+    "UNRESOLVED",
+    "REMEDIATION_REQUIRED",
+    "DEFERRED",
+    "ACCEPTED_RISK",
+    "FALSE_POSITIVE",
+    "RESOLVED"
+  ],
+  "status_dispositions": {
+    "OPEN": [
+      "UNRESOLVED",
+      "REMEDIATION_REQUIRED",
+      "DEFERRED"
+    ],
+    "CLOSED": [
+      "ACCEPTED_RISK",
+      "FALSE_POSITIVE",
+      "RESOLVED"
+    ]
+  },
+  "rationale_required_dispositions": [
+    "REMEDIATION_REQUIRED",
+    "DEFERRED",
+    "ACCEPTED_RISK",
+    "FALSE_POSITIVE",
+    "RESOLVED"
+  ],
+  "reference_prefixes": [
+    "docs/",
+    "src/crypto_quant_bot/",
+    "tests/",
+    "contracts/",
+    "data/audit/",
+    "reports/",
+    "scripts/",
+    "config/",
+    "engineering/",
+    ".github/"
+  ],
+  "mutation_permissions": {
+    "historical_evidence": false,
+    "business_code": false,
+    "contracts": false,
+    "reports": false,
+    "data_audit": false,
+    "runtime_authority": false,
+    "business_state": false
+  },
+  "identity": {
+    "algorithm": "sha256",
+    "canonical_json": {
+      "sort_keys": true,
+      "separators": [
+        ",",
+        ":"
+      ],
+      "ensure_ascii": false,
+      "allow_nan": false
+    },
+    "excluded_fields": [
+      "registry_identity_sha256"
+    ]
+  },
+  "invariants": [
+    "registry binds exactly one validated ENG-07.2 manifest and one validated ENG-07.3 mapping",
+    "manifest mapping plan batch and lot identities must agree",
+    "CLEAN requires an empty findings list while FINDINGS requires one or more findings",
+    "finding ids are sorted unique and contiguous within batch and lot",
+    "every finding requirement_id exists in the bound traceability mapping",
+    "finding references are relative traversal-free prefix-constrained and duplicate-free",
+    "OPEN and CLOSED statuses only allow their declared dispositions",
+    "remediation deferred accepted-risk false-positive and resolved dispositions require rationale",
+    "severity changes require previous severity plus explicit rationale; severity cannot change silently",
+    "registry identity covers all semantic fields except itself",
+    "all mutation permissions remain false"
+  ]
+}
