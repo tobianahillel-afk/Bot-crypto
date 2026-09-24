@@ -207,6 +207,12 @@ jobs:
       - name: Run post-merge certification adversarial self-tests
         run: python scripts/governance/selftest_certification_post_merge.py
 
+      - name: Validate historical audit batching
+        run: python scripts/governance/plan_historical_audit_batches.py --self-check
+
+      - name: Run historical audit batching adversarial self-tests
+        run: python scripts/governance/selftest_historical_audit_batching.py
+
       - name: Run incremental validation adversarial self-tests
         run: python scripts/governance/selftest_incremental_validation.py
 

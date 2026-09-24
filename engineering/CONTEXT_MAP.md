@@ -13,19 +13,20 @@
 - Track: ENGINEERING
 - Work item: ENG-07
 - Task: ENG-07.1
-- AWU: ENG-07.1-WU01
+- AWU: ENG-07.1-WU02
 - Risk: R1
 - Manifest: engineering/lots/ENG-07.json
-- AWU file: engineering/work_units/ENG-07.1-WU01.json
+- AWU file: engineering/work_units/ENG-07.1-WU02.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-07.json
-- engineering/work_units/ENG-07.1-WU01.json
-- engineering/HISTORICAL_EVIDENCE_PROTECTION.json
-- docs/ROADMAP_V1_TO_V21.md
+- engineering/work_units/ENG-07.1-WU02.json
+- config/governance/historical_audit_batching_v1.json
+- scripts/governance/plan_historical_audit_batches.py
+- scripts/governance/selftest_historical_audit_batching.py
 - engineering/handoff/CURRENT.json
 
 ## Execution context — reference
@@ -35,16 +36,16 @@
 
 ## Budget
 
-- Primary: 7 / 10 files
+- Primary: 8 / 10 files
 - Reference: 2 / 12 files
-- Routed size: 61 / 768 KiB
+- Routed size: 54 / 768 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-07.1 WU01: define pure complexity-aware historical audit batching for certified Lots 0-44 without executing audits or mutating historical evidence.
-- Next action: Implement historical_audit_batching_v1 policy plus a pure planner/selftests that cover Lots 0-44 exactly once, split by explicit complexity budget, isolate oversized lots, and never mutate or execute historical audit content. CI integration is a separate WU.
+- Objective: ENG-07.1 WU02: integrate and qualify the historical audit batching core in CI without executing historical audits.
+- Next action: Run the WU01 planner self-check and 12 adversarial probes from engineering bootstrap on one exact head; do not change batching semantics or historical evidence.
 
 ## Non-authoritative sources
 
