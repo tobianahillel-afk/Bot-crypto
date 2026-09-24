@@ -34,7 +34,6 @@
     "active_manifest": "engineering/lots/ENG-07.json"
   },
   "recent_completed": [
-    "ENG-05.6 WU04 Vale v3.22.0 offline benchmark completed on exact head c6ae1454fb959009efea9d054d6db836fcd00153; benchmark 35971826612, bootstrap 35971826361 and Security Secrets 35971826327 all passed. Vale lint time 34.631 ms with 1 expected synthetic finding and 0 findings across 4 representative docs.",
     "ENG-05.6 WU05 lychee v0.24.2 offline benchmark completed on exact head 8edbe4cd4a9f03974356f17753101668f07d314a; benchmark 35972886401, bootstrap 35972886436 and Security Secrets 35972886267 passed. lychee checked 67 representative local links with 0 errors in 41.777 ms total benchmark time.",
     "ENG-06.1 certification-candidate lifecycle completed on exact head 220ec5c15c3a14fb73c0d83f75455e1247a36566; bootstrap run 35973940464 passed lifecycle validation, 12 adversarial probes, scope checks and cold-start qualification.",
     "ENG-06.2 exact-head evidence binding completed on exact head 883e887545801355734ed700dad1f7a5af6dc31b; bootstrap run 35981610621 passed self-check, 12 adversarial probes, cold-start and exact-head validation.",
