@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-07.3-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-07",
+    "task_id": "ENG-07.3",
+    "manifest": "engineering/lots/ENG-07.json"
+  },
+  "title": "Define source-bound historical requirement traceability mapping",
+  "objective": "Define a canonical read-only mapping contract that binds each historical requirement to its normative source, design references, implementation symbols, tests, contracts and evidence under one validated ENG-07.2 batch manifest, without executing historical audits or recording findings.",
+  "non_goals": [
+    "execute historical audits",
+    "populate mappings for real historical lots",
+    "record audit findings severity ownership or disposition",
+    "remediate historical gaps",
+    "modify data/audit reports contracts or business code",
+    "audit Lot45 candidate",
+    "unlock Lot46",
+    "change runtime authority",
+    "integrate the new checks into CI in this WU",
+    "add paid or LLM-backed dependency"
+  ],
+  "depends_on": [
+    "ENG-07.2-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "Historical audit manifest validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_historical_audit_manifest.py"
+    },
+    {
+      "name": "Historical audit manifest schema",
+      "kind": "SCHEMA",
+      "locator": "config/governance/historical_audit_manifest_schema_v1.json"
+    },
+    {
+      "name": "Traceability standard",
+      "kind": "FILE",
+      "locator": "docs/DECISION_AUDITABILITY_AND_TRACEABILITY_STANDARD.md"
+    },
+    {
+      "name": "Roadmap traceability matrix",
+      "kind": "FILE",
+      "locator": "docs/ROADMAP_TRACEABILITY_MATRIX.md"
+    },
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Historical traceability mapping schema",
+      "kind": "SCHEMA",
+      "locator": "config/governance/historical_audit_mapping_schema_v1.json"
+    },
+    {
+      "name": "Historical traceability mapping policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/historical_audit_mapping_policy_v1.json"
+    },
+    {
+      "name": "Historical traceability mapping validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_historical_audit_mapping.py"
+    },
+    {
+      "name": "Historical traceability mapping adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_historical_audit_mapping.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "abb82c1e0aba4c3fa6d19d40d7ad5cb4dc934617",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-07.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "AGENTS.md",
+      "README.md",
+      "engineering/CURRENT_STATUS.md",
+      "engineering/work_units/ENG-07.2-WU02.json",
+      "engineering/work_units/ENG-07.3-WU01.json",
+      "config/governance/historical_audit_mapping_schema_v1.json",
+      "config/governance/historical_audit_mapping_policy_v1.json",
+      "scripts/governance/validate_historical_audit_mapping.py",
+      "scripts/governance/selftest_historical_audit_mapping.py"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/lot*/**"
+    ],
+    "forbidden_semantics": [
+      "historical audit execution",
+      "real historical mapping population",
+      "historical evidence mutation",
+      "findings recording",
+      "remediation",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency",
+      "CI topology change"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "mapping is READ_ONLY and bound to one validated ENG-07.2 manifest identity",
+      "mapping lot belongs to the bound manifest batch and remains within historical Lots 0 through 44",
+      "mapping plan and batch identities equal the validated manifest identities",
+      "every requirement has a stable requirement_id and exact normative source reference",
+      "MAPPED requirements include at least one design reference implementation symbol test and evidence artifact",
+      "JUSTIFIED_NON_CODE requirements include an explicit formal justification plus design/evidence references and no fake implementation/test references",
+      "UNRESOLVED requirements remain explicit and cannot masquerade as complete coverage",
+      "repository references are relative traversal-free typed by category and duplicate-free",
+      "mapping identity is SHA-256 over canonical material excluding the identity field",
+      "validator is pure and performs no repository audit evidence or business/runtime mutation"
+    ],
+    "acceptance_criteria": [
+      "valid synthetic mapping validates and replays deterministically",
+      "tampering any identity-bound mapping field invalidates mapping identity",
+      "mapping a lot outside the bound manifest batch fails closed",
+      "Lot45 or later lot mapping fails closed",
+      "forged manifest plan or batch binding fails closed through ENG-07.2 validation",
+      "MAPPED requirement missing design implementation test contract/evidence coverage fails closed",
+      "JUSTIFIED_NON_CODE without justification or with fake implementation/test refs fails closed",
+      "UNRESOLVED status remains machine-visible and requires an explicit gap reason",
+      "absolute traversal malformed or duplicate repository references fail closed",
+      "mapping schema/policy drift is detected",
+      "no historical artifact or business/runtime state is mutated"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 3,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 1,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": true,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 15,
+      "executable_loc_changed": 780,
+      "new_public_behaviors": 1,
+      "contract_families": 1,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_historical_audit_mapping.py --self-check",
+      "python scripts/governance/selftest_historical_audit_mapping.py"
+    ]
+  },
+  "done_when": [
+    "mapping schema policy validator and adversarial tests are defined",
+    "traceability semantics distinguish complete justified-non-code and unresolved requirements without hiding gaps",
+    "all mappings remain bound to a validated read-only historical batch manifest",
+    "CI integration and executable qualification are deferred to ENG-07.3-WU02"
+  ]
+}

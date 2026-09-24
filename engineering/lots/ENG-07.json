@@ -35,12 +35,12 @@
     },
     {
       "id": "ENG-07.2",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Define the historical audit manifest and read-only batch lifecycle."
     },
     {
       "id": "ENG-07.3",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Map historical requirements to implementation tests contracts and evidence."
     },
     {
