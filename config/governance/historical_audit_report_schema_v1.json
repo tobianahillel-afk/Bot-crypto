@@ -1,0 +1,272 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "historical_audit_report_schema_v1",
+  "title": "HistoricalAuditReportV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_kind",
+    "mode",
+    "report_id",
+    "findings_registry_id",
+    "registry_identity_sha256",
+    "manifest_identity_sha256",
+    "mapping_identity_sha256",
+    "plan_identity_sha256",
+    "batch_identity_sha256",
+    "lot",
+    "audit_result",
+    "report_status",
+    "finding_count",
+    "open_finding_count",
+    "closed_finding_count",
+    "severity_counts",
+    "open_severity_counts",
+    "remediation_queue_count",
+    "remediation_queue",
+    "mutation_permissions",
+    "report_identity_sha256"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "report_kind": {
+      "const": "historical_audit_report_v1"
+    },
+    "mode": {
+      "const": "READ_ONLY"
+    },
+    "report_id": {
+      "type": "string",
+      "pattern": "^HIST-REPORT-B[0-9]{3}-L[0-9]{3}$"
+    },
+    "findings_registry_id": {
+      "type": "string",
+      "pattern": "^HIST-FIND-B[0-9]{3}-L[0-9]{3}$"
+    },
+    "registry_identity_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "manifest_identity_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "mapping_identity_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "plan_identity_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "batch_identity_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "lot": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 44
+    },
+    "audit_result": {
+      "enum": [
+        "CLEAN",
+        "FINDINGS"
+      ]
+    },
+    "report_status": {
+      "enum": [
+        "CLEAN",
+        "BLOCKED",
+        "ACTION_REQUIRED",
+        "RESOLVED"
+      ]
+    },
+    "finding_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 999
+    },
+    "open_finding_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 999
+    },
+    "closed_finding_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 999
+    },
+    "severity_counts": {
+      "$ref": "#/$defs/severity_counts"
+    },
+    "open_severity_counts": {
+      "$ref": "#/$defs/severity_counts"
+    },
+    "remediation_queue_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 999
+    },
+    "remediation_queue": {
+      "type": "array",
+      "maxItems": 999,
+      "items": {
+        "$ref": "#/$defs/remediation_queue_item"
+      }
+    },
+    "mutation_permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "historical_evidence",
+        "business_code",
+        "contracts",
+        "reports",
+        "data_audit",
+        "runtime_authority",
+        "business_state"
+      ],
+      "properties": {
+        "historical_evidence": {
+          "const": false
+        },
+        "business_code": {
+          "const": false
+        },
+        "contracts": {
+          "const": false
+        },
+        "reports": {
+          "const": false
+        },
+        "data_audit": {
+          "const": false
+        },
+        "runtime_authority": {
+          "const": false
+        },
+        "business_state": {
+          "const": false
+        }
+      }
+    },
+    "report_identity_sha256": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "severity_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "BLOCKER",
+        "MAJOR",
+        "MINOR",
+        "INFO"
+      ],
+      "properties": {
+        "BLOCKER": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 999
+        },
+        "MAJOR": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 999
+        },
+        "MINOR": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 999
+        },
+        "INFO": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 999
+        }
+      }
+    },
+    "remediation_queue_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "queue_id",
+        "finding_id",
+        "requirement_id",
+        "finding_type",
+        "severity",
+        "priority",
+        "disposition",
+        "triage_action",
+        "owner"
+      ],
+      "properties": {
+        "queue_id": {
+          "type": "string",
+          "pattern": "^HIST-REMED-B[0-9]{3}-L[0-9]{3}-Q[0-9]{3}$"
+        },
+        "finding_id": {
+          "type": "string",
+          "pattern": "^HIST-FIND-B[0-9]{3}-L[0-9]{3}-F[0-9]{3}$"
+        },
+        "requirement_id": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 120,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,119}$"
+        },
+        "finding_type": {
+          "enum": [
+            "MISSING_IMPLEMENTATION",
+            "MISSING_TEST",
+            "MISSING_CONTRACT",
+            "MISSING_EVIDENCE",
+            "TRACEABILITY_GAP",
+            "SOURCE_DRIFT",
+            "CONTROL_GAP",
+            "OTHER"
+          ]
+        },
+        "severity": {
+          "enum": [
+            "BLOCKER",
+            "MAJOR",
+            "MINOR",
+            "INFO"
+          ]
+        },
+        "priority": {
+          "enum": [
+            "P0",
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        "disposition": {
+          "enum": [
+            "UNRESOLVED",
+            "REMEDIATION_REQUIRED",
+            "DEFERRED"
+          ]
+        },
+        "triage_action": {
+          "enum": [
+            "TRIAGE_REQUIRED",
+            "REMEDIATE",
+            "TRACK_DEFERRED"
+          ]
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      }
+    }
+  }
+}

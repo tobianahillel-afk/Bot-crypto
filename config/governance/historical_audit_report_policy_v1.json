@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "policy_kind": "historical_audit_report_policy_v1",
+  "semantics": "SOURCE_BOUND_READ_ONLY_REPORT_WITH_OWNER_BOUND_REMEDIATION_QUEUE",
+  "historical_lot_range": {
+    "min": 0,
+    "max": 44
+  },
+  "report_mode": "READ_ONLY",
+  "report_statuses": [
+    "CLEAN",
+    "BLOCKED",
+    "ACTION_REQUIRED",
+    "RESOLVED"
+  ],
+  "severity_order": [
+    "BLOCKER",
+    "MAJOR",
+    "MINOR",
+    "INFO"
+  ],
+  "priority_order": [
+    "P0",
+    "P1",
+    "P2",
+    "P3"
+  ],
+  "severity_priority": {
+    "BLOCKER": "P0",
+    "MAJOR": "P1",
+    "MINOR": "P2",
+    "INFO": "P3"
+  },
+  "open_disposition_triage_actions": {
+    "UNRESOLVED": "TRIAGE_REQUIRED",
+    "REMEDIATION_REQUIRED": "REMEDIATE",
+    "DEFERRED": "TRACK_DEFERRED"
+  },
+  "mutation_permissions": {
+    "historical_evidence": false,
+    "business_code": false,
+    "contracts": false,
+    "reports": false,
+    "data_audit": false,
+    "runtime_authority": false,
+    "business_state": false
+  },
+  "identity": {
+    "algorithm": "sha256",
+    "canonical_json": {
+      "sort_keys": true,
+      "separators": [
+        ",",
+        ":"
+      ],
+      "ensure_ascii": false,
+      "allow_nan": false
+    },
+    "excluded_fields": [
+      "report_identity_sha256"
+    ]
+  },
+  "invariants": [
+    "report binds exactly one validated findings registry plus its manifest mapping plan batch and lot identities",
+    "CLEAN registry produces CLEAN report and an empty remediation queue",
+    "any OPEN BLOCKER finding produces BLOCKED report status",
+    "OPEN non-blocker findings without an OPEN BLOCKER produce ACTION_REQUIRED status",
+    "non-empty registry with all findings CLOSED produces RESOLVED status",
+    "severity counts and open severity counts exactly equal the bound findings registry",
+    "remediation queue contains every and only OPEN finding",
+    "queue priority maps BLOCKER P0 MAJOR P1 MINOR P2 INFO P3",
+    "queue triage action is deterministically derived from OPEN finding disposition",
+    "queue owner is copied exactly from the finding owner",
+    "queue order is priority then finding_id and queue ids are contiguous within batch and lot",
+    "report identity covers every semantic field except itself",
+    "all mutation permissions remain false"
+  ]
+}
