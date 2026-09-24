@@ -6,7 +6,7 @@
     "parent_manifest": "engineering/lots/ENG-08.json",
     "scope_base_sha": "62fbd6c34dd95d683368e93739df34bed5f34148",
     "risk_class": "R1",
-    "complexity_score": 1
+    "complexity_score": 2
   },
   "authority": {
     "context_map": "engineering/CONTEXT_MAP.json",
@@ -27,21 +27,21 @@
     "rulesets_count": 0
   },
   "kind": "engineering_handoff",
-  "next_action": "Implement a static auditor over the bounded Development Engine workflow set, approved action registry and governance cost policies; prove no paid API/LLM/SaaS/license/larger-runner requirement and report repository visibility as unverified until WU02.",
+  "next_action": "Implement the static mandatory-cost auditor now that completed ENG-08.3 qualification-only bootstrap hooks have been removed from the permanent path.",
   "next_engineering": {
     "active_lot": "ENG-08",
     "active_task": "ENG-08.4",
     "active_manifest": "engineering/lots/ENG-08.json"
   },
   "recent_completed": [
-    "ENG-07.6 WU01 audit-engine immutable-evidence binding implemented on exact head 00ca474f9690667326e88a8a55ef9d432033b87f; Bootstrap 36031261087 and Security Secrets 36031260788 passed. Canonical protection is reused unchanged; adversarial CI qualification is delegated to WU02.",
     "ENG-07 Historical Audit Engine completed on exact head 9edb0916440832a724698996d6ba6dba5c54d1a6; Bootstrap 36032060794, Security Secrets 36032060848, Security Actions 36032060933 and Supply Chain 36032060898 all passed. ENG-07.6 immutable-evidence qualification passed validator check/self-check plus 21 negative adversarial probes, with no protected evidence path modified.",
     "ENG-08.1 WU01 timing-budget core completed on exact head 229ad24acfc4a1aeda07d8016ef30f77712ba150; Bootstrap 36044163745 and Security Secrets 36044163773 passed. Budgets are 250/500/750 ms for T0/T1/T2 and 1500 ms total, calibrated from 20.536/22.219/15.782/71.289 ms.",
     "ENG-08.1 timing-budget qualification completed on exact head fca82534bafd7bce5a1a395e6c76aa095222604e; Bootstrap 36045023149 and Security Secrets 36045023084 passed. T0 25.413 ms, T1 54.392 ms, T2 16.513 ms, total 110.485 ms; 15 adversarial probes passed without tier recomputation.",
     "ENG-08.2 WU01 unnecessary-check detection core implemented on exact head b65bff680215a1b5b2f14df27182e90fe49bff8e; Bootstrap 36046192079 and Security Secrets 36046192289 passed. Pure detector semantics are defined; executable qualification is delegated to WU02.",
     "ENG-08.2 unnecessary-validation qualification completed on exact head 10c469575138b0ef4aa99127dd8d02958f01d307; Bootstrap 36049171919 and Security Secrets 36049171987 passed. Current single-pass trace verdict CLEAN; 31 adversarial unnecessary-check probes passed with T0/T1/T2/selector exactly once and no pytest/full-suite/network/T3/T4 execution.",
     "ENG-08.3 WU01 proof-reuse effectiveness core implemented on exact head 114f0c8c2ad07bb9994d152c445ad84a16a4098b; Bootstrap 36053443968 and Security Secrets 36053444050 passed. Generic measurement primitives are implemented without production cache integration; executable generic/real-subject qualification is delegated to WU02.",
-    "ENG-08.3 proof-reuse effectiveness qualification completed on exact head 62fbd6c34dd95d683368e93739df34bed5f34148; Bootstrap 36054501545 and Security Secrets 36054501491 passed. Generic self-check passed 18 probes; real T1 SELFTEST_ENTRYPOINT_CHECK qualification bound 3 inputs, 7 policies and 8 implementations, measured baseline=2 actual=1 avoided=1 with EXACT_INPUT_MATCH (executor 9.138428 ms, lookup 0.043905 ms), and 20 adversarial probes passed. Canonical incremental validation remained CLEAN at 52.81 ms."
+    "ENG-08.3 proof-reuse effectiveness qualification completed on exact head 62fbd6c34dd95d683368e93739df34bed5f34148; Bootstrap 36054501545 and Security Secrets 36054501491 passed. Generic self-check passed 18 probes; real T1 SELFTEST_ENTRYPOINT_CHECK qualification bound 3 inputs, 7 policies and 8 implementations, measured baseline=2 actual=1 avoided=1 with EXACT_INPUT_MATCH (executor 9.138428 ms, lookup 0.043905 ms), and 20 adversarial probes passed. Canonical incremental validation remained CLEAN at 52.81 ms.",
+    "ENG-08.3 qualification-only bootstrap hooks were identified as lifecycle-specific after task transition and removed from the permanent mandatory path; this prevents completed proof-reuse qualification from blocking or slowing later AWUs."
   ],
   "resume_read_order": [
     "AGENTS.md",

@@ -2,7 +2,7 @@
   "active_work": {
     "awu_id": "ENG-08.4-WU01",
     "awu_path": "engineering/work_units/ENG-08.4-WU01.json",
-    "complexity_score": 1,
+    "complexity_score": 2,
     "lot": "ENG-08",
     "manifest": "engineering/lots/ENG-08.json",
     "risk_class": "R1",
@@ -68,7 +68,7 @@
   "resume": {
     "current_objective": "ENG-08.4 WU01: define a deterministic mandatory-path zero-cost inventory without querying billing services.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Implement a static auditor over the bounded Development Engine workflow set, approved action registry and governance cost policies; prove no paid API/LLM/SaaS/license/larger-runner requirement and report repository visibility as unverified until WU02."
+    "next_action": "Implement the static mandatory-cost auditor now that completed ENG-08.3 qualification-only bootstrap hooks have been removed from the permanent path."
   },
   "safety": {
     "execution_allowed": false,

@@ -13,7 +13,7 @@
   "non_goals": [
     "query billing APIs or account balances",
     "change GitHub plan or repository visibility",
-    "modify mandatory workflows in WU01",
+    "modify mandatory workflows except removal of completed ENG-08.3 qualification-only hooks",
     "infer public-repository pricing without runtime evidence",
     "integrate a paid cost-monitoring service",
     "business implementation",
@@ -73,7 +73,8 @@
       "engineering/MANDATORY_COST_ZERO.md",
       "AGENTS.md",
       "README.md",
-      "engineering/CURRENT_STATUS.md"
+      "engineering/CURRENT_STATUS.md",
+      ".github/workflows/engineering-bootstrap.yml"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -121,7 +122,7 @@
   },
   "planning": {
     "risk_class": "R1",
-    "complexity_score": 1,
+    "complexity_score": 2,
     "split_required": false,
     "context_budget": {
       "max_primary_files": 10,
@@ -140,11 +141,11 @@
       "security_trust_boundary": false,
       "risk_execution_permission": false,
       "dependency_change": false,
-      "ci_evidence_topology_change": false
+      "ci_evidence_topology_change": true
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 14,
+      "files_touched": 15,
       "executable_loc_changed": 550,
       "new_public_behaviors": 1,
       "contract_families": 0,

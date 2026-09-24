@@ -44,7 +44,7 @@
 
 - Handoff: engineering/handoff/CURRENT.json
 - Objective: ENG-08.4 WU01: define a deterministic mandatory-path zero-cost inventory without querying billing services.
-- Next action: Implement a static auditor over the bounded Development Engine workflow set, approved action registry and governance cost policies; prove no paid API/LLM/SaaS/license/larger-runner requirement and report repository visibility as unverified until WU02.
+- Next action: Implement the static mandatory-cost auditor now that completed ENG-08.3 qualification-only bootstrap hooks have been removed from the permanent path.
 
 ## Non-authoritative sources
 
