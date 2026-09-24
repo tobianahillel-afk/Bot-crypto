@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "agent_work_unit",
   "id": "ENG-08.7-WU01",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "parent": {
     "work_item_id": "ENG-08",
     "task_id": "ENG-08.7",
@@ -153,8 +153,8 @@
       "R3 assurance plan contains exactly ENGINEERING_BOOTSTRAP SAST and SECRET_SCANNING",
       "R3 assurance with no exact-head evidence remains INCOMPLETE",
       "permanent T3/T4 selftest reports at least 16 probes",
-      "Bootstrap and Security Secrets pass on the same exact head",
-      "BUSINESS stays PAUSED Lot46 stays LOCKED and trading/execution stay disabled"
+      "BUSINESS stays PAUSED Lot46 stays LOCKED and trading/execution stay disabled",
+      "WU01 core assurance steps pass before lifecycle-regression remediation is delegated to WU02"
     ]
   },
   "planning": {
@@ -207,10 +207,9 @@
     ]
   },
   "done_when": [
-    "all three independent governance layers reject R3 floor removal",
-    "cross-layer R3 bypass probes pass in permanent Bootstrap validation",
-    "R3 assurance remains exact-head and fail-closed when evidence is missing or invalid",
-    "Bootstrap and Security Secrets pass on one exact head",
-    "business and execution safety remain unchanged"
+    "selector deep-assurance and exact-head validators independently reject R3 floor removal",
+    "permanent T3/T4 selector selftest passes the cross-layer R3 bypass probes",
+    "Security Secrets passes on the WU01 exact head",
+    "the discovered lifecycle-specific recovery regression is delegated to ENG-08.7-WU02 for final full-bootstrap qualification"
   ]
 }

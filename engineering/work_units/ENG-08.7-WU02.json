@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-08.7-WU02",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-08",
+    "task_id": "ENG-08.7",
+    "manifest": "engineering/lots/ENG-08.json"
+  },
+  "title": "Generalize recovery lifecycle and certify R3 hardening",
+  "objective": "Remove ENG-08.6-specific hardcoding from permanent interruption/recovery qualification so it follows canonical active state/AWU across task transitions, then obtain final exact-head Bootstrap and Security Secrets evidence for the already-hardened R3 assurance chain.",
+  "non_goals": [
+    "change R3 assurance requirements or controls",
+    "change runtime risk or execution permissions",
+    "modify workflow topology",
+    "modify business code or frozen evidence",
+    "remediate Lot45 or unlock Lot46",
+    "introduce paid or LLM-backed validation"
+  ],
+  "depends_on": [
+    "ENG-08.7-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Recovery qualifier",
+      "kind": "FILE",
+      "locator": "scripts/governance/resume_recovery_qualification.py"
+    },
+    {
+      "name": "Recovery adversarial selftest",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_resume_recovery.py"
+    },
+    {
+      "name": "Next-work resolver",
+      "kind": "FILE",
+      "locator": "scripts/governance/resolve_next_work.py"
+    },
+    {
+      "name": "Capability/evidence policy",
+      "kind": "CONFIG",
+      "locator": "engineering/AGENT_CAPABILITIES.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Lifecycle-generic recovery qualifier",
+      "kind": "FILE",
+      "locator": "scripts/governance/resume_recovery_qualification.py"
+    },
+    {
+      "name": "Lifecycle-generic recovery selftest",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_resume_recovery.py"
+    },
+    {
+      "name": "Critical R3 bypass evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/CRITICAL_R3_BYPASS_EVIDENCE.json"
+    },
+    {
+      "name": "Critical R3 assurance design",
+      "kind": "FILE",
+      "locator": "engineering/CRITICAL_R3_BYPASS.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "6d9bc16d4c1958e9b762c64b5020ccc4e0a4f96e",
+    "allowed_paths": [
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-08.7-WU01.json",
+      "engineering/work_units/ENG-08.7-WU02.json",
+      "scripts/governance/resume_recovery_qualification.py",
+      "scripts/governance/selftest_resume_recovery.py",
+      "engineering/CRITICAL_R3_BYPASS_EVIDENCE.json",
+      "engineering/CRITICAL_R3_BYPASS.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/**",
+      "config/governance/validation_t3_t4_policy_v1.json",
+      "config/governance/certification_deep_assurance_v1.json",
+      "config/governance/certification_exact_head_binding_v1.json"
+    ],
+    "forbidden_semantics": [
+      "R3 requirement weakening",
+      "assurance control weakening",
+      "runtime risk permission change",
+      "execution permission change",
+      "business implementation",
+      "Lot45 remediation",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "recovery qualification derives expected task and AWU from canonical state plus unique active AWU instead of a hardcoded ENG-08.6 identifier",
+      "stale or missing handoff/context cannot redirect recovery after an engineering task transition",
+      "LIVE_GIT_REVERIFY_REQUIRED remains mandatory before resumed writes",
+      "BUSINESS remains PAUSED Lot46 remains LOCKED and trading/execution remain disabled",
+      "the R3 hardening produced by WU01 remains unchanged while WU02 repairs only lifecycle-generic recovery qualification"
+    ],
+    "acceptance_criteria": [
+      "recovery qualifier passes for ENG-08.7-WU02 without any ENG-08.6 hardcoded expectation",
+      "recovery selftest remains at least 17 adversarial probes",
+      "context-free cold-start remains within its bounded route",
+      "T3/T4 selector cross-layer selftest remains at least 16 probes",
+      "deep assurance and exact-head selfchecks remain PASS",
+      "full Engineering Bootstrap and Security Secrets both pass on the same final head"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 9,
+      "executable_loc_changed": 220,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/resume_recovery_qualification.py",
+      "python scripts/governance/selftest_resume_recovery.py",
+      "python scripts/governance/selftest_t3_t4_selector.py"
+    ]
+  },
+  "done_when": [
+    "permanent recovery qualification is lifecycle-generic across active engineering AWUs",
+    "R3 hardening remains green after recovery regression repair",
+    "Bootstrap and Security Secrets pass on one exact final head",
+    "critical R3 bypass evidence is recorded without weakening safety or cost constraints"
+  ]
+}
