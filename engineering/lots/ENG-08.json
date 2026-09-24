@@ -35,12 +35,12 @@
     },
     {
       "id": "ENG-08.2",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Detect unnecessary validation checks and redundant work."
     },
     {
       "id": "ENG-08.3",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Measure and qualify proof-reuse effectiveness."
     },
     {

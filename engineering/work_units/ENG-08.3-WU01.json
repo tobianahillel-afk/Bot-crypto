@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-08.3-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-08",
+    "task_id": "ENG-08.3",
+    "manifest": "engineering/lots/ENG-08.json"
+  },
+  "title": "Define proof-reuse effectiveness measurement",
+  "objective": "Define a deterministic fail-closed measurement harness that proves exact-input proof reuse can suppress a redundant eligible execution, quantifies avoided execution count and lookup overhead, and leaves production validation/cache semantics unchanged.",
+  "non_goals": [
+    "integrate a production proof cache",
+    "modify proof_reuse.py or proof_reuse_policy_v1.json",
+    "reuse T0 T3 or T4 evidence",
+    "persist reusable proofs in external storage",
+    "execute T3 assurance or T4 certification",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-08.2-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "Exact-input proof reuse engine",
+      "kind": "FILE",
+      "locator": "scripts/governance/proof_reuse.py"
+    },
+    {
+      "name": "Exact-input proof reuse policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/proof_reuse_policy_v1.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Proof-reuse effectiveness policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/proof_reuse_effectiveness_policy_v1.json"
+    },
+    {
+      "name": "Proof-reuse effectiveness measurement",
+      "kind": "FILE",
+      "locator": "scripts/governance/measure_proof_reuse_effectiveness.py"
+    },
+    {
+      "name": "Proof-reuse effectiveness design",
+      "kind": "FILE",
+      "locator": "engineering/PROOF_REUSE_EFFECTIVENESS.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "10c469575138b0ef4aa99127dd8d02958f01d307",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-08.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-08.2-WU02.json",
+      "engineering/work_units/ENG-08.3-WU01.json",
+      "config/governance/proof_reuse_effectiveness_policy_v1.json",
+      "scripts/governance/measure_proof_reuse_effectiveness.py",
+      "engineering/PROOF_REUSE_EFFECTIVENESS.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      "scripts/governance/proof_reuse.py",
+      "config/governance/proof_reuse_policy_v1.json"
+    ],
+    "forbidden_semantics": [
+      "production proof cache integration",
+      "proof reuse semantic weakening",
+      "T0 reuse",
+      "T3 reuse",
+      "T4 reuse",
+      "external proof storage",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "measurement imports and uses the certified proof_reuse engine unchanged",
+      "first eligible request executes the supplied subject exactly once and issues a PASS proof",
+      "second identical request verifies exact-input reuse and suppresses the redundant subject execution",
+      "changed input policy implementation parameter or environment must force execution rather than reuse",
+      "T0 T3 T4 and forbidden subjects remain ineligible",
+      "effectiveness reports actual executor call counts and proof-evaluation elapsed time without inventing saved milliseconds",
+      "measurement uses only local deterministic data with no network paid service or larger runner"
+    ],
+    "acceptance_criteria": [
+      "two identical eligible requests have baseline executions=2 actual executions=1 avoided executions=1",
+      "the second identical request returns EXACT_INPUT_MATCH and does not call the executor",
+      "a changed bound input produces a miss and calls the executor",
+      "a FAIL proof is not reusable",
+      "T4 exact-head certification remains non-reusable",
+      "reported avoided executions equal baseline minus actual executions",
+      "reported reuse hit rate and lookup timing are directly measured",
+      "no production validation tier or proof policy is modified"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 11,
+      "executable_loc_changed": 450,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/measure_proof_reuse_effectiveness.py --self-check"
+    ]
+  },
+  "done_when": [
+    "generic exact-match reuse measurably suppresses one redundant eligible executor call",
+    "misses and forbidden subjects remain fail-closed",
+    "measurement reports real call counts and lookup time",
+    "WU02 can qualify the measurement against a real reusable T1 subject without production cache integration"
+  ]
+}
