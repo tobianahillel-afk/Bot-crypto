@@ -34,7 +34,6 @@
     "active_manifest": "engineering/lots/ENG-07.json"
   },
   "recent_completed": [
-    "ENG-06.2 exact-head evidence binding completed on exact head 883e887545801355734ed700dad1f7a5af6dc31b; bootstrap run 35981610621 passed self-check, 12 adversarial probes, cold-start and exact-head validation.",
     "ENG-06.3 risk-proportional deep assurance completed on exact head 59985cfaf33c81ab9b4a185c624a2f1ca1ed5b4c; bootstrap 35982509927 passed policy plus 16 probes, while selected T3 controls Security Actions 35982509888 and Security Supply Chain 35982509911 passed on the same head.",
     "ENG-06.4 WU01 canonical provenance semantics completed on exact head ea39c36a5d882ced48ad34b6c95c6c720d42aebf; bootstrap 35983241823 passed provenance validation, 12 adversarial probes, scope and cold-start qualification.",
     "ENG-06.4 WU02 native GitHub attestation transport completed on exact head c887b5ebbdd870d1351a1f909a88454d1beb9a1c; Certification Provenance run 35987439933 plus bootstrap, Security Actions, Supply Chain and Secrets passed with exact actions/attest v4.2.2 pin and least-privilege OIDC/attestations writes.",
@@ -84,20 +83,6 @@
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
   ],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "head_sha": "59985cfaf33c81ab9b4a185c624a2f1ca1ed5b4c",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35982509927",
-      "scope": "ENG-06.3_DEEP_ASSURANCE",
-      "status": "PASS"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "head_sha": "ea39c36a5d882ced48ad34b6c95c6c720d42aebf",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35983241823",
-      "scope": "ENG-06.4-WU01_PROVENANCE_SEMANTICS",
-      "status": "PASS"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "head_sha": "c887b5ebbdd870d1351a1f909a88454d1beb9a1c",
