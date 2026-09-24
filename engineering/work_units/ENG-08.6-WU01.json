@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-08.6-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-08",
+    "task_id": "ENG-08.6",
+    "manifest": "engineering/lots/ENG-08.json"
+  },
+  "title": "Qualify deterministic interruption and recovery",
+  "objective": "Prove interrupted or context-lost work resumes from permanent repository authority and the unique active AWU, treats handoff/context as non-authoritative hints, never auto-heals canonical state, and requires live Git re-verification before any resumed write.",
+  "non_goals": [
+    "critical R3 bypass qualification (ENG-08.7)",
+    "modify state-machine or resolver semantics",
+    "modify mandatory workflow topology",
+    "auto-heal stale repository state",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-08.5-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Permanent recovery qualifier",
+      "kind": "FILE",
+      "locator": "scripts/governance/resume_recovery_qualification.py"
+    },
+    {
+      "name": "Canonical next-work resolver",
+      "kind": "FILE",
+      "locator": "scripts/governance/resolve_next_work.py"
+    },
+    {
+      "name": "Agent capabilities",
+      "kind": "CONFIG",
+      "locator": "engineering/AGENT_CAPABILITIES.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Strengthened interruption/recovery qualifier",
+      "kind": "FILE",
+      "locator": "scripts/governance/resume_recovery_qualification.py"
+    },
+    {
+      "name": "Recovery adversarial qualification",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_resume_recovery.py"
+    },
+    {
+      "name": "Interruption/recovery evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/INTERRUPTION_RECOVERY_EVIDENCE.json"
+    },
+    {
+      "name": "Interruption/recovery design",
+      "kind": "FILE",
+      "locator": "engineering/INTERRUPTION_RECOVERY.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "5ec2ede8c194fbe01e178ae02d9fba5f0d139b2a",
+    "allowed_paths": [
+      "AGENTS.md",
+      "README.md",
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-08.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/CURRENT_STATUS.md",
+      "engineering/work_units/ENG-08.5-WU01.json",
+      "engineering/work_units/ENG-08.6-WU01.json",
+      "engineering/COLD_START_QUALIFICATION_EVIDENCE.json",
+      "scripts/governance/resume_recovery_qualification.py",
+      "scripts/governance/selftest_resume_recovery.py",
+      "engineering/INTERRUPTION_RECOVERY_EVIDENCE.json",
+      "engineering/INTERRUPTION_RECOVERY.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/**"
+    ],
+    "forbidden_semantics": [
+      "R3 bypass implementation",
+      "state machine semantic change",
+      "resolver semantic change",
+      "mandatory workflow mutation",
+      "canonical state auto-heal",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "canonical project_state and the unique active AWU remain authoritative after interruption; handoff context map bridge chat history and model memory cannot authorize work",
+      "missing or stale handoff/context never mutate or auto-heal canonical state",
+      "recovery reconstructs the bounded active-AWU read order and excludes engineering/STATE chat_history and model_memory",
+      "recovered work is never write-authorized until LIVE_GIT_REVERIFY_REQUIRED is satisfied",
+      "simultaneously stale handoff and context still resolve the canonical active task and AWU",
+      "unsafe Lot46 paid mandatory dependency and ambiguous active AWU scenarios fail closed",
+      "business development stays PAUSED Lot46 stays LOCKED and trading/execution stay disabled",
+      "interruption/recovery qualification measures elapsed time and stays below a generous 1000 ms CI budget"
+    ],
+    "acceptance_criteria": [
+      "qualification prints INTERRUPTION_RECOVERY_PASS for ENG-08.6-WU01",
+      "normal recovery reports VALID handoff/context but write_authorized=false",
+      "stale and missing handoff/context cases recover canonical ENG-08.6 rather than stale hints",
+      "simultaneously stale hints cannot redirect active work",
+      "required_before_write is exactly LIVE_GIT_REVERIFY_REQUIRED",
+      "required read order contains neither engineering/STATE.json chat_history nor model_memory",
+      "at least ten recovery/adversarial scenarios pass",
+      "measured recovery elapsed_ms < 1000 on CI",
+      "Bootstrap and Security Secrets pass on the same exact head"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 16,
+      "executable_loc_changed": 650,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/resume_recovery_qualification.py",
+      "python scripts/governance/selftest_resume_recovery.py"
+    ]
+  },
+  "done_when": [
+    "interruption and context loss recover from canonical repository authority without conversational state",
+    "stale/missing hints are detected without auto-healing state",
+    "resumed writes remain blocked pending live Git re-verification",
+    "Bootstrap and Security Secrets pass on one exact head"
+  ]
+}

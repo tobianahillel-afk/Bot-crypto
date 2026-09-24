@@ -50,12 +50,12 @@
     },
     {
       "id": "ENG-08.5",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Run context-free cold-start qualification."
     },
     {
       "id": "ENG-08.6",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Run interruption and recovery qualification."
     },
     {
