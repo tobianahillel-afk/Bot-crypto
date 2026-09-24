@@ -1,7 +1,7 @@
 {
   "active_work": {
-    "awu_id": "ENG-08.3-WU01",
-    "awu_path": "engineering/work_units/ENG-08.3-WU01.json",
+    "awu_id": "ENG-08.3-WU02",
+    "awu_path": "engineering/work_units/ENG-08.3-WU02.json",
     "complexity_score": 1,
     "lot": "ENG-08",
     "manifest": "engineering/lots/ENG-08.json",
@@ -35,21 +35,25 @@
       "max_total_kib": 768
     },
     "implicit_expansion": "FORBIDDEN",
-    "primary_count": 6,
+    "primary_count": 10,
     "primary_files": [
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-08.json",
-      "engineering/work_units/ENG-08.3-WU01.json",
+      "engineering/work_units/ENG-08.3-WU02.json",
+      "scripts/governance/measure_proof_reuse_effectiveness.py",
       "scripts/governance/proof_reuse.py",
-      "config/governance/proof_reuse_policy_v1.json"
+      "config/governance/proof_reuse_policy_v1.json",
+      "scripts/governance/run_t1.py",
+      "config/governance/validation_t1_policy_v1.json",
+      "config/governance/proof_reuse_effectiveness_policy_v1.json"
     ],
     "reference_count": 2,
     "reference_files": [
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 43
+    "total_kib_ceil": 71
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -65,9 +69,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "ENG-08.3 WU01: define a deterministic proof-reuse effectiveness measurement without changing production cache semantics.",
+    "current_objective": "ENG-08.3 WU02: qualify exact-input proof reuse against the real T1 SELFTEST_ENTRYPOINT_CHECK without integrating a production cache.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Implement a local measurement harness over the existing proof_reuse engine that executes an eligible subject once, reuses the exact PASS proof on the identical second request, and reports avoided executor calls plus measured lookup overhead."
+    "next_action": "Bind active state/AWU, changed governance selftests, T1/proof policies and transitive T1 implementation into proof material; execute the real SELFTEST_ENTRYPOINT_CHECK once, reuse the exact PASS proof for the identical second request, add adversarial probes, and run all qualification in bootstrap."
   },
   "safety": {
     "execution_allowed": false,

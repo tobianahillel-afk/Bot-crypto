@@ -13,19 +13,23 @@
 - Track: ENGINEERING
 - Work item: ENG-08
 - Task: ENG-08.3
-- AWU: ENG-08.3-WU01
+- AWU: ENG-08.3-WU02
 - Risk: R1
 - Manifest: engineering/lots/ENG-08.json
-- AWU file: engineering/work_units/ENG-08.3-WU01.json
+- AWU file: engineering/work_units/ENG-08.3-WU02.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-08.json
-- engineering/work_units/ENG-08.3-WU01.json
+- engineering/work_units/ENG-08.3-WU02.json
+- scripts/governance/measure_proof_reuse_effectiveness.py
 - scripts/governance/proof_reuse.py
 - config/governance/proof_reuse_policy_v1.json
+- scripts/governance/run_t1.py
+- config/governance/validation_t1_policy_v1.json
+- config/governance/proof_reuse_effectiveness_policy_v1.json
 
 ## Execution context — reference
 
@@ -34,16 +38,16 @@
 
 ## Budget
 
-- Primary: 6 / 10 files
+- Primary: 10 / 10 files
 - Reference: 2 / 12 files
-- Routed size: 43 / 768 KiB
+- Routed size: 71 / 768 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-08.3 WU01: define a deterministic proof-reuse effectiveness measurement without changing production cache semantics.
-- Next action: Implement a local measurement harness over the existing proof_reuse engine that executes an eligible subject once, reuses the exact PASS proof on the identical second request, and reports avoided executor calls plus measured lookup overhead.
+- Objective: ENG-08.3 WU02: qualify exact-input proof reuse against the real T1 SELFTEST_ENTRYPOINT_CHECK without integrating a production cache.
+- Next action: Bind active state/AWU, changed governance selftests, T1/proof policies and transitive T1 implementation into proof material; execute the real SELFTEST_ENTRYPOINT_CHECK once, reuse the exact PASS proof for the identical second request, add adversarial probes, and run all qualification in bootstrap.
 
 ## Non-authoritative sources
 

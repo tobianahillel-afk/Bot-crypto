@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-08.3-WU02",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-08",
+    "task_id": "ENG-08.3",
+    "manifest": "engineering/lots/ENG-08.json"
+  },
+  "title": "Qualify proof reuse on the real T1 selftest-entrypoint check",
+  "objective": "Qualify the WU01 effectiveness harness against the real reusable T1 SELFTEST_ENTRYPOINT_CHECK, bind every relevant active-AWU and T1 implementation input into exact proof material, add adversarial qualification, and execute the measurement in bootstrap without integrating a production proof cache.",
+  "non_goals": [
+    "integrate proof reuse into production T1 execution",
+    "skip the canonical single-pass T1 check",
+    "modify proof_reuse.py or proof_reuse_policy_v1.json",
+    "reuse T0 T3 or T4 evidence",
+    "persist reusable proofs across jobs or external storage",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-08.3-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Proof-reuse effectiveness harness",
+      "kind": "FILE",
+      "locator": "scripts/governance/measure_proof_reuse_effectiveness.py"
+    },
+    {
+      "name": "Certified exact-input proof engine",
+      "kind": "FILE",
+      "locator": "scripts/governance/proof_reuse.py"
+    },
+    {
+      "name": "Certified proof-reuse policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/proof_reuse_policy_v1.json"
+    },
+    {
+      "name": "Real T1 check implementation",
+      "kind": "FILE",
+      "locator": "scripts/governance/run_t1.py"
+    },
+    {
+      "name": "T1 symbolic-check policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/validation_t1_policy_v1.json"
+    },
+    {
+      "name": "Effectiveness measurement policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/proof_reuse_effectiveness_policy_v1.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Repository-bound effectiveness qualification",
+      "kind": "FILE",
+      "locator": "scripts/governance/measure_proof_reuse_effectiveness.py"
+    },
+    {
+      "name": "Proof-reuse effectiveness adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_proof_reuse_effectiveness.py"
+    },
+    {
+      "name": "Bootstrap proof-reuse effectiveness qualification",
+      "kind": "FILE",
+      "locator": ".github/workflows/engineering-bootstrap.yml"
+    },
+    {
+      "name": "Qualified proof-reuse effectiveness design",
+      "kind": "FILE",
+      "locator": "engineering/PROOF_REUSE_EFFECTIVENESS.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "114f0c8c2ad07bb9994d152c445ad84a16a4098b",
+    "allowed_paths": [
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-08.3-WU01.json",
+      "engineering/work_units/ENG-08.3-WU02.json",
+      "scripts/governance/measure_proof_reuse_effectiveness.py",
+      "scripts/governance/selftest_proof_reuse_effectiveness.py",
+      "engineering/PROOF_REUSE_EFFECTIVENESS.md",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      "scripts/governance/proof_reuse.py",
+      "config/governance/proof_reuse_policy_v1.json",
+      "scripts/governance/run_t1.py",
+      "config/governance/validation_t1_policy_v1.json"
+    ],
+    "forbidden_semantics": [
+      "production proof cache integration",
+      "canonical T1 execution suppression",
+      "proof reuse semantic weakening",
+      "T0 reuse",
+      "T3 reuse",
+      "T4 reuse",
+      "cross-job proof persistence",
+      "external proof storage",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "repository qualification executes the real run_t1 SELFTEST_ENTRYPOINT_CHECK as the measured executor",
+      "the qualification diff contains at least one changed scripts/governance/selftest_*.py file and the real check must report it as inspected",
+      "proof material binds canonical project state active AWU all changed selftest files T1 policy proof policy effectiveness policy and transitive T1/resolver implementation files",
+      "proof parameters bind active AWU id scope_base_sha changed selftest path set and symbolic check id",
+      "first repository request executes the real T1 check once and second identical request reuses the PASS proof without a second executor call",
+      "canonical single-pass validation still executes independently; qualification does not skip or replace mandatory T1 work",
+      "changed input policy implementation parameters or environment cannot reuse the prior proof",
+      "T0 T3 T4 and forbidden subjects remain non-reusable",
+      "bootstrap qualification uses no network paid service external cache or larger runner"
+    ],
+    "acceptance_criteria": [
+      "generic WU01 self-check passes in bootstrap",
+      "repository qualification inspects the WU02 selftest file with the real T1 check",
+      "repository qualification reports baseline_executions=2 actual_executions=1 avoided_executions=1",
+      "repository qualification reports one EXACT_INPUT_MATCH hit and candidate_hit_rate=1.0",
+      "repository qualification reports saved_elapsed_ms=null",
+      "at least 12 adversarial effectiveness probes cover input policy implementation parameter environment FAIL-proof and forbidden-tier invalidation",
+      "canonical incremental validation and unnecessary-check detector remain CLEAN",
+      "bootstrap and Security Secrets pass on the same exact head"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 9,
+      "executable_loc_changed": 700,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/measure_proof_reuse_effectiveness.py --self-check",
+      "python scripts/governance/measure_proof_reuse_effectiveness.py --repository-qualification",
+      "python scripts/governance/selftest_proof_reuse_effectiveness.py"
+    ]
+  },
+  "done_when": [
+    "generic and repository-bound proof-reuse measurements both pass",
+    "real T1 executor calls are reduced from baseline two to measured one only inside the isolated qualification",
+    "all exact-input invalidation scenarios remain fail-closed",
+    "canonical validation remains CLEAN and unchanged",
+    "ENG-08.3 can transition to mandatory-cost qualification"
+  ]
+}
