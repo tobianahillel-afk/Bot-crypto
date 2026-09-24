@@ -30,7 +30,7 @@
   "next_action": "Implement the historical audit manifest schema, lifecycle policy, pure validator and adversarial tests; do not execute audits, record findings, remediate code, or mutate historical evidence. CI integration is a separate WU.",
   "next_engineering": {
     "active_lot": "ENG-07",
-    "active_task": "ENG-07.1",
+    "active_task": "ENG-07.2",
     "active_manifest": "engineering/lots/ENG-07.json"
   },
   "recent_completed": [
@@ -62,7 +62,7 @@
   "state_snapshot": {
     "active_lot": "ENG-07",
     "active_manifest": "engineering/lots/ENG-07.json",
-    "active_task": "ENG-07.1",
+    "active_task": "ENG-07.2",
     "business_development": "PAUSED",
     "engineering_phase": "BUILDING",
     "execution_allowed": false,
