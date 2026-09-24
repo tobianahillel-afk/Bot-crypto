@@ -1,14 +1,7 @@
 {
-  "active_work": {
-    "awu_id": "ENG-06.4-WU02",
-    "awu_path": "engineering/work_units/ENG-06.4-WU02.json",
-    "complexity_score": 8,
-    "lot": "ENG-06",
-    "manifest": "engineering/lots/ENG-06.json",
-    "risk_class": "R2",
-    "task": "ENG-06.4",
-    "track": "ENGINEERING"
-  },
+  "schema_version": 1,
+  "map_kind": "active_agent_context_map_v1",
+  "project": "Crypto Quant Bot V3.1-Ops",
   "authority": {
     "current_state": "config/governance/project_state.json",
     "resume_hint": "engineering/handoff/CURRENT.json",
@@ -19,72 +12,79 @@
     "config/governance/project_state.json",
     "engineering/CONTEXT_MAP.json"
   ],
-  "business_hold": {
-    "candidate_lot": 45,
-    "candidate_status": "SUSPENDED_CANDIDATE",
-    "development_status": "PAUSED",
-    "next_lot": {
-      "lot": 46,
-      "status": "LOCKED"
-    }
+  "active_work": {
+    "track": "ENGINEERING",
+    "lot": "ENG-06",
+    "task": "ENG-06.5",
+    "manifest": "engineering/lots/ENG-06.json",
+    "awu_id": "ENG-06.5-WU01",
+    "awu_path": "engineering/work_units/ENG-06.5-WU01.json",
+    "risk_class": "R2",
+    "complexity_score": 7
   },
   "execution_context": {
+    "primary_files": [
+      "AGENTS.md",
+      "config/governance/project_state.json",
+      "engineering/lots/ENG-06.json",
+      "engineering/work_units/ENG-06.5-WU01.json",
+      "config/governance/certification_candidate_lifecycle_v1.json",
+      "config/governance/certification_exact_head_binding_v1.json",
+      "config/governance/certification_deep_assurance_v1.json",
+      "config/governance/certification_provenance_v1.json",
+      "config/governance/certification_attestation_transport_v1.json",
+      "engineering/handoff/CURRENT.json"
+    ],
+    "reference_files": [
+      "engineering/MASTER_PLAN.md",
+      "engineering/AGENT_PROTOCOL.md"
+    ],
+    "primary_count": 10,
+    "reference_count": 2,
+    "total_kib_ceil": 53,
     "budget": {
       "max_primary_files": 12,
       "max_reference_files": 16,
       "max_total_kib": 1024
     },
-    "implicit_expansion": "FORBIDDEN",
-    "primary_count": 10,
-    "primary_files": [
-      "AGENTS.md",
-      "config/governance/project_state.json",
-      "engineering/lots/ENG-06.json",
-      "engineering/work_units/ENG-06.4-WU02.json",
-      "config/governance/certification_provenance_v1.json",
-      "scripts/governance/validate_certification_provenance.py",
-      "config/governance/action_pin_registry_v1.json",
-      "config/governance/workflow_permission_policy_v1.json",
-      "config/governance/action_supply_chain_policy_v1.json",
-      "engineering/handoff/CURRENT.json"
-    ],
-    "reference_count": 2,
-    "reference_files": [
-      "engineering/MASTER_PLAN.md",
-      "engineering/AGENT_PROTOCOL.md"
-    ],
-    "total_kib_ceil": 67
+    "implicit_expansion": "FORBIDDEN"
   },
-  "instructions": [
-    "verify external Git reality before writing",
-    "continue only the active AWU",
-    "do not recursively load the repository at startup",
-    "load additional files only when the active AWU or validated dependency requires them"
-  ],
-  "map_kind": "active_agent_context_map_v1",
-  "non_authoritative_sources": [
-    "engineering/STATE.json",
-    "chat_history",
-    "model_memory"
-  ],
-  "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "ENG-06.4 WU02: qualify native GitHub attestation transport without redefining provenance or executing business/T4 certification.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Register the exact actions/attest v4.2.2 commit and only the two required write scopes, then issue one engineering-only exact-head attestation probe over the canonical WU01 provenance envelope."
+    "current_objective": "ENG-06.5 WU01: define pure fail-closed certification promotion rules without promoting any business candidate.",
+    "next_action": "Implement certification_promotion_v1 policy plus validator/selftests that require CERTIFICATION_READY, exact-head PASS evidence, satisfied selected assurance, canonical provenance, matching native attestation and explicit PASS verdict; do not mutate Lot45 or unlock Lot46."
+  },
+  "business_hold": {
+    "development_status": "PAUSED",
+    "candidate_lot": 45,
+    "candidate_status": "SUSPENDED_CANDIDATE",
+    "next_lot": {
+      "lot": 46,
+      "status": "LOCKED"
+    }
   },
   "safety": {
-    "execution_allowed": false,
-    "live_execution": "DISABLED",
     "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
-    "trade_allowed": false
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED"
   },
-  "schema_version": 1,
   "stop_conditions": [
     "STATE_DRIFT",
     "BUSINESS_SCOPE_TOUCHED_WITHOUT_UNLOCK",
     "FROZEN_EVIDENCE_MUTATION",
     "LOT46_UNLOCK_ATTEMPT",
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
+  ],
+  "non_authoritative_sources": [
+    "engineering/STATE.json",
+    "chat_history",
+    "model_memory"
+  ],
+  "instructions": [
+    "verify external Git reality before writing",
+    "continue only the active AWU",
+    "do not recursively load the repository at startup",
+    "load additional files only when the active AWU or validated dependency requires them"
   ]
 }
