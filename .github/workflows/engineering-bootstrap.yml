@@ -213,6 +213,7 @@ jobs:
       - name: Run historical audit batching adversarial self-tests
         run: python scripts/governance/selftest_historical_audit_batching.py
 
+      # ENG-07.2 WU02 exact-head qualification boundary: validation only, no audit execution.
       - name: Validate historical audit manifest lifecycle
         run: python scripts/governance/validate_historical_audit_manifest.py --self-check
 
