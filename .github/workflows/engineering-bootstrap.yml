@@ -213,6 +213,12 @@ jobs:
       - name: Run historical audit batching adversarial self-tests
         run: python scripts/governance/selftest_historical_audit_batching.py
 
+      - name: Validate historical audit manifest lifecycle
+        run: python scripts/governance/validate_historical_audit_manifest.py --self-check
+
+      - name: Run historical audit manifest adversarial self-tests
+        run: python scripts/governance/selftest_historical_audit_manifest.py
+
       - name: Run incremental validation adversarial self-tests
         run: python scripts/governance/selftest_incremental_validation.py
 
