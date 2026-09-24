@@ -163,14 +163,21 @@ def validate_canonical_protection(policy: dict[str, Any]) -> dict[str, Any]:
     return canonical_policy
 
 
+def validate_permission_object(
+    value: dict[str, Any],
+    expected: dict[str, bool],
+    label: str,
+) -> None:
+    if value.get("mutation_permissions") != expected:
+        raise HistoricalAuditEvidenceProtectionError(
+            f"audit policy gained mutation authority: {label}"
+        )
+
+
 def validate_mutation_permissions(policy: dict[str, Any]) -> None:
     expected = policy["required_mutation_permissions"]
     for path_text in policy["audit_policy_bindings"]:
-        value = _load(ROOT / path_text)
-        if value.get("mutation_permissions") != expected:
-            raise HistoricalAuditEvidenceProtectionError(
-                f"audit policy gained mutation authority: {path_text}"
-            )
+        validate_permission_object(_load(ROOT / path_text), expected, path_text)
 
 
 def _import_roots(tree: ast.AST) -> set[str]:
@@ -193,38 +200,51 @@ def _call_name(node: ast.Call) -> tuple[str | None, str | None]:
     return None, None
 
 
-def validate_no_write_validators(policy: dict[str, Any]) -> None:
-    forbidden_imports = set(policy["forbidden_import_roots"])
+def validate_source_text_no_write(
+    path_text: str,
+    source: str,
+    policy: dict[str, Any],
+) -> None:
+    try:
+        tree = ast.parse(source, filename=path_text)
+    except SyntaxError as exc:
+        raise HistoricalAuditEvidenceProtectionError(
+            f"cannot statically inspect audit validator {path_text}: {exc}"
+        ) from exc
+
+    bad_imports = sorted(
+        _import_roots(tree) & set(policy["forbidden_import_roots"])
+    )
+    if bad_imports:
+        raise HistoricalAuditEvidenceProtectionError(
+            f"audit validator imports mutation-capable client: "
+            f"{path_text}: {bad_imports}"
+        )
+
     forbidden_names = set(policy["forbidden_call_names"])
     forbidden_attrs = set(policy["forbidden_call_attributes"])
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        name, attr = _call_name(node)
+        if name in forbidden_names or attr in forbidden_attrs:
+            call = name if name is not None else attr
+            raise HistoricalAuditEvidenceProtectionError(
+                f"audit validator contains forbidden write primitive: "
+                f"{path_text}:{getattr(node, 'lineno', '?')}:{call}"
+            )
 
+
+def validate_no_write_validators(policy: dict[str, Any]) -> None:
     for path_text in policy["audit_validator_paths"]:
         path = ROOT / path_text
         try:
             source = path.read_text(encoding="utf-8")
-            tree = ast.parse(source, filename=path_text)
-        except (OSError, SyntaxError) as exc:
+        except OSError as exc:
             raise HistoricalAuditEvidenceProtectionError(
-                f"cannot statically inspect audit validator {path_text}: {exc}"
+                f"cannot read audit validator {path_text}: {exc}"
             ) from exc
-
-        bad_imports = sorted(_import_roots(tree) & forbidden_imports)
-        if bad_imports:
-            raise HistoricalAuditEvidenceProtectionError(
-                f"audit validator imports mutation-capable client: "
-                f"{path_text}: {bad_imports}"
-            )
-
-        for node in ast.walk(tree):
-            if not isinstance(node, ast.Call):
-                continue
-            name, attr = _call_name(node)
-            if name in forbidden_names or attr in forbidden_attrs:
-                call = name if name is not None else attr
-                raise HistoricalAuditEvidenceProtectionError(
-                    f"audit validator contains forbidden write primitive: "
-                    f"{path_text}:{getattr(node, 'lineno', '?')}:{call}"
-                )
+        validate_source_text_no_write(path_text, source, policy)
 
 
 def _pattern_hits_forbidden(path_pattern: str, prefixes: list[str]) -> bool:
@@ -237,6 +257,29 @@ def _pattern_hits_forbidden(path_pattern: str, prefixes: list[str]) -> bool:
         "contracts/example.json",
     ]
     return any(fnmatch.fnmatchcase(probe, path_pattern) for probe in probe_paths)
+
+
+def validate_allowed_paths(
+    awu_name: str,
+    allowed: list[Any],
+    protected: set[str],
+    prefixes: list[str],
+) -> None:
+    for candidate in allowed:
+        if not isinstance(candidate, str):
+            raise HistoricalAuditEvidenceProtectionError(
+                f"ENG-07 AWU contains non-string allowed path: {awu_name}"
+            )
+        if candidate in protected:
+            raise HistoricalAuditEvidenceProtectionError(
+                f"ENG-07 AWU can edit protected historical evidence: "
+                f"{awu_name}:{candidate}"
+            )
+        if _pattern_hits_forbidden(candidate, prefixes):
+            raise HistoricalAuditEvidenceProtectionError(
+                f"ENG-07 AWU scope reaches historical/business prefix: "
+                f"{awu_name}:{candidate}"
+            )
 
 
 def validate_eng07_scopes(
@@ -275,21 +318,20 @@ def validate_eng07_scopes(
             raise HistoricalAuditEvidenceProtectionError(
                 f"ENG-07 AWU missing allowed_paths: {path.name}"
             )
-        for candidate in allowed:
-            if not isinstance(candidate, str):
-                raise HistoricalAuditEvidenceProtectionError(
-                    f"ENG-07 AWU contains non-string allowed path: {path.name}"
-                )
-            if candidate in protected:
-                raise HistoricalAuditEvidenceProtectionError(
-                    f"ENG-07 AWU can edit protected historical evidence: "
-                    f"{path.name}:{candidate}"
-                )
-            if _pattern_hits_forbidden(candidate, prefixes):
-                raise HistoricalAuditEvidenceProtectionError(
-                    f"ENG-07 AWU scope reaches historical/business prefix: "
-                    f"{path.name}:{candidate}"
-                )
+        validate_allowed_paths(path.name, allowed, protected, prefixes)
+
+
+def validate_queue_properties(
+    properties: dict[str, Any],
+    policy: dict[str, Any],
+) -> None:
+    normalized = {str(key).lower() for key in properties}
+    forbidden = {field.lower() for field in policy["forbidden_queue_fields"]}
+    overlap = sorted(normalized & forbidden)
+    if overlap:
+        raise HistoricalAuditEvidenceProtectionError(
+            f"remediation queue gained write-authority fields: {overlap}"
+        )
 
 
 def validate_queue_has_no_write_authority(policy: dict[str, Any]) -> None:
@@ -304,13 +346,7 @@ def validate_queue_has_no_write_authority(policy: dict[str, Any]) -> None:
         raise HistoricalAuditEvidenceProtectionError(
             "report remediation queue properties invalid"
         )
-    normalized = {str(key).lower() for key in properties}
-    forbidden = {field.lower() for field in policy["forbidden_queue_fields"]}
-    overlap = sorted(normalized & forbidden)
-    if overlap:
-        raise HistoricalAuditEvidenceProtectionError(
-            f"remediation queue gained write-authority fields: {overlap}"
-        )
+    validate_queue_properties(properties, policy)
 
 
 def validate_repository(policy: dict[str, Any]) -> None:
