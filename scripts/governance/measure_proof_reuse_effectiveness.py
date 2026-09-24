@@ -362,24 +362,173 @@ def _self_check() -> dict[str, Any]:
     return summary
 
 
+
+def repository_qualification() -> dict[str, Any]:
+    effectiveness_policy = _json(POLICY_PATH)
+    validate_policy(effectiveness_policy)
+    engine = _module("proof_reuse_repository_engine", PROOF_ENGINE_PATH)
+    proof_policy = _json(PROOF_POLICY_PATH)
+    engine.validate_policy(proof_policy)
+
+    active = _module(
+        "proof_reuse_repository_active",
+        ROOT / "scripts" / "governance" / "resolve_active_awu.py",
+    )
+    t0 = _module(
+        "proof_reuse_repository_t0",
+        ROOT / "scripts" / "governance" / "run_t0.py",
+    )
+    t1 = _module(
+        "proof_reuse_repository_t1",
+        ROOT / "scripts" / "governance" / "run_t1.py",
+    )
+    try:
+        awu_path, awu, _evidence = active.resolve_active_awu()
+    except active.ActiveAwuError as exc:
+        raise ProofReuseEffectivenessError(str(exc)) from exc
+
+    if awu.get("id") != "ENG-08.3-WU02":
+        raise ProofReuseEffectivenessError(
+            f"repository qualification requires ENG-08.3-WU02, got {awu.get('id')!r}"
+        )
+    base = awu.get("scope", {}).get("scope_base_sha")
+    if not isinstance(base, str) or len(base) != 40:
+        raise ProofReuseEffectivenessError("active AWU scope base is invalid")
+
+    changes = t0.changed_files(base)
+    changed_selftests = sorted(
+        change.path
+        for change in changes
+        if not change.status.startswith("D")
+        and change.path.startswith("scripts/governance/selftest_")
+        and change.path.endswith(".py")
+    )
+    expected_selftest = "scripts/governance/selftest_proof_reuse_effectiveness.py"
+    if expected_selftest not in changed_selftests:
+        raise ProofReuseEffectivenessError(
+            "repository qualification requires the WU02 effectiveness selftest in the active diff"
+        )
+
+    awu_rel = awu_path.relative_to(ROOT).as_posix()
+    input_paths = [
+        "config/governance/project_state.json",
+        awu_rel,
+        *changed_selftests,
+    ]
+    policy_paths = [
+        "config/governance/validation_t1_policy_v1.json",
+        "config/governance/proof_reuse_policy_v1.json",
+        "config/governance/proof_reuse_effectiveness_policy_v1.json",
+        "config/governance/awu_complexity_policy_v1.json",
+        "config/governance/awu_split_policy_v1.json",
+        "config/governance/awu_risk_policy_v1.json",
+        "config/governance/awu_context_policy_v1.json",
+    ]
+    implementation_paths = [
+        "scripts/governance/run_t1.py",
+        "scripts/governance/run_t0.py",
+        "scripts/governance/resolve_active_awu.py",
+        "scripts/governance/validate_agent_work_unit.py",
+        "scripts/governance/validate_awu_complexity.py",
+        "scripts/governance/validate_awu_split.py",
+        "scripts/governance/validate_awu_risk.py",
+        "scripts/governance/validate_awu_context.py",
+    ]
+    parameters = {
+        "check_id": "SELFTEST_ENTRYPOINT_CHECK",
+        "active_awu_id": awu["id"],
+        "scope_base_sha": base,
+        "changed_selftest_paths": changed_selftests,
+    }
+    material = engine.build_material(
+        tier="T1",
+        subject_id="SELFTEST_ENTRYPOINT_CHECK",
+        input_paths=input_paths,
+        policy_paths=policy_paths,
+        implementation_paths=implementation_paths,
+        parameters=parameters,
+        environment=engine.current_environment(),
+        policy=proof_policy,
+        root=ROOT,
+    )
+
+    executor_details: list[dict[str, Any]] = []
+
+    def executor() -> str:
+        try:
+            detail = t1.CHECKS["SELFTEST_ENTRYPOINT_CHECK"](base)
+        except t1.T1Error as exc:
+            raise ProofReuseEffectivenessError(
+                f"real SELFTEST_ENTRYPOINT_CHECK failed: {exc}"
+            ) from exc
+        inspected = sorted(detail.get("inspected", []))
+        if inspected != changed_selftests:
+            raise ProofReuseEffectivenessError(
+                f"real T1 inspected-set drift: {inspected} != {changed_selftests}"
+            )
+        executor_details.append(detail)
+        return "PASS"
+
+    measured = measure_exact_pair(
+        engine=engine,
+        proof_policy=proof_policy,
+        material=material,
+        executor=executor,
+        effectiveness_policy=effectiveness_policy,
+    )
+    if len(executor_details) != 1:
+        raise ProofReuseEffectivenessError(
+            f"real T1 executor was called {len(executor_details)} times, expected exactly 1"
+        )
+    if expected_selftest not in executor_details[0].get("inspected", []):
+        raise ProofReuseEffectivenessError("real T1 did not inspect the WU02 effectiveness selftest")
+    if measured["events"][1]["reuse_reason"] != "EXACT_INPUT_MATCH":
+        raise ProofReuseEffectivenessError("second real-subject request was not an exact-input hit")
+
+    return {
+        "qualification_version": 1,
+        "qualification_kind": "REAL_T1_SELFTEST_ENTRYPOINT_CHECK",
+        "active_awu": awu["id"],
+        "scope_base_sha": base,
+        "changed_selftest_paths": changed_selftests,
+        "executor_inspected_paths": sorted(executor_details[0]["inspected"]),
+        "proof_key": engine.proof_key(material),
+        "binding_counts": {
+            "inputs": len(input_paths),
+            "policies": len(policy_paths),
+            "implementations": len(implementation_paths),
+        },
+        "measurement": measured,
+        "production_cache_integrated": False,
+        "canonical_t1_suppressed": False,
+        "network_used": False,
+        "external_storage_used": False,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--self-check", action="store_true")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--self-check", action="store_true")
+    group.add_argument("--repository-qualification", action="store_true")
     args = parser.parse_args()
     try:
-        if not args.self_check:
-            raise ProofReuseEffectivenessError(
-                "WU01 exposes measurement primitives only; use --self-check"
+        if args.self_check:
+            summary = _self_check()
+            print(
+                "PROOF_REUSE_EFFECTIVENESS_SELF_CHECK_PASS "
+                f"probes={summary['probes']} "
+                + json.dumps(summary["exact_match"], sort_keys=True, separators=(",", ":"))
             )
-        summary = _self_check()
+        else:
+            qualification = repository_qualification()
+            print(
+                "PROOF_REUSE_REPOSITORY_QUALIFICATION_PASS "
+                + json.dumps(qualification, sort_keys=True, separators=(",", ":"))
+            )
     except (ProofReuseEffectivenessError, OSError, KeyError, AssertionError) as exc:
         print(f"PROOF_REUSE_EFFECTIVENESS_INVALID: {exc}", file=sys.stderr)
         return 1
-    print(
-        "PROOF_REUSE_EFFECTIVENESS_SELF_CHECK_PASS "
-        f"probes={summary['probes']} "
-        + json.dumps(summary["exact_match"], sort_keys=True, separators=(",", ":"))
-    )
     return 0
 
 
