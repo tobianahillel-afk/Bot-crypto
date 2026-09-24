@@ -58,12 +58,12 @@
     {
       "description": "Implement provenance and attestation semantics without replacing domain integrity hashes.",
       "id": "ENG-06.4",
-      "status": "IN_PROGRESS"
+      "status": "DONE"
     },
     {
       "description": "Define fail-closed promotion rules from candidate to certified state.",
       "id": "ENG-06.5",
-      "status": "PLANNED"
+      "status": "IN_PROGRESS"
     },
     {
       "description": "Verify post-merge state without redundant full reruns when exact reusable evidence remains valid.",
