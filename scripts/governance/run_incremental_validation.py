@@ -74,6 +74,7 @@ def run_chain(
     t2_func:Callable[[dict[str,Any]],dict[str,Any]],
     selector_func:Callable[[dict[str,Any]],dict[str,Any]],
     policy:dict[str,Any],
+    require_trace_metadata:bool=False,
 )->dict[str,Any]:
     validate_policy(policy)
     started=time.perf_counter()
@@ -129,22 +130,25 @@ def run_chain(
             f"routine incremental chain exceeded {policy['routine_max_elapsed_ms']} ms: {elapsed}"
         )
 
-    impact = t0.get("impact")
-    if not isinstance(impact, dict):
-        raise IncrementalValidationError("T0 impact metadata missing from single-pass result")
-    impact_families = impact.get("impact_families")
-    if not isinstance(impact_families, list) or not impact_families:
-        raise IncrementalValidationError("T0 impact families missing from single-pass result")
-    risk_class = selector.get("risk_class")
-    if not isinstance(risk_class, str) or not risk_class:
-        raise IncrementalValidationError("selector risk class missing from single-pass result")
+    trace_metadata:dict[str,Any]={}
+    impact=t0.get("impact")
+    risk_class=selector.get("risk_class")
+    if isinstance(impact,dict):
+        impact_families=impact.get("impact_families")
+        if isinstance(impact_families,list) and impact_families:
+            trace_metadata["trace_version"]=1
+            trace_metadata["impact_families"]=sorted(set(impact_families))
+    if isinstance(risk_class,str) and risk_class:
+        trace_metadata["risk_class"]=risk_class
+    if require_trace_metadata and set(trace_metadata)!={"trace_version","impact_families","risk_class"}:
+        raise IncrementalValidationError(
+            "production single-pass result lacks required impact/risk trace metadata"
+        )
 
     return {
         "incremental_validation_version":1,
-        "trace_version":1,
+        **trace_metadata,
         "active_awu":selector.get("active_awu") or t2.get("active_awu"),
-        "impact_families":sorted(set(impact_families)),
-        "risk_class":risk_class,
         "stage_invocations":calls,
         "nested_baseline_invocations":policy["nested_baseline_invocations"],
         "avoided_stage_invocations":avoided,
@@ -185,6 +189,7 @@ def repository_run()->dict[str,Any]:
             t2_func=t2.repository_run,
             selector_func=selector.repository_run,
             policy=policy,
+            require_trace_metadata=True,
         )
     except (t0.T0Error,t1.T1Error,t2.T2Error,selector.T3T4SelectionError) as exc:
         raise IncrementalValidationError(str(exc)) from exc
