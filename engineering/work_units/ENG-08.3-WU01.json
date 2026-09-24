@@ -65,7 +65,10 @@
       "engineering/work_units/ENG-08.3-WU01.json",
       "config/governance/proof_reuse_effectiveness_policy_v1.json",
       "scripts/governance/measure_proof_reuse_effectiveness.py",
-      "engineering/PROOF_REUSE_EFFECTIVENESS.md"
+      "engineering/PROOF_REUSE_EFFECTIVENESS.md",
+      "AGENTS.md",
+      "README.md",
+      "engineering/CURRENT_STATUS.md"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
