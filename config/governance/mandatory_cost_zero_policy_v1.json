@@ -90,5 +90,20 @@
     "all project capability and ENG-04 governance cost-policy values are boolean false",
     "WU01 never infers GitHub-hosted runner cost from static repository files",
     "WU01 performs no billing API query and requires no network access"
-  ]
+  ],
+  "qualification": {
+    "active_awu_id": "ENG-08.4-WU02",
+    "evidence_path": "engineering/MANDATORY_COST_ZERO_EVIDENCE.json",
+    "qualifier": "scripts/governance/qualify_mandatory_cost_zero.py",
+    "adversarial_selftest": "scripts/governance/selftest_mandatory_cost_zero.py",
+    "required_repository": {
+      "id": "1322269966",
+      "full_name": "tobianahillel-afk/Bot-crypto",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main"
+    },
+    "expected_final_verdict": "PASS_MANDATORY_PATH_ZERO_PAID_REQUIREMENT",
+    "claim_scope": "MANDATORY_PAID_REQUIREMENT_ONLY_NOT_ACCOUNT_WIDE_BILLING"
+  }
 }

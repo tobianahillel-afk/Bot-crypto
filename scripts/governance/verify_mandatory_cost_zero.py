@@ -4,10 +4,12 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import re
 import sys
 from pathlib import Path
+from types import ModuleType
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -32,6 +34,26 @@ def _json(path: Path) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise MandatoryCostError(f"{path} must contain an object")
     return value
+
+
+def _module(name: str, path: Path) -> ModuleType:
+    spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None or spec.loader is None:
+        raise MandatoryCostError(f"cannot import {path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def _active_awu_id() -> str | None:
+    path = ROOT / "engineering" / "CONTEXT_MAP.json"
+    try:
+        value = _json(path)
+    except MandatoryCostError:
+        return None
+    active = value.get("active_work")
+    return active.get("awu_id") if isinstance(active, dict) else None
 
 
 def _text(path: Path) -> str:
@@ -290,8 +312,27 @@ def main() -> int:
         print("MANDATORY_COST_INVALID: --static is required", file=sys.stderr)
         return 2
     try:
-        result = static_audit(_json(POLICY_PATH))
-    except (MandatoryCostError, KeyError, TypeError) as exc:
+        policy = _json(POLICY_PATH)
+        result = static_audit(policy)
+        qualification = policy.get("qualification")
+        if (
+            isinstance(qualification, dict)
+            and _active_awu_id() == qualification.get("active_awu_id")
+        ):
+            qualifier = _module(
+                "mandatory_cost_active_qualifier",
+                ROOT / qualification["qualifier"],
+            )
+            evidence = _json(ROOT / qualification["evidence_path"])
+            result["wu02_qualification"] = qualifier.qualify(result, evidence, policy)
+            adversarial = _module(
+                "mandatory_cost_active_selftest",
+                ROOT / qualification["adversarial_selftest"],
+            )
+            result["wu02_adversarial_probes"] = adversarial.run_selftests(
+                result, evidence, policy
+            )
+    except (MandatoryCostError, ValueError, KeyError, TypeError) as exc:
         print(f"MANDATORY_COST_INVALID: {exc}", file=sys.stderr)
         return 1
     print(json.dumps(result, sort_keys=True, separators=(",", ":")))
