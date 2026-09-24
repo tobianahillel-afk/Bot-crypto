@@ -1,12 +1,12 @@
 {
   "active_work": {
-    "awu_id": "ENG-06.1-WU01",
-    "awu_path": "engineering/work_units/ENG-06.1-WU01.json",
-    "complexity_score": 4,
+    "awu_id": "ENG-06.2-WU01",
+    "awu_path": "engineering/work_units/ENG-06.2-WU01.json",
+    "complexity_score": 5,
     "lot": "ENG-06",
     "manifest": "engineering/lots/ENG-06.json",
     "risk_class": "R2",
-    "task": "ENG-06.1",
+    "task": "ENG-06.2",
     "track": "ENGINEERING"
   },
   "authority": {
@@ -35,14 +35,15 @@
       "max_total_kib": 1024
     },
     "implicit_expansion": "FORBIDDEN",
-    "primary_count": 8,
+    "primary_count": 9,
     "primary_files": [
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-06.json",
-      "engineering/work_units/ENG-06.1-WU01.json",
-      "config/governance/project_state_transitions_v1.json",
+      "engineering/work_units/ENG-06.2-WU01.json",
+      "config/governance/certification_candidate_lifecycle_v1.json",
       "engineering/AGENT_CAPABILITIES.json",
+      "config/governance/proof_reuse_policy_v1.json",
       "config/governance/validation_t3_t4_policy_v1.json",
       "engineering/handoff/CURRENT.json"
     ],
@@ -51,7 +52,7 @@
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 46
+    "total_kib_ceil": 51
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -67,9 +68,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "ENG-06.1: define the deterministic fail-closed lifecycle for engineering certification candidates.",
+    "current_objective": "ENG-06.2: bind certification evidence to one exact candidate head and immutable declared-input identity.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Implement the certification candidate lifecycle policy, validator and adversarial tests, wire them into engineering bootstrap, then inspect exact-head CI evidence."
+    "next_action": "Implement the exact-head binding policy, local-Git input identity, exact-run evidence validator and adversarial tests; do not execute T3/T4 or issue attestations."
   },
   "safety": {
     "execution_allowed": false,

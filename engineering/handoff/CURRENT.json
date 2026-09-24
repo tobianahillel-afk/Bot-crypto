@@ -1,160 +1,55 @@
 {
-  "schema_version": 2,
-  "kind": "engineering_handoff",
-  "workstream": "DEVELOPMENT_ENGINE",
-  "status": "IN_PROGRESS",
-  "authority": {
-    "state_source": "config/governance/project_state.json",
-    "context_map": "engineering/CONTEXT_MAP.json",
-    "handoff_role": "RESUME_HINT_NOT_AUTHORITY"
+  "active_checkpoint": {
+    "awu_id": "ENG-06.2-WU01",
+    "awu_path": "engineering/work_units/ENG-06.2-WU01.json",
+    "complexity_score": 5,
+    "parent_manifest": "engineering/lots/ENG-06.json",
+    "risk_class": "R2",
+    "scope_base_sha": "220ec5c15c3a14fb73c0d83f75455e1247a36566",
+    "track": "ENGINEERING"
   },
+  "authority": {
+    "context_map": "engineering/CONTEXT_MAP.json",
+    "handoff_role": "RESUME_HINT_NOT_AUTHORITY",
+    "state_source": "config/governance/project_state.json"
+  },
+  "blockers": [],
+  "current_objective": "ENG-06.2: bind certification evidence to one exact candidate head and immutable declared-input identity.",
+  "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
-    "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
-    "main_branch_protected": false,
-    "rulesets_count": 0,
-    "lot45_pr": 66,
     "lot45_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "lot45_merged": false,
+    "lot45_pr": 66,
     "lot45_state": "open",
-    "lot45_merged": false
+    "main_branch_protected": false,
+    "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "rulesets_count": 0
   },
-  "engineering_branch": "engineering/bootstrap-development-engine",
-  "state_snapshot": {
-    "engineering_phase": "BUILDING",
+  "kind": "engineering_handoff",
+  "next_action": "Implement the exact-head binding policy, local-Git input identity, exact-run evidence validator and adversarial tests; do not execute T3/T4 or issue attestations.",
+  "next_engineering": {
     "active_lot": "ENG-06",
-    "active_task": "ENG-06.1",
     "active_manifest": "engineering/lots/ENG-06.json",
-    "business_development": "PAUSED",
-    "lot46_status": "LOCKED",
-    "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
-    "trade_allowed": false,
-    "execution_allowed": false,
-    "live_execution": "DISABLED",
-    "open_findings": [
-      "BOOT-FINDING-001"
-    ]
+    "active_task": "ENG-06.2"
   },
-  "active_checkpoint": {
-    "track": "ENGINEERING",
-    "awu_id": "ENG-06.1-WU01",
-    "awu_path": "engineering/work_units/ENG-06.1-WU01.json",
-    "parent_manifest": "engineering/lots/ENG-06.json",
-    "scope_base_sha": "c1f6d4e37ae66ba23621c3ccc84fef76013bcd0b",
-    "risk_class": "R2",
-    "complexity_score": 4
-  },
-  "resume_read_order": [
-    "AGENTS.md",
-    "config/governance/project_state.json",
-    "engineering/CONTEXT_MAP.json",
-    "engineering/handoff/CURRENT.json"
-  ],
   "recent_completed": [
-    "ENG-05.3 bounded Context Map completed on exact head 1c292cacae3f38b8025eaf1b0d5b215d2458b741.",
     "ENG-05.4 WU01 Handoff V2 validator and 12 adversarial probes passed on head b98ba29f2428f175dd186dc4a170d8f57a7b06cd; legacy bootstrap compatibility repair isolated to WU02.",
     "ENG-05.4 WU02 permanent-handoff bootstrap compatibility completed on exact head a9d712cc0f455a70ed9c39f35791e64cec1f58e7; run 35920389779 passed negative validators, context-map checks and full cold-start qualification.",
     "ENG-05.5 resume/recovery completed on exact head 48b32eb43f778d2da364725974e1805bd2660837; run 35930055502 passed recovery qualification, 9 adversarial probes and cold-start qualification.",
     "ENG-05.6 WU01 recovery harness genericity repair completed on exact head 4b1d5e417eb64461781b77de32e3d59ab423c761; run 35930906226 passed resume/recovery, adversarial recovery and cold-start.",
     "ENG-05.6 WU02 documentation tooling evaluation completed on exact head 1f40aee0580e75b3f5404bb27be6a654c37dedc3; bootstrap 35931507203 plus Security Actions, Supply Chain and Secrets all passed. Verdicts: DocGuard COPY_PATTERN; Vale and lychee ADOPT_PARTIALLY pending benchmark.",
     "ENG-05.6 WU04 Vale v3.22.0 offline benchmark completed on exact head c6ae1454fb959009efea9d054d6db836fcd00153; benchmark 35971826612, bootstrap 35971826361 and Security Secrets 35971826327 all passed. Vale lint time 34.631 ms with 1 expected synthetic finding and 0 findings across 4 representative docs.",
-    "ENG-05.6 WU05 lychee v0.24.2 offline benchmark completed on exact head 8edbe4cd4a9f03974356f17753101668f07d314a; benchmark 35972886401, bootstrap 35972886436 and Security Secrets 35972886267 passed. lychee checked 67 representative local links with 0 errors in 41.777 ms total benchmark time."
+    "ENG-05.6 WU05 lychee v0.24.2 offline benchmark completed on exact head 8edbe4cd4a9f03974356f17753101668f07d314a; benchmark 35972886401, bootstrap 35972886436 and Security Secrets 35972886267 passed. lychee checked 67 representative local links with 0 errors in 41.777 ms total benchmark time.",
+    "ENG-06.1 certification-candidate lifecycle completed on exact head 220ec5c15c3a14fb73c0d83f75455e1247a36566; bootstrap run 35973940464 passed lifecycle validation, 12 adversarial probes, scope checks and cold-start qualification."
   ],
-  "current_objective": "ENG-06.1: define the deterministic fail-closed lifecycle for engineering certification candidates.",
-  "next_action": "Implement the certification candidate lifecycle policy, validator and adversarial tests, wire them into engineering bootstrap, then inspect exact-head CI evidence.",
-  "blockers": [],
-  "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35920389779",
-      "head_sha": "a9d712cc0f455a70ed9c39f35791e64cec1f58e7",
-      "scope": "ENG-05.4-WU02_BOOTSTRAP_COLD_START"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35930055502",
-      "head_sha": "48b32eb43f778d2da364725974e1805bd2660837",
-      "scope": "ENG-05.5_RESUME_RECOVERY_COLD_START"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35930906226",
-      "head_sha": "4b1d5e417eb64461781b77de32e3d59ab423c761",
-      "scope": "ENG-05.6-WU01_GENERIC_RECOVERY"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35931507203",
-      "head_sha": "1f40aee0580e75b3f5404bb27be6a654c37dedc3",
-      "scope": "ENG-05.6-WU02_TOOLING_EVALUATION"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35971826612",
-      "head_sha": "c6ae1454fb959009efea9d054d6db836fcd00153",
-      "scope": "ENG-05.6-WU04_VALE_BENCHMARK"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35971826361",
-      "head_sha": "c6ae1454fb959009efea9d054d6db836fcd00153",
-      "scope": "ENG-05.6-WU04_BOOTSTRAP"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35971826327",
-      "head_sha": "c6ae1454fb959009efea9d054d6db836fcd00153",
-      "scope": "ENG-05.6-WU04_SECURITY_SECRETS"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35972886401",
-      "head_sha": "8edbe4cd4a9f03974356f17753101668f07d314a",
-      "scope": "ENG-05.6-WU05_LYCHEE_BENCHMARK"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35972886436",
-      "head_sha": "8edbe4cd4a9f03974356f17753101668f07d314a",
-      "scope": "ENG-05.6-WU05_BOOTSTRAP"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35972886267",
-      "head_sha": "8edbe4cd4a9f03974356f17753101668f07d314a",
-      "scope": "ENG-05.6-WU05_SECURITY_SECRETS"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35973352316",
-      "head_sha": "c1f6d4e37ae66ba23621c3ccc84fef76013bcd0b",
-      "scope": "ENG-06_ACTIVATION_BOOTSTRAP"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35973352066",
-      "head_sha": "c1f6d4e37ae66ba23621c3ccc84fef76013bcd0b",
-      "scope": "ENG-06_ACTIVATION_SECURITY_SECRETS"
-    }
+  "resume_read_order": [
+    "AGENTS.md",
+    "config/governance/project_state.json",
+    "engineering/CONTEXT_MAP.json",
+    "engineering/handoff/CURRENT.json"
   ],
-  "stop_conditions": [
-    "STATE_DRIFT",
-    "BUSINESS_SCOPE_TOUCHED_WITHOUT_UNLOCK",
-    "FROZEN_EVIDENCE_MUTATION",
-    "LOT46_UNLOCK_ATTEMPT",
-    "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
-  ],
+  "schema_version": 2,
   "stale_when": [
     "STATE_ACTIVE_WORK_MISMATCH",
     "ACTIVE_AWU_MISMATCH",
@@ -164,9 +59,114 @@
     "SAFETY_SNAPSHOT_CHANGED",
     "STOP_CONDITIONS_CHANGED"
   ],
-  "next_engineering": {
+  "state_snapshot": {
     "active_lot": "ENG-06",
-    "active_task": "ENG-06.1",
-    "active_manifest": "engineering/lots/ENG-06.json"
-  }
+    "active_manifest": "engineering/lots/ENG-06.json",
+    "active_task": "ENG-06.2",
+    "business_development": "PAUSED",
+    "engineering_phase": "BUILDING",
+    "execution_allowed": false,
+    "live_execution": "DISABLED",
+    "lot46_status": "LOCKED",
+    "open_findings": [
+      "BOOT-FINDING-001"
+    ],
+    "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "trade_allowed": false
+  },
+  "status": "IN_PROGRESS",
+  "stop_conditions": [
+    "STATE_DRIFT",
+    "BUSINESS_SCOPE_TOUCHED_WITHOUT_UNLOCK",
+    "FROZEN_EVIDENCE_MUTATION",
+    "LOT46_UNLOCK_ATTEMPT",
+    "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
+  ],
+  "validation_evidence": [
+    {
+      "class": "GITHUB_ACTIONS",
+      "head_sha": "48b32eb43f778d2da364725974e1805bd2660837",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35930055502",
+      "scope": "ENG-05.5_RESUME_RECOVERY_COLD_START",
+      "status": "PASS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "head_sha": "4b1d5e417eb64461781b77de32e3d59ab423c761",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35930906226",
+      "scope": "ENG-05.6-WU01_GENERIC_RECOVERY",
+      "status": "PASS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "head_sha": "1f40aee0580e75b3f5404bb27be6a654c37dedc3",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35931507203",
+      "scope": "ENG-05.6-WU02_TOOLING_EVALUATION",
+      "status": "PASS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "head_sha": "c6ae1454fb959009efea9d054d6db836fcd00153",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35971826612",
+      "scope": "ENG-05.6-WU04_VALE_BENCHMARK",
+      "status": "PASS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "head_sha": "c6ae1454fb959009efea9d054d6db836fcd00153",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35971826361",
+      "scope": "ENG-05.6-WU04_BOOTSTRAP",
+      "status": "PASS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "head_sha": "c6ae1454fb959009efea9d054d6db836fcd00153",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35971826327",
+      "scope": "ENG-05.6-WU04_SECURITY_SECRETS",
+      "status": "PASS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "head_sha": "8edbe4cd4a9f03974356f17753101668f07d314a",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35972886401",
+      "scope": "ENG-05.6-WU05_LYCHEE_BENCHMARK",
+      "status": "PASS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "head_sha": "8edbe4cd4a9f03974356f17753101668f07d314a",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35972886436",
+      "scope": "ENG-05.6-WU05_BOOTSTRAP",
+      "status": "PASS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "head_sha": "8edbe4cd4a9f03974356f17753101668f07d314a",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35972886267",
+      "scope": "ENG-05.6-WU05_SECURITY_SECRETS",
+      "status": "PASS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "head_sha": "c1f6d4e37ae66ba23621c3ccc84fef76013bcd0b",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35973352316",
+      "scope": "ENG-06_ACTIVATION_BOOTSTRAP",
+      "status": "PASS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "head_sha": "c1f6d4e37ae66ba23621c3ccc84fef76013bcd0b",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35973352066",
+      "scope": "ENG-06_ACTIVATION_SECURITY_SECRETS",
+      "status": "PASS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "head_sha": "220ec5c15c3a14fb73c0d83f75455e1247a36566",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/35973940464",
+      "scope": "ENG-06.1_CANDIDATE_LIFECYCLE",
+      "status": "PASS"
+    }
+  ],
+  "workstream": "DEVELOPMENT_ENGINE"
 }

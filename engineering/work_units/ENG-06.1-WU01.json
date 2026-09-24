@@ -1,15 +1,57 @@
 {
-  "schema_version": 1,
-  "kind": "agent_work_unit",
-  "id": "ENG-06.1-WU01",
-  "status": "IN_PROGRESS",
-  "parent": {
-    "work_item_id": "ENG-06",
-    "task_id": "ENG-06.1",
-    "manifest": "engineering/lots/ENG-06.json"
+  "contracts": {
+    "acceptance_criteria": [
+      "valid forward lifecycle transition sequences pass",
+      "skipped certification prerequisites fail",
+      "CERTIFIED without exact-head evidence prerequisite fails",
+      "terminal-state resurrection fails",
+      "stale evidence invalidates readiness",
+      "withdrawal remains distinct from rejection",
+      "unknown states transitions or evidence classes fail closed",
+      "validator and adversarial selftests require no network or third-party dependency"
+    ],
+    "required_invariants": [
+      "candidate lifecycle states and allowed transitions are finite explicit and machine-readable",
+      "terminal certified rejected and withdrawn states cannot silently return to mutable validation states",
+      "certification readiness requires declared evidence prerequisites and cannot be inferred from status text alone",
+      "stale or mismatched evidence forces the candidate out of certification-ready state",
+      "withdrawal and rejection are distinct explicit outcomes",
+      "lifecycle policy does not unlock business development or runtime capability",
+      "all validation is deterministic standard-library and zero-cost"
+    ]
   },
-  "title": "Define certification candidate lifecycle",
-  "objective": "Define a deterministic fail-closed lifecycle for engineering certification candidates, including admissible transitions, terminal states, evidence prerequisites and stale/withdrawal behavior, without executing certification or touching business runtime code.",
+  "depends_on": [
+    "ENG-05.6-WU05"
+  ],
+  "done_when": [
+    "certification candidate states transitions prerequisites and terminal behavior are machine enforced",
+    "stale or missing evidence cannot remain certification-ready",
+    "lifecycle semantics are ready for ENG-06.2 exact-head binding without executing certification"
+  ],
+  "id": "ENG-06.1-WU01",
+  "inputs": [
+    {
+      "kind": "CONFIG",
+      "locator": "config/governance/project_state_transitions_v1.json",
+      "name": "Permanent state transition policy"
+    },
+    {
+      "kind": "CONFIG",
+      "locator": "engineering/AGENT_CAPABILITIES.json",
+      "name": "Agent execution evidence policy"
+    },
+    {
+      "kind": "CONFIG",
+      "locator": "config/governance/validation_t3_t4_policy_v1.json",
+      "name": "T3/T4 requirement policy"
+    },
+    {
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json",
+      "name": "Current handoff"
+    }
+  ],
+  "kind": "agent_work_unit",
   "non_goals": [
     "exact-head certification execution",
     "T3 scanner execution",
@@ -19,50 +61,67 @@
     "Lot46 unlock",
     "runtime capability activation"
   ],
-  "depends_on": [
-    "ENG-05.6-WU05"
-  ],
-  "inputs": [
-    {
-      "name": "Permanent state transition policy",
-      "kind": "CONFIG",
-      "locator": "config/governance/project_state_transitions_v1.json"
-    },
-    {
-      "name": "Agent execution evidence policy",
-      "kind": "CONFIG",
-      "locator": "engineering/AGENT_CAPABILITIES.json"
-    },
-    {
-      "name": "T3/T4 requirement policy",
-      "kind": "CONFIG",
-      "locator": "config/governance/validation_t3_t4_policy_v1.json"
-    },
-    {
-      "name": "Current handoff",
-      "kind": "STATE",
-      "locator": "engineering/handoff/CURRENT.json"
-    }
-  ],
+  "objective": "Define a deterministic fail-closed lifecycle for engineering certification candidates, including admissible transitions, terminal states, evidence prerequisites and stale/withdrawal behavior, without executing certification or touching business runtime code.",
   "outputs": [
     {
-      "name": "Certification candidate lifecycle policy",
       "kind": "CONFIG",
-      "locator": "config/governance/certification_candidate_lifecycle_v1.json"
+      "locator": "config/governance/certification_candidate_lifecycle_v1.json",
+      "name": "Certification candidate lifecycle policy"
     },
     {
-      "name": "Lifecycle validator",
       "kind": "FILE",
-      "locator": "scripts/governance/validate_certification_candidate_lifecycle.py"
+      "locator": "scripts/governance/validate_certification_candidate_lifecycle.py",
+      "name": "Lifecycle validator"
     },
     {
-      "name": "Lifecycle adversarial tests",
       "kind": "TEST",
-      "locator": "scripts/governance/selftest_certification_candidate_lifecycle.py"
+      "locator": "scripts/governance/selftest_certification_candidate_lifecycle.py",
+      "name": "Lifecycle adversarial tests"
     }
   ],
+  "parent": {
+    "manifest": "engineering/lots/ENG-06.json",
+    "task_id": "ENG-06.1",
+    "work_item_id": "ENG-06"
+  },
+  "planning": {
+    "complexity_factors": {
+      "ci_evidence_topology_change": true,
+      "contract_schema_families": 0,
+      "cross_domain_interfaces": 0,
+      "dependency_change": false,
+      "math_numeric_semantics": false,
+      "persistence_checksum_boundary": false,
+      "policy_config_families": 1,
+      "production_modules": 0,
+      "risk_execution_permission": false,
+      "security_trust_boundary": false,
+      "state_machine_or_concurrency": true,
+      "temporal_lineage_semantics": false
+    },
+    "complexity_score": 4,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "risk_class": "R2",
+    "size_estimate": {
+      "business_domains": 1,
+      "contract_families": 0,
+      "executable_loc_changed": 650,
+      "files_touched": 8,
+      "independent_algorithms": 1,
+      "new_dependencies": 0,
+      "new_public_behaviors": 1,
+      "state_machines": 1,
+      "trust_boundaries": 0
+    },
+    "split_reasons": [],
+    "split_required": false
+  },
+  "schema_version": 1,
   "scope": {
-    "scope_base_sha": "c1f6d4e37ae66ba23621c3ccc84fef76013bcd0b",
     "allowed_paths": [
       "engineering/handoff/CURRENT.json",
       "engineering/work_units/ENG-06.1-WU01.json",
@@ -88,65 +147,11 @@
       "Lot46 unlock",
       "runtime capability activation",
       "mandatory paid dependency"
-    ]
-  },
-  "contracts": {
-    "required_invariants": [
-      "candidate lifecycle states and allowed transitions are finite explicit and machine-readable",
-      "terminal certified rejected and withdrawn states cannot silently return to mutable validation states",
-      "certification readiness requires declared evidence prerequisites and cannot be inferred from status text alone",
-      "stale or mismatched evidence forces the candidate out of certification-ready state",
-      "withdrawal and rejection are distinct explicit outcomes",
-      "lifecycle policy does not unlock business development or runtime capability",
-      "all validation is deterministic standard-library and zero-cost"
     ],
-    "acceptance_criteria": [
-      "valid forward lifecycle transition sequences pass",
-      "skipped certification prerequisites fail",
-      "CERTIFIED without exact-head evidence prerequisite fails",
-      "terminal-state resurrection fails",
-      "stale evidence invalidates readiness",
-      "withdrawal remains distinct from rejection",
-      "unknown states transitions or evidence classes fail closed",
-      "validator and adversarial selftests require no network or third-party dependency"
-    ]
+    "scope_base_sha": "c1f6d4e37ae66ba23621c3ccc84fef76013bcd0b"
   },
-  "planning": {
-    "risk_class": "R2",
-    "complexity_score": 4,
-    "split_required": false,
-    "context_budget": {
-      "max_primary_files": 12,
-      "max_reference_files": 16,
-      "max_total_kib": 1024
-    },
-    "complexity_factors": {
-      "production_modules": 0,
-      "contract_schema_families": 0,
-      "policy_config_families": 1,
-      "persistence_checksum_boundary": false,
-      "math_numeric_semantics": false,
-      "temporal_lineage_semantics": false,
-      "cross_domain_interfaces": 0,
-      "state_machine_or_concurrency": true,
-      "security_trust_boundary": false,
-      "risk_execution_permission": false,
-      "dependency_change": false,
-      "ci_evidence_topology_change": true
-    },
-    "size_estimate": {
-      "business_domains": 1,
-      "files_touched": 8,
-      "executable_loc_changed": 650,
-      "new_public_behaviors": 1,
-      "contract_families": 0,
-      "independent_algorithms": 1,
-      "state_machines": 1,
-      "trust_boundaries": 0,
-      "new_dependencies": 0
-    },
-    "split_reasons": []
-  },
+  "status": "DONE",
+  "title": "Define certification candidate lifecycle",
   "validation": {
     "required_tiers": [
       "T0",
@@ -157,10 +162,5 @@
       "python scripts/governance/validate_certification_candidate_lifecycle.py",
       "python scripts/governance/selftest_certification_candidate_lifecycle.py"
     ]
-  },
-  "done_when": [
-    "certification candidate states transitions prerequisites and terminal behavior are machine enforced",
-    "stale or missing evidence cannot remain certification-ready",
-    "lifecycle semantics are ready for ENG-06.2 exact-head binding without executing certification"
-  ]
+  }
 }
