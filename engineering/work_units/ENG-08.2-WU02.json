@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-08.2-WU02",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-08",
+    "task_id": "ENG-08.2",
+    "manifest": "engineering/lots/ENG-08.json"
+  },
+  "title": "Qualify unnecessary-check detection on the single-pass trace",
+  "objective": "Expose the existing single-pass validation result as a complete validation trace, consume that same JSON with the unnecessary-check detector, add focused adversarial qualification, and fail bootstrap on overvalidation or undervalidation without executing validation twice.",
+  "non_goals": [
+    "rerun T0 T1 T2 or T3/T4 selection for detector qualification",
+    "change canonical T1 T2 or T3/T4 selection semantics",
+    "change timing budgets",
+    "execute T3 assurance or T4 certification",
+    "change proof reuse",
+    "add third-party tooling",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-08.2-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Unnecessary-check detector",
+      "kind": "FILE",
+      "locator": "scripts/governance/detect_unnecessary_checks.py"
+    },
+    {
+      "name": "Single-pass incremental validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/run_incremental_validation.py"
+    },
+    {
+      "name": "Unnecessary-check policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/unnecessary_check_policy_v1.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Complete validation trace",
+      "kind": "FILE",
+      "locator": "scripts/governance/run_incremental_validation.py"
+    },
+    {
+      "name": "Unnecessary-check adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_unnecessary_checks.py"
+    },
+    {
+      "name": "Bootstrap unnecessary-check qualification",
+      "kind": "FILE",
+      "locator": ".github/workflows/engineering-bootstrap.yml"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "b65bff680215a1b5b2f14df27182e90fe49bff8e",
+    "allowed_paths": [
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-08.2-WU01.json",
+      "engineering/work_units/ENG-08.2-WU02.json",
+      "scripts/governance/run_incremental_validation.py",
+      "scripts/governance/detect_unnecessary_checks.py",
+      "scripts/governance/selftest_unnecessary_checks.py",
+      "config/governance/unnecessary_check_policy_v1.json",
+      "engineering/UNNECESSARY_CHECK_DETECTION.md",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "duplicate T0 T1 T2 execution",
+      "validation semantic weakening",
+      "timing budget weakening",
+      "T3 assurance execution",
+      "T4 certification execution",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "the detector consumes the JSON already emitted by the existing single-pass validation step",
+      "incremental validation adds only trace metadata and does not rerun or alter T0 T1 T2 or selector decisions",
+      "trace impact families come from the already-computed T0 impact result",
+      "trace risk class comes from the already-computed selector result",
+      "bootstrap detector qualification occurs after the single-pass measurement and does not execute validation again",
+      "overvalidation undervalidation and mixed mismatch are fail-closed bootstrap outcomes",
+      "adversarial qualification covers symbolic extras omissions duplicate stages unnecessary execution and missing required pytest",
+      "no new dependency network call paid service or larger runner is introduced"
+    ],
+    "acceptance_criteria": [
+      "single-pass JSON contains trace_version impact_families and risk_class plus all detector-required fields",
+      "current exact single-pass trace returns CLEAN",
+      "documentation-only R1 synthetic trace returns CLEAN with no T1 T2 T3 T4 work",
+      "workflow/security synthetic trace requires exactly its T3 requirements",
+      "R3 synthetic trace requires the canonical strengthened T3/T4 obligations",
+      "repeated T0/T1/T2/selector invocation is detected as overvalidation",
+      "extra symbolic work pytest full-suite network deep-assurance or certification execution is detected as overvalidation",
+      "missing checks groups requirements stages or required pytest is detected as undervalidation",
+      "mixed extra and missing work returns MISMATCH",
+      "at least 18 focused adversarial probes pass",
+      "bootstrap and Security Secrets pass on the same exact head"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 11,
+      "executable_loc_changed": 500,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/detect_unnecessary_checks.py --self-check",
+      "python scripts/governance/selftest_unnecessary_checks.py",
+      "bootstrap detector evaluation on existing incremental-validation.json"
+    ]
+  },
+  "done_when": [
+    "current single-pass trace is CLEAN without tier recomputation",
+    "at least 18 adversarial detector probes pass",
+    "bootstrap fails closed on unnecessary or missing validation work",
+    "bootstrap and Security Secrets pass on the same exact head",
+    "ENG-08.2 can transition to ENG-08.3 without changing validation semantics"
+  ]
+}

@@ -1,13 +1,13 @@
 {
   "active_work": {
-    "awu_id": "ENG-08.2-WU01",
-    "awu_path": "engineering/work_units/ENG-08.2-WU01.json",
-    "complexity_score": 1,
+    "track": "ENGINEERING",
     "lot": "ENG-08",
-    "manifest": "engineering/lots/ENG-08.json",
-    "risk_class": "R1",
     "task": "ENG-08.2",
-    "track": "ENGINEERING"
+    "manifest": "engineering/lots/ENG-08.json",
+    "awu_id": "ENG-08.2-WU02",
+    "awu_path": "engineering/work_units/ENG-08.2-WU02.json",
+    "risk_class": "R1",
+    "complexity_score": 1
   },
   "authority": {
     "current_state": "config/governance/project_state.json",
@@ -29,29 +29,28 @@
     }
   },
   "execution_context": {
+    "primary_files": [
+      "AGENTS.md",
+      "config/governance/project_state.json",
+      "engineering/lots/ENG-08.json",
+      "engineering/work_units/ENG-08.2-WU02.json",
+      "scripts/governance/detect_unnecessary_checks.py",
+      "scripts/governance/run_incremental_validation.py",
+      "config/governance/unnecessary_check_policy_v1.json"
+    ],
+    "reference_files": [
+      "engineering/MASTER_PLAN.md",
+      "engineering/AGENT_PROTOCOL.md"
+    ],
+    "primary_count": 7,
+    "reference_count": 2,
+    "total_kib_ceil": 52,
     "budget": {
       "max_primary_files": 10,
       "max_reference_files": 12,
       "max_total_kib": 768
     },
-    "implicit_expansion": "FORBIDDEN",
-    "primary_count": 8,
-    "primary_files": [
-      "AGENTS.md",
-      "config/governance/project_state.json",
-      "engineering/lots/ENG-08.json",
-      "engineering/work_units/ENG-08.2-WU01.json",
-      "config/governance/validation_t1_policy_v1.json",
-      "config/governance/validation_t2_policy_v1.json",
-      "config/governance/validation_t3_t4_policy_v1.json",
-      "config/governance/incremental_validation_policy_v1.json"
-    ],
-    "reference_count": 2,
-    "reference_files": [
-      "engineering/MASTER_PLAN.md",
-      "engineering/AGENT_PROTOCOL.md"
-    ],
-    "total_kib_ceil": 38
+    "implicit_expansion": "FORBIDDEN"
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -67,9 +66,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "ENG-08.2 WU01: define exact deterministic semantics for unnecessary validation and missing required validation.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Implement the validation-trace policy and pure detector only; do not change the incremental orchestrator or bootstrap in WU01."
+    "current_objective": "ENG-08.2 WU02: qualify unnecessary-validation detection directly on the existing single-pass trace.",
+    "next_action": "Expose trace metadata in incremental-validation.json, run the detector on that same file, and add adversarial qualification; do not execute a second validation pass."
   },
   "safety": {
     "execution_allowed": false,
