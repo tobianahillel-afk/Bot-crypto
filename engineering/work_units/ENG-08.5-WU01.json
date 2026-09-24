@@ -71,7 +71,8 @@
       "engineering/work_units/ENG-08.5-WU01.json",
       "scripts/governance/cold_start_qualification.py",
       "engineering/COLD_START_QUALIFICATION_EVIDENCE.json",
-      "engineering/COLD_START_QUALIFICATION.md"
+      "engineering/COLD_START_QUALIFICATION.md",
+      "engineering/CURRENT_STATUS.md"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
