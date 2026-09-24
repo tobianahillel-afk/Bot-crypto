@@ -150,7 +150,7 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 16,
+      "files_touched": 14,
       "executable_loc_changed": 650,
       "new_public_behaviors": 1,
       "contract_families": 0,
