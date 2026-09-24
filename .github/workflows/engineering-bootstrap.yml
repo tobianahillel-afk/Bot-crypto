@@ -241,6 +241,15 @@ jobs:
       - name: Run historical audit report adversarial self-tests
         run: python scripts/governance/selftest_historical_audit_report.py
 
+      # ENG-07.6 WU02 exact-head qualification boundary: immutable-evidence requalification only, no audit or remediation.
+      - name: Validate historical audit immutable-evidence protection
+        run: |
+          python scripts/governance/validate_historical_audit_evidence_protection.py --check
+          python scripts/governance/validate_historical_audit_evidence_protection.py --self-check
+
+      - name: Run historical audit evidence-protection adversarial self-tests
+        run: python scripts/governance/selftest_historical_audit_evidence_protection.py
+
       - name: Run incremental validation adversarial self-tests
         run: python scripts/governance/selftest_incremental_validation.py
 
