@@ -227,6 +227,13 @@ jobs:
       - name: Run historical audit mapping adversarial self-tests
         run: python scripts/governance/selftest_historical_audit_mapping.py
 
+      # ENG-07.4 WU02 exact-head qualification boundary: synthetic findings only, no historical audit execution.
+      - name: Validate historical audit findings registry
+        run: python scripts/governance/validate_historical_audit_findings.py --self-check
+
+      - name: Run historical audit findings adversarial self-tests
+        run: python scripts/governance/selftest_historical_audit_findings.py
+
       - name: Run incremental validation adversarial self-tests
         run: python scripts/governance/selftest_incremental_validation.py
 
