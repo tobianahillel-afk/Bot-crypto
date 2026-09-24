@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-06.5-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-06",
+    "task_id": "ENG-06.5",
+    "manifest": "engineering/lots/ENG-06.json"
+  },
+  "title": "Define fail-closed certification promotion rules",
+  "objective": "Define a pure deterministic promotion decision that can move a certification lifecycle from CERTIFICATION_READY to CERTIFIED only when exact-head, selected assurance, canonical provenance, native attestation and explicit PASS verdict evidence all agree on one immutable candidate identity.",
+  "non_goals": [
+    "promote Lot45 or any business candidate",
+    "execute T4 certification",
+    "mutate a candidate branch or pull request",
+    "unlock business development or Lot46",
+    "change canonical provenance or domain integrity semantics",
+    "change runtime execution authority",
+    "business implementation",
+    "mandatory paid dependency"
+  ],
+  "depends_on": [
+    "ENG-06.4-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "Candidate lifecycle policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/certification_candidate_lifecycle_v1.json"
+    },
+    {
+      "name": "Exact-head binding policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/certification_exact_head_binding_v1.json"
+    },
+    {
+      "name": "Deep assurance policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/certification_deep_assurance_v1.json"
+    },
+    {
+      "name": "Canonical provenance policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/certification_provenance_v1.json"
+    },
+    {
+      "name": "Native attestation transport policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/certification_attestation_transport_v1.json"
+    },
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Promotion policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/certification_promotion_v1.json"
+    },
+    {
+      "name": "Promotion validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_certification_promotion.py"
+    },
+    {
+      "name": "Promotion adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_certification_promotion.py"
+    },
+    {
+      "name": "Promotion semantics documentation",
+      "kind": "FILE",
+      "locator": "engineering/CERTIFICATION_PROMOTION.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "c887b5ebbdd870d1351a1f909a88454d1beb9a1c",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-06.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-06.4-WU02.json",
+      "engineering/work_units/ENG-06.5-WU01.json",
+      "config/governance/certification_promotion_v1.json",
+      "scripts/governance/validate_certification_promotion.py",
+      "scripts/governance/selftest_certification_promotion.py",
+      "engineering/CERTIFICATION_PROMOTION.md",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/lot*/**"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "actual candidate promotion",
+      "T4 execution",
+      "business certification claim",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "promotion is a pure decision and never mutates Git PR lifecycle business state or runtime capability",
+      "source lifecycle state must be CERTIFICATION_READY and target state may be CERTIFIED only on complete PASS evidence",
+      "candidate id head SHA and risk class must agree across lifecycle exact-head assurance provenance attestation and verdict inputs",
+      "exact-head evidence must be fresh successful and bound to the candidate head",
+      "all selected T3 and T4 requirements must be satisfied with no missing control or manual review",
+      "canonical provenance identity must validate and preserve separate domain integrity digests",
+      "native attestation subject digest must equal canonical provenance identity and must be bound to the same candidate head",
+      "explicit certification verdict must be PASS and cryptographically bind candidate exact-head bundle and provenance identity",
+      "missing stale failed duplicate mismatched extra or unknown evidence fails closed",
+      "promotion decision never unlocks business development Lot46 live execution leverage or withdrawals"
+    ],
+    "acceptance_criteria": [
+      "a complete synthetic exact-head candidate produces PROMOTION_ALLOWED with target CERTIFIED",
+      "CERTIFICATION_READY is the only promotable source state",
+      "head or candidate mismatch anywhere produces PROMOTION_DENIED",
+      "missing selected T3 or T4 requirement produces PROMOTION_DENIED",
+      "failed stale or wrong-head CI evidence produces PROMOTION_DENIED",
+      "missing or mismatched native attestation evidence produces PROMOTION_DENIED",
+      "non-PASS certification verdict produces PROMOTION_DENIED",
+      "promotion output contains no business unlock or runtime-execution authority field",
+      "no Lot45 state branch PR or Lot46 lock is mutated during qualification"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 7,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": true,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": true,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 13,
+      "executable_loc_changed": 760,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 1,
+      "trust_boundaries": 1,
+      "new_dependencies": 0,
+      "cross_domain_interfaces": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_certification_promotion.py --self-check",
+      "python scripts/governance/selftest_certification_promotion.py"
+    ]
+  },
+  "done_when": [
+    "promotion decision is deterministic pure and fail-closed",
+    "all exact-head assurance provenance attestation and verdict bindings agree before CERTIFIED is allowed",
+    "adversarial mismatch stale missing and failure cases are rejected",
+    "business development and execution safety remain unchanged"
+  ]
+}
