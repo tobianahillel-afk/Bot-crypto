@@ -13,20 +13,19 @@
 - Track: ENGINEERING
 - Work item: ENG-07
 - Task: ENG-07.3
-- AWU: ENG-07.3-WU02
-- Risk: R1
+- AWU: ENG-07.3-WU03
+- Risk: R0
 - Manifest: engineering/lots/ENG-07.json
-- AWU file: engineering/work_units/ENG-07.3-WU02.json
+- AWU file: engineering/work_units/ENG-07.3-WU03.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-07.json
-- engineering/work_units/ENG-07.3-WU02.json
-- config/governance/historical_audit_mapping_schema_v1.json
-- config/governance/historical_audit_mapping_policy_v1.json
+- engineering/work_units/ENG-07.3-WU03.json
 - scripts/governance/validate_historical_audit_mapping.py
+- scripts/governance/validate_historical_audit_manifest.py
 - scripts/governance/selftest_historical_audit_mapping.py
 - engineering/handoff/CURRENT.json
 
@@ -37,16 +36,16 @@
 
 ## Budget
 
-- Primary: 9 / 10 files
-- Reference: 2 / 12 files
-- Routed size: 71 / 768 KiB
+- Primary: 8 / 8 files
+- Reference: 2 / 8 files
+- Routed size: 80 / 512 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-07.3 WU02: integrate and qualify the source-bound historical requirement traceability mapping.
-- Next action: Wire the existing mapping self-check and 15 adversarial probes into Engineering Bootstrap; do not change mapping semantics or execute/populate historical audits.
+- Objective: ENG-07.3 WU03: repair only the synthetic mapping qualification fixture compatibility.
+- Next action: Update the mapping synthetic bundle to use current planner.synthetic_request()/plan_batches() and manifest build_manifest(); do not alter mapping schema, policy, status semantics or CI topology.
 
 ## Non-authoritative sources
 
