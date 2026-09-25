@@ -158,7 +158,16 @@ def validate_workflow(policy: dict[str, Any], text: str) -> None:
     _require(text, "ZIZMOR_OFFLINE=1", "zizmor offline environment")
     _require(text, ".github/actions/*/action.yml", "local action target discovery")
     _require(text, "WORKFLOW_SECURITY_TARGET_FILE", "shared target discovery")
-    _require(text, "WORKFLOW_SECURITY_BASE", "diff-base export")
+    _require(
+        text,
+        "printf 'WORKFLOW_SECURITY_BASE=%s\\n' \"${base}\"",
+        "exact diff-base export",
+    )
+    _require(
+        text,
+        '--base "${WORKFLOW_SECURITY_BASE}"',
+        "diff-base consumer binding",
+    )
     _require(
         text,
         "python scripts/governance/filter_zizmor_changed_findings.py",
