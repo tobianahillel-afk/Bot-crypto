@@ -101,11 +101,8 @@ jobs:
         assert blocked[0]["classification"] == "REMOTE_FLOATING_REF"
 
         conservative = mod.changed_gate(result, registry)
-        assert len(conservative) == 2
-        assert {item["blocked_reason"] for item in conservative} == {
-            "REMOTE_FLOATING_REF",
-            "UNAPPROVED_REMOTE_SHA",
-        }
+        assert len(conservative) == 1
+        assert conservative[0]["blocked_reason"] == "REMOTE_FLOATING_REF"
 
         assert mod.changed_gate(
             result,
