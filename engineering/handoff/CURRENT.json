@@ -1,12 +1,12 @@
 {
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-09.2-WU01",
-    "awu_path": "engineering/work_units/ENG-09.2-WU01.json",
+    "awu_id": "ENG-09.3-WU01",
+    "awu_path": "engineering/work_units/ENG-09.3-WU01.json",
     "parent_manifest": "engineering/lots/ENG-09.json",
-    "scope_base_sha": "e61712c8c1b5128aeb8bb4103d564c87c84808a8",
-    "risk_class": "R1",
-    "complexity_score": 1
+    "scope_base_sha": "40af00305b110e33e250299cb90277366a3da72f",
+    "risk_class": "R2",
+    "complexity_score": 3
   },
   "authority": {
     "context_map": "engineering/CONTEXT_MAP.json",
@@ -14,7 +14,7 @@
     "state_source": "config/governance/project_state.json"
   },
   "blockers": [],
-  "current_objective": "ENG-09.2: quantify Lot45 workflow/review redundancy and define a provider-agnostic consolidation plan without mutating workflows or the candidate.",
+  "current_objective": "ENG-09.3-WU01: close Lot45 pilot classifier coverage gaps without weakening fail-closed semantics.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -27,10 +27,10 @@
     "rulesets_count": 0
   },
   "kind": "engineering_handoff",
-  "next_action": "Reverify PR #66 head, enumerate the exact current workflow set and review obligations, classify candidate-critical/global versus historical fan-out work, quantify duplication/noise, and write only the ENG-09.2 redundancy evidence/report.",
+  "next_action": "Add explicit conservative classification for dependency manifests and lot runner/validator scripts, with regression probes for all six previously UNKNOWN Lot45 operational paths.",
   "next_engineering": {
     "active_lot": "ENG-09",
-    "active_task": "ENG-09.2",
+    "active_task": "ENG-09.3",
     "active_manifest": "engineering/lots/ENG-09.json"
   },
   "recent_completed": [
@@ -41,7 +41,8 @@
     "ENG-08.6 interruption/recovery qualification completed on exact head ad131734d7b85fde809d6ab7bd4a89f25321f82f; Bootstrap 36073305546 and Security Secrets 36073305552 passed. Recovery completed in 113.574 ms across 13 scenarios; adversarial selftest passed 17 probes in 177.574 ms; cold-start regression completed in 21.516 ms using 7 primary + 2 reference files (62 KiB). Resumed writes remain blocked pending LIVE_GIT_REVERIFY_REQUIRED; BUSINESS stays PAUSED, Lot46 LOCKED, trading/execution disabled. Evidence anchor commit 02c74a40d220ea3b4389f28139422e1c0f769808 also passed Bootstrap 36073668394 and Security Secrets 36073668282.",
     "ENG-08.7 WU01 critical-R3 core hardening completed on head 6d9bc16d4c1958e9b762c64b5020ccc4e0a4f96e: AWU complexity/risk/context/handoff, T3/T4 selector cross-layer selftest, exact-head validator/selftest and deep-assurance validator/selftest all passed inside Bootstrap run 36074598534; Security Secrets run 36074598394 passed. Full Bootstrap then exposed lifecycle-specific ENG-08.6 hardcoding in the permanent recovery qualifier; remediation and final same-head qualification are split into WU02.",
     "ENG-08.7 WU02 lifecycle-generic recovery and critical-R3 bypass qualification completed. Implementation head d0bf1381298ea81356e469afec4e9f5a90deefda passed Bootstrap 36121700188 and Security Secrets 36121700184; evidence-anchor head c2c1f0990c881cb725a3fccfccfd8098f84a0694 also passed Bootstrap 36122013069 and Security Secrets 36122013061. WU02 touched no forbidden R3 control/policy/workflow.",
-    "ENG-09.1 read-only Lot45 pilot completed on exact head e61712c8c1b5128aeb8bb4103d564c87c84808a8; Bootstrap 36123998108 and Security Secrets 36123997952 passed. Pilot verdict ENGINE_PILOT_PASS_CANDIDATE_BLOCKED: PR #66 current head ec2c4ab16f21b23e062b7fca0bb796c8db4a5133 has 49 workflows with 26 success/23 failure, 2 unresolved non-outdated P1 review threads, stale frozen-head certification, and mandatory split under the current engine."
+    "ENG-09.1 read-only Lot45 pilot completed on exact head e61712c8c1b5128aeb8bb4103d564c87c84808a8; Bootstrap 36123998108 and Security Secrets 36123997952 passed. Pilot verdict ENGINE_PILOT_PASS_CANDIDATE_BLOCKED: PR #66 current head ec2c4ab16f21b23e062b7fca0bb796c8db4a5133 has 49 workflows with 26 success/23 failure, 2 unresolved non-outdated P1 review threads, stale frozen-head certification, and mandatory split under the current engine.",
+    "ENG-09.2 workflow/review redundancy analysis completed on exact head 40af00305b110e33e250299cb90277366a3da72f; Bootstrap 36128277207 and Security Secrets 36128277147 passed. Exact Lot45 candidate head ec2c4ab16f21b23e062b7fca0bb796c8db4a5133 has 49 workflows: 41 historical fan-out (83.67%), 19/23 failures from historical fan-out (82.61%), 20 mutation workflows, and 2 unresolved non-outdated P1 review threads. Phase-1 consolidation target is 49 -> 8 without hiding the 4 relevant failures."
   ],
   "resume_read_order": [
     "AGENTS.md",
@@ -62,7 +63,7 @@
   "state_snapshot": {
     "engineering_phase": "BUILDING",
     "active_lot": "ENG-09",
-    "active_task": "ENG-09.2",
+    "active_task": "ENG-09.3",
     "active_manifest": "engineering/lots/ENG-09.json",
     "business_development": "PAUSED",
     "lot46_status": "LOCKED",
@@ -166,6 +167,20 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36123997952",
       "head_sha": "e61712c8c1b5128aeb8bb4103d564c87c84808a8",
       "scope": "ENG-09.1-WU01_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36128277207",
+      "head_sha": "40af00305b110e33e250299cb90277366a3da72f",
+      "scope": "ENG-09.2-WU01_BOOTSTRAP"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36128277147",
+      "head_sha": "40af00305b110e33e250299cb90277366a3da72f",
+      "scope": "ENG-09.2-WU01_SECURITY_SECRETS"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"

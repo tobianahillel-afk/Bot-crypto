@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-09.3-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-09",
+    "task_id": "ENG-09.3",
+    "manifest": "engineering/lots/ENG-09.json"
+  },
+  "title": "Close classifier coverage gaps from Lot45 pilot",
+  "objective": "Remove the six known Lot45 UNKNOWN_REQUIRES_REVIEW path classifications without weakening fail-closed behavior by explicitly classifying dependency manifests as config+security sensitive and lot runner/validator scripts as business/certification code.",
+  "non_goals": [
+    "modify GitHub Actions workflow fan-out",
+    "change semantic review transport",
+    "change ENGINE_COMPLETE lifecycle semantics",
+    "modify Lot45 candidate code",
+    "resolve Lot45 P1 findings",
+    "merge PR #66",
+    "unlock Lot46",
+    "change business development status"
+  ],
+  "depends_on": [
+    "ENG-09.2-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Diff classifier policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/diff_classifier_policy_v1.json"
+    },
+    {
+      "name": "Diff classifier implementation",
+      "kind": "FILE",
+      "locator": "scripts/governance/classify_diff.py"
+    },
+    {
+      "name": "Lot45 pilot evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/LOT45_ENGINE_PILOT_EVIDENCE.json"
+    },
+    {
+      "name": "Workflow redundancy evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/LOT45_WORKFLOW_REDUNDANCY_EVIDENCE.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Updated diff classifier policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/diff_classifier_policy_v1.json"
+    },
+    {
+      "name": "Classifier regression probes",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_diff_classifier.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "40af00305b110e33e250299cb90277366a3da72f",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-09.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-09.2-WU01.json",
+      "engineering/work_units/ENG-09.3-WU01.json",
+      "config/governance/diff_classifier_policy_v1.json",
+      "scripts/governance/selftest_diff_classifier.py",
+      "AGENTS.md",
+      "README.md",
+      "engineering/CURRENT_STATUS.md",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md"
+    ],
+    "forbidden_paths": [
+      ".github/workflows/**",
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "workflow mutation",
+      "Lot45 candidate mutation",
+      "Lot45 remediation",
+      "Lot45 merge",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "risk or execution permission change",
+      "mandatory paid dependency",
+      "mandatory LLM review",
+      "downgrade UNKNOWN fallback behavior"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "paths with no explicit rule still receive UNKNOWN_REQUIRES_REVIEW",
+      "dependency manifests are never classified as documentation-only or low-sensitivity-only",
+      "pyproject.toml requirements locks and requirements text files receive both CONFIG_POLICY and SECURITY labels",
+      "lot runner and validator scripts receive BUSINESS_PRODUCTION",
+      "frozen/post-merge/entry-gate validation scripts additionally receive CERTIFICATION_EVIDENCE",
+      "rules remain additive and cannot suppress a higher-risk label",
+      "the exact six previously unknown Lot45 operational paths no longer receive UNKNOWN_REQUIRES_REVIEW"
+    ],
+    "acceptance_criteria": [
+      "pyproject.toml => CONFIG_POLICY + SECURITY",
+      "requirements-dev.lock => CONFIG_POLICY + SECURITY",
+      "scripts/lot45_trusted_prelaunch.sh => BUSINESS_PRODUCTION",
+      "scripts/run_lot45_order_flow_delta_and_cvd_engine.py => BUSINESS_PRODUCTION",
+      "scripts/validate_lot45.py => BUSINESS_PRODUCTION",
+      "scripts/validate_lot45_frozen_evidence.py => BUSINESS_PRODUCTION + CERTIFICATION_EVIDENCE",
+      "an unrelated unmapped path still => UNKNOWN_REQUIRES_REVIEW",
+      "DOC_ONLY semantics remain unchanged"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 3,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 13,
+      "executable_loc_changed": 220,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 0,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 0,
+      "cross_domain_interfaces": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/classify_diff.py --self-check",
+      "python scripts/governance/selftest_diff_classifier.py",
+      "python scripts/governance/run_incremental_validation.py"
+    ]
+  },
+  "done_when": [
+    "the six pilot UNKNOWN paths are deterministically classified",
+    "dependency manifests remain security-sensitive",
+    "unknown fallback remains fail-closed",
+    "classifier change passes adversarial regression and incremental validation"
+  ]
+}

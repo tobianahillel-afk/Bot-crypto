@@ -35,12 +35,12 @@
     },
     {
       "id": "ENG-09.2",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Identify redundant workflows, reviews and validation work exposed by the Lot45 pilot."
     },
     {
       "id": "ENG-09.3",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Repair engine defects found by the pilot, including terminal engineering-lifecycle semantics if required."
     },
     {
