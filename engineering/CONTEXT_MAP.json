@@ -50,7 +50,7 @@
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 44
+    "total_kib_ceil": 45
   },
   "instructions": [
     "verify external Git reality before writing",
