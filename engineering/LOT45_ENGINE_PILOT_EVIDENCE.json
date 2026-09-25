@@ -1,0 +1,396 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "eng09_lot45_engine_pilot_v1",
+  "awu_id": "ENG-09.1-WU01",
+  "pilot_verdict": "ENGINE_PILOT_PASS_CANDIDATE_BLOCKED",
+  "business_authorization": "NONE",
+  "candidate_ready_for_merge": false,
+  "engine_head": "b4c7d459a23ed01d9b850cd3afb6def545a8b266",
+  "transition_evidence": {
+    "bootstrap": {
+      "run_id": 36123197944,
+      "conclusion": "success",
+      "head_sha": "b4c7d459a23ed01d9b850cd3afb6def545a8b266"
+    },
+    "security_secrets": {
+      "run_id": 36123198210,
+      "conclusion": "success",
+      "head_sha": "b4c7d459a23ed01d9b850cd3afb6def545a8b266"
+    }
+  },
+  "live_git": {
+    "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "main_protected": false,
+    "rulesets_count": 0,
+    "pr": 66,
+    "state": "open",
+    "merged": false,
+    "base_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "head_branch": "agent/lot45-order-flow-delta-cvd-engine-v2"
+  },
+  "candidate_diff": {
+    "commits": 228,
+    "files": 48,
+    "additions": 7689,
+    "deletions": 587,
+    "production_files": 6,
+    "contract_files": 4,
+    "workflow_files": 6,
+    "test_files": 11,
+    "evidence_files": 7,
+    "files_by_label": {
+      "BUSINESS_PRODUCTION": [
+        "src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine_impl.py",
+        "src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine_models_impl.py",
+        "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py",
+        "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py",
+        "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_policy.py",
+        "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py"
+      ],
+      "CERTIFICATION_EVIDENCE": [
+        "data/audit/cvd_series_lot45.json",
+        "data/audit/order_flow_delta_and_cvd_engine_audit_lot45.json",
+        "data/audit/order_flow_delta_and_cvd_engine_lot45.json",
+        "data/audit/order_flow_state_lot45.json",
+        "reports/lot45/coverage_summary.json",
+        "reports/lot45/mutation_summary.json",
+        "reports/lot_45_order_flow_delta_and_cvd_engine_report.md"
+      ],
+      "CI_WORKFLOW": [
+        ".github/workflows/lot34-post-merge-audit.yml",
+        ".github/workflows/lot35-post-merge-audit.yml",
+        ".github/workflows/lot44-frozen-evidence.yml",
+        ".github/workflows/lot45-frozen-evidence.yml",
+        ".github/workflows/lot45-mutation-assurance.yml",
+        ".github/workflows/lot45-order-flow-delta-cvd.yml"
+      ],
+      "CONFIG_POLICY": [
+        "config/microstructure/order_flow_delta_and_cvd_engine_v1.json"
+      ],
+      "CONTRACT_SCHEMA": [
+        "contracts/schemas/cvd_series_v1.schema.json",
+        "contracts/schemas/order_flow_delta_cvd_engine_audit_v1.schema.json",
+        "contracts/schemas/order_flow_delta_cvd_engine_state_v1.schema.json",
+        "contracts/schemas/order_flow_state_v1.schema.json"
+      ],
+      "DOCUMENTATION": [
+        "README.md",
+        "docs/ACCEPTANCE_CRITERIA_LOT_45.md",
+        "docs/FUNCTIONAL_COVERAGE_REGISTRY.md",
+        "docs/LOT_45_ORDER_FLOW_DELTA_AND_CVD_ENGINE.md",
+        "docs/MASTER_SYSTEM_SPECIFICATION.md",
+        "docs/ROADMAP_V1_TO_V21.md",
+        "docs/SYSTEM_EXECUTION_ARCHITECTURE.md",
+        "reports/lot_45_order_flow_delta_and_cvd_engine_report.md"
+      ],
+      "TEST_ONLY": [
+        "tests/test_lot44_v4_entry_gate.py",
+        "tests/test_lot45_checksum_binding_adversarial.py",
+        "tests/test_lot45_decimal_context_and_pre_epoch.py",
+        "tests/test_lot45_final_review_contracts.py",
+        "tests/test_lot45_market_identity_binding.py",
+        "tests/test_lot45_order_flow_delta_and_cvd_engine.py",
+        "tests/test_lot45_policy_contract.py",
+        "tests/test_lot45_runtime_binding_and_rounding.py",
+        "tests/test_lot45_schema_contracts.py",
+        "tests/test_lot45_top_level_checksum_authenticity.py",
+        "tests/test_lot45_untracked_executable_source_binding.py"
+      ],
+      "UNKNOWN_REQUIRES_REVIEW": [
+        "pyproject.toml",
+        "requirements-dev.lock",
+        "scripts/lot45_trusted_prelaunch.sh",
+        "scripts/run_lot45_order_flow_delta_and_cvd_engine.py",
+        "scripts/validate_lot45.py",
+        "scripts/validate_lot45_frozen_evidence.py"
+      ]
+    },
+    "aggregate_labels": [
+      "BUSINESS_PRODUCTION",
+      "CERTIFICATION_EVIDENCE",
+      "CI_WORKFLOW",
+      "CONFIG_POLICY",
+      "CONTRACT_SCHEMA",
+      "DOCUMENTATION",
+      "TEST_ONLY",
+      "UNKNOWN_REQUIRES_REVIEW"
+    ],
+    "label_counts": {
+      "CI_WORKFLOW": 6,
+      "DOCUMENTATION": 8,
+      "CONFIG_POLICY": 1,
+      "CONTRACT_SCHEMA": 4,
+      "CERTIFICATION_EVIDENCE": 7,
+      "UNKNOWN_REQUIRES_REVIEW": 6,
+      "BUSINESS_PRODUCTION": 6,
+      "TEST_ONLY": 11
+    },
+    "impact_families": [
+      "ACTIONS_SECURITY",
+      "CONFIG_POLICY_VALIDATION",
+      "CONSERVATIVE_BROAD_IMPACT",
+      "CONTRACT_COMPATIBILITY",
+      "CONTRACT_SCHEMA_VALIDATION",
+      "DOC_CONSISTENCY",
+      "EVIDENCE_PROVENANCE",
+      "HUMAN_REVIEW_REQUIRED",
+      "STATIC_ANALYSIS",
+      "TEST_HARNESS_INTEGRITY",
+      "UNIT_BEHAVIOR",
+      "WORKFLOW_SYNTAX"
+    ],
+    "domains": [
+      "BUSINESS",
+      "CI",
+      "CONFIGURATION",
+      "CONTRACTS",
+      "DOCUMENTATION",
+      "EVIDENCE",
+      "SECURITY",
+      "TESTS",
+      "UNKNOWN"
+    ],
+    "sensitivity": "CRITICAL"
+  },
+  "risk_and_split": {
+    "risk_floor": "R2",
+    "observed_semantic_factors": {
+      "persistence_checksum_boundary": true,
+      "math_numeric_semantics": true,
+      "temporal_lineage_semantics": true,
+      "dependency_change": true,
+      "ci_evidence_topology_change": true
+    },
+    "conservative_minimum_complexity_score": 15,
+    "mandatory_split": true,
+    "split_reasons": [
+      "FILES_TOUCHED_GT_15:48",
+      "COMPLEXITY_SCORE_GT_10:minimum_15"
+    ]
+  },
+  "validation_plan": {
+    "T0": "REQUIRED",
+    "T1": {
+      "selected_checks": [
+        "DIFF_CHECK",
+        "GOVERNANCE_ACTIVE_SCOPE",
+        "SELFTEST_ENTRYPOINT_CHECK"
+      ],
+      "covered_impacts": [
+        "CONFIG_POLICY_VALIDATION",
+        "DOC_CONSISTENCY",
+        "TEST_HARNESS_INTEGRITY"
+      ]
+    },
+    "T2": {
+      "selected_groups": [
+        "CHANGED_DOMAIN_TESTS",
+        "CONTRACT_TESTS",
+        "EVIDENCE_TESTS"
+      ],
+      "covered_impacts": [
+        "CONTRACT_COMPATIBILITY",
+        "CONTRACT_SCHEMA_VALIDATION",
+        "EVIDENCE_PROVENANCE",
+        "UNIT_BEHAVIOR"
+      ]
+    },
+    "T3": {
+      "requirements": [
+        "MANUAL_DEEP_REVIEW",
+        "SECURITY_ASSURANCE",
+        "STATIC_ANALYSIS_ASSURANCE",
+        "WORKFLOW_ASSURANCE"
+      ],
+      "residual_impacts": [
+        "ACTIONS_SECURITY",
+        "CONSERVATIVE_BROAD_IMPACT",
+        "HUMAN_REVIEW_REQUIRED",
+        "STATIC_ANALYSIS",
+        "WORKFLOW_SYNTAX"
+      ]
+    },
+    "T4": {
+      "requirements": [
+        "EXACT_HEAD_CERTIFICATION",
+        "PROVENANCE_CERTIFICATION"
+      ]
+    }
+  },
+  "exact_head_ci": {
+    "head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "workflow_count": 49,
+    "success_count": 26,
+    "failure_count": 23,
+    "direct_candidate_or_global_failures": [
+      {
+        "run_id": 32144783988,
+        "name": "Lot 45 V4 implementation entry gate",
+        "conclusion": "failure"
+      },
+      {
+        "run_id": 32144783998,
+        "name": "Institutional code quality gates",
+        "conclusion": "failure"
+      },
+      {
+        "run_id": 32144784085,
+        "name": "Lot 45 frozen evidence attestation",
+        "conclusion": "failure"
+      },
+      {
+        "run_id": 32144784139,
+        "name": "P0.6 final exact-commit assurance",
+        "conclusion": "failure"
+      }
+    ],
+    "historical_fanout_failures": [
+      "Lot 26 foundation and lifecycle validation",
+      "Lot 27 global market context validation",
+      "Lot 28 explanation core validation",
+      "Lot 29 V2 deterministic replay validation",
+      "Lot 30 V2 market analysis closure validation",
+      "Lot 31 market data source registry validation",
+      "Lot 31 post-merge audit exact-head",
+      "Lot 32 instrument normalization validation",
+      "Lot 32 post-merge audit exact-head",
+      "Lot 33 timestamp clock timezone governance validation",
+      "Lot 34 market data quality engine validation",
+      "Lot 35 candle trade book reconciliation validation",
+      "Lot 36 freshness gap outage V3 closure validation",
+      "Lot 37 microstructure scope and offline contracts validation",
+      "Lot 38 independent post-merge audit",
+      "Lot 39 independent post-merge audit",
+      "Lot 39 order book delta sequence validation",
+      "Lot 40 book integrity desynchronization validation",
+      "Lot 44 frozen evidence attestation"
+    ],
+    "known_failure_causes": [
+      {
+        "workflow": "Lot 45 V4 implementation entry gate",
+        "run_id": 32144783988,
+        "failed_step": "Security dependency full regression and anti-flake",
+        "detail": "2 Lot45 tests fail with CVD checksum canonical mismatch; 2363 passed, 1 skipped."
+      },
+      {
+        "workflow": "Lot 45 frozen evidence attestation",
+        "run_id": 32144784085,
+        "failed_step": "Trusted pre-launch proof before Python setup",
+        "detail": "trusted pre-launch command exits 67."
+      },
+      {
+        "workflow": "Institutional code quality gates",
+        "run_id": 32144783998,
+        "failed_step": "Mypy package validation",
+        "detail": "mypy reports 1 error in order_flow_delta_and_cvd_engine_models.py."
+      },
+      {
+        "workflow": "P0.6 final exact-commit assurance",
+        "run_id": 32144784139,
+        "failed_step": "Enforce final assurance verdict",
+        "detail": "mypy, full pytest coverage and flake repetitions 1/2/3 are FAIL."
+      }
+    ]
+  },
+  "certification_staleness": {
+    "claimed_frozen_head": "75e8a82fe7c20717f7351129073d1f47b373d4b9",
+    "frozen_head_workflows": {
+      "count": 49,
+      "success": 49,
+      "failure": 0
+    },
+    "relation_to_current": "diverged",
+    "current_ahead_by": 7,
+    "current_behind_by": 5,
+    "materially_different_files": [
+      "contracts/schemas/cvd_series_v1.schema.json",
+      "contracts/schemas/order_flow_state_v1.schema.json",
+      "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py",
+      "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py",
+      "tests/test_lot45_final_review_contracts.py",
+      "tests/test_lot45_market_identity_binding.py",
+      "tests/test_lot45_order_flow_delta_and_cvd_engine.py"
+    ],
+    "conclusion": "FROZEN_HEAD evidence cannot certify current PR head."
+  },
+  "unresolved_reviews": {
+    "count": 2,
+    "threads": [
+      {
+        "id": "PRRT_kwDOTtA9Ds6aIHFn",
+        "path": "src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine_impl.py",
+        "line": 447,
+        "priority": "P1",
+        "summary": "** Preserve market identity in order-flow artifacts** When two homogeneous trade batches differ only by source, venue, instrument, or market type, this validation accepts each batch but then discards the identity tuple; `OrderFlowStateV1` and `CVDSeriesV1` serialize none of these fields. For example, replacing every frozen trade's `instrument_id` with `ETH-USDT` produces byte-identical order-flow and CVD payloads and the same checksums as `BTC-USDT`, so the published standalone artifacts can be "
+      },
+      {
+        "id": "PRRT_kwDOTtA9Ds6aIhbE",
+        "path": "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py",
+        "line": 175,
+        "priority": "P1",
+        "summary": "** Bind matching identities to the certified input market** When both nested artifacts carry the same wrong identity, this equality check accepts them because it compares only Order Flow with CVD, not either identity with the homogeneous source batch or the fixed Lot 44 lineage. For example, `_build_engine_state` accepts BTC classified trades together with an ETH Order Flow/CVD pair sharing timestamps and produces a checksum-valid state claiming the certified Lot 44 lineage; validate the common "
+      }
+    ]
+  },
+  "engine_findings": [
+    {
+      "id": "ENG09-PILOT-001",
+      "class": "ENGINE_DEFECT",
+      "severity": "MEDIUM",
+      "route": "ENG-09.3",
+      "code": "CLASSIFIER_COVERAGE_GAP",
+      "detail": "Six changed operational files are UNKNOWN_REQUIRES_REVIEW: pyproject.toml, requirements-dev.lock and four Lot45 scripts. Fail-closed behavior is safe, but classification is noisier than necessary."
+    },
+    {
+      "id": "ENG09-PILOT-002",
+      "class": "ENGINE_FRICTION",
+      "severity": "HIGH",
+      "route": "ENG-09.2",
+      "code": "LEGACY_WORKFLOW_FANOUT",
+      "detail": "Current candidate head has 49 distinct workflows; 23 fail and 19 of those failures are historical/non-Lot45 workflow fan-out."
+    },
+    {
+      "id": "ENG09-PILOT-003",
+      "class": "PROCESS_DRIFT",
+      "severity": "MEDIUM",
+      "route": "ENG-09.2",
+      "code": "MANDATORY_LLM_REVIEW_MISMATCH",
+      "detail": "PR body still requires a fresh Codex review for merge progression, while Development Engine mandatory progress is explicitly LLM-independent. Substantive review findings must remain addressed, but one specific paid/quota-sensitive reviewer must not be the mandatory transport."
+    },
+    {
+      "id": "ENG09-PILOT-004",
+      "class": "ENGINE_DEFECT",
+      "severity": "MEDIUM",
+      "route": "ENG-09.3",
+      "code": "TERMINAL_ENGINE_LIFECYCLE_SENTINEL",
+      "detail": "ENG-09 currently requires non-empty next_lot while BUILDING although no ENG-10 exists; ENGINE_COMPLETE is a temporary non-executable sentinel that must be hardened before ENG-09 completion."
+    }
+  ],
+  "routing": {
+    "ENG_09_2": [
+      "ENG09-PILOT-002",
+      "ENG09-PILOT-003"
+    ],
+    "ENG_09_3": [
+      "ENG09-PILOT-001",
+      "ENG09-PILOT-004"
+    ],
+    "candidate_remediation": "NOT_AUTHORIZED_IN_ENG_09_1"
+  },
+  "safety": {
+    "business_development": "PAUSED",
+    "candidate_status": "SUSPENDED_CANDIDATE",
+    "lot46": "LOCKED",
+    "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED"
+  },
+  "cost": {
+    "paid_external_api_required": false,
+    "paid_llm_required": false,
+    "paid_saas_required": false,
+    "paid_runner_required": false
+  }
+}
