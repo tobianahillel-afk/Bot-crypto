@@ -12,38 +12,40 @@
 
 - Track: ENGINEERING
 - Work item: ENG-09
-- Task: ENG-09.2
-- AWU: ENG-09.2-WU01
-- Risk: R1
+- Task: ENG-09.3
+- AWU: ENG-09.3-WU01
+- Risk: R2
 - Manifest: engineering/lots/ENG-09.json
-- AWU file: engineering/work_units/ENG-09.2-WU01.json
+- AWU file: engineering/work_units/ENG-09.3-WU01.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-09.json
-- engineering/work_units/ENG-09.2-WU01.json
+- engineering/work_units/ENG-09.3-WU01.json
+- config/governance/diff_classifier_policy_v1.json
+- scripts/governance/classify_diff.py
 - engineering/LOT45_ENGINE_PILOT_EVIDENCE.json
-- engineering/LOT45_ENGINE_PILOT.md
-- engineering/MASTER_PLAN.md
+- engineering/LOT45_WORKFLOW_REDUNDANCY_EVIDENCE.json
 
 ## Execution context — reference
 
+- engineering/MASTER_PLAN.md
 - engineering/AGENT_PROTOCOL.md
 
 ## Budget
 
-- Primary: 7 / 10 files
-- Reference: 1 / 12 files
-- Routed size: 51 / 768 KiB
+- Primary: 8 / 12 files
+- Reference: 2 / 16 files
+- Routed size: 77 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: ENG-09.2: quantify Lot45 workflow/review redundancy and define a provider-agnostic consolidation plan without mutating workflows or the candidate.
-- Next action: Reverify PR #66 head, enumerate the exact current workflow set and review obligations, classify candidate-critical/global versus historical fan-out work, quantify duplication/noise, and write only the ENG-09.2 redundancy evidence/report.
+- Objective: ENG-09.3-WU01: close Lot45 pilot classifier coverage gaps without weakening fail-closed semantics.
+- Next action: Add explicit conservative classification for dependency manifests and lot runner/validator scripts, with regression probes for all six previously UNKNOWN Lot45 operational paths.
 
 ## Non-authoritative sources
 
