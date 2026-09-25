@@ -30,12 +30,12 @@
   "tasks": [
     {
       "id": "ENG-09.1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Run the Development Engine read-only against the suspended Lot45 candidate and record exact-head pilot evidence."
     },
     {
       "id": "ENG-09.2",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Identify redundant workflows, reviews and validation work exposed by the Lot45 pilot."
     },
     {

@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-09.2-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-09",
+    "task_id": "ENG-09.2",
+    "manifest": "engineering/lots/ENG-09.json"
+  },
+  "title": "Measure Lot45 workflow and review redundancy",
+  "objective": "Quantify redundant validation, workflow fan-out and quota-sensitive review coupling exposed by the Lot45 pilot, separate candidate-critical evidence from historical/noisy evidence, and produce a bounded consolidation plan without modifying workflows, Lot45 or business state.",
+  "non_goals": [
+    "modify or delete GitHub Actions workflows",
+    "modify the Lot45 candidate",
+    "remediate Lot45 code findings",
+    "merge PR #66",
+    "start or unlock Lot46",
+    "change business development status",
+    "make Codex or another LLM mandatory",
+    "change runtime safety or execution permissions"
+  ],
+  "depends_on": [
+    "ENG-09.1-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Lot45 pilot evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/LOT45_ENGINE_PILOT_EVIDENCE.json"
+    },
+    {
+      "name": "Lot45 pilot report",
+      "kind": "FILE",
+      "locator": "engineering/LOT45_ENGINE_PILOT.md"
+    },
+    {
+      "name": "Current project state",
+      "kind": "STATE",
+      "locator": "config/governance/project_state.json"
+    },
+    {
+      "name": "Engineering master plan",
+      "kind": "FILE",
+      "locator": "engineering/MASTER_PLAN.md"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Workflow redundancy evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/LOT45_WORKFLOW_REDUNDANCY_EVIDENCE.json"
+    },
+    {
+      "name": "Workflow redundancy report",
+      "kind": "FILE",
+      "locator": "engineering/LOT45_WORKFLOW_REDUNDANCY.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "e61712c8c1b5128aeb8bb4103d564c87c84808a8",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-09.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-09.1-WU01.json",
+      "engineering/work_units/ENG-09.2-WU01.json",
+      "AGENTS.md",
+      "README.md",
+      "engineering/CURRENT_STATUS.md",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/LOT45_WORKFLOW_REDUNDANCY_EVIDENCE.json",
+      "engineering/LOT45_WORKFLOW_REDUNDANCY.md"
+    ],
+    "forbidden_paths": [
+      ".github/workflows/**",
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "workflow mutation",
+      "Lot45 candidate mutation",
+      "Lot45 remediation",
+      "Lot45 merge",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "risk or execution permission change",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "analysis is bound to exact PR #66 head and current workflow-run evidence",
+      "candidate-critical failures are separated from historical fan-out failures",
+      "workflow duplication is measured before any deletion or consolidation proposal",
+      "semantic review requirements are provider-agnostic and never depend on a single LLM vendor or quota",
+      "substantive unresolved P1/P2 findings remain blockers regardless of review transport",
+      "no workflow or business code is changed in this AWU",
+      "BUSINESS remains PAUSED and Lot46 remains LOCKED"
+    ],
+    "acceptance_criteria": [
+      "all current PR-head workflows are classified by relevance and outcome",
+      "candidate-critical/global versus historical-fan-out failures are counted explicitly",
+      "repeated validation capabilities are mapped to candidate reusable/generic engine controls",
+      "review transport is separated from semantic review obligation",
+      "a concrete consolidation sequence is produced with expected workflow/noise reduction",
+      "repair actions are routed to a separate executable AWU rather than performed here"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 13,
+      "executable_loc_changed": 0,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/resolve_active_awu.py",
+      "python scripts/governance/run_incremental_validation.py"
+    ]
+  },
+  "done_when": [
+    "workflow/review redundancy is quantitatively documented",
+    "candidate-critical evidence remains fail-closed and clearly separated from historical noise",
+    "LLM-provider coupling is removed from future mandatory-process design",
+    "consolidation/remediation work is precisely routed to the next repair AWU"
+  ]
+}
