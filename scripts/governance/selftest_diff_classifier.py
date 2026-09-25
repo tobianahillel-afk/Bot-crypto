@@ -80,6 +80,35 @@ def main() -> int:
     result = mod.classify_paths([".github/workflows/check.yml"], additive)
     assert {"CI_WORKFLOW", "SECURITY"} <= set(result["labels"])
 
+    dependency_pyproject = mod.classify_paths(["pyproject.toml"], policy)
+    assert {"CONFIG_POLICY", "SECURITY"} <= set(dependency_pyproject["labels"])
+    assert "UNKNOWN_REQUIRES_REVIEW" not in dependency_pyproject["labels"]
+    assert dependency_pyproject["requires_review"] is True
+
+    dependency_lock = mod.classify_paths(["requirements-dev.lock"], policy)
+    assert {"CONFIG_POLICY", "SECURITY"} <= set(dependency_lock["labels"])
+    assert "UNKNOWN_REQUIRES_REVIEW" not in dependency_lock["labels"]
+
+    pilot_paths = {
+        "scripts/lot45_trusted_prelaunch.sh": {"BUSINESS_PRODUCTION"},
+        "scripts/run_lot45_order_flow_delta_and_cvd_engine.py": {"BUSINESS_PRODUCTION"},
+        "scripts/validate_lot45.py": {"BUSINESS_PRODUCTION"},
+        "scripts/validate_lot45_frozen_evidence.py": {
+            "BUSINESS_PRODUCTION",
+            "CERTIFICATION_EVIDENCE",
+        },
+    }
+    for path, expected in pilot_paths.items():
+        classified = mod.classify_paths([path], policy)
+        assert expected <= set(classified["labels"])
+        assert "UNKNOWN_REQUIRES_REVIEW" not in classified["labels"]
+
+    post_merge = mod.classify_paths(["scripts/validate_lot44_post_merge.py"], policy)
+    assert {"BUSINESS_PRODUCTION", "CERTIFICATION_EVIDENCE"} <= set(post_merge["labels"])
+
+    entry_gate = mod.classify_paths(["scripts/validate_lot46_entry_gate.py"], policy)
+    assert {"BUSINESS_PRODUCTION", "CERTIFICATION_EVIDENCE"} <= set(entry_gate["labels"])
+
     broken = copy.deepcopy(policy)
     broken["aggregate_rules"]["unknown_fallback"] = "DOCUMENTATION"
     _expect(mod.DiffClassifierError, lambda: mod.validate_policy(broken), "unsafe fallback")
@@ -90,7 +119,7 @@ def main() -> int:
         "empty diff",
     )
 
-    print("DIFF_CLASSIFIER_SELFTEST_PASS probes=11")
+    print("DIFF_CLASSIFIER_SELFTEST_PASS probes=21")
     return 0
 
 
