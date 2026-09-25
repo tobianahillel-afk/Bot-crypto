@@ -13,9 +13,7 @@
     "handoff_role": "RESUME_HINT_NOT_AUTHORITY",
     "state_source": "config/governance/project_state.json"
   },
-  "blockers": [
-    "ENG-09.3-WU02 is blocked until diff-local Security Actions and Security Supply Chain semantics stop treating unchanged legacy action-ref debt as newly introduced debt."
-  ],
+  "blockers": [],
   "current_objective": "ENG-09.3-WU03: make workflow-security and action-supply-chain changed gates diff-local without suppressing any newly introduced unsafe line.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
