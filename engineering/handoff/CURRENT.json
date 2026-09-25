@@ -34,7 +34,6 @@
     "active_manifest": "engineering/lots/ENG-09.json"
   },
   "recent_completed": [
-    "ENG-08.3 qualification-only bootstrap hooks were identified as lifecycle-specific after task transition and removed from the permanent mandatory path; this prevents completed proof-reuse qualification from blocking or slowing later AWUs.",
     "ENG-08.4 WU01 mandatory-cost static core completed on exact head e341ad2693e246ddee32939b452c87f5a3ce55a0; Bootstrap 36057570058, Security Secrets 36057570005, Security Actions 36057569995 and Supply Chain 36057570009 passed. Static verdict PASS_WITH_VISIBILITY_UNVERIFIED inventories 6 mandatory workflows, ubuntu-latest only, no repository secrets, approved exact action pins, and all project/ENG-04 cost-policy values false.",
     "ENG-08.4 mandatory zero-paid-requirement qualification completed on exact head ac5433357f8784dc1e0499f7440b7527e0d1792d; Bootstrap 36060138932 and Security Secrets 36060138426 passed. Live repository evidence confirms public repo id 1322269966; official GitHub billing semantics bind standard public ubuntu-latest execution to zero mandatory paid spend. Verdict PASS_MANDATORY_PATH_ZERO_PAID_REQUIREMENT with 21 adversarial probes.",
     "ENG-08.5 context-free cold-start qualification completed on exact head 5ec2ede8c194fbe01e178ae02d9fba5f0d139b2a; Bootstrap 36063155037 and Security Secrets 36063155021 passed. Fresh GITHUB_CONNECTOR_ONLY recovery used 7 primary + 2 reference files (57 KiB), required no conversational context, passed 10 negative probes and completed in 38.129 ms.",
@@ -84,20 +83,6 @@
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
   ],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36060138426",
-      "head_sha": "ac5433357f8784dc1e0499f7440b7527e0d1792d",
-      "scope": "ENG-08.4-WU02_SECURITY_SECRETS"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36063155037",
-      "head_sha": "5ec2ede8c194fbe01e178ae02d9fba5f0d139b2a",
-      "scope": "ENG-08.5-WU01_BOOTSTRAP"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "status": "PASS",
