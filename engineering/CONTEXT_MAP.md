@@ -26,16 +26,16 @@
 - engineering/work_units/ENG-09.2-WU01.json
 - engineering/LOT45_ENGINE_PILOT_EVIDENCE.json
 - engineering/LOT45_ENGINE_PILOT.md
+- engineering/MASTER_PLAN.md
 
 ## Execution context — reference
 
-- engineering/MASTER_PLAN.md
 - engineering/AGENT_PROTOCOL.md
 
 ## Budget
 
-- Primary: 6 / 10 files
-- Reference: 2 / 12 files
+- Primary: 7 / 10 files
+- Reference: 1 / 12 files
 - Routed size: 51 / 768 KiB
 - Implicit repository expansion: FORBIDDEN
 
