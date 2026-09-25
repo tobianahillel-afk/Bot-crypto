@@ -2,14 +2,14 @@
   "schema_version": 1,
   "kind": "agent_work_unit",
   "id": "ENG-09.3-WU02",
-  "status": "IN_PROGRESS",
+  "status": "BLOCKED",
   "parent": {
     "work_item_id": "ENG-09",
     "task_id": "ENG-09.3",
     "manifest": "engineering/lots/ENG-09.json"
   },
   "title": "Suppress historical mutation PR fanout batch 1",
-  "objective": "Remove pull_request triggering from the first bounded batch of nine historical Lots26-44 mutation workflows while preserving their existing push/manual lifecycle surfaces and all jobs, commands, thresholds and evidence logic.",
+  "objective": "Remove pull_request triggering from the first bounded batch of eight mutable historical Lots26-40 mutation workflows while preserving their existing push/manual lifecycle surfaces and all jobs, commands, thresholds and evidence logic; protected Lot44 certification workflows are excluded.",
   "non_goals": [
     "modify Lot45 or global workflows",
     "consolidate mutation execution into the future reusable generic workflow",
@@ -18,7 +18,8 @@
     "change ENGINE_COMPLETE lifecycle semantics",
     "modify Lot45 candidate code or resolve its P1 findings",
     "merge PR #66 or unlock Lot46",
-    "change business development status"
+    "change business development status",
+    "modify protected Lot44 certification or mutation workflows"
   ],
   "depends_on": [
     "ENG-09.3-WU01"
@@ -70,11 +71,6 @@
       "name": "Historical mutation workflow batch1 8",
       "kind": "FILE",
       "locator": ".github/workflows/lot36-mutation-assurance.yml"
-    },
-    {
-      "name": "Historical mutation workflow batch1 9",
-      "kind": "FILE",
-      "locator": ".github/workflows/lot44-mutation-assurance.yml"
     }
   ],
   "scope": {
@@ -92,8 +88,7 @@
       ".github/workflows/lot30-mutation.yml",
       ".github/workflows/lot40-mutation-assurance.yml",
       ".github/workflows/lot28-mutation.yml",
-      ".github/workflows/lot36-mutation-assurance.yml",
-      ".github/workflows/lot44-mutation-assurance.yml"
+      ".github/workflows/lot36-mutation-assurance.yml"
     ],
     "forbidden_paths": [
       ".github/workflows/lot45-*.yml",
@@ -121,22 +116,23 @@
   "contracts": {
     "required_invariants": [
       "each target workflow loses pull_request triggering and its pull-request-only path filter",
-      "workflow_dispatch remains present on all nine workflows",
+      "workflow_dispatch remains present on all eight target workflows",
       "existing push main triggers remain unchanged where they already exist",
       "workflows without a pre-existing push trigger remain manual-only after pull_request removal",
       "everything below each workflow trigger block remains byte-for-byte unchanged",
       "no Lot45 or global workflow is modified",
       "historical mutation implementation thresholds tests artifacts and jobs remain unchanged",
-      "business development remains paused and Lot46 remains locked"
+      "business development remains paused and Lot46 remains locked",
+      "protected Lot44 current-tree evidence remains byte-for-byte equal to main"
     ],
     "acceptance_criteria": [
-      "lot37 lot40 lot36 and lot44 mutation workflows become workflow_dispatch-only",
+      "lot37 lot40 and lot36 mutation workflows become workflow_dispatch-only",
       "lot26 lot31 lot32 lot30 and lot28 retain push main plus workflow_dispatch",
-      "none of the nine target workflows contains pull_request",
-      "the nine target workflow job sections are unchanged",
       "workflow syntax and workflow-security validation pass",
       "Security Secrets remains green",
-      "active-AWU scope enforcement passes"
+      "active-AWU scope enforcement passes",
+      "the eight target workflow job sections are unchanged",
+      "Lot44 protected workflow is unchanged from main"
     ]
   },
   "planning": {
@@ -164,7 +160,7 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 14,
+      "files_touched": 13,
       "executable_loc_changed": 0,
       "new_public_behaviors": 1,
       "contract_families": 0,
@@ -188,7 +184,7 @@
     ]
   },
   "done_when": [
-    "the first nine historical mutation workflows no longer trigger on candidate pull requests",
+    "the first eight mutable historical mutation workflows no longer trigger on candidate pull requests",
     "their original push/manual lifecycle surfaces are preserved exactly",
     "their jobs and mutation assurance semantics are unchanged",
     "same-head bootstrap and security controls pass"
