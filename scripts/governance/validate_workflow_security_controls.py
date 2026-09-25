@@ -38,7 +38,7 @@ def validate_policy(policy: dict[str, Any]) -> None:
         raise WorkflowSecurityError("unsupported workflow-security policy version")
     if policy.get("policy_kind") != "workflow_security_policy_v1":
         raise WorkflowSecurityError("invalid workflow-security policy kind")
-    if policy.get("semantics") != "CHANGED_WORKFLOW_ACTIONLINT_ZIZMOR_FAIL_CLOSED_V1":
+    if policy.get("semantics") != "CHANGED_WORKFLOW_ACTIONLINT_ZIZMOR_DIFF_LOCAL_V2":
         raise WorkflowSecurityError("workflow-security semantics drift")
     actionlint = policy.get("actionlint")
     if not isinstance(actionlint, dict):
@@ -90,8 +90,13 @@ def validate_policy(policy: dict[str, Any]) -> None:
         ".github/workflows/*.yaml",
     ]:
         raise WorkflowSecurityError("changed workflow target globs drift")
-    if policy.get("scan_semantics", {}).get("unchanged_legacy_blocking") is not False:
-        raise WorkflowSecurityError("legacy unchanged workflows must not become WU01 blockers")
+    scan = policy.get("scan_semantics", {})
+    if scan.get("unchanged_legacy_blocking") is not False:
+        raise WorkflowSecurityError("legacy unchanged workflows must not become blockers")
+    if scan.get("changed_head_lines_only") is not True:
+        raise WorkflowSecurityError("zizmor gate must use changed HEAD lines")
+    if scan.get("unlocated_findings_blocking") is not True:
+        raise WorkflowSecurityError("unlocated zizmor findings must fail closed")
     cost = policy.get("cost_policy")
     if not isinstance(cost, dict) or any(cost.values()):
         raise WorkflowSecurityError("mandatory workflow-security path must remain zero-cost")
@@ -153,8 +158,14 @@ def validate_workflow(policy: dict[str, Any], text: str) -> None:
     _require(text, "ZIZMOR_OFFLINE=1", "zizmor offline environment")
     _require(text, ".github/actions/*/action.yml", "local action target discovery")
     _require(text, "WORKFLOW_SECURITY_TARGET_FILE", "shared target discovery")
-    _require(text, "ZIZMOR_FINDINGS=", "safe finding count")
-    _require(text, '"ident": item.get("ident")', "safe finding rule metadata")
+    _require(text, "WORKFLOW_SECURITY_BASE", "diff-base export")
+    _require(
+        text,
+        "python scripts/governance/filter_zizmor_changed_findings.py",
+        "diff-local zizmor finding filter",
+    )
+    _require(text, '--zizmor-status "${status}"', "zizmor status binding")
+    _require(text, "Run changed-finding filter selftests", "zizmor filter qualification")
     if 'item.get("feature")' in text:
         raise WorkflowSecurityError("zizmor logs must not expose feature/snippet content")
     for trigger_path in policy["trigger_paths"]:

@@ -82,6 +82,30 @@ def main() -> int:
     _expect(mod.WorkflowSecurityError, lambda: mod.validate_workflow(policy, no_zizmor_positive), "zizmor positive control weakened")
     no_exit = workflow.replace("--format=json-v1", "--no-exit-codes --format=json-v1")
     _expect(mod.WorkflowSecurityError, lambda: mod.validate_workflow(policy, no_exit), "zizmor exit codes disabled")
+
+    no_filter = workflow.replace(
+        "python scripts/governance/filter_zizmor_changed_findings.py",
+        "python -c 'raise SystemExit(0)'",
+    )
+    _expect(
+        mod.WorkflowSecurityError,
+        lambda: mod.validate_workflow(policy, no_filter),
+        "diff-local zizmor filter removed",
+    )
+    no_base = workflow.replace("WORKFLOW_SECURITY_BASE", "WORKFLOW_SECURITY_BASE_REMOVED")
+    _expect(
+        mod.WorkflowSecurityError,
+        lambda: mod.validate_workflow(policy, no_base),
+        "diff-base export removed",
+    )
+    unlocated = copy.deepcopy(policy)
+    unlocated["scan_semantics"]["unlocated_findings_blocking"] = False
+    _expect(
+        mod.WorkflowSecurityError,
+        lambda: mod.validate_policy(unlocated),
+        "unlocated findings allowed",
+    )
+
     paid = copy.deepcopy(policy)
     paid["cost_policy"]["paid_saas_required"] = True
     _expect(mod.WorkflowSecurityError, lambda: mod.validate_policy(paid), "paid SaaS")
@@ -89,7 +113,7 @@ def main() -> int:
     broad["scan_semantics"]["unchanged_legacy_blocking"] = True
     _expect(mod.WorkflowSecurityError, lambda: mod.validate_policy(broad), "legacy scope broadened")
 
-    print("WORKFLOW_SECURITY_SELFTEST_PASS probes=18")
+    print("WORKFLOW_SECURITY_SELFTEST_PASS probes=21")
     return 0
 
 

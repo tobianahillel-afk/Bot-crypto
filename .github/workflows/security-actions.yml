@@ -9,6 +9,7 @@ on:
       - ".github/actions/**"
       - "config/governance/workflow_security_policy_v1.json"
       - "scripts/governance/validate_workflow_security_controls.py"
+      - "scripts/governance/filter_zizmor_changed_findings.py"
   push:
     branches:
       - main
@@ -19,6 +20,7 @@ on:
       - ".github/actions/**"
       - "config/governance/workflow_security_policy_v1.json"
       - "scripts/governance/validate_workflow_security_controls.py"
+      - "scripts/governance/filter_zizmor_changed_findings.py"
   workflow_dispatch:
 
 permissions:
@@ -195,6 +197,7 @@ jobs:
           printf '%s\n' "${security_targets[@]}" >"${security_file}"
           printf 'WORKFLOW_TARGET_FILE=%s\n' "${workflow_file}" >> "${GITHUB_ENV}"
           printf 'WORKFLOW_SECURITY_TARGET_FILE=%s\n' "${security_file}" >> "${GITHUB_ENV}"
+          printf 'WORKFLOW_SECURITY_BASE=%s\n' "${base}" >> "${GITHUB_ENV}"
           printf 'ACTIONLINT_TARGET_COUNT=%s\n' "${#workflows[@]}"
           printf 'ZIZMOR_TARGET_COUNT=%s\n' "${#security_targets[@]}"
           if (("${#workflows[@]}" > 0)); then printf 'ACTIONLINT_TARGET=%s\n' "${workflows[@]}"; fi
@@ -211,6 +214,9 @@ jobs:
           fi
           "${ACTIONLINT_BIN}" "${targets[@]}"
 
+      - name: Run changed-finding filter selftests
+        run: python scripts/governance/selftest_zizmor_changed_findings.py
+
       - name: Audit changed workflows and actions with zizmor
         shell: bash
         run: |
@@ -221,39 +227,15 @@ jobs:
             exit 0
           fi
           report="${RUNNER_TEMP}/zizmor-findings.json"
+          cleanup() { rm -f "${report}"; }
+          trap cleanup EXIT
           set +e
           ZIZMOR_OFFLINE=1 "${ZIZMOR_BIN}" --offline --strict-collection --no-config --format=json-v1 "${targets[@]}" >"${report}"
           status=$?
           set -e
-          python - "${report}" <<'PY'
-          import json
-          import sys
-          from pathlib import Path
-
-          findings = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-          print(f"ZIZMOR_FINDINGS={len(findings)}")
-          for item in findings:
-              determinations = item.get("determinations", {})
-              path = None
-              row = None
-              locations = item.get("locations", [])
-              if locations:
-                  symbolic = locations[0].get("symbolic", {})
-                  key = symbolic.get("key", {})
-                  path = key.get("Local", {}).get("verbatim_path") if isinstance(key, dict) else None
-                  concrete = locations[0].get("concrete", {}).get("location", {}).get("start_point", {})
-                  row = concrete.get("row")
-              safe = {
-                  "ident": item.get("ident"),
-                  "severity": determinations.get("severity"),
-                  "confidence": determinations.get("confidence"),
-                  "file": path,
-                  "row_zero_based": row,
-              }
-              print(json.dumps(safe, sort_keys=True))
-          PY
-          rm -f "${report}"
-          if [ "${status}" -ne 0 ]; then
-            echo "zizmor findings detected" >&2
-            exit 1
-          fi
+          python scripts/governance/filter_zizmor_changed_findings.py \
+            --report "${report}" \
+            --base "${WORKFLOW_SECURITY_BASE}" \
+            --head HEAD \
+            --targets-file "${WORKFLOW_SECURITY_TARGET_FILE}" \
+            --zizmor-status "${status}"

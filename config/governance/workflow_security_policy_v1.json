@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy_kind": "workflow_security_policy_v1",
-  "semantics": "CHANGED_WORKFLOW_ACTIONLINT_ZIZMOR_FAIL_CLOSED_V1",
+  "semantics": "CHANGED_WORKFLOW_ACTIONLINT_ZIZMOR_DIFF_LOCAL_V2",
   "workflow_path": ".github/workflows/security-actions.yml",
   "actionlint": {
     "repository": "rhysd/actionlint",
@@ -26,13 +26,17 @@
     ".github/workflows/**/*.yaml",
     ".github/actions/**",
     "config/governance/workflow_security_policy_v1.json",
-    "scripts/governance/validate_workflow_security_controls.py"
+    "scripts/governance/validate_workflow_security_controls.py",
+    "scripts/governance/filter_zizmor_changed_findings.py"
   ],
   "scan_semantics": {
     "pull_request": "merge-base(base_sha, HEAD) to HEAD",
     "push": "before_sha to HEAD; fallback HEAD^ when before is unavailable/all-zero",
     "workflow_dispatch": "HEAD^ to HEAD; fallback tracked workflow files when no parent",
-    "unchanged_legacy_blocking": false
+    "unchanged_legacy_blocking": false,
+    "changed_head_lines_only": true,
+    "unlocated_findings_blocking": true,
+    "zizmor_gate": "findings on added or modified HEAD lines block; findings confined to unchanged legacy lines remain visible but nonblocking"
   },
   "cost_policy": {
     "paid_api_required": false,
@@ -49,9 +53,10 @@
     "legacy unchanged workflow debt remains explicit for ENG-04.5 and is not silently treated as clean",
     "workflow uses contents read only and checkout does not persist credentials",
     "zizmor release tag and source commit are audited and the exact Linux asset SHA-256 is enforced",
-    "zizmor runs offline with strict collection no configuration no token and fail-closed exit codes",
+    "zizmor runs offline with strict collection no configuration and no token; changed-line filtering blocks new or unlocated findings while preserving legacy findings as visible debt",
     "changed local action definitions are included in zizmor targets",
-    "zizmor finding logs expose metadata only and never workflow feature/snippet content"
+    "zizmor finding logs expose metadata only and never workflow feature/snippet content",
+    "zizmor findings without a concrete repository-local target location fail closed"
   ],
   "zizmor": {
     "repository": "zizmorcore/zizmor",
