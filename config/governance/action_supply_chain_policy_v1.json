@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy_kind": "action_supply_chain_policy_v1",
-  "semantics": "INVENTORY_LEGACY_DEBT_BLOCK_CHANGED_FLOATING_REFS",
+  "semantics": "INVENTORY_LEGACY_DEBT_BLOCK_CHANGED_USES_LINES",
   "scan_roots": [
     ".github/workflows",
     ".github/actions"
@@ -29,7 +29,8 @@
     "fail_on_remote_floating": true,
     "fail_on_dynamic_or_malformed": true,
     "deleted_files_ignored": true,
-    "require_registered_remote_sha": true
+    "require_registered_remote_sha": true,
+    "changed_head_lines_only": true
   },
   "workflow": {
     "path": ".github/workflows/security-supply-chain.yml",
@@ -52,11 +53,12 @@
     "remote refs are immutable only when exactly 40 hexadecimal characters",
     "local ./ uses and docker:// uses are classified separately",
     "inventory reports legacy debt without blocking the repository",
-    "changed workflow files fail closed on floating dynamic or malformed uses",
+    "added or modified uses lines fail closed on floating dynamic malformed or unapproved remote refs",
     "deleted workflow files do not create stale-content failures",
     "mandatory gate uses only Python standard library and local git",
     "new remote action references require later registry verification before approval",
-    "changed remote SHA pins must be approved for their exact owner/repository in the offline registry"
+    "changed remote SHA pins must be approved for their exact owner/repository in the offline registry",
+    "unchanged legacy uses lines remain visible in inventory but never become changed-mode blockers solely because another line in the file changed"
   ],
   "approved_pin_registry": "config/governance/action_pin_registry_v1.json"
 }

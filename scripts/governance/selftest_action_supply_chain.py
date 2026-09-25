@@ -91,28 +91,74 @@ jobs:
             "REMOTE_PINNED_SHA",
         ]
         result = mod.audit([workflow], policy, root=root)
-        blocked = mod.changed_gate(result, registry)
+        floating_record = next(
+            record for record in result["records"]
+            if record["classification"] == "REMOTE_FLOATING_REF"
+        )
+        changed = {floating_record["file"]: {floating_record["line"]}}
+        blocked = mod.changed_gate(result, registry, changed)
         assert len(blocked) == 1
         assert blocked[0]["classification"] == "REMOTE_FLOATING_REF"
+        assert mod.changed_gate(
+            result,
+            registry,
+            {floating_record["file"]: {1}},
+        ) == []
 
         safe = root / ".github" / "workflows" / "safe.yml"
         safe.write_text(
             "steps:\n  - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065\n",
             encoding="utf-8",
         )
-        assert mod.changed_gate(mod.audit([safe], policy, root=root), registry) == []
+        safe_result = mod.audit([safe], policy, root=root)
+        safe_record = safe_result["records"][0]
+        assert mod.changed_gate(
+            safe_result,
+            registry,
+            {safe_record["file"]: {safe_record["line"]}},
+        ) == []
 
         unknown = root / ".github" / "workflows" / "unknown.yml"
         unknown.write_text(
             "steps:\n  - uses: actions/checkout@0000000000000000000000000000000000000000\n",
             encoding="utf-8",
         )
+        unknown_result = mod.audit([unknown], policy, root=root)
+        unknown_record = unknown_result["records"][0]
         unknown_blocked = mod.changed_gate(
-            mod.audit([unknown], policy, root=root),
+            unknown_result,
             registry,
+            {unknown_record["file"]: {unknown_record["line"]}},
         )
         assert len(unknown_blocked) == 1
         assert unknown_blocked[0]["blocked_reason"] == "UNAPPROVED_REMOTE_SHA"
+
+
+    diff_probe = """diff --git a/.github/workflows/probe.yml b/.github/workflows/probe.yml
+--- a/.github/workflows/probe.yml
++++ b/.github/workflows/probe.yml
+@@ -1,2 +1 @@
+-on:
+-  pull_request:
++on: workflow_dispatch
+@@ -8,0 +8 @@
++      - uses: owner/action@v1
+"""
+    assert mod.parse_changed_head_lines(diff_probe) == {
+        ".github/workflows/probe.yml": {1, 8}
+    }
+
+    new_file_probe = """diff --git a/.github/workflows/new.yml b/.github/workflows/new.yml
+new file mode 100644
+--- /dev/null
++++ b/.github/workflows/new.yml
+@@ -0,0 +1,2 @@
++name: New
++on: push
+"""
+    assert mod.parse_changed_head_lines(new_file_probe) == {
+        ".github/workflows/new.yml": {1, 2}
+    }
 
     broken = dict(policy)
     broken["immutable_remote_ref_regex"] = "^v\\d+$"
@@ -122,7 +168,7 @@ jobs:
         "mutable immutable-ref policy",
     )
 
-    print("ACTION_SUPPLY_CHAIN_SELFTEST_PASS probes=13")
+    print("ACTION_SUPPLY_CHAIN_SELFTEST_PASS probes=17")
     return 0
 
 
