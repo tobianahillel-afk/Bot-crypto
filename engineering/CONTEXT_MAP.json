@@ -1,14 +1,7 @@
 {
-  "active_work": {
-    "awu_id": "ENG-08.7-WU02",
-    "awu_path": "engineering/work_units/ENG-08.7-WU02.json",
-    "complexity_score": 1,
-    "lot": "ENG-08",
-    "manifest": "engineering/lots/ENG-08.json",
-    "risk_class": "R1",
-    "task": "ENG-08.7",
-    "track": "ENGINEERING"
-  },
+  "schema_version": 1,
+  "map_kind": "active_agent_context_map_v1",
+  "project": "Crypto Quant Bot V3.1-Ops",
   "authority": {
     "current_state": "config/governance/project_state.json",
     "resume_hint": "engineering/handoff/CURRENT.json",
@@ -19,70 +12,78 @@
     "config/governance/project_state.json",
     "engineering/CONTEXT_MAP.json"
   ],
-  "business_hold": {
-    "candidate_lot": 45,
-    "candidate_status": "SUSPENDED_CANDIDATE",
-    "development_status": "PAUSED",
-    "next_lot": {
-      "lot": 46,
-      "status": "LOCKED"
-    }
+  "active_work": {
+    "track": "ENGINEERING",
+    "lot": "ENG-09",
+    "task": "ENG-09.1",
+    "manifest": "engineering/lots/ENG-09.json",
+    "awu_id": "ENG-09.1-WU01",
+    "awu_path": "engineering/work_units/ENG-09.1-WU01.json",
+    "risk_class": "R1",
+    "complexity_score": 1
   },
   "execution_context": {
+    "primary_files": [
+      "AGENTS.md",
+      "config/governance/project_state.json",
+      "engineering/lots/ENG-09.json",
+      "engineering/work_units/ENG-09.1-WU01.json",
+      "engineering/CRITICAL_R3_BYPASS_EVIDENCE.json",
+      "config/governance/diff_classifier_policy_v1.json",
+      "config/governance/diff_impact_policy_v1.json",
+      "config/governance/validation_t3_t4_policy_v1.json",
+      "engineering/AGENT_CAPABILITIES.json"
+    ],
+    "reference_files": [
+      "engineering/MASTER_PLAN.md",
+      "engineering/AGENT_PROTOCOL.md"
+    ],
+    "primary_count": 9,
+    "reference_count": 2,
+    "total_kib_ceil": 50,
     "budget": {
       "max_primary_files": 10,
       "max_reference_files": 12,
       "max_total_kib": 768
     },
-    "implicit_expansion": "FORBIDDEN",
-    "primary_count": 8,
-    "primary_files": [
-      "AGENTS.md",
-      "config/governance/project_state.json",
-      "engineering/lots/ENG-08.json",
-      "engineering/work_units/ENG-08.7-WU02.json",
-      "scripts/governance/resume_recovery_qualification.py",
-      "scripts/governance/selftest_resume_recovery.py",
-      "scripts/governance/resolve_next_work.py",
-      "engineering/AGENT_CAPABILITIES.json"
-    ],
-    "reference_count": 2,
-    "reference_files": [
-      "engineering/MASTER_PLAN.md",
-      "engineering/AGENT_PROTOCOL.md"
-    ],
-    "total_kib_ceil": 69
+    "implicit_expansion": "FORBIDDEN"
   },
-  "instructions": [
-    "verify external Git reality before writing",
-    "continue only the active AWU",
-    "do not recursively load the repository at startup",
-    "load additional files only when the active AWU or validated dependency requires them"
-  ],
-  "map_kind": "active_agent_context_map_v1",
-  "non_authoritative_sources": [
-    "engineering/STATE.json",
-    "chat_history",
-    "model_memory"
-  ],
-  "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "ENG-08.7 WU02: make permanent interruption/recovery qualification lifecycle-generic and obtain final same-head proof that the hardened R3 assurance chain cannot be bypassed.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Replace ENG-08.6 hardcoded recovery expectations with canonical active-task/AWU expectations, retain all safety/write-gate invariants, then require full Bootstrap plus Security Secrets on the exact final head."
+    "current_objective": "ENG-09.1: run the completed Development Engine read-only against suspended Lot45 PR #66 and record exact-head pilot evidence without mutating business code.",
+    "next_action": "Verify live main and PR #66 base/head/open/unmerged state, then inventory the candidate diff and exact workflow/check evidence and map them through the current engine; write only engineering/LOT45_ENGINE_PILOT_EVIDENCE.json and engineering/LOT45_ENGINE_PILOT.md."
+  },
+  "business_hold": {
+    "development_status": "PAUSED",
+    "candidate_lot": 45,
+    "candidate_status": "SUSPENDED_CANDIDATE",
+    "next_lot": {
+      "lot": 46,
+      "status": "LOCKED"
+    }
   },
   "safety": {
-    "execution_allowed": false,
-    "live_execution": "DISABLED",
     "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
-    "trade_allowed": false
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED"
   },
-  "schema_version": 1,
   "stop_conditions": [
     "STATE_DRIFT",
     "BUSINESS_SCOPE_TOUCHED_WITHOUT_UNLOCK",
     "FROZEN_EVIDENCE_MUTATION",
     "LOT46_UNLOCK_ATTEMPT",
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
+  ],
+  "non_authoritative_sources": [
+    "engineering/STATE.json",
+    "chat_history",
+    "model_memory"
+  ],
+  "instructions": [
+    "verify external Git reality before writing",
+    "continue only the active AWU",
+    "do not recursively load the repository at startup",
+    "load additional files only when the active AWU or validated dependency requires them"
   ]
 }

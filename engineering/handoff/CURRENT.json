@@ -1,10 +1,10 @@
 {
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-08.7-WU02",
-    "awu_path": "engineering/work_units/ENG-08.7-WU02.json",
-    "parent_manifest": "engineering/lots/ENG-08.json",
-    "scope_base_sha": "6d9bc16d4c1958e9b762c64b5020ccc4e0a4f96e",
+    "awu_id": "ENG-09.1-WU01",
+    "awu_path": "engineering/work_units/ENG-09.1-WU01.json",
+    "parent_manifest": "engineering/lots/ENG-09.json",
+    "scope_base_sha": "c2c1f0990c881cb725a3fccfccfd8098f84a0694",
     "risk_class": "R1",
     "complexity_score": 1
   },
@@ -14,7 +14,7 @@
     "state_source": "config/governance/project_state.json"
   },
   "blockers": [],
-  "current_objective": "ENG-08.7 WU02: make permanent interruption/recovery qualification lifecycle-generic and obtain final same-head proof that the hardened R3 assurance chain cannot be bypassed.",
+  "current_objective": "ENG-09.1: run the completed Development Engine read-only against suspended Lot45 PR #66 and record exact-head pilot evidence without mutating business code.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -27,11 +27,11 @@
     "rulesets_count": 0
   },
   "kind": "engineering_handoff",
-  "next_action": "Replace ENG-08.6 hardcoded recovery expectations with canonical active-task/AWU expectations, retain all safety/write-gate invariants, then require full Bootstrap plus Security Secrets on the exact final head.",
+  "next_action": "Verify live main and PR #66 base/head/open/unmerged state, then inventory the candidate diff and exact workflow/check evidence and map them through the current engine; write only engineering/LOT45_ENGINE_PILOT_EVIDENCE.json and engineering/LOT45_ENGINE_PILOT.md.",
   "next_engineering": {
-    "active_lot": "ENG-08",
-    "active_task": "ENG-08.7",
-    "active_manifest": "engineering/lots/ENG-08.json"
+    "active_lot": "ENG-09",
+    "active_task": "ENG-09.1",
+    "active_manifest": "engineering/lots/ENG-09.json"
   },
   "recent_completed": [
     "ENG-08.3 WU01 proof-reuse effectiveness core implemented on exact head 114f0c8c2ad07bb9994d152c445ad84a16a4098b; Bootstrap 36053443968 and Security Secrets 36053444050 passed. Generic measurement primitives are implemented without production cache integration; executable generic/real-subject qualification is delegated to WU02.",
@@ -41,7 +41,8 @@
     "ENG-08.4 mandatory zero-paid-requirement qualification completed on exact head ac5433357f8784dc1e0499f7440b7527e0d1792d; Bootstrap 36060138932 and Security Secrets 36060138426 passed. Live repository evidence confirms public repo id 1322269966; official GitHub billing semantics bind standard public ubuntu-latest execution to zero mandatory paid spend. Verdict PASS_MANDATORY_PATH_ZERO_PAID_REQUIREMENT with 21 adversarial probes.",
     "ENG-08.5 context-free cold-start qualification completed on exact head 5ec2ede8c194fbe01e178ae02d9fba5f0d139b2a; Bootstrap 36063155037 and Security Secrets 36063155021 passed. Fresh GITHUB_CONNECTOR_ONLY recovery used 7 primary + 2 reference files (57 KiB), required no conversational context, passed 10 negative probes and completed in 38.129 ms.",
     "ENG-08.6 interruption/recovery qualification completed on exact head ad131734d7b85fde809d6ab7bd4a89f25321f82f; Bootstrap 36073305546 and Security Secrets 36073305552 passed. Recovery completed in 113.574 ms across 13 scenarios; adversarial selftest passed 17 probes in 177.574 ms; cold-start regression completed in 21.516 ms using 7 primary + 2 reference files (62 KiB). Resumed writes remain blocked pending LIVE_GIT_REVERIFY_REQUIRED; BUSINESS stays PAUSED, Lot46 LOCKED, trading/execution disabled. Evidence anchor commit 02c74a40d220ea3b4389f28139422e1c0f769808 also passed Bootstrap 36073668394 and Security Secrets 36073668282.",
-    "ENG-08.7 WU01 critical-R3 core hardening completed on head 6d9bc16d4c1958e9b762c64b5020ccc4e0a4f96e: AWU complexity/risk/context/handoff, T3/T4 selector cross-layer selftest, exact-head validator/selftest and deep-assurance validator/selftest all passed inside Bootstrap run 36074598534; Security Secrets run 36074598394 passed. Full Bootstrap then exposed lifecycle-specific ENG-08.6 hardcoding in the permanent recovery qualifier; remediation and final same-head qualification are split into WU02."
+    "ENG-08.7 WU01 critical-R3 core hardening completed on head 6d9bc16d4c1958e9b762c64b5020ccc4e0a4f96e: AWU complexity/risk/context/handoff, T3/T4 selector cross-layer selftest, exact-head validator/selftest and deep-assurance validator/selftest all passed inside Bootstrap run 36074598534; Security Secrets run 36074598394 passed. Full Bootstrap then exposed lifecycle-specific ENG-08.6 hardcoding in the permanent recovery qualifier; remediation and final same-head qualification are split into WU02.",
+    "ENG-08.7 WU02 lifecycle-generic recovery and critical-R3 bypass qualification completed. Implementation head d0bf1381298ea81356e469afec4e9f5a90deefda passed Bootstrap 36121700188 and Security Secrets 36121700184; evidence-anchor head c2c1f0990c881cb725a3fccfccfd8098f84a0694 also passed Bootstrap 36122013069 and Security Secrets 36122013061. WU02 touched no forbidden R3 control/policy/workflow."
   ],
   "resume_read_order": [
     "AGENTS.md",
@@ -61,9 +62,9 @@
   ],
   "state_snapshot": {
     "engineering_phase": "BUILDING",
-    "active_lot": "ENG-08",
-    "active_task": "ENG-08.7",
-    "active_manifest": "engineering/lots/ENG-08.json",
+    "active_lot": "ENG-09",
+    "active_task": "ENG-09.1",
+    "active_manifest": "engineering/lots/ENG-09.json",
     "business_development": "PAUSED",
     "lot46_status": "LOCKED",
     "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
@@ -166,6 +167,20 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36074598394",
       "head_sha": "6d9bc16d4c1958e9b762c64b5020ccc4e0a4f96e",
       "scope": "ENG-08.7-WU01_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36122013069",
+      "head_sha": "c2c1f0990c881cb725a3fccfccfd8098f84a0694",
+      "scope": "ENG-08.7-WU02_EVIDENCE_BOOTSTRAP"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36122013061",
+      "head_sha": "c2c1f0990c881cb725a3fccfccfd8098f84a0694",
+      "scope": "ENG-08.7-WU02_EVIDENCE_SECURITY_SECRETS"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"

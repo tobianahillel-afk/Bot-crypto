@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "kind": "engineering_work_item",
+  "id": "ENG-09",
+  "title": "Productionization / Lot45 Pilot",
+  "status": "IN_PROGRESS",
+  "objective": "Pilot the completed Development Engine against the suspended Lot45 candidate without mutating business code, identify engine/workflow redundancies or defects, certify Development Engine V1, freeze its bootstrap interfaces, and only then make an explicit business-development unlock decision.",
+  "depends_on": [
+    "ENG-08"
+  ],
+  "allowed_paths": [
+    "AGENTS.md",
+    "README.md",
+    "config/governance/**",
+    "engineering/**",
+    "scripts/governance/**",
+    ".github/workflows/**"
+  ],
+  "forbidden_scope": [
+    "Lot45 candidate branch mutation during ENG-09.1 pilot",
+    "Lot45 merge during ENG-09.1 pilot",
+    "Lot46 implementation or unlock before ENG-09.6 decision",
+    "data/audit/** historical evidence mutation",
+    "reports/lot*/** historical evidence mutation",
+    "contracts/** historical certification mutation",
+    "runtime capability activation",
+    "mandatory paid or LLM-backed dependency",
+    "live trading execution enablement"
+  ],
+  "tasks": [
+    {
+      "id": "ENG-09.1",
+      "status": "IN_PROGRESS",
+      "description": "Run the Development Engine read-only against the suspended Lot45 candidate and record exact-head pilot evidence."
+    },
+    {
+      "id": "ENG-09.2",
+      "status": "PLANNED",
+      "description": "Identify redundant workflows, reviews and validation work exposed by the Lot45 pilot."
+    },
+    {
+      "id": "ENG-09.3",
+      "status": "PLANNED",
+      "description": "Repair engine defects found by the pilot, including terminal engineering-lifecycle semantics if required."
+    },
+    {
+      "id": "ENG-09.4",
+      "status": "PLANNED",
+      "description": "Certify Development Engine V1 with exact-head SAFE, FAST, zero-cost and security evidence."
+    },
+    {
+      "id": "ENG-09.5",
+      "status": "PLANNED",
+      "description": "Freeze V1 bootstrap interfaces and permanent agent entry points."
+    },
+    {
+      "id": "ENG-09.6",
+      "status": "PLANNED",
+      "description": "Explicitly decide whether business development may be unlocked; never auto-unlock."
+    }
+  ],
+  "done_when": [
+    "Lot45 candidate has been exercised by the engine without candidate mutation",
+    "workflow and review redundancies are measured and addressed or explicitly accepted",
+    "pilot-discovered engine defects are repaired and regression-qualified",
+    "Development Engine V1 receives exact-head SAFE FAST zero-cost security certification",
+    "V1 bootstrap interfaces are frozen and documented",
+    "business-development unlock is an explicit fail-closed decision that cannot bypass BOOT-FINDING-001 or other blockers"
+  ],
+  "extensions": {
+    "scope_base_sha": "c2c1f0990c881cb725a3fccfccfd8098f84a0694",
+    "scope_base_kind": "ENG_08_FINAL_EVIDENCE_ANCHOR",
+    "scope_base_evidence_run": 36122013069,
+    "scope_base_security_run": 36122013061,
+    "terminal_next_lot_sentinel": "ENGINE_COMPLETE",
+    "terminal_sentinel_semantics": "NON_EXECUTABLE_SENTINEL_TO_BE_HARDENED_BEFORE_ENG_09_COMPLETION"
+  }
+}

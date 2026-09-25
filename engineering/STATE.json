@@ -1,6 +1,6 @@
 {
   "authority": {
-    "active_manifest": "engineering/lots/ENG-08.json",
+    "active_manifest": "engineering/lots/ENG-09.json",
     "bootstrap_protocol": "engineering/BOOTSTRAP.md",
     "current_state": "config/governance/project_state.json",
     "handoff": "engineering/handoff/CURRENT.json",
@@ -48,9 +48,9 @@
     }
   },
   "engineering_engine": {
-    "active_lot": "ENG-08",
-    "active_manifest": "engineering/lots/ENG-08.json",
-    "active_task": "ENG-08.7",
+    "active_lot": "ENG-09",
+    "active_manifest": "engineering/lots/ENG-09.json",
+    "active_task": "ENG-09.1",
     "blockers": [],
     "completed": [
       "ENG-00",
@@ -60,9 +60,10 @@
       "ENG-04",
       "ENG-05",
       "ENG-06",
-      "ENG-07"
+      "ENG-07",
+      "ENG-08"
     ],
-    "next_lot": "ENG-09",
+    "next_lot": "ENGINE_COMPLETE",
     "phase": "BUILDING"
   },
   "known_findings": [

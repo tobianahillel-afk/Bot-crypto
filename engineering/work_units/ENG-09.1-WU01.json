@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-09.1-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-09",
+    "task_id": "ENG-09.1",
+    "manifest": "engineering/lots/ENG-09.json"
+  },
+  "title": "Run read-only Development Engine pilot against Lot45",
+  "objective": "Apply the current Development Engine to the exact suspended Lot45 PR #66 candidate using GitHub read evidence only, record how the engine decomposes/classifies/assures the candidate, and surface engine defects without modifying Lot45, main, business state, workflows or runtime permissions.",
+  "non_goals": [
+    "modify the Lot45 candidate branch",
+    "remediate Lot45 findings",
+    "merge PR #66",
+    "start or unlock Lot46",
+    "change business development status",
+    "change runtime trading execution risk or permission boundaries",
+    "change mandatory workflows or engine policies during the pilot",
+    "require Codex or any paid LLM reviewer"
+  ],
+  "depends_on": [
+    "ENG-08.7-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "Current project state",
+      "kind": "STATE",
+      "locator": "config/governance/project_state.json"
+    },
+    {
+      "name": "Final ENG-08 R3 evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/CRITICAL_R3_BYPASS_EVIDENCE.json"
+    },
+    {
+      "name": "Diff classifier policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/diff_classifier_policy_v1.json"
+    },
+    {
+      "name": "Diff impact policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/diff_impact_policy_v1.json"
+    },
+    {
+      "name": "T3/T4 selector policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/validation_t3_t4_policy_v1.json"
+    },
+    {
+      "name": "Capability/evidence policy",
+      "kind": "CONFIG",
+      "locator": "engineering/AGENT_CAPABILITIES.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Lot45 pilot evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/LOT45_ENGINE_PILOT_EVIDENCE.json"
+    },
+    {
+      "name": "Lot45 pilot report",
+      "kind": "FILE",
+      "locator": "engineering/LOT45_ENGINE_PILOT.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "c2c1f0990c881cb725a3fccfccfd8098f84a0694",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-08.json",
+      "engineering/lots/ENG-09.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-08.7-WU02.json",
+      "engineering/work_units/ENG-09.1-WU01.json",
+      "AGENTS.md",
+      "README.md",
+      "engineering/CURRENT_STATUS.md",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/LOT45_ENGINE_PILOT_EVIDENCE.json",
+      "engineering/LOT45_ENGINE_PILOT.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/**"
+    ],
+    "forbidden_semantics": [
+      "Lot45 candidate mutation",
+      "Lot45 remediation",
+      "Lot45 merge",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "risk or execution permission change",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "pilot observations are bound to exact PR #66 base and head SHAs",
+      "pilot is read-only toward the Lot45 candidate and main",
+      "current engine policies are observed rather than changed during ENG-09.1",
+      "candidate changed files and CI evidence are classified without trusting PR prose as proof",
+      "missing unavailable or stale evidence remains an explicit gap rather than an assumed PASS",
+      "Lot45 remains SUSPENDED_CANDIDATE Lot46 remains LOCKED and BUSINESS remains PAUSED",
+      "BOOT-FINDING-001 remains visible and cannot be bypassed by pilot success",
+      "no Codex or other paid LLM review is mandatory for pilot progress"
+    ],
+    "acceptance_criteria": [
+      "pilot verifies current main PR #66 base/head/open/unmerged reality before analysis",
+      "pilot inventories the exact Lot45 changed-file set and groups it by engine impact/domain",
+      "pilot maps candidate impacts to T0 T1 T2 and T3/T4 requirements using current policies",
+      "pilot inventories exact current workflow/check evidence and identifies missing stale failed or redundant evidence without modifying it",
+      "pilot records whether the Development Engine itself exposes defects or friction",
+      "pilot evidence/report contain no business merge/unlock authorization",
+      "pilot writes only ENG-09 evidence/report and governance transition files"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 14,
+      "executable_loc_changed": 0,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0,
+      "cross_domain_interfaces": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/resolve_active_awu.py",
+      "python scripts/governance/run_incremental_validation.py"
+    ]
+  },
+  "done_when": [
+    "Lot45 pilot evidence is exact-head bound and reproducible from GitHub observations",
+    "engine-selected validation and assurance requirements are recorded without candidate mutation",
+    "pilot defects/redundancies are routed to ENG-09.2 or ENG-09.3 instead of silently patched inside the candidate",
+    "BUSINESS remains PAUSED and Lot46 remains LOCKED"
+  ]
+}

@@ -3,7 +3,7 @@
   "kind": "engineering_work_item",
   "id": "ENG-08",
   "title": "Performance & Cold-Start Qualification",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "objective": "Prove the Development Engine is both SAFE and FAST by enforcing bounded timing/cost/context budgets, detecting unnecessary validation, qualifying proof reuse, cold-start and recovery, and proving R3 work cannot bypass strengthened assurance.",
   "depends_on": [
     "ENG-07"
@@ -60,7 +60,7 @@
     },
     {
       "id": "ENG-08.7",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Prove critical R3 work cannot bypass strengthened assurance."
     }
   ],
