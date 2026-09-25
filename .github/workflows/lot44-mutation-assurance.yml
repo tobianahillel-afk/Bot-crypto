@@ -1,6 +1,17 @@
 name: Lot 44 mutation assurance
 
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema*.py'
+      - 'tests/test_lot44*.py'
+      - 'config/microstructure/trades_and_aggressor_classification_schema_v1.json'
+      - 'contracts/schemas/classified_trade_v1.schema.json'
+      - 'contracts/schemas/aggressor_confidence_state_v1.schema.json'
+      - 'contracts/schemas/trades_aggressor_classification_schema_*.schema.json'
+      - '.github/workflows/lot44-mutation-assurance.yml'
+      - 'requirements-dev.lock'
   workflow_dispatch:
 
 permissions:
