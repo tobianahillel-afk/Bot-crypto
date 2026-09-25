@@ -1,11 +1,11 @@
 {
   "active_work": {
-    "awu_id": "ENG-09.3-WU01",
-    "awu_path": "engineering/work_units/ENG-09.3-WU01.json",
-    "complexity_score": 3,
+    "awu_id": "ENG-09.3-WU02",
+    "awu_path": "engineering/work_units/ENG-09.3-WU02.json",
+    "complexity_score": 1,
     "lot": "ENG-09",
     "manifest": "engineering/lots/ENG-09.json",
-    "risk_class": "R2",
+    "risk_class": "R1",
     "task": "ENG-09.3",
     "track": "ENGINEERING"
   },
@@ -30,20 +30,17 @@
   },
   "execution_context": {
     "budget": {
-      "max_primary_files": 12,
-      "max_reference_files": 16,
-      "max_total_kib": 1024
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
     },
     "implicit_expansion": "FORBIDDEN",
-    "primary_count": 8,
+    "primary_count": 5,
     "primary_files": [
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-09.json",
-      "engineering/work_units/ENG-09.3-WU01.json",
-      "config/governance/diff_classifier_policy_v1.json",
-      "scripts/governance/classify_diff.py",
-      "engineering/LOT45_ENGINE_PILOT_EVIDENCE.json",
+      "engineering/work_units/ENG-09.3-WU02.json",
       "engineering/LOT45_WORKFLOW_REDUNDANCY_EVIDENCE.json"
     ],
     "reference_count": 2,
@@ -51,7 +48,7 @@
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 77
+    "total_kib_ceil": 53
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -67,9 +64,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "ENG-09.3-WU01: close Lot45 pilot classifier coverage gaps without weakening fail-closed semantics.",
+    "current_objective": "ENG-09.3-WU02: suppress pull-request fanout for the first bounded batch of nine historical mutation workflows without changing their mutation jobs or lifecycle evidence.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Add explicit conservative classification for dependency manifests and lot runner/validator scripts, with regression probes for all six previously UNKNOWN Lot45 operational paths."
+    "next_action": "Remove only the pull_request trigger blocks from the nine WU02 workflows; preserve existing push main and workflow_dispatch triggers and leave all job bodies byte-for-byte unchanged."
   },
   "safety": {
     "execution_allowed": false,
