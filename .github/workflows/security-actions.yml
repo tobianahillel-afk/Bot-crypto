@@ -195,9 +195,11 @@ jobs:
           done
           printf '%s\n' "${workflows[@]}" >"${workflow_file}"
           printf '%s\n' "${security_targets[@]}" >"${security_file}"
-          printf 'WORKFLOW_TARGET_FILE=%s\n' "${workflow_file}" >> "${GITHUB_ENV}"
-          printf 'WORKFLOW_SECURITY_TARGET_FILE=%s\n' "${security_file}" >> "${GITHUB_ENV}"
-          printf 'WORKFLOW_SECURITY_BASE=%s\n' "${base}" >> "${GITHUB_ENV}"
+          {
+            printf 'WORKFLOW_TARGET_FILE=%s\n' "${workflow_file}"
+            printf 'WORKFLOW_SECURITY_TARGET_FILE=%s\n' "${security_file}"
+            printf 'WORKFLOW_SECURITY_BASE=%s\n' "${base}"
+          } >> "${GITHUB_ENV}"
           printf 'ACTIONLINT_TARGET_COUNT=%s\n' "${#workflows[@]}"
           printf 'ZIZMOR_TARGET_COUNT=%s\n' "${#security_targets[@]}"
           if (("${#workflows[@]}" > 0)); then printf 'ACTIONLINT_TARGET=%s\n' "${workflows[@]}"; fi
