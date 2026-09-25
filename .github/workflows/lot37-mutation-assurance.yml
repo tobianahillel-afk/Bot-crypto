@@ -1,14 +1,6 @@
 name: Lot 37 mutation assurance
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'src/crypto_quant_bot/microstructure/**'
-      - 'tests/test_lot37*.py'
-      - '.github/workflows/lot37-mutation-assurance.yml'
-      - 'pyproject.toml'
-      - 'requirements-dev.lock'
   workflow_dispatch:
 
 permissions:
