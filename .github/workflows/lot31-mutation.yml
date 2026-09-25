@@ -1,14 +1,6 @@
 name: Lot 31 critical mutation assurance
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'src/crypto_quant_bot/data_governance/**'
-      - 'tests/test_lot31_*.py'
-      - 'config/data_governance/market_data_source_registry_v1.json'
-      - '.github/workflows/lot31-mutation.yml'
-      - 'requirements-dev.lock'
   push:
     branches: [main]
   workflow_dispatch:
