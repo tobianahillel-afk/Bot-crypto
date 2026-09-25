@@ -1,20 +1,22 @@
 {
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-09.3-WU02",
-    "awu_path": "engineering/work_units/ENG-09.3-WU02.json",
+    "awu_id": "ENG-09.3-WU03",
+    "awu_path": "engineering/work_units/ENG-09.3-WU03.json",
     "parent_manifest": "engineering/lots/ENG-09.json",
-    "scope_base_sha": "8c886fc6839201b4e6fb7d7303cdb4128909d213",
-    "risk_class": "R1",
-    "complexity_score": 1
+    "scope_base_sha": "40291845a8e01a4d0ca44005f5fd22a03e234a89",
+    "risk_class": "R2",
+    "complexity_score": 5
   },
   "authority": {
     "context_map": "engineering/CONTEXT_MAP.json",
     "handoff_role": "RESUME_HINT_NOT_AUTHORITY",
     "state_source": "config/governance/project_state.json"
   },
-  "blockers": [],
-  "current_objective": "ENG-09.3-WU02: suppress pull-request fanout for the first bounded batch of nine historical mutation workflows without changing their mutation jobs or lifecycle evidence.",
+  "blockers": [
+    "ENG-09.3-WU02 is blocked until diff-local Security Actions and Security Supply Chain semantics stop treating unchanged legacy action-ref debt as newly introduced debt."
+  ],
+  "current_objective": "ENG-09.3-WU03: make workflow-security and action-supply-chain changed gates diff-local without suppressing any newly introduced unsafe line.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -27,7 +29,7 @@
     "rulesets_count": 0
   },
   "kind": "engineering_handoff",
-  "next_action": "Remove only the pull_request trigger blocks from the nine WU02 workflows; preserve existing push main and workflow_dispatch triggers and leave all job bodies byte-for-byte unchanged.",
+  "next_action": "Implement changed-head-line filtering for supply-chain uses and zizmor findings; preserve strict actionlint/zizmor execution and do not modify historical mutation workflows.",
   "next_engineering": {
     "active_lot": "ENG-09",
     "active_task": "ENG-09.3",
