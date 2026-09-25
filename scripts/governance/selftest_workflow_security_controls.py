@@ -92,11 +92,23 @@ def main() -> int:
         lambda: mod.validate_workflow(policy, no_filter),
         "diff-local zizmor filter removed",
     )
-    no_base = workflow.replace("WORKFLOW_SECURITY_BASE", "WORKFLOW_SECURITY_BASE_REMOVED")
+    no_base = workflow.replace(
+        "printf 'WORKFLOW_SECURITY_BASE=%s\\n' \"${base}\"",
+        "printf 'REMOVED_WORKFLOW_SECURITY_BASE=%s\\n' \"${base}\"",
+    )
     _expect(
         mod.WorkflowSecurityError,
         lambda: mod.validate_workflow(policy, no_base),
         "diff-base export removed",
+    )
+    no_base_consumer = workflow.replace(
+        '--base "${WORKFLOW_SECURITY_BASE}"',
+        '--base ""',
+    )
+    _expect(
+        mod.WorkflowSecurityError,
+        lambda: mod.validate_workflow(policy, no_base_consumer),
+        "diff-base consumer removed",
     )
     unlocated = copy.deepcopy(policy)
     unlocated["scan_semantics"]["unlocated_findings_blocking"] = False
@@ -113,7 +125,7 @@ def main() -> int:
     broad["scan_semantics"]["unchanged_legacy_blocking"] = True
     _expect(mod.WorkflowSecurityError, lambda: mod.validate_policy(broad), "legacy scope broadened")
 
-    print("WORKFLOW_SECURITY_SELFTEST_PASS probes=21")
+    print("WORKFLOW_SECURITY_SELFTEST_PASS probes=22")
     return 0
 
 
