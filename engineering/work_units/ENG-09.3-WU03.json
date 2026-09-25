@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-09.3-WU03",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-09",
+    "task_id": "ENG-09.3",
+    "manifest": "engineering/lots/ENG-09.json"
+  },
+  "title": "Make workflow security gates diff-local for legacy debt",
+  "objective": "Repair Security Actions and Security Supply Chain so unchanged historical workflow debt remains visible but does not block trigger-only edits, while every newly introduced or modified unsafe workflow line still fails closed.",
+  "non_goals": [
+    "modify any historical Lot mutation workflow",
+    "pin or rewrite historical action refs as a workaround",
+    "add zizmor ignores configs or broad suppressions",
+    "weaken actionlint syntax validation",
+    "change Lot45 candidate code or reviews",
+    "merge PR #66 or unlock Lot46",
+    "change business development status",
+    "introduce mandatory paid or LLM-backed security review"
+  ],
+  "depends_on": [
+    "ENG-09.3-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Blocked batch work unit",
+      "kind": "STATE",
+      "locator": "engineering/work_units/ENG-09.3-WU02.json"
+    },
+    {
+      "name": "Action supply-chain policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/action_supply_chain_policy_v1.json"
+    },
+    {
+      "name": "Workflow security policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/workflow_security_policy_v1.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Diff-local workflow security gate",
+      "kind": "FILE",
+      "locator": ".github/workflows/security-actions.yml"
+    },
+    {
+      "name": "Diff-local action supply-chain gate",
+      "kind": "FILE",
+      "locator": ".github/workflows/security-supply-chain.yml"
+    },
+    {
+      "name": "Changed-line supply-chain auditor",
+      "kind": "FILE",
+      "locator": "scripts/governance/audit_action_supply_chain.py"
+    },
+    {
+      "name": "Zizmor changed-finding filter",
+      "kind": "FILE",
+      "locator": "scripts/governance/filter_zizmor_changed_findings.py"
+    },
+    {
+      "name": "Security regression tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_zizmor_changed_findings.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "40291845a8e01a4d0ca44005f5fd22a03e234a89",
+    "allowed_paths": [
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-09.3-WU02.json",
+      "engineering/work_units/ENG-09.3-WU03.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      ".github/workflows/security-actions.yml",
+      ".github/workflows/security-supply-chain.yml",
+      "config/governance/action_supply_chain_policy_v1.json",
+      "config/governance/workflow_security_policy_v1.json",
+      "scripts/governance/audit_action_supply_chain.py",
+      "scripts/governance/validate_workflow_security_controls.py",
+      "scripts/governance/selftest_action_supply_chain.py",
+      "scripts/governance/selftest_workflow_security_controls.py",
+      "scripts/governance/filter_zizmor_changed_findings.py",
+      "scripts/governance/selftest_zizmor_changed_findings.py"
+    ],
+    "forbidden_paths": [
+      ".github/workflows/lot*-mutation*.yml",
+      ".github/workflows/lot45-*.yml",
+      ".github/workflows/code-quality.yml",
+      ".github/workflows/p06-*.yml",
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "broad security finding suppression",
+      "zizmor ignore or config enablement",
+      "new floating action ref acceptance",
+      "new dynamic or malformed uses acceptance",
+      "unapproved remote SHA acceptance",
+      "unlocated security finding suppression",
+      "historical workflow job or action ref mutation",
+      "Lot45 candidate mutation or remediation",
+      "Lot45 merge",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "actionlint still lints each complete changed workflow for syntax",
+      "zizmor remains offline strict no-config with its positive control unchanged",
+      "zizmor blocks findings located on added or modified head lines and blocks findings without a concrete location",
+      "zizmor findings confined to unchanged legacy lines remain visible metadata but do not fail the changed-line gate",
+      "supply-chain changed mode evaluates only uses clauses on added or modified head lines",
+      "new floating dynamic malformed or unapproved pinned uses on changed lines fail closed",
+      "inventory mode continues to report all repository legacy action-ref debt",
+      "trigger-only deletions before unchanged uses lines do not transform legacy debt into new debt",
+      "the eight WU02 historical workflows and all protected Lot44 evidence remain untouched during WU03",
+      "business development remains paused and Lot46 remains locked"
+    ],
+    "acceptance_criteria": [
+      "synthetic trigger-only edit with unchanged legacy floating uses passes the diff-local gates",
+      "synthetic newly added floating uses fails supply-chain validation",
+      "synthetic changed uses to an unapproved SHA fails supply-chain validation",
+      "synthetic changed dangerous workflow line producing a zizmor finding fails",
+      "synthetic zizmor finding without a concrete location fails closed",
+      "Security Actions passes on WU03 exact head",
+      "Security Supply Chain passes on WU03 exact head",
+      "Engineering Bootstrap and Security Secrets pass on WU03 exact head",
+      "no historical mutation workflow changes occur inside WU03 scope"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 5,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 2,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 15,
+      "executable_loc_changed": 780,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/run_incremental_validation.py",
+      "python scripts/governance/selftest_action_supply_chain.py",
+      "python scripts/governance/selftest_workflow_security_controls.py",
+      "python scripts/governance/selftest_zizmor_changed_findings.py",
+      "Security Actions workflow",
+      "Security Supply Chain workflow"
+    ]
+  },
+  "done_when": [
+    "unchanged legacy workflow debt no longer blocks unrelated trigger-only edits",
+    "new or modified unsafe workflow lines still fail closed",
+    "both security workflows pass on the exact WU03 head without broad ignores",
+    "WU02 can be safely resumed without touching historical jobs or protected Lot44 evidence"
+  ]
+}
