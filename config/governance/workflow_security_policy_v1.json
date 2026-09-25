@@ -27,7 +27,9 @@
     ".github/actions/**",
     "config/governance/workflow_security_policy_v1.json",
     "scripts/governance/validate_workflow_security_controls.py",
-    "scripts/governance/filter_zizmor_changed_findings.py"
+    "scripts/governance/filter_zizmor_changed_findings.py",
+    "scripts/governance/selftest_workflow_security_controls.py",
+    "scripts/governance/selftest_zizmor_changed_findings.py"
   ],
   "scan_semantics": {
     "pull_request": "merge-base(base_sha, HEAD) to HEAD",

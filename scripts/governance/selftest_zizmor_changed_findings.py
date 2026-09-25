@@ -88,10 +88,17 @@ def main() -> int:
 """
     assert mod.parse_changed_head_lines(diff_probe) == {target: {1, 8}}
 
+    escaped = mod.evaluate_findings(
+        [_finding("../escape.yml", 0)], changed, [target], 1
+    )
+    assert escaped["legacy_findings"] == []
+    assert len(escaped["blocking_findings"]) == 1
+    assert escaped["blocking_findings"][0]["decision"] == "BLOCK_UNLOCATED"
+
     _expect(
         mod.ZizmorChangedFindingError,
-        lambda: mod.evaluate_findings([_finding("../escape.yml", 0)], changed, [target], 1),
-        "path escape",
+        lambda: mod._safe_target("../escape.yml"),
+        "direct target path escape",
     )
     _expect(
         mod.ZizmorChangedFindingError,
@@ -99,7 +106,7 @@ def main() -> int:
         "negative tool status",
     )
 
-    print("ZIZMOR_CHANGED_FINDING_SELFTEST_PASS probes=9")
+    print("ZIZMOR_CHANGED_FINDING_SELFTEST_PASS probes=10")
     return 0
 
 

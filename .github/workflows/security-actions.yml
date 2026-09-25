@@ -10,6 +10,8 @@ on:
       - "config/governance/workflow_security_policy_v1.json"
       - "scripts/governance/validate_workflow_security_controls.py"
       - "scripts/governance/filter_zizmor_changed_findings.py"
+      - "scripts/governance/selftest_zizmor_changed_findings.py"
+      - "scripts/governance/selftest_workflow_security_controls.py"
   push:
     branches:
       - main
