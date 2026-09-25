@@ -99,6 +99,14 @@ jobs:
         blocked = mod.changed_gate(result, registry, changed)
         assert len(blocked) == 1
         assert blocked[0]["classification"] == "REMOTE_FLOATING_REF"
+
+        conservative = mod.changed_gate(result, registry)
+        assert len(conservative) == 2
+        assert {item["blocked_reason"] for item in conservative} == {
+            "REMOTE_FLOATING_REF",
+            "UNAPPROVED_REMOTE_SHA",
+        }
+
         assert mod.changed_gate(
             result,
             registry,
@@ -168,7 +176,7 @@ new file mode 100644
         "mutable immutable-ref policy",
     )
 
-    print("ACTION_SUPPLY_CHAIN_SELFTEST_PASS probes=17")
+    print("ACTION_SUPPLY_CHAIN_SELFTEST_PASS probes=18")
     return 0
 
 

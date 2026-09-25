@@ -407,10 +407,22 @@ def unapproved_pins(
 def changed_gate(
     result: dict[str, Any],
     registry: dict[str, Any],
-    changed_head_lines: dict[str, set[int]],
+    changed_head_lines: dict[str, set[int]] | None = None,
 ) -> list[dict[str, Any]]:
+    if changed_head_lines is None:
+        # Backward-compatible fail-closed behavior for callers that predate
+        # diff-local evidence: every observed uses clause is treated as changed.
+        changed_head_lines = {}
+        for record in result.get("records", []):
+            if not isinstance(record, dict):
+                raise ActionSupplyChainError("supply-chain record must be an object")
+            file = record.get("file")
+            line = record.get("line")
+            if not isinstance(file, str) or not isinstance(line, int) or isinstance(line, bool):
+                raise ActionSupplyChainError("supply-chain record lacks file/line evidence")
+            changed_head_lines.setdefault(file, set()).add(line)
     if not isinstance(changed_head_lines, dict):
-        raise ActionSupplyChainError("changed-head-line evidence is required")
+        raise ActionSupplyChainError("changed-head-line evidence must be an object")
     blocked = {"REMOTE_FLOATING_REF", "DYNAMIC_EXPRESSION", "MALFORMED_USES"}
     changed_records = [
         record
