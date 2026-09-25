@@ -115,6 +115,44 @@
         "docs/**",
         "**/*.md"
       ]
+    },
+    {
+      "code": "DEPENDENCY_CONFIG",
+      "label": "CONFIG_POLICY",
+      "patterns": [
+        "pyproject.toml",
+        "requirements*.txt",
+        "requirements*.lock",
+        "requirements*.in"
+      ]
+    },
+    {
+      "code": "DEPENDENCY_SECURITY",
+      "label": "SECURITY",
+      "patterns": [
+        "pyproject.toml",
+        "requirements*.txt",
+        "requirements*.lock",
+        "requirements*.in"
+      ]
+    },
+    {
+      "code": "LOT_SCRIPT",
+      "label": "BUSINESS_PRODUCTION",
+      "patterns": [
+        "scripts/lot*.sh",
+        "scripts/run_lot*.py",
+        "scripts/validate_lot*.py"
+      ]
+    },
+    {
+      "code": "LOT_CERTIFICATION_SCRIPT",
+      "label": "CERTIFICATION_EVIDENCE",
+      "patterns": [
+        "scripts/validate_lot*_frozen_evidence.py",
+        "scripts/validate_lot*_post_merge.py",
+        "scripts/validate_lot*_entry_gate.py"
+      ]
     }
   ],
   "aggregate_rules": {
@@ -132,6 +170,9 @@
     "a path with no matching rule receives UNKNOWN_REQUIRES_REVIEW",
     "DOC_ONLY is aggregate-only and appears only when every changed path is documentation and has no other label",
     "classification never selects or executes tests",
-    "critical labels can only be added by classification and are never downgraded by lower-risk labels"
+    "critical labels can only be added by classification and are never downgraded by lower-risk labels",
+    "root dependency manifests are security-sensitive configuration and receive CONFIG_POLICY plus SECURITY",
+    "lot runner and validator scripts receive BUSINESS_PRODUCTION",
+    "frozen post-merge and entry-gate lot validators additionally receive CERTIFICATION_EVIDENCE"
   ]
 }
