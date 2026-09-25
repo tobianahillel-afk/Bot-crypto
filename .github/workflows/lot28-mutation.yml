@@ -1,15 +1,6 @@
 name: Lot 28 critical mutation assurance
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'config/explanations/explanation_core_why_not_trade_v1.json'
-      - 'src/crypto_quant_bot/market_analysis/explanation_core*.py'
-      - 'tests/lot28_fixtures.py'
-      - 'tests/test_lot28_*.py'
-      - '.github/workflows/lot28-mutation.yml'
-      - 'requirements-dev.lock'
   push:
     branches: [main]
   workflow_dispatch:

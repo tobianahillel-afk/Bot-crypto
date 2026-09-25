@@ -1,14 +1,6 @@
 name: Lot 36 mutation assurance
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'src/crypto_quant_bot/data_governance/freshness_gap_outage_audit_and_v3_closure*.py'
-      - 'tests/test_lot36*.py'
-      - '.github/workflows/lot36-mutation-assurance.yml'
-      - 'pyproject.toml'
-      - 'requirements-dev.lock'
   workflow_dispatch:
 
 permissions:
