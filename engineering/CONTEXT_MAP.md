@@ -37,7 +37,7 @@
 
 - Primary: 7 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 44 / 1024 KiB
+- Routed size: 45 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
