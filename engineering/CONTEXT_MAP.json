@@ -35,18 +35,18 @@
       "max_total_kib": 768
     },
     "implicit_expansion": "FORBIDDEN",
-    "primary_count": 6,
+    "primary_count": 7,
     "primary_files": [
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-09.json",
       "engineering/work_units/ENG-09.2-WU01.json",
       "engineering/LOT45_ENGINE_PILOT_EVIDENCE.json",
-      "engineering/LOT45_ENGINE_PILOT.md"
+      "engineering/LOT45_ENGINE_PILOT.md",
+      "engineering/MASTER_PLAN.md"
     ],
-    "reference_count": 2,
+    "reference_count": 1,
     "reference_files": [
-      "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
     "total_kib_ceil": 51
