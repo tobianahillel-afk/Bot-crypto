@@ -1,0 +1,598 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "eng09_lot45_workflow_redundancy_v1",
+  "awu_id": "ENG-09.2-WU01",
+  "observed_at_utc": "2026-09-25T11:07:51Z",
+  "engine_head": "6b96029aebcb81e2e1fb58242be5e99741c314db",
+  "business_authorization": "NONE",
+  "candidate": {
+    "pr": 66,
+    "state": "open",
+    "merged": false,
+    "base_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "head_branch": "agent/lot45-order-flow-delta-cvd-engine-v2",
+    "commits": 228,
+    "changed_files": 48,
+    "additions": 7689,
+    "deletions": 587
+  },
+  "workflow_snapshot": {
+    "head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "workflow_count": 49,
+    "success_count": 26,
+    "failure_count": 23,
+    "categories": {
+      "LOT45_DIRECT": {
+        "count": 4,
+        "success": 2,
+        "failure": 2
+      },
+      "GLOBAL_TRANSVERSAL": {
+        "count": 4,
+        "success": 2,
+        "failure": 2
+      },
+      "HISTORICAL_MUTATION": {
+        "count": 18,
+        "success": 18,
+        "failure": 0
+      },
+      "HISTORICAL_VALIDATION": {
+        "count": 17,
+        "success": 3,
+        "failure": 14
+      },
+      "HISTORICAL_EVIDENCE_AUDIT": {
+        "count": 6,
+        "success": 1,
+        "failure": 5
+      },
+      "OTHER": {
+        "count": 0,
+        "success": 0,
+        "failure": 0
+      }
+    },
+    "historical_fanout": {
+      "count": 41,
+      "percent_of_all": 83.67,
+      "failures": 19,
+      "percent_of_failures": 82.61
+    },
+    "candidate_or_global": {
+      "count": 8,
+      "successes": 4,
+      "failures": 4
+    },
+    "mutation_workflows": {
+      "count": 20,
+      "historical_count": 18,
+      "current_candidate_or_global_count": 2
+    },
+    "workflows": {
+      "LOT45_DIRECT": [
+        {
+          "run_id": 32144784102,
+          "name": "Lot 45 order flow delta CVD validation",
+          "path": ".github/workflows/lot45-order-flow-delta-cvd.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783988,
+          "name": "Lot 45 V4 implementation entry gate",
+          "path": ".github/workflows/lot45-entry-gate.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783987,
+          "name": "Lot 45 mutation assurance",
+          "path": ".github/workflows/lot45-mutation-assurance.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784085,
+          "name": "Lot 45 frozen evidence attestation",
+          "path": ".github/workflows/lot45-frozen-evidence.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        }
+      ],
+      "GLOBAL_TRANSVERSAL": [
+        {
+          "run_id": 32144784144,
+          "name": "Roadmap documentation validation",
+          "path": ".github/workflows/roadmap-documentation-validation.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783998,
+          "name": "Institutional code quality gates",
+          "path": ".github/workflows/code-quality.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783935,
+          "name": "P0.6 extended mutation assurance",
+          "path": ".github/workflows/p06-extended-mutation.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784139,
+          "name": "P0.6 final exact-commit assurance",
+          "path": ".github/workflows/p06-final-assurance.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        }
+      ],
+      "HISTORICAL_MUTATION": [
+        {
+          "run_id": 32144783957,
+          "name": "Lot 37 mutation assurance",
+          "path": ".github/workflows/lot37-mutation-assurance.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783994,
+          "name": "Lot 26 critical mutation assurance",
+          "path": ".github/workflows/lot26-mutation.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783932,
+          "name": "Lot 31 critical mutation assurance",
+          "path": ".github/workflows/lot31-mutation.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784112,
+          "name": "Lot 32 critical mutation assurance",
+          "path": ".github/workflows/lot32-mutation.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784021,
+          "name": "Lot 30 critical mutation assurance",
+          "path": ".github/workflows/lot30-mutation.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783921,
+          "name": "Lot 40 mutation assurance",
+          "path": ".github/workflows/lot40-mutation-assurance.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783966,
+          "name": "Lot 28 critical mutation assurance",
+          "path": ".github/workflows/lot28-mutation.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783949,
+          "name": "Lot 36 mutation assurance",
+          "path": ".github/workflows/lot36-mutation-assurance.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784025,
+          "name": "Lot 44 mutation assurance",
+          "path": ".github/workflows/lot44-mutation-assurance.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784004,
+          "name": "Lot 39 mutation assurance",
+          "path": ".github/workflows/lot39-mutation-assurance.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784022,
+          "name": "Lot 34 critical mutation assurance",
+          "path": ".github/workflows/lot34-mutation.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783964,
+          "name": "Lot 29 critical mutation assurance",
+          "path": ".github/workflows/lot29-mutation.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784055,
+          "name": "Lot 41 mutation assurance",
+          "path": ".github/workflows/lot41-mutation-assurance.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783922,
+          "name": "Lot 33 critical mutation assurance",
+          "path": ".github/workflows/lot33-mutation.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784047,
+          "name": "Lot 27 critical mutation assurance",
+          "path": ".github/workflows/lot27-mutation.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784013,
+          "name": "Lot 35 critical mutation assurance",
+          "path": ".github/workflows/lot35-mutation.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783959,
+          "name": "Lot 42 mutation assurance",
+          "path": ".github/workflows/lot42-mutation-assurance.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784012,
+          "name": "Lot 43 mutation assurance",
+          "path": ".github/workflows/lot43-mutation-assurance.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        }
+      ],
+      "HISTORICAL_VALIDATION": [
+        {
+          "run_id": 32144783939,
+          "name": "Lot 40 engineering diagnostic",
+          "path": ".github/workflows/lot40-engineering-diagnostic.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784070,
+          "name": "Lot 40 book integrity desynchronization validation",
+          "path": ".github/workflows/lot40-book-integrity-desynchronization.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783934,
+          "name": "Lot 36 freshness gap outage V3 closure validation",
+          "path": ".github/workflows/lot36-freshness-gap-outage-v3-closure.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784002,
+          "name": "Lot 44 trades aggressor classification validation",
+          "path": ".github/workflows/lot44-trades-aggressor-classification.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784019,
+          "name": "Lot 37 microstructure scope and offline contracts validation",
+          "path": ".github/workflows/lot37-microstructure-scope-contracts.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784062,
+          "name": "Lot 43 book resilience replenishment validation",
+          "path": ".github/workflows/lot43-book-resilience-replenishment.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784057,
+          "name": "Lot 29 V2 deterministic replay validation",
+          "path": ".github/workflows/lot29-v2-replay-audit.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783965,
+          "name": "Lot 31 market data source registry validation",
+          "path": ".github/workflows/lot31-source-registry.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783984,
+          "name": "Lot 26 foundation and lifecycle validation",
+          "path": ".github/workflows/pre-lot26-readiness-validation.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784018,
+          "name": "Lot 39 order book delta sequence validation",
+          "path": ".github/workflows/lot39-order-book-delta-sequence.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783943,
+          "name": "Lot 28 explanation core validation",
+          "path": ".github/workflows/lot28-explanation-core.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784058,
+          "name": "Lot 33 timestamp clock timezone governance validation",
+          "path": ".github/workflows/lot33-timestamp-governance.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784092,
+          "name": "Lot 34 market data quality engine validation",
+          "path": ".github/workflows/lot34-market-data-quality.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784046,
+          "name": "Lot 32 instrument normalization validation",
+          "path": ".github/workflows/lot32-instrument-normalization.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783982,
+          "name": "Lot 30 V2 market analysis closure validation",
+          "path": ".github/workflows/lot30-v2-closure.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784016,
+          "name": "Lot 35 candle trade book reconciliation validation",
+          "path": ".github/workflows/lot35-candle-trade-book-reconciliation.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783980,
+          "name": "Lot 27 global market context validation",
+          "path": ".github/workflows/lot27-global-context.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        }
+      ],
+      "HISTORICAL_EVIDENCE_AUDIT": [
+        {
+          "run_id": 32144784051,
+          "name": "Lot 31 post-merge audit exact-head",
+          "path": ".github/workflows/lot31-post-merge-audit.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783924,
+          "name": "Lot 39 frozen evidence attestation",
+          "path": ".github/workflows/lot39-frozen-evidence.yml",
+          "conclusion": "success",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783962,
+          "name": "Lot 38 independent post-merge audit",
+          "path": ".github/workflows/lot38-post-merge-audit.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784027,
+          "name": "Lot 44 frozen evidence attestation",
+          "path": ".github/workflows/lot44-frozen-evidence.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144783973,
+          "name": "Lot 32 post-merge audit exact-head",
+          "path": ".github/workflows/lot32-post-merge-audit.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        },
+        {
+          "run_id": 32144784005,
+          "name": "Lot 39 independent post-merge audit",
+          "path": ".github/workflows/lot39-post-merge-audit.yml",
+          "conclusion": "failure",
+          "event": "pull_request"
+        }
+      ],
+      "OTHER": []
+    }
+  },
+  "relevant_failures": [
+    {
+      "run_id": 32144783988,
+      "name": "Lot 45 V4 implementation entry gate",
+      "path": ".github/workflows/lot45-entry-gate.yml"
+    },
+    {
+      "run_id": 32144784085,
+      "name": "Lot 45 frozen evidence attestation",
+      "path": ".github/workflows/lot45-frozen-evidence.yml"
+    },
+    {
+      "run_id": 32144783998,
+      "name": "Institutional code quality gates",
+      "path": ".github/workflows/code-quality.yml"
+    },
+    {
+      "run_id": 32144784139,
+      "name": "P0.6 final exact-commit assurance",
+      "path": ".github/workflows/p06-final-assurance.yml"
+    }
+  ],
+  "known_relevant_failure_causes": [
+    {
+      "run_id": 32144783988,
+      "workflow": "Lot 45 V4 implementation entry gate",
+      "failed_step": "Security dependency full regression and anti-flake",
+      "cause": "Two Lot45 tests fail with CVD checksum canonical mismatch."
+    },
+    {
+      "run_id": 32144784085,
+      "workflow": "Lot 45 frozen evidence attestation",
+      "failed_step": "Trusted pre-launch proof before Python setup",
+      "cause": "Trusted pre-launch command exits 67."
+    },
+    {
+      "run_id": 32144783998,
+      "workflow": "Institutional code quality gates",
+      "failed_step": "Mypy package validation",
+      "cause": "One mypy error in order_flow_delta_and_cvd_engine_models.py."
+    },
+    {
+      "run_id": 32144784139,
+      "workflow": "P0.6 final exact-commit assurance",
+      "failed_step": "Enforce final assurance verdict",
+      "cause": "Mypy, full pytest coverage and repeated flake runs are failing."
+    }
+  ],
+  "review_snapshot": {
+    "total_review_submissions": 28,
+    "codex_review_submissions": 28,
+    "non_codex_review_submissions": 0,
+    "unique_codex_reviewed_commits": 27,
+    "current_head_reviewed_by_codex": true,
+    "unresolved_non_outdated_count": 2,
+    "unresolved_non_outdated": [
+      {
+        "id": "PRRT_kwDOTtA9Ds6aIHFn",
+        "path": "src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine_impl.py",
+        "line": 447,
+        "priority": "P1",
+        "summary": "![P1 Badge](https://img.shields.io/badge/P1-orange?style=flat)  Preserve market identity in order-flow artifacts"
+      },
+      {
+        "id": "PRRT_kwDOTtA9Ds6aIhbE",
+        "path": "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py",
+        "line": 175,
+        "priority": "P1",
+        "summary": "![P1 Badge](https://img.shields.io/badge/P1-orange?style=flat)  Bind matching identities to the certified input market"
+      }
+    ],
+    "pr_body_requires_specific_provider": true,
+    "provider_requirement_text": "A fresh Codex review is required on exact FROZEN_HEAD before merge progression.",
+    "semantic_obligation": "No unresolved substantive P1/P2 findings on the exact candidate head."
+  },
+  "redundancy_findings": [
+    {
+      "id": "ENG09-RED-001",
+      "class": "HISTORICAL_PR_FANOUT",
+      "measured": "41 of 49 workflows (83.67%) are Lots26-44 historical workflows; 19 of 23 failures (82.61%) originate there.",
+      "disposition": "Do not trigger historical lot workflows on unrelated future candidate PR heads. Preserve them for their own lifecycle/manual/historical audit surfaces."
+    },
+    {
+      "id": "ENG09-RED-002",
+      "class": "MUTATION_WORKFLOW_PROLIFERATION",
+      "measured": "20 mutation workflows run on the current head, including 18 historical mutation workflows.",
+      "disposition": "Replace lot-specific PR mutation fan-out with one reusable impact-selected mutation workflow/configuration while retaining lot-specific thresholds/targets as manifest data."
+    },
+    {
+      "id": "ENG09-RED-003",
+      "class": "DUPLICATED_GLOBAL_ASSURANCE",
+      "measured": "Institutional quality, Lot45 entry gate and P0.6 final assurance overlap on full regression, typing/quality, anti-flake and/or security/dependency checks.",
+      "disposition": "Execute each generic capability once per tier/head and let lifecycle gates consume exact-head evidence rather than re-running the same expensive capability."
+    },
+    {
+      "id": "ENG09-RED-004",
+      "class": "DUPLICATED_DOCUMENTATION_ARCHITECTURE_CHECKS",
+      "measured": "Roadmap validation is a standalone workflow and is also invoked inside institutional quality; architecture/roadmap/traceability checks are repeated in the Lot45 entry gate.",
+      "disposition": "Centralize deterministic documentation/architecture checks in reusable generic controls and bind downstream gates to their evidence."
+    },
+    {
+      "id": "ENG09-RED-005",
+      "class": "MANDATORY_PROVIDER_COUPLING",
+      "measured": "All 28 recorded review submissions are from Codex; the PR body names Codex as a mandatory exact-head transport.",
+      "disposition": "Keep exact-head semantic review and unresolved P1/P2 blocking semantics, but allow any authorized human or approved review implementation. No specific LLM/provider/quota may be mandatory."
+    }
+  ],
+  "consolidation_plan": [
+    {
+      "phase": 1,
+      "action": "REMOVE_IRRELEVANT_HISTORICAL_PR_FANOUT",
+      "guaranteed_candidate_pr_workflow_count_before": 49,
+      "guaranteed_candidate_pr_workflow_count_after": 8,
+      "removed_workflows": 41,
+      "reduction_percent": 83.67,
+      "expected_failure_noise_before": 23,
+      "expected_failure_noise_after_if_candidate_unchanged": 4,
+      "failure_noise_reduction_percent": 82.61,
+      "safety": "No relevant Lot45/global failure is removed."
+    },
+    {
+      "phase": 2,
+      "action": "CONSOLIDATE_MUTATION_TO_REUSABLE_IMPACT_SELECTED_CONTROL",
+      "current_mutation_workflows_on_head": 20,
+      "candidate_or_global_mutation_workflows_after_phase1": 2,
+      "target_candidate_mutation_invocations": 1,
+      "safety": "Lot/domain-specific mutation targets and thresholds remain manifest-driven evidence, not discarded."
+    },
+    {
+      "phase": 3,
+      "action": "DE_DUPLICATE_GLOBAL_QUALITY_REGRESSION_SECURITY_CAPABILITIES",
+      "target": "One execution per capability/tier/exact head; lifecycle/certification gates consume evidence.",
+      "safety": "Exact-head T4 certification remains fail-closed and non-reusable where policy forbids reuse."
+    },
+    {
+      "phase": 4,
+      "action": "MAKE_FROZEN_PROVENANCE_ATTESTATION_LIFECYCLE_CONDITIONAL",
+      "target": "Run frozen/provenance attestation only for a stabilized certification candidate, not every development edit.",
+      "safety": "Never reuse stale FROZEN_HEAD evidence for a different current head."
+    },
+    {
+      "phase": 5,
+      "action": "PROVIDER_AGNOSTIC_SEMANTIC_REVIEW",
+      "target": "Exact-head review record + zero unresolved substantive P1/P2; transport may be human or approved reviewer implementation.",
+      "safety": "The two current P1 findings remain blockers until substantively resolved."
+    }
+  ],
+  "bounded_target": {
+    "guaranteed_after_phase1_workflows": 8,
+    "design_target_after_generic_consolidation": "4-6 routine mandatory top-level checks plus conditional T4 certification",
+    "target_is_not_yet_certified": true,
+    "if_six_workflows_reduction_percent": 87.76,
+    "if_four_workflows_reduction_percent": 91.84
+  },
+  "routing": {
+    "implementation_changes": "ENG-09.3 or a dedicated repair AWU",
+    "workflow_mutation_in_this_awu": "FORBIDDEN",
+    "candidate_mutation_in_this_awu": "FORBIDDEN",
+    "review_transport_change_in_this_awu": "DOCUMENT_ONLY"
+  },
+  "safety": {
+    "business_development": "PAUSED",
+    "candidate_status": "SUSPENDED_CANDIDATE",
+    "lot46": "LOCKED",
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED"
+  }
+}
