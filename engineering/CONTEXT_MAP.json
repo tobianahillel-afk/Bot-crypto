@@ -1,11 +1,11 @@
 {
   "active_work": {
-    "awu_id": "ENG-09.3-WU03",
-    "awu_path": "engineering/work_units/ENG-09.3-WU03.json",
-    "complexity_score": 5,
+    "awu_id": "ENG-09.3-WU02",
+    "awu_path": "engineering/work_units/ENG-09.3-WU02.json",
+    "complexity_score": 1,
     "lot": "ENG-09",
     "manifest": "engineering/lots/ENG-09.json",
-    "risk_class": "R2",
+    "risk_class": "R1",
     "task": "ENG-09.3",
     "track": "ENGINEERING"
   },
@@ -30,27 +30,26 @@
   },
   "execution_context": {
     "budget": {
-      "max_primary_files": 12,
-      "max_reference_files": 16,
-      "max_total_kib": 1024
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
     },
     "implicit_expansion": "FORBIDDEN",
-    "primary_count": 7,
+    "primary_count": 6,
     "primary_files": [
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-09.json",
-      "engineering/work_units/ENG-09.3-WU03.json",
       "engineering/work_units/ENG-09.3-WU02.json",
-      "config/governance/action_supply_chain_policy_v1.json",
-      "config/governance/workflow_security_policy_v1.json"
+      "engineering/work_units/ENG-09.3-WU03.json",
+      "engineering/LOT45_WORKFLOW_REDUNDANCY_EVIDENCE.json"
     ],
     "reference_count": 2,
     "reference_files": [
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 45
+    "total_kib_ceil": 40
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -66,9 +65,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "ENG-09.3-WU03: make workflow-security and action-supply-chain changed gates diff-local without suppressing any newly introduced unsafe line.",
+    "current_objective": "ENG-09.3-WU02: suppress pull_request fanout for the first eight mutable historical mutation workflows while preserving all jobs, commands, thresholds, artifacts and existing push/manual behavior.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Implement changed-head-line filtering for supply-chain uses and zizmor findings; preserve strict actionlint/zizmor execution and do not modify historical mutation workflows."
+    "next_action": "Remove only pull_request triggers and pull-request-only path filters from the eight WU02 workflows; preserve everything below each trigger block byte-for-byte and do not touch Lot44 protected or Lot45/global workflows."
   },
   "safety": {
     "execution_allowed": false,
