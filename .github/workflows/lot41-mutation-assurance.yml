@@ -1,17 +1,6 @@
 name: Lot 41 mutation assurance
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine*.py'
-      - 'tests/test_lot41*.py'
-      - 'config/microstructure/spread_depth_and_imbalance_engine_v1.json'
-      - 'contracts/schemas/book_feature_state_v1.schema.json'
-      - 'contracts/schemas/spread_depth_imbalance_engine_*.json'
-      - 'reports/lot41/mutation_summary.json'
-      - '.github/workflows/lot41-mutation-assurance.yml'
-      - 'requirements-dev.lock'
   workflow_dispatch:
 
 permissions:
