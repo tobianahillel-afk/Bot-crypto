@@ -1,20 +1,19 @@
 {
   "schema_version": 1,
   "kind": "agent_work_unit",
-  "id": "ENG-09.3-WU05",
-  "status": "DONE",
+  "id": "ENG-09.3-WU06",
+  "status": "IN_PROGRESS",
   "parent": {
     "work_item_id": "ENG-09",
     "task_id": "ENG-09.3",
     "manifest": "engineering/lots/ENG-09.json"
   },
-  "title": "Suppress historical validation PR fanout batch 1",
-  "objective": "Remove pull_request triggering from the first bounded batch of eight mutable historical validation workflows while preserving existing push/manual lifecycle surfaces and all validation jobs, commands, thresholds and evidence logic.",
+  "title": "Suppress historical validation PR fanout batch 2",
+  "objective": "Remove pull_request triggering from the remaining eight mutable historical validation workflows while preserving existing push/manual lifecycle surfaces and all validation jobs, commands, thresholds and evidence logic.",
   "non_goals": [
     "modify any Lot44 workflow",
     "modify Lot45 or global workflows",
-    "change validation commands or historical evidence semantics",
-    "consolidate validators into reusable workflows",
+    "change validation jobs commands thresholds reports or evidence semantics",
     "modify business code",
     "resolve Lot45 P1 findings",
     "merge PR #66",
@@ -23,7 +22,7 @@
     "modify frozen historical evidence"
   ],
   "depends_on": [
-    "ENG-09.3-WU04"
+    "ENG-09.3-WU05"
   ],
   "inputs": [
     {
@@ -32,76 +31,70 @@
       "locator": "engineering/LOT45_WORKFLOW_REDUNDANCY_EVIDENCE.json"
     },
     {
-      "name": "WU04 completion evidence",
-      "kind": "EVIDENCE",
-      "locator": "engineering/ENG09_WU04_COMPLETION_EVIDENCE.json"
-    }
-  ],
-  "outputs": [
-    {
-      "name": "Historical validation workflow batch1 1",
-      "kind": "FILE",
-      "locator": ".github/workflows/lot40-engineering-diagnostic.yml"
-    },
-    {
-      "name": "Historical validation workflow batch1 2",
-      "kind": "FILE",
-      "locator": ".github/workflows/lot40-book-integrity-desynchronization.yml"
-    },
-    {
-      "name": "Historical validation workflow batch1 3",
-      "kind": "FILE",
-      "locator": ".github/workflows/lot36-freshness-gap-outage-v3-closure.yml"
-    },
-    {
-      "name": "Historical validation workflow batch1 4",
-      "kind": "FILE",
-      "locator": ".github/workflows/lot37-microstructure-scope-contracts.yml"
-    },
-    {
-      "name": "Historical validation workflow batch1 5",
-      "kind": "FILE",
-      "locator": ".github/workflows/lot43-book-resilience-replenishment.yml"
-    },
-    {
-      "name": "Historical validation workflow batch1 6",
-      "kind": "FILE",
-      "locator": ".github/workflows/lot29-v2-replay-audit.yml"
-    },
-    {
-      "name": "Historical validation workflow batch1 7",
-      "kind": "FILE",
-      "locator": ".github/workflows/lot31-source-registry.yml"
-    },
-    {
-      "name": "Historical validation workflow batch1 8",
-      "kind": "FILE",
-      "locator": ".github/workflows/pre-lot26-readiness-validation.yml"
-    },
-    {
       "name": "WU05 completion evidence",
       "kind": "EVIDENCE",
       "locator": "engineering/ENG09_WU05_COMPLETION_EVIDENCE.json"
     }
   ],
+  "outputs": [
+    {
+      "name": "Historical validation workflow batch2 1",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot39-order-book-delta-sequence.yml"
+    },
+    {
+      "name": "Historical validation workflow batch2 2",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot28-explanation-core.yml"
+    },
+    {
+      "name": "Historical validation workflow batch2 3",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot33-timestamp-governance.yml"
+    },
+    {
+      "name": "Historical validation workflow batch2 4",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot34-market-data-quality.yml"
+    },
+    {
+      "name": "Historical validation workflow batch2 5",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot32-instrument-normalization.yml"
+    },
+    {
+      "name": "Historical validation workflow batch2 6",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot30-v2-closure.yml"
+    },
+    {
+      "name": "Historical validation workflow batch2 7",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot35-candle-trade-book-reconciliation.yml"
+    },
+    {
+      "name": "Historical validation workflow batch2 8",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot27-global-context.yml"
+    }
+  ],
   "scope": {
-    "scope_base_sha": "06b3338ec59c831f7adcefcdccbf1bc366fec194",
+    "scope_base_sha": "36f5bc1bf28b7cd97817d8336114b0c70eaeb142",
     "allowed_paths": [
       "engineering/handoff/CURRENT.json",
-      "engineering/work_units/ENG-09.3-WU04.json",
       "engineering/work_units/ENG-09.3-WU05.json",
-      "engineering/ENG09_WU04_COMPLETION_EVIDENCE.json",
+      "engineering/work_units/ENG-09.3-WU06.json",
+      "engineering/ENG09_WU05_COMPLETION_EVIDENCE.json",
       "engineering/CONTEXT_MAP.json",
       "engineering/CONTEXT_MAP.md",
-      ".github/workflows/lot40-engineering-diagnostic.yml",
-      ".github/workflows/lot40-book-integrity-desynchronization.yml",
-      ".github/workflows/lot36-freshness-gap-outage-v3-closure.yml",
-      ".github/workflows/lot37-microstructure-scope-contracts.yml",
-      ".github/workflows/lot43-book-resilience-replenishment.yml",
-      ".github/workflows/lot29-v2-replay-audit.yml",
-      ".github/workflows/lot31-source-registry.yml",
-      ".github/workflows/pre-lot26-readiness-validation.yml",
-      "engineering/ENG09_WU05_COMPLETION_EVIDENCE.json"
+      ".github/workflows/lot39-order-book-delta-sequence.yml",
+      ".github/workflows/lot28-explanation-core.yml",
+      ".github/workflows/lot33-timestamp-governance.yml",
+      ".github/workflows/lot34-market-data-quality.yml",
+      ".github/workflows/lot32-instrument-normalization.yml",
+      ".github/workflows/lot30-v2-closure.yml",
+      ".github/workflows/lot35-candle-trade-book-reconciliation.yml",
+      ".github/workflows/lot27-global-context.yml"
     ],
     "forbidden_paths": [
       ".github/workflows/lot44-*.yml",
@@ -140,8 +133,8 @@
       "business development remains paused and Lot46 remains locked"
     ],
     "acceptance_criteria": [
-      "lot40 diagnostic lot40 book-integrity and lot43 resilience become workflow_dispatch-only",
-      "lot36 lot37 lot29 lot31 and pre-lot26 retain push main plus workflow_dispatch",
+      "lot39 order-book validation becomes workflow_dispatch-only",
+      "lot28 lot33 lot34 lot32 lot30 lot35 and lot27 retain push main plus workflow_dispatch",
       "all eight jobs sections are unchanged",
       "workflow security and supply-chain gates pass on exact head",
       "Security Secrets and Engineering Bootstrap pass on exact head"
@@ -172,7 +165,7 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 14,
+      "files_touched": 13,
       "executable_loc_changed": 0,
       "new_public_behaviors": 1,
       "contract_families": 0,
@@ -196,9 +189,9 @@
     ]
   },
   "done_when": [
-    "all eight historical validation workflows no longer trigger on unrelated candidate pull requests",
+    "the final eight mutable historical validation workflows no longer trigger on unrelated candidate pull requests",
     "their original push/manual lifecycle surfaces are preserved",
-    "their validation jobs and evidence semantics remain unchanged",
+    "their jobs and validation semantics are unchanged",
     "no Lot44 Lot45 or global workflow is touched",
     "same-head bootstrap and security gates pass"
   ]

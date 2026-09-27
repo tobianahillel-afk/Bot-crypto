@@ -1,10 +1,10 @@
 {
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-09.3-WU05",
-    "awu_path": "engineering/work_units/ENG-09.3-WU05.json",
+    "awu_id": "ENG-09.3-WU06",
+    "awu_path": "engineering/work_units/ENG-09.3-WU06.json",
     "parent_manifest": "engineering/lots/ENG-09.json",
-    "scope_base_sha": "06b3338ec59c831f7adcefcdccbf1bc366fec194",
+    "scope_base_sha": "36f5bc1bf28b7cd97817d8336114b0c70eaeb142",
     "risk_class": "R1",
     "complexity_score": 1
   },
@@ -14,7 +14,7 @@
     "state_source": "config/governance/project_state.json"
   },
   "blockers": [],
-  "current_objective": "Remove pull_request triggering from the first bounded batch of eight mutable historical validation workflows while preserving existing push/manual lifecycle surfaces and all validation jobs, commands, thresholds and evidence logic.",
+  "current_objective": "Remove pull_request triggering from the remaining eight mutable historical validation workflows while preserving existing push/manual lifecycle surfaces and all validation jobs, commands, thresholds and evidence logic.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -27,21 +27,21 @@
     "rulesets_count": 0
   },
   "kind": "engineering_handoff",
-  "next_action": "Remove only pull_request triggers and pull-request-only path filters from the eight WU05 validation workflows; preserve everything below each trigger block byte-for-byte and do not touch any Lot44, Lot45, or global workflow.",
+  "next_action": "Remove only pull_request triggers and pull-request-only path filters from the eight WU06 validation workflows; preserve everything below each trigger block byte-for-byte and do not touch any Lot44, Lot45, or global workflow.",
   "next_engineering": {
     "active_lot": "ENG-09",
     "active_task": "ENG-09.3",
     "active_manifest": "engineering/lots/ENG-09.json"
   },
   "recent_completed": [
-    "ENG-08.7 WU01 critical-R3 core hardening completed on head 6d9bc16d4c1958e9b762c64b5020ccc4e0a4f96e: AWU complexity/risk/context/handoff, T3/T4 selector cross-layer selftest, exact-head validator/selftest and deep-assurance validator/selftest all passed inside Bootstrap run 36074598534; Security Secrets run 36074598394 passed. Full Bootstrap then exposed lifecycle-specific ENG-08.6 hardcoding in the permanent recovery qualifier; remediation and final same-head qualification are split into WU02.",
     "ENG-08.7 WU02 lifecycle-generic recovery and critical-R3 bypass qualification completed. Implementation head d0bf1381298ea81356e469afec4e9f5a90deefda passed Bootstrap 36121700188 and Security Secrets 36121700184; evidence-anchor head c2c1f0990c881cb725a3fccfccfd8098f84a0694 also passed Bootstrap 36122013069 and Security Secrets 36122013061. WU02 touched no forbidden R3 control/policy/workflow.",
     "ENG-09.1 read-only Lot45 pilot completed on exact head e61712c8c1b5128aeb8bb4103d564c87c84808a8; Bootstrap 36123998108 and Security Secrets 36123997952 passed. Pilot verdict ENGINE_PILOT_PASS_CANDIDATE_BLOCKED: PR #66 current head ec2c4ab16f21b23e062b7fca0bb796c8db4a5133 has 49 workflows with 26 success/23 failure, 2 unresolved non-outdated P1 review threads, stale frozen-head certification, and mandatory split under the current engine.",
     "ENG-09.2 workflow/review redundancy analysis completed on exact head 40af00305b110e33e250299cb90277366a3da72f; Bootstrap 36128277207 and Security Secrets 36128277147 passed. Exact Lot45 candidate head ec2c4ab16f21b23e062b7fca0bb796c8db4a5133 has 49 workflows: 41 historical fan-out (83.67%), 19/23 failures from historical fan-out (82.61%), 20 mutation workflows, and 2 unresolved non-outdated P1 review threads. Phase-1 consolidation target is 49 -> 8 without hiding the 4 relevant failures.",
     "ENG-09.3-WU01 classifier coverage repair completed on exact head 8c886fc6839201b4e6fb7d7303cdb4128909d213; Bootstrap 36132283013 and Security Secrets 36132283100 passed. Six Lot45 operational UNKNOWN paths are now explicitly classified while UNKNOWN fallback and DOC_ONLY semantics remain fail-closed.",
     "ENG-09.3-WU03 diff-local workflow-security repair completed on exact head 8d728d228e5a287cc2e054acb2f2a68a57c24011. Engineering Bootstrap 36141845236, Security Secrets 36141845230, Security Actions 36141845234 and Security Supply Chain 36141845322 all passed. Diff from WU03 scope base touched only WU03-authorized security/governance files and no historical mutation workflow, Lot45 workflow, business code or protected evidence.",
     "ENG-09.3-WU02 completed: eight historical mutation workflows had only pull_request/path-filter deletions from 8c886fc6839201b4e6fb7d7303cdb4128909d213 to 40291845a8e01a4d0ca44005f5fd22a03e234a89 with all jobs sections byte-identical; WU03 repaired legacy-debt gates; final WU02 evidence head f983edf74c53cabe511cd2122a03e5c7b566bf38 passed Bootstrap 36349052437 and Security Secrets 36349052493.",
-    "ENG-09.3-WU04 completed on 06b3338ec59c831f7adcefcdccbf1bc366fec194: nine remaining mutable historical mutation workflows lost only pull_request fanout; existing push/manual surfaces and all jobs remained unchanged. Bootstrap 36349354927, Secrets 36349354899, Actions 36349354913 and Supply Chain 36349354926 passed; Lot44 remained untouched."
+    "ENG-09.3-WU04 completed on 06b3338ec59c831f7adcefcdccbf1bc366fec194: nine remaining mutable historical mutation workflows lost only pull_request fanout; existing push/manual surfaces and all jobs remained unchanged. Bootstrap 36349354927, Secrets 36349354899, Actions 36349354913 and Supply Chain 36349354926 passed; Lot44 remained untouched.",
+    "ENG-09.3-WU05 completed on 36f5bc1bf28b7cd97817d8336114b0c70eaeb142: eight historical validation workflows lost only pull_request fanout; existing push/manual surfaces and all jobs remained unchanged. Bootstrap 36349637574, Secrets 36349637569, Actions 36349637593 and Supply Chain 36349637572 passed; Lot44 remained untouched."
   ],
   "resume_read_order": [
     "AGENTS.md",
@@ -83,34 +83,6 @@
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
   ],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36132283100",
-      "head_sha": "8c886fc6839201b4e6fb7d7303cdb4128909d213",
-      "scope": "ENG-09.3-WU01_SECURITY_SECRETS"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36137808847",
-      "head_sha": "40291845a8e01a4d0ca44005f5fd22a03e234a89",
-      "scope": "ENG-09.3-WU03_SCOPE_BASE_BOOTSTRAP"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36141845236",
-      "head_sha": "8d728d228e5a287cc2e054acb2f2a68a57c24011",
-      "scope": "ENG-09.3-WU03_BOOTSTRAP"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36141845230",
-      "head_sha": "8d728d228e5a287cc2e054acb2f2a68a57c24011",
-      "scope": "ENG-09.3-WU03_SECURITY_SECRETS"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "status": "PASS",
@@ -166,6 +138,34 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36349354926",
       "head_sha": "06b3338ec59c831f7adcefcdccbf1bc366fec194",
       "scope": "ENG-09.3-WU04_SECURITY_SUPPLY_CHAIN"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36349637574",
+      "head_sha": "36f5bc1bf28b7cd97817d8336114b0c70eaeb142",
+      "scope": "ENG-09.3-WU05_BOOTSTRAP"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36349637569",
+      "head_sha": "36f5bc1bf28b7cd97817d8336114b0c70eaeb142",
+      "scope": "ENG-09.3-WU05_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36349637593",
+      "head_sha": "36f5bc1bf28b7cd97817d8336114b0c70eaeb142",
+      "scope": "ENG-09.3-WU05_SECURITY_ACTIONS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36349637572",
+      "head_sha": "36f5bc1bf28b7cd97817d8336114b0c70eaeb142",
+      "scope": "ENG-09.3-WU05_SECURITY_SUPPLY_CHAIN"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"
