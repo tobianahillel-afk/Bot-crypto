@@ -1,31 +1,6 @@
 name: Lot 34 market data quality engine validation
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'config/data_governance/market_data_quality_engine_v1.json'
-      - 'contracts/schemas/*quality*.json'
-      - 'contracts/schemas/data_anomaly_v1.schema.json'
-      - 'src/crypto_quant_bot/data_governance/market_data_quality_engine*.py'
-      - 'src/crypto_quant_bot/data_governance/__init__.py'
-      - 'scripts/run_lot34_market_data_quality_engine.py'
-      - 'scripts/validate_lot34.py'
-      - 'scripts/validate_lot34_no_connectivity.py'
-      - 'tests/test_lot34_market_data_quality_engine.py'
-      - 'tests/test_lot34_contract_boundaries.py'
-      - 'tests/test_lot34_mutation_contracts.py'
-      - 'tests/test_lot34_v3_entry_gate.py'
-      - 'docs/LOT_34_MARKET_DATA_QUALITY_ENGINE.md'
-      - 'docs/ACCEPTANCE_CRITERIA_LOT_34.md'
-      - 'reports/lot_34_market_data_quality_engine_report.md'
-      - 'data/audit/market_data_quality_engine_lot34.json'
-      - 'data/audit/market_data_quality_engine_audit_lot34.json'
-      - 'data/audit/data_quality_states_lot34.json'
-      - 'data/audit/data_anomalies_lot34.json'
-      - 'data/audit/data_quality_veto_lot34.json'
-      - '.github/workflows/lot34-market-data-quality.yml'
-      - 'requirements-dev.lock'
   push:
     branches: [main]
   workflow_dispatch:
