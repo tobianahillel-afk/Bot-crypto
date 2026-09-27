@@ -1,8 +1,6 @@
 name: Lot 39 independent post-merge audit
 
 on:
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

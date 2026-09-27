@@ -1,19 +1,6 @@
 name: Lot 31 post-merge audit exact-head
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'README.md'
-      - 'pyproject.toml'
-      - 'data/audit/roadmap_lifecycle_overlay_lot31.json'
-      - 'docs/LOT_31_POST_MERGE_AUDIT.md'
-      - 'docs/LOT31_POST_MERGE_VALIDATION_MATRIX.md'
-      - 'docs/ROADMAP_V1_TO_V21.md'
-      - 'scripts/validate_roadmap_documentation.py'
-      - 'tests/test_lot30_post_merge_state.py'
-      - 'tests/test_lot31_post_merge_state.py'
-      - '.github/workflows/lot31-post-merge-audit.yml'
   workflow_dispatch:
 
 permissions:

@@ -1,25 +1,6 @@
 name: Lot 38 independent post-merge audit
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'pyproject.toml'
-      - 'docs/LOT_38_POST_MERGE_AUDIT.md'
-      - 'docs/LOT38_POST_MERGE_VALIDATION_MATRIX.md'
-      - 'data/audit/roadmap_lifecycle_overlay_lot38.json'
-      - 'reports/lot38/coverage_summary.json'
-      - 'reports/lot38/mutation_summary.json'
-      - 'scripts/validate_lot37_post_merge.py'
-      - 'scripts/validate_lot38_post_merge.py'
-      - 'tests/test_lot37_post_merge_state.py'
-      - 'tests/test_lot38_coverage_completion.py'
-      - 'tests/test_lot38_post_merge_state.py'
-      - 'tests/test_lot38_v4_entry_gate.py'
-      - '.github/workflows/lot37-post-merge-audit.yml'
-      - '.github/workflows/lot38-order-book-l2-snapshot.yml'
-      - '.github/workflows/lot38-mutation-assurance.yml'
-      - '.github/workflows/lot38-post-merge-audit.yml'
   push:
     branches: [main]
   workflow_dispatch:
