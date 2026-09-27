@@ -1,7 +1,14 @@
 {
-  "schema_version": 1,
-  "map_kind": "active_agent_context_map_v1",
-  "project": "Crypto Quant Bot V3.1-Ops",
+  "active_work": {
+    "awu_id": "ENG-09.3-WU08",
+    "awu_path": "engineering/work_units/ENG-09.3-WU08.json",
+    "complexity_score": 1,
+    "lot": "ENG-09",
+    "manifest": "engineering/lots/ENG-09.json",
+    "risk_class": "R1",
+    "task": "ENG-09.3",
+    "track": "ENGINEERING"
+  },
   "authority": {
     "current_state": "config/governance/project_state.json",
     "resume_hint": "engineering/handoff/CURRENT.json",
@@ -12,15 +19,14 @@
     "config/governance/project_state.json",
     "engineering/CONTEXT_MAP.json"
   ],
-  "active_work": {
-    "track": "ENGINEERING",
-    "lot": "ENG-09",
-    "task": "ENG-09.3",
-    "awu_id": "ENG-09.3-WU08",
-    "awu_path": "engineering/work_units/ENG-09.3-WU08.json",
-    "manifest": "engineering/lots/ENG-09.json",
-    "risk_class": "R1",
-    "complexity_score": 1
+  "business_hold": {
+    "candidate_lot": 45,
+    "candidate_status": "SUSPENDED_CANDIDATE",
+    "development_status": "PAUSED",
+    "next_lot": {
+      "lot": 46,
+      "status": "LOCKED"
+    }
   },
   "execution_context": {
     "budget": {
@@ -51,14 +57,17 @@
     "do not recursively load the repository at startup",
     "load additional files only when the active AWU or validated dependency requires them"
   ],
-  "business_hold": {
-    "candidate_lot": 45,
-    "candidate_status": "SUSPENDED_CANDIDATE",
-    "development_status": "PAUSED",
-    "next_lot": {
-      "lot": 46,
-      "status": "LOCKED"
-    }
+  "map_kind": "active_agent_context_map_v1",
+  "non_authoritative_sources": [
+    "engineering/STATE.json",
+    "chat_history",
+    "model_memory"
+  ],
+  "project": "Crypto Quant Bot V3.1-Ops",
+  "resume": {
+    "current_objective": "Remove pull_request triggering from the final three protected Lot44 historical workflows while preserving workflow_dispatch and every job, command, evidence, provenance, threshold and exact-head check byte-for-byte; this completes phase-1 historical PR fanout removal without mutating frozen evidence artifacts.",
+    "handoff": "engineering/handoff/CURRENT.json",
+    "next_action": "Remove only pull_request triggering from the three protected Lot44 workflows; preserve workflow_dispatch and everything below each trigger block byte-for-byte. Do not touch Lot45, global workflows, business code, or historical evidence artifacts."
   },
   "safety": {
     "execution_allowed": false,
@@ -66,21 +75,12 @@
     "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
     "trade_allowed": false
   },
+  "schema_version": 1,
   "stop_conditions": [
     "STATE_DRIFT",
     "BUSINESS_SCOPE_TOUCHED_WITHOUT_UNLOCK",
     "FROZEN_EVIDENCE_MUTATION",
     "LOT46_UNLOCK_ATTEMPT",
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
-  ],
-  "resume": {
-    "handoff": "engineering/handoff/CURRENT.json",
-    "current_objective": "Remove pull_request triggering from the final three protected Lot44 historical workflows while preserving workflow_dispatch and every job, command, evidence, provenance, threshold and exact-head check byte-for-byte; this completes phase-1 historical PR fanout removal without mutating frozen evidence artifacts.",
-    "next_action": "Remove only pull_request triggering from the three protected Lot44 workflows; preserve workflow_dispatch and everything below each trigger block byte-for-byte. Do not touch Lot45, global workflows, business code, or historical evidence artifacts."
-  },
-  "non_authoritative_sources": [
-    "engineering/STATE.json",
-    "chat_history",
-    "model_memory"
   ]
 }
