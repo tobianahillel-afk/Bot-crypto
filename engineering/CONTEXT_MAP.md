@@ -13,19 +13,19 @@
 - Track: ENGINEERING
 - Work item: ENG-09
 - Task: ENG-09.3
-- AWU: ENG-09.3-WU06
+- AWU: ENG-09.3-WU07
 - Risk: R1
 - Manifest: engineering/lots/ENG-09.json
-- AWU file: engineering/work_units/ENG-09.3-WU06.json
+- AWU file: engineering/work_units/ENG-09.3-WU07.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-09.json
-- engineering/work_units/ENG-09.3-WU06.json
+- engineering/work_units/ENG-09.3-WU07.json
 - engineering/LOT45_WORKFLOW_REDUNDANCY_EVIDENCE.json
-- engineering/ENG09_WU05_COMPLETION_EVIDENCE.json
+- engineering/ENG09_WU06_COMPLETION_EVIDENCE.json
 
 ## Execution context — reference
 
@@ -36,14 +36,14 @@
 
 - Primary: 6 / 10 files
 - Reference: 2 / 12 files
-- Routed size: 56 / 768 KiB
+- Routed size: 55 / 768 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: Remove pull_request triggering from the remaining eight mutable historical validation workflows while preserving existing push/manual lifecycle surfaces and all validation jobs, commands, thresholds and evidence logic.
-- Next action: Remove only pull_request triggers and pull-request-only path filters from the eight WU06 validation workflows; preserve everything below each trigger block byte-for-byte and do not touch any Lot44, Lot45, or global workflow.
+- Objective: Remove pull_request triggering from the five mutable historical evidence and post-merge audit workflows while preserving their existing push/manual lifecycle surfaces and all evidence, provenance, audit and exact-head logic; protected Lot44 frozen evidence remains untouched.
+- Next action: Remove only pull_request triggers and pull-request-only path filters from the five WU07 evidence/audit workflows; preserve everything below each trigger block byte-for-byte and do not touch protected Lot44 frozen evidence, Lot45, or global workflows.
 
 ## Non-authoritative sources
 
