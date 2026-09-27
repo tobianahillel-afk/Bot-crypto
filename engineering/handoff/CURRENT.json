@@ -86,34 +86,6 @@
     {
       "class": "GITHUB_ACTIONS",
       "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36073668394",
-      "head_sha": "02c74a40d220ea3b4389f28139422e1c0f769808",
-      "scope": "ENG-08.6-WU01_EVIDENCE_BOOTSTRAP"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36073668282",
-      "head_sha": "02c74a40d220ea3b4389f28139422e1c0f769808",
-      "scope": "ENG-08.6-WU01_EVIDENCE_SECURITY_SECRETS"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36074598394",
-      "head_sha": "6d9bc16d4c1958e9b762c64b5020ccc4e0a4f96e",
-      "scope": "ENG-08.7-WU01_SECURITY_SECRETS"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36122013069",
-      "head_sha": "c2c1f0990c881cb725a3fccfccfd8098f84a0694",
-      "scope": "ENG-08.7-WU02_EVIDENCE_BOOTSTRAP"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36122013061",
       "head_sha": "c2c1f0990c881cb725a3fccfccfd8098f84a0694",
       "scope": "ENG-08.7-WU02_EVIDENCE_SECURITY_SECRETS"
