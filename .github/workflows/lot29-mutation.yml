@@ -1,15 +1,6 @@
 name: Lot 29 critical mutation assurance
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'config/replay/v2_deterministic_replay_audit_v1.json'
-      - 'src/crypto_quant_bot/market_analysis/v2_*replay*audit*.py'
-      - 'scripts/run_lot29_v2_deterministic_replay_and_audit.py'
-      - 'tests/test_lot29_*.py'
-      - '.github/workflows/lot29-mutation.yml'
-      - 'requirements-dev.lock'
   push:
     branches: [main]
   workflow_dispatch:
