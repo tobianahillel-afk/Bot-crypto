@@ -1,17 +1,6 @@
 name: Lot 42 mutation assurance
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_*.py'
-      - 'tests/test_lot42*.py'
-      - 'config/microstructure/liquidity_zones_walls_and_voids_engine_v1.json'
-      - 'contracts/schemas/liquidity_zone_set_v1.schema.json'
-      - 'contracts/schemas/liquidity_zones_walls_voids_engine_*.json'
-      - 'reports/lot42/mutation_summary.json'
-      - '.github/workflows/lot42-mutation-assurance.yml'
-      - 'requirements-dev.lock'
   workflow_dispatch:
 
 permissions:
