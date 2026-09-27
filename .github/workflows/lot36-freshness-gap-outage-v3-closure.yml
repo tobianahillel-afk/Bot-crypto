@@ -1,25 +1,6 @@
 name: Lot 36 freshness gap outage V3 closure validation
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'config/data_governance/freshness_gap_outage_v3_closure_v1.json'
-      - 'contracts/schemas/*closure*.json'
-      - 'contracts/schemas/freshness_gap_outage_evidence_v1.schema.json'
-      - 'contracts/schemas/lot_validation_report_v1.schema.json'
-      - 'contracts/schemas/replay_evidence_v1.schema.json'
-      - 'src/crypto_quant_bot/data_governance/freshness_gap_outage_audit_and_v3_closure*.py'
-      - 'src/crypto_quant_bot/data_governance/__init__.py'
-      - 'scripts/*lot36*'
-      - 'scripts/run_required_chain_until_lot36.sh'
-      - 'tests/test_lot36*.py'
-      - 'docs/LOT_36_FRESHNESS_GAP_OUTAGE_AUDIT_AND_V3_CLOSURE.md'
-      - 'docs/ACCEPTANCE_CRITERIA_LOT_36.md'
-      - 'reports/lot_36_freshness_gap_outage_audit_and_v3_closure_report.md'
-      - 'data/audit/*lot36.json'
-      - '.github/workflows/lot36-freshness-gap-outage-v3-closure.yml'
-      - 'requirements-dev.lock'
   push:
     branches: [main]
   workflow_dispatch:
