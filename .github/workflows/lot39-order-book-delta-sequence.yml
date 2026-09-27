@@ -1,8 +1,6 @@
 name: Lot 39 order book delta sequence validation
 
 on:
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
