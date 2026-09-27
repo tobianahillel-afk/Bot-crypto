@@ -1,7 +1,7 @@
 {
   "active_work": {
-    "awu_id": "ENG-09.3-WU04",
-    "awu_path": "engineering/work_units/ENG-09.3-WU04.json",
+    "awu_id": "ENG-09.3-WU05",
+    "awu_path": "engineering/work_units/ENG-09.3-WU05.json",
     "complexity_score": 1,
     "lot": "ENG-09",
     "manifest": "engineering/lots/ENG-09.json",
@@ -40,16 +40,16 @@
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-09.json",
-      "engineering/work_units/ENG-09.3-WU04.json",
+      "engineering/work_units/ENG-09.3-WU05.json",
       "engineering/LOT45_WORKFLOW_REDUNDANCY_EVIDENCE.json",
-      "engineering/ENG09_WU02_COMPLETION_EVIDENCE.json"
+      "engineering/ENG09_WU04_COMPLETION_EVIDENCE.json"
     ],
     "reference_count": 2,
     "reference_files": [
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 59
+    "total_kib_ceil": 56
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -65,9 +65,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "Remove pull_request triggering from the remaining nine mutable historical mutation workflows while preserving their existing push/manual lifecycle surfaces and all jobs, commands, thresholds and evidence logic; protected Lot44 mutation assurance remains untouched.",
+    "current_objective": "Remove pull_request triggering from the first bounded batch of eight mutable historical validation workflows while preserving existing push/manual lifecycle surfaces and all validation jobs, commands, thresholds and evidence logic.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Remove only pull_request triggers and pull-request-only path filters from the nine WU04 workflows; preserve everything below each trigger block byte-for-byte and do not touch protected Lot44, Lot45, or global workflows."
+    "next_action": "Remove only pull_request triggers and pull-request-only path filters from the eight WU05 validation workflows; preserve everything below each trigger block byte-for-byte and do not touch any Lot44, Lot45, or global workflow."
   },
   "safety": {
     "execution_allowed": false,
