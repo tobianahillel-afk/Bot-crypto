@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "agent_work_unit",
   "id": "ENG-09.3-WU02",
-  "status": "BLOCKED",
+  "status": "IN_PROGRESS",
   "parent": {
     "work_item_id": "ENG-09",
     "task_id": "ENG-09.3",
@@ -22,7 +22,8 @@
     "modify protected Lot44 certification or mutation workflows"
   ],
   "depends_on": [
-    "ENG-09.3-WU01"
+    "ENG-09.3-WU01",
+    "ENG-09.3-WU03"
   ],
   "inputs": [
     {
@@ -74,11 +75,12 @@
     }
   ],
   "scope": {
-    "scope_base_sha": "8c886fc6839201b4e6fb7d7303cdb4128909d213",
+    "scope_base_sha": "8d728d228e5a287cc2e054acb2f2a68a57c24011",
     "allowed_paths": [
       "engineering/handoff/CURRENT.json",
       "engineering/work_units/ENG-09.3-WU01.json",
       "engineering/work_units/ENG-09.3-WU02.json",
+      "engineering/work_units/ENG-09.3-WU03.json",
       "engineering/CONTEXT_MAP.json",
       "engineering/CONTEXT_MAP.md",
       ".github/workflows/lot37-mutation-assurance.yml",
