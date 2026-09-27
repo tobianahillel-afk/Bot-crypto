@@ -24,7 +24,6 @@
 - config/governance/project_state.json
 - engineering/lots/ENG-09.json
 - engineering/work_units/ENG-09.3-WU02.json
-- engineering/work_units/ENG-09.3-WU03.json
 - engineering/LOT45_WORKFLOW_REDUNDANCY_EVIDENCE.json
 
 ## Execution context — reference
@@ -34,9 +33,9 @@
 
 ## Budget
 
-- Primary: 6 / 10 files
+- Primary: 5 / 10 files
 - Reference: 2 / 12 files
-- Routed size: 40 / 768 KiB
+- Routed size: 53 / 768 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
