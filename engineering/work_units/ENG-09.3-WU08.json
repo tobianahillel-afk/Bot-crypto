@@ -8,18 +8,18 @@
     "task_id": "ENG-09.3",
     "manifest": "engineering/lots/ENG-09.json"
   },
-  "title": "Suppress protected Lot44 historical PR fanout",
-  "objective": "Remove pull_request triggering from the final three protected Lot44 historical workflows while preserving workflow_dispatch and every job, command, evidence, provenance, threshold and exact-head check byte-for-byte; this completes phase-1 historical PR fanout removal without mutating frozen evidence artifacts.",
+  "title": "Reconcile protected Lot44 historical PR fanout",
+  "objective": "Prove whether the final three Lot44 historical workflows may be removed from unrelated PR fanout under the repository's higher historical-evidence protection policy; restore exact protected blobs when the policy rejects mutation and record the resulting protected exception.",
   "non_goals": [
-    "modify any Lot45 or global workflow",
-    "change any Lot44 job command threshold evidence provenance or exact-head logic",
+    "weaken or edit historical evidence protection policy",
+    "modify Lot44 jobs commands thresholds evidence provenance or exact-head logic",
+    "modify Lot45 or global workflows",
     "rewrite Lot44 historical artifacts",
     "modify business code",
     "resolve Lot45 P1 findings",
     "merge PR #66",
     "unlock Lot46",
-    "change business development status",
-    "introduce new workflow triggers"
+    "change business development status"
   ],
   "depends_on": [
     "ENG-09.3-WU07"
@@ -51,6 +51,11 @@
       "name": "Protected Lot44 frozen evidence workflow",
       "kind": "FILE",
       "locator": ".github/workflows/lot44-frozen-evidence.yml"
+    },
+    {
+      "name": "WU08 reconciliation evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/ENG09_WU08_COMPLETION_EVIDENCE.json"
     }
   ],
   "scope": {
@@ -64,7 +69,8 @@
       "engineering/CONTEXT_MAP.md",
       ".github/workflows/lot44-mutation-assurance.yml",
       ".github/workflows/lot44-trades-aggressor-classification.yml",
-      ".github/workflows/lot44-frozen-evidence.yml"
+      ".github/workflows/lot44-frozen-evidence.yml",
+      "engineering/ENG09_WU08_COMPLETION_EVIDENCE.json"
     ],
     "forbidden_paths": [
       ".github/workflows/lot45-*.yml",
@@ -92,22 +98,20 @@
   },
   "contracts": {
     "required_invariants": [
-      "all three Lot44 targets lose pull_request triggering",
-      "workflow_dispatch remains present on all three targets",
-      "no push trigger is introduced",
-      "everything below each trigger block remains byte-for-byte unchanged",
-      "Lot44 jobs commands thresholds evidence provenance and exact-head logic remain unchanged",
-      "no Lot45 global business-code historical-artifact or contract path is modified",
+      "historical evidence protection outranks AWU-local workflow authorization",
+      "the three protected Lot44 workflow blobs must equal their protected origin/main versions at completion",
+      "no Lot44 job command threshold evidence provenance or exact-head logic is modified",
+      "the rejected trigger-only attempt and exact restoration are recorded as evidence",
+      "the phase-1 fanout target is reconciled rather than achieved by weakening protection",
       "business development remains paused and Lot46 remains locked"
     ],
     "acceptance_criteria": [
-      "lot44 mutation assurance becomes workflow_dispatch-only",
-      "lot44 trades aggressor validation becomes workflow_dispatch-only",
-      "lot44 frozen evidence attestation becomes workflow_dispatch-only",
-      "all three jobs sections are unchanged",
-      "the original 41-workflow historical PR fanout set has no remaining pull_request triggers on the engineering branch",
-      "workflow security and supply-chain gates pass on exact head",
-      "Security Secrets and Engineering Bootstrap pass on exact head"
+      "Engineering Bootstrap identifies the attempted Lot44 edits as protected historical evidence drift",
+      "all three protected Lot44 workflow blobs are restored exactly",
+      "Engineering Bootstrap passes after restoration",
+      "Security Secrets and Security Supply Chain pass after restoration",
+      "pre-existing actionlint warnings are recorded without editing protected Lot44 job sections",
+      "phase-1 accounting records 38 of 41 historical workflows removed and 3 protected exceptions retained"
     ]
   },
   "planning": {
@@ -159,10 +163,10 @@
     ]
   },
   "done_when": [
-    "the final three protected Lot44 historical workflows no longer trigger on unrelated candidate pull requests",
-    "their manual lifecycle surface is preserved",
-    "their jobs evidence provenance and exact-head semantics are unchanged",
-    "phase-1 historical PR fanout removal is complete without hiding any Lot45/global failure",
-    "same-head bootstrap and security gates pass"
+    "the three protected Lot44 workflows are byte-identical to the protected baseline",
+    "the attempted protected mutation is explicitly rejected and not hidden",
+    "phase-1 consolidation accounting is reconciled to the protected exception",
+    "no protected evidence policy is weakened",
+    "business development remains paused and Lot46 remains locked"
   ]
 }
