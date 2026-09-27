@@ -35,13 +35,12 @@
       "max_total_kib": 768
     },
     "implicit_expansion": "FORBIDDEN",
-    "primary_count": 6,
+    "primary_count": 5,
     "primary_files": [
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-09.json",
       "engineering/work_units/ENG-09.3-WU02.json",
-      "engineering/work_units/ENG-09.3-WU03.json",
       "engineering/LOT45_WORKFLOW_REDUNDANCY_EVIDENCE.json"
     ],
     "reference_count": 2,
@@ -49,7 +48,7 @@
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 40
+    "total_kib_ceil": 53
   },
   "instructions": [
     "verify external Git reality before writing",
