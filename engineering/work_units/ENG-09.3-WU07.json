@@ -1,28 +1,28 @@
 {
   "schema_version": 1,
   "kind": "agent_work_unit",
-  "id": "ENG-09.3-WU06",
-  "status": "DONE",
+  "id": "ENG-09.3-WU07",
+  "status": "IN_PROGRESS",
   "parent": {
     "work_item_id": "ENG-09",
     "task_id": "ENG-09.3",
     "manifest": "engineering/lots/ENG-09.json"
   },
-  "title": "Suppress historical validation PR fanout batch 2",
-  "objective": "Remove pull_request triggering from the remaining eight mutable historical validation workflows while preserving existing push/manual lifecycle surfaces and all validation jobs, commands, thresholds and evidence logic.",
+  "title": "Suppress historical evidence/audit PR fanout",
+  "objective": "Remove pull_request triggering from the five mutable historical evidence and post-merge audit workflows while preserving their existing push/manual lifecycle surfaces and all evidence, provenance, audit and exact-head logic; protected Lot44 frozen evidence remains untouched.",
   "non_goals": [
     "modify any Lot44 workflow",
     "modify Lot45 or global workflows",
-    "change validation jobs commands thresholds reports or evidence semantics",
+    "change evidence audit provenance or exact-head commands",
+    "rewrite historical artifacts",
     "modify business code",
     "resolve Lot45 P1 findings",
     "merge PR #66",
     "unlock Lot46",
-    "change business development status",
-    "modify frozen historical evidence"
+    "change business development status"
   ],
   "depends_on": [
-    "ENG-09.3-WU05"
+    "ENG-09.3-WU06"
   ],
   "inputs": [
     {
@@ -31,76 +31,52 @@
       "locator": "engineering/LOT45_WORKFLOW_REDUNDANCY_EVIDENCE.json"
     },
     {
-      "name": "WU05 completion evidence",
-      "kind": "EVIDENCE",
-      "locator": "engineering/ENG09_WU05_COMPLETION_EVIDENCE.json"
-    }
-  ],
-  "outputs": [
-    {
-      "name": "Historical validation workflow batch2 1",
-      "kind": "FILE",
-      "locator": ".github/workflows/lot39-order-book-delta-sequence.yml"
-    },
-    {
-      "name": "Historical validation workflow batch2 2",
-      "kind": "FILE",
-      "locator": ".github/workflows/lot28-explanation-core.yml"
-    },
-    {
-      "name": "Historical validation workflow batch2 3",
-      "kind": "FILE",
-      "locator": ".github/workflows/lot33-timestamp-governance.yml"
-    },
-    {
-      "name": "Historical validation workflow batch2 4",
-      "kind": "FILE",
-      "locator": ".github/workflows/lot34-market-data-quality.yml"
-    },
-    {
-      "name": "Historical validation workflow batch2 5",
-      "kind": "FILE",
-      "locator": ".github/workflows/lot32-instrument-normalization.yml"
-    },
-    {
-      "name": "Historical validation workflow batch2 6",
-      "kind": "FILE",
-      "locator": ".github/workflows/lot30-v2-closure.yml"
-    },
-    {
-      "name": "Historical validation workflow batch2 7",
-      "kind": "FILE",
-      "locator": ".github/workflows/lot35-candle-trade-book-reconciliation.yml"
-    },
-    {
-      "name": "Historical validation workflow batch2 8",
-      "kind": "FILE",
-      "locator": ".github/workflows/lot27-global-context.yml"
-    },
-    {
       "name": "WU06 completion evidence",
       "kind": "EVIDENCE",
       "locator": "engineering/ENG09_WU06_COMPLETION_EVIDENCE.json"
     }
   ],
+  "outputs": [
+    {
+      "name": "Historical evidence/audit workflow 1",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot31-post-merge-audit.yml"
+    },
+    {
+      "name": "Historical evidence/audit workflow 2",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot39-frozen-evidence.yml"
+    },
+    {
+      "name": "Historical evidence/audit workflow 3",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot38-post-merge-audit.yml"
+    },
+    {
+      "name": "Historical evidence/audit workflow 4",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot32-post-merge-audit.yml"
+    },
+    {
+      "name": "Historical evidence/audit workflow 5",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot39-post-merge-audit.yml"
+    }
+  ],
   "scope": {
-    "scope_base_sha": "36f5bc1bf28b7cd97817d8336114b0c70eaeb142",
+    "scope_base_sha": "2ee8029b21e75172a73a394d74d577672da1cbe2",
     "allowed_paths": [
       "engineering/handoff/CURRENT.json",
-      "engineering/work_units/ENG-09.3-WU05.json",
       "engineering/work_units/ENG-09.3-WU06.json",
-      "engineering/ENG09_WU05_COMPLETION_EVIDENCE.json",
+      "engineering/work_units/ENG-09.3-WU07.json",
+      "engineering/ENG09_WU06_COMPLETION_EVIDENCE.json",
       "engineering/CONTEXT_MAP.json",
       "engineering/CONTEXT_MAP.md",
-      ".github/workflows/lot39-order-book-delta-sequence.yml",
-      ".github/workflows/lot28-explanation-core.yml",
-      ".github/workflows/lot33-timestamp-governance.yml",
-      ".github/workflows/lot34-market-data-quality.yml",
-      ".github/workflows/lot32-instrument-normalization.yml",
-      ".github/workflows/lot30-v2-closure.yml",
-      ".github/workflows/lot35-candle-trade-book-reconciliation.yml",
-      ".github/workflows/lot27-global-context.yml",
-      "engineering/ENG09_WU06_COMPLETION_EVIDENCE.json"
+      ".github/workflows/lot31-post-merge-audit.yml",
+      ".github/workflows/lot39-frozen-evidence.yml",
+      ".github/workflows/lot38-post-merge-audit.yml",
+      ".github/workflows/lot32-post-merge-audit.yml",
+      ".github/workflows/lot39-post-merge-audit.yml"
     ],
     "forbidden_paths": [
       ".github/workflows/lot44-*.yml",
@@ -115,8 +91,9 @@
     "forbidden_semantics": [
       "Lot44 workflow mutation",
       "Lot45 or global workflow mutation",
-      "workflow job command threshold or artifact mutation",
+      "evidence audit provenance exact-head job mutation",
       "new workflow trigger introduction",
+      "historical artifact mutation",
       "business implementation",
       "Lot45 candidate remediation",
       "Lot45 merge",
@@ -130,20 +107,21 @@
   "contracts": {
     "required_invariants": [
       "each target loses pull_request triggering and pull-request-only path filters",
-      "workflow_dispatch remains present on all eight targets",
-      "pre-existing push main surfaces remain unchanged",
-      "workflows without pre-existing push remain manual-only",
+      "workflow_dispatch remains present on all five targets",
+      "lot38 post-merge audit preserves its pre-existing push main trigger",
+      "the other four targets remain workflow_dispatch-only after pull_request removal",
       "everything below each trigger block remains byte-for-byte unchanged",
-      "no Lot44 Lot45 or global workflow is modified",
-      "validation jobs commands thresholds reports and evidence logic remain unchanged",
+      "protected lot44-frozen-evidence.yml remains byte-for-byte unchanged",
+      "evidence provenance audit and exact-head logic remain unchanged",
       "business development remains paused and Lot46 remains locked"
     ],
     "acceptance_criteria": [
-      "lot39 order-book validation becomes workflow_dispatch-only",
-      "lot28 lot33 lot34 lot32 lot30 lot35 and lot27 retain push main plus workflow_dispatch",
-      "all eight jobs sections are unchanged",
+      "lot31 post-merge lot39 frozen lot32 post-merge and lot39 post-merge become workflow_dispatch-only",
+      "lot38 post-merge retains push main plus workflow_dispatch",
+      "all five jobs sections are unchanged",
       "workflow security and supply-chain gates pass on exact head",
-      "Security Secrets and Engineering Bootstrap pass on exact head"
+      "Security Secrets and Engineering Bootstrap pass on exact head",
+      "Lot44 frozen evidence workflow is unchanged"
     ]
   },
   "planning": {
@@ -171,7 +149,7 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 14,
+      "files_touched": 10,
       "executable_loc_changed": 0,
       "new_public_behaviors": 1,
       "contract_families": 0,
@@ -195,10 +173,10 @@
     ]
   },
   "done_when": [
-    "the final eight mutable historical validation workflows no longer trigger on unrelated candidate pull requests",
+    "the five mutable historical evidence/audit workflows no longer trigger on unrelated candidate pull requests",
     "their original push/manual lifecycle surfaces are preserved",
-    "their jobs and validation semantics are unchanged",
-    "no Lot44 Lot45 or global workflow is touched",
+    "their evidence audit provenance and exact-head jobs remain unchanged",
+    "protected Lot44 frozen evidence remains untouched",
     "same-head bootstrap and security gates pass"
   ]
 }
