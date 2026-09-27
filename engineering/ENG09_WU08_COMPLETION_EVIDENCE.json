@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "eng09_wu08_reconciliation_evidence_v1",
+  "awu_id": "ENG-09.3-WU08",
+  "verdict": "PASS_RECONCILED_PROTECTED_EXCEPTION",
+  "scope_base_sha": "a946e59ab129340f6d865bdbae6a8a9e047d3329",
+  "attempted_mutation_head": "c0e97a22f2fe4b11d85ac573edea6f65cbff4f37",
+  "restored_head_sha": "93cb5526ccefa233684ae94b3bb3fec4685393f9",
+  "higher_authority": {
+    "policy": "engineering/HISTORICAL_EVIDENCE_PROTECTION.json",
+    "rule": "protected current-tree paths must not differ from origin/main during engineering foundation work",
+    "validator": "scripts/governance/validate_historical_evidence_protection.py"
+  },
+  "protected_paths": [
+    {
+      "path": ".github/workflows/lot44-mutation-assurance.yml",
+      "restored_blob_sha": "3668603ed0af66a49808a241f8c510e6c5cf97fb"
+    },
+    {
+      "path": ".github/workflows/lot44-trades-aggressor-classification.yml",
+      "restored_blob_sha": "19848ef4fc87c163fced9b186b5805161ee2e847"
+    },
+    {
+      "path": ".github/workflows/lot44-frozen-evidence.yml",
+      "restored_blob_sha": "03996c563bbdff7639ea669b383d709c4876f269"
+    }
+  ],
+  "rejected_attempt_runs": [
+    {
+      "id": 36358074814,
+      "name": "Engineering Bootstrap",
+      "conclusion": "failure",
+      "cause": "protected historical evidence drift on the three Lot44 workflows"
+    },
+    {
+      "id": 36358074897,
+      "name": "Security Actions",
+      "conclusion": "failure",
+      "cause": "pre-existing SC2034 warnings in unchanged protected Lot44 job scripts"
+    },
+    {
+      "id": 36358074840,
+      "name": "Security Secrets",
+      "conclusion": "success"
+    },
+    {
+      "id": 36358074828,
+      "name": "Security Supply Chain",
+      "conclusion": "success"
+    }
+  ],
+  "restoration_runs": [
+    {
+      "id": 36358340803,
+      "name": "Engineering Bootstrap",
+      "conclusion": "success"
+    },
+    {
+      "id": 36358340824,
+      "name": "Security Secrets",
+      "conclusion": "success"
+    },
+    {
+      "id": 36358340827,
+      "name": "Security Supply Chain",
+      "conclusion": "success"
+    },
+    {
+      "id": 36358340838,
+      "name": "Security Actions",
+      "conclusion": "failure",
+      "cause": "restoration diff re-exposed the same pre-existing SC2034 warnings"
+    }
+  ],
+  "actionlint_legacy_findings": [
+    {
+      "path": ".github/workflows/lot44-frozen-evidence.yml",
+      "line": 131,
+      "rule": "SC2034",
+      "summary": "repetition appears unused",
+      "changed_by_wu08": false
+    },
+    {
+      "path": ".github/workflows/lot44-trades-aggressor-classification.yml",
+      "line": 134,
+      "rule": "SC2034",
+      "summary": "repetition appears unused",
+      "changed_by_wu08": false
+    }
+  ],
+  "phase1_reconciliation": {
+    "original_candidate_workflows": 49,
+    "original_historical_fanout": 41,
+    "removable_historical_fanout_removed": 38,
+    "protected_historical_fanout_retained": 3,
+    "historical_fanout_reduction_percent": 92.68,
+    "projected_candidate_pr_workflows": 11,
+    "projected_workflow_reduction_percent": 77.55,
+    "original_historical_failures": 19,
+    "historical_failure_noise_removed": 18,
+    "protected_historical_failures_retained": 1,
+    "historical_failure_noise_reduction_percent": 94.74,
+    "protected_exception_workflows": [
+      ".github/workflows/lot44-mutation-assurance.yml",
+      ".github/workflows/lot44-trades-aggressor-classification.yml",
+      ".github/workflows/lot44-frozen-evidence.yml"
+    ]
+  },
+  "safety": {
+    "protection_policy_weakened": false,
+    "protected_job_logic_changed": false,
+    "business_code_changed": false,
+    "candidate_changed": false,
+    "lot46_unlocked": false
+  }
+}
