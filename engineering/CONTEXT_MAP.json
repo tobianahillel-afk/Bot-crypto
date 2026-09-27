@@ -1,7 +1,7 @@
 {
   "active_work": {
-    "awu_id": "ENG-09.3-WU05",
-    "awu_path": "engineering/work_units/ENG-09.3-WU05.json",
+    "awu_id": "ENG-09.3-WU06",
+    "awu_path": "engineering/work_units/ENG-09.3-WU06.json",
     "complexity_score": 1,
     "lot": "ENG-09",
     "manifest": "engineering/lots/ENG-09.json",
@@ -40,9 +40,9 @@
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-09.json",
-      "engineering/work_units/ENG-09.3-WU05.json",
+      "engineering/work_units/ENG-09.3-WU06.json",
       "engineering/LOT45_WORKFLOW_REDUNDANCY_EVIDENCE.json",
-      "engineering/ENG09_WU04_COMPLETION_EVIDENCE.json"
+      "engineering/ENG09_WU05_COMPLETION_EVIDENCE.json"
     ],
     "reference_count": 2,
     "reference_files": [
@@ -65,9 +65,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "Remove pull_request triggering from the first bounded batch of eight mutable historical validation workflows while preserving existing push/manual lifecycle surfaces and all validation jobs, commands, thresholds and evidence logic.",
+    "current_objective": "Remove pull_request triggering from the remaining eight mutable historical validation workflows while preserving existing push/manual lifecycle surfaces and all validation jobs, commands, thresholds and evidence logic.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Remove only pull_request triggers and pull-request-only path filters from the eight WU05 validation workflows; preserve everything below each trigger block byte-for-byte and do not touch any Lot44, Lot45, or global workflow."
+    "next_action": "Remove only pull_request triggers and pull-request-only path filters from the eight WU06 validation workflows; preserve everything below each trigger block byte-for-byte and do not touch any Lot44, Lot45, or global workflow."
   },
   "safety": {
     "execution_allowed": false,
