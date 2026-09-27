@@ -219,5 +219,11 @@
     "lot45_merged": false,
     "main_branch_protected": false,
     "rulesets_count": 0
+  },
+  "final_certification": {
+    "exact_head_sha": "f983edf74c53cabe511cd2122a03e5c7b566bf38",
+    "engineering_bootstrap_run": 36349052437,
+    "security_secrets_run": 36349052493,
+    "verdict": "PASS"
   }
 }
