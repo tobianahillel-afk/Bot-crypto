@@ -1,35 +1,6 @@
 name: Lot 37 microstructure scope and offline contracts validation
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'config/microstructure/microstructure_scope_offline_data_contracts_v1.json'
-      - 'contracts/schemas/microstructure_offline_l2_input_v1.schema.json'
-      - 'contracts/schemas/microstructure_offline_trade_input_v1.schema.json'
-      - 'contracts/schemas/microstructure_scope_offline_data_contracts_state_v1.schema.json'
-      - 'contracts/schemas/microstructure_scope_offline_data_contracts_audit_v1.schema.json'
-      - 'contracts/schemas/microstructure_scope_offline_data_contracts_contract_registry_v1.schema.json'
-      - 'contracts/schemas/microstructure_scope_offline_data_contracts_capability_matrix_v1.schema.json'
-      - 'src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts.py'
-      - 'src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts_models.py'
-      - 'src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts_validation.py'
-      - 'scripts/run_lot37_microstructure_scope_and_offline_data_contracts.py'
-      - 'scripts/validate_lot37.py'
-      - 'scripts/validate_lot37_frozen_evidence.py'
-      - 'tests/test_lot37_microstructure_scope_and_offline_data_contracts.py'
-      - 'tests/test_lot37_branch_coverage.py'
-      - 'docs/LOT_37_MICROSTRUCTURE_SCOPE_AND_OFFLINE_DATA_CONTRACTS.md'
-      - 'docs/ACCEPTANCE_CRITERIA_LOT_37.md'
-      - 'reports/lot_37_microstructure_scope_and_offline_data_contracts_report.md'
-      - 'reports/lot37/coverage_summary.json'
-      - 'reports/lot37/mutation_summary.json'
-      - 'data/audit/microstructure_scope_and_offline_data_contracts_lot37.json'
-      - 'data/audit/microstructure_scope_and_offline_data_contracts_audit_lot37.json'
-      - 'data/audit/microstructure_contract_registry_lot37.json'
-      - 'data/audit/microstructure_capability_matrix_lot37.json'
-      - '.github/workflows/lot37-microstructure-scope-contracts.yml'
-      - 'requirements-dev.lock'
   push:
     branches: [main]
   workflow_dispatch:
