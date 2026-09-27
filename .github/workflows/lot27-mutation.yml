@@ -1,15 +1,6 @@
 name: Lot 27 critical mutation assurance
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'config/math/global_market_context_aggregator_v1.json'
-      - 'src/crypto_quant_bot/market_analysis/global_market_context_aggregator*.py'
-      - 'tests/lot27_fixtures.py'
-      - 'tests/test_lot27_*.py'
-      - '.github/workflows/lot27-mutation.yml'
-      - 'requirements-dev.lock'
   push:
     branches: [main]
   workflow_dispatch:
