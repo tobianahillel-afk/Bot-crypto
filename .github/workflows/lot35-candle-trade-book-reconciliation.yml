@@ -1,28 +1,6 @@
 name: Lot 35 candle trade book reconciliation validation
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'config/data_governance/candle_trade_book_reconciliation_v1.json'
-      - 'contracts/schemas/*reconciliation*.json'
-      - 'src/crypto_quant_bot/data_governance/candle_trade_book_reconciliation*.py'
-      - 'src/crypto_quant_bot/data_governance/__init__.py'
-      - 'scripts/run_lot35_candle_trade_book_reconciliation.py'
-      - 'scripts/validate_lot35.py'
-      - 'scripts/validate_lot35_no_connectivity.py'
-      - 'tests/test_lot35_candle_trade_book_reconciliation.py'
-      - 'tests/test_lot35_reconciliation_boundaries.py'
-      - 'tests/test_lot35_mutation_contracts.py'
-      - 'docs/LOT_35_CANDLE_TRADE_BOOK_RECONCILIATION.md'
-      - 'docs/ACCEPTANCE_CRITERIA_LOT_35.md'
-      - 'reports/lot_35_candle_trade_book_reconciliation_report.md'
-      - 'data/audit/candle_trade_book_reconciliation_lot35.json'
-      - 'data/audit/candle_trade_book_reconciliation_audit_lot35.json'
-      - 'data/audit/reconciliation_reports_lot35.json'
-      - 'data/audit/reconciliation_veto_lot35.json'
-      - '.github/workflows/lot35-candle-trade-book-reconciliation.yml'
-      - 'requirements-dev.lock'
   push:
     branches: [main]
   workflow_dispatch:
