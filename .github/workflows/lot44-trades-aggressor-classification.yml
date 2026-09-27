@@ -1,6 +1,23 @@
 name: Lot 44 trades aggressor classification validation
 
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema*.py'
+      - 'tests/test_lot44*.py'
+      - 'config/microstructure/trades_and_aggressor_classification_schema_v1.json'
+      - 'contracts/schemas/classified_trade_v1.schema.json'
+      - 'contracts/schemas/aggressor_confidence_state_v1.schema.json'
+      - 'contracts/schemas/trades_aggressor_classification_schema_*.schema.json'
+      - 'scripts/run_lot44_trades_and_aggressor_classification_schema.py'
+      - 'scripts/validate_lot44.py'
+      - 'scripts/validate_lot44_no_connectivity.py'
+      - 'docs/LOT_44_TRADES_AND_AGGRESSOR_CLASSIFICATION_SCHEMA.md'
+      - 'docs/ACCEPTANCE_CRITERIA_LOT_44.md'
+      - 'reports/lot_44_trades_and_aggressor_classification_schema_report.md'
+      - '.github/workflows/lot44-trades-aggressor-classification.yml'
+      - 'requirements-dev.lock'
   workflow_dispatch:
 
 permissions:
