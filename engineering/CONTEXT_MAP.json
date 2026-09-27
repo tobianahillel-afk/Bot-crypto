@@ -1,7 +1,7 @@
 {
   "active_work": {
-    "awu_id": "ENG-09.3-WU06",
-    "awu_path": "engineering/work_units/ENG-09.3-WU06.json",
+    "awu_id": "ENG-09.3-WU07",
+    "awu_path": "engineering/work_units/ENG-09.3-WU07.json",
     "complexity_score": 1,
     "lot": "ENG-09",
     "manifest": "engineering/lots/ENG-09.json",
@@ -40,16 +40,16 @@
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-09.json",
-      "engineering/work_units/ENG-09.3-WU06.json",
+      "engineering/work_units/ENG-09.3-WU07.json",
       "engineering/LOT45_WORKFLOW_REDUNDANCY_EVIDENCE.json",
-      "engineering/ENG09_WU05_COMPLETION_EVIDENCE.json"
+      "engineering/ENG09_WU06_COMPLETION_EVIDENCE.json"
     ],
     "reference_count": 2,
     "reference_files": [
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 56
+    "total_kib_ceil": 55
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -65,9 +65,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "Remove pull_request triggering from the remaining eight mutable historical validation workflows while preserving existing push/manual lifecycle surfaces and all validation jobs, commands, thresholds and evidence logic.",
+    "current_objective": "Remove pull_request triggering from the five mutable historical evidence and post-merge audit workflows while preserving their existing push/manual lifecycle surfaces and all evidence, provenance, audit and exact-head logic; protected Lot44 frozen evidence remains untouched.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Remove only pull_request triggers and pull-request-only path filters from the eight WU06 validation workflows; preserve everything below each trigger block byte-for-byte and do not touch any Lot44, Lot45, or global workflow."
+    "next_action": "Remove only pull_request triggers and pull-request-only path filters from the five WU07 evidence/audit workflows; preserve everything below each trigger block byte-for-byte and do not touch protected Lot44 frozen evidence, Lot45, or global workflows."
   },
   "safety": {
     "execution_allowed": false,
