@@ -72,6 +72,11 @@
       "name": "Historical mutation workflow batch1 8",
       "kind": "FILE",
       "locator": ".github/workflows/lot36-mutation-assurance.yml"
+    },
+    {
+      "name": "WU02 completion evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/ENG09_WU02_COMPLETION_EVIDENCE.json"
     }
   ],
   "scope": {
@@ -90,7 +95,8 @@
       ".github/workflows/lot30-mutation.yml",
       ".github/workflows/lot40-mutation-assurance.yml",
       ".github/workflows/lot28-mutation.yml",
-      ".github/workflows/lot36-mutation-assurance.yml"
+      ".github/workflows/lot36-mutation-assurance.yml",
+      "engineering/ENG09_WU02_COMPLETION_EVIDENCE.json"
     ],
     "forbidden_paths": [
       ".github/workflows/lot45-*.yml",
@@ -162,7 +168,7 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 13,
+      "files_touched": 14,
       "executable_loc_changed": 0,
       "new_public_behaviors": 1,
       "contract_families": 0,
