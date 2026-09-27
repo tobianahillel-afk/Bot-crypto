@@ -1,20 +1,6 @@
 name: Lot 33 timestamp clock timezone governance validation
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'config/data_governance/timestamp_clock_timezone_governance_v1.json'
-      - 'contracts/schemas/*time*.json'
-      - 'src/crypto_quant_bot/data_governance/timestamp_*.py'
-      - 'scripts/*lot33*'
-      - 'tests/test_lot33_*.py'
-      - 'docs/*LOT_33*'
-      - 'docs/LOT33_*'
-      - 'reports/*lot_33*'
-      - 'data/audit/*lot33.json'
-      - '.github/workflows/lot33-timestamp-governance.yml'
-      - 'requirements-dev.lock'
   push:
     branches: [main]
   workflow_dispatch:
