@@ -13,19 +13,19 @@
 - Track: ENGINEERING
 - Work item: ENG-09
 - Task: ENG-09.3
-- AWU: ENG-09.3-WU07
+- AWU: ENG-09.3-WU08
 - Risk: R1
 - Manifest: engineering/lots/ENG-09.json
-- AWU file: engineering/work_units/ENG-09.3-WU07.json
+- AWU file: engineering/work_units/ENG-09.3-WU08.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-09.json
-- engineering/work_units/ENG-09.3-WU07.json
+- engineering/work_units/ENG-09.3-WU08.json
 - engineering/LOT45_WORKFLOW_REDUNDANCY_EVIDENCE.json
-- engineering/ENG09_WU06_COMPLETION_EVIDENCE.json
+- engineering/ENG09_WU07_COMPLETION_EVIDENCE.json
 
 ## Execution context — reference
 
@@ -36,14 +36,14 @@
 
 - Primary: 6 / 10 files
 - Reference: 2 / 12 files
-- Routed size: 55 / 768 KiB
+- Routed size: 54 / 768 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: Remove pull_request triggering from the five mutable historical evidence and post-merge audit workflows while preserving their existing push/manual lifecycle surfaces and all evidence, provenance, audit and exact-head logic; protected Lot44 frozen evidence remains untouched.
-- Next action: Remove only pull_request triggers and pull-request-only path filters from the five WU07 evidence/audit workflows; preserve everything below each trigger block byte-for-byte and do not touch protected Lot44 frozen evidence, Lot45, or global workflows.
+- Objective: Remove pull_request triggering from the final three protected Lot44 historical workflows while preserving workflow_dispatch and every job, command, evidence, provenance, threshold and exact-head check byte-for-byte; this completes phase-1 historical PR fanout removal without mutating frozen evidence artifacts.
+- Next action: Remove only pull_request triggering from the three protected Lot44 workflows; preserve workflow_dispatch and everything below each trigger block byte-for-byte. Do not touch Lot45, global workflows, business code, or historical evidence artifacts.
 
 ## Non-authoritative sources
 
