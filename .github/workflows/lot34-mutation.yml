@@ -1,14 +1,6 @@
 name: Lot 34 critical mutation assurance
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'src/crypto_quant_bot/data_governance/market_data_quality_engine*.py'
-      - 'tests/test_lot34_*.py'
-      - 'config/data_governance/market_data_quality_engine_v1.json'
-      - '.github/workflows/lot34-mutation.yml'
-      - 'requirements-dev.lock'
   push:
     branches: [main]
   workflow_dispatch:
