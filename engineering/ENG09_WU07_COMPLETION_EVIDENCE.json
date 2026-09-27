@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "eng09_wu07_completion_evidence_v1",
+  "awu_id": "ENG-09.3-WU07",
+  "verdict": "PASS",
+  "scope_base_sha": "2ee8029b21e75172a73a394d74d577672da1cbe2",
+  "exact_head_sha": "a946e59ab129340f6d865bdbae6a8a9e047d3329",
+  "transformations": [
+    {
+      "path": ".github/workflows/lot31-post-merge-audit.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": false,
+      "jobs_suffix_byte_identical": true
+    },
+    {
+      "path": ".github/workflows/lot39-frozen-evidence.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": false,
+      "jobs_suffix_byte_identical": true
+    },
+    {
+      "path": ".github/workflows/lot38-post-merge-audit.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": true,
+      "jobs_suffix_byte_identical": true
+    },
+    {
+      "path": ".github/workflows/lot32-post-merge-audit.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": false,
+      "jobs_suffix_byte_identical": true
+    },
+    {
+      "path": ".github/workflows/lot39-post-merge-audit.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": false,
+      "jobs_suffix_byte_identical": true
+    }
+  ],
+  "protected_boundaries": {
+    "lot44_workflows_unchanged": true,
+    "lot45_workflows_unchanged": true,
+    "global_workflows_unchanged": true,
+    "business_code_unchanged": true,
+    "historical_evidence_unchanged": true,
+    "contracts_unchanged": true
+  },
+  "residual_phase1_historical_pr_fanout": [
+    ".github/workflows/lot44-mutation-assurance.yml",
+    ".github/workflows/lot44-trades-aggressor-classification.yml",
+    ".github/workflows/lot44-frozen-evidence.yml"
+  ],
+  "exact_head_runs": [
+    {
+      "id": 36357397561,
+      "name": "Engineering Bootstrap",
+      "conclusion": "success"
+    },
+    {
+      "id": 36357397600,
+      "name": "Security Secrets",
+      "conclusion": "success"
+    },
+    {
+      "id": 36357397583,
+      "name": "Security Actions",
+      "conclusion": "success"
+    },
+    {
+      "id": 36357397553,
+      "name": "Security Supply Chain",
+      "conclusion": "success"
+    }
+  ]
+}
