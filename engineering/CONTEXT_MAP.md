@@ -13,19 +13,19 @@
 - Track: ENGINEERING
 - Work item: ENG-09
 - Task: ENG-09.3
-- AWU: ENG-09.3-WU05
+- AWU: ENG-09.3-WU06
 - Risk: R1
 - Manifest: engineering/lots/ENG-09.json
-- AWU file: engineering/work_units/ENG-09.3-WU05.json
+- AWU file: engineering/work_units/ENG-09.3-WU06.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-09.json
-- engineering/work_units/ENG-09.3-WU05.json
+- engineering/work_units/ENG-09.3-WU06.json
 - engineering/LOT45_WORKFLOW_REDUNDANCY_EVIDENCE.json
-- engineering/ENG09_WU04_COMPLETION_EVIDENCE.json
+- engineering/ENG09_WU05_COMPLETION_EVIDENCE.json
 
 ## Execution context — reference
 
@@ -42,8 +42,8 @@
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: Remove pull_request triggering from the first bounded batch of eight mutable historical validation workflows while preserving existing push/manual lifecycle surfaces and all validation jobs, commands, thresholds and evidence logic.
-- Next action: Remove only pull_request triggers and pull-request-only path filters from the eight WU05 validation workflows; preserve everything below each trigger block byte-for-byte and do not touch any Lot44, Lot45, or global workflow.
+- Objective: Remove pull_request triggering from the remaining eight mutable historical validation workflows while preserving existing push/manual lifecycle surfaces and all validation jobs, commands, thresholds and evidence logic.
+- Next action: Remove only pull_request triggers and pull-request-only path filters from the eight WU06 validation workflows; preserve everything below each trigger block byte-for-byte and do not touch any Lot44, Lot45, or global workflow.
 
 ## Non-authoritative sources
 
