@@ -1,23 +1,6 @@
 name: Lot 26 foundation and lifecycle validation
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'README.md'
-      - 'requirements-dev.lock'
-      - 'pyproject.toml'
-      - '.github/workflows/pre-lot26-readiness-validation.yml'
-      - 'config/**'
-      - 'contracts/schemas/**'
-      - 'docs/**'
-      - 'scripts/validate_pre_lot26_readiness.py'
-      - 'scripts/validate_lot26.py'
-      - 'scripts/run_lot26_multi_timeframe_alignment_engine.py'
-      - 'src/crypto_quant_bot/contracts/timeframe_alignment.py'
-      - 'src/crypto_quant_bot/market_analysis/alignment_*.py'
-      - 'tests/test_pre_lot26_readiness.py'
-      - 'tests/test_lot26_*.py'
   push:
     branches: [main]
     paths:
