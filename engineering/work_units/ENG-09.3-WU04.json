@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "agent_work_unit",
   "id": "ENG-09.3-WU04",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "parent": {
     "work_item_id": "ENG-09",
     "task_id": "ENG-09.3",
@@ -83,6 +83,11 @@
       "name": "Historical mutation workflow batch2 9",
       "kind": "FILE",
       "locator": ".github/workflows/lot43-mutation-assurance.yml"
+    },
+    {
+      "name": "WU04 completion evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/ENG09_WU04_COMPLETION_EVIDENCE.json"
     }
   ],
   "scope": {
@@ -102,7 +107,8 @@
       ".github/workflows/lot27-mutation.yml",
       ".github/workflows/lot35-mutation.yml",
       ".github/workflows/lot42-mutation-assurance.yml",
-      ".github/workflows/lot43-mutation-assurance.yml"
+      ".github/workflows/lot43-mutation-assurance.yml",
+      "engineering/ENG09_WU04_COMPLETION_EVIDENCE.json"
     ],
     "forbidden_paths": [
       ".github/workflows/lot44-mutation-assurance.yml",
@@ -176,7 +182,7 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 14,
+      "files_touched": 15,
       "executable_loc_changed": 0,
       "new_public_behaviors": 1,
       "contract_families": 0,
