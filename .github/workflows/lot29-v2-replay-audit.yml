@@ -1,20 +1,6 @@
 name: Lot 29 V2 deterministic replay validation
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'config/replay/v2_deterministic_replay_audit_v1.json'
-      - 'contracts/schemas/v2_deterministic_replay_audit_state_v1.schema.json'
-      - 'src/crypto_quant_bot/market_analysis/v2_*replay*audit*.py'
-      - 'scripts/run_lot29_v2_deterministic_replay_and_audit.py'
-      - 'scripts/validate_lot29.py'
-      - 'tests/test_lot29_*.py'
-      - 'docs/*LOT_29*'
-      - 'reports/*lot_29*'
-      - 'data/audit/v2_*lot29.json'
-      - '.github/workflows/lot29-v2-replay-audit.yml'
-      - 'requirements-dev.lock'
   push:
     branches: [main]
   workflow_dispatch:
