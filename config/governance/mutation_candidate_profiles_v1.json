@@ -144,8 +144,8 @@
           "max_children": 1,
           "python_hash_seed": "0",
           "do_not_mutate_patterns": [
-            "raise \\\\w+",
-            "logger\\\\.\\\\w+"
+            "raise \\w+",
+            "logger\\.\\w+"
           ]
         }
       },
