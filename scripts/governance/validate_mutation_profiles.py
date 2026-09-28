@@ -46,7 +46,7 @@ P06_SETTINGS = {
     "max_stack_depth": 10,
     "timeout_multiplier": 8.0,
     "timeout_constant": 1.0,
-    "do_not_mutate_patterns": [r"raise \w+", r"logger\.\w+"],
+    "do_not_mutate_patterns": [r"raise \\w+", r"logger\\.\\w+"],
 }
 P06_WORKFLOW = ".github/workflows/p06-extended-mutation.yml"
 P06_WORKFLOW_BLOB = "b1653c0c392e74ea7f50b7b922fd8750fa402bb7"
