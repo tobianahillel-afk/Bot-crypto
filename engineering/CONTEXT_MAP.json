@@ -2,7 +2,7 @@
   "active_work": {
     "awu_id": "ENG-09.3-WU13",
     "awu_path": "engineering/work_units/ENG-09.3-WU13.json",
-    "complexity_score": 1,
+    "complexity_score": 2,
     "lot": "ENG-09",
     "manifest": "engineering/lots/ENG-09.json",
     "risk_class": "R1",

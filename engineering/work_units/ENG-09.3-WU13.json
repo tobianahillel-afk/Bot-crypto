@@ -112,7 +112,8 @@
       "scripts/governance/validate_mutation_candidate_profiles.py",
       "scripts/governance/select_mutation_candidate_profile.py",
       "scripts/governance/selftest_mutation_candidate_profiles.py",
-      "engineering/MUTATION_CANDIDATE_PROFILE_CONTROL.md"
+      "engineering/MUTATION_CANDIDATE_PROFILE_CONTROL.md",
+      ".github/workflows/eng09-wu13-candidate-profile-qualification.yml"
     ],
     "forbidden_paths": [
       "config/governance/mutation_profiles_v1.json",
@@ -154,7 +155,8 @@
       "candidate score evidence remains PASS with 1341 killed 0 timeout 0 suspicious 324 survived 1665 evaluated and 80.54 percent",
       "qualification selector can simulate candidate selection but production selector visibility remains false",
       "no Lot45 mutation execution occurs in WU13",
-      "business development remains PAUSED and Lot46 remains LOCKED"
+      "business development remains PAUSED and Lot46 remains LOCKED",
+      "WU13 qualification workflow is temporary and must be removed after qualification evidence is captured"
     ],
     "acceptance_criteria": [
       "candidate registry and policy validate deterministically",
@@ -170,7 +172,7 @@
   },
   "planning": {
     "risk_class": "R1",
-    "complexity_score": 1,
+    "complexity_score": 2,
     "split_required": false,
     "context_budget": {
       "max_primary_files": 10,
@@ -189,11 +191,11 @@
       "security_trust_boundary": false,
       "risk_execution_permission": false,
       "dependency_change": false,
-      "ci_evidence_topology_change": false
+      "ci_evidence_topology_change": true
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 12,
+      "files_touched": 13,
       "executable_loc_changed": 450,
       "new_public_behaviors": 1,
       "contract_families": 0,
