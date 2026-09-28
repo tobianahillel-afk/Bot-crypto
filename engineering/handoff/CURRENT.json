@@ -112,7 +112,7 @@
       "scope": "ENG-09.4-WU01_SECURITY_SECRETS"
     },
     {
-      "class": "EXACT_GITHUB_ACTIONS_RUN",
+      "class": "GITHUB_ACTIONS",
       "status": "PASS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36461104451",
       "head_sha": "972748579bcb998fc48542c02ed76aacae482fa5",
