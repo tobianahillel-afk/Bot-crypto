@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "policy_kind": "mutation_profile_policy_v1",
+  "semantics": "DATA_ONLY_DETERMINISTIC_FAIL_CLOSED",
+  "registry_path": "config/governance/mutation_profiles_v1.json",
+  "allowed_selector_modes": [
+    "EXACT",
+    "GLOB"
+  ],
+  "allowed_source_binding_modes": [
+    "CURRENT_CHECKOUT",
+    "EXACT_HEAD_INPUT"
+  ],
+  "allowed_score_terms": [
+    "killed",
+    "timeout",
+    "suspicious",
+    "survived"
+  ],
+  "forbidden_profile_keys": [
+    "command",
+    "commands",
+    "shell",
+    "run",
+    "script",
+    "executable",
+    "argv",
+    "environment",
+    "env"
+  ],
+  "bounds": {
+    "max_profiles": 32,
+    "max_selectors_per_profile": 32,
+    "max_mutation_targets_per_profile": 8,
+    "max_tests_per_profile": 32,
+    "max_also_copy_per_profile": 64,
+    "max_do_not_mutate_patterns": 16
+  },
+  "invariants": [
+    "profiles contain declarative data only and never executable shell or command strings",
+    "repository paths are relative and may not escape the repository",
+    "a changed path matching selectors from multiple profiles fails closed",
+    "unrelated changed paths do not select a blanket mutation profile",
+    "score numerator and denominator semantics are explicit per profile",
+    "source binding mode is explicit and stale hardcoded heads are not accepted as CURRENT_CHECKOUT",
+    "P06_DECISION_EVIDENCE remains parity-bound to the legacy P0.6 workflow until migration",
+    "profile selection performs no mutation execution"
+  ]
+}
