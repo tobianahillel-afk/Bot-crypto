@@ -8,12 +8,17 @@ The profile registry is data only. The runner first executes the WU10 validator 
 only one enabled, validated profile. No profile field can supply a shell command, executable,
 argv, or environment variable.
 
-The only mutation subprocesses are fixed in source:
+The only mutation subprocesses are fixed in source and use the installed console entrypoint
+from the same locked Python environment:
 
 ```text
-python -m mutmut run
-python -m mutmut results
+mutmut run
+mutmut results
 ```
+
+This deliberately matches the legacy P0.6 workflow. Running `python -m mutmut` is not
+equivalent for mutmut 3.5.0 because trampoline imports can re-enter
+`mutmut.__main__` and re-run multiprocessing initialization.
 
 The runner rejects non-`CURRENT_CHECKOUT` source bindings during WU11.
 

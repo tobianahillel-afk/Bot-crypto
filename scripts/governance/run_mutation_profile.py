@@ -238,10 +238,23 @@ def materialized_config_sha256(profile: dict[str, Any]) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
+def _mutmut_console() -> str:
+    candidate = shutil.which("mutmut")
+    if candidate is None:
+        raise MutationRunnerError("mutmut console entrypoint is not installed")
+    resolved = Path(candidate).resolve()
+    python_bin = Path(sys.executable).resolve().parent
+    if resolved.parent != python_bin or resolved.name != "mutmut":
+        raise MutationRunnerError(
+            f"mutmut console entrypoint is outside locked Python environment: {resolved}"
+        )
+    return str(resolved)
+
+
 def mutmut_argv(action: str) -> list[str]:
     if action not in {"run", "results"}:
         raise MutationRunnerError(f"unsupported fixed mutmut action: {action}")
-    return [sys.executable, "-m", "mutmut", action]
+    return [_mutmut_console(), action]
 
 
 def _run_fixed(action: str) -> tuple[int, str]:
@@ -404,8 +417,8 @@ def execute_profile(profile_id: str) -> dict[str, Any]:
         },
         "status": status,
         "fixed_commands": [
-            ["python", "-m", "mutmut", "run"],
-            ["python", "-m", "mutmut", "results"],
+            ["mutmut", "run"],
+            ["mutmut", "results"],
         ],
     }
     _write_json(evidence_dir / "profile_evidence.json", common)

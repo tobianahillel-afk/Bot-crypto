@@ -52,13 +52,11 @@ def main() -> int:
     assert parsed["timeout_constant"] == 1.0
     assert parsed["do_not_mutate_patterns"] == profile["mutation"]["settings"]["do_not_mutate_patterns"]
 
-    assert mod.mutmut_argv("run") == [sys.executable, "-m", "mutmut", "run"]
-    assert mod.mutmut_argv("results") == [
-        sys.executable,
-        "-m",
-        "mutmut",
-        "results",
-    ]
+    console = mod._mutmut_console()
+    assert Path(console).name == "mutmut"
+    assert Path(console).parent == Path(sys.executable).resolve().parent
+    assert mod.mutmut_argv("run") == [console, "run"]
+    assert mod.mutmut_argv("results") == [console, "results"]
     _expect(
         mod.MutationRunnerError,
         lambda: mod.mutmut_argv("arbitrary"),
@@ -130,6 +128,7 @@ def main() -> int:
     assert "os.system" not in source
     assert "subprocess.Popen" not in source
     assert '["git", *args]' in source
+    assert '[sys.executable, "-m", "mutmut"' not in source
 
     validate = mod.validate_only("P06_DECISION_EVIDENCE")
     assert validate["mutation_executed"] is False

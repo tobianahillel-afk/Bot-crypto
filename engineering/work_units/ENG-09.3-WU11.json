@@ -141,7 +141,7 @@
       "selftest_mutation_profiles.py passes before generic mutation execution",
       "runner validate-only mode proves exact P0.6 materialized configuration without executing mutmut",
       "runner rejects unknown disabled ambiguous or non-CURRENT_CHECKOUT profiles in WU11",
-      "runner invokes only python -m mutmut through fixed internal code paths",
+      "runner invokes only the locked mutmut console entrypoint with fixed run/results argv and rejects an entrypoint outside the active Python environment",
       "P0.6 evidence score is computed as killed plus timeout over killed plus timeout plus suspicious plus survived with minimum 80 percent",
       "source immutability check leaves src/crypto_quant_bot unchanged and restores pyproject.toml",
       "ci-mutation.yml is engineering-branch parity only plus workflow_dispatch and does not adopt main pull_request triggers",
