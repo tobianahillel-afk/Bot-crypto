@@ -61,6 +61,16 @@ def main() -> int:
     )
     assert glob["selected_profiles"] == ["P06_DECISION_EVIDENCE"]
 
+    generic_workflow = selector.select_profiles(
+        [".github/workflows/ci-mutation.yml"], registry
+    )
+    assert generic_workflow["selected_profiles"] == ["P06_DECISION_EVIDENCE"]
+
+    retired_workflow = selector.select_profiles(
+        [".github/workflows/p06-extended-mutation.yml"], registry
+    )
+    assert retired_workflow["selected_profiles"] == []
+
     unrelated = selector.select_profiles(["docs/README.md"], registry)
     assert unrelated["selected_profiles"] == []
 
@@ -139,7 +149,40 @@ def main() -> int:
         "legacy blob drift",
     )
 
-    print("MUTATION_PROFILES_SELFTEST_PASS probes=12")
+    lifecycle_drift = copy.deepcopy(registry)
+    lifecycle_drift["profiles"][0]["legacy_reference"]["lifecycle"] = "PARITY_REFERENCE_UNTIL_WU12_MIGRATION"
+    _expect(
+        validator.MutationProfileError,
+        lambda: validator.validate_p06_parity(lifecycle_drift),
+        "migrated lifecycle drift",
+    )
+
+    workflow_text = (ROOT / ".github/workflows/ci-mutation.yml").read_text(encoding="utf-8")
+    validator.validate_p06_migrated_workflow(workflow_text)
+
+    missing_pr_path = workflow_text.replace(
+        "      - 'pyproject.toml'\n  push:",
+        "  push:",
+        1,
+    )
+    _expect(
+        validator.MutationProfileError,
+        lambda: validator.validate_p06_migrated_workflow(missing_pr_path),
+        "generic pull-request path drift",
+    )
+
+    missing_engineering = workflow_text.replace(
+        "      - engineering/bootstrap-development-engine\n",
+        "",
+        1,
+    )
+    _expect(
+        validator.MutationProfileError,
+        lambda: validator.validate_p06_migrated_workflow(missing_engineering),
+        "generic engineering maintenance branch drift",
+    )
+
+    print("MUTATION_PROFILES_SELFTEST_PASS probes=17")
     return 0
 
 

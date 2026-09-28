@@ -1,20 +1,32 @@
 name: CI Mutation Profiles
 
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/crypto_quant_bot/contracts/decision_evidence.py'
+      - 'tests/test_p06_decision_evidence*.py'
+      - '.github/workflows/ci-mutation.yml'
+      - 'requirements-dev.lock'
+      - 'pyproject.toml'
   push:
     branches:
+      - main
       - engineering/bootstrap-development-engine
     paths:
+      - 'src/crypto_quant_bot/contracts/decision_evidence.py'
+      - 'tests/test_p06_decision_evidence*.py'
+      - '.github/workflows/ci-mutation.yml'
+      - 'requirements-dev.lock'
+      - 'pyproject.toml'
       - 'scripts/governance/run_mutation_profile.py'
       - 'scripts/governance/selftest_mutation_runner.py'
       - 'scripts/governance/validate_mutation_profiles.py'
+      - 'scripts/governance/selftest_mutation_profiles.py'
       - 'scripts/governance/select_mutation_profile.py'
       - 'config/governance/mutation_profile_policy_v1.json'
       - 'config/governance/mutation_profiles_v1.json'
-      - '.github/workflows/ci-mutation.yml'
-      - '.github/workflows/p06-extended-mutation.yml'
-      - 'requirements-dev.lock'
-      - 'pyproject.toml'
   workflow_dispatch:
     inputs:
       profile_id:
@@ -34,7 +46,7 @@ concurrency:
 
 jobs:
   mutation-profile:
-    name: P0.6 generic-runner parity
+    name: P0.6 generic mutation control
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:

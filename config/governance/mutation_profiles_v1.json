@@ -4,7 +4,7 @@
   "profiles": [
     {
       "id": "P06_DECISION_EVIDENCE",
-      "profile_version": 1,
+      "profile_version": 2,
       "enabled": true,
       "selectors": [
         {
@@ -17,7 +17,7 @@
         },
         {
           "mode": "EXACT",
-          "pattern": ".github/workflows/p06-extended-mutation.yml"
+          "pattern": ".github/workflows/ci-mutation.yml"
         },
         {
           "mode": "EXACT",
@@ -96,7 +96,7 @@
         "workflow": ".github/workflows/p06-extended-mutation.yml",
         "workflow_blob_sha": "b1653c0c392e74ea7f50b7b922fd8750fa402bb7",
         "canonical_mutmut_defaults": "pyproject.toml",
-        "lifecycle": "PARITY_REFERENCE_UNTIL_WU12_MIGRATION"
+        "lifecycle": "GENERIC_CONTROL_ACTIVE_AFTER_WU12"
       }
     }
   ]
