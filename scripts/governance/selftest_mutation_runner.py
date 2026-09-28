@@ -50,7 +50,7 @@ def main() -> int:
     ]
     assert parsed["timeout_multiplier"] == 8.0
     assert parsed["timeout_constant"] == 1.0
-    assert parsed["do_not_mutate_patterns"] == [r"raise \w+", r"logger\.\w+"]
+    assert parsed["do_not_mutate_patterns"] == profile["mutation"]["settings"]["do_not_mutate_patterns"]
 
     assert mod.mutmut_argv("run") == [sys.executable, "-m", "mutmut", "run"]
     assert mod.mutmut_argv("results") == [
