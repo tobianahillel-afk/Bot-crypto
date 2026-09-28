@@ -152,6 +152,18 @@ def _toml_array(name: str, values: list[str]) -> list[str]:
     return lines
 
 
+def _toml_literal_array(name: str, values: list[str]) -> list[str]:
+    lines = [f"{name} = ["]
+    for value in values:
+        if "'" in value or "\n" in value or "\r" in value:
+            raise MutationRunnerError(
+                f"{name} contains value unsafe for TOML literal string: {value!r}"
+            )
+        lines.append(f"  '{value}',")
+    lines.append("]")
+    return lines
+
+
 def expected_mutmut_config(profile: dict[str, Any]) -> dict[str, Any]:
     mutation = profile["mutation"]
     settings = mutation["settings"]
@@ -184,7 +196,10 @@ def render_mutmut_block(profile: dict[str, Any]) -> str:
         f"timeout_multiplier = {config['timeout_multiplier']:.1f}",
         f"timeout_constant = {config['timeout_constant']:.1f}",
     ]
-    lines += _toml_array("do_not_mutate_patterns", config["do_not_mutate_patterns"])
+    lines += _toml_literal_array(
+        "do_not_mutate_patterns",
+        config["do_not_mutate_patterns"],
+    )
     return "\n".join(lines) + "\n"
 
 
