@@ -43,7 +43,7 @@
     ],
     "primary_count": 12,
     "reference_count": 2,
-    "total_kib_ceil": 64,
+    "total_kib_ceil": 63,
     "budget": {
       "max_primary_files": 12,
       "max_reference_files": 16,

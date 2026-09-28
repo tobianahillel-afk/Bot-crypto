@@ -100,11 +100,12 @@
       "engineering/CONTEXT_MAP.md",
       "engineering/work_units/ENG-09.3-WU13.json",
       "engineering/work_units/ENG-09.4-WU01.json",
-      "engineering/ENG09_WU13_LOT45_PROFILE_EVIDENCE.json",
       "config/governance/development_engine_v1_certification_policy_v1.json",
       "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_CANDIDATE.json",
       "scripts/governance/validate_development_engine_v1_certification.py",
-      "scripts/governance/selftest_development_engine_v1_certification.py"
+      "scripts/governance/selftest_development_engine_v1_certification.py",
+      "README.md",
+      "engineering/CURRENT_STATUS.md"
     ],
     "forbidden_paths": [
       ".github/workflows/**",
@@ -181,7 +182,7 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 14,
+      "files_touched": 15,
       "executable_loc_changed": 650,
       "new_public_behaviors": 1,
       "contract_families": 0,
