@@ -76,8 +76,8 @@
       "locator": ".github/workflows/ci-mutation.yml"
     },
     {
-      "name": "Retired legacy P0.6 workflow",
-      "kind": "DELETED_FILE",
+      "name": "Retired legacy P0.6 workflow (absent from HEAD after migration)",
+      "kind": "FILE",
       "locator": ".github/workflows/p06-extended-mutation.yml"
     },
     {
