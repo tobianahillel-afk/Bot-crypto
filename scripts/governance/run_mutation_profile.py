@@ -80,6 +80,49 @@ def _git_blob(path: str) -> str:
     return value
 
 
+def _legacy_provenance(profile: dict[str, Any]) -> dict[str, Any]:
+    legacy = profile["legacy_reference"]
+    path = legacy["workflow"]
+    expected = legacy["workflow_blob_sha"]
+    lifecycle = legacy["lifecycle"]
+    present = (ROOT / path).is_file()
+
+    if lifecycle == "GENERIC_CONTROL_ACTIVE_AFTER_WU12":
+        if present:
+            raise MutationRunnerError(
+                f"retired legacy workflow unexpectedly exists in HEAD: {path}"
+            )
+        proc = _git("cat-file", "-t", expected)
+        if proc.returncode != 0 or proc.stdout.strip() != "blob":
+            raise MutationRunnerError(
+                f"retired legacy workflow blob unavailable in Git history: {expected}"
+            )
+        return {
+            "workflow": path,
+            "blob": expected,
+            "lifecycle": lifecycle,
+            "present_in_head": False,
+            "provenance": "GIT_HISTORY_BLOB",
+        }
+
+    if not present:
+        raise MutationRunnerError(
+            f"legacy workflow missing before generic-control migration: {path}"
+        )
+    actual = _git_blob(path)
+    if actual != expected:
+        raise MutationRunnerError(
+            f"legacy workflow blob drift: {actual} != {expected}"
+        )
+    return {
+        "workflow": path,
+        "blob": actual,
+        "lifecycle": lifecycle,
+        "present_in_head": True,
+        "provenance": "HEAD_BLOB",
+    }
+
+
 def _require_clean(paths: list[str], label: str) -> None:
     proc = _git("diff", "--quiet", "HEAD", "--", *paths)
     if proc.returncode == 1:
@@ -326,6 +369,7 @@ def validate_only(profile_id: str) -> dict[str, Any]:
     _policy, profile = _validated_profile(profile_id)
     _check_locked_mutmut(require_installed=False)
     _require_clean(["pyproject.toml", *profile["source_immutability"]["verify_paths"]], "mutation inputs")
+    legacy = _legacy_provenance(profile)
     return {
         "runner_version": 1,
         "mode": "VALIDATE_ONLY",
@@ -333,7 +377,9 @@ def validate_only(profile_id: str) -> dict[str, Any]:
         "profile_version": profile["profile_version"],
         "source_binding": profile["source_binding"]["mode"],
         "source_head": _head_sha(),
-        "legacy_workflow_blob": _git_blob(profile["legacy_reference"]["workflow"]),
+        "legacy_workflow_blob": legacy["blob"],
+        "legacy_workflow_lifecycle": legacy["lifecycle"],
+        "legacy_workflow_present_in_head": legacy["present_in_head"],
         "materialized_config_sha256": materialized_config_sha256(profile),
         "mutmut_version_locked": MUTMUT_VERSION,
         "mutation_executed": False,
@@ -343,6 +389,7 @@ def validate_only(profile_id: str) -> dict[str, Any]:
 def execute_profile(profile_id: str) -> dict[str, Any]:
     _policy, profile = _validated_profile(profile_id)
     _check_locked_mutmut(require_installed=True)
+    legacy = _legacy_provenance(profile)
     immutable_paths = list(profile["source_immutability"]["verify_paths"])
     restore_paths = list(profile["source_immutability"]["restore_paths"])
     _require_clean([*restore_paths, *immutable_paths], "mutation inputs")
@@ -401,7 +448,9 @@ def execute_profile(profile_id: str) -> dict[str, Any]:
         "source_head": source_head,
         "source_binding": profile["source_binding"]["mode"],
         "legacy_workflow": profile["legacy_reference"]["workflow"],
-        "legacy_workflow_blob": _git_blob(profile["legacy_reference"]["workflow"]),
+        "legacy_workflow_blob": legacy["blob"],
+        "legacy_workflow_lifecycle": legacy["lifecycle"],
+        "legacy_workflow_present_in_head": legacy["present_in_head"],
         "materialized_config_sha256": config_sha,
         "mutmut_version": MUTMUT_VERSION,
         "python_version": PYTHON_VERSION,

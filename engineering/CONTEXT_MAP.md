@@ -30,6 +30,7 @@
 - scripts/governance/validate_mutation_profiles.py
 - .github/workflows/ci-mutation.yml
 
+- scripts/governance/run_mutation_profile.py
 ## Execution context — reference
 
 - engineering/MASTER_PLAN.md
@@ -37,9 +38,9 @@
 
 ## Budget
 
-- Primary: 9 / 10 files
+- Primary: 10 / 10 files
 - Reference: 2 / 12 files
-- Routed size: 77 / 768 KiB
+- Routed size: 95 / 768 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint

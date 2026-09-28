@@ -52,6 +52,11 @@
       "name": "Generic mutation workflow",
       "kind": "FILE",
       "locator": ".github/workflows/ci-mutation.yml"
+    },
+    {
+      "name": "Generic mutation runner lifecycle binding",
+      "kind": "FILE",
+      "locator": "scripts/governance/run_mutation_profile.py"
     }
   ],
   "outputs": [
@@ -84,6 +89,11 @@
       "name": "WU12 migration evidence",
       "kind": "EVIDENCE",
       "locator": "engineering/ENG09_WU12_P06_MIGRATION_EVIDENCE.json"
+    },
+    {
+      "name": "Lifecycle-aware generic mutation runner",
+      "kind": "FILE",
+      "locator": "scripts/governance/run_mutation_profile.py"
     }
   ],
   "scope": {
@@ -101,7 +111,8 @@
       ".github/workflows/ci-mutation.yml",
       ".github/workflows/p06-extended-mutation.yml",
       "engineering/MUTATION_PROFILE_CONTROL.md",
-      "engineering/MUTATION_RUNNER.md"
+      "engineering/MUTATION_RUNNER.md",
+      "scripts/governance/run_mutation_profile.py"
     ],
     "forbidden_paths": [
       ".github/workflows/code-quality.yml",
@@ -137,7 +148,8 @@
       "validator requires legacy workflow absence and validates the generic trigger surface after migration",
       "P0.6 mutation source target tests also-copy settings score formula threshold and source binding remain unchanged",
       "code-quality.yml and Lot45 mutation workflow remain unchanged",
-      "business development remains PAUSED and Lot46 remains LOCKED"
+      "business development remains PAUSED and Lot46 remains LOCKED",
+      "runner resolves retired legacy provenance from the certified historical blob after WU12 and never requires the retired workflow to exist in HEAD"
     ],
     "acceptance_criteria": [
       "ci-mutation pull_request main paths cover P0.6 source tests requirements pyproject and ci-mutation workflow",
@@ -148,7 +160,8 @@
       "generic runner selftest and validate-only remain green",
       "Security Actions Security Supply Chain Security Secrets and Engineering Bootstrap pass on migration head",
       "CI Mutation Profiles executes successfully on the migration head",
-      "code-quality embedded mutation and Lot45 mutation assurance are byte-identical to scope base"
+      "code-quality embedded mutation and Lot45 mutation assurance are byte-identical to scope base",
+      "generic runner validate-only reports the certified historical legacy blob while the retired workflow remains absent from HEAD"
     ]
   },
   "planning": {
@@ -176,7 +189,7 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 13,
+      "files_touched": 14,
       "executable_loc_changed": 350,
       "new_public_behaviors": 1,
       "contract_families": 0,
