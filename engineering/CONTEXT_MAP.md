@@ -13,19 +13,23 @@
 - Track: ENGINEERING
 - Work item: ENG-09
 - Task: ENG-09.3
-- AWU: ENG-09.3-WU10
-- Risk: R1
+- AWU: ENG-09.3-WU11
+- Risk: R2
 - Manifest: engineering/lots/ENG-09.json
-- AWU file: engineering/work_units/ENG-09.3-WU10.json
+- AWU file: engineering/work_units/ENG-09.3-WU11.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-09.json
-- engineering/work_units/ENG-09.3-WU10.json
-- engineering/ENG09_PHASE1_MUTATION_CONSOLIDATION_PLAN.json
+- engineering/work_units/ENG-09.3-WU11.json
+- config/governance/mutation_profile_policy_v1.json
+- config/governance/mutation_profiles_v1.json
+- scripts/governance/validate_mutation_profiles.py
+- scripts/governance/select_mutation_profile.py
 - .github/workflows/p06-extended-mutation.yml
+- requirements-dev.lock
 - pyproject.toml
 
 ## Execution context — reference
@@ -35,16 +39,16 @@
 
 ## Budget
 
-- Primary: 7 / 10 files
-- Reference: 2 / 12 files
-- Routed size: 46 / 768 KiB
+- Primary: 11 / 12 files
+- Reference: 2 / 16 files
+- Routed size: 73 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: Implement a command-free profile policy, validated P0.6 mutation profile and deterministic changed-path selector that preserve the exact P0.6 mutation semantics without migrating or editing any workflow.
-- Next action: Implement and adversarially validate the command-free mutation profile policy/registry plus deterministic P0.6 selector; do not edit any workflow, run generic mutation, or touch the Lot45 candidate.
+- Objective: Implement a command-free reusable mutation-profile runner and engineering-branch parity workflow, then prove P0.6 profile execution preserves the legacy mutation semantics before any trigger migration.
+- Next action: Implement the fixed internal mutation runner, adversarial runner selftests and engineering-only ci-mutation parity workflow; execute WU10 profile validation before mutation and keep the legacy P0.6 workflow byte-identical.
 
 ## Non-authoritative sources
 

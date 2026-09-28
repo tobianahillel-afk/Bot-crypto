@@ -1,0 +1,208 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-09.3-WU11",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-09",
+    "task_id": "ENG-09.3",
+    "manifest": "engineering/lots/ENG-09.json"
+  },
+  "title": "Implement reusable mutation runner and P0.6 parity workflow",
+  "objective": "Implement a command-free reusable mutation-profile runner and engineering-branch parity workflow, then prove P0.6 profile execution preserves the legacy mutation semantics before any trigger migration.",
+  "non_goals": [
+    "modify delete or replace p06-extended-mutation.yml",
+    "migrate P0.6 main or pull-request triggers",
+    "modify code-quality.yml embedded mutation assurance",
+    "define or adopt the Lot45 mutation profile",
+    "modify Lot45 candidate or business code",
+    "unlock Lot46 or business development",
+    "introduce paid services or mandatory LLM review"
+  ],
+  "depends_on": [
+    "ENG-09.3-WU10"
+  ],
+  "inputs": [
+    {
+      "name": "Mutation profile policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/mutation_profile_policy_v1.json"
+    },
+    {
+      "name": "Mutation profile registry",
+      "kind": "CONFIG",
+      "locator": "config/governance/mutation_profiles_v1.json"
+    },
+    {
+      "name": "Mutation profile validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_mutation_profiles.py"
+    },
+    {
+      "name": "Mutation profile selector",
+      "kind": "FILE",
+      "locator": "scripts/governance/select_mutation_profile.py"
+    },
+    {
+      "name": "Legacy P0.6 parity reference",
+      "kind": "FILE",
+      "locator": ".github/workflows/p06-extended-mutation.yml"
+    },
+    {
+      "name": "Locked development toolchain",
+      "kind": "FILE",
+      "locator": "requirements-dev.lock"
+    },
+    {
+      "name": "Canonical mutmut defaults",
+      "kind": "FILE",
+      "locator": "pyproject.toml"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Reusable mutation profile runner",
+      "kind": "FILE",
+      "locator": "scripts/governance/run_mutation_profile.py"
+    },
+    {
+      "name": "Mutation runner adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_mutation_runner.py"
+    },
+    {
+      "name": "Generic mutation parity workflow",
+      "kind": "FILE",
+      "locator": ".github/workflows/ci-mutation.yml"
+    },
+    {
+      "name": "P0.6 parity evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/ENG09_WU11_P06_PARITY_EVIDENCE.json"
+    },
+    {
+      "name": "Mutation runner documentation",
+      "kind": "FILE",
+      "locator": "engineering/MUTATION_RUNNER.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "dc48a919a24b45a176115e27f21e6961b819b84b",
+    "allowed_paths": [
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-09.3-WU10.json",
+      "engineering/work_units/ENG-09.3-WU11.json",
+      "scripts/governance/run_mutation_profile.py",
+      "scripts/governance/selftest_mutation_runner.py",
+      ".github/workflows/ci-mutation.yml",
+      "engineering/ENG09_WU11_P06_PARITY_EVIDENCE.json",
+      "engineering/MUTATION_RUNNER.md"
+    ],
+    "forbidden_paths": [
+      ".github/workflows/p06-extended-mutation.yml",
+      ".github/workflows/code-quality.yml",
+      ".github/workflows/lot45-mutation-assurance.yml",
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "legacy P0.6 workflow migration or deletion",
+      "main or pull-request mutation trigger migration",
+      "institutional mutation deduplication",
+      "Lot45 profile adoption",
+      "Lot45 candidate remediation",
+      "Lot45 merge",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "runner accepts only a validated enabled profile id from the declarative registry",
+      "profile JSON never supplies shell commands executable names argv or environment injection",
+      "P0.6 execution uses CURRENT_CHECKOUT and the locked mutmut 3.5.0 toolchain",
+      "runner materializes profile-specific mutmut settings without changing production Python source",
+      "P0.6 target tests also-copy score numerator denominator threshold timeout policy and do-not-mutate patterns remain parity-bound to WU10 data",
+      "runner restores canonical pyproject.toml and verifies configured source immutability after mutation execution",
+      "evidence serialization is deterministic and records exact source head profile version counts formula threshold and PASS or FAIL",
+      "engineering parity workflow runs WU10 validator and selftests before invoking mutation",
+      "legacy P0.6 workflow remains byte-identical during WU11",
+      "Lot45 profile workflow and business code remain untouched"
+    ],
+    "acceptance_criteria": [
+      "validate_mutation_profiles.py passes before generic mutation execution",
+      "selftest_mutation_profiles.py passes before generic mutation execution",
+      "runner validate-only mode proves exact P0.6 materialized configuration without executing mutmut",
+      "runner rejects unknown disabled ambiguous or non-CURRENT_CHECKOUT profiles in WU11",
+      "runner invokes only python -m mutmut through fixed internal code paths",
+      "P0.6 evidence score is computed as killed plus timeout over killed plus timeout plus suspicious plus survived with minimum 80 percent",
+      "source immutability check leaves src/crypto_quant_bot unchanged and restores pyproject.toml",
+      "ci-mutation.yml is engineering-branch parity only plus workflow_dispatch and does not adopt main pull_request triggers",
+      "legacy p06-extended-mutation.yml Git blob remains b1653c0c392e74ea7f50b7b922fd8750fa402bb7",
+      "parity evidence binds the exact generic workflow run and head before WU12 can begin"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 2,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": true,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 10,
+      "executable_loc_changed": 780,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_mutation_profiles.py",
+      "python scripts/governance/selftest_mutation_profiles.py",
+      "python scripts/governance/selftest_mutation_runner.py",
+      "python scripts/governance/run_mutation_profile.py --profile P06_DECISION_EVIDENCE --validate-only",
+      "GitHub Actions ci-mutation P0.6 parity workflow"
+    ]
+  },
+  "done_when": [
+    "generic runner executes only validated declarative mutation profiles",
+    "P0.6 generic execution has exact-head parity evidence",
+    "legacy P0.6 workflow remains unchanged and active until WU12",
+    "no Lot45 or institutional mutation behavior is migrated"
+  ]
+}
