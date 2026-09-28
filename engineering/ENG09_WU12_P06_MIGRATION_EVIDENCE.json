@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "eng09_wu12_p06_migration_evidence_v1",
+  "work_unit": "ENG-09.3-WU12",
+  "status": "PASS",
+  "scope_base_sha": "c612c9af0f76d4d21ae1a9df96ae925f093a5e11",
+  "qualification_head_sha": "a8efc3c8cc4fb8e291820756311bf04c1af9b6e5",
+  "profile": {
+    "id": "P06_DECISION_EVIDENCE",
+    "version": 2,
+    "lifecycle": "GENERIC_CONTROL_ACTIVE_AFTER_WU12",
+    "source_binding": "CURRENT_CHECKOUT",
+    "materialized_config_sha256": "df29ee50f3cf9226ccce5940ebcb5204c4a94976e66dff42a0204a42ec23c648",
+    "mutmut_version": "3.5.0",
+    "python_version": "3.11.9"
+  },
+  "legacy_reference": {
+    "workflow": ".github/workflows/p06-extended-mutation.yml",
+    "expected_blob_sha": "b1653c0c392e74ea7f50b7b922fd8750fa402bb7",
+    "observed_blob_sha": "b1653c0c392e74ea7f50b7b922fd8750fa402bb7",
+    "present_in_head": false,
+    "provenance": "GIT_HISTORY_BLOB"
+  },
+  "mutation_result": {
+    "killed": 39,
+    "timeout": 0,
+    "suspicious": 0,
+    "survived": 9,
+    "numerator": 39,
+    "denominator": 48,
+    "numerator_terms": [
+      "killed",
+      "timeout"
+    ],
+    "denominator_terms": [
+      "killed",
+      "timeout",
+      "suspicious",
+      "survived"
+    ],
+    "minimum_percent": 80,
+    "score_percent": 81.25,
+    "status": "PASS"
+  },
+  "github_actions": {
+    "qualification_head": "a8efc3c8cc4fb8e291820756311bf04c1af9b6e5",
+    "same_head_required_workflows": true,
+    "mutation_run": {
+      "run_id": 36411693261,
+      "job_id": 108893146837,
+      "workflow": "CI Mutation Profiles",
+      "conclusion": "success",
+      "head_sha": "a8efc3c8cc4fb8e291820756311bf04c1af9b6e5"
+    },
+    "bootstrap_run": {
+      "run_id": 36411692851,
+      "workflow": "Engineering Bootstrap",
+      "conclusion": "success",
+      "head_sha": "a8efc3c8cc4fb8e291820756311bf04c1af9b6e5"
+    },
+    "secrets_run": {
+      "run_id": 36411692948,
+      "workflow": "Security Secrets",
+      "conclusion": "success",
+      "head_sha": "a8efc3c8cc4fb8e291820756311bf04c1af9b6e5"
+    },
+    "security_actions_run": {
+      "run_id": 36411692874,
+      "workflow": "Security Actions",
+      "conclusion": "success",
+      "head_sha": "a8efc3c8cc4fb8e291820756311bf04c1af9b6e5"
+    },
+    "supply_chain_run": {
+      "run_id": 36411692868,
+      "workflow": "Security Supply Chain",
+      "conclusion": "success",
+      "head_sha": "a8efc3c8cc4fb8e291820756311bf04c1af9b6e5"
+    }
+  },
+  "artifact": {
+    "id": 10965035970,
+    "name": "mutation-profile-evidence-a8efc3c8cc4fb8e291820756311bf04c1af9b6e5",
+    "size_bytes": 2585,
+    "digest": "sha256:94a7aa19e3d75daaed0726562d531fad36b66c1c96d2eb169d357e4776a84fc4",
+    "expires_at": "2026-12-27T10:47:12Z"
+  },
+  "diff_from_scope_base": [
+    ".github/workflows/ci-mutation.yml",
+    ".github/workflows/p06-extended-mutation.yml",
+    "config/governance/mutation_profiles_v1.json",
+    "engineering/CONTEXT_MAP.json",
+    "engineering/CONTEXT_MAP.md",
+    "engineering/handoff/CURRENT.json",
+    "engineering/work_units/ENG-09.3-WU11.json",
+    "engineering/work_units/ENG-09.3-WU12.json",
+    "scripts/governance/run_mutation_profile.py",
+    "scripts/governance/selftest_mutation_profiles.py",
+    "scripts/governance/validate_mutation_profiles.py"
+  ],
+  "invariance": {
+    "code_quality_workflow_touched": false,
+    "lot45_workflows_touched": false,
+    "business_code_touched": false,
+    "protected_lot44_workflows_touched": false,
+    "p06_mutation_targets_changed": false,
+    "p06_tests_changed": false,
+    "p06_score_formula_changed": false,
+    "p06_minimum_percent_changed": false,
+    "p06_source_binding_changed": false
+  },
+  "external_safety_snapshot": {
+    "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "main_branch_protected": false,
+    "lot45_pr": 66,
+    "lot45_state": "open",
+    "lot45_merged": false,
+    "lot45_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "business_development": "PAUSED",
+    "lot46_status": "LOCKED",
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED"
+  },
+  "qualification": {
+    "profile_validator": "PASS",
+    "profile_selftests": "PASS",
+    "runner_selftests": "PASS",
+    "validate_only": "PASS",
+    "mutation_execution": "PASS",
+    "source_immutability": "PASS",
+    "automatic_trigger_migration": "PASS",
+    "legacy_workflow_retired": "PASS",
+    "same_head_bootstrap_security_supply_chain": "PASS"
+  },
+  "verdict": "P06_GENERIC_CONTROL_MIGRATION_PROVEN_WU13_MAY_START_READ_ONLY_LOT45_PROFILE_WORK"
+}
