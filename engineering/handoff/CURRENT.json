@@ -1,10 +1,10 @@
 {
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-09.3-WU12",
-    "awu_path": "engineering/work_units/ENG-09.3-WU12.json",
+    "awu_id": "ENG-09.3-WU13",
+    "awu_path": "engineering/work_units/ENG-09.3-WU13.json",
     "parent_manifest": "engineering/lots/ENG-09.json",
-    "scope_base_sha": "c612c9af0f76d4d21ae1a9df96ae925f093a5e11",
+    "scope_base_sha": "984154bd62ce38d36f3d10a415e74b49d92e9f6b",
     "risk_class": "R1",
     "complexity_score": 2
   },
@@ -14,7 +14,7 @@
     "state_source": "config/governance/project_state.json"
   },
   "blockers": [],
-  "current_objective": "After proven WU11 parity, migrate the P0.6 pull-request and main-push trigger surface to ci-mutation, retire the legacy P0.6 workflow, and transition the P0.6 profile from parity-reference lifecycle to generic-control lifecycle without changing mutation score or test semantics.",
+  "current_objective": "Model the suspended Lot45 candidate mutation semantics as a lifecycle-gated read-only candidate profile and prove selector/evidence equivalence against exact PR #66 Git evidence without modifying the candidate branch, enabling generic execution, or adopting the profile into active mutation control.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -27,7 +27,7 @@
     "rulesets_count": 0
   },
   "kind": "engineering_handoff",
-  "next_action": "Migrate the P0.6 profile lifecycle and trigger surface to ci-mutation, retire p06-extended-mutation.yml in the same bounded change, and prove same-head workflow/security plus generic mutation execution before WU13.",
+  "next_action": "Define the read-only Lot45 candidate mutation profile from exact PR #66 Git evidence and prove selection/evidence equivalence without modifying or executing the candidate.",
   "next_engineering": {
     "active_lot": "ENG-09",
     "active_task": "ENG-09.3",
@@ -41,7 +41,8 @@
     "ENG-09.3-WU08 reconciled on 93cb5526ccefa233684ae94b3bb3fec4685393f9: attempted removal of the three protected Lot44 PR triggers was rejected by historical-evidence protection and fully restored. Phase 1 removes 38/41 historical fanout workflows; 3 Lot44 exceptions remain protected.",
     "ENG-09.3-WU09 completed on 0476acda65470992c6abe1cc0ebea3790acbe0e6: exact-evidence reconciliation records 38/41 historical fanout removals, three protected Lot44 exceptions, P0.6 and candidate-only Lot45 mutation as the remaining top-level mutation workflows, and defers embedded institutional mutation deduplication to phase 3.",
     "ENG-09.3-WU10 completed on dc48a919a24b45a176115e27f21e6961b819b84b: declarative P0.6 profile, fail-closed selector, validator and adversarial profile model are in place; diff from 0476acda65470992c6abe1cc0ebea3790acbe0e6 touched only WU10-authorized governance/context files, with Bootstrap 36397589276 and Secrets 36397590060 passing. Executable mutation parity remains intentionally assigned to WU11.",
-    "ENG-09.3-WU11 completed with exact parity evidence: generic runner run 36403097208 on af93cac4387b93865080a732c88ab8fd6eebeea0 scored 81.25% (39 killed, 9 survived, 48 evaluated) with source immutability PASS, legacy blob b1653c0c392e74ea7f50b7b922fd8750fa402bb7 unchanged, artifact 10960734995 digest sha256:0342c4e83ee1bffb31d25b7cae1ac51b9bafbbc08209b05d23dc8bb4b31f3b54; evidence commit c612c9af0f76d4d21ae1a9df96ae925f093a5e11 passed Bootstrap 36403410034 and Secrets 36403410088."
+    "ENG-09.3-WU11 completed with exact parity evidence: generic runner run 36403097208 on af93cac4387b93865080a732c88ab8fd6eebeea0 scored 81.25% (39 killed, 9 survived, 48 evaluated) with source immutability PASS, legacy blob b1653c0c392e74ea7f50b7b922fd8750fa402bb7 unchanged, artifact 10960734995 digest sha256:0342c4e83ee1bffb31d25b7cae1ac51b9bafbbc08209b05d23dc8bb4b31f3b54; evidence commit c612c9af0f76d4d21ae1a9df96ae925f093a5e11 passed Bootstrap 36403410034 and Secrets 36403410088.",
+    "ENG-09.3-WU12 completed: evidence engineering/ENG09_WU12_P06_MIGRATION_EVIDENCE.json is PASS. Qualification head a8efc3c8cc4fb8e291820756311bf04c1af9b6e5 passed CI Mutation Profiles 36411693261, Engineering Bootstrap 36411692851, Security Secrets 36411692948, Security Actions 36411692874 and Security Supply Chain 36411692868; P0.6 score stayed 81.25%, legacy workflow was retired, code-quality/Lot45/business code stayed untouched. Evidence commit 984154bd62ce38d36f3d10a415e74b49d92e9f6b."
   ],
   "resume_read_order": [
     "AGENTS.md",
@@ -84,25 +85,11 @@
   ],
   "validation_evidence": [
     {
-      "class": "GITHUB_ACTIONS",
+      "class": "ENGINEERING_EVIDENCE",
       "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36403410034",
-      "head_sha": "c612c9af0f76d4d21ae1a9df96ae925f093a5e11",
-      "scope": "ENG-09.3-WU11_EVIDENCE_COMMIT_AND_WU12_SCOPE_BASE"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36403410088",
-      "head_sha": "c612c9af0f76d4d21ae1a9df96ae925f093a5e11",
-      "scope": "ENG-09.3-WU11_EVIDENCE_SECURITY_AND_WU12_SCOPE_BASE"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36403097208",
-      "head_sha": "af93cac4387b93865080a732c88ab8fd6eebeea0",
-      "scope": "ENG-09.3-WU11_P06_GENERIC_MUTATION_PARITY"
+      "ref": "engineering/ENG09_WU12_P06_MIGRATION_EVIDENCE.json",
+      "head_sha": "984154bd62ce38d36f3d10a415e74b49d92e9f6b",
+      "scope": "ENG-09.3-WU12_COMPLETION_AND_WU13_SCOPE_BASE"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"

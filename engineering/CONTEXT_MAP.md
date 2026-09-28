@@ -13,17 +13,17 @@
 - Track: ENGINEERING
 - Work item: ENG-09
 - Task: ENG-09.3
-- AWU: ENG-09.3-WU12
+- AWU: ENG-09.3-WU13
 - Risk: R1
 - Manifest: engineering/lots/ENG-09.json
-- AWU file: engineering/work_units/ENG-09.3-WU12.json
+- AWU file: engineering/work_units/ENG-09.3-WU13.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-09.json
-- engineering/work_units/ENG-09.3-WU12.json
+- engineering/work_units/ENG-09.3-WU13.json
 - engineering/ENG09_PHASE1_MUTATION_CONSOLIDATION_PLAN.json
 - engineering/ENG09_WU11_P06_PARITY_EVIDENCE.json
 - config/governance/mutation_profiles_v1.json
