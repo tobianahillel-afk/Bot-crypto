@@ -1,7 +1,7 @@
 {
   "active_work": {
-    "awu_id": "ENG-09.5-WU01",
-    "awu_path": "engineering/work_units/ENG-09.5-WU01.json",
+    "awu_id": "ENG-09.5-WU02",
+    "awu_path": "engineering/work_units/ENG-09.5-WU02.json",
     "complexity_score": 5,
     "lot": "ENG-09",
     "manifest": "engineering/lots/ENG-09.json",
@@ -35,26 +35,24 @@
       "max_total_kib": 1024
     },
     "implicit_expansion": "FORBIDDEN",
-    "primary_count": 12,
+    "primary_count": 9,
     "primary_files": [
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-09.json",
-      "engineering/work_units/ENG-09.5-WU01.json",
-      "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json",
-      "engineering/AGENT_PROTOCOL.md",
-      "engineering/AGENT_CAPABILITIES.json",
-      "config/governance/context_map_policy_v1.json",
-      "config/governance/generated_status_policy_v1.json",
-      "scripts/governance/resolve_active_awu.py",
-      "scripts/governance/verify_external_git_state.py",
-      "scripts/governance/render_context_map.py"
+      "engineering/work_units/ENG-09.5-WU02.json",
+      "config/governance/development_engine_v1_interface_freeze_v1.json",
+      "scripts/governance/validate_development_engine_v1_interface_freeze.py",
+      "scripts/governance/selftest_development_engine_v1_interface_freeze.py",
+      ".github/workflows/engineering-bootstrap.yml",
+      "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json"
     ],
-    "reference_count": 1,
+    "reference_count": 2,
     "reference_files": [
-      "engineering/MASTER_PLAN.md"
+      "engineering/MASTER_PLAN.md",
+      "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 83
+    "total_kib_ceil": 84
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -70,9 +68,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "Freeze the certified Development Engine V1 bootstrap interfaces and permanent agent entry points without freezing dynamic state values or changing business/runtime authority.",
+    "current_objective": "Enforce the certified Development Engine V1 interface freeze in the permanent Engineering Bootstrap workflow.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Define the machine-readable V1 interface freeze policy plus fail-closed validator/selftests for stable authority paths, JSON identities and CLI contracts."
+    "next_action": "Add one permanent validator step and one adversarial selftest step to Engineering Bootstrap, then inspect the exact-head run before closing ENG-09.5."
   },
   "safety": {
     "execution_allowed": false,
