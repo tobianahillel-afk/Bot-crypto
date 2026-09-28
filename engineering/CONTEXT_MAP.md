@@ -13,22 +13,22 @@
 - Track: ENGINEERING
 - Work item: ENG-09
 - Task: ENG-09.4
-- AWU: ENG-09.4-WU02
+- AWU: ENG-09.4-WU03
 - Risk: R2
 - Manifest: engineering/lots/ENG-09.json
-- AWU file: engineering/work_units/ENG-09.4-WU02.json
+- AWU file: engineering/work_units/ENG-09.4-WU03.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-09.json
-- engineering/work_units/ENG-09.4-WU02.json
+- engineering/work_units/ENG-09.4-WU03.json
 - engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_CANDIDATE.json
 - config/governance/development_engine_v1_certification_policy_v1.json
-- scripts/governance/validate_development_engine_v1_certification.py
+- scripts/governance/qualify_development_engine_v1_exact_head.py
 - config/governance/certification_exact_head_binding_v1.json
-- config/governance/certification_deep_assurance_v1.json
+- engineering/work_units/ENG-09.4-WU02.json
 
 ## Execution context — reference
 
@@ -39,14 +39,14 @@
 
 - Primary: 9 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 68 / 1024 KiB
+- Routed size: 58 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: Qualify the assembled Development Engine V1 candidate on one exact engineering HEAD using the existing ENG-06 exact-head and deep-assurance controls, without business or runtime promotion.
-- Next action: Add the bounded exact-head qualification driver and temporary workflow, require WU01 validator/selftest plus ENG-06 exact-head/deep-assurance checks, then capture the exact successful run evidence for the next certification-evidence work unit.
+- Objective: Persist the successful exact-head Development Engine V1 certification evidence from WU02 and retire the temporary qualification workflow, while preserving the external business-unlock blocker.
+- Next action: Capture WU02 qualification material and exact run conclusions into DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json, remove the temporary WU02 workflow, then require permanent cleanup-head controls to pass.
 
 ## Non-authoritative sources
 

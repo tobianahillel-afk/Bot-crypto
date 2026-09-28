@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-09.4-WU03",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-09",
+    "task_id": "ENG-09.4",
+    "manifest": "engineering/lots/ENG-09.json"
+  },
+  "title": "Capture V1 certification evidence and retire qualification workflow",
+  "objective": "Persist the exact-head Development Engine V1 qualification as immutable repository evidence, confirm the successful exact-head CI controls and safety blocker, then remove the temporary WU02 qualification workflow without changing candidate material or business/runtime authority.",
+  "non_goals": [
+    "rewrite the WU01 certification candidate",
+    "change ENG-06 certification semantics",
+    "unlock business development or Lot46",
+    "resolve or suppress BOOT-FINDING-001",
+    "modify or merge Lot45",
+    "activate runtime execution leverage or withdrawals",
+    "introduce paid services or mandatory LLM review"
+  ],
+  "depends_on": [
+    "ENG-09.4-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "Development Engine V1 candidate",
+      "kind": "EVIDENCE",
+      "locator": "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_CANDIDATE.json"
+    },
+    {
+      "name": "Development Engine V1 certification policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/development_engine_v1_certification_policy_v1.json"
+    },
+    {
+      "name": "WU02 exact-head qualification driver",
+      "kind": "FILE",
+      "locator": "scripts/governance/qualify_development_engine_v1_exact_head.py"
+    },
+    {
+      "name": "Exact-head certification policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/certification_exact_head_binding_v1.json"
+    },
+    {
+      "name": "WU02 manifest",
+      "kind": "FILE",
+      "locator": "engineering/work_units/ENG-09.4-WU02.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Development Engine V1 exact-head certification evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "972748579bcb998fc48542c02ed76aacae482fa5",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-09.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-09.4-WU02.json",
+      "engineering/work_units/ENG-09.4-WU03.json",
+      "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json",
+      ".github/workflows/eng09-wu02-development-engine-v1-qualification.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      "config/governance/mutation_profiles_v1.json",
+      "config/governance/mutation_candidate_profiles_v1.json",
+      "scripts/governance/run_mutation_profile.py",
+      ".github/workflows/lot45-*.yml"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "candidate material rewrite",
+      "business development unlock",
+      "BOOT-FINDING-001 suppression",
+      "Lot45 mutation remediation merge or adoption",
+      "Lot46 unlock",
+      "certification policy weakening",
+      "runtime capability activation",
+      "permission-to-trade activation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "certification evidence is derived from the exact WU02 qualification log and actual GitHub run conclusions",
+      "qualified head remains 972748579bcb998fc48542c02ed76aacae482fa5 and candidate identity remains DEV_ENGINE_V1:b9e5ebadbb739e57f2e0023d7498593f0f9a45bde46af24d8a83541351cdd1ed",
+      "exact-head input identity and bundle identity are copied without recomputation or weakening",
+      "qualification Bootstrap Secrets Actions Supply Chain and exact-head workflow all concluded success on the qualified head",
+      "deep assurance remains NOT_REQUIRED and satisfied for the R2 qualification",
+      "EXACT_HEAD_CERTIFICATION is the only selected T4 requirement",
+      "BOOT-FINDING-001 remains observed and continues to block business unlock",
+      "certification evidence grants no Lot45 merge Lot46 unlock trade execution or runtime authority",
+      "temporary WU02 qualification workflow is removed after evidence capture"
+    ],
+    "acceptance_criteria": [
+      "evidence verdict is PASS_DEVELOPMENT_ENGINE_V1_EXACT_HEAD_CERTIFIED",
+      "evidence contains exact candidate input tree bundle and CI identities from run 36461104451",
+      "all five qualified-head GitHub runs are recorded as success",
+      "evidence explicitly separates engine certification from business-development unlock authority",
+      "temporary WU02 workflow is absent on the cleanup head",
+      "cleanup head retains green permanent Bootstrap Secrets Actions and Supply Chain controls"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 4,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": true,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 10,
+      "executable_loc_changed": 300,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3",
+      "T4"
+    ],
+    "target_commands": [
+      "verify exact WU02 run 36461104451 success",
+      "verify permanent cleanup-head controls after workflow retirement"
+    ]
+  },
+  "done_when": [
+    "exact-head Development Engine V1 certification evidence is committed",
+    "temporary qualification workflow is removed",
+    "cleanup head permanent controls are green",
+    "business development remains paused Lot46 locked and BOOT-FINDING-001 visible"
+  ]
+}
