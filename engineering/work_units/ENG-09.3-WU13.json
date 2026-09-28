@@ -94,7 +94,7 @@
     },
     {
       "name": "Candidate profile documentation",
-      "kind": "DOC",
+      "kind": "FILE",
       "locator": "engineering/MUTATION_CANDIDATE_PROFILE_CONTROL.md"
     }
   ],
