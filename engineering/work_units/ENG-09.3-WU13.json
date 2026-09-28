@@ -47,17 +47,17 @@
     },
     {
       "name": "Suspended Lot45 PR",
-      "kind": "EXTERNAL_GIT",
+      "kind": "EVIDENCE",
       "locator": "PR#66@ec2c4ab16f21b23e062b7fca0bb796c8db4a5133"
     },
     {
       "name": "Lot45 mutation workflow",
-      "kind": "EXTERNAL_GIT",
+      "kind": "EVIDENCE",
       "locator": ".github/workflows/lot45-mutation-assurance.yml@ec2c4ab16f21b23e062b7fca0bb796c8db4a5133"
     },
     {
       "name": "Lot45 mutation summary",
-      "kind": "EXTERNAL_GIT",
+      "kind": "EVIDENCE",
       "locator": "reports/lot45/mutation_summary.json@ec2c4ab16f21b23e062b7fca0bb796c8db4a5133"
     }
   ],
