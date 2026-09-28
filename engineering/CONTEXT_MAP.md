@@ -13,25 +13,22 @@
 - Track: ENGINEERING
 - Work item: ENG-09
 - Task: ENG-09.4
-- AWU: ENG-09.4-WU01
+- AWU: ENG-09.4-WU02
 - Risk: R2
 - Manifest: engineering/lots/ENG-09.json
-- AWU file: engineering/work_units/ENG-09.4-WU01.json
+- AWU file: engineering/work_units/ENG-09.4-WU02.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-09.json
-- engineering/work_units/ENG-09.4-WU01.json
-- engineering/ENG09_WU13_LOT45_PROFILE_EVIDENCE.json
-- engineering/SECURITY_ENGINE_VERIFICATION.json
-- engineering/MANDATORY_COST_ZERO_EVIDENCE.json
-- engineering/COLD_START_QUALIFICATION_EVIDENCE.json
-- engineering/INTERRUPTION_RECOVERY_EVIDENCE.json
-- engineering/CRITICAL_R3_BYPASS_EVIDENCE.json
-- engineering/LOT45_ENGINE_PILOT_EVIDENCE.json
-- config/governance/validation_timing_budget_v1.json
+- engineering/work_units/ENG-09.4-WU02.json
+- engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_CANDIDATE.json
+- config/governance/development_engine_v1_certification_policy_v1.json
+- scripts/governance/validate_development_engine_v1_certification.py
+- config/governance/certification_exact_head_binding_v1.json
+- config/governance/certification_deep_assurance_v1.json
 
 ## Execution context — reference
 
@@ -40,16 +37,16 @@
 
 ## Budget
 
-- Primary: 12 / 12 files
+- Primary: 9 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 63 / 1024 KiB
+- Routed size: 68 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: Assemble a bounded Development Engine V1 certification candidate from existing ENG-04/06/08/09 evidence, bind it to exact inputs, and validate SAFE/FAST/zero-cost/security prerequisites without unlocking business development.
-- Next action: Compose the Development Engine V1 certification policy and candidate from existing immutable evidence, validate all evidence identities and blockers fail-closed, and prepare—but do not yet execute—the final exact-head T4 certification.
+- Objective: Qualify the assembled Development Engine V1 candidate on one exact engineering HEAD using the existing ENG-06 exact-head and deep-assurance controls, without business or runtime promotion.
+- Next action: Add the bounded exact-head qualification driver and temporary workflow, require WU01 validator/selftest plus ENG-06 exact-head/deep-assurance checks, then capture the exact successful run evidence for the next certification-evidence work unit.
 
 ## Non-authoritative sources
 

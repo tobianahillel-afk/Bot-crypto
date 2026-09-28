@@ -1,12 +1,12 @@
 {
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-09.4-WU01",
-    "awu_path": "engineering/work_units/ENG-09.4-WU01.json",
+    "awu_id": "ENG-09.4-WU02",
+    "awu_path": "engineering/work_units/ENG-09.4-WU02.json",
     "parent_manifest": "engineering/lots/ENG-09.json",
-    "scope_base_sha": "4cbe86486858325b81b2e2446baff0a4b88b39e0",
+    "scope_base_sha": "37e62e2cdcf6b1f86595e0056688cfdb1394ab58",
     "risk_class": "R2",
-    "complexity_score": 2
+    "complexity_score": 6
   },
   "authority": {
     "context_map": "engineering/CONTEXT_MAP.json",
@@ -14,7 +14,7 @@
     "state_source": "config/governance/project_state.json"
   },
   "blockers": [],
-  "current_objective": "Assemble a bounded Development Engine V1 certification candidate from existing ENG-04/06/08/09 evidence, bind it to exact inputs, and validate SAFE/FAST/zero-cost/security prerequisites without unlocking business development.",
+  "current_objective": "Qualify the assembled Development Engine V1 candidate on one exact engineering HEAD using the existing ENG-06 exact-head and deep-assurance controls, without business or runtime promotion.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -27,21 +27,21 @@
     "rulesets_count": 0
   },
   "kind": "engineering_handoff",
-  "next_action": "Compose the Development Engine V1 certification policy and candidate from existing immutable evidence, validate all evidence identities and blockers fail-closed, and prepare—but do not yet execute—the final exact-head T4 certification.",
+  "next_action": "Add the bounded exact-head qualification driver and temporary workflow, require WU01 validator/selftest plus ENG-06 exact-head/deep-assurance checks, then capture the exact successful run evidence for the next certification-evidence work unit.",
   "next_engineering": {
     "active_lot": "ENG-09",
     "active_task": "ENG-09.4",
     "active_manifest": "engineering/lots/ENG-09.json"
   },
   "recent_completed": [
-    "ENG-09.3-WU06 completed on 2ee8029b21e75172a73a394d74d577672da1cbe2: the final eight mutable historical validation workflows lost only pull_request fanout; jobs and lifecycle surfaces stayed unchanged. Bootstrap 36349854988, Secrets 36349855013, Actions 36349854997 and Supply Chain 36349854991 passed; Lot44 remained untouched.",
     "ENG-09.3-WU07 completed on a946e59ab129340f6d865bdbae6a8a9e047d3329: five mutable historical evidence/audit workflows lost only pull_request fanout; Lot38 retained push main, all jobs remained unchanged, and Lot44 stayed byte-identical. Bootstrap 36357397561, Secrets 36357397600, Actions 36357397583 and Supply Chain 36357397553 passed.",
     "ENG-09.3-WU08 reconciled on 93cb5526ccefa233684ae94b3bb3fec4685393f9: attempted removal of the three protected Lot44 PR triggers was rejected by historical-evidence protection and fully restored. Phase 1 removes 38/41 historical fanout workflows; 3 Lot44 exceptions remain protected.",
     "ENG-09.3-WU09 completed on 0476acda65470992c6abe1cc0ebea3790acbe0e6: exact-evidence reconciliation records 38/41 historical fanout removals, three protected Lot44 exceptions, P0.6 and candidate-only Lot45 mutation as the remaining top-level mutation workflows, and defers embedded institutional mutation deduplication to phase 3.",
     "ENG-09.3-WU10 completed on dc48a919a24b45a176115e27f21e6961b819b84b: declarative P0.6 profile, fail-closed selector, validator and adversarial profile model are in place; diff from 0476acda65470992c6abe1cc0ebea3790acbe0e6 touched only WU10-authorized governance/context files, with Bootstrap 36397589276 and Secrets 36397590060 passing. Executable mutation parity remains intentionally assigned to WU11.",
     "ENG-09.3-WU11 completed with exact parity evidence: generic runner run 36403097208 on af93cac4387b93865080a732c88ab8fd6eebeea0 scored 81.25% (39 killed, 9 survived, 48 evaluated) with source immutability PASS, legacy blob b1653c0c392e74ea7f50b7b922fd8750fa402bb7 unchanged, artifact 10960734995 digest sha256:0342c4e83ee1bffb31d25b7cae1ac51b9bafbbc08209b05d23dc8bb4b31f3b54; evidence commit c612c9af0f76d4d21ae1a9df96ae925f093a5e11 passed Bootstrap 36403410034 and Secrets 36403410088.",
     "ENG-09.3-WU12 completed: evidence engineering/ENG09_WU12_P06_MIGRATION_EVIDENCE.json is PASS. Qualification head a8efc3c8cc4fb8e291820756311bf04c1af9b6e5 passed CI Mutation Profiles 36411693261, Engineering Bootstrap 36411692851, Security Secrets 36411692948, Security Actions 36411692874 and Security Supply Chain 36411692868; P0.6 score stayed 81.25%, legacy workflow was retired, code-quality/Lot45/business code stayed untouched. Evidence commit 984154bd62ce38d36f3d10a415e74b49d92e9f6b.",
-    "ENG-09.3-WU13 completed: Lot45 mutation semantics were qualified read-only on exact head 649b7f332d42c6f32fd4a405e8c3af5020c435f8 with Bootstrap 36441003692, candidate qualification 36441003628, Secrets 36441003765, Actions 36441003627 and Supply Chain 36441003655 all passing. Evidence commit 8af6cb6ff21ae70e696f41b23bcf2583b71441bb passed Bootstrap 36441316000 and Secrets 36441315836. Temporary qualification workflow was retired at 4cbe86486858325b81b2e2446baff0a4b88b39e0; retirement head passed Bootstrap 36441473123, Secrets 36441473322, Actions 36441473244 and Supply Chain 36441473344. PR #66 remained untouched and Lot45 was not adopted into active mutation control."
+    "ENG-09.3-WU13 completed: Lot45 mutation semantics were qualified read-only on exact head 649b7f332d42c6f32fd4a405e8c3af5020c435f8 with Bootstrap 36441003692, candidate qualification 36441003628, Secrets 36441003765, Actions 36441003627 and Supply Chain 36441003655 all passing. Evidence commit 8af6cb6ff21ae70e696f41b23bcf2583b71441bb passed Bootstrap 36441316000 and Secrets 36441315836. Temporary qualification workflow was retired at 4cbe86486858325b81b2e2446baff0a4b88b39e0; retirement head passed Bootstrap 36441473123, Secrets 36441473322, Actions 36441473244 and Supply Chain 36441473344. PR #66 remained untouched and Lot45 was not adopted into active mutation control.",
+    "ENG-09.4-WU01 assembled Development Engine V1 candidate DEV_ENGINE_V1:b9e5ebadbb739e57f2e0023d7498593f0f9a45bde46af24d8a83541351cdd1ed on head 37e62e2cdcf6b1f86595e0056688cfdb1394ab58. Diff was limited to four WU01 outputs; Engineering Bootstrap 36459556089 and Security Secrets 36459556100 passed. Candidate remains pre-T4, uncertified, business/runtime locked, with BOOT-FINDING-001 preserved."
   ],
   "resume_read_order": [
     "AGENTS.md",
@@ -96,6 +96,20 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36441473123",
       "head_sha": "4cbe86486858325b81b2e2446baff0a4b88b39e0",
       "scope": "ENG-09.3-WU13_RETIREMENT_HEAD_BOOTSTRAP"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36459556089",
+      "head_sha": "37e62e2cdcf6b1f86595e0056688cfdb1394ab58",
+      "scope": "ENG-09.4-WU01_BOOTSTRAP"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36459556100",
+      "head_sha": "37e62e2cdcf6b1f86595e0056688cfdb1394ab58",
+      "scope": "ENG-09.4-WU01_SECURITY_SECRETS"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"
