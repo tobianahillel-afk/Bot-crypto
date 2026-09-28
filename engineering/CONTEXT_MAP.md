@@ -24,12 +24,10 @@
 - config/governance/project_state.json
 - engineering/lots/ENG-09.json
 - engineering/work_units/ENG-09.3-WU13.json
+- engineering/ENG09_WU12_P06_MIGRATION_EVIDENCE.json
 - engineering/ENG09_PHASE1_MUTATION_CONSOLIDATION_PLAN.json
-- engineering/ENG09_WU11_P06_PARITY_EVIDENCE.json
+- config/governance/mutation_profile_policy_v1.json
 - config/governance/mutation_profiles_v1.json
-- scripts/governance/validate_mutation_profiles.py
-- .github/workflows/ci-mutation.yml
-- scripts/governance/run_mutation_profile.py
 
 ## Execution context — reference
 
@@ -38,16 +36,16 @@
 
 ## Budget
 
-- Primary: 10 / 10 files
+- Primary: 8 / 10 files
 - Reference: 2 / 12 files
-- Routed size: 96 / 768 KiB
+- Routed size: 49 / 768 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: After proven WU11 parity, migrate the P0.6 pull-request and main-push trigger surface to ci-mutation, retire the legacy P0.6 workflow, and transition the P0.6 profile from parity-reference lifecycle to generic-control lifecycle without changing mutation score or test semantics.
-- Next action: Migrate the P0.6 profile lifecycle and trigger surface to ci-mutation, retire p06-extended-mutation.yml in the same bounded change, and prove same-head workflow/security plus generic mutation execution before WU13.
+- Objective: Model the suspended Lot45 candidate mutation semantics as a lifecycle-gated read-only candidate profile and prove selector/evidence equivalence against exact PR #66 Git evidence without modifying the candidate branch, enabling generic execution, or adopting the profile into active mutation control.
+- Next action: Define the read-only Lot45 candidate mutation profile from exact PR #66 Git evidence and prove selection/evidence equivalence without modifying or executing the candidate.
 
 ## Non-authoritative sources
 
