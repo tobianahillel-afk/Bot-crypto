@@ -12,22 +12,26 @@
 
 - Track: ENGINEERING
 - Work item: ENG-09
-- Task: ENG-09.3
-- AWU: ENG-09.3-WU13
-- Risk: R1
+- Task: ENG-09.4
+- AWU: ENG-09.4-WU01
+- Risk: R2
 - Manifest: engineering/lots/ENG-09.json
-- AWU file: engineering/work_units/ENG-09.3-WU13.json
+- AWU file: engineering/work_units/ENG-09.4-WU01.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-09.json
-- engineering/work_units/ENG-09.3-WU13.json
-- engineering/ENG09_WU12_P06_MIGRATION_EVIDENCE.json
-- engineering/ENG09_PHASE1_MUTATION_CONSOLIDATION_PLAN.json
-- config/governance/mutation_profile_policy_v1.json
-- config/governance/mutation_profiles_v1.json
+- engineering/work_units/ENG-09.4-WU01.json
+- engineering/ENG09_WU13_LOT45_PROFILE_EVIDENCE.json
+- engineering/SECURITY_ENGINE_VERIFICATION.json
+- engineering/MANDATORY_COST_ZERO_EVIDENCE.json
+- engineering/COLD_START_QUALIFICATION_EVIDENCE.json
+- engineering/INTERRUPTION_RECOVERY_EVIDENCE.json
+- engineering/CRITICAL_R3_BYPASS_EVIDENCE.json
+- engineering/LOT45_ENGINE_PILOT_EVIDENCE.json
+- config/governance/validation_timing_budget_v1.json
 
 ## Execution context — reference
 
@@ -36,16 +40,16 @@
 
 ## Budget
 
-- Primary: 8 / 10 files
-- Reference: 2 / 12 files
-- Routed size: 50 / 768 KiB
+- Primary: 12 / 12 files
+- Reference: 2 / 16 files
+- Routed size: 64 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: Model the suspended Lot45 candidate mutation semantics as a lifecycle-gated read-only candidate profile and prove selector/evidence equivalence against exact PR #66 Git evidence without modifying the candidate branch, enabling generic execution, or adopting the profile into active mutation control.
-- Next action: Define the read-only Lot45 candidate mutation profile from exact PR #66 Git evidence and prove selection/evidence equivalence without modifying or executing the candidate.
+- Objective: Assemble a bounded Development Engine V1 certification candidate from existing ENG-04/06/08/09 evidence, bind it to exact inputs, and validate SAFE/FAST/zero-cost/security prerequisites without unlocking business development.
+- Next action: Compose the Development Engine V1 certification policy and candidate from existing immutable evidence, validate all evidence identities and blockers fail-closed, and prepare—but do not yet execute—the final exact-head T4 certification.
 
 ## Non-authoritative sources
 

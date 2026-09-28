@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-09.4-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-09",
+    "task_id": "ENG-09.4",
+    "manifest": "engineering/lots/ENG-09.json"
+  },
+  "title": "Assemble Development Engine V1 certification candidate",
+  "objective": "Compose a bounded Development Engine V1 certification candidate from existing exact repository evidence, validate SAFE FAST zero-cost and security prerequisites fail-closed, and prepare the stable candidate for a later exact-head T4 certification without unlocking business development.",
+  "non_goals": [
+    "certify the candidate in the same work unit",
+    "change ENG-06 certification semantics",
+    "modify Lot45 candidate or business code",
+    "adopt or execute the Lot45 mutation profile",
+    "merge Lot45",
+    "unlock Lot46 or business development",
+    "resolve or suppress BOOT-FINDING-001 by assertion",
+    "modify branch protection or repository rulesets",
+    "introduce paid services or mandatory LLM review"
+  ],
+  "depends_on": [
+    "ENG-09.3-WU13"
+  ],
+  "inputs": [
+    {
+      "name": "WU13 Lot45 read-only profile evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/ENG09_WU13_LOT45_PROFILE_EVIDENCE.json"
+    },
+    {
+      "name": "Security engine verification",
+      "kind": "EVIDENCE",
+      "locator": "engineering/SECURITY_ENGINE_VERIFICATION.json"
+    },
+    {
+      "name": "Mandatory zero-cost evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/MANDATORY_COST_ZERO_EVIDENCE.json"
+    },
+    {
+      "name": "Cold-start qualification evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/COLD_START_QUALIFICATION_EVIDENCE.json"
+    },
+    {
+      "name": "Interruption recovery evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/INTERRUPTION_RECOVERY_EVIDENCE.json"
+    },
+    {
+      "name": "Critical R3 bypass evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/CRITICAL_R3_BYPASS_EVIDENCE.json"
+    },
+    {
+      "name": "Lot45 engine pilot evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/LOT45_ENGINE_PILOT_EVIDENCE.json"
+    },
+    {
+      "name": "Validation timing budget",
+      "kind": "CONFIG",
+      "locator": "config/governance/validation_timing_budget_v1.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Development Engine V1 certification policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/development_engine_v1_certification_policy_v1.json"
+    },
+    {
+      "name": "Development Engine V1 certification candidate",
+      "kind": "EVIDENCE",
+      "locator": "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_CANDIDATE.json"
+    },
+    {
+      "name": "Development Engine V1 certification validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_development_engine_v1_certification.py"
+    },
+    {
+      "name": "Development Engine V1 certification adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_development_engine_v1_certification.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "4cbe86486858325b81b2e2446baff0a4b88b39e0",
+    "allowed_paths": [
+      "AGENTS.md",
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-09.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-09.3-WU13.json",
+      "engineering/work_units/ENG-09.4-WU01.json",
+      "engineering/ENG09_WU13_LOT45_PROFILE_EVIDENCE.json",
+      "config/governance/development_engine_v1_certification_policy_v1.json",
+      "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_CANDIDATE.json",
+      "scripts/governance/validate_development_engine_v1_certification.py",
+      "scripts/governance/selftest_development_engine_v1_certification.py"
+    ],
+    "forbidden_paths": [
+      ".github/workflows/**",
+      "config/governance/mutation_profiles_v1.json",
+      "config/governance/mutation_candidate_profiles_v1.json",
+      "scripts/governance/run_mutation_profile.py",
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "Development Engine V1 final certification verdict",
+      "exact-head T4 execution",
+      "certification policy weakening",
+      "Lot45 candidate mutation or remediation",
+      "Lot45 mutation profile adoption",
+      "Lot45 merge",
+      "Lot46 unlock",
+      "business development unlock",
+      "BOOT-FINDING-001 suppression",
+      "runtime capability activation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "WU13 evidence remains PASS and its temporary qualification workflow is removed with permanent controls green",
+      "security engine evidence remains PASS_ENGINEERING_SECURITY and its external-protection blocker is preserved",
+      "mandatory-cost evidence remains scoped to zero mandatory paid requirements and never claims account-wide zero billing",
+      "cold-start and interruption-recovery evidence remain PASS without conversational context dependence",
+      "critical R3 bypass evidence remains PASS and preserves exact-head plus deep-assurance floors",
+      "Lot45 pilot evidence remains read-only and the business candidate remains suspended",
+      "SAFE and FAST are derived from explicit evidence and policy fields rather than prose",
+      "BOOT-FINDING-001 blocks future business unlock but does not get silently converted into an engine-security PASS",
+      "candidate identity binds exact evidence blob SHAs and certification-policy content through deterministic SHA-256 material",
+      "candidate assembly cannot mark itself CERTIFIED and cannot unlock business or runtime execution"
+    ],
+    "acceptance_criteria": [
+      "certification policy enumerates required SAFE FAST zero-cost security and pilot evidence",
+      "candidate validates all required evidence schema identities verdicts and safety locks",
+      "FAST requires routine timing budgets T0<=250ms T1<=500ms T2<=750ms total<=1500ms plus cold-start and recovery under 1000ms",
+      "SAFE requires security engine PASS mandatory-cost PASS R3 bypass PASS and unchanged business safety locks",
+      "candidate records BOOT-FINDING-001 as an external business-unlock blocker",
+      "candidate status is CERTIFICATION_CANDIDATE_READY_FOR_EXACT_HEAD_QUALIFICATION not CERTIFIED",
+      "changing an evidence blob identity expected verdict safety lock or timing threshold fails closed",
+      "no workflow business source historical evidence or active mutation control is modified"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 2,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": true,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 14,
+      "executable_loc_changed": 650,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_development_engine_v1_certification.py",
+      "python scripts/governance/selftest_development_engine_v1_certification.py"
+    ]
+  },
+  "done_when": [
+    "Development Engine V1 certification candidate is deterministic and validates SAFE FAST zero-cost security and pilot prerequisites",
+    "candidate identity is bound to exact repository evidence and remains uncertified until a later exact-head T4 work unit",
+    "BOOT-FINDING-001 remains visible as a business-unlock blocker",
+    "business development remains paused and Lot46 remains locked"
+  ]
+}

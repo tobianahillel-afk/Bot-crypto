@@ -114,7 +114,32 @@
   "temporary_qualification_workflow": {
     "path": ".github/workflows/eng09-wu13-candidate-profile-qualification.yml",
     "present_at_qualification_head": true,
-    "removal_required_after_evidence_capture": true
+    "removal_required_after_evidence_capture": true,
+    "removal_completed": true,
+    "removal_head_sha": "4cbe86486858325b81b2e2446baff0a4b88b39e0"
   },
-  "verdict": "READ_ONLY_LOT45_CANDIDATE_PROFILE_QUALIFIED_NOT_ADOPTED"
+  "verdict": "READ_ONLY_LOT45_CANDIDATE_PROFILE_QUALIFIED_NOT_ADOPTED",
+  "post_qualification_cleanup": {
+    "cleanup_head_sha": "4cbe86486858325b81b2e2446baff0a4b88b39e0",
+    "temporary_workflow_removed": true,
+    "temporary_workflow_path": ".github/workflows/eng09-wu13-candidate-profile-qualification.yml",
+    "permanent_control_runs": {
+      "engineering_bootstrap": {
+        "run_id": 36441473123,
+        "conclusion": "success"
+      },
+      "security_secrets": {
+        "run_id": 36441473322,
+        "conclusion": "success"
+      },
+      "security_actions": {
+        "run_id": 36441473244,
+        "conclusion": "success"
+      },
+      "security_supply_chain": {
+        "run_id": 36441473344,
+        "conclusion": "success"
+      }
+    }
+  }
 }

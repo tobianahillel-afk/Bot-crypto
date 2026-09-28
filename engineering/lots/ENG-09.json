@@ -40,12 +40,12 @@
     },
     {
       "id": "ENG-09.3",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Repair engine defects found by the pilot, including terminal engineering-lifecycle semantics if required."
     },
     {
       "id": "ENG-09.4",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Certify Development Engine V1 with exact-head SAFE, FAST, zero-cost and security evidence."
     },
     {
