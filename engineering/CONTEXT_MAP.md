@@ -12,23 +12,23 @@
 
 - Track: ENGINEERING
 - Work item: ENG-09
-- Task: ENG-09.5
-- AWU: ENG-09.5-WU02
+- Task: ENG-09.6
+- AWU: ENG-09.6-WU01
 - Risk: R2
 - Manifest: engineering/lots/ENG-09.json
-- AWU file: engineering/work_units/ENG-09.5-WU02.json
+- AWU file: engineering/work_units/ENG-09.6-WU01.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-09.json
-- engineering/work_units/ENG-09.5-WU02.json
-- config/governance/development_engine_v1_interface_freeze_v1.json
-- scripts/governance/validate_development_engine_v1_interface_freeze.py
-- scripts/governance/selftest_development_engine_v1_interface_freeze.py
-- .github/workflows/engineering-bootstrap.yml
+- engineering/work_units/ENG-09.6-WU01.json
+- engineering/REPOSITORY_PROTECTION_STATUS.json
+- config/governance/repository_protection_policy_v1.json
+- engineering/SECURITY_ENGINE_VERIFICATION.json
 - engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json
+- config/governance/development_engine_v1_interface_freeze_v1.json
 
 ## Execution context — reference
 
@@ -39,14 +39,14 @@
 
 - Primary: 9 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 84 / 1024 KiB
+- Routed size: 55 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: Enforce the certified Development Engine V1 interface freeze in the permanent Engineering Bootstrap workflow.
-- Next action: Add one permanent validator step and one adversarial selftest step to Engineering Bootstrap, then inspect the exact-head run before closing ENG-09.5.
+- Objective: Make the explicit ENG-09.6 business-development unlock decision while preserving fail-closed business/runtime authority.
+- Next action: Keep business PAUSED and Lot46 LOCKED. Resolve BOOT-FINDING-001 through GitHub repository administration, then refresh live Git state and explicitly re-evaluate; never auto-unlock.
 
 ## Non-authoritative sources
 

@@ -50,12 +50,12 @@
     },
     {
       "id": "ENG-09.5",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Freeze V1 bootstrap interfaces and permanent agent entry points."
     },
     {
       "id": "ENG-09.6",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Explicitly decide whether business development may be unlocked; never auto-unlock."
     }
   ],

@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-09.6-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-09",
+    "task_id": "ENG-09.6",
+    "manifest": "engineering/lots/ENG-09.json"
+  },
+  "title": "Make explicit fail-closed business-development unlock decision",
+  "objective": "Evaluate certified engine readiness against live repository-protection preconditions and persist a machine-enforced explicit business-development unlock decision without auto-unlocking business or runtime authority.",
+  "non_goals": [
+    "change GitHub branch protection or rulesets through unavailable administration APIs",
+    "activate business development while BOOT-FINDING-001 is observed",
+    "merge or modify Lot45",
+    "unlock Lot46",
+    "change runtime execution authority or permission to trade",
+    "change Development Engine V1 interfaces or certification evidence",
+    "introduce paid services or mandatory LLM review"
+  ],
+  "depends_on": [
+    "ENG-09.5-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "Repository protection status",
+      "kind": "EVIDENCE",
+      "locator": "engineering/REPOSITORY_PROTECTION_STATUS.json"
+    },
+    {
+      "name": "Repository protection policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/repository_protection_policy_v1.json"
+    },
+    {
+      "name": "Security engine verification",
+      "kind": "EVIDENCE",
+      "locator": "engineering/SECURITY_ENGINE_VERIFICATION.json"
+    },
+    {
+      "name": "Development Engine V1 certification",
+      "kind": "EVIDENCE",
+      "locator": "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json"
+    },
+    {
+      "name": "Development Engine V1 interface freeze",
+      "kind": "CONFIG",
+      "locator": "config/governance/development_engine_v1_interface_freeze_v1.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Explicit business unlock decision",
+      "kind": "EVIDENCE",
+      "locator": "engineering/BUSINESS_DEVELOPMENT_UNLOCK_DECISION.json"
+    },
+    {
+      "name": "Business unlock decision validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_business_development_unlock_decision.py"
+    },
+    {
+      "name": "Business unlock adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_business_development_unlock_decision.py"
+    },
+    {
+      "name": "Permanent bootstrap unlock-decision gate",
+      "kind": "FILE",
+      "locator": ".github/workflows/engineering-bootstrap.yml"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "8414ff22fdd53f3d9ab7d7408c6bedec75fc4e68",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-09.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-09.5-WU02.json",
+      "engineering/work_units/ENG-09.6-WU01.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_DECISION.json",
+      "scripts/governance/validate_business_development_unlock_decision.py",
+      "scripts/governance/selftest_business_development_unlock_decision.py",
+      ".github/workflows/engineering-bootstrap.yml",
+      "README.md",
+      "AGENTS.md",
+      "engineering/CURRENT_STATUS.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json",
+      "config/governance/development_engine_v1_interface_freeze_v1.json"
+    ],
+    "forbidden_semantics": [
+      "business development unlock",
+      "Lot45 merge mutation remediation or adoption",
+      "Lot46 unlock",
+      "BOOT-FINDING-001 suppression",
+      "runtime capability activation",
+      "permission-to-trade activation",
+      "Development Engine V1 interface mutation",
+      "certification evidence mutation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "decision is explicit and machine-readable rather than inferred from engine completion",
+      "observed unprotected main or unresolved BOOT-FINDING-001 forces BLOCKED_NO_UNLOCK",
+      "business development remains PAUSED and Lot45 remains SUSPENDED_CANDIDATE",
+      "Lot46 remains LOCKED",
+      "trade execution live execution leverage and withdrawals remain fail-closed",
+      "manual repository-administration remediation is recorded because the connector cannot mutate branch protection",
+      "a later protection-state change invalidates the blocked decision and requires explicit re-evaluation",
+      "permanent bootstrap validates the unlock decision and adversarial fail-closed scenarios"
+    ],
+    "acceptance_criteria": [
+      "ENG-09.5 is DONE and ENG-09.6 is the unique active task",
+      "BOOT-FINDING-001 is the active engineering blocker",
+      "decision verdict is BLOCKED_NO_UNLOCK",
+      "decision is bound to certified Development Engine V1 and existing repository-protection evidence",
+      "validator rejects ALLOW_UNLOCK while blocker or unprotected-main evidence remains",
+      "validator rejects Lot46 OPEN or business ACTIVE while blocker remains",
+      "exact-head Engineering Bootstrap and Security Secrets remain green after integration"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 6,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 1,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 15,
+      "executable_loc_changed": 520,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_business_development_unlock_decision.py",
+      "python scripts/governance/selftest_business_development_unlock_decision.py"
+    ]
+  },
+  "done_when": [
+    "business unlock decision is explicit fail-closed and reproducible",
+    "current repository-protection blocker is machine-enforced",
+    "no business or runtime authority is granted",
+    "future protection changes require explicit re-evaluation rather than auto-unlock"
+  ]
+}

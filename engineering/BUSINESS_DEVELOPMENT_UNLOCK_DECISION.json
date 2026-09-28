@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "decision_kind": "business_development_unlock_decision_v1",
+  "semantics": "EXPLICIT_FAIL_CLOSED_NO_AUTO_UNLOCK",
+  "project": "Crypto Quant Bot V3.1-Ops",
+  "evaluated_engine": {
+    "version": "V1",
+    "certification_verdict": "PASS_DEVELOPMENT_ENGINE_V1_EXACT_HEAD_CERTIFIED",
+    "certification_candidate_id": "DEV_ENGINE_V1:b9e5ebadbb739e57f2e0023d7498593f0f9a45bde46af24d8a83541351cdd1ed",
+    "certified_head_sha": "972748579bcb998fc48542c02ed76aacae482fa5",
+    "permanent_interface_gate_head": "8414ff22fdd53f3d9ab7d7408c6bedec75fc4e68",
+    "bootstrap_run_id": 36486573093,
+    "security_secrets_run_id": 36486572922
+  },
+  "repository_protection": {
+    "policy_path": "config/governance/repository_protection_policy_v1.json",
+    "status_path": "engineering/REPOSITORY_PROTECTION_STATUS.json",
+    "required_semantics": "BUSINESS_UNLOCK_REQUIRES_VERIFIED_MAIN_PROTECTION",
+    "observed_main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "branch_protected": false,
+    "rulesets_count": 0,
+    "overall_status": "UNPROTECTED",
+    "manual_admin_action_required": true
+  },
+  "blocking_findings": [
+    "BOOT-FINDING-001"
+  ],
+  "verdict": "BLOCKED_NO_UNLOCK",
+  "business_authority": {
+    "business_development_unlock_allowed": false,
+    "development_status": "PAUSED",
+    "lot45_status": "SUSPENDED_CANDIDATE",
+    "lot45_merge_allowed": false,
+    "lot46_status": "LOCKED",
+    "lot46_unlock_allowed": false
+  },
+  "safety_authority": {
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED",
+    "leverage": "FORBIDDEN",
+    "withdrawals": "FORBIDDEN"
+  },
+  "required_remediation": [
+    "Protect main with an accepted GitHub branch-protection or repository-ruleset mechanism.",
+    "Require pull requests and required status checks on main.",
+    "Block force pushes and branch deletion on main.",
+    "Refresh live external Git verification after the administrative change.",
+    "Re-evaluate this decision explicitly; never auto-unlock from an external observation."
+  ]
+}

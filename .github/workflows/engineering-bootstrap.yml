@@ -40,6 +40,12 @@ jobs:
       - name: Run Development Engine V1 interface freeze adversarial self-tests
         run: python scripts/governance/selftest_development_engine_v1_interface_freeze.py
 
+      - name: Validate explicit business-development unlock decision
+        run: python scripts/governance/validate_business_development_unlock_decision.py
+
+      - name: Run business-development unlock adversarial self-tests
+        run: python scripts/governance/selftest_business_development_unlock_decision.py
+
       - name: Validate canonical state
         run: python scripts/governance/validate_bootstrap_state.py
 

@@ -1,20 +1,22 @@
 {
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-09.5-WU02",
-    "awu_path": "engineering/work_units/ENG-09.5-WU02.json",
+    "awu_id": "ENG-09.6-WU01",
+    "awu_path": "engineering/work_units/ENG-09.6-WU01.json",
     "parent_manifest": "engineering/lots/ENG-09.json",
-    "scope_base_sha": "476a1042c9dfff84ebed89f7ad1ee10e2ef07a9c",
+    "scope_base_sha": "8414ff22fdd53f3d9ab7d7408c6bedec75fc4e68",
     "risk_class": "R2",
-    "complexity_score": 5
+    "complexity_score": 6
   },
   "authority": {
     "context_map": "engineering/CONTEXT_MAP.json",
     "handoff_role": "RESUME_HINT_NOT_AUTHORITY",
     "state_source": "config/governance/project_state.json"
   },
-  "blockers": [],
-  "current_objective": "Enforce the certified Development Engine V1 interface freeze in the permanent Engineering Bootstrap workflow.",
+  "blockers": [
+    "BOOT-FINDING-001"
+  ],
+  "current_objective": "Make the explicit ENG-09.6 business-development unlock decision while preserving fail-closed business/runtime authority.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -27,21 +29,21 @@
     "rulesets_count": 0
   },
   "kind": "engineering_handoff",
-  "next_action": "Add one permanent validator step and one adversarial selftest step to Engineering Bootstrap, then inspect the exact-head run before closing ENG-09.5.",
+  "next_action": "Keep business PAUSED and Lot46 LOCKED. Resolve BOOT-FINDING-001 through GitHub repository administration, then refresh live Git state and explicitly re-evaluate; never auto-unlock.",
   "next_engineering": {
     "active_lot": "ENG-09",
-    "active_task": "ENG-09.5",
+    "active_task": "ENG-09.6",
     "active_manifest": "engineering/lots/ENG-09.json"
   },
   "recent_completed": [
-    "ENG-09.3-WU10 completed on dc48a919a24b45a176115e27f21e6961b819b84b: declarative P0.6 profile, fail-closed selector, validator and adversarial profile model are in place; diff from 0476acda65470992c6abe1cc0ebea3790acbe0e6 touched only WU10-authorized governance/context files, with Bootstrap 36397589276 and Secrets 36397590060 passing. Executable mutation parity remains intentionally assigned to WU11.",
     "ENG-09.3-WU11 completed with exact parity evidence: generic runner run 36403097208 on af93cac4387b93865080a732c88ab8fd6eebeea0 scored 81.25% (39 killed, 9 survived, 48 evaluated) with source immutability PASS, legacy blob b1653c0c392e74ea7f50b7b922fd8750fa402bb7 unchanged, artifact 10960734995 digest sha256:0342c4e83ee1bffb31d25b7cae1ac51b9bafbbc08209b05d23dc8bb4b31f3b54; evidence commit c612c9af0f76d4d21ae1a9df96ae925f093a5e11 passed Bootstrap 36403410034 and Secrets 36403410088.",
     "ENG-09.3-WU12 completed: evidence engineering/ENG09_WU12_P06_MIGRATION_EVIDENCE.json is PASS. Qualification head a8efc3c8cc4fb8e291820756311bf04c1af9b6e5 passed CI Mutation Profiles 36411693261, Engineering Bootstrap 36411692851, Security Secrets 36411692948, Security Actions 36411692874 and Security Supply Chain 36411692868; P0.6 score stayed 81.25%, legacy workflow was retired, code-quality/Lot45/business code stayed untouched. Evidence commit 984154bd62ce38d36f3d10a415e74b49d92e9f6b.",
     "ENG-09.3-WU13 completed: Lot45 mutation semantics were qualified read-only on exact head 649b7f332d42c6f32fd4a405e8c3af5020c435f8 with Bootstrap 36441003692, candidate qualification 36441003628, Secrets 36441003765, Actions 36441003627 and Supply Chain 36441003655 all passing. Evidence commit 8af6cb6ff21ae70e696f41b23bcf2583b71441bb passed Bootstrap 36441316000 and Secrets 36441315836. Temporary qualification workflow was retired at 4cbe86486858325b81b2e2446baff0a4b88b39e0; retirement head passed Bootstrap 36441473123, Secrets 36441473322, Actions 36441473244 and Supply Chain 36441473344. PR #66 remained untouched and Lot45 was not adopted into active mutation control.",
     "ENG-09.4-WU01 assembled Development Engine V1 candidate DEV_ENGINE_V1:b9e5ebadbb739e57f2e0023d7498593f0f9a45bde46af24d8a83541351cdd1ed on head 37e62e2cdcf6b1f86595e0056688cfdb1394ab58. Diff was limited to four WU01 outputs; Engineering Bootstrap 36459556089 and Security Secrets 36459556100 passed. Candidate remains pre-T4, uncertified, business/runtime locked, with BOOT-FINDING-001 preserved.",
     "ENG-09.4-WU02 qualified Development Engine V1 at exact head 972748579bcb998fc48542c02ed76aacae482fa5. Exact qualification run 36461104451, Engineering Bootstrap 36461103875, Security Secrets 36461103947, Security Actions 36461104200 and Security Supply Chain 36461103963 all passed. Exact input identity 32829891fa11c4e5905ef01d9f24320a34180e03640d478807fda2edf10565ac, bundle identity 490cf76580b4259a5812e81cc861c63bf9e4c1825591f46a276b1694ad18590b; deep assurance NOT_REQUIRED/satisfied; business/runtime authority unchanged.",
     "ENG-09.4-WU03 completed: exact certification evidence was persisted at 7cc73de48fdd407e126129ac6323a580a706e9a5 after WU02 T4 run 36461104451; capture-head Bootstrap 36468111109 and Secrets 36468111001 passed. Temporary WU02 qualification workflow was retired on cleanup head e322f25012c875fb3ddbe1b814019adbe28e5123; Bootstrap 36468361198, Secrets 36468361107, Security Actions 36468361235 and Security Supply Chain 36468361228 all passed. BOOT-FINDING-001 and business/runtime locks remain unchanged.",
-    "ENG-09.5-WU01 defined the Development Engine V1 compatibility surface on 476a1042c9dfff84ebed89f7ad1ee10e2ef07a9c: stable bootstrap order, authority paths, JSON identities and CLI contracts are machine-readable while dynamic state bytes remain unfrozen. Engineering Bootstrap 36470616758 and Security Secrets 36470616752 passed."
+    "ENG-09.5-WU01 defined the Development Engine V1 compatibility surface on 476a1042c9dfff84ebed89f7ad1ee10e2ef07a9c: stable bootstrap order, authority paths, JSON identities and CLI contracts are machine-readable while dynamic state bytes remain unfrozen. Engineering Bootstrap 36470616758 and Security Secrets 36470616752 passed.",
+    "ENG-09.5-WU02 completed on 8414ff22fdd53f3d9ab7d7408c6bedec75fc4e68: permanent Development Engine V1 interface validator and adversarial selftests are integrated into Engineering Bootstrap; Bootstrap 36486573093 and Security Secrets 36486572922 passed on the exact head."
   ],
   "resume_read_order": [
     "AGENTS.md",
@@ -62,7 +64,7 @@
   "state_snapshot": {
     "engineering_phase": "BUILDING",
     "active_lot": "ENG-09",
-    "active_task": "ENG-09.5",
+    "active_task": "ENG-09.6",
     "active_manifest": "engineering/lots/ENG-09.json",
     "business_development": "PAUSED",
     "lot46_status": "LOCKED",
@@ -74,7 +76,7 @@
       "BOOT-FINDING-001"
     ]
   },
-  "status": "IN_PROGRESS",
+  "status": "BLOCKED",
   "stop_conditions": [
     "STATE_DRIFT",
     "BUSINESS_SCOPE_TOUCHED_WITHOUT_UNLOCK",
@@ -83,20 +85,6 @@
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
   ],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36441473123",
-      "head_sha": "4cbe86486858325b81b2e2446baff0a4b88b39e0",
-      "scope": "ENG-09.3-WU13_RETIREMENT_HEAD_BOOTSTRAP"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36459556089",
-      "head_sha": "37e62e2cdcf6b1f86595e0056688cfdb1394ab58",
-      "scope": "ENG-09.4-WU01_BOOTSTRAP"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "status": "PASS",
@@ -166,6 +154,20 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36470616752",
       "head_sha": "476a1042c9dfff84ebed89f7ad1ee10e2ef07a9c",
       "scope": "ENG-09.5-WU01_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36486573093",
+      "head_sha": "8414ff22fdd53f3d9ab7d7408c6bedec75fc4e68",
+      "scope": "ENG-09.5-WU02_PERMANENT_V1_INTERFACE_BOOTSTRAP"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36486572922",
+      "head_sha": "8414ff22fdd53f3d9ab7d7408c6bedec75fc4e68",
+      "scope": "ENG-09.5-WU02_SECURITY_SECRETS"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"
