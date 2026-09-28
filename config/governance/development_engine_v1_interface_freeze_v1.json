@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "policy_kind": "development_engine_v1_interface_freeze_v1",
+  "semantics": "STABLE_COMPATIBILITY_SURFACE_WITH_DYNAMIC_STATE_PAYLOADS",
+  "engine_version": "V1",
+  "canonical_project": "Crypto Quant Bot V3.1-Ops",
+  "bootstrap": {
+    "human_entrypoint": "AGENTS.md",
+    "read_order": [
+      "AGENTS.md",
+      "config/governance/project_state.json",
+      "engineering/CONTEXT_MAP.json"
+    ],
+    "max_bootstrap_files": 3,
+    "current_authority": "config/governance/project_state.json",
+    "generated_context_route": "engineering/CONTEXT_MAP.json",
+    "active_awu_resolver": "scripts/governance/resolve_active_awu.py",
+    "external_git_verifier": "scripts/governance/verify_external_git_state.py",
+    "handoff": "engineering/handoff/CURRENT.json",
+    "operating_protocol": "engineering/AGENT_PROTOCOL.md",
+    "capability_policy": "engineering/AGENT_CAPABILITIES.json"
+  },
+  "stable_cli_contracts": {
+    "resolve_active_awu": [
+      "python",
+      "scripts/governance/resolve_active_awu.py"
+    ],
+    "verify_external_git_state": [
+      "python",
+      "scripts/governance/verify_external_git_state.py",
+      "--mode",
+      "github"
+    ],
+    "check_context_map": [
+      "python",
+      "scripts/governance/render_context_map.py",
+      "--check"
+    ],
+    "check_current_status": [
+      "python",
+      "scripts/governance/render_current_status.py",
+      "--check"
+    ]
+  },
+  "json_interfaces": [
+    {
+      "path": "config/governance/project_state.json",
+      "required_values": {
+        "schema_version": 1,
+        "state_kind": "project_state_v1"
+      },
+      "dynamic_payload": true
+    },
+    {
+      "path": "engineering/CONTEXT_MAP.json",
+      "required_values": {
+        "schema_version": 1,
+        "map_kind": "active_agent_context_map_v1"
+      },
+      "dynamic_payload": true
+    },
+    {
+      "path": "engineering/AGENT_CAPABILITIES.json",
+      "required_values": {
+        "schema_version": 1,
+        "policy_kind": "agent_execution_evidence_policy_v1"
+      },
+      "dynamic_payload": false
+    },
+    {
+      "path": "config/governance/context_map_policy_v1.json",
+      "required_values": {
+        "schema_version": 1,
+        "policy_kind": "context_map_policy_v1",
+        "semantics": "GENERATED_PROGRESSIVE_DISCLOSURE_FROM_ACTIVE_AWU"
+      },
+      "dynamic_payload": false
+    },
+    {
+      "path": "config/governance/generated_status_policy_v1.json",
+      "required_values": {
+        "schema_version": 1,
+        "policy_kind": "generated_status_policy_v1",
+        "semantics": "CANONICAL_STATE_TO_BOUNDED_DOC_BLOCKS"
+      },
+      "dynamic_payload": false
+    },
+    {
+      "path": "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json",
+      "required_values": {
+        "schema_version": 1,
+        "evidence_kind": "development_engine_v1_certification_evidence_v1",
+        "verdict": "PASS_DEVELOPMENT_ENGINE_V1_EXACT_HEAD_CERTIFIED",
+        "engine_version": "V1",
+        "candidate_id": "DEV_ENGINE_V1:b9e5ebadbb739e57f2e0023d7498593f0f9a45bde46af24d8a83541351cdd1ed"
+      },
+      "dynamic_payload": false
+    }
+  ],
+  "certification_identity": {
+    "evidence_path": "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json",
+    "qualified_head_sha": "972748579bcb998fc48542c02ed76aacae482fa5",
+    "candidate_material_sha256": "b9e5ebadbb739e57f2e0023d7498593f0f9a45bde46af24d8a83541351cdd1ed",
+    "input_identity_sha256": "32829891fa11c4e5905ef01d9f24320a34180e03640d478807fda2edf10565ac",
+    "bundle_identity_sha256": "490cf76580b4259a5812e81cc861c63bf9e4c1825591f46a276b1694ad18590b"
+  },
+  "authority_contract": {
+    "current_authorization_source": "config/governance/project_state.json",
+    "executable_task_source": "ACTIVE_AWU_RESOLVED_FROM_CANONICAL_STATE",
+    "context_route_role": "GENERATED_BOUNDED_ROUTE_NOT_AUTHORITY",
+    "handoff_role": "RESUME_HINT_NOT_AUTHORITY",
+    "state_bridge_role": "MIGRATION_COMPATIBILITY_NOT_AUTHORITY",
+    "chat_memory_role": "NON_AUTHORITATIVE",
+    "conflict_consequence": "STATE_DRIFT_FAIL_CLOSED"
+  },
+  "dynamic_not_frozen": [
+    "config/governance/project_state.json#engineering_track.active_task",
+    "config/governance/project_state.json#external_observations",
+    "engineering/CONTEXT_MAP.json#active_work",
+    "engineering/CONTEXT_MAP.json#execution_context",
+    "engineering/handoff/CURRENT.json#current_objective",
+    "engineering/handoff/CURRENT.json#next_action",
+    "README.md#generated-current-status-block",
+    "AGENTS.md#generated-current-status-block",
+    "engineering/CURRENT_STATUS.md#generated-current-status-block"
+  ],
+  "active_awu_contract": {
+    "schema_version": 1,
+    "kind": "agent_work_unit",
+    "single_in_progress_required": true,
+    "parent_must_match_canonical_state": true,
+    "allowlist_is_executable_boundary": true,
+    "parent_manifest_is_upper_bound": true
+  },
+  "safety_floor": {
+    "business_development": "PAUSED",
+    "lot45_status": "SUSPENDED_CANDIDATE",
+    "lot46_status": "LOCKED",
+    "blocking_finding_id": "BOOT-FINDING-001",
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED",
+    "leverage": "FORBIDDEN",
+    "withdrawals": "FORBIDDEN"
+  },
+  "compatibility": {
+    "incompatible_change_requires_new_interface_version": true,
+    "v1_must_not_silently_move_paths": true,
+    "v1_must_not_invert_authority": true,
+    "v1_must_not_freeze_dynamic_payload_bytes": true,
+    "paid_dependency_required": false,
+    "mandatory_llm_review_required": false
+  }
+}
