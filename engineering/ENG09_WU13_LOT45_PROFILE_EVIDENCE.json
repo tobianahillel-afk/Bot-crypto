@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "eng09_wu13_lot45_candidate_profile_evidence_v1",
+  "awu_id": "ENG-09.3-WU13",
+  "status": "PASS",
+  "scope_base_sha": "984154bd62ce38d36f3d10a415e74b49d92e9f6b",
+  "qualification_head_sha": "649b7f332d42c6f32fd4a405e8c3af5020c435f8",
+  "qualification_runs": {
+    "engineering_bootstrap": {
+      "run_id": 36441003692,
+      "conclusion": "success"
+    },
+    "candidate_profile_qualification": {
+      "run_id": 36441003628,
+      "conclusion": "success"
+    },
+    "security_secrets": {
+      "run_id": 36441003765,
+      "conclusion": "success"
+    },
+    "security_actions": {
+      "run_id": 36441003627,
+      "conclusion": "success"
+    },
+    "security_supply_chain": {
+      "run_id": 36441003655,
+      "conclusion": "success"
+    }
+  },
+  "external_git_evidence": {
+    "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "main_branch_protected": false,
+    "rulesets_count": 0,
+    "pull_request": 66,
+    "pull_request_state": "open",
+    "pull_request_merged": false,
+    "pull_request_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "pull_request_base_sha": "390d0779f2be257fa8134faf8f02193a760a09c3"
+  },
+  "candidate_bindings": {
+    "mutation_workflow_path": ".github/workflows/lot45-mutation-assurance.yml",
+    "mutation_workflow_blob_sha": "e5a569b79b70e42da7c9ce2cc96b8623a0040f1d",
+    "mutation_summary_path": "reports/lot45/mutation_summary.json",
+    "mutation_summary_blob_sha": "26e49b1d1fc450a00ebc346541a69e82059f1119",
+    "trusted_prelaunch_path": "scripts/lot45_trusted_prelaunch.sh",
+    "trusted_prelaunch_blob_sha": "f9aec59ec03449702dc67cac98b020ffe64fe403",
+    "exact_source_head_sha": "c418338da86c49bd4b688d4a64893ee5042adc40"
+  },
+  "candidate_profile": {
+    "id": "LOT45_ORDER_FLOW_DELTA_CVD",
+    "lifecycle": "READ_ONLY_QUALIFIED_NOT_ADOPTED",
+    "execution_allowed": false,
+    "active_registry_adopted": false,
+    "production_selector_visible": false,
+    "generic_runner_executable": false,
+    "selector_count": 10,
+    "baseline_test_count": 8,
+    "mutation_target_count": 3,
+    "mutation_execution_performed": false
+  },
+  "mutation_evidence": {
+    "schema_version": "lot45-mutation-summary-v1",
+    "status": "PASS",
+    "killed": 1341,
+    "timeout": 0,
+    "suspicious": 0,
+    "survived": 324,
+    "evaluated": 1665,
+    "completed": 1665,
+    "total": 1665,
+    "score_percent": 80.54,
+    "minimum_percent": 80,
+    "mutmut_run_exit_code": 0,
+    "mutmut_results_exit_code": 0,
+    "arithmetic": {
+      "numerator": 1341,
+      "denominator": 1665,
+      "computed_percent": 80.54,
+      "formula": "round(100 * killed / evaluated, 2)"
+    }
+  },
+  "protected_control_immutability": {
+    "config/governance/mutation_profiles_v1.json": {
+      "scope_base_blob_sha": "b9c618ad3e20e8865ae791f89e4eb7a7f9e7cb73",
+      "qualification_head_blob_sha": "b9c618ad3e20e8865ae791f89e4eb7a7f9e7cb73",
+      "identical": true
+    },
+    ".github/workflows/ci-mutation.yml": {
+      "scope_base_blob_sha": "7f135de0a9644d64aab113cc5189f6af04df7260",
+      "qualification_head_blob_sha": "7f135de0a9644d64aab113cc5189f6af04df7260",
+      "identical": true
+    },
+    ".github/workflows/code-quality.yml": {
+      "scope_base_blob_sha": "d40d96a8189cfbeffc706991f5dc14fbf178e36f",
+      "qualification_head_blob_sha": "d40d96a8189cfbeffc706991f5dc14fbf178e36f",
+      "identical": true
+    }
+  },
+  "predecessor_evidence": {
+    "path": "engineering/ENG09_WU12_P06_MIGRATION_EVIDENCE.json",
+    "blob_sha": "6817b27f638c54282bde3655504fe7f8d213d268",
+    "status": "PASS"
+  },
+  "safety": {
+    "business_development": "PAUSED",
+    "lot46_status": "LOCKED",
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED",
+    "candidate_branch_mutated": false,
+    "candidate_merged": false,
+    "generic_mutation_execution_enabled": false
+  },
+  "temporary_qualification_workflow": {
+    "path": ".github/workflows/eng09-wu13-candidate-profile-qualification.yml",
+    "present_at_qualification_head": true,
+    "removal_required_after_evidence_capture": true
+  },
+  "verdict": "READ_ONLY_LOT45_CANDIDATE_PROFILE_QUALIFIED_NOT_ADOPTED"
+}
