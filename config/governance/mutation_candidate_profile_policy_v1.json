@@ -41,6 +41,10 @@
     "candidate selection performs no mutation execution",
     "candidate Git evidence bindings are exact and lifecycle-gated",
     "unsafe repository-relative paths fail closed",
-    "score arithmetic is recomputed from stored evidence rather than trusted as a label"
+    "score arithmetic is recomputed from stored evidence rather than trusted as a label",
+    "candidate source binding mode is explicit and limited to exact-head qualification input"
+  ],
+  "allowed_source_binding_modes": [
+    "EXACT_HEAD_INPUT"
   ]
 }

@@ -23,6 +23,97 @@ EXPECTED_WORKFLOW_BLOB = "e5a569b79b70e42da7c9ce2cc96b8623a0040f1d"
 EXPECTED_SUMMARY_BLOB = "26e49b1d1fc450a00ebc346541a69e82059f1119"
 EXPECTED_PRELAUNCH_BLOB = "f9aec59ec03449702dc67cac98b020ffe64fe403"
 
+EXPECTED_SELECTORS = [
+    {
+        "mode": "GLOB",
+        "pattern": "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine*.py"
+    },
+    {
+        "mode": "EXACT",
+        "pattern": "scripts/lot45_trusted_prelaunch.sh"
+    },
+    {
+        "mode": "GLOB",
+        "pattern": "tests/test_lot45*.py"
+    },
+    {
+        "mode": "EXACT",
+        "pattern": "config/microstructure/order_flow_delta_and_cvd_engine_v1.json"
+    },
+    {
+        "mode": "EXACT",
+        "pattern": "contracts/schemas/order_flow_delta_cvd_engine_state_v1.schema.json"
+    },
+    {
+        "mode": "EXACT",
+        "pattern": "contracts/schemas/order_flow_delta_cvd_engine_audit_v1.schema.json"
+    },
+    {
+        "mode": "EXACT",
+        "pattern": "contracts/schemas/order_flow_state_v1.schema.json"
+    },
+    {
+        "mode": "EXACT",
+        "pattern": "contracts/schemas/cvd_series_v1.schema.json"
+    },
+    {
+        "mode": "EXACT",
+        "pattern": ".github/workflows/lot45-mutation-assurance.yml"
+    },
+    {
+        "mode": "EXACT",
+        "pattern": "requirements-dev.lock"
+    }
+]
+EXPECTED_BASELINE_TESTS = [
+    "tests/test_lot45_order_flow_delta_and_cvd_engine.py",
+    "tests/test_lot45_policy_contract.py",
+    "tests/test_lot45_runtime_binding_and_rounding.py",
+    "tests/test_lot45_schema_contracts.py",
+    "tests/test_lot45_checksum_binding_adversarial.py",
+    "tests/test_lot45_untracked_executable_source_binding.py",
+    "tests/test_lot45_decimal_context_and_pre_epoch.py",
+    "tests/test_lot45_top_level_checksum_authenticity.py"
+]
+EXPECTED_MICROSTRUCTURE_COPY = [
+    "src/crypto_quant_bot/microstructure/__init__.py",
+    "src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py",
+    "src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector_models.py",
+    "src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector_validation.py",
+    "src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_analysis.py",
+    "src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py",
+    "src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py",
+    "src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_validation.py",
+    "src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_analysis.py",
+    "src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine.py",
+    "src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine_models.py",
+    "src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine_validation.py",
+    "src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts.py",
+    "src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts_models.py",
+    "src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts_validation.py",
+    "src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor.py",
+    "src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor_models.py",
+    "src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor.py",
+    "src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor_models.py",
+    "src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor_validation.py",
+    "src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine.py",
+    "src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine_models.py",
+    "src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine_validation.py",
+    "src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine.py",
+    "src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine_models.py",
+    "src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine_validation.py",
+    "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py",
+    "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py",
+    "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py"
+]
+EXPECTED_SOURCE_BINDING = {
+    "mode": "EXACT_HEAD_INPUT",
+    "exact_head": EXPECTED_SOURCE_HEAD,
+    "candidate_head": EXPECTED_CANDIDATE_HEAD,
+    "trusted_prelaunch_required": True,
+    "lot46_absence_checks_required": True,
+}
+
 
 class MutationCandidateProfileError(ValueError):
     pass
@@ -74,6 +165,8 @@ def validate_policy(policy: dict[str, Any]) -> None:
         raise MutationCandidateProfileError("selector mode drift")
     if policy.get("allowed_lifecycles") != ["READ_ONLY_QUALIFIED_NOT_ADOPTED"]:
         raise MutationCandidateProfileError("candidate lifecycle drift")
+    if policy.get("allowed_source_binding_modes") != ["EXACT_HEAD_INPUT"]:
+        raise MutationCandidateProfileError("candidate source-binding mode drift")
     if policy.get("required_false_flags") != [
         "execution_allowed", "active_registry_adopted",
         "production_selector_visible", "generic_runner_executable"
@@ -99,6 +192,8 @@ def _validate_selectors(profile: dict[str, Any], policy: dict[str, Any]) -> None
         if key in seen:
             raise MutationCandidateProfileError(f"duplicate selector: {key}")
         seen.add(key)
+    if selectors != EXPECTED_SELECTORS:
+        raise MutationCandidateProfileError("Lot45 selector identity/order drift")
 
 
 def _validate_candidate_binding(profile: dict[str, Any]) -> None:
@@ -118,6 +213,14 @@ def _validate_candidate_binding(profile: dict[str, Any]) -> None:
     }
     if b != expected:
         raise MutationCandidateProfileError("Lot45 candidate Git binding drift")
+
+
+def _validate_source_binding(profile: dict[str, Any], policy: dict[str, Any]) -> None:
+    binding = profile.get("source_binding")
+    if binding != EXPECTED_SOURCE_BINDING:
+        raise MutationCandidateProfileError("Lot45 exact-head source binding drift")
+    if binding["mode"] not in policy["allowed_source_binding_modes"]:
+        raise MutationCandidateProfileError("Lot45 source-binding mode is not allowed")
 
 
 def _validate_score(profile: dict[str, Any]) -> None:
@@ -170,8 +273,8 @@ def _validate_mutation_semantics(profile: dict[str, Any], policy: dict[str, Any]
     mutation = profile.get("mutation")
     if not isinstance(baseline, list) or not isinstance(mutation, dict):
         raise MutationCandidateProfileError("Lot45 baseline/mutation semantics missing")
-    if len(baseline) != 8 or baseline != mutation.get("tests"):
-        raise MutationCandidateProfileError("Lot45 baseline and mutation test set drift")
+    if baseline != EXPECTED_BASELINE_TESTS or baseline != mutation.get("tests"):
+        raise MutationCandidateProfileError("Lot45 baseline and mutation test set identity drift")
     targets = mutation.get("targets")
     if not isinstance(targets, list) or len(targets) != 3:
         raise MutationCandidateProfileError("Lot45 target set drift")
@@ -214,8 +317,10 @@ def _validate_mutation_semantics(profile: dict[str, Any], policy: dict[str, Any]
     if copies.get("static_directories") != ["config/", "data/audit/", "contracts/", "tests/fixtures/"]:
         raise MutationCandidateProfileError("Lot45 static-copy directory drift")
     other = copies.get("microstructure_python_except_targets")
-    if not isinstance(other, list) or len(other) != 29 or len(other) != len(set(other)):
-        raise MutationCandidateProfileError("Lot45 observed microstructure dependency set drift")
+    if other != EXPECTED_MICROSTRUCTURE_COPY:
+        raise MutationCandidateProfileError("Lot45 observed microstructure dependency identity/order drift")
+    if len(other) != len(set(other)):
+        raise MutationCandidateProfileError("Lot45 observed microstructure dependency duplicates")
     for path in other:
         _safe_path(path)
         if path in targets or not path.startswith("src/crypto_quant_bot/microstructure/"):
@@ -243,6 +348,7 @@ def validate_registry(policy: dict[str, Any], registry: dict[str, Any]) -> None:
     _walk_forbidden(profile, set(policy["forbidden_profile_keys"]))
     _validate_selectors(profile, policy)
     _validate_candidate_binding(profile)
+    _validate_source_binding(profile, policy)
     _validate_mutation_semantics(profile, policy)
     _validate_score(profile)
 

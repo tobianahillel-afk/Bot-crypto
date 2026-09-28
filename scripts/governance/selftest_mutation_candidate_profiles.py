@@ -102,6 +102,41 @@ def main() -> int:
         "candidate head drift",
     )
 
+    selector_drift = copy.deepcopy(registry)
+    selector_drift["profiles"][0]["selectors"][0]["pattern"] = "src/crypto_quant_bot/microstructure/*.py"
+    _expect(
+        validator.MutationCandidateProfileError,
+        lambda: validator.validate_registry(policy, selector_drift),
+        "selector identity drift",
+    )
+
+    source_mode_drift = copy.deepcopy(registry)
+    source_mode_drift["profiles"][0]["source_binding"]["mode"] = "CURRENT_CHECKOUT"
+    _expect(
+        validator.MutationCandidateProfileError,
+        lambda: validator.validate_registry(policy, source_mode_drift),
+        "source-binding mode drift",
+    )
+
+    baseline_drift = copy.deepcopy(registry)
+    baseline_drift["profiles"][0]["baseline_tests"][0] = "tests/test_unrelated.py"
+    baseline_drift["profiles"][0]["mutation"]["tests"][0] = "tests/test_unrelated.py"
+    _expect(
+        validator.MutationCandidateProfileError,
+        lambda: validator.validate_registry(policy, baseline_drift),
+        "baseline test identity drift",
+    )
+
+    copy_drift = copy.deepcopy(registry)
+    copy_drift["profiles"][0]["mutation"]["copy_semantics"]["microstructure_python_except_targets"][0] = (
+        "src/crypto_quant_bot/microstructure/fake_dependency.py"
+    )
+    _expect(
+        validator.MutationCandidateProfileError,
+        lambda: validator.validate_registry(policy, copy_drift),
+        "workspace copy identity drift",
+    )
+
     workflow_blob_drift = copy.deepcopy(registry)
     workflow_blob_drift["profiles"][0]["candidate_binding"]["mutation_workflow_blob_sha"] = "0" * 40
     _expect(
@@ -146,7 +181,7 @@ def main() -> int:
         "command injection",
     )
 
-    print("MUTATION_CANDIDATE_PROFILES_SELFTEST_PASS probes=18")
+    print("MUTATION_CANDIDATE_PROFILES_SELFTEST_PASS probes=22")
 
 
 if __name__ == "__main__":

@@ -28,3 +28,20 @@ output always states that the selection is qualification-only and no mutation wa
 
 This separation prevents a suspended business candidate from silently becoming an active
 engineering control while still allowing deterministic parity review.
+
+
+## Exact semantic parity guards
+
+The WU13 validator now requires exact equality, not merely shape/count, for the ten path
+selectors, eight baseline/mutation tests, three mutation targets and twenty-nine
+microstructure dependency files copied into the isolated workspace.
+
+The candidate also carries an explicit non-executable source binding:
+
+- mode: `EXACT_HEAD_INPUT`;
+- exact input head: `c418338da86c49bd4b688d4a64893ee5042adc40`;
+- observed suspended candidate head: `ec2c4ab16f21b23e062b7fca0bb796c8db4a5133`;
+- trusted prelaunch required: `true`;
+- Lot46 absence checks required: `true`.
+
+A valid count with substituted selectors, tests or dependency files now fails closed.

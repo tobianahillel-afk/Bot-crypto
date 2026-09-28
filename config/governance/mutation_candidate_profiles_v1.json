@@ -179,6 +179,13 @@
         "score_percent": 80.54,
         "mutmut_run_exit_code": 0,
         "mutmut_results_exit_code": 0
+      },
+      "source_binding": {
+        "mode": "EXACT_HEAD_INPUT",
+        "exact_head": "c418338da86c49bd4b688d4a64893ee5042adc40",
+        "candidate_head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+        "trusted_prelaunch_required": true,
+        "lot46_absence_checks_required": true
       }
     }
   ]
