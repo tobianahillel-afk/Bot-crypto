@@ -73,7 +73,7 @@
   "resume": {
     "current_objective": "Assemble a bounded Development Engine V1 certification candidate from existing ENG-04/06/08/09 evidence, bind it to exact inputs, and validate SAFE/FAST/zero-cost/security prerequisites without unlocking business development.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Compose the Development Engine V1 certification policy and candidate from existing immutable evidence, validate all evidence identities and blockers fail-closed, and prepare—but do not yet execute—the final exact-head T4 certification."
+    "next_action": "Compose the Development Engine V1 certification policy and candidate from existing immutable evidence, validate all evidence identities and blockers fail-closed, and prepare\u2014but do not yet execute\u2014the final exact-head T4 certification."
   },
   "safety": {
     "execution_allowed": false,
