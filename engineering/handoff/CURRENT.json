@@ -34,7 +34,6 @@
     "active_manifest": "engineering/lots/ENG-09.json"
   },
   "recent_completed": [
-    "ENG-09.3-WU05 completed on 36f5bc1bf28b7cd97817d8336114b0c70eaeb142: eight historical validation workflows lost only pull_request fanout; existing push/manual surfaces and all jobs remained unchanged. Bootstrap 36349637574, Secrets 36349637569, Actions 36349637593 and Supply Chain 36349637572 passed; Lot44 remained untouched.",
     "ENG-09.3-WU06 completed on 2ee8029b21e75172a73a394d74d577672da1cbe2: the final eight mutable historical validation workflows lost only pull_request fanout; jobs and lifecycle surfaces stayed unchanged. Bootstrap 36349854988, Secrets 36349855013, Actions 36349854997 and Supply Chain 36349854991 passed; Lot44 remained untouched.",
     "ENG-09.3-WU07 completed on a946e59ab129340f6d865bdbae6a8a9e047d3329: five mutable historical evidence/audit workflows lost only pull_request fanout; Lot38 retained push main, all jobs remained unchanged, and Lot44 stayed byte-identical. Bootstrap 36357397561, Secrets 36357397600, Actions 36357397583 and Supply Chain 36357397553 passed.",
     "ENG-09.3-WU08 reconciled on 93cb5526ccefa233684ae94b3bb3fec4685393f9: attempted removal of the three protected Lot44 PR triggers was rejected by historical-evidence protection and fully restored. Phase 1 removes 38/41 historical fanout workflows; 3 Lot44 exceptions remain protected.",
