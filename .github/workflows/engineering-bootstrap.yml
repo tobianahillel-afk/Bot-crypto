@@ -34,6 +34,12 @@ jobs:
       - name: Compile governance scripts
         run: python -m compileall -q scripts/governance
 
+      - name: Validate Development Engine V1 interface freeze
+        run: python scripts/governance/validate_development_engine_v1_interface_freeze.py
+
+      - name: Run Development Engine V1 interface freeze adversarial self-tests
+        run: python scripts/governance/selftest_development_engine_v1_interface_freeze.py
+
       - name: Validate canonical state
         run: python scripts/governance/validate_bootstrap_state.py
 
