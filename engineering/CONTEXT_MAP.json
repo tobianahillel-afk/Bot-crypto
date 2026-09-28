@@ -35,7 +35,7 @@
       "max_total_kib": 768
     },
     "implicit_expansion": "FORBIDDEN",
-    "primary_count": 10,
+    "primary_count": 9,
     "primary_files": [
       "AGENTS.md",
       "config/governance/project_state.json",
@@ -45,7 +45,6 @@
       "engineering/ENG09_WU11_P06_PARITY_EVIDENCE.json",
       "config/governance/mutation_profiles_v1.json",
       "scripts/governance/validate_mutation_profiles.py",
-      ".github/workflows/p06-extended-mutation.yml",
       ".github/workflows/ci-mutation.yml"
     ],
     "reference_count": 2,
@@ -53,7 +52,7 @@
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 78
+    "total_kib_ceil": 77
   },
   "instructions": [
     "verify external Git reality before writing",

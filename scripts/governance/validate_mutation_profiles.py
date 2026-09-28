@@ -340,6 +340,205 @@ def _validate_profile(profile: dict[str, Any], policy: dict[str, Any], root: Pat
         )
 
     legacy = profile["legacy_reference"]
+    if not isinstance(legacy, dict) or set(legacy) != {
+        "workflow", "workflow_blob_sha", "canonical_mutmut_defaults", "lifecycle"
+    }:
+        raise MutationProfileError(f"{profile_id}: legacy_reference shape invalid")
+    _safe_repo_path(legacy["workflow"])
+    _safe_repo_path(legacy["canonical_mutmut_defaults"])
+    if not isinstance(legacy["workflow_blob_sha"], str) or HEX40_RE.fullmatch(legacy["workflow_blob_sha"]) is None:
+        raise MutationProfileError(f"{profile_id}: legacy workflow blob SHA invalid")
+    if not isinstance(legacy["lifecycle"], str) or not legacy["lifecycle"]:
+        raise MutationProfileError(f"{profile_id}: legacy lifecycle invalid")
+
+
+def validate_registry(policy: dict[str, Any], registry: dict[str, Any], root: Path = ROOT) -> None:
+    if registry.get("schema_version") != 1 or registry.get("registry_kind") != "mutation_profiles_v1":
+        raise MutationProfileError("invalid mutation-profile registry identity")
+    profiles = registry.get("profiles")
+    if not isinstance(profiles, list) or not profiles:
+        raise MutationProfileError("mutation-profile registry must contain profiles")
+    if len(profiles) > policy["bounds"]["max_profiles"]:
+        raise MutationProfileError("mutation-profile registry exceeds profile bound")
+    ids = [profile.get("id") if isinstance(profile, dict) else None for profile in profiles]
+    if len(ids) != len(set(ids)):
+        raise MutationProfileError("mutation-profile ids must be unique")
+
+    forbidden = {key.lower() for key in policy["forbidden_profile_keys"]}
+    _reject_forbidden_keys(registry, forbidden)
+    for profile in profiles:
+        _validate_profile(profile, policy, root)
+
+
+def _trigger_block(workflow_text: str, trigger: str) -> list[str]:
+    lines = workflow_text.splitlines()
+    header = f"  {trigger}:"
+    try:
+        start = next(index for index, line in enumerate(lines) if line == header)
+    except StopIteration as exc:
+        raise MutationProfileError(f"generic mutation workflow missing {trigger} trigger") from exc
+    end = len(lines)
+    for index in range(start + 1, len(lines)):
+        line = lines[index]
+        if line and not line.startswith(" "):
+            end = index
+            break
+        if line.startswith("  ") and not line.startswith("    ") and line.endswith(":"):
+            end = index
+            break
+    return lines[start:end]
+
+
+def _strip_yaml_scalar(value: str) -> str:
+    value = value.strip()
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in {"'", '"'}:
+        return value[1:-1]
+    return value
+
+
+def _extract_trigger_paths(workflow_text: str, trigger: str) -> list[str]:
+    block = _trigger_block(workflow_text, trigger)
+    try:
+        paths_index = next(index for index, line in enumerate(block) if line.strip() == "paths:")
+    except StopIteration as exc:
+        raise MutationProfileError(f"generic mutation {trigger} trigger missing paths") from exc
+    result: list[str] = []
+    for line in block[paths_index + 1:]:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if not stripped.startswith("- "):
+            break
+        result.append(_strip_yaml_scalar(stripped[2:]))
+    return result
+
+
+def _extract_trigger_branches(workflow_text: str, trigger: str) -> list[str]:
+    block = _trigger_block(workflow_text, trigger)
+    for index, line in enumerate(block):
+        stripped = line.strip()
+        if not stripped.startswith("branches:"):
+            continue
+        suffix = stripped.split(":", 1)[1].strip()
+        if suffix:
+            if not (suffix.startswith("[") and suffix.endswith("]")):
+                raise MutationProfileError(f"generic mutation {trigger} inline branches invalid")
+            body = suffix[1:-1].strip()
+            return [] if not body else [
+                _strip_yaml_scalar(item) for item in body.split(",")
+            ]
+        result: list[str] = []
+        for child in block[index + 1:]:
+            child_stripped = child.strip()
+            if not child_stripped:
+                continue
+            if not child_stripped.startswith("- "):
+                break
+            result.append(_strip_yaml_scalar(child_stripped[2:]))
+        return result
+    raise MutationProfileError(f"generic mutation {trigger} trigger missing branches")
+
+
+def _verify_retired_provenance(root: Path) -> None:
+    if (root / P06_RETIRED_WORKFLOW).exists():
+        raise MutationProfileError("retired legacy P0.6 workflow must be absent after WU12")
+    evidence = _load_json(root / P06_WU11_EVIDENCE)
+    if evidence.get("status") != "PASS":
+        raise MutationProfileError("WU11 P0.6 parity evidence is not PASS")
+    if evidence.get("parity_head_sha") != P06_PARITY_HEAD:
+        raise MutationProfileError("WU11 P0.6 parity head drift")
+    legacy = evidence.get("legacy_reference")
+    if not isinstance(legacy, dict):
+        raise MutationProfileError("WU11 legacy-reference evidence missing")
+    if (
+        legacy.get("expected_blob_sha") != P06_WORKFLOW_BLOB
+        or legacy.get("observed_blob_sha") != P06_WORKFLOW_BLOB
+    ):
+        raise MutationProfileError("retired legacy workflow provenance blob drift")
+    proc = subprocess.run(
+        ["git", "cat-file", "-t", P06_WORKFLOW_BLOB],
+        cwd=root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if proc.returncode != 0 or proc.stdout.strip() != "blob":
+        raise MutationProfileError("retired legacy workflow blob is unavailable in Git history")
+
+
+def validate_p06_migrated_workflow(workflow_text: str) -> None:
+    expected_main_paths = [selector["pattern"] for selector in P06_SELECTORS]
+    if _extract_trigger_branches(workflow_text, "pull_request") != ["main"]:
+        raise MutationProfileError("generic mutation pull_request branch surface drift")
+    if _extract_trigger_paths(workflow_text, "pull_request") != expected_main_paths:
+        raise MutationProfileError("generic mutation pull_request path surface drift")
+    if _extract_trigger_branches(workflow_text, "push") != ["main", P06_ENGINEERING_BRANCH]:
+        raise MutationProfileError("generic mutation push branch surface drift")
+    expected_push = [*expected_main_paths, *P06_MAINTENANCE_PATHS]
+    if _extract_trigger_paths(workflow_text, "push") != expected_push:
+        raise MutationProfileError("generic mutation push path surface drift")
+    if "  workflow_dispatch:" not in workflow_text:
+        raise MutationProfileError("generic mutation workflow_dispatch missing")
+    if "default: P06_DECISION_EVIDENCE" not in workflow_text:
+        raise MutationProfileError("generic mutation default profile drift")
+    option_lines = [
+        line.strip()
+        for line in workflow_text.splitlines()
+        if line.strip().startswith("- ") and "P06_DECISION_EVIDENCE" in line
+    ]
+    if option_lines != ["- P06_DECISION_EVIDENCE"]:
+        raise MutationProfileError("generic mutation WU12 profile options drift")
+
+
+def _find_profile(registry: dict[str, Any], profile_id: str) -> dict[str, Any]:
+    matches = [profile for profile in registry["profiles"] if profile["id"] == profile_id]
+    if len(matches) != 1:
+        raise MutationProfileError(f"expected exactly one {profile_id} profile")
+    return matches[0]
+
+
+def validate_p06_parity(registry: dict[str, Any], root: Path = ROOT) -> None:
+    profile = _find_profile(registry, P06_ID)
+    if profile["profile_version"] != P06_PROFILE_VERSION or profile["enabled"] is not True:
+        raise MutationProfileError("P0.6 profile identity/version/enabled drift")
+    if profile["selectors"] != P06_SELECTORS:
+        raise MutationProfileError("P0.6 selector surface drift")
+    mutation = profile["mutation"]
+    if mutation["source_paths"] != P06_SOURCE_PATHS:
+        raise MutationProfileError("P0.6 source_paths drift")
+    if mutation["targets"] != P06_TARGETS:
+        raise MutationProfileError("P0.6 mutation target drift")
+    if mutation["tests"] != P06_TESTS:
+        raise MutationProfileError("P0.6 mutation tests drift")
+    if mutation["also_copy"] != P06_ALSO_COPY:
+        raise MutationProfileError("P0.6 also_copy semantics drift")
+    if mutation["settings"] != P06_SETTINGS:
+        raise MutationProfileError("P0.6 mutmut settings drift")
+    score = profile["score"]
+    if score != {
+        "minimum_percent": 80.0,
+        "numerator": ["killed", "timeout"],
+        "denominator": ["killed", "timeout", "suspicious", "survived"],
+        "require_zero": [],
+    }:
+        raise MutationProfileError("P0.6 mutation score semantics drift")
+    if profile["source_binding"] != {"mode": "CURRENT_CHECKOUT", "exact_head": None}:
+        raise MutationProfileError("P0.6 source-binding drift")
+    if profile["evidence"] != {
+        "directory": "reports/quality/p06_extended_mutation/",
+        "run_log": "run.txt",
+        "results_log": "results.txt",
+        "score_file": "score.json",
+        "schema_version": "p0-6-decision-evidence-mutation-score-v1",
+    }:
+        raise MutationProfileError("P0.6 evidence semantics drift")
+    if profile["source_immutability"] != {
+        "enabled": True,
+        "restore_paths": ["pyproject.toml"],
+        "verify_paths": ["src/crypto_quant_bot"],
+    }:
+        raise MutationProfileError("P0.6 source-immutability semantics drift")
+    legacy = profile["legacy_reference"]
     if legacy != {
         "workflow": P06_RETIRED_WORKFLOW,
         "workflow_blob_sha": P06_WORKFLOW_BLOB,

@@ -28,7 +28,6 @@
 - engineering/ENG09_WU11_P06_PARITY_EVIDENCE.json
 - config/governance/mutation_profiles_v1.json
 - scripts/governance/validate_mutation_profiles.py
-- .github/workflows/p06-extended-mutation.yml
 - .github/workflows/ci-mutation.yml
 
 ## Execution context — reference
@@ -38,9 +37,9 @@
 
 ## Budget
 
-- Primary: 10 / 10 files
+- Primary: 9 / 10 files
 - Reference: 2 / 12 files
-- Routed size: 78 / 768 KiB
+- Routed size: 77 / 768 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
