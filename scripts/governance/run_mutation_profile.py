@@ -211,7 +211,7 @@ def materialize_pyproject_text(original: str, profile: dict[str, Any]) -> str:
         raise MutationRunnerError(
             f"expected one [tool.mutmut] block, found {len(matches)}"
         )
-    result = pattern.sub(block, original, count=1)
+    result = pattern.sub(lambda _match: block, original, count=1)
     try:
         parsed = tomllib.loads(result)
     except tomllib.TOMLDecodeError as exc:
