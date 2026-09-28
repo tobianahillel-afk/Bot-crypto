@@ -13,21 +13,20 @@
 - Track: ENGINEERING
 - Work item: ENG-09
 - Task: ENG-09.3
-- AWU: ENG-09.3-WU09
-- Risk: R0
+- AWU: ENG-09.3-WU10
+- Risk: R1
 - Manifest: engineering/lots/ENG-09.json
-- AWU file: engineering/work_units/ENG-09.3-WU09.json
+- AWU file: engineering/work_units/ENG-09.3-WU10.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-09.json
-- engineering/work_units/ENG-09.3-WU09.json
-- engineering/LOT45_WORKFLOW_REDUNDANCY_EVIDENCE.json
-- engineering/ENG09_WU08_COMPLETION_EVIDENCE.json
+- engineering/work_units/ENG-09.3-WU10.json
+- engineering/ENG09_PHASE1_MUTATION_CONSOLIDATION_PLAN.json
 - .github/workflows/p06-extended-mutation.yml
-- .github/workflows/code-quality.yml
+- pyproject.toml
 
 ## Execution context — reference
 
@@ -36,16 +35,16 @@
 
 ## Budget
 
-- Primary: 8 / 8 files
-- Reference: 2 / 8 files
-- Routed size: 67 / 512 KiB
+- Primary: 7 / 10 files
+- Reference: 2 / 12 files
+- Routed size: 46 / 768 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: Produce a read-only, exact-evidence phase-1 reconciliation and a bounded implementation plan for phase-2 mutation consolidation, accounting for the three protected Lot44 exceptions and the fact that the Lot45 mutation workflow exists only on the suspended candidate head.
-- Next action: Write the phase-1 reconciliation and phase-2 mutation consolidation plan from WU08 evidence, P0.6 mutation, institutional quality mutation overlap, and read-only Lot45 mutation evidence; do not mutate any workflow or candidate file.
+- Objective: Implement a command-free profile policy, validated P0.6 mutation profile and deterministic changed-path selector that preserve the exact P0.6 mutation semantics without migrating or editing any workflow.
+- Next action: Implement and adversarially validate the command-free mutation profile policy/registry plus deterministic P0.6 selector; do not edit any workflow, run generic mutation, or touch the Lot45 candidate.
 
 ## Non-authoritative sources
 
