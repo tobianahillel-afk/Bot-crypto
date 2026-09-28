@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-09.3-WU12",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-09",
+    "task_id": "ENG-09.3",
+    "manifest": "engineering/lots/ENG-09.json"
+  },
+  "title": "Migrate P0.6 automatic mutation triggers to generic control",
+  "objective": "After proven WU11 parity, migrate the P0.6 pull-request and main-push trigger surface to ci-mutation, retire the legacy P0.6 workflow, and transition the P0.6 profile from parity-reference lifecycle to generic-control lifecycle without changing mutation score or test semantics.",
+  "non_goals": [
+    "modify code-quality.yml embedded institutional mutation assurance",
+    "define or adopt the Lot45 mutation profile",
+    "modify Lot45 candidate or business code",
+    "modify protected Lot44 workflows",
+    "change P0.6 mutation target tests score formula threshold timeouts or do-not-mutate semantics",
+    "unlock Lot46 or business development",
+    "introduce paid services or mandatory LLM review"
+  ],
+  "depends_on": [
+    "ENG-09.3-WU11"
+  ],
+  "inputs": [
+    {
+      "name": "Phase-2 mutation consolidation plan",
+      "kind": "EVIDENCE",
+      "locator": "engineering/ENG09_PHASE1_MUTATION_CONSOLIDATION_PLAN.json"
+    },
+    {
+      "name": "WU11 exact parity evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/ENG09_WU11_P06_PARITY_EVIDENCE.json"
+    },
+    {
+      "name": "P0.6 mutation profile registry",
+      "kind": "CONFIG",
+      "locator": "config/governance/mutation_profiles_v1.json"
+    },
+    {
+      "name": "Mutation profile validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_mutation_profiles.py"
+    },
+    {
+      "name": "Legacy P0.6 workflow",
+      "kind": "FILE",
+      "locator": ".github/workflows/p06-extended-mutation.yml"
+    },
+    {
+      "name": "Generic mutation workflow",
+      "kind": "FILE",
+      "locator": ".github/workflows/ci-mutation.yml"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Migrated P0.6 profile lifecycle",
+      "kind": "CONFIG",
+      "locator": "config/governance/mutation_profiles_v1.json"
+    },
+    {
+      "name": "Migrated profile validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_mutation_profiles.py"
+    },
+    {
+      "name": "Updated profile adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_mutation_profiles.py"
+    },
+    {
+      "name": "Generic mutation workflow with main/PR P0.6 triggers",
+      "kind": "FILE",
+      "locator": ".github/workflows/ci-mutation.yml"
+    },
+    {
+      "name": "Retired legacy P0.6 workflow",
+      "kind": "DELETED_FILE",
+      "locator": ".github/workflows/p06-extended-mutation.yml"
+    },
+    {
+      "name": "WU12 migration evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/ENG09_WU12_P06_MIGRATION_EVIDENCE.json"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "c612c9af0f76d4d21ae1a9df96ae925f093a5e11",
+    "allowed_paths": [
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-09.3-WU11.json",
+      "engineering/work_units/ENG-09.3-WU12.json",
+      "engineering/ENG09_WU12_P06_MIGRATION_EVIDENCE.json",
+      "config/governance/mutation_profiles_v1.json",
+      "scripts/governance/validate_mutation_profiles.py",
+      "scripts/governance/selftest_mutation_profiles.py",
+      ".github/workflows/ci-mutation.yml",
+      ".github/workflows/p06-extended-mutation.yml",
+      "engineering/MUTATION_PROFILE_CONTROL.md",
+      "engineering/MUTATION_RUNNER.md"
+    ],
+    "forbidden_paths": [
+      ".github/workflows/code-quality.yml",
+      ".github/workflows/lot44-*.yml",
+      ".github/workflows/lot45-*.yml",
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "institutional mutation deduplication",
+      "Lot44 protected workflow mutation",
+      "Lot45 profile adoption",
+      "Lot45 candidate remediation",
+      "Lot45 merge",
+      "P0.6 mutation score test target or threshold weakening",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "WU11 parity evidence status remains PASS and binds successful generic execution at af93cac4387b93865080a732c88ab8fd6eebeea0",
+      "generic ci-mutation gains pull_request main and push main P0.6 automatic coverage before legacy workflow retirement",
+      "generic trigger path surface contains every original P0.6 selector with legacy workflow path replaced by ci-mutation.yml",
+      "engineering branch mutation-maintenance trigger remains available during ENG-09.3",
+      "legacy p06-extended-mutation.yml is deleted only after generic trigger migration is present in the same commit",
+      "P0.6 registry lifecycle becomes GENERIC_CONTROL_ACTIVE_AFTER_WU12 and retains retired legacy workflow blob as provenance only",
+      "validator requires legacy workflow absence and validates the generic trigger surface after migration",
+      "P0.6 mutation source target tests also-copy settings score formula threshold and source binding remain unchanged",
+      "code-quality.yml and Lot45 mutation workflow remain unchanged",
+      "business development remains PAUSED and Lot46 remains LOCKED"
+    ],
+    "acceptance_criteria": [
+      "ci-mutation pull_request main paths cover P0.6 source tests requirements pyproject and ci-mutation workflow",
+      "ci-mutation push includes main and engineering/bootstrap-development-engine and the same P0.6 trigger paths plus mutation-engine maintenance paths",
+      "workflow_dispatch remains available with P06_DECISION_EVIDENCE as the only WU12 profile option",
+      "p06-extended-mutation.yml is absent from HEAD after migration",
+      "validate_mutation_profiles.py and selftest_mutation_profiles.py pass in migrated lifecycle",
+      "generic runner selftest and validate-only remain green",
+      "Security Actions Security Supply Chain Security Secrets and Engineering Bootstrap pass on migration head",
+      "CI Mutation Profiles executes successfully on the migration head",
+      "code-quality embedded mutation and Lot45 mutation assurance are byte-identical to scope base"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 2,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 13,
+      "executable_loc_changed": 350,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 0,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_mutation_profiles.py",
+      "python scripts/governance/selftest_mutation_profiles.py",
+      "python scripts/governance/selftest_mutation_runner.py",
+      "python scripts/governance/run_mutation_profile.py --profile P06_DECISION_EVIDENCE --validate-only",
+      "GitHub Actions CI Mutation Profiles",
+      "GitHub Actions Security Actions",
+      "GitHub Actions Security Supply Chain"
+    ]
+  },
+  "done_when": [
+    "P0.6 automatic triggers are owned only by the generic mutation workflow",
+    "legacy P0.6 workflow is retired",
+    "P0.6 profile semantics remain parity-equivalent except for lifecycle and self-workflow selector migration",
+    "institutional and Lot45 mutation assurance remain untouched"
+  ]
+}
