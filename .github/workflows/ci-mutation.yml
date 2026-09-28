@@ -1,4 +1,4 @@
-# ENG-09.3-WU12 qualification anchor: P0.6 automatic mutation ownership is migrated to this generic control.
+# ENG-09.3-WU12 qualification anchor: P0.6 automatic mutation ownership is assigned to this generic control.
 name: CI Mutation Profiles
 
 on:
