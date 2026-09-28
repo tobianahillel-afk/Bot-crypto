@@ -84,11 +84,11 @@
   ],
   "validation_evidence": [
     {
-      "class": "ENGINEERING_EVIDENCE",
+      "class": "GITHUB_ACTIONS",
       "status": "PASS",
-      "ref": "engineering/ENG09_WU12_P06_MIGRATION_EVIDENCE.json",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36412035185",
       "head_sha": "984154bd62ce38d36f3d10a415e74b49d92e9f6b",
-      "scope": "ENG-09.3-WU12_COMPLETION_AND_WU13_SCOPE_BASE"
+      "scope": "ENG-09.3-WU12_EVIDENCE_COMMIT_AND_WU13_SCOPE_BASE_SECURITY"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"
