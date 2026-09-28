@@ -11,6 +11,8 @@ on:
       - "scripts/governance/select_mutation_candidate_profile.py"
       - "scripts/governance/selftest_mutation_candidate_profiles.py"
       - "engineering/work_units/ENG-09.3-WU13.json"
+      - "engineering/CONTEXT_MAP.json"
+      - "engineering/CONTEXT_MAP.md"
       - ".github/workflows/eng09-wu13-candidate-profile-qualification.yml"
   workflow_dispatch:
 
