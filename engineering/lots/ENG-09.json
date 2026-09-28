@@ -45,12 +45,12 @@
     },
     {
       "id": "ENG-09.4",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Certify Development Engine V1 with exact-head SAFE, FAST, zero-cost and security evidence."
     },
     {
       "id": "ENG-09.5",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Freeze V1 bootstrap interfaces and permanent agent entry points."
     },
     {

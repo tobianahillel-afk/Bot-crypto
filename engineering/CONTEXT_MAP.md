@@ -12,41 +12,43 @@
 
 - Track: ENGINEERING
 - Work item: ENG-09
-- Task: ENG-09.4
-- AWU: ENG-09.4-WU03
+- Task: ENG-09.5
+- AWU: ENG-09.5-WU01
 - Risk: R2
 - Manifest: engineering/lots/ENG-09.json
-- AWU file: engineering/work_units/ENG-09.4-WU03.json
+- AWU file: engineering/work_units/ENG-09.5-WU01.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-09.json
-- engineering/work_units/ENG-09.4-WU03.json
-- engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_CANDIDATE.json
-- config/governance/development_engine_v1_certification_policy_v1.json
-- scripts/governance/qualify_development_engine_v1_exact_head.py
-- config/governance/certification_exact_head_binding_v1.json
-- engineering/work_units/ENG-09.4-WU02.json
+- engineering/work_units/ENG-09.5-WU01.json
+- engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json
+- engineering/AGENT_PROTOCOL.md
+- engineering/AGENT_CAPABILITIES.json
+- config/governance/context_map_policy_v1.json
+- config/governance/generated_status_policy_v1.json
+- scripts/governance/resolve_active_awu.py
+- scripts/governance/verify_external_git_state.py
+- scripts/governance/render_context_map.py
 
 ## Execution context — reference
 
 - engineering/MASTER_PLAN.md
-- engineering/AGENT_PROTOCOL.md
 
 ## Budget
 
-- Primary: 9 / 12 files
-- Reference: 2 / 16 files
-- Routed size: 58 / 1024 KiB
+- Primary: 12 / 12 files
+- Reference: 1 / 16 files
+- Routed size: 83 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: Persist the successful exact-head Development Engine V1 certification evidence from WU02 and retire the temporary qualification workflow, while preserving the external business-unlock blocker.
-- Next action: Capture WU02 qualification material and exact run conclusions into DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json, remove the temporary WU02 workflow, then require permanent cleanup-head controls to pass.
+- Objective: Freeze the certified Development Engine V1 bootstrap interfaces and permanent agent entry points without freezing dynamic state values or changing business/runtime authority.
+- Next action: Define the machine-readable V1 interface freeze policy plus fail-closed validator/selftests for stable authority paths, JSON identities and CLI contracts.
 
 ## Non-authoritative sources
 

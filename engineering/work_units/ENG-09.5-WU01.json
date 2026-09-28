@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-09.5-WU01",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-09",
+    "task_id": "ENG-09.5",
+    "manifest": "engineering/lots/ENG-09.json"
+  },
+  "title": "Freeze Development Engine V1 bootstrap interface contract",
+  "objective": "Define and machine-enforce the stable Development Engine V1 bootstrap surface: authority order, permanent paths, schema/kind identities and CLI contracts, without byte-freezing dynamic state or granting business/runtime authority.",
+  "non_goals": [
+    "freeze dynamic project_state handoff or context-map values byte-for-byte",
+    "rename or replace the certified V1 entrypoints",
+    "change canonical project-state or AWU schemas",
+    "change certification semantics",
+    "unlock business development or Lot46",
+    "modify or merge Lot45",
+    "activate runtime execution leverage or withdrawals",
+    "introduce paid services or mandatory LLM review"
+  ],
+  "depends_on": [
+    "ENG-09.4-WU03"
+  ],
+  "inputs": [
+    {
+      "name": "Development Engine V1 certification evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json"
+    },
+    {
+      "name": "Permanent agent operating protocol",
+      "kind": "FILE",
+      "locator": "engineering/AGENT_PROTOCOL.md"
+    },
+    {
+      "name": "Agent capability policy",
+      "kind": "CONFIG",
+      "locator": "engineering/AGENT_CAPABILITIES.json"
+    },
+    {
+      "name": "Context map policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/context_map_policy_v1.json"
+    },
+    {
+      "name": "Generated current-status policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/generated_status_policy_v1.json"
+    },
+    {
+      "name": "Active AWU resolver",
+      "kind": "FILE",
+      "locator": "scripts/governance/resolve_active_awu.py"
+    },
+    {
+      "name": "External Git verifier",
+      "kind": "FILE",
+      "locator": "scripts/governance/verify_external_git_state.py"
+    },
+    {
+      "name": "Context map renderer",
+      "kind": "FILE",
+      "locator": "scripts/governance/render_context_map.py"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Development Engine V1 interface freeze policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/development_engine_v1_interface_freeze_v1.json"
+    },
+    {
+      "name": "V1 interface freeze validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_development_engine_v1_interface_freeze.py"
+    },
+    {
+      "name": "V1 interface freeze adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_development_engine_v1_interface_freeze.py"
+    },
+    {
+      "name": "V1 interface freeze documentation",
+      "kind": "FILE",
+      "locator": "engineering/DEVELOPMENT_ENGINE_V1_INTERFACE_FREEZE.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "e322f25012c875fb3ddbe1b814019adbe28e5123",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-09.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/CURRENT_STATUS.md",
+      "README.md",
+      "AGENTS.md",
+      "engineering/work_units/ENG-09.4-WU03.json",
+      "engineering/work_units/ENG-09.5-WU01.json",
+      "config/governance/development_engine_v1_interface_freeze_v1.json",
+      "scripts/governance/validate_development_engine_v1_interface_freeze.py",
+      "scripts/governance/selftest_development_engine_v1_interface_freeze.py",
+      "engineering/DEVELOPMENT_ENGINE_V1_INTERFACE_FREEZE.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/**",
+      "config/governance/mutation_profiles_v1.json",
+      "config/governance/mutation_candidate_profiles_v1.json",
+      "scripts/governance/run_mutation_profile.py"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "dynamic-state byte freeze",
+      "business development unlock",
+      "BOOT-FINDING-001 suppression",
+      "Lot45 mutation remediation merge or adoption",
+      "Lot46 unlock",
+      "certification policy weakening",
+      "runtime capability activation",
+      "permission-to-trade activation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "Development Engine V1 certification evidence remains immutable and its candidate input and bundle identities remain unchanged",
+      "AGENTS.md remains the first human agent entrypoint and config/governance/project_state.json remains the sole mutable current-authorization source",
+      "engineering/CONTEXT_MAP.json remains generated bounded routing and never overrides canonical state",
+      "engineering/handoff/CURRENT.json remains a non-authoritative resume hint",
+      "active AWU resolution remains scripts/governance/resolve_active_awu.py and fails closed on ambiguity",
+      "live Git verification remains scripts/governance/verify_external_git_state.py --mode github before writes",
+      "V1 freezes path schema/kind and CLI compatibility contracts but does not freeze dynamic state values or generated status bytes",
+      "incompatible V1 interface changes require an explicit later interface version rather than silent mutation",
+      "BOOT-FINDING-001 remains observed and business development remains paused"
+    ],
+    "acceptance_criteria": [
+      "machine-readable freeze policy enumerates the V1 authority order permanent paths JSON identities and CLI commands",
+      "validator proves each frozen path exists and each JSON interface has its required schema/kind identity",
+      "validator proves AGENTS bootstrap order and authority statements still point to canonical state context map and active AWU resolver",
+      "validator proves certified V1 evidence verdict candidate identity input identity and bundle identity remain exact",
+      "selftests reject path drift authority inversion schema/kind drift command drift and attempted dynamic byte-freeze semantics",
+      "no business candidate runtime or historical evidence is mutated"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 5,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 1,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 15,
+      "executable_loc_changed": 700,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_development_engine_v1_interface_freeze.py",
+      "python scripts/governance/selftest_development_engine_v1_interface_freeze.py"
+    ]
+  },
+  "done_when": [
+    "V1 bootstrap authority/path/schema/CLI surface is machine-readable and fail-closed",
+    "dynamic state remains evolvable without invalidating V1 compatibility",
+    "fresh agents retain the same three-file bootstrap and single-AWU execution route",
+    "business development remains paused Lot46 locked and BOOT-FINDING-001 visible"
+  ]
+}
