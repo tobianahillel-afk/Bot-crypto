@@ -29,8 +29,8 @@
 - config/governance/mutation_profiles_v1.json
 - scripts/governance/validate_mutation_profiles.py
 - .github/workflows/ci-mutation.yml
-
 - scripts/governance/run_mutation_profile.py
+
 ## Execution context — reference
 
 - engineering/MASTER_PLAN.md
