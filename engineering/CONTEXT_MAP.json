@@ -1,14 +1,7 @@
 {
-  "active_work": {
-    "awu_id": "ENG-09.6-WU03",
-    "awu_path": "engineering/work_units/ENG-09.6-WU03A.json",
-    "complexity_score": 6,
-    "lot": "ENG-09",
-    "manifest": "engineering/lots/ENG-09.json",
-    "risk_class": "R2",
-    "task": "ENG-09.6",
-    "track": "ENGINEERING"
-  },
+  "schema_version": 1,
+  "map_kind": "active_agent_context_map_v1",
+  "project": "Crypto Quant Bot V3.1-Ops",
   "authority": {
     "current_state": "config/governance/project_state.json",
     "resume_hint": "engineering/handoff/CURRENT.json",
@@ -19,68 +12,76 @@
     "config/governance/project_state.json",
     "engineering/CONTEXT_MAP.json"
   ],
-  "business_hold": {
-    "candidate_lot": 45,
-    "candidate_status": "SUSPENDED_CANDIDATE",
-    "development_status": "PAUSED",
-    "next_lot": {
-      "lot": 46,
-      "status": "LOCKED"
-    }
+  "active_work": {
+    "track": "ENGINEERING",
+    "lot": "ENG-09",
+    "task": "ENG-09.6",
+    "awu_id": "ENG-09.6-WU04",
+    "awu_path": "engineering/work_units/ENG-09.6-WU04.json",
+    "risk_class": "R2",
+    "complexity_score": 7,
+    "manifest": "engineering/lots/ENG-09.json"
   },
   "execution_context": {
+    "primary_files": [
+      "AGENTS.md",
+      "config/governance/project_state.json",
+      "engineering/lots/ENG-09.json",
+      "engineering/work_units/ENG-09.6-WU04.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY.json",
+      "config/governance/active_work_routing_policy_v1.json",
+      "engineering/LOT45_ENGINE_PILOT_EVIDENCE.json"
+    ],
+    "reference_files": [
+      "engineering/MASTER_PLAN.md",
+      "engineering/AGENT_PROTOCOL.md"
+    ],
+    "primary_count": 7,
+    "reference_count": 2,
+    "total_kib_ceil": 52,
     "budget": {
       "max_primary_files": 12,
       "max_reference_files": 16,
       "max_total_kib": 1024
     },
-    "implicit_expansion": "FORBIDDEN",
-    "primary_count": 7,
-    "primary_files": [
-      "AGENTS.md",
-      "config/governance/project_state.json",
-      "engineering/lots/ENG-09.json",
-      "engineering/work_units/ENG-09.6-WU03A.json",
-      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY.json",
-      "config/governance/development_engine_v1_interface_freeze_v1.json",
-      "engineering/AGENT_PROTOCOL.md"
-    ],
-    "reference_count": 1,
-    "reference_files": [
-      "engineering/MASTER_PLAN.md"
-    ],
-    "total_kib_ceil": 42
+    "implicit_expansion": "FORBIDDEN"
   },
-  "instructions": [
-    "verify external Git reality before writing",
-    "continue only the active AWU",
-    "do not recursively load the repository at startup",
-    "load additional files only when the active AWU or validated dependency requires them"
-  ],
-  "map_kind": "active_agent_context_map_v1",
-  "non_authoritative_sources": [
-    "engineering/STATE.json",
-    "chat_history",
-    "model_memory"
-  ],
-  "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "Prepare terminal Development Engine cold-start routing so ordinary continue can safely route to BUSINESS after a later explicit activation transition.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Extend the existing V1 resolver and context-map path with backward-compatible BUSINESS routing semantics while keeping project_state PAUSED during WU03A."
+    "current_objective": "Stage the atomic terminal ENGINEERING-to-BUSINESS activation route without changing canonical business authority.",
+    "next_action": "Expand ENG-09 scope for exact business staging files, create a read-only Lot45 requalification manifest/AWU plus activation policy/tests, and leave BUSINESS PAUSED until a direct explicit BUSINESS_DEVELOPMENT_UNLOCK instruction."
+  },
+  "business_hold": {
+    "development_status": "PAUSED",
+    "candidate_lot": 45,
+    "candidate_status": "SUSPENDED_CANDIDATE",
+    "next_lot": {
+      "lot": 46,
+      "status": "LOCKED"
+    }
   },
   "safety": {
-    "execution_allowed": false,
-    "live_execution": "DISABLED",
     "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
-    "trade_allowed": false
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED"
   },
-  "schema_version": 1,
   "stop_conditions": [
     "STATE_DRIFT",
     "BUSINESS_SCOPE_TOUCHED_WITHOUT_UNLOCK",
     "FROZEN_EVIDENCE_MUTATION",
     "LOT46_UNLOCK_ATTEMPT",
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
+  ],
+  "non_authoritative_sources": [
+    "engineering/STATE.json",
+    "chat_history",
+    "model_memory"
+  ],
+  "instructions": [
+    "verify external Git reality before writing",
+    "continue only the active AWU",
+    "do not recursively load the repository at startup",
+    "load additional files only when the active AWU or validated dependency requires them"
   ]
 }

@@ -1,11 +1,11 @@
 {
   "active_checkpoint": {
-    "awu_id": "ENG-09.6-WU03",
-    "awu_path": "engineering/work_units/ENG-09.6-WU03A.json",
-    "complexity_score": 6,
+    "awu_id": "ENG-09.6-WU04",
+    "awu_path": "engineering/work_units/ENG-09.6-WU04.json",
+    "complexity_score": 7,
     "parent_manifest": "engineering/lots/ENG-09.json",
     "risk_class": "R2",
-    "scope_base_sha": "1ca40ec71e004dd27c9f44c72069ea897c8322c7",
+    "scope_base_sha": "86da75900304e364bc8f11a0cd3b472fe4606a2f",
     "track": "ENGINEERING"
   },
   "authority": {
@@ -13,10 +13,8 @@
     "handoff_role": "RESUME_HINT_NOT_AUTHORITY",
     "state_source": "config/governance/project_state.json"
   },
-  "blockers": [
-    "BOOT-FINDING-001"
-  ],
-  "current_objective": "Prepare terminal Development Engine cold-start routing so ordinary continue can safely route to BUSINESS after a later explicit activation transition.",
+  "blockers": [],
+  "current_objective": "Stage the atomic terminal ENGINEERING-to-BUSINESS activation route without changing canonical business authority.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -29,7 +27,7 @@
     "rulesets_count": 0
   },
   "kind": "engineering_handoff",
-  "next_action": "Extend the existing V1 resolver and context-map path with backward-compatible BUSINESS routing semantics while keeping project_state PAUSED during WU03A.",
+  "next_action": "Expand ENG-09 scope for exact business staging files, create a read-only Lot45 requalification manifest/AWU plus activation policy/tests, and leave BUSINESS PAUSED until a direct explicit BUSINESS_DEVELOPMENT_UNLOCK instruction.",
   "next_engineering": {
     "active_lot": "ENG-09",
     "active_manifest": "engineering/lots/ENG-09.json",
@@ -43,7 +41,8 @@
     "ENG-09.6-WU01 persisted the fail-closed BLOCKED_NO_UNLOCK checkpoint for the pre-remediation disabled/incomplete Protect ruleset.",
     "ENG-09.6-WU01 terminal blocked-decision path passed Bootstrap 36557277756 and Secrets 36557277759 on aaf1606b53446d7b3d49324049c60237942217ac.",
     "Post-remediation observation on 2026-09-29: ruleset Protect is active on main with PR enforcement and required checks Gitleaks pinned CLI, CodeQL Python security-extended, and quality; no business/runtime authority has been activated.",
-    "ENG-09.6-WU02 proved post-remediation BUSINESS_DEVELOPMENT_UNLOCK eligibility on live protected main; the user subsequently supplied the required explicit human authorization, but authority remains unchanged until terminal routing/state compatibility is qualified."
+    "ENG-09.6-WU02 proved post-remediation BUSINESS_DEVELOPMENT_UNLOCK eligibility on live protected main; the user subsequently supplied the required explicit human authorization, but authority remains unchanged until terminal routing/state compatibility is qualified.",
+    "ENG-09.6-WU03 qualified backward-compatible terminal BUSINESS cold-start routing on exact head 86da75900304e364bc8f11a0cd3b472fe4606a2f; Engineering Bootstrap 36607903196 and Security Secrets 36607903198 passed."
   ],
   "resume_read_order": [
     "AGENTS.md",
@@ -76,7 +75,7 @@
     "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
     "trade_allowed": false
   },
-  "status": "BLOCKED",
+  "status": "IN_PROGRESS",
   "stop_conditions": [
     "STATE_DRIFT",
     "BUSINESS_SCOPE_TOUCHED_WITHOUT_UNLOCK",

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "agent_work_unit",
   "id": "ENG-09.6-WU03",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "parent": {
     "work_item_id": "ENG-09",
     "task_id": "ENG-09.6",
@@ -173,6 +173,6 @@
     "ordinary continue routing is deterministic for both BUILDING engineering and future ACTIVE business states",
     "existing V1 entrypoint paths stay stable",
     "current PAUSED authority remains unchanged",
-    "successor WU03B can terminalize the state machine without creating a cold-start dead end"
+    "successor WU04 can terminalize the state machine without creating a cold-start dead end"
   ]
 }
