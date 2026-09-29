@@ -37,8 +37,28 @@ def validate() -> None:
         raise ProjectStateError("permanent state project identity disagrees with baseline")
 
     business = state.get("business_track")
-    if business != baseline.get("business"):
-        raise ProjectStateError("BUSINESS track must match certified ENG-00 baseline")
+    baseline_business = baseline.get("business")
+    if not isinstance(business, dict) or not isinstance(baseline_business, dict):
+        raise ProjectStateError("BUSINESS track missing")
+    mode = business.get("development_status")
+    if mode == "PAUSED":
+        if business != baseline_business:
+            raise ProjectStateError("PAUSED BUSINESS track must match certified ENG-00 baseline")
+    elif mode == "ACTIVE":
+        for key in ("merged_certified_baseline", "merged_entry_gate", "next_lot"):
+            if business.get(key) != baseline_business.get(key):
+                raise ProjectStateError(f"ACTIVE BUSINESS immutable baseline drift: {key}")
+        candidate = business.get("candidate")
+        baseline_candidate = baseline_business.get("candidate")
+        if not isinstance(candidate, dict) or not isinstance(baseline_candidate, dict):
+            raise ProjectStateError("ACTIVE BUSINESS candidate missing")
+        for key in ("lot", "pr", "branch", "observed_head", "state", "merged"):
+            if candidate.get(key) != baseline_candidate.get(key):
+                raise ProjectStateError(f"ACTIVE BUSINESS candidate identity drift: {key}")
+        if candidate.get("status") != "ACTIVE_CANDIDATE":
+            raise ProjectStateError("ACTIVE BUSINESS requires ACTIVE_CANDIDATE")
+    else:
+        raise ProjectStateError(f"unsupported BUSINESS lifecycle mode: {mode!r}")
 
     engineering = state.get("engineering_track")
     bridge_engine = bridge.get("engineering_engine")
@@ -83,10 +103,20 @@ def validate() -> None:
 
     observations = state.get("external_observations", {})
     baseline_obs = baseline.get("external_git_observations", {})
-    if observations.get("main") != baseline_obs.get("main"):
-        raise ProjectStateError("main Git observation disagrees with baseline")
-    if observations.get("rulesets_count") != baseline_obs.get("rulesets_count"):
-        raise ProjectStateError("rulesets observation disagrees with baseline")
+    main_obs = observations.get("main")
+    baseline_main = baseline_obs.get("main")
+    if not isinstance(main_obs, dict) or not isinstance(baseline_main, dict):
+        raise ProjectStateError("main Git observation missing")
+    if main_obs.get("sha") != baseline_main.get("sha"):
+        raise ProjectStateError("main SHA disagrees with certified baseline")
+    if mode == "PAUSED":
+        if main_obs != baseline_main or observations.get("rulesets_count") != baseline_obs.get("rulesets_count"):
+            raise ProjectStateError("PAUSED Git observations disagree with baseline")
+    else:
+        if main_obs.get("branch_protected") is not True:
+            raise ProjectStateError("ACTIVE BUSINESS requires protected main")
+        if not isinstance(observations.get("rulesets_count"), int) or observations["rulesets_count"] < 1:
+            raise ProjectStateError("ACTIVE BUSINESS requires at least one active ruleset observation")
     candidate_obs = observations.get("business_candidate", {})
     baseline_candidate_obs = baseline_obs.get("lot45_candidate", {})
     if candidate_obs != baseline_candidate_obs:
@@ -105,8 +135,12 @@ def validate() -> None:
     if freshness.get("mismatch_consequence") != "STATE_DRIFT":
         raise ProjectStateError("external mismatch consequence must be STATE_DRIFT")
 
-    if business.get("development_status") != "PAUSED":
-        raise ProjectStateError("business development must remain PAUSED")
+    if mode == "ACTIVE":
+        if engineering.get("phase") not in {"STABLE", "COMPLETE"}:
+            raise ProjectStateError("ACTIVE BUSINESS requires terminal ENGINEERING")
+        for key in ("active_lot", "active_task", "next_lot", "active_manifest"):
+            if engineering.get(key) is not None:
+                raise ProjectStateError(f"terminal ENGINEERING requires {key}=null")
     if business.get("next_lot") != {"lot": 46, "status": "LOCKED"}:
         raise ProjectStateError("Lot46 must remain locked")
     candidate = business.get("candidate", {})
