@@ -1,10 +1,10 @@
 {
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-09.6-WU02",
-    "awu_path": "engineering/work_units/ENG-09.6-WU02.json",
+    "awu_id": "ENG-09.6-WU03A",
+    "awu_path": "engineering/work_units/ENG-09.6-WU03A.json",
     "parent_manifest": "engineering/lots/ENG-09.json",
-    "scope_base_sha": "7dd1cf451990ab18662621037f775349a555666b",
+    "scope_base_sha": "1ca40ec71e004dd27c9f44c72069ea897c8322c7",
     "risk_class": "R2",
     "complexity_score": 6
   },
@@ -13,10 +13,8 @@
     "handoff_role": "RESUME_HINT_NOT_AUTHORITY",
     "state_source": "config/governance/project_state.json"
   },
-  "blockers": [
-    "BOOT-FINDING-001"
-  ],
-  "current_objective": "Re-evaluate business-development unlock eligibility against the manually remediated live ruleset without activating business/runtime authority.",
+  "blockers": [],
+  "current_objective": "Prepare terminal Development Engine cold-start routing so ordinary continue can safely route to BUSINESS after a later explicit activation transition.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -29,7 +27,7 @@
     "lot45_merged": false
   },
   "kind": "engineering_handoff",
-  "next_action": "Validate exact live protection and PR #66 against BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY; if eligible, preserve PAUSED/LOCKED authority and require a separate explicit human unlock transition.",
+  "next_action": "Extend the existing V1 resolver and context-map path with backward-compatible BUSINESS routing semantics while keeping project_state PAUSED during WU03A.",
   "next_engineering": {
     "active_lot": "ENG-09",
     "active_task": "ENG-09.6",
@@ -43,7 +41,8 @@
     "ENG-09.5-WU02 integrated the permanent V1 interface validator; Bootstrap 36486573093 and Secrets 36486572922 passed.",
     "ENG-09.6-WU01 persisted the fail-closed BLOCKED_NO_UNLOCK checkpoint for the pre-remediation disabled/incomplete Protect ruleset.",
     "ENG-09.6-WU01 terminal blocked-decision path passed Bootstrap 36557277756 and Secrets 36557277759 on aaf1606b53446d7b3d49324049c60237942217ac.",
-    "Post-remediation observation on 2026-09-29: ruleset Protect is active on main with PR enforcement and required checks Gitleaks pinned CLI, CodeQL Python security-extended, and quality; no business/runtime authority has been activated."
+    "Post-remediation observation on 2026-09-29: ruleset Protect is active on main with PR enforcement and required checks Gitleaks pinned CLI, CodeQL Python security-extended, and quality; no business/runtime authority has been activated.",
+    "ENG-09.6-WU02 proved post-remediation BUSINESS_DEVELOPMENT_UNLOCK eligibility on live protected main; the user subsequently supplied the required explicit human authorization, but authority remains unchanged until terminal routing/state compatibility is qualified."
   ],
   "resume_read_order": [
     "AGENTS.md",
@@ -76,7 +75,7 @@
       "BOOT-FINDING-001"
     ]
   },
-  "status": "BLOCKED",
+  "status": "IN_PROGRESS",
   "stop_conditions": [
     "STATE_DRIFT",
     "BUSINESS_SCOPE_TOUCHED_WITHOUT_UNLOCK",

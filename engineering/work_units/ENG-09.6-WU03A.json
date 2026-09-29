@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-09.6-WU03A",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-09",
+    "task_id": "ENG-09.6",
+    "manifest": "engineering/lots/ENG-09.json"
+  },
+  "title": "Prepare terminal cold-start routing for business development",
+  "objective": "Extend the frozen V1 entrypoint behavior so a context-free ordinary continue can route to BUSINESS after engineering becomes terminal/stable, while preserving the current PAUSED business authority during this preparation AWU.",
+  "non_goals": [
+    "activate business development",
+    "change project_state business authority",
+    "mark ENG-09 done",
+    "modify merge or remediate Lot45 candidate",
+    "unlock or start Lot46",
+    "change runtime trade execution leverage or withdrawal authority",
+    "mutate certified Development Engine V1 evidence or historical evidence",
+    "introduce paid services or mandatory LLM review"
+  ],
+  "depends_on": [
+    "ENG-09.6-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "Unlock eligibility evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY.json"
+    },
+    {
+      "name": "Development Engine V1 interface freeze",
+      "kind": "CONFIG",
+      "locator": "config/governance/development_engine_v1_interface_freeze_v1.json"
+    },
+    {
+      "name": "Agent operating protocol",
+      "kind": "FILE",
+      "locator": "engineering/AGENT_PROTOCOL.md"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Post-engine active-work routing policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/active_work_routing_policy_v1.json"
+    },
+    {
+      "name": "Extended active AWU resolver",
+      "kind": "FILE",
+      "locator": "scripts/governance/resolve_active_awu.py"
+    },
+    {
+      "name": "Extended context-map renderer",
+      "kind": "FILE",
+      "locator": "scripts/governance/render_context_map.py"
+    },
+    {
+      "name": "Terminal business routing selftest",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_terminal_business_routing.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "1ca40ec71e004dd27c9f44c72069ea897c8322c7",
+    "allowed_paths": [
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-09.6-WU02.json",
+      "engineering/work_units/ENG-09.6-WU03A.json",
+      "engineering/work_units/ENG-09.6-WU03B.json",
+      "config/governance/active_work_routing_policy_v1.json",
+      "scripts/governance/resolve_active_awu.py",
+      "scripts/governance/render_context_map.py",
+      "scripts/governance/selftest_terminal_business_routing.py",
+      "engineering/AGENT_PROTOCOL.md",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_DECISION.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY.json",
+      "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json",
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "business development activation",
+      "Lot45 merge mutation remediation or adoption",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "permission-to-trade activation",
+      "certification evidence mutation",
+      "historical evidence mutation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "while engineering phase is BUILDING ordinary continue still resolves ENGINEERING exactly as V1 currently does",
+      "a future terminal engineering phase with ACTIVE business may route ordinary continue to BUSINESS without changing the stable human entrypoint or resolver path",
+      "BUSINESS routing requires an explicit active business candidate and one compatible IN_PROGRESS business AWU",
+      "AUDIT never becomes the ordinary continue route without explicit audit authorization",
+      "this preparation AWU leaves current canonical business authority PAUSED and Lot45 SUSPENDED_CANDIDATE",
+      "Lot46 remains LOCKED and all trading execution safety remains fail-closed",
+      "no chat history or model memory is accepted as authorization"
+    ],
+    "acceptance_criteria": [
+      "existing ENGINEERING cold-start scenario still passes unchanged",
+      "synthetic terminal-state scenario selects BUSINESS only when engineering is terminal and business is ACTIVE",
+      "synthetic terminal-state scenario rejects ACTIVE business without an active candidate",
+      "synthetic terminal-state scenario rejects zero or multiple business AWUs",
+      "context map can render track BUSINESS using the same frozen path and schema identity",
+      "current live repository still renders ENGINEERING because authority has not yet changed",
+      "Engineering Bootstrap and Security Secrets pass on the exact WU03A integration head"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 6,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 1,
+      "state_machine_or_concurrency": true,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 12,
+      "executable_loc_changed": 720,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 1,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/resolve_active_awu.py",
+      "python scripts/governance/render_context_map.py --check",
+      "python scripts/governance/selftest_terminal_business_routing.py"
+    ]
+  },
+  "done_when": [
+    "ordinary continue routing is deterministic for both BUILDING engineering and future ACTIVE business states",
+    "existing V1 entrypoint paths stay stable",
+    "current PAUSED authority remains unchanged",
+    "successor WU03B can terminalize the state machine without creating a cold-start dead end"
+  ]
+}
