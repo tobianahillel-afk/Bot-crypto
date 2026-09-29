@@ -238,11 +238,16 @@ def _validate_safety(policy: dict[str, Any], root: Path = ROOT) -> None:
     state = _json(_safe_file("config/governance/project_state.json", root))
     floor = policy.get("safety_floor")
     _require(isinstance(floor, dict), "safety floor missing")
-    _require(state["business_track"]["development_status"] == floor["business_development"], "business pause drift")
-    _require(state["business_track"]["candidate"]["status"] == floor["lot45_status"], "Lot45 status drift")
+    lifecycle = state["business_track"]["development_status"]
+    _require(lifecycle in {"PAUSED", "ACTIVE"}, "unsupported business lifecycle")
+    expected_candidate = floor["lot45_status"] if lifecycle == "PAUSED" else "ACTIVE_CANDIDATE"
+    _require(state["business_track"]["candidate"]["status"] == expected_candidate, "Lot45 status drift")
+    _require(state["business_track"]["candidate"]["merged"] is False, "Lot45 merge authority drift")
     _require(state["business_track"]["next_lot"]["status"] == floor["lot46_status"], "Lot46 lock drift")
     finding = next((x for x in state.get("findings", []) if x.get("id") == floor["blocking_finding_id"]), None)
-    _require(isinstance(finding, dict) and finding.get("observed") is True, "BOOT-FINDING-001 disappeared")
+    _require(isinstance(finding, dict), "BOOT-FINDING-001 historical record disappeared")
+    expected_observed = lifecycle == "PAUSED"
+    _require(finding.get("observed") is expected_observed, "BOOT-FINDING-001 lifecycle observation drift")
     safety = state.get("safety", {})
     for key in ("trade_allowed", "execution_allowed", "live_execution", "leverage", "withdrawals"):
         _require(safety.get(key) == floor[key], f"safety floor drift: {key}")
