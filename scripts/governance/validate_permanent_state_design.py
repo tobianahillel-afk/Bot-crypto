@@ -41,8 +41,11 @@ def validate(design: dict[str, Any], state: dict[str, Any]) -> None:
 
     business = tracks["business"]
     current_business = state.get("business_track", {})
-    if business.get("development_status") != current_business.get("business_development"):
-        raise PermanentStateDesignError("business development status mismatch")
+    lifecycle = current_business.get("business_development")
+    if lifecycle not in {"PAUSED", "ACTIVE"}:
+        raise PermanentStateDesignError(f"unsupported business lifecycle: {lifecycle!r}")
+    if business.get("development_status") != "PAUSED":
+        raise PermanentStateDesignError("design must preserve the original PAUSED baseline declaration")
     if business.get("merged_certified_baseline", {}).get("lot") != 44:
         raise PermanentStateDesignError("Lot44 must remain the merged certified baseline")
     if business.get("merged_certified_baseline", {}).get("version") != "0.44.0":
@@ -61,13 +64,15 @@ def validate(design: dict[str, Any], state: dict[str, Any]) -> None:
         "pr": state_candidate.get("pull_request"),
         "branch": state_candidate.get("branch"),
         "observed_head": state_candidate.get("observed_head_sha"),
-        "status": state_candidate.get("status"),
     }
     for key, value in expected_candidate.items():
         if candidate.get(key) != value:
             raise PermanentStateDesignError(f"candidate mismatch for {key}")
     if candidate.get("merged") is not False:
         raise PermanentStateDesignError("candidate must remain explicitly unmerged")
+    expected_status = "SUSPENDED_CANDIDATE" if lifecycle == "PAUSED" else "ACTIVE_CANDIDATE"
+    if state_candidate.get("status") != expected_status:
+        raise PermanentStateDesignError("current candidate status disagrees with lifecycle")
 
     if business.get("next_lot") != {"lot": 46, "status": "LOCKED"}:
         raise PermanentStateDesignError("Lot46 lock missing")
