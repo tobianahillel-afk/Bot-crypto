@@ -1,6 +1,6 @@
 {
   "active_checkpoint": {
-    "awu_id": "ENG-09.6-WU03A",
+    "awu_id": "ENG-09.6-WU03",
     "awu_path": "engineering/work_units/ENG-09.6-WU03A.json",
     "complexity_score": 6,
     "parent_manifest": "engineering/lots/ENG-09.json",
