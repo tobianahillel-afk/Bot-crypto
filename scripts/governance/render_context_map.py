@@ -93,17 +93,84 @@ def validate_policy(policy: dict[str, Any]) -> None:
         raise ContextMapError("bootstrap file budget drift")
 
 
-def _validate_handoff(handoff: dict[str, Any], engineering: dict[str, Any]) -> None:
-    expected = {
-        "active_lot": engineering.get("active_lot"),
-        "active_task": engineering.get("active_task"),
-        "active_manifest": engineering.get("active_manifest"),
-    }
-    if handoff.get("next_engineering") != expected:
-        raise ContextMapError("handoff next_engineering disagrees with canonical state")
+def _validate_handoff(
+    handoff: dict[str, Any], engineering: dict[str, Any], active_track: str
+) -> None:
+    if active_track == "ENGINEERING":
+        expected = {
+            "active_lot": engineering.get("active_lot"),
+            "active_task": engineering.get("active_task"),
+            "active_manifest": engineering.get("active_manifest"),
+        }
+        if handoff.get("next_engineering") != expected:
+            raise ContextMapError("handoff next_engineering disagrees with canonical state")
+    elif active_track == "BUSINESS":
+        terminal = {"active_lot": None, "active_task": None, "active_manifest": None}
+        if handoff.get("next_engineering") != terminal:
+            raise ContextMapError("BUSINESS handoff requires terminal next_engineering")
+    else:
+        raise ContextMapError(f"unsupported active track: {active_track!r}")
     for field in ("current_objective", "next_action"):
         if not isinstance(handoff.get(field), str) or not handoff[field]:
             raise ContextMapError(f"handoff {field} missing")
+
+
+def _active_descriptor(
+    state: dict[str, Any],
+    awu_path: str,
+    awu: dict[str, Any],
+    active_track: str,
+) -> dict[str, Any]:
+    engineering = state.get("engineering_track", {})
+    business = state.get("business_track", {})
+    parent = awu.get("parent")
+    if not isinstance(parent, dict) or awu.get("status") != "IN_PROGRESS":
+        raise ContextMapError("context map requires one IN_PROGRESS AWU")
+
+    if active_track == "ENGINEERING":
+        if engineering.get("phase") != "BUILDING":
+            raise ContextMapError("ENGINEERING route requires BUILDING phase")
+        expected = {
+            "work_item_id": engineering.get("active_lot"),
+            "task_id": engineering.get("active_task"),
+            "manifest": engineering.get("active_manifest"),
+        }
+        if parent != expected:
+            raise ContextMapError("active AWU parent disagrees with canonical ENGINEERING state")
+    elif active_track == "BUSINESS":
+        if engineering.get("phase") not in {"STABLE", "COMPLETE"}:
+            raise ContextMapError("BUSINESS route requires terminal ENGINEERING")
+        if business.get("development_status") != "ACTIVE":
+            raise ContextMapError("BUSINESS route requires ACTIVE canonical authority")
+        candidate = business.get("candidate")
+        if (
+            not isinstance(candidate, dict)
+            or candidate.get("status") != "ACTIVE_CANDIDATE"
+            or candidate.get("state") != "OPEN"
+            or candidate.get("merged") is not False
+        ):
+            raise ContextMapError("BUSINESS route requires active open unmerged candidate")
+        expected = {
+            "work_item_id": f"LOT-{candidate['lot']}",
+            "manifest": state.get("authority", {}).get("active_manifest"),
+        }
+        if parent.get("work_item_id") != expected["work_item_id"]:
+            raise ContextMapError("BUSINESS AWU lot disagrees with active candidate")
+        if parent.get("manifest") != expected["manifest"]:
+            raise ContextMapError("BUSINESS AWU manifest disagrees with canonical authority")
+    else:
+        raise ContextMapError(f"unsupported active track: {active_track!r}")
+
+    return {
+        "track": active_track,
+        "lot": parent["work_item_id"],
+        "task": parent["task_id"],
+        "manifest": parent["manifest"],
+        "awu_id": awu["id"],
+        "awu_path": awu_path,
+        "risk_class": awu["planning"]["risk_class"],
+        "complexity_score": awu["planning"]["complexity_score"],
+    }
 
 
 def build_map(
@@ -114,24 +181,16 @@ def build_map(
     route: dict[str, Any],
     policy: dict[str, Any],
     root: Path = ROOT,
+    active_track: str = "ENGINEERING",
 ) -> dict[str, Any]:
     validate_policy(policy)
     if state.get("project", {}).get("canonical_name") != "Crypto Quant Bot V3.1-Ops":
         raise ContextMapError("canonical identity drift")
     engineering = state.get("engineering_track")
-    if not isinstance(engineering, dict) or engineering.get("phase") != "BUILDING":
-        raise ContextMapError("ENGINEERING track must be BUILDING")
-    _validate_handoff(handoff, engineering)
-
-    expected_parent = {
-        "work_item_id": engineering.get("active_lot"),
-        "task_id": engineering.get("active_task"),
-        "manifest": engineering.get("active_manifest"),
-    }
-    if awu.get("parent") != expected_parent:
-        raise ContextMapError("active AWU parent disagrees with canonical state")
-    if awu.get("status") != "IN_PROGRESS":
-        raise ContextMapError("context map requires one IN_PROGRESS AWU")
+    if not isinstance(engineering, dict):
+        raise ContextMapError("ENGINEERING track missing")
+    _validate_handoff(handoff, engineering, active_track)
+    active = _active_descriptor(state, awu_path, awu, active_track)
 
     primary = route.get("primary_files")
     reference = route.get("reference_files")
@@ -143,7 +202,7 @@ def build_map(
         raise ContextMapError("primary/reference route overlap")
     if primary[:2] != ["AGENTS.md", "config/governance/project_state.json"]:
         raise ContextMapError("primary route authority prefix drift")
-    if engineering["active_manifest"] not in primary or awu_path not in primary:
+    if active["manifest"] not in primary or awu_path not in primary:
         raise ContextMapError("active manifest/AWU missing from primary route")
     if "engineering/STATE.json" in primary + reference:
         raise ContextMapError("migration bridge entered executable context")
@@ -176,16 +235,7 @@ def build_map(
             "resume_hint_is_authoritative": False,
         },
         "bootstrap_read_order": list(policy["bootstrap_read_order"]),
-        "active_work": {
-            "track": "ENGINEERING",
-            "lot": engineering["active_lot"],
-            "task": engineering["active_task"],
-            "manifest": engineering["active_manifest"],
-            "awu_id": awu["id"],
-            "awu_path": awu_path,
-            "risk_class": awu["planning"]["risk_class"],
-            "complexity_score": awu["planning"]["complexity_score"],
-        },
+        "active_work": active,
         "execution_context": {
             "primary_files": primary,
             "reference_files": reference,
@@ -231,7 +281,7 @@ def validate_map(value: dict[str, Any], root: Path = ROOT) -> None:
     ]:
         raise ContextMapError("generated bootstrap order drift")
     active = value.get("active_work")
-    if not isinstance(active, dict) or active.get("track") != "ENGINEERING":
+    if not isinstance(active, dict) or active.get("track") not in {"ENGINEERING", "BUSINESS"}:
         raise ContextMapError("generated active work invalid")
     execution = value.get("execution_context")
     if not isinstance(execution, dict):
@@ -337,6 +387,7 @@ def desired(root: Path = ROOT) -> tuple[dict[str, Any], str]:
         evidence["context_route"],
         policy,
         root,
+        evidence.get("track", "ENGINEERING"),
     )
     validate_map(value, root)
     return value, render_markdown(value)

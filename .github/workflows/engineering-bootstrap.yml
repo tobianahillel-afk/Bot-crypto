@@ -52,6 +52,9 @@ jobs:
       - name: Run business-development unlock eligibility adversarial self-tests
         run: python scripts/governance/selftest_business_development_unlock_eligibility.py
 
+      - name: Run terminal business routing adversarial self-tests
+        run: python scripts/governance/selftest_terminal_business_routing.py
+
       - name: Validate canonical state
         run: python scripts/governance/validate_bootstrap_state.py
 

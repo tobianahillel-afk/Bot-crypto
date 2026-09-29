@@ -26,8 +26,12 @@ Resolve:
 - unresolved findings and stop conditions;
 - recorded external Git observations.
 
-For ordinary development/“continue”, the default work track is ENGINEERING.
-Use AUDIT only for explicitly authorized audit work.
+For ordinary development/“continue”, route from canonical state:
+- if ENGINEERING is `BUILDING`, continue ENGINEERING;
+- if ENGINEERING is terminal (`STABLE` or `COMPLETE`) and BUSINESS is explicitly `ACTIVE`, continue BUSINESS;
+- otherwise fail closed because there is no authorized ordinary-development route.
+
+Use AUDIT only for explicitly authorized audit work; AUDIT is never selected automatically.
 
 `engineering/STATE.json` is a temporary migration bridge and must not override permanent
 state.
@@ -51,9 +55,16 @@ For ENGINEERING:
 - `engineering_track.active_task`;
 - `engineering_track.active_manifest`.
 
+For BUSINESS after terminal ENGINEERING:
+- canonical BUSINESS must be `ACTIVE`;
+- the candidate must be `ACTIVE_CANDIDATE`, open and unmerged;
+- `authority.active_manifest` identifies the bounded business manifest;
+- the manifest must represent `LOT-<candidate lot>` and expose one `IN_PROGRESS` task;
+- exactly one business AWU must be `IN_PROGRESS`.
+
 For AUDIT, use the equivalent active batch/task/manifest only when that track is active.
 
-The manifest must agree with state and the task must be the single `IN_PROGRESS` task. For ENGINEERING, `scripts/governance/resolve_active_awu.py` must then resolve exactly one `IN_PROGRESS` AWU whose parent matches that task. The AWU dependency DAG, split decision, risk class and context route must all validate.
+The manifest must agree with state and the task must be the single `IN_PROGRESS` task. `scripts/governance/resolve_active_awu.py` resolves the ordinary track from canonical state, then validates exactly one matching `IN_PROGRESS` AWU. The AWU dependency DAG, split decision, risk class and context route must all validate.
 
 ## S4 — Load bounded context
 

@@ -14,6 +14,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 STATE_PATH = ROOT / "config" / "governance" / "project_state.json"
 WORK_UNITS_DIR = ROOT / "engineering" / "work_units"
+ROUTING_POLICY_PATH = ROOT / "config" / "governance" / "active_work_routing_policy_v1.json"
 
 
 class ActiveAwuError(ValueError):
@@ -60,6 +61,81 @@ def select_active_awu(
     return active[0]
 
 
+def validate_routing_policy(policy: dict[str, Any]) -> None:
+    if policy.get("schema_version") != 1:
+        raise ActiveAwuError("unsupported active-work routing policy version")
+    if policy.get("policy_kind") != "active_work_routing_policy_v1":
+        raise ActiveAwuError("invalid active-work routing policy kind")
+    if policy.get("semantics") != "ENGINEERING_WHILE_BUILDING_BUSINESS_AFTER_TERMINAL_EXPLICIT_ACTIVATION":
+        raise ActiveAwuError("active-work routing semantics drift")
+    if policy.get("engineering_active_phase") != "BUILDING":
+        raise ActiveAwuError("engineering active phase drift")
+    if policy.get("engineering_terminal_phases") != ["STABLE", "COMPLETE"]:
+        raise ActiveAwuError("engineering terminal phases drift")
+    if policy.get("engineering_work_units_dir") != "engineering/work_units":
+        raise ActiveAwuError("engineering work-unit directory drift")
+    if policy.get("business_work_units_dir") != "business/work_units":
+        raise ActiveAwuError("business work-unit directory drift")
+    if policy.get("business_required_status") != "ACTIVE":
+        raise ActiveAwuError("business activation requirement drift")
+    if policy.get("business_candidate_required_status") != "ACTIVE_CANDIDATE":
+        raise ActiveAwuError("business candidate requirement drift")
+    if policy.get("business_candidate_required_state") != "OPEN":
+        raise ActiveAwuError("business candidate state requirement drift")
+    if policy.get("business_candidate_merged") is not False:
+        raise ActiveAwuError("business candidate must remain unmerged")
+    if policy.get("business_work_item_id_template") != "LOT-{lot}":
+        raise ActiveAwuError("business work-item template drift")
+    if policy.get("business_next_lot_required_status") != "LOCKED":
+        raise ActiveAwuError("next-lot lock requirement drift")
+    if policy.get("audit_automatic_route") is not False:
+        raise ActiveAwuError("AUDIT must never be an automatic route")
+
+
+def resolve_active_track(state: dict[str, Any], policy: dict[str, Any]) -> str:
+    validate_routing_policy(policy)
+    engineering = state.get("engineering_track")
+    business = state.get("business_track")
+    if not isinstance(engineering, dict) or not isinstance(business, dict):
+        raise ActiveAwuError("canonical ENGINEERING/BUSINESS tracks are missing")
+
+    phase = engineering.get("phase")
+    if phase == policy["engineering_active_phase"]:
+        if business.get("development_status") != "PAUSED":
+            raise ActiveAwuError("BUSINESS must remain PAUSED while ENGINEERING is BUILDING")
+        return "ENGINEERING"
+
+    if phase not in set(policy["engineering_terminal_phases"]):
+        raise ActiveAwuError(f"no ordinary route for ENGINEERING phase {phase!r}")
+    if business.get("development_status") != policy["business_required_status"]:
+        raise ActiveAwuError("terminal ENGINEERING requires explicit ACTIVE business authority for ordinary continue")
+
+    candidate = business.get("candidate")
+    if not isinstance(candidate, dict):
+        raise ActiveAwuError("ACTIVE business requires an explicit candidate")
+    if candidate.get("status") != policy["business_candidate_required_status"]:
+        raise ActiveAwuError("ACTIVE business candidate status is invalid")
+    if candidate.get("state") != policy["business_candidate_required_state"]:
+        raise ActiveAwuError("ACTIVE business candidate must remain OPEN")
+    if candidate.get("merged") is not policy["business_candidate_merged"]:
+        raise ActiveAwuError("ACTIVE business candidate must remain unmerged")
+    next_lot = business.get("next_lot")
+    if not isinstance(next_lot, dict) or next_lot.get("status") != policy["business_next_lot_required_status"]:
+        raise ActiveAwuError("next business lot must remain locked during candidate remediation")
+    return "BUSINESS"
+
+
+def _work_units_directory(track: str, policy: dict[str, Any]) -> Path:
+    key = "engineering_work_units_dir" if track == "ENGINEERING" else "business_work_units_dir"
+    value = policy.get(key)
+    if not isinstance(value, str) or not value:
+        raise ActiveAwuError(f"work-unit directory missing for {track}")
+    path = ROOT / value
+    if not path.is_dir():
+        raise ActiveAwuError(f"{track} work-unit directory missing: {value}")
+    return path
+
+
 def _covered_by_parent(child: str, parent_patterns: list[str]) -> bool:
     return any(child == pattern or fnmatch.fnmatchcase(child, pattern) for pattern in parent_patterns)
 
@@ -68,24 +144,43 @@ def validate_parent_binding(
     state: dict[str, Any],
     awu_path: Path,
     awu: dict[str, Any],
+    *,
+    track: str | None = None,
+    routing_policy: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    engineering = state.get("engineering_track")
-    if not isinstance(engineering, dict) or engineering.get("phase") != "BUILDING":
-        raise ActiveAwuError("ENGINEERING track must be BUILDING")
-
+    policy = routing_policy or _load(ROUTING_POLICY_PATH)
+    active_track = track or resolve_active_track(state, policy)
     parent = awu.get("parent")
     if not isinstance(parent, dict):
         raise ActiveAwuError("AWU parent is missing")
-    expected = {
-        "work_item_id": engineering.get("active_lot"),
-        "task_id": engineering.get("active_task"),
-        "manifest": engineering.get("active_manifest"),
-    }
-    for key, value in expected.items():
-        if parent.get(key) != value:
+
+    if active_track == "ENGINEERING":
+        engineering = state.get("engineering_track")
+        if not isinstance(engineering, dict) or engineering.get("phase") != "BUILDING":
+            raise ActiveAwuError("ENGINEERING route requires BUILDING phase")
+        expected = {
+            "work_item_id": engineering.get("active_lot"),
+            "task_id": engineering.get("active_task"),
+            "manifest": engineering.get("active_manifest"),
+        }
+        for key, value in expected.items():
+            if parent.get(key) != value:
+                raise ActiveAwuError(
+                    f"{awu_path}: parent {key} mismatch: {parent.get(key)!r} != {value!r}"
+                )
+    elif active_track == "BUSINESS":
+        candidate = state.get("business_track", {}).get("candidate", {})
+        authority = state.get("authority", {})
+        manifest_path = authority.get("active_manifest")
+        expected_work_item = policy["business_work_item_id_template"].format(lot=candidate.get("lot"))
+        if parent.get("work_item_id") != expected_work_item:
             raise ActiveAwuError(
-                f"{awu_path}: parent {key} mismatch: {parent.get(key)!r} != {value!r}"
+                f"{awu_path}: BUSINESS work_item_id mismatch: {parent.get('work_item_id')!r} != {expected_work_item!r}"
             )
+        if parent.get("manifest") != manifest_path or not isinstance(manifest_path, str):
+            raise ActiveAwuError("BUSINESS parent manifest disagrees with canonical authority")
+    else:
+        raise ActiveAwuError(f"unsupported active track: {active_track!r}")
 
     manifest_path = parent["manifest"]
     manifest = _load(ROOT / manifest_path)
@@ -116,8 +211,15 @@ def validate_full_awu(
     state: dict[str, Any],
     awu_path: Path,
     awu: dict[str, Any],
+    *,
+    track: str | None = None,
+    routing_policy: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    manifest = validate_parent_binding(state, awu_path, awu)
+    policy = routing_policy or _load(ROUTING_POLICY_PATH)
+    active_track = track or resolve_active_track(state, policy)
+    manifest = validate_parent_binding(
+        state, awu_path, awu, track=active_track, routing_policy=policy
+    )
     contract = _module("active_awu_contract", ROOT / "scripts/governance/validate_agent_work_unit.py")
     complexity = _module("active_awu_complexity", ROOT / "scripts/governance/validate_awu_complexity.py")
     split = _module("active_awu_split", ROOT / "scripts/governance/validate_awu_split.py")
@@ -150,13 +252,17 @@ def validate_full_awu(
         raise
     if route is None:
         raise ActiveAwuError("active AWU must have an executable context route")
-    return {"parent_manifest": manifest, "context_route": route}
+    return {"parent_manifest": manifest, "context_route": route, "track": active_track}
 
 
 def resolve_active_awu() -> tuple[Path, dict[str, Any], dict[str, Any]]:
     state = _load(STATE_PATH)
-    path, awu = select_active_awu(load_work_units())
-    evidence = validate_full_awu(state, path, awu)
+    policy = _load(ROUTING_POLICY_PATH)
+    track = resolve_active_track(state, policy)
+    path, awu = select_active_awu(load_work_units(_work_units_directory(track, policy)))
+    evidence = validate_full_awu(
+        state, path, awu, track=track, routing_policy=policy
+    )
     return path, awu, evidence
 
 
@@ -169,7 +275,7 @@ def main() -> int:
     route = evidence["context_route"]
     print(
         "ACTIVE_AWU_RESOLVED "
-        f"id={awu['id']} path={path.relative_to(ROOT)} "
+        f"track={evidence['track']} id={awu['id']} path={path.relative_to(ROOT)} "
         f"task={awu['parent']['task_id']} risk={awu['planning']['risk_class']} "
         f"score={awu['planning']['complexity_score']} "
         f"context=P{route['primary_count']}:R{route['reference_count']}:K{route['total_kib_ceil']}"
