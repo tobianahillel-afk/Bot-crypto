@@ -20,7 +20,7 @@
     "treat eligibility handoff chat history or model memory as sufficient authorization"
   ],
   "depends_on": [
-    "ENG-09.6-WU05B"
+    "ENG-09.6-WU07"
   ],
   "inputs": [
     {
