@@ -122,7 +122,9 @@
       "a later protection-state change invalidates the blocked decision and requires explicit re-evaluation",
       "permanent bootstrap validates the unlock decision and adversarial fail-closed scenarios",
       "decision repository_protection snapshot must match the immutable ENG-00 baseline while live_reverification separately records current GitHub protection reality",
-      "a present or active-but-policy-incomplete ruleset must not be treated as compliant main protection"
+      "a present or active-but-policy-incomplete ruleset must not be treated as compliant main protection",
+      "ENG-09.6 live verification must bind GitHub reality exactly to decision.live_reverification rather than auto-heal or overwrite the immutable ENG-00 baseline",
+      "outside ENG-09.6 the permanent bootstrap keeps the original strict live-versus-canonical external-state verifier"
     ],
     "acceptance_criteria": [
       "ENG-09.5 is DONE and ENG-09.6 is the unique active task",
@@ -133,7 +135,9 @@
       "validator rejects Lot46 OPEN or business ACTIVE while blocker remains",
       "exact-head Engineering Bootstrap and Security Secrets remain green after integration",
       "validator rejects drift between immutable baseline bindings and live_reverification consistency fields",
-      "validator keeps BLOCKED_NO_UNLOCK for the observed disabled ruleset and for an active ruleset whose protection evidence still lacks required PR/status-check enforcement"
+      "validator keeps BLOCKED_NO_UNLOCK for the observed disabled ruleset and for an active ruleset whose protection evidence still lacks required PR/status-check enforcement",
+      "GitHub-live decision verification passes only when main PR #66 and full normalized ruleset semantics exactly match persisted live_reverification",
+      "live changes to ruleset enforcement rules parameters bypass actors main or candidate fail closed and require explicit re-evaluation"
     ]
   },
   "planning": {
@@ -180,7 +184,8 @@
     ],
     "target_commands": [
       "python scripts/governance/validate_business_development_unlock_decision.py",
-      "python scripts/governance/selftest_business_development_unlock_decision.py"
+      "python scripts/governance/selftest_business_development_unlock_decision.py",
+      "python scripts/governance/validate_business_development_unlock_decision.py --mode github"
     ]
   },
   "done_when": [

@@ -121,7 +121,71 @@ def main() -> int:
     no_blocker["engineering_track"]["blockers"] = []
     _expect(mod.BusinessUnlockDecisionError, lambda: mod.validate(decision, no_blocker, policy, protection, security, cert), "engineering blocker removed")
 
-    print("BUSINESS_UNLOCK_DECISION_SELFTEST_PASS probes=11")
+    live = decision["live_reverification"]
+    observed = {
+        "main_sha": live["main_sha"],
+        "main_branch_protected": live["main_branch_protected"],
+        "lot45_pr": state["external_observations"]["business_candidate"]["pr"],
+        "lot45_head_sha": state["external_observations"]["business_candidate"]["head"],
+        "lot45_base_sha": state["external_observations"]["business_candidate"]["base"],
+        "lot45_state": state["external_observations"]["business_candidate"]["state"],
+        "lot45_merged": state["external_observations"]["business_candidate"]["merged"],
+        "live_rulesets_count": live["live_rulesets_count"],
+        "active_rulesets_count": live["active_rulesets_count"],
+        "observed_ruleset": copy.deepcopy(live["observed_ruleset"]),
+    }
+    mod.validate_live_reverification(decision, state, observed)
+
+    changed_ruleset = copy.deepcopy(observed)
+    changed_ruleset["observed_ruleset"]["enforcement"] = "active"
+    _expect(
+        mod.BusinessUnlockDecisionError,
+        lambda: mod.validate_live_reverification(decision, state, changed_ruleset),
+        "live ruleset enforcement drift",
+    )
+
+    bypass_added = copy.deepcopy(observed)
+    bypass_added["observed_ruleset"]["bypass_actors"] = [{"actor_id": 1}]
+    _expect(
+        mod.BusinessUnlockDecisionError,
+        lambda: mod.validate_live_reverification(decision, state, bypass_added),
+        "live ruleset bypass drift",
+    )
+
+    rule_added = copy.deepcopy(observed)
+    rule_added["observed_ruleset"]["rules"].append({"type": "pull_request"})
+    _expect(
+        mod.BusinessUnlockDecisionError,
+        lambda: mod.validate_live_reverification(decision, state, rule_added),
+        "live ruleset rule drift",
+    )
+
+    main_changed = copy.deepcopy(observed)
+    main_changed["main_sha"] = "0" * 40
+    _expect(
+        mod.BusinessUnlockDecisionError,
+        lambda: mod.validate_live_reverification(decision, state, main_changed),
+        "live main drift",
+    )
+
+    candidate_changed = copy.deepcopy(observed)
+    candidate_changed["lot45_head_sha"] = "1" * 40
+    _expect(
+        mod.BusinessUnlockDecisionError,
+        lambda: mod.validate_live_reverification(decision, state, candidate_changed),
+        "live candidate drift",
+    )
+
+    extra_ruleset = copy.deepcopy(observed)
+    extra_ruleset["live_rulesets_count"] = 2
+    extra_ruleset["observed_ruleset"] = None
+    _expect(
+        mod.BusinessUnlockDecisionError,
+        lambda: mod.validate_live_reverification(decision, state, extra_ruleset),
+        "live ruleset count drift",
+    )
+
+    print("BUSINESS_UNLOCK_DECISION_SELFTEST_PASS probes=17")
     return 0
 
 

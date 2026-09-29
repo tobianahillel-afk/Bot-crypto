@@ -69,9 +69,15 @@
         }
       },
       "rules": [
-        "deletion",
-        "non_fast_forward"
-      ]
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        }
+      ],
+      "bypass_actors": [],
+      "current_user_can_bypass": "never"
     },
     "conclusion": "BLOCKER_STILL_OBSERVED_DISABLED_INCOMPLETE_RULESET",
     "baseline_rulesets_count": 0,

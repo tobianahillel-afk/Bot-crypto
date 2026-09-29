@@ -132,7 +132,15 @@ jobs:
       - name: Verify live external Git state
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: python scripts/governance/verify_external_git_state.py --mode github
+        shell: bash
+        run: |
+          set -euo pipefail
+          active_task="$(python -c 'import json; print(json.load(open("config/governance/project_state.json", encoding="utf-8"))["engineering_track"]["active_task"] or "")')"
+          if [ "${active_task}" = "ENG-09.6" ]; then
+            python scripts/governance/validate_business_development_unlock_decision.py --mode github
+          else
+            python scripts/governance/verify_external_git_state.py --mode github
+          fi
 
       - name: Run negative validator self-tests
         run: python scripts/governance/selftest_bootstrap_validators.py
