@@ -13,17 +13,17 @@
 - Track: ENGINEERING
 - Work item: ENG-09
 - Task: ENG-09.6
-- AWU: ENG-09.6-WU05A
+- AWU: ENG-09.6-WU06
 - Risk: R2
 - Manifest: engineering/lots/ENG-09.json
-- AWU file: engineering/work_units/ENG-09.6-WU05A.json
+- AWU file: engineering/work_units/ENG-09.6-WU06.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-09.json
-- engineering/work_units/ENG-09.6-WU05A.json
+- engineering/work_units/ENG-09.6-WU06.json
 - config/governance/business_unlock_activation_policy_v1.json
 - config/governance/active_work_routing_policy_v1.json
 
@@ -42,8 +42,8 @@
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: Qualify terminal-business lifecycle compatibility without activating BUSINESS.
-- Next action: Make lifecycle validators accept the explicit terminal STABLE/ACTIVE topology while preserving the current PAUSED/BUILDING mode.
+- Objective: Qualify terminal-business lifecycle compatibility in ENG-09.6-WU06 without activating BUSINESS.
+- Next action: Complete strict bimodal lifecycle validators, then exact-head qualify WU06 before opening WU07.
 
 ## Non-authoritative sources
 
