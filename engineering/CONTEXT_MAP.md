@@ -46,7 +46,7 @@
 
 - Handoff: engineering/handoff/CURRENT.json
 - Objective: Make the explicit ENG-09.6 business-development unlock decision while preserving fail-closed business/runtime authority.
-- Next action: Keep business PAUSED and Lot46 LOCKED. Resolve BOOT-FINDING-001 through GitHub repository administration, then refresh live Git state and explicitly re-evaluate; never auto-unlock.
+- Next action: Keep business PAUSED and Lot46 LOCKED. In GitHub repository administration, change main protection so an accepted mechanism is actively enforced: the current ruleset Protect is disabled and only contains deletion/non-fast-forward rules, so it still lacks required pull-request and required-status-check enforcement. After that change, refresh live Git state and explicitly re-evaluate; never auto-unlock.
 
 ## Non-authoritative sources
 

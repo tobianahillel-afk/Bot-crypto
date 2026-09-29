@@ -20,32 +20,13 @@
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
-    "lot45_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
-    "lot45_merged": false,
-    "lot45_pr": 66,
-    "lot45_state": "open",
-    "main_branch_protected": false,
     "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "main_branch_protected": false,
     "rulesets_count": 1,
-    "rulesets_enabled_count": 0,
-    "rulesets": [
-      {
-        "id": 24172517,
-        "name": "Protect",
-        "target": "branch",
-        "enforcement": "disabled",
-        "conditions": {
-          "ref_name": {
-            "exclude": [],
-            "include": []
-          }
-        },
-        "rules": [
-          "deletion",
-          "non_fast_forward"
-        ]
-      }
-    ]
+    "lot45_pr": 66,
+    "lot45_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "lot45_state": "open",
+    "lot45_merged": false
   },
   "kind": "engineering_handoff",
   "next_action": "Keep business PAUSED and Lot46 LOCKED. In GitHub repository administration, change main protection so an accepted mechanism is actively enforced: the current ruleset Protect is disabled and only contains deletion/non-fast-forward rules, so it still lacks required pull-request and required-status-check enforcement. After that change, refresh live Git state and explicitly re-evaluate; never auto-unlock.",
@@ -55,7 +36,6 @@
     "active_manifest": "engineering/lots/ENG-09.json"
   },
   "recent_completed": [
-    "ENG-09.3-WU11 completed with exact parity evidence: generic runner run 36403097208 on af93cac4387b93865080a732c88ab8fd6eebeea0 scored 81.25% (39 killed, 9 survived, 48 evaluated) with source immutability PASS, legacy blob b1653c0c392e74ea7f50b7b922fd8750fa402bb7 unchanged, artifact 10960734995 digest sha256:0342c4e83ee1bffb31d25b7cae1ac51b9bafbbc08209b05d23dc8bb4b31f3b54; evidence commit c612c9af0f76d4d21ae1a9df96ae925f093a5e11 passed Bootstrap 36403410034 and Secrets 36403410088.",
     "ENG-09.3-WU12 completed: evidence engineering/ENG09_WU12_P06_MIGRATION_EVIDENCE.json is PASS. Qualification head a8efc3c8cc4fb8e291820756311bf04c1af9b6e5 passed CI Mutation Profiles 36411693261, Engineering Bootstrap 36411692851, Security Secrets 36411692948, Security Actions 36411692874 and Security Supply Chain 36411692868; P0.6 score stayed 81.25%, legacy workflow was retired, code-quality/Lot45/business code stayed untouched. Evidence commit 984154bd62ce38d36f3d10a415e74b49d92e9f6b.",
     "ENG-09.3-WU13 completed: Lot45 mutation semantics were qualified read-only on exact head 649b7f332d42c6f32fd4a405e8c3af5020c435f8 with Bootstrap 36441003692, candidate qualification 36441003628, Secrets 36441003765, Actions 36441003627 and Supply Chain 36441003655 all passing. Evidence commit 8af6cb6ff21ae70e696f41b23bcf2583b71441bb passed Bootstrap 36441316000 and Secrets 36441315836. Temporary qualification workflow was retired at 4cbe86486858325b81b2e2446baff0a4b88b39e0; retirement head passed Bootstrap 36441473123, Secrets 36441473322, Actions 36441473244 and Supply Chain 36441473344. PR #66 remained untouched and Lot45 was not adopted into active mutation control.",
     "ENG-09.4-WU01 assembled Development Engine V1 candidate DEV_ENGINE_V1:b9e5ebadbb739e57f2e0023d7498593f0f9a45bde46af24d8a83541351cdd1ed on head 37e62e2cdcf6b1f86595e0056688cfdb1394ab58. Diff was limited to four WU01 outputs; Engineering Bootstrap 36459556089 and Security Secrets 36459556100 passed. Candidate remains pre-T4, uncertified, business/runtime locked, with BOOT-FINDING-001 preserved.",
