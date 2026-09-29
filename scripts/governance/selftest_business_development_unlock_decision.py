@@ -50,13 +50,14 @@ def main() -> int:
 
     mod.validate(decision, state, policy, protection, security, cert)
 
-    # Baseline intentionally contains one disabled/incomplete ruleset.
-    assert state["external_observations"]["rulesets_count"] == 1
-    assert state["external_observations"]["rulesets_enabled_count"] == 0
-    assert state["external_observations"]["rulesets"][0]["enforcement"] == "disabled"
+    # Canonical state preserves the ENG-00 baseline, while the decision stores fresh GitHub reality.
+    assert state["external_observations"]["rulesets_count"] == 0
+    assert decision["live_reverification"]["live_rulesets_count"] == 1
+    assert decision["live_reverification"]["active_rulesets_count"] == 0
+    assert decision["live_reverification"]["observed_ruleset"]["enforcement"] == "disabled"
 
     forged_snapshot = copy.deepcopy(decision)
-    forged_snapshot["repository_protection"]["rulesets_count"] = 0
+    forged_snapshot["repository_protection"]["rulesets_count"] = 1
     _expect(
         mod.BusinessUnlockDecisionError,
         lambda: mod.validate(forged_snapshot, state, policy, protection, security, cert),
@@ -64,7 +65,7 @@ def main() -> int:
     )
 
     bad_counter = copy.deepcopy(state)
-    bad_counter["external_observations"]["rulesets_count"] = 2
+    bad_counter["external_observations"]["rulesets_count"] = 1
     _expect(
         mod.BusinessUnlockDecisionError,
         lambda: mod.validate(decision, bad_counter, policy, protection, security, cert),
@@ -73,19 +74,10 @@ def main() -> int:
 
     # Even an active ruleset is insufficient while policy evidence remains UNPROTECTED:
     # the observed rules only cover deletion/non-fast-forward and omit PR/status-check rules.
-    active_incomplete = copy.deepcopy(state)
-    active_incomplete["external_observations"]["rulesets"][0]["enforcement"] = "active"
-    active_incomplete["external_observations"]["rulesets_enabled_count"] = 1
-    active_incomplete["external_observations"]["rulesets_disabled_count"] = 0
     active_decision = copy.deepcopy(decision)
-    active_decision["repository_protection"]["observed_rulesets"] = copy.deepcopy(
-        active_incomplete["external_observations"]["rulesets"]
-    )
-    active_decision["repository_protection"]["rulesets_enabled_count"] = 1
-    active_decision["repository_protection"]["rulesets_disabled_count"] = 0
     active_decision["live_reverification"]["active_rulesets_count"] = 1
     active_decision["live_reverification"]["observed_ruleset"]["enforcement"] = "active"
-    mod.validate(active_decision, active_incomplete, policy, protection, security, cert)
+    mod.validate(active_decision, state, policy, protection, security, cert)
 
     allowed = copy.deepcopy(decision)
     allowed["verdict"] = "ALLOW_UNLOCK"
@@ -107,10 +99,15 @@ def main() -> int:
     protected["overall_status"] = "PROTECTED"
     protected["business_unlock_allowed"] = True
     protected["manual_admin_action_required"] = False
-    protected_state = copy.deepcopy(state)
-    protected_state["external_observations"]["main"]["branch_protected"] = True
-    protected_state["external_observations"]["rulesets_count"] = 1
-    _expect(mod.BusinessUnlockDecisionError, lambda: mod.validate(decision, protected_state, policy, protected, security, cert), "stale blocked decision after protection changes")
+    protected_decision = copy.deepcopy(decision)
+    protected_decision["live_reverification"]["main_branch_protected"] = True
+    protected_decision["live_reverification"]["active_rulesets_count"] = 1
+    protected_decision["live_reverification"]["observed_ruleset"]["enforcement"] = "active"
+    _expect(
+        mod.BusinessUnlockDecisionError,
+        lambda: mod.validate(protected_decision, state, policy, protected, security, cert),
+        "stale blocked decision after protection changes",
+    )
 
     no_engine_cert = copy.deepcopy(cert)
     no_engine_cert["verdict"] = "FAIL"

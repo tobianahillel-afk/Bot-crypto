@@ -121,7 +121,7 @@
       "manual repository-administration remediation is recorded because the connector cannot mutate branch protection",
       "a later protection-state change invalidates the blocked decision and requires explicit re-evaluation",
       "permanent bootstrap validates the unlock decision and adversarial fail-closed scenarios",
-      "decision snapshot must exactly match the current recorded main/ruleset observation",
+      "decision repository_protection snapshot must match the immutable ENG-00 baseline while live_reverification separately records current GitHub protection reality",
       "a present or active-but-policy-incomplete ruleset must not be treated as compliant main protection"
     ],
     "acceptance_criteria": [
@@ -132,7 +132,7 @@
       "validator rejects ALLOW_UNLOCK while blocker or unprotected-main evidence remains",
       "validator rejects Lot46 OPEN or business ACTIVE while blocker remains",
       "exact-head Engineering Bootstrap and Security Secrets remain green after integration",
-      "validator rejects mismatched ruleset counts/details between canonical state and decision evidence",
+      "validator rejects drift between immutable baseline bindings and live_reverification consistency fields",
       "validator keeps BLOCKED_NO_UNLOCK for the observed disabled ruleset and for an active ruleset whose protection evidence still lacks required PR/status-check enforcement"
     ]
   },

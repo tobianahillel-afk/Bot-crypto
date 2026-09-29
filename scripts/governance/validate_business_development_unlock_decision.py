@@ -78,57 +78,22 @@ def validate(
         "blocking finding target drift",
     )
 
+    # Canonical external observations are the immutable ENG-00 baseline.
+    # Fresh GitHub reality is recorded separately in decision.live_reverification.
     external = state.get("external_observations", {})
     main = external.get("main", {})
-    rulesets = external.get("rulesets", [])
-    _require(isinstance(rulesets, list), "external rulesets observation must be a list")
-    _require(
-        external.get("rulesets_count") == len(rulesets),
-        "external rulesets_count does not match observed rulesets",
-    )
-    enabled_rulesets = [
-        item for item in rulesets
-        if isinstance(item, dict) and item.get("enforcement") == "active"
-    ]
-    disabled_rulesets = [
-        item for item in rulesets
-        if isinstance(item, dict) and item.get("enforcement") == "disabled"
-    ]
-    _require(
-        external.get("rulesets_enabled_count") == len(enabled_rulesets),
-        "external enabled-ruleset count drift",
-    )
-    _require(
-        external.get("rulesets_disabled_count") == len(disabled_rulesets),
-        "external disabled-ruleset count drift",
-    )
-
     decision_protection = decision.get("repository_protection", {})
     _require(
         decision_protection.get("observed_main_sha") == main.get("sha"),
-        "decision main SHA is not bound to current external observation",
+        "decision baseline main SHA drift",
     )
     _require(
         decision_protection.get("branch_protected") == main.get("branch_protected"),
-        "decision branch-protection snapshot drift",
+        "decision baseline branch-protection drift",
     )
     _require(
         decision_protection.get("rulesets_count") == external.get("rulesets_count"),
-        "decision ruleset-count snapshot drift",
-    )
-    _require(
-        decision_protection.get("rulesets_enabled_count")
-        == external.get("rulesets_enabled_count"),
-        "decision enabled-ruleset snapshot drift",
-    )
-    _require(
-        decision_protection.get("rulesets_disabled_count")
-        == external.get("rulesets_disabled_count"),
-        "decision disabled-ruleset snapshot drift",
-    )
-    _require(
-        decision_protection.get("observed_rulesets") == rulesets,
-        "decision ruleset details are not exactly bound to external observation",
+        "decision baseline ruleset-count drift",
     )
     _require(
         decision_protection.get("overall_status") == protection_status.get("overall_status"),
@@ -144,20 +109,40 @@ def validate(
     _require(live.get("source") == "GITHUB_CONNECTOR", "live re-verification source drift")
     _require(live.get("main_sha") == main.get("sha"), "live re-verification main SHA drift")
     _require(
-        live.get("main_branch_protected") == main.get("branch_protected"),
-        "live re-verification branch status drift",
+        live.get("baseline_rulesets_count") == external.get("rulesets_count"),
+        "live re-verification baseline ruleset binding drift",
+    )
+    live_rulesets_count = live.get("live_rulesets_count")
+    active_rulesets_count = live.get("active_rulesets_count")
+    _require(
+        isinstance(live_rulesets_count, int) and live_rulesets_count >= 0,
+        "live ruleset count invalid",
     )
     _require(
-        live.get("rulesets_count") == external.get("rulesets_count"),
-        "live re-verification ruleset count drift",
+        isinstance(active_rulesets_count, int)
+        and 0 <= active_rulesets_count <= live_rulesets_count,
+        "live active-ruleset count invalid",
     )
+    observed_ruleset = live.get("observed_ruleset")
+    if live_rulesets_count == 1:
+        _require(isinstance(observed_ruleset, dict), "single live ruleset detail missing")
+        enforcement = observed_ruleset.get("enforcement")
+        _require(
+            enforcement in {"disabled", "active", "evaluate"},
+            "live ruleset enforcement invalid",
+        )
+        expected_active = 1 if enforcement == "active" else 0
+        _require(
+            active_rulesets_count == expected_active,
+            "live active-ruleset count disagrees with observed enforcement",
+        )
     _require(
-        live.get("active_rulesets_count") == len(enabled_rulesets),
-        "live re-verification active ruleset count drift",
+        live.get("main_branch_protected") in {True, False},
+        "live branch-protection observation invalid",
     )
 
     accepted_mechanism_observed = (
-        main.get("branch_protected") is True or bool(enabled_rulesets)
+        live.get("main_branch_protected") is True or active_rulesets_count > 0
     )
     unprotected = (
         not accepted_mechanism_observed
