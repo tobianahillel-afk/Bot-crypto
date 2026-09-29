@@ -1,13 +1,13 @@
 {
   "active_work": {
-    "track": "ENGINEERING",
-    "lot": "ENG-09",
-    "task": "ENG-09.6",
-    "manifest": "engineering/lots/ENG-09.json",
     "awu_id": "ENG-09.6-WU03A",
     "awu_path": "engineering/work_units/ENG-09.6-WU03A.json",
+    "complexity_score": 6,
+    "lot": "ENG-09",
+    "manifest": "engineering/lots/ENG-09.json",
     "risk_class": "R2",
-    "complexity_score": 6
+    "task": "ENG-09.6",
+    "track": "ENGINEERING"
   },
   "authority": {
     "current_state": "config/governance/project_state.json",
@@ -29,6 +29,13 @@
     }
   },
   "execution_context": {
+    "budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "implicit_expansion": "FORBIDDEN",
+    "primary_count": 7,
     "primary_files": [
       "AGENTS.md",
       "config/governance/project_state.json",
@@ -38,18 +45,11 @@
       "config/governance/development_engine_v1_interface_freeze_v1.json",
       "engineering/AGENT_PROTOCOL.md"
     ],
+    "reference_count": 1,
     "reference_files": [
       "engineering/MASTER_PLAN.md"
     ],
-    "primary_count": 7,
-    "reference_count": 1,
-    "total_kib_ceil": 50,
-    "budget": {
-      "max_primary_files": 12,
-      "max_reference_files": 16,
-      "max_total_kib": 1024
-    },
-    "implicit_expansion": "FORBIDDEN"
+    "total_kib_ceil": 41
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -65,8 +65,8 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "handoff": "engineering/handoff/CURRENT.json",
     "current_objective": "Prepare terminal Development Engine cold-start routing so ordinary continue can safely route to BUSINESS after a later explicit activation transition.",
+    "handoff": "engineering/handoff/CURRENT.json",
     "next_action": "Extend the existing V1 resolver and context-map path with backward-compatible BUSINESS routing semantics while keeping project_state PAUSED during WU03A."
   },
   "safety": {
