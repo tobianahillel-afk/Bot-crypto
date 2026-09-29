@@ -46,6 +46,12 @@ jobs:
       - name: Run business-development unlock adversarial self-tests
         run: python scripts/governance/selftest_business_development_unlock_decision.py
 
+      - name: Validate post-remediation business-development unlock eligibility
+        run: python scripts/governance/validate_business_development_unlock_eligibility.py
+
+      - name: Run business-development unlock eligibility adversarial self-tests
+        run: python scripts/governance/selftest_business_development_unlock_eligibility.py
+
       - name: Validate canonical state
         run: python scripts/governance/validate_bootstrap_state.py
 
@@ -137,7 +143,7 @@ jobs:
           set -euo pipefail
           active_task="$(python -c 'import json; print(json.load(open("config/governance/project_state.json", encoding="utf-8"))["engineering_track"]["active_task"] or "")')"
           if [ "${active_task}" = "ENG-09.6" ]; then
-            python scripts/governance/validate_business_development_unlock_decision.py --mode github
+            python scripts/governance/validate_business_development_unlock_eligibility.py --mode github
           else
             python scripts/governance/verify_external_git_state.py --mode github
           fi

@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "policy_kind": "business_unlock_eligibility_policy_v1",
+  "semantics": "LIVE_PROTECTION_ELIGIBILITY_NO_AUTHORITY_ACTIVATION",
+  "repository": "tobianahillel-afk/Bot-crypto",
+  "default_branch": "main",
+  "required_ruleset": {
+    "name": "Protect",
+    "target": "branch",
+    "enforcement": "active",
+    "ref_include": [
+      "refs/heads/main"
+    ],
+    "ref_exclude": [],
+    "required_rule_types": [
+      "deletion",
+      "non_fast_forward",
+      "pull_request",
+      "required_status_checks"
+    ],
+    "required_check_contexts": [
+      "CodeQL Python security-extended",
+      "Gitleaks pinned CLI",
+      "quality"
+    ],
+    "bypass_actors": [],
+    "current_user_can_bypass": "never"
+  },
+  "required_floor": {
+    "branch_is_protected": true,
+    "pull_request_required": true,
+    "required_status_checks": true,
+    "force_pushes_blocked": true,
+    "branch_deletions_blocked": true,
+    "no_bypass": true
+  },
+  "optional_hardening_not_required_for_floor": [
+    "strict_required_status_checks_policy",
+    "required_approving_review_count_gt_0",
+    "required_review_thread_resolution"
+  ],
+  "eligibility_verdict": "ELIGIBLE_AWAITING_EXPLICIT_HUMAN_UNLOCK",
+  "activation_policy": {
+    "eligibility_is_not_activation": true,
+    "explicit_human_unlock_transition_required": true,
+    "lot45_merge_not_granted": true,
+    "lot46_unlock_not_granted": true,
+    "runtime_unlock_not_granted": true
+  },
+  "cost_policy": {
+    "paid_api_required": false,
+    "paid_saas_required": false,
+    "paid_llm_required": false,
+    "paid_runner_required": false
+  }
+}

@@ -13,22 +13,23 @@
 - Track: ENGINEERING
 - Work item: ENG-09
 - Task: ENG-09.6
-- AWU: ENG-09.6-WU01
+- AWU: ENG-09.6-WU02
 - Risk: R2
 - Manifest: engineering/lots/ENG-09.json
-- AWU file: engineering/work_units/ENG-09.6-WU01.json
+- AWU file: engineering/work_units/ENG-09.6-WU02.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-09.json
-- engineering/work_units/ENG-09.6-WU01.json
+- engineering/work_units/ENG-09.6-WU02.json
 - engineering/REPOSITORY_PROTECTION_STATUS.json
 - config/governance/repository_protection_policy_v1.json
 - engineering/SECURITY_ENGINE_VERIFICATION.json
 - engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json
 - config/governance/development_engine_v1_interface_freeze_v1.json
+- engineering/BUSINESS_DEVELOPMENT_UNLOCK_DECISION.json
 
 ## Execution context — reference
 
@@ -37,16 +38,16 @@
 
 ## Budget
 
-- Primary: 9 / 12 files
+- Primary: 10 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 57 / 1024 KiB
+- Routed size: 60 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: Make the explicit ENG-09.6 business-development unlock decision while preserving fail-closed business/runtime authority.
-- Next action: Keep business PAUSED and Lot46 LOCKED. In GitHub repository administration, change main protection so an accepted mechanism is actively enforced: the current ruleset Protect is disabled and only contains deletion/non-fast-forward rules, so it still lacks required pull-request and required-status-check enforcement. After that change, refresh live Git state and explicitly re-evaluate; never auto-unlock.
+- Objective: Re-evaluate business-development unlock eligibility against the manually remediated live ruleset without activating business/runtime authority.
+- Next action: Validate exact live protection and PR #66 against BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY; if eligible, preserve PAUSED/LOCKED authority and require a separate explicit human unlock transition.
 
 ## Non-authoritative sources
 

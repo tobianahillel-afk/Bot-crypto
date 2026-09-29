@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-09.6-WU02",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-09",
+    "task_id": "ENG-09.6",
+    "manifest": "engineering/lots/ENG-09.json"
+  },
+  "title": "Re-evaluate business unlock eligibility after repository-protection remediation",
+  "objective": "Bind the manually remediated live main-branch ruleset to an explicit machine-readable eligibility verdict while keeping business/runtime authority unchanged and requiring a separate explicit human-authorized unlock transition.",
+  "non_goals": [
+    "activate business development",
+    "merge modify remediate or adopt Lot45",
+    "unlock or start Lot46",
+    "change runtime execution authority permission to trade leverage or withdrawals",
+    "rewrite the WU01 blocked decision or immutable ENG-00 baseline",
+    "mutate Development Engine V1 certification or frozen interface",
+    "introduce paid services or mandatory LLM review"
+  ],
+  "depends_on": [
+    "ENG-09.6-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Historical repository-protection status baseline",
+      "kind": "EVIDENCE",
+      "locator": "engineering/REPOSITORY_PROTECTION_STATUS.json"
+    },
+    {
+      "name": "Repository protection policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/repository_protection_policy_v1.json"
+    },
+    {
+      "name": "Security engine verification",
+      "kind": "EVIDENCE",
+      "locator": "engineering/SECURITY_ENGINE_VERIFICATION.json"
+    },
+    {
+      "name": "Development Engine V1 certification",
+      "kind": "EVIDENCE",
+      "locator": "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json"
+    },
+    {
+      "name": "Development Engine V1 interface freeze",
+      "kind": "CONFIG",
+      "locator": "config/governance/development_engine_v1_interface_freeze_v1.json"
+    },
+    {
+      "name": "Prior blocked unlock decision",
+      "kind": "EVIDENCE",
+      "locator": "engineering/BUSINESS_DEVELOPMENT_UNLOCK_DECISION.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Unlock eligibility policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/business_unlock_eligibility_policy_v1.json"
+    },
+    {
+      "name": "Post-remediation unlock eligibility evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY.json"
+    },
+    {
+      "name": "Unlock eligibility validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_business_development_unlock_eligibility.py"
+    },
+    {
+      "name": "Unlock eligibility adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_business_development_unlock_eligibility.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "7dd1cf451990ab18662621037f775349a555666b",
+    "allowed_paths": [
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-09.6-WU01.json",
+      "engineering/work_units/ENG-09.6-WU02.json",
+      "config/governance/business_unlock_eligibility_policy_v1.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY.json",
+      "scripts/governance/validate_business_development_unlock_eligibility.py",
+      "scripts/governance/selftest_business_development_unlock_eligibility.py",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_DECISION.json",
+      "engineering/REPOSITORY_PROTECTION_STATUS.json",
+      "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json",
+      "config/governance/development_engine_v1_interface_freeze_v1.json",
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "business development activation",
+      "Lot45 merge mutation remediation or adoption",
+      "Lot46 unlock",
+      "canonical baseline auto-heal",
+      "runtime capability activation",
+      "permission-to-trade activation",
+      "Development Engine V1 interface mutation",
+      "certification evidence mutation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "the historical WU01 BLOCKED_NO_UNLOCK decision remains byte-preserved and valid as the pre-remediation checkpoint",
+      "live eligibility is proven from fresh GitHub branch PR and full normalized ruleset semantics rather than by editing canonical ENG-00 observations",
+      "an accepted active ruleset must cover refs/heads/main and include deletion non_fast_forward pull_request and required_status_checks rules",
+      "required status checks must include Gitleaks pinned CLI CodeQL Python security-extended and quality",
+      "ruleset bypass actors must be empty and current_user_can_bypass must be never",
+      "branch resource protected must be true and PR66 head/base/state/merged facts must remain unchanged",
+      "eligibility verdict grants permission to perform a later explicit unlock transition but does not itself activate business or runtime authority",
+      "Lot45 remains SUSPENDED_CANDIDATE Lot46 remains LOCKED and trade/execution remain fail-closed",
+      "any later change to main candidate or normalized ruleset invalidates the evidence and requires explicit re-evaluation"
+    ],
+    "acceptance_criteria": [
+      "snapshot eligibility validator passes against the persisted post-remediation evidence",
+      "GitHub-live eligibility validator exactly matches main PR66 and normalized ruleset semantics",
+      "ruleset compliance verifies all five repository-protection floor requirements",
+      "strict status-check mode approvals and review-thread resolution are recorded but are not required by the current protection floor",
+      "validator rejects disabled/evaluate enforcement missing main scope missing PR rule missing status rule missing required check missing deletion/non-fast-forward rule or any bypass actor",
+      "validator rejects business activation Lot45 merge permission Lot46 unlock or runtime/trading authority in the eligibility evidence",
+      "Engineering Bootstrap and Security Secrets pass on the exact integration head"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 6,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 1,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 10,
+      "executable_loc_changed": 650,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_business_development_unlock_eligibility.py",
+      "python scripts/governance/selftest_business_development_unlock_eligibility.py",
+      "python scripts/governance/validate_business_development_unlock_eligibility.py --mode github"
+    ]
+  },
+  "done_when": [
+    "manual repository-protection remediation is independently proven compliant",
+    "eligibility is explicit reproducible and live-bound",
+    "no business/runtime authority is activated",
+    "a separate explicit human-authorized transition is still required for any actual business unlock"
+  ]
+}

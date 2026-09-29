@@ -1,7 +1,7 @@
 {
   "active_work": {
-    "awu_id": "ENG-09.6-WU01",
-    "awu_path": "engineering/work_units/ENG-09.6-WU01.json",
+    "awu_id": "ENG-09.6-WU02",
+    "awu_path": "engineering/work_units/ENG-09.6-WU02.json",
     "complexity_score": 6,
     "lot": "ENG-09",
     "manifest": "engineering/lots/ENG-09.json",
@@ -35,24 +35,25 @@
       "max_total_kib": 1024
     },
     "implicit_expansion": "FORBIDDEN",
-    "primary_count": 9,
+    "primary_count": 10,
     "primary_files": [
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-09.json",
-      "engineering/work_units/ENG-09.6-WU01.json",
+      "engineering/work_units/ENG-09.6-WU02.json",
       "engineering/REPOSITORY_PROTECTION_STATUS.json",
       "config/governance/repository_protection_policy_v1.json",
       "engineering/SECURITY_ENGINE_VERIFICATION.json",
       "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json",
-      "config/governance/development_engine_v1_interface_freeze_v1.json"
+      "config/governance/development_engine_v1_interface_freeze_v1.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_DECISION.json"
     ],
     "reference_count": 2,
     "reference_files": [
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 57
+    "total_kib_ceil": 60
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -68,9 +69,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "Make the explicit ENG-09.6 business-development unlock decision while preserving fail-closed business/runtime authority.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Keep business PAUSED and Lot46 LOCKED. In GitHub repository administration, change main protection so an accepted mechanism is actively enforced: the current ruleset Protect is disabled and only contains deletion/non-fast-forward rules, so it still lacks required pull-request and required-status-check enforcement. After that change, refresh live Git state and explicitly re-evaluate; never auto-unlock."
+    "current_objective": "Re-evaluate business-development unlock eligibility against the manually remediated live ruleset without activating business/runtime authority.",
+    "next_action": "Validate exact live protection and PR #66 against BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY; if eligible, preserve PAUSED/LOCKED authority and require a separate explicit human unlock transition."
   },
   "safety": {
     "execution_allowed": false,
