@@ -156,9 +156,5 @@
     "foundation mode remains green",
     "terminal lifecycle is accepted without weakening safety",
     "WU07 can qualify resume/handoff compatibility"
-  ],
-  "extensions": {
-    "qualification_retry_reason": "GITHUB_CONCURRENCY_CANCELLED_HEAD",
-    "superseded_cancelled_head": "54d0714025a0de82f73bf24e6086a3b82a0f72ed"
-  }
+  ]
 }
