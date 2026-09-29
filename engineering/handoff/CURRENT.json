@@ -22,7 +22,7 @@
     "default_branch": "main",
     "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
     "main_branch_protected": false,
-    "rulesets_count": 1,
+    "rulesets_count": 0,
     "lot45_pr": 66,
     "lot45_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
     "lot45_state": "open",

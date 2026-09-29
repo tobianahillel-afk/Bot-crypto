@@ -89,27 +89,7 @@
       "branch_protected": false,
       "sha": "390d0779f2be257fa8134faf8f02193a760a09c3"
     },
-    "rulesets_count": 1,
-    "rulesets_enabled_count": 0,
-    "rulesets_disabled_count": 1,
-    "rulesets": [
-      {
-        "id": 24172517,
-        "name": "Protect",
-        "target": "branch",
-        "enforcement": "disabled",
-        "conditions": {
-          "ref_name": {
-            "exclude": [],
-            "include": []
-          }
-        },
-        "rules": [
-          "deletion",
-          "non_fast_forward"
-        ]
-      }
-    ]
+    "rulesets_count": 0
   },
   "findings": [
     {

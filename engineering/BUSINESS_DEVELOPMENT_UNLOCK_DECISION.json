@@ -18,29 +18,9 @@
     "required_semantics": "BUSINESS_UNLOCK_REQUIRES_VERIFIED_MAIN_PROTECTION",
     "observed_main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
     "branch_protected": false,
-    "rulesets_count": 1,
+    "rulesets_count": 0,
     "overall_status": "UNPROTECTED",
-    "manual_admin_action_required": true,
-    "rulesets_enabled_count": 0,
-    "rulesets_disabled_count": 1,
-    "observed_rulesets": [
-      {
-        "id": 24172517,
-        "name": "Protect",
-        "target": "branch",
-        "enforcement": "disabled",
-        "conditions": {
-          "ref_name": {
-            "exclude": [],
-            "include": []
-          }
-        },
-        "rules": [
-          "deletion",
-          "non_fast_forward"
-        ]
-      }
-    ]
+    "manual_admin_action_required": true
   },
   "blocking_findings": [
     "BOOT-FINDING-001"
@@ -93,6 +73,8 @@
         "non_fast_forward"
       ]
     },
-    "conclusion": "BLOCKER_STILL_OBSERVED_DISABLED_INCOMPLETE_RULESET"
+    "conclusion": "BLOCKER_STILL_OBSERVED_DISABLED_INCOMPLETE_RULESET",
+    "baseline_rulesets_count": 0,
+    "live_rulesets_count": 1
   }
 }
