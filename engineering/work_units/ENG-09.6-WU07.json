@@ -64,7 +64,7 @@
     }
   ],
   "scope": {
-    "scope_base_sha": "TO_BE_BOUND_AFTER_WU05A",
+    "scope_base_sha": "787871d9527acf81f7d020d79e9cec3e00dc8ced",
     "allowed_paths": [
       "engineering/work_units/ENG-09.6-WU06.json",
       "engineering/work_units/ENG-09.6-WU07.json",
