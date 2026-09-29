@@ -199,6 +199,7 @@
     "ENG-09 scope safely admits exact staged business route files",
     "read-only Lot45 business manifest and PLANNED AWU exist without activating BUSINESS",
     "activation policy validator and adversarial tests are green",
-    "WU05 can execute only after a direct explicit human BUSINESS_DEVELOPMENT_UNLOCK instruction"
+    "WU05 can execute only after a direct explicit human BUSINESS_DEVELOPMENT_UNLOCK instruction",
+    "WU04 exact-head Bootstrap run 36617637470 and Security Secrets run 36617637444 pass before WU05 may be activated"
   ]
 }

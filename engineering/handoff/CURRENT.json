@@ -16,7 +16,7 @@
   "blockers": [
     "BOOT-FINDING-001"
   ],
-  "current_objective": "Stage the atomic terminal ENGINEERING-to-BUSINESS activation route without changing canonical business authority.",
+  "current_objective": "WU04 staging is qualified; wait for direct exact BUSINESS_DEVELOPMENT_UNLOCK before activating WU05.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -29,21 +29,21 @@
     "rulesets_count": 0
   },
   "kind": "engineering_handoff",
-  "next_action": "Expand ENG-09 scope for exact business staging files, create a read-only Lot45 requalification manifest/AWU plus activation policy/tests, and leave BUSINESS PAUSED until a direct explicit BUSINESS_DEVELOPMENT_UNLOCK instruction.",
+  "next_action": "Do not activate business on generic continue. On a direct current-session BUSINESS_DEVELOPMENT_UNLOCK instruction, live-reverify eligibility, bind WU05 to the qualified WU04 head, then execute the atomic terminal ENGINEERING-to-BUSINESS transition.",
   "next_engineering": {
     "active_lot": "ENG-09",
     "active_manifest": "engineering/lots/ENG-09.json",
     "active_task": "ENG-09.6"
   },
   "recent_completed": [
-    "ENG-09.4-WU03 persisted exact certification evidence and retired its temporary qualification workflow without rewriting evidence.",
     "ENG-09.5-WU01 defined the V1 compatibility surface while leaving dynamic state payloads unfrozen.",
     "ENG-09.5-WU02 integrated the permanent V1 interface validator; Bootstrap 36486573093 and Secrets 36486572922 passed.",
     "ENG-09.6-WU01 persisted the fail-closed BLOCKED_NO_UNLOCK checkpoint for the pre-remediation disabled/incomplete Protect ruleset.",
     "ENG-09.6-WU01 terminal blocked-decision path passed Bootstrap 36557277756 and Secrets 36557277759 on aaf1606b53446d7b3d49324049c60237942217ac.",
     "Post-remediation observation on 2026-09-29: ruleset Protect is active on main with PR enforcement and required checks Gitleaks pinned CLI, CodeQL Python security-extended, and quality; no business/runtime authority has been activated.",
     "ENG-09.6-WU02 proved post-remediation BUSINESS_DEVELOPMENT_UNLOCK eligibility on live protected main; the user subsequently supplied the required explicit human authorization, but authority remains unchanged until terminal routing/state compatibility is qualified.",
-    "ENG-09.6-WU03 qualified backward-compatible terminal BUSINESS cold-start routing on exact head 86da75900304e364bc8f11a0cd3b472fe4606a2f; Engineering Bootstrap 36607903196 and Security Secrets 36607903198 passed."
+    "ENG-09.6-WU03 qualified backward-compatible terminal BUSINESS cold-start routing on exact head 86da75900304e364bc8f11a0cd3b472fe4606a2f; Engineering Bootstrap 36607903196 and Security Secrets 36607903198 passed.",
+    "ENG-09.6-WU04 staged a bounded read-only Lot45 business route and passed activation staged/synthetic validation on head 2f996a5a1613f20beff51949ed9d95bbfca9eb57; Bootstrap 36617637470 and Security Secrets 36617637444 passed."
   ],
   "resume_read_order": [
     "AGENTS.md",
