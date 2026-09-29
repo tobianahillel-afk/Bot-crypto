@@ -1,7 +1,7 @@
 {
   "active_work": {
-    "awu_id": "ENG-09.6-WU05A",
-    "awu_path": "engineering/work_units/ENG-09.6-WU05A.json",
+    "awu_id": "ENG-09.6-WU06",
+    "awu_path": "engineering/work_units/ENG-09.6-WU06.json",
     "complexity_score": 7,
     "lot": "ENG-09",
     "manifest": "engineering/lots/ENG-09.json",
@@ -40,7 +40,7 @@
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-09.json",
-      "engineering/work_units/ENG-09.6-WU05A.json",
+      "engineering/work_units/ENG-09.6-WU06.json",
       "config/governance/business_unlock_activation_policy_v1.json",
       "config/governance/active_work_routing_policy_v1.json"
     ],
@@ -65,9 +65,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "Qualify terminal-business lifecycle compatibility without activating BUSINESS.",
+    "current_objective": "Qualify terminal-business lifecycle compatibility in ENG-09.6-WU06 without activating BUSINESS.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Make lifecycle validators accept the explicit terminal STABLE/ACTIVE topology while preserving the current PAUSED/BUILDING mode."
+    "next_action": "Complete strict bimodal lifecycle validators, then exact-head qualify WU06 before opening WU07."
   },
   "safety": {
     "execution_allowed": false,
