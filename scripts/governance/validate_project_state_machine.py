@@ -192,9 +192,27 @@ def validate_transition(previous: dict[str, Any], current: dict[str, Any], polic
     if previous.get("project") != current.get("project"):
         raise StateMachineError("project identity is immutable")
 
+    prev_eng = previous.get("engineering_track", {})
+    cur_eng = current.get("engineering_track", {})
+    prev_business = previous.get("business_track", {})
+    cur_business = current.get("business_track", {})
+    terminal_activation = (
+        prev_eng.get("phase") == "BUILDING"
+        and prev_eng.get("active_lot") == "ENG-09"
+        and prev_eng.get("active_task") == "ENG-09.6"
+        and cur_eng.get("phase") == "STABLE"
+        and all(cur_eng.get(key) is None for key in ("active_lot", "active_task", "next_lot", "active_manifest"))
+        and prev_business.get("development_status") == "PAUSED"
+        and cur_business.get("development_status") == "ACTIVE"
+        and cur_business.get("next_lot") == {"lot": 46, "status": "LOCKED"}
+        and cur_business.get("candidate", {}).get("status") == "ACTIVE_CANDIDATE"
+        and cur_business.get("candidate", {}).get("state") == "OPEN"
+        and cur_business.get("candidate", {}).get("merged") is False
+    )
+
     if policy.get("business_mutation_mode") == "LOCKED_DURING_ENGINE_FOUNDATION":
-        if previous.get("business_track") != current.get("business_track"):
-            raise StateMachineError("BUSINESS track mutated while foundation lock is active")
+        if previous.get("business_track") != current.get("business_track") and not terminal_activation:
+            raise StateMachineError("BUSINESS track mutated outside explicit ENG-09 terminal activation")
     if policy.get("safety_mutation_mode") == "LOCKED_FAIL_CLOSED_DURING_ENGINE_FOUNDATION":
         if previous.get("safety") != current.get("safety"):
             raise StateMachineError("safety mutated while foundation lock is active")
@@ -202,8 +220,6 @@ def validate_transition(previous: dict[str, Any], current: dict[str, Any], polic
         if previous.get("cost_policy") != current.get("cost_policy"):
             raise StateMachineError("cost policy mutated while foundation lock is active")
 
-    prev_eng = previous.get("engineering_track", {})
-    cur_eng = current.get("engineering_track", {})
     _validate_phase_transition(
         str(prev_eng.get("phase")),
         str(cur_eng.get("phase")),
@@ -220,7 +236,16 @@ def validate_transition(previous: dict[str, Any], current: dict[str, Any], polic
 
     prev_lot = prev_eng.get("active_lot")
     cur_lot = cur_eng.get("active_lot")
-    if prev_lot == cur_lot:
+    if terminal_activation:
+        if cur_completed != prev_completed + ["ENG-09"]:
+            raise StateMachineError("terminal activation must append ENG-09 exactly once")
+        if cur_eng.get("branch") != prev_eng.get("branch"):
+            raise StateMachineError("engineering branch changed during terminal activation")
+        if previous.get("safety") != current.get("safety"):
+            raise StateMachineError("terminal activation cannot change runtime safety")
+        if previous.get("cost_policy") != current.get("cost_policy"):
+            raise StateMachineError("terminal activation cannot change mandatory cost policy")
+    elif prev_lot == cur_lot:
         if cur_completed != prev_completed:
             raise StateMachineError("completed lots changed without active-lot transition")
         if prev_eng.get("next_lot") != cur_eng.get("next_lot"):
