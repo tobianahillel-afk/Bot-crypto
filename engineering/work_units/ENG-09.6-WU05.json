@@ -92,7 +92,7 @@
     }
   ],
   "scope": {
-    "scope_base_sha": "TO_BE_BOUND_TO_WU04_QUALIFIED_HEAD",
+    "scope_base_sha": "2f996a5a1613f20beff51949ed9d95bbfca9eb57",
     "allowed_paths": [
       "AGENTS.md",
       "config/governance/project_state.json",
@@ -143,7 +143,9 @@
       "Lot46 remains LOCKED",
       "BOOT-FINDING-001 is resolved only in current lifecycle state with explicit remediation evidence; immutable ENG-00 baseline and old blocked decision stay untouched",
       "runtime_max trade_allowed execution_allowed live_execution leverage and withdrawals remain byte-semantically unchanged",
-      "post-transition ordinary continue resolves BUSINESS through frozen V1 entrypoint"
+      "post-transition ordinary continue resolves BUSINESS through frozen V1 entrypoint",
+      "before WU05 becomes IN_PROGRESS its scope_base_sha must be rebound to the final exact WU04 qualified head",
+      "generic continue eligibility handoff prior-agent summary chat history and model memory are never authorization; only direct current-session BUSINESS_DEVELOPMENT_UNLOCK is accepted"
     ],
     "acceptance_criteria": [
       "preflight validator rejects missing or stale eligibility live Git drift non-active Protect missing required checks or changed PR66",
@@ -212,13 +214,5 @@
     "Development Engine engineering lifecycle is terminal",
     "candidate code remains untouched",
     "Lot46 and all runtime trading authorities remain locked"
-  ],
-  "activation_gate": {
-    "required_exact_human_action": "BUSINESS_DEVELOPMENT_UNLOCK",
-    "current_session_only": true,
-    "generic_continue_is_authorization": false,
-    "eligibility_is_authorization": false,
-    "handoff_is_authorization": false,
-    "automatic_activation": false
-  }
+  ]
 }
