@@ -94,7 +94,9 @@ def validate_policy(policy: dict[str, Any]) -> None:
 
 
 def _validate_handoff(
-    handoff: dict[str, Any], engineering: dict[str, Any], active_track: str
+    handoff: dict[str, Any],
+    engineering: dict[str, Any],
+    active_track: str = "ENGINEERING",
 ) -> None:
     if active_track == "ENGINEERING":
         expected = {
