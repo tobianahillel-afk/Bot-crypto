@@ -13,7 +13,9 @@
     "handoff_role": "RESUME_HINT_NOT_AUTHORITY",
     "state_source": "config/governance/project_state.json"
   },
-  "blockers": [],
+  "blockers": [
+    "BOOT-FINDING-001"
+  ],
   "current_objective": "Stage the atomic terminal ENGINEERING-to-BUSINESS activation route without changing canonical business authority.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
@@ -34,7 +36,6 @@
     "active_task": "ENG-09.6"
   },
   "recent_completed": [
-    "ENG-09.4-WU02 qualified Development Engine V1 exact-head at 972748579bcb998fc48542c02ed76aacae482fa5; qualification run 36461104451 passed.",
     "ENG-09.4-WU03 persisted exact certification evidence and retired its temporary qualification workflow without rewriting evidence.",
     "ENG-09.5-WU01 defined the V1 compatibility surface while leaving dynamic state payloads unfrozen.",
     "ENG-09.5-WU02 integrated the permanent V1 interface validator; Bootstrap 36486573093 and Secrets 36486572922 passed.",
@@ -75,7 +76,7 @@
     "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
     "trade_allowed": false
   },
-  "status": "IN_PROGRESS",
+  "status": "BLOCKED",
   "stop_conditions": [
     "STATE_DRIFT",
     "BUSINESS_SCOPE_TOUCHED_WITHOUT_UNLOCK",
@@ -84,13 +85,6 @@
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
   ],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "head_sha": "e322f25012c875fb3ddbe1b814019adbe28e5123",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36468361228",
-      "scope": "ENG-09.4-WU03_CLEANUP_SECURITY_SUPPLY_CHAIN",
-      "status": "PASS"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "head_sha": "476a1042c9dfff84ebed89f7ad1ee10e2ef07a9c",
@@ -167,6 +161,13 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36603755867",
       "scope": "ENG-09.6-WU03A_SCOPE_BASE_BOOTSTRAP",
       "status": "PASS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36607903196",
+      "head_sha": "86da75900304e364bc8f11a0cd3b472fe4606a2f",
+      "scope": "ENG-09.6-WU03A_TERMINAL_ROUTING_BOOTSTRAP"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"
