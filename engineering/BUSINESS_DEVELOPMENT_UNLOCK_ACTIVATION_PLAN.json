@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "business_development_unlock_activation_plan_v1",
+  "semantics": "STAGED_NOT_EXECUTED",
+  "project": "Crypto Quant Bot V3.1-Ops",
+  "staged_on_engineering_head": "bf298962a225bbf1b2149efb50b8f15fae575496",
+  "eligibility": {
+    "path": "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY.json",
+    "verdict": "ELIGIBLE_AWAITING_EXPLICIT_HUMAN_UNLOCK",
+    "ruleset_id": 24172517,
+    "required_checks": [
+      "Gitleaks pinned CLI",
+      "CodeQL Python security-extended",
+      "quality"
+    ]
+  },
+  "canonical_authority_before": {
+    "engineering_phase": "BUILDING",
+    "engineering_active_lot": "ENG-09",
+    "engineering_active_task": "ENG-09.6",
+    "business_development": "PAUSED",
+    "candidate_status": "SUSPENDED_CANDIDATE",
+    "lot46_status": "LOCKED"
+  },
+  "staged_route": {
+    "business_manifest": "business/lots/LOT-45.json",
+    "first_business_awu": "business/work_units/LOT-45.1-WU01.json",
+    "first_business_behavior": "READ_ONLY_EXACT_HEAD_REQUALIFICATION",
+    "candidate_branch_mutation_allowed": false,
+    "candidate_merge_allowed": false
+  },
+  "atomic_activation_target": {
+    "engineering_phase": "STABLE",
+    "engineering_completed_append": "ENG-09",
+    "engineering_active_lot": null,
+    "engineering_active_task": null,
+    "engineering_active_manifest": null,
+    "engineering_next_lot": null,
+    "business_development": "ACTIVE",
+    "candidate_status": "ACTIVE_CANDIDATE",
+    "candidate_state": "OPEN",
+    "candidate_merged": false,
+    "authority_active_manifest": "business/lots/LOT-45.json",
+    "business_task_status": "IN_PROGRESS",
+    "business_awu_status": "IN_PROGRESS",
+    "lot46_status": "LOCKED"
+  },
+  "execution_gate": {
+    "explicit_human_action_required": "BUSINESS_DEVELOPMENT_UNLOCK",
+    "direct_current_session_required": true,
+    "automatic_transition_forbidden": true,
+    "eligibility_is_not_authorization": true,
+    "handoff_is_not_authorization": true
+  },
+  "safety_unchanged": {
+    "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED",
+    "leverage": "FORBIDDEN",
+    "withdrawals": "FORBIDDEN"
+  },
+  "status": "STAGED_AWAITING_DIRECT_EXPLICIT_HUMAN_ACTION"
+}

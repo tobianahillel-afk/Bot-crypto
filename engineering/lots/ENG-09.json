@@ -14,7 +14,11 @@
     "config/governance/**",
     "engineering/**",
     "scripts/governance/**",
-    ".github/workflows/**"
+    ".github/workflows/**",
+    "business/lots/LOT-45.json",
+    "business/work_units/LOT-45.1-WU01.json",
+    "business/evidence/LOT45_V1_REQUALIFICATION.json",
+    "business/plans/LOT45_REMEDIATION_PLAN.json"
   ],
   "forbidden_scope": [
     "Lot45 candidate branch mutation during ENG-09.1 pilot",
@@ -65,7 +69,8 @@
     "pilot-discovered engine defects are repaired and regression-qualified",
     "Development Engine V1 receives exact-head SAFE FAST zero-cost security certification",
     "V1 bootstrap interfaces are frozen and documented",
-    "business-development unlock is an explicit fail-closed decision that cannot bypass BOOT-FINDING-001 or other blockers"
+    "business-development unlock is an explicit fail-closed decision that cannot bypass BOOT-FINDING-001 or other blockers",
+    "terminal business route is staged before any activation so ordinary continue cannot dead-end after ENG-09 completion"
   ],
   "extensions": {
     "scope_base_sha": "c2c1f0990c881cb725a3fccfccfd8098f84a0694",

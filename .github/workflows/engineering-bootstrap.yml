@@ -55,6 +55,14 @@ jobs:
       - name: Run terminal business routing adversarial self-tests
         run: python scripts/governance/selftest_terminal_business_routing.py
 
+      - name: Validate staged business-development activation topology
+        run: |
+          python scripts/governance/validate_business_development_activation.py --mode staged
+          python scripts/governance/validate_business_development_activation.py --mode synthetic-activated
+
+      - name: Run business-development activation adversarial self-tests
+        run: python scripts/governance/selftest_business_development_activation.py
+
       - name: Validate canonical state
         run: python scripts/governance/validate_bootstrap_state.py
 
