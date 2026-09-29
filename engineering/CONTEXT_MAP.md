@@ -13,7 +13,7 @@
 - Track: ENGINEERING
 - Work item: ENG-09
 - Task: ENG-09.6
-- AWU: ENG-09.6-WU03A
+- AWU: ENG-09.6-WU03
 - Risk: R2
 - Manifest: engineering/lots/ENG-09.json
 - AWU file: engineering/work_units/ENG-09.6-WU03A.json
