@@ -102,13 +102,19 @@ def validate_current(state: dict[str, Any], policy: dict[str, Any]) -> None:
     safety = state.get("safety", {})
     cost = state.get("cost_policy", {})
 
-    if business.get("development_status") != "PAUSED":
-        raise StateMachineError("BUSINESS must remain PAUSED during engine foundation")
+    business_mode = business.get("development_status")
+    if business_mode not in {"PAUSED", "ACTIVE"}:
+        raise StateMachineError(f"unsupported BUSINESS lifecycle mode: {business_mode!r}")
     if business.get("next_lot") != {"lot": 46, "status": "LOCKED"}:
         raise StateMachineError("Lot46 must remain LOCKED")
     candidate = business.get("candidate")
     if not isinstance(candidate, dict) or candidate.get("merged") is not False:
         raise StateMachineError("Lot45 candidate must remain explicitly unmerged")
+    if candidate.get("state") != "OPEN":
+        raise StateMachineError("Lot45 candidate must remain OPEN")
+    expected_candidate_status = "SUSPENDED_CANDIDATE" if business_mode == "PAUSED" else "ACTIVE_CANDIDATE"
+    if candidate.get("status") != expected_candidate_status:
+        raise StateMachineError("Lot45 candidate lifecycle status disagrees with BUSINESS mode")
 
     if safety.get("trade_allowed") is not False or safety.get("execution_allowed") is not False:
         raise StateMachineError("trade/execution must remain disabled")
@@ -125,6 +131,8 @@ def validate_current(state: dict[str, Any], policy: dict[str, Any]) -> None:
     if phase not in policy.get("engineering_phase_transitions", {}):
         raise StateMachineError(f"unknown ENGINEERING phase: {phase!r}")
     if phase == "BUILDING":
+        if business_mode != "PAUSED":
+            raise StateMachineError("ENGINEERING BUILDING requires BUSINESS PAUSED")
         for key in ("active_lot","active_task","next_lot","active_manifest","branch"):
             if not isinstance(engineering.get(key), str) or not engineering[key]:
                 raise StateMachineError(f"ENGINEERING BUILDING requires {key}")
@@ -140,6 +148,16 @@ def validate_current(state: dict[str, Any], policy: dict[str, Any]) -> None:
         ]
         if active_tasks != [engineering.get("active_task")]:
             raise StateMachineError("ENGINEERING active_task/manfiest status mismatch")
+    elif phase in {"STABLE", "COMPLETE"}:
+        if business_mode != "ACTIVE":
+            raise StateMachineError("terminal ENGINEERING requires BUSINESS ACTIVE")
+        for key in ("active_lot", "active_task", "next_lot", "active_manifest"):
+            if engineering.get(key) is not None:
+                raise StateMachineError(f"terminal ENGINEERING requires {key}=null")
+        if not engineering.get("completed") or engineering["completed"][-1] != "ENG-09":
+            raise StateMachineError("terminal ENGINEERING requires ENG-09 completed")
+        if engineering.get("blockers") != []:
+            raise StateMachineError("terminal ENGINEERING blockers must be empty")
 
     audit_phase = audit.get("phase")
     if audit_phase not in policy.get("audit_phase_transitions", {}):
