@@ -108,7 +108,7 @@ def _validate_active_manifest(
 def validate_state(
     state: dict[str, Any],
     policy: dict[str, Any],
-    manifest: dict[str, Any],
+    manifest: dict[str, Any] | None,
 ) -> None:
     if state.get("schema_version") != 1:
         raise BootstrapStateError("unsupported state schema_version")
@@ -154,21 +154,37 @@ def validate_state(
             if bootstrap.get(field) is not None:
                 raise BootstrapStateError(f"STABLE bootstrap requires {field}=null")
         engineering = _require(state, "engineering_engine", "state")
-        if engineering.get("phase") != "BUILDING":
-            raise BootstrapStateError("STABLE bootstrap must hand off to BUILDING engineering_engine")
-        active = engineering.get("active_lot")
-        task = engineering.get("active_task")
-        if not isinstance(active, str) or not active.startswith("ENG-"):
-            raise BootstrapStateError("engineering_engine active_lot must be ENG-*")
-        if not isinstance(task, str) or not task.startswith(f"{active}."):
-            raise BootstrapStateError("engineering_engine active_task must belong to active_lot")
-        _validate_active_manifest(engineering, manifest, completed_bootstrap=completed_bootstrap)
+        engineering_phase = engineering.get("phase")
+        if engineering_phase == "BUILDING":
+            active = engineering.get("active_lot")
+            task = engineering.get("active_task")
+            if not isinstance(active, str) or not active.startswith("ENG-"):
+                raise BootstrapStateError("engineering_engine active_lot must be ENG-*")
+            if not isinstance(task, str) or not task.startswith(f"{active}."):
+                raise BootstrapStateError("engineering_engine active_task must belong to active_lot")
+            if manifest is None:
+                raise BootstrapStateError("BUILDING engineering requires active manifest")
+            _validate_active_manifest(engineering, manifest, completed_bootstrap=completed_bootstrap)
+        elif engineering_phase in {"STABLE", "COMPLETE"}:
+            for field in ("active_lot", "active_task", "active_manifest", "next_lot"):
+                if engineering.get(field) is not None:
+                    raise BootstrapStateError(f"terminal engineering requires {field}=null")
+            if not engineering.get("completed") or engineering["completed"][-1] != "ENG-09":
+                raise BootstrapStateError("terminal engineering requires ENG-09 completed")
+            if engineering.get("blockers") != []:
+                raise BootstrapStateError("terminal engineering blockers must be empty")
+        else:
+            raise BootstrapStateError("STABLE bootstrap requires BUILDING or terminal engineering_engine")
     else:
         raise BootstrapStateError("unknown bootstrap phase")
 
     business = _require(state, "business_track", "state")
-    if business.get("business_development") != "PAUSED":
-        raise BootstrapStateError("business development must remain PAUSED during engine construction")
+    engineering_phase = state.get("engineering_engine", {}).get("phase")
+    expected_business = "PAUSED" if engineering_phase == "BUILDING" else "ACTIVE"
+    if business.get("business_development") != expected_business:
+        raise BootstrapStateError(
+            f"business development must be {expected_business} for engineering phase {engineering_phase}"
+        )
     next_lot = business.get("next_lot")
     if not isinstance(next_lot, dict) or next_lot.get("lot") != 46 or next_lot.get("status") != "LOCKED":
         raise BootstrapStateError("Lot46 must remain LOCKED during engine construction")
@@ -211,12 +227,16 @@ def main() -> int:
             else state.get("engineering_engine", {})
         )
         manifest_path = args.manifest
+        manifest = None
         if manifest_path is None:
-            declared = _require(active_engine, "active_manifest", "active_engine")
-            if not isinstance(declared, str):
+            declared = active_engine.get("active_manifest")
+            if isinstance(declared, str):
+                manifest_path = root / declared
+            elif active_engine.get("phase") not in {"STABLE", "COMPLETE"}:
                 raise BootstrapStateError("active_manifest must be a path")
-            manifest_path = root / declared
-        validate_state(state, policy, _load_json(manifest_path))
+        if manifest_path is not None:
+            manifest = _load_json(manifest_path)
+        validate_state(state, policy, manifest)
     except BootstrapStateError as exc:
         print(f"BOOTSTRAP_STATE_INVALID: {exc}", file=sys.stderr)
         return 1
