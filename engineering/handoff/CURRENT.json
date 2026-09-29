@@ -1,8 +1,8 @@
 {
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-09.6-WU05A",
-    "awu_path": "engineering/work_units/ENG-09.6-WU05A.json",
+    "awu_id": "ENG-09.6-WU06",
+    "awu_path": "engineering/work_units/ENG-09.6-WU06.json",
     "parent_manifest": "engineering/lots/ENG-09.json",
     "scope_base_sha": "787871d9527acf81f7d020d79e9cec3e00dc8ced",
     "risk_class": "R2",
@@ -16,7 +16,7 @@
   "blockers": [
     "BOOT-FINDING-001"
   ],
-  "current_objective": "Qualify terminal-business lifecycle compatibility without activating BUSINESS.",
+  "current_objective": "Qualify terminal-business lifecycle compatibility in ENG-09.6-WU06 without activating BUSINESS.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -29,7 +29,7 @@
     "rulesets_count": 0
   },
   "kind": "engineering_handoff",
-  "next_action": "Make lifecycle validators accept the explicit terminal STABLE/ACTIVE topology while preserving the current PAUSED/BUILDING mode.",
+  "next_action": "Complete strict bimodal lifecycle validators, then exact-head qualify WU06 before opening WU07.",
   "next_engineering": {
     "active_lot": "ENG-09",
     "active_manifest": "engineering/lots/ENG-09.json",
