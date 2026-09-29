@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "agent_work_unit",
   "id": "ENG-09.6-WU05",
-  "status": "PLANNED",
+  "status": "IN_PROGRESS",
   "parent": {
     "work_item_id": "ENG-09",
     "task_id": "ENG-09.6",
@@ -92,7 +92,7 @@
     }
   ],
   "scope": {
-    "scope_base_sha": "2f996a5a1613f20beff51949ed9d95bbfca9eb57",
+    "scope_base_sha": "c837a468ef318796bdda2d9f770613ec6c8593c5",
     "allowed_paths": [
       "AGENTS.md",
       "config/governance/project_state.json",
