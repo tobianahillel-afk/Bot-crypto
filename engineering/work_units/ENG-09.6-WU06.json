@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "agent_work_unit",
   "id": "ENG-09.6-WU06",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "parent": {
     "work_item_id": "ENG-09",
     "task_id": "ENG-09.6",
@@ -10,151 +10,38 @@
   },
   "title": "Make lifecycle validators terminal-business compatible",
   "objective": "Extend lifecycle validators to accept the explicitly authorized terminal ENGINEERING/STABLE plus BUSINESS/ACTIVE topology while preserving PAUSED/BUILDING mode and fail-closed runtime safety.",
-  "non_goals": [
-    "activate business development",
-    "modify or merge PR66",
-    "unlock Lot46",
-    "change runtime/trading authority",
-    "rewrite historical evidence"
-  ],
-  "depends_on": [
-    "ENG-09.6-WU04"
-  ],
+  "non_goals": ["activate business development","modify or merge PR66","unlock Lot46","change runtime/trading authority","rewrite historical evidence"],
+  "depends_on": ["ENG-09.6-WU04"],
   "inputs": [
-    {
-      "name": "Activation policy",
-      "kind": "CONFIG",
-      "locator": "config/governance/business_unlock_activation_policy_v1.json"
-    },
-    {
-      "name": "Terminal route policy",
-      "kind": "CONFIG",
-      "locator": "config/governance/active_work_routing_policy_v1.json"
-    }
+    {"name":"Activation policy","kind":"CONFIG","locator":"config/governance/business_unlock_activation_policy_v1.json"},
+    {"name":"Terminal route policy","kind":"CONFIG","locator":"config/governance/active_work_routing_policy_v1.json"}
   ],
   "outputs": [
-    {
-      "name": "Permanent state validator",
-      "kind": "FILE",
-      "locator": "scripts/governance/validate_project_state.py"
-    },
-    {
-      "name": "Permanent state machine",
-      "kind": "FILE",
-      "locator": "scripts/governance/validate_project_state_machine.py"
-    },
-    {
-      "name": "Bootstrap bridge validator",
-      "kind": "FILE",
-      "locator": "scripts/governance/validate_bootstrap_state.py"
-    },
-    {
-      "name": "Permanent design validator",
-      "kind": "FILE",
-      "locator": "scripts/governance/validate_permanent_state_design.py"
-    },
-    {
-      "name": "V1 interface validator",
-      "kind": "FILE",
-      "locator": "scripts/governance/validate_development_engine_v1_interface_freeze.py"
-    }
+    {"name":"Permanent state validator","kind":"FILE","locator":"scripts/governance/validate_project_state.py"},
+    {"name":"Permanent state machine","kind":"FILE","locator":"scripts/governance/validate_project_state_machine.py"},
+    {"name":"Bootstrap bridge validator","kind":"FILE","locator":"scripts/governance/validate_bootstrap_state.py"},
+    {"name":"Permanent design validator","kind":"FILE","locator":"scripts/governance/validate_permanent_state_design.py"},
+    {"name":"V1 interface validator","kind":"FILE","locator":"scripts/governance/validate_development_engine_v1_interface_freeze.py"}
   ],
   "scope": {
     "scope_base_sha": "787871d9527acf81f7d020d79e9cec3e00dc8ced",
-    "allowed_paths": [
-      "engineering/work_units/ENG-09.6-WU05.json",
-      "engineering/work_units/ENG-09.6-WU06.json",
-      "engineering/work_units/ENG-09.6-WU07.json",
-      "engineering/handoff/CURRENT.json",
-      "engineering/CONTEXT_MAP.json",
-      "engineering/CONTEXT_MAP.md",
-      "scripts/governance/validate_project_state.py",
-      "scripts/governance/validate_project_state_machine.py",
-      "scripts/governance/validate_bootstrap_state.py",
-      "scripts/governance/validate_permanent_state_design.py",
-      "scripts/governance/validate_development_engine_v1_interface_freeze.py"
-    ],
-    "forbidden_paths": [
-      "src/crypto_quant_bot/**",
-      "contracts/**",
-      "data/audit/**",
-      "reports/lot*/**",
-      ".github/workflows/**"
-    ],
-    "forbidden_semantics": [
-      "business activation",
-      "candidate mutation or merge",
-      "Lot46 unlock",
-      "runtime capability activation",
-      "historical evidence mutation"
-    ]
+    "allowed_paths": ["engineering/work_units/ENG-09.6-WU05.json","engineering/work_units/ENG-09.6-WU06.json","engineering/work_units/ENG-09.6-WU07.json","engineering/handoff/CURRENT.json","engineering/CONTEXT_MAP.json","engineering/CONTEXT_MAP.md","scripts/governance/validate_project_state.py","scripts/governance/validate_project_state_machine.py","scripts/governance/validate_bootstrap_state.py","scripts/governance/validate_permanent_state_design.py","scripts/governance/validate_development_engine_v1_interface_freeze.py"],
+    "forbidden_paths": ["src/crypto_quant_bot/**","contracts/**","data/audit/**","reports/lot*/**",".github/workflows/**"],
+    "forbidden_semantics": ["business activation","candidate mutation or merge","Lot46 unlock","runtime capability activation","historical evidence mutation"]
   },
   "contracts": {
-    "required_invariants": [
-      "PAUSED/BUILDING remains valid",
-      "terminal STABLE/ACTIVE is accepted only with Lot46 LOCKED, candidate ACTIVE_CANDIDATE OPEN unmerged and unchanged runtime safety",
-      "historical finding entries are preserved; resolved lifecycle findings become observed=false rather than deleted",
-      "frozen V1 paths and CLI contracts remain unchanged"
-    ],
-    "acceptance_criteria": [
-      "current pre-activation repository remains valid",
-      "synthetic terminal topology is accepted",
-      "unlocked Lot46 or enabled trade/execution is rejected"
-    ]
+    "required_invariants": ["PAUSED/BUILDING remains valid","terminal STABLE/ACTIVE is accepted only with Lot46 LOCKED, candidate ACTIVE_CANDIDATE OPEN unmerged and unchanged runtime safety","historical finding entries are preserved; resolved lifecycle findings become observed=false rather than deleted","frozen V1 paths and CLI contracts remain unchanged"],
+    "acceptance_criteria": ["current pre-activation repository remains valid","synthetic terminal topology is accepted","unlocked Lot46 or enabled trade/execution is rejected"]
   },
   "planning": {
     "risk_class": "R2",
     "complexity_score": 7,
     "split_required": false,
-    "context_budget": {
-      "max_primary_files": 12,
-      "max_reference_files": 16,
-      "max_total_kib": 1024
-    },
-    "complexity_factors": {
-      "production_modules": 0,
-      "contract_schema_families": 0,
-      "policy_config_families": 1,
-      "persistence_checksum_boundary": false,
-      "math_numeric_semantics": false,
-      "temporal_lineage_semantics": false,
-      "cross_domain_interfaces": 1,
-      "state_machine_or_concurrency": true,
-      "security_trust_boundary": true,
-      "risk_execution_permission": false,
-      "dependency_change": false,
-      "ci_evidence_topology_change": false
-    },
-    "size_estimate": {
-      "business_domains": 1,
-      "files_touched": 11,
-      "executable_loc_changed": 760,
-      "new_public_behaviors": 1,
-      "contract_families": 0,
-      "independent_algorithms": 1,
-      "state_machines": 1,
-      "trust_boundaries": 1,
-      "new_dependencies": 0
-    },
+    "context_budget": {"max_primary_files":12,"max_reference_files":16,"max_total_kib":1024},
+    "complexity_factors": {"production_modules":0,"contract_schema_families":0,"policy_config_families":1,"persistence_checksum_boundary":false,"math_numeric_semantics":false,"temporal_lineage_semantics":false,"cross_domain_interfaces":1,"state_machine_or_concurrency":true,"security_trust_boundary":true,"risk_execution_permission":false,"dependency_change":false,"ci_evidence_topology_change":false},
+    "size_estimate": {"business_domains":1,"files_touched":11,"executable_loc_changed":760,"new_public_behaviors":1,"contract_families":0,"independent_algorithms":1,"state_machines":1,"trust_boundaries":1,"new_dependencies":0},
     "split_reasons": []
   },
-  "validation": {
-    "required_tiers": [
-      "T0",
-      "T1",
-      "T3"
-    ],
-    "target_commands": [
-      "python scripts/governance/validate_project_state.py",
-      "python scripts/governance/validate_project_state_machine.py",
-      "python scripts/governance/validate_bootstrap_state.py",
-      "python scripts/governance/validate_permanent_state_design.py",
-      "python scripts/governance/validate_development_engine_v1_interface_freeze.py"
-    ]
-  },
-  "done_when": [
-    "foundation mode remains green",
-    "terminal lifecycle is accepted without weakening safety",
-    "WU07 can qualify resume/handoff compatibility"
-  ]
+  "validation": {"required_tiers":["T0","T1","T3"],"target_commands":["python scripts/governance/validate_project_state.py","python scripts/governance/validate_project_state_machine.py","python scripts/governance/validate_bootstrap_state.py","python scripts/governance/validate_permanent_state_design.py","python scripts/governance/validate_development_engine_v1_interface_freeze.py"]},
+  "done_when": ["foundation mode remains green","terminal lifecycle is accepted without weakening safety","WU07 can qualify resume/handoff compatibility"]
 }
