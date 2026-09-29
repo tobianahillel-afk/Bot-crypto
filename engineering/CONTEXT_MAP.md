@@ -13,22 +13,19 @@
 - Track: ENGINEERING
 - Work item: ENG-09
 - Task: ENG-09.6
-- AWU: ENG-09.6-WU05
+- AWU: ENG-09.6-WU05A
 - Risk: R2
 - Manifest: engineering/lots/ENG-09.json
-- AWU file: engineering/work_units/ENG-09.6-WU05.json
+- AWU file: engineering/work_units/ENG-09.6-WU05A.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-09.json
-- engineering/work_units/ENG-09.6-WU05.json
-- engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION_PLAN.json
-- engineering/BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY.json
+- engineering/work_units/ENG-09.6-WU05A.json
 - config/governance/business_unlock_activation_policy_v1.json
-- business/lots/LOT-45.json
-- business/work_units/LOT-45.1-WU01.json
+- config/governance/active_work_routing_policy_v1.json
 
 ## Execution context — reference
 
@@ -37,16 +34,16 @@
 
 ## Budget
 
-- Primary: 9 / 12 files
+- Primary: 6 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 49 / 1024 KiB
+- Routed size: 34 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: Execute the explicitly authorized BUSINESS_DEVELOPMENT_UNLOCK through ENG-09.6-WU05 without changing runtime/trading authority.
-- Next action: Live-reverify Protect/main/PR66, then execute the atomic terminal ENGINEERING-to-BUSINESS activation and qualify the exact activation head.
+- Objective: Qualify terminal-business lifecycle compatibility without activating BUSINESS.
+- Next action: Make lifecycle validators accept the explicit terminal STABLE/ACTIVE topology while preserving the current PAUSED/BUILDING mode.
 
 ## Non-authoritative sources
 
