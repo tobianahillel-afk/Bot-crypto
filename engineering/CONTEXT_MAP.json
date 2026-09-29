@@ -1,7 +1,7 @@
 {
   "active_work": {
-    "awu_id": "ENG-09.6-WU05",
-    "awu_path": "engineering/work_units/ENG-09.6-WU05.json",
+    "awu_id": "ENG-09.6-WU05A",
+    "awu_path": "engineering/work_units/ENG-09.6-WU05A.json",
     "complexity_score": 7,
     "lot": "ENG-09",
     "manifest": "engineering/lots/ENG-09.json",
@@ -35,24 +35,21 @@
       "max_total_kib": 1024
     },
     "implicit_expansion": "FORBIDDEN",
-    "primary_count": 9,
+    "primary_count": 6,
     "primary_files": [
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-09.json",
-      "engineering/work_units/ENG-09.6-WU05.json",
-      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION_PLAN.json",
-      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY.json",
+      "engineering/work_units/ENG-09.6-WU05A.json",
       "config/governance/business_unlock_activation_policy_v1.json",
-      "business/lots/LOT-45.json",
-      "business/work_units/LOT-45.1-WU01.json"
+      "config/governance/active_work_routing_policy_v1.json"
     ],
     "reference_count": 2,
     "reference_files": [
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 49
+    "total_kib_ceil": 34
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -68,9 +65,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "Execute the explicitly authorized BUSINESS_DEVELOPMENT_UNLOCK through ENG-09.6-WU05 without changing runtime/trading authority.",
+    "current_objective": "Qualify terminal-business lifecycle compatibility without activating BUSINESS.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Live-reverify Protect/main/PR66, then execute the atomic terminal ENGINEERING-to-BUSINESS activation and qualify the exact activation head."
+    "next_action": "Make lifecycle validators accept the explicit terminal STABLE/ACTIVE topology while preserving the current PAUSED/BUILDING mode."
   },
   "safety": {
     "execution_allowed": false,
