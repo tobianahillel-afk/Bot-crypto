@@ -49,7 +49,7 @@
     "reference_files": [
       "engineering/MASTER_PLAN.md"
     ],
-    "total_kib_ceil": 41
+    "total_kib_ceil": 42
   },
   "instructions": [
     "verify external Git reality before writing",
