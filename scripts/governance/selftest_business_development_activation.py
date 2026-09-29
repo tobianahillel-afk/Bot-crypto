@@ -24,4 +24,5 @@ def main():
     x=copy.deepcopy(ba); x["status"]="IN_PROGRESS"; expect(m.ActivationError,lambda:m.validate_staged(plan,s,bm,x,p),"premature business AWU")
     x=copy.deepcopy(p); x["explicit_human_action"]="continue"; expect(m.ActivationError,lambda:m.validate_policy(x),"generic continue authorization")
     print("BUSINESS_ACTIVATION_SELFTEST_PASS probes=8"); return 0
-if __name__=="__main__": raise SystemExit(main())
+if __name__ == "__main__":
+    raise SystemExit(main())
