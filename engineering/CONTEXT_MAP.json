@@ -69,8 +69,8 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "handoff": "engineering/handoff/CURRENT.json",
     "current_objective": "Re-evaluate business-development unlock eligibility against the manually remediated live ruleset without activating business/runtime authority.",
+    "handoff": "engineering/handoff/CURRENT.json",
     "next_action": "Validate exact live protection and PR #66 against BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY; if eligible, preserve PAUSED/LOCKED authority and require a separate explicit human unlock transition."
   },
   "safety": {
