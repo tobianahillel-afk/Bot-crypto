@@ -19,8 +19,50 @@
   "depends_on": [
     "ENG-09.6-WU06"
   ],
-  "inputs": [],
-  "outputs": [],
+  "inputs": [
+    {
+      "name": "Terminal active-work routing policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/active_work_routing_policy_v1.json"
+    },
+    {
+      "name": "Lifecycle-compatible canonical state validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_project_state.py"
+    },
+    {
+      "name": "Frozen V1 bootstrap entrypoint",
+      "kind": "FILE",
+      "locator": "AGENTS.md"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Terminal-aware next-work resolver",
+      "kind": "FILE",
+      "locator": "scripts/governance/resolve_next_work.py"
+    },
+    {
+      "name": "Terminal-aware cold-start qualification",
+      "kind": "FILE",
+      "locator": "scripts/governance/cold_start_qualification.py"
+    },
+    {
+      "name": "Terminal-aware resume qualification",
+      "kind": "FILE",
+      "locator": "scripts/governance/resume_recovery_qualification.py"
+    },
+    {
+      "name": "Terminal-aware handoff contract",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_handoff.py"
+    },
+    {
+      "name": "Terminal-aware current status renderer",
+      "kind": "FILE",
+      "locator": "scripts/governance/render_current_status.py"
+    }
+  ],
   "scope": {
     "scope_base_sha": "TO_BE_BOUND_AFTER_WU05A",
     "allowed_paths": [
