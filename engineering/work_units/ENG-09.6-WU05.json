@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "agent_work_unit",
   "id": "ENG-09.6-WU05",
-  "status": "IN_PROGRESS",
+  "status": "PLANNED",
   "parent": {
     "work_item_id": "ENG-09",
     "task_id": "ENG-09.6",
@@ -20,7 +20,7 @@
     "treat eligibility handoff chat history or model memory as sufficient authorization"
   ],
   "depends_on": [
-    "ENG-09.6-WU04"
+    "ENG-09.6-WU05B"
   ],
   "inputs": [
     {
