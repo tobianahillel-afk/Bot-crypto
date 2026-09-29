@@ -88,7 +88,8 @@
       "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY.json",
       "scripts/governance/validate_business_development_unlock_eligibility.py",
       "scripts/governance/selftest_business_development_unlock_eligibility.py",
-      ".github/workflows/engineering-bootstrap.yml"
+      ".github/workflows/engineering-bootstrap.yml",
+      "engineering/work_units/ENG-09.6-WU03A.json"
     ],
     "forbidden_paths": [
       "config/governance/project_state.json",
@@ -125,7 +126,8 @@
       "branch resource protected must be true and PR66 head/base/state/merged facts must remain unchanged",
       "eligibility verdict grants permission to perform a later explicit unlock transition but does not itself activate business or runtime authority",
       "Lot45 remains SUSPENDED_CANDIDATE Lot46 remains LOCKED and trade/execution remain fail-closed",
-      "any later change to main candidate or normalized ruleset invalidates the evidence and requires explicit re-evaluation"
+      "any later change to main candidate or normalized ruleset invalidates the evidence and requires explicit re-evaluation",
+      "the only successor introduced by this eligibility AWU is the human-authorized terminal-routing preparation AWU; no business/runtime authority changes in this planning amendment"
     ],
     "acceptance_criteria": [
       "snapshot eligibility validator passes against the persisted post-remediation evidence",
