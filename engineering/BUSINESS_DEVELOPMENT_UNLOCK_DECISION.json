@@ -18,9 +18,29 @@
     "required_semantics": "BUSINESS_UNLOCK_REQUIRES_VERIFIED_MAIN_PROTECTION",
     "observed_main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
     "branch_protected": false,
-    "rulesets_count": 0,
+    "rulesets_count": 1,
     "overall_status": "UNPROTECTED",
-    "manual_admin_action_required": true
+    "manual_admin_action_required": true,
+    "rulesets_enabled_count": 0,
+    "rulesets_disabled_count": 1,
+    "observed_rulesets": [
+      {
+        "id": 24172517,
+        "name": "Protect",
+        "target": "branch",
+        "enforcement": "disabled",
+        "conditions": {
+          "ref_name": {
+            "exclude": [],
+            "include": []
+          }
+        },
+        "rules": [
+          "deletion",
+          "non_fast_forward"
+        ]
+      }
+    ]
   },
   "blocking_findings": [
     "BOOT-FINDING-001"
@@ -43,9 +63,36 @@
   },
   "required_remediation": [
     "Protect main with an accepted GitHub branch-protection or repository-ruleset mechanism.",
-    "Require pull requests and required status checks on main.",
-    "Block force pushes and branch deletion on main.",
+    "If using repository ruleset Protect (id 24172517), enable enforcement for the intended main-branch scope.",
+    "Add required pull-request enforcement; the currently observed ruleset has no pull-request rule.",
+    "Add required status-check enforcement; the currently observed ruleset has no required-status-check rule.",
+    "Keep force-push prevention and branch-deletion prevention actively enforced.",
     "Refresh live external Git verification after the administrative change.",
     "Re-evaluate this decision explicitly; never auto-unlock from an external observation."
-  ]
+  ],
+  "live_reverification": {
+    "date": "2026-09-29",
+    "source": "GITHUB_CONNECTOR",
+    "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "main_branch_protected": false,
+    "rulesets_count": 1,
+    "active_rulesets_count": 0,
+    "observed_ruleset": {
+      "id": 24172517,
+      "name": "Protect",
+      "target": "branch",
+      "enforcement": "disabled",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": []
+        }
+      },
+      "rules": [
+        "deletion",
+        "non_fast_forward"
+      ]
+    },
+    "conclusion": "BLOCKER_STILL_OBSERVED_DISABLED_INCOMPLETE_RULESET"
+  }
 }
