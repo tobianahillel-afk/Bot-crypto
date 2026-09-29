@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "agent_work_unit",
-  "id": "ENG-09.6-WU03A",
+  "id": "ENG-09.6-WU03",
   "status": "IN_PROGRESS",
   "parent": {
     "work_item_id": "ENG-09",
@@ -70,7 +70,7 @@
       "engineering/CONTEXT_MAP.md",
       "engineering/work_units/ENG-09.6-WU02.json",
       "engineering/work_units/ENG-09.6-WU03A.json",
-      "engineering/work_units/ENG-09.6-WU03B.json",
+      "engineering/work_units/ENG-09.6-WU04.json",
       "config/governance/active_work_routing_policy_v1.json",
       "scripts/governance/resolve_active_awu.py",
       "scripts/governance/render_context_map.py",
