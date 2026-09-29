@@ -1,10 +1,10 @@
 {
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-09.6-WU05",
-    "awu_path": "engineering/work_units/ENG-09.6-WU05.json",
+    "awu_id": "ENG-09.6-WU05A",
+    "awu_path": "engineering/work_units/ENG-09.6-WU05A.json",
     "parent_manifest": "engineering/lots/ENG-09.json",
-    "scope_base_sha": "c837a468ef318796bdda2d9f770613ec6c8593c5",
+    "scope_base_sha": "787871d9527acf81f7d020d79e9cec3e00dc8ced",
     "risk_class": "R2",
     "complexity_score": 7
   },
@@ -16,7 +16,7 @@
   "blockers": [
     "BOOT-FINDING-001"
   ],
-  "current_objective": "Execute the explicitly authorized BUSINESS_DEVELOPMENT_UNLOCK through ENG-09.6-WU05 without changing runtime/trading authority.",
+  "current_objective": "Qualify terminal-business lifecycle compatibility without activating BUSINESS.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -29,21 +29,21 @@
     "rulesets_count": 0
   },
   "kind": "engineering_handoff",
-  "next_action": "Live-reverify Protect/main/PR66, then execute the atomic terminal ENGINEERING-to-BUSINESS activation and qualify the exact activation head.",
+  "next_action": "Make lifecycle validators accept the explicit terminal STABLE/ACTIVE topology while preserving the current PAUSED/BUILDING mode.",
   "next_engineering": {
     "active_lot": "ENG-09",
     "active_manifest": "engineering/lots/ENG-09.json",
     "active_task": "ENG-09.6"
   },
   "recent_completed": [
-    "ENG-09.6-WU01 persisted the fail-closed BLOCKED_NO_UNLOCK checkpoint for the pre-remediation disabled/incomplete Protect ruleset.",
     "ENG-09.6-WU01 terminal blocked-decision path passed Bootstrap 36557277756 and Secrets 36557277759 on aaf1606b53446d7b3d49324049c60237942217ac.",
     "Post-remediation observation on 2026-09-29: ruleset Protect is active on main with PR enforcement and required checks Gitleaks pinned CLI, CodeQL Python security-extended, and quality; no business/runtime authority has been activated.",
     "ENG-09.6-WU02 proved post-remediation BUSINESS_DEVELOPMENT_UNLOCK eligibility on live protected main; the user subsequently supplied the required explicit human authorization, but authority remains unchanged until terminal routing/state compatibility is qualified.",
     "ENG-09.6-WU03 qualified backward-compatible terminal BUSINESS cold-start routing on exact head 86da75900304e364bc8f11a0cd3b472fe4606a2f; Engineering Bootstrap 36607903196 and Security Secrets 36607903198 passed.",
     "ENG-09.6-WU04 staged a bounded read-only Lot45 business route and passed activation staged/synthetic validation on head 2f996a5a1613f20beff51949ed9d95bbfca9eb57; Bootstrap 36617637470 and Security Secrets 36617637444 passed.",
     "ENG-09.6-WU04 final staging head c837a468ef318796bdda2d9f770613ec6c8593c5 passed Engineering Bootstrap 36618171456 and Security Secrets 36618171473.",
-    "Direct current-session BUSINESS_DEVELOPMENT_UNLOCK authorization received; WU05 activated with no BUSINESS authority mutation yet."
+    "Direct current-session BUSINESS_DEVELOPMENT_UNLOCK authorization received; WU05 activated with no BUSINESS authority mutation yet.",
+    "ENG-09.6-WU05 staging exact head 787871d9527acf81f7d020d79e9cec3e00dc8ced passed Engineering Bootstrap 36640205649; direct unlock remains authorized but not yet executed."
   ],
   "resume_read_order": [
     "AGENTS.md",
@@ -85,13 +85,6 @@
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
   ],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "head_sha": "8414ff22fdd53f3d9ab7d7408c6bedec75fc4e68",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36486573093",
-      "scope": "ENG-09.5-WU02_PERMANENT_V1_INTERFACE_BOOTSTRAP",
-      "status": "PASS"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "head_sha": "8414ff22fdd53f3d9ab7d7408c6bedec75fc4e68",
@@ -168,6 +161,13 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36618171473",
       "head_sha": "c837a468ef318796bdda2d9f770613ec6c8593c5",
       "scope": "ENG-09.6-WU04_FINAL_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36640205649",
+      "head_sha": "787871d9527acf81f7d020d79e9cec3e00dc8ced",
+      "scope": "ENG-09.6-WU05_STAGING_BOOTSTRAP"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"
