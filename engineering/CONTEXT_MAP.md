@@ -43,8 +43,8 @@
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: Stage the atomic terminal ENGINEERING-to-BUSINESS activation route without changing canonical business authority.
-- Next action: Expand ENG-09 scope for exact business staging files, create a read-only Lot45 requalification manifest/AWU plus activation policy/tests, and leave BUSINESS PAUSED until a direct explicit BUSINESS_DEVELOPMENT_UNLOCK instruction.
+- Objective: WU04 staging is qualified; wait for direct exact BUSINESS_DEVELOPMENT_UNLOCK before activating WU05.
+- Next action: Do not activate business on generic continue. On a direct current-session BUSINESS_DEVELOPMENT_UNLOCK instruction, live-reverify eligibility, bind WU05 to the qualified WU04 head, then execute the atomic terminal ENGINEERING-to-BUSINESS transition.
 
 ## Non-authoritative sources
 
