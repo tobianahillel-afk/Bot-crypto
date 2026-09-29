@@ -80,9 +80,87 @@ def validate(
 
     external = state.get("external_observations", {})
     main = external.get("main", {})
+    rulesets = external.get("rulesets", [])
+    _require(isinstance(rulesets, list), "external rulesets observation must be a list")
+    _require(
+        external.get("rulesets_count") == len(rulesets),
+        "external rulesets_count does not match observed rulesets",
+    )
+    enabled_rulesets = [
+        item for item in rulesets
+        if isinstance(item, dict) and item.get("enforcement") == "active"
+    ]
+    disabled_rulesets = [
+        item for item in rulesets
+        if isinstance(item, dict) and item.get("enforcement") == "disabled"
+    ]
+    _require(
+        external.get("rulesets_enabled_count") == len(enabled_rulesets),
+        "external enabled-ruleset count drift",
+    )
+    _require(
+        external.get("rulesets_disabled_count") == len(disabled_rulesets),
+        "external disabled-ruleset count drift",
+    )
+
+    decision_protection = decision.get("repository_protection", {})
+    _require(
+        decision_protection.get("observed_main_sha") == main.get("sha"),
+        "decision main SHA is not bound to current external observation",
+    )
+    _require(
+        decision_protection.get("branch_protected") == main.get("branch_protected"),
+        "decision branch-protection snapshot drift",
+    )
+    _require(
+        decision_protection.get("rulesets_count") == external.get("rulesets_count"),
+        "decision ruleset-count snapshot drift",
+    )
+    _require(
+        decision_protection.get("rulesets_enabled_count")
+        == external.get("rulesets_enabled_count"),
+        "decision enabled-ruleset snapshot drift",
+    )
+    _require(
+        decision_protection.get("rulesets_disabled_count")
+        == external.get("rulesets_disabled_count"),
+        "decision disabled-ruleset snapshot drift",
+    )
+    _require(
+        decision_protection.get("observed_rulesets") == rulesets,
+        "decision ruleset details are not exactly bound to external observation",
+    )
+    _require(
+        decision_protection.get("overall_status") == protection_status.get("overall_status"),
+        "decision protection status drift",
+    )
+    _require(
+        decision_protection.get("manual_admin_action_required")
+        == protection_status.get("manual_admin_action_required"),
+        "decision manual-remediation flag drift",
+    )
+
+    live = decision.get("live_reverification", {})
+    _require(live.get("source") == "GITHUB_CONNECTOR", "live re-verification source drift")
+    _require(live.get("main_sha") == main.get("sha"), "live re-verification main SHA drift")
+    _require(
+        live.get("main_branch_protected") == main.get("branch_protected"),
+        "live re-verification branch status drift",
+    )
+    _require(
+        live.get("rulesets_count") == external.get("rulesets_count"),
+        "live re-verification ruleset count drift",
+    )
+    _require(
+        live.get("active_rulesets_count") == len(enabled_rulesets),
+        "live re-verification active ruleset count drift",
+    )
+
+    accepted_mechanism_observed = (
+        main.get("branch_protected") is True or bool(enabled_rulesets)
+    )
     unprotected = (
-        main.get("branch_protected") is False
-        or external.get("rulesets_count") == 0
+        not accepted_mechanism_observed
         or protection_status.get("overall_status") != "PROTECTED"
         or protection_status.get("business_unlock_allowed") is not True
     )
