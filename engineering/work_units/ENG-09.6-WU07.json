@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "agent_work_unit",
   "id": "ENG-09.6-WU07",
-  "status": "PLANNED",
+  "status": "IN_PROGRESS",
   "parent": {
     "work_item_id": "ENG-09",
     "task_id": "ENG-09.6",
@@ -64,7 +64,7 @@
     }
   ],
   "scope": {
-    "scope_base_sha": "787871d9527acf81f7d020d79e9cec3e00dc8ced",
+    "scope_base_sha": "6c30f47c173218ff8645e23eefbbcf1a8f2eb373",
     "allowed_paths": [
       "engineering/work_units/ENG-09.6-WU06.json",
       "engineering/work_units/ENG-09.6-WU07.json",
