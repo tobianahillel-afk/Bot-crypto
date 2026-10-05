@@ -95,6 +95,21 @@
       "name": "Lifecycle-aware generated current-status adversarial tests",
       "kind": "TEST",
       "locator": "scripts/governance/selftest_current_status.py"
+    },
+    {
+      "name": "Live repository-protection status reconciliation",
+      "kind": "STATE",
+      "locator": "engineering/REPOSITORY_PROTECTION_STATUS.json"
+    },
+    {
+      "name": "Repository-protection current-status documentation",
+      "kind": "FILE",
+      "locator": "engineering/REPOSITORY_PROTECTION.md"
+    },
+    {
+      "name": "Protected-current-state repository-protection selftest",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_repository_protection.py"
     }
   ],
   "scope": {
@@ -118,7 +133,10 @@
       "scripts/governance/selftest_active_awu_scope.py",
       "scripts/governance/run_t0.py",
       "scripts/governance/run_t1.py",
-      "scripts/governance/selftest_current_status.py"
+      "scripts/governance/selftest_current_status.py",
+      "engineering/REPOSITORY_PROTECTION_STATUS.json",
+      "engineering/REPOSITORY_PROTECTION.md",
+      "scripts/governance/selftest_repository_protection.py"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -155,7 +173,8 @@
       "terminal bootstrap selftests must exercise validate_state with no engineering active manifest while validating the active business work-item independently",
       "BUSINESS scope_base_sha remains the explicit activation predecessor so the standard activation bridge validates the one-time authority transition separately from post-activation maintenance",
       "size_estimate.files_touched counts files intentionally modified by WU03, while the cumulative bridge allowlist may also contain prior post-activation business files required for scope replay",
-      "for ACTIVE BUSINESS routes the effective incremental diff begins after the one-time activation commit while scope_base_sha remains the immutable activation predecessor"
+      "for ACTIVE BUSINESS routes the effective incremental diff begins after the one-time activation commit while scope_base_sha remains the immutable activation predecessor",
+      "repository-protection status snapshot may be refreshed only from fresh live GitHub branch and ruleset reads; protection policy and historical activation evidence remain immutable"
     ],
     "acceptance_criteria": [
       "baseline file is not in the AWU allowed paths and is explicitly forbidden from mutation",
@@ -169,7 +188,8 @@
       "negative bootstrap selftest passes in terminal Engineering + ACTIVE Business lifecycle without synthesizing a nonexistent engineering active_manifest",
       "active AWU boundary passes through the standard activation bridge with only post-activation business and reconciliation files in the WU03 allowlist",
       "incremental T0/T1 validate only the post-activation business diff and still rely on the canonical activation bridge for transition integrity",
-      "CURRENT_STATUS selftest derives business lifecycle and candidate expectations from canonical project state and preserves stale-document detection"
+      "CURRENT_STATUS selftest derives business lifecycle and candidate expectations from canonical project state and preserves stale-document detection",
+      "repository-protection policy validator passes against fresh live main protected=true and the active Protect ruleset"
     ]
   },
   "planning": {
@@ -197,7 +217,7 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 14,
+      "files_touched": 17,
       "executable_loc_changed": 760,
       "new_public_behaviors": 1,
       "contract_families": 0,
