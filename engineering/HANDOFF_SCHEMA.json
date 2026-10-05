@@ -190,7 +190,10 @@
       ],
       "properties": {
         "track": {
-          "const": "ENGINEERING"
+          "enum": [
+            "ENGINEERING",
+            "BUSINESS"
+          ]
         },
         "awu_id": {
           "type": "string",
@@ -329,15 +332,24 @@
       ],
       "properties": {
         "active_lot": {
-          "type": "string",
+          "type": [
+            "string",
+            "null"
+          ],
           "minLength": 1
         },
         "active_task": {
-          "type": "string",
+          "type": [
+            "string",
+            "null"
+          ],
           "minLength": 1
         },
         "active_manifest": {
-          "type": "string",
+          "type": [
+            "string",
+            "null"
+          ],
           "minLength": 1
         }
       }
