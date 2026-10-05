@@ -45,7 +45,18 @@ def main() -> int:
     )
     resolver.validate_routing_policy(policy)
 
-    assert resolver.resolve_active_track(state, policy) == "ENGINEERING"
+    assert resolver.resolve_active_track(state, policy) == "BUSINESS"
+
+    building = copy.deepcopy(state)
+    building["engineering_track"]["phase"] = "BUILDING"
+    building["engineering_track"]["active_lot"] = "ENG-09"
+    building["engineering_track"]["active_task"] = "ENG-09.6"
+    building["engineering_track"]["next_lot"] = "ENGINE_COMPLETE"
+    building["engineering_track"]["active_manifest"] = "engineering/lots/ENG-09.json"
+    building["business_track"]["development_status"] = "PAUSED"
+    building["business_track"]["candidate"]["status"] = "SUSPENDED_CANDIDATE"
+    building["authority"]["active_manifest"] = "engineering/lots/ENG-09.json"
+    assert resolver.resolve_active_track(building, policy) == "ENGINEERING"
 
     terminal = copy.deepcopy(state)
     terminal["engineering_track"]["phase"] = "STABLE"
@@ -144,7 +155,7 @@ def main() -> int:
         "BUSINESS",
     )
 
-    print("TERMINAL_BUSINESS_ROUTING_SELFTEST_PASS probes=9")
+    print("TERMINAL_BUSINESS_ROUTING_SELFTEST_PASS probes=10")
     return 0
 
 
