@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-09.6-WU08",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "ENG-09",
+    "task_id": "ENG-09.6",
+    "manifest": "engineering/lots/ENG-09.json"
+  },
+  "title": "Repair exact-head terminal activation CI compatibility",
+  "objective": "Make the already-staged BUSINESS_DEVELOPMENT_UNLOCK transition exact-head CI-compatible by separating pre-activation checks from activated-state checks and validating the one-time activation diff without weakening the subsequent BUSINESS AWU boundary.",
+  "non_goals": [
+    "activate business development in this repair AWU",
+    "modify or merge PR66",
+    "unlock Lot46",
+    "change runtime trading leverage or withdrawal authority",
+    "change frozen Development Engine V1 stable entrypoint paths",
+    "introduce paid or LLM-backed mandatory review"
+  ],
+  "depends_on": [
+    "ENG-09.6-WU07"
+  ],
+  "inputs": [
+    {
+      "name": "Activation policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/business_unlock_activation_policy_v1.json"
+    },
+    {
+      "name": "Staged activation plan",
+      "kind": "EVIDENCE",
+      "locator": "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION_PLAN.json"
+    },
+    {
+      "name": "Activation validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_business_development_activation.py"
+    },
+    {
+      "name": "Active diff validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_bootstrap_diff.py"
+    },
+    {
+      "name": "Bootstrap workflow",
+      "kind": "FILE",
+      "locator": ".github/workflows/engineering-bootstrap.yml"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Activated-state CLI validation mode",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_business_development_activation.py"
+    },
+    {
+      "name": "Activation-transition diff validation",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_bootstrap_diff.py"
+    },
+    {
+      "name": "Lifecycle-aware bootstrap workflow",
+      "kind": "FILE",
+      "locator": ".github/workflows/engineering-bootstrap.yml"
+    },
+    {
+      "name": "Activation compatibility adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_business_development_activation.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "6bc13918ce1178d341175d588f4254e535e04e9a",
+    "allowed_paths": [
+      "engineering/work_units/ENG-09.6-WU05.json",
+      "engineering/work_units/ENG-09.6-WU08.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      ".github/workflows/engineering-bootstrap.yml",
+      "scripts/governance/validate_business_development_activation.py",
+      "scripts/governance/selftest_business_development_activation.py",
+      "scripts/governance/validate_bootstrap_diff.py",
+      "scripts/governance/selftest_active_awu_scope.py"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "contracts/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "business/**"
+    ],
+    "forbidden_semantics": [
+      "business activation",
+      "candidate mutation or merge",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "permission-to-trade activation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "PAUSED lifecycle keeps validating blocked decision eligibility staged topology and synthetic activated topology",
+      "ACTIVE lifecycle validates actual activated topology without requiring PAUSED-only evidence validators",
+      "activation transition diff is validated against WU05 activation allowlist before subsequent BUSINESS diff is validated against the active business AWU",
+      "ordinary BUSINESS changes after the activation commit cannot use the activation transition exception",
+      "Development Engine V1 frozen stable CLI contracts and authority paths remain unchanged",
+      "Lot46 and runtime trading authority remain fail-closed"
+    ],
+    "acceptance_criteria": [
+      "current PAUSED head remains fully green",
+      "synthetic ACTIVE lifecycle passes the same workflow routing logic",
+      "validate_business_development_activation.py exposes --mode activated",
+      "active BUSINESS scope validation rejects non-business changes after the derived activation commit",
+      "activation evidence predecessor mismatch fails closed",
+      "bootstrap and Security Secrets pass on the final repair exact head"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 8,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 1,
+      "state_machine_or_concurrency": true,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 10,
+      "executable_loc_changed": 620,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 1,
+      "trust_boundaries": 1,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_business_development_activation.py --mode staged",
+      "python scripts/governance/validate_business_development_activation.py --mode activated",
+      "python scripts/governance/selftest_business_development_activation.py",
+      "python scripts/governance/validate_bootstrap_diff.py",
+      "exact-head Engineering Bootstrap and Security Secrets"
+    ]
+  },
+  "done_when": [
+    "pre-activation repository remains green",
+    "actual activated topology has a valid bootstrap path",
+    "one-time activation transition does not widen normal BUSINESS scope",
+    "WU05 can resume and execute BUSINESS_DEVELOPMENT_UNLOCK on a green exact head"
+  ]
+}

@@ -13,22 +13,22 @@
 - Track: ENGINEERING
 - Work item: ENG-09
 - Task: ENG-09.6
-- AWU: ENG-09.6-WU05
+- AWU: ENG-09.6-WU08
 - Risk: R2
 - Manifest: engineering/lots/ENG-09.json
-- AWU file: engineering/work_units/ENG-09.6-WU05.json
+- AWU file: engineering/work_units/ENG-09.6-WU08.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-09.json
-- engineering/work_units/ENG-09.6-WU05.json
-- engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION_PLAN.json
-- engineering/BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY.json
+- engineering/work_units/ENG-09.6-WU08.json
 - config/governance/business_unlock_activation_policy_v1.json
-- business/lots/LOT-45.json
-- business/work_units/LOT-45.1-WU01.json
+- engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION_PLAN.json
+- scripts/governance/validate_business_development_activation.py
+- scripts/governance/validate_bootstrap_diff.py
+- .github/workflows/engineering-bootstrap.yml
 
 ## Execution context — reference
 
@@ -39,14 +39,14 @@
 
 - Primary: 9 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 49 / 1024 KiB
+- Routed size: 63 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: Preflight ENG-09.6-WU05 atomic business-development activation without executing authority writes.
-- Next action: Reverify live GitHub eligibility and remain fail-closed until the exact current-session human action BUSINESS_DEVELOPMENT_UNLOCK is supplied; generic continue is not authorization.
+- Objective: Repair exact-head terminal BUSINESS activation CI compatibility without executing business authority.
+- Next action: Make bootstrap lifecycle-aware for PAUSED versus ACTIVE and validate the one-time activation diff bridge, then return to WU05.
 
 ## Non-authoritative sources
 
