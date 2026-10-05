@@ -1,12 +1,12 @@
 {
   "active_checkpoint": {
     "track": "ENGINEERING",
-    "awu_id": "ENG-09.6-WU08",
-    "awu_path": "engineering/work_units/ENG-09.6-WU08.json",
+    "awu_id": "ENG-09.6-WU05",
+    "awu_path": "engineering/work_units/ENG-09.6-WU05.json",
     "parent_manifest": "engineering/lots/ENG-09.json",
-    "scope_base_sha": "6bc13918ce1178d341175d588f4254e535e04e9a",
+    "scope_base_sha": "d4a275458aa32c25f84370957595bdf47a2fa90d",
     "risk_class": "R2",
-    "complexity_score": 8
+    "complexity_score": 7
   },
   "authority": {
     "context_map": "engineering/CONTEXT_MAP.json",
@@ -16,7 +16,7 @@
   "blockers": [
     "BOOT-FINDING-001"
   ],
-  "current_objective": "Repair exact-head terminal BUSINESS activation CI compatibility without executing business authority.",
+  "current_objective": "Preflight ENG-09.6-WU05 atomic business-development activation without executing authority writes.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -29,7 +29,7 @@
     "rulesets_count": 0
   },
   "kind": "engineering_handoff",
-  "next_action": "Make bootstrap lifecycle-aware for PAUSED versus ACTIVE and validate the one-time activation diff bridge, then return to WU05.",
+  "next_action": "Reverify live GitHub eligibility and remain fail-closed until the literal current-session human action BUSINESS_DEVELOPMENT_UNLOCK is supplied; generic continue is not authorization.",
   "next_engineering": {
     "active_lot": "ENG-09",
     "active_manifest": "engineering/lots/ENG-09.json",
@@ -43,7 +43,8 @@
     "ENG-09.6-WU05 staging exact head 787871d9527acf81f7d020d79e9cec3e00dc8ced passed Engineering Bootstrap 36640205649; direct unlock remains authorized but not yet executed.",
     "ENG-09.6-WU06 is closed; WU07 scope base 6c30f47c173218ff8645e23eefbbcf1a8f2eb373 passed Engineering Bootstrap 36641980568 and Security Secrets 36641980576.",
     "ENG-09.6-WU07 terminal compatibility passed Engineering Bootstrap 37302659296 and Security Secrets 37302659318 on exact head 97f026dbd6d2de8c61fd737a7f37c45ff2dd1b14; WU05 is now the bounded preflight route only.",
-    "ENG-09.6-WU08 activated after preflight found that exact-head BUSINESS activation would otherwise fail PAUSED-only bootstrap validation; no business authority changed."
+    "ENG-09.6-WU08 activated after preflight found that exact-head BUSINESS activation would otherwise fail PAUSED-only bootstrap validation; no business authority changed.",
+    "ENG-09.6-WU08 terminal activation compatibility qualified on exact head d4a275458aa32c25f84370957595bdf47a2fa90d; Engineering Bootstrap 37321549602 and Security Secrets 37321549689 passed. WU05 resumed only as bounded preflight; prior-session authorization is not reusable."
   ],
   "resume_read_order": [
     "AGENTS.md",
@@ -168,6 +169,20 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37303177208",
       "head_sha": "6bc13918ce1178d341175d588f4254e535e04e9a",
       "scope": "ENG-09.6-WU08_SCOPE_BASE_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37321549602",
+      "head_sha": "d4a275458aa32c25f84370957595bdf47a2fa90d",
+      "scope": "ENG-09.6-WU08_FINAL_BOOTSTRAP"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37321549689",
+      "head_sha": "d4a275458aa32c25f84370957595bdf47a2fa90d",
+      "scope": "ENG-09.6-WU08_FINAL_SECURITY_SECRETS"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"

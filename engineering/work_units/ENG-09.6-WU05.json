@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "agent_work_unit",
   "id": "ENG-09.6-WU05",
-  "status": "BLOCKED",
+  "status": "IN_PROGRESS",
   "parent": {
     "work_item_id": "ENG-09",
     "task_id": "ENG-09.6",
@@ -92,7 +92,7 @@
     }
   ],
   "scope": {
-    "scope_base_sha": "97f026dbd6d2de8c61fd737a7f37c45ff2dd1b14",
+    "scope_base_sha": "d4a275458aa32c25f84370957595bdf47a2fa90d",
     "allowed_paths": [
       "AGENTS.md",
       "config/governance/project_state.json",
