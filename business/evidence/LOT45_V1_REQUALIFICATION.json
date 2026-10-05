@@ -3,7 +3,7 @@
   "evidence_kind": "lot45_development_engine_v1_read_only_requalification_v1",
   "awu_id": "LOT-45.1-WU01",
   "observed_date": "2026-10-05",
-  "verdict": "READ_ONLY_REQUALIFIED_REMEDIATION_REQUIRED_ENGINE_INTERFACE_BLOCKED",
+  "verdict": "READ_ONLY_REQUALIFIED_REMEDIATION_REQUIRED_ENGINE_LIFECYCLE_BLOCKED",
   "candidate_ready_for_merge": false,
   "candidate_mutated": false,
   "candidate_merged": false,
@@ -26,7 +26,7 @@
     "pull_request_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
     "prior_pilot_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
     "head_unchanged_since_engine_pilot": true,
-    "reverified_at_utc": "2026-10-05T19:58:00Z"
+    "reverified_at_utc": "2026-10-05T21:47:21Z"
   },
   "safety": {
     "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
@@ -213,19 +213,49 @@
     "failed_step": "Validate Development Engine V1 interface freeze",
     "detail": "AGENTS V1 interface phrase missing: resolve the single active AWU with `python scripts/governance/resolve_active_awu.py`",
     "historical_v1_certification_remains_immutable": true,
-    "consequence": "Current business-route bootstrap cannot become green until V1 compatibility text/policy is repaired through an authorized engine-maintenance route.",
+    "consequence": "DEV-ENGINE-V1-IFACE-001 itself is cleared on exact head 3c0f54de..., but the same bootstrap run now exposes a later lifecycle incompatibility in the ENG-00 canonical-baseline validator.",
     "latest_requalification": {
-      "engineering_head": "e9877cbb00343ca889e09645a6884c4c57f4393a",
+      "engineering_head": "3c0f54deaa47fbe7bce4d7b79153b42ab141650a",
       "interface_phrase_present": true,
       "terminal_routing_selftest_fixture_updated": true,
-      "bootstrap_run_id": 37363993726,
+      "bootstrap_run_id": 37367447809,
       "bootstrap_run_attempt": 2,
-      "bootstrap_status": "QUEUED",
-      "conclusion": "PENDING_EXACT_HEAD_BOOTSTRAP_RESULT"
-    }
+      "interface_freeze_step": "PASS",
+      "terminal_routing_selftest_step": "PASS",
+      "security_secrets_run_id": 37367447615,
+      "security_secrets_run_attempt": 2,
+      "security_secrets_conclusion": "SUCCESS",
+      "overall_bootstrap_conclusion": "FAILURE",
+      "conclusion": "DEV_ENGINE_V1_IFACE_001_CLEARED_BUT_BOOTSTRAP_BLOCKED_LATER"
+    },
+    "status": "CLEARED_INTERFACE_STEP_ONLY"
   },
   "remediation_required": true,
   "remediation_plan_path": "business/plans/LOT45_REMEDIATION_PLAN.json",
   "bounded_successor_path": "business/work_units/LOT-45.1-WU02.json",
-  "closure_condition": "WU01 remains IN_PROGRESS until DEV-ENGINE-V1-IFACE-001 is cleared on an authorized engine-maintenance route and the business staging successor can be activated without scope/state drift."
+  "closure_condition": "WU01 remains IN_PROGRESS until DEV-ENGINE-V1-BASELINE-001 is cleared through a separately authorized engine reconciliation route and the exact-head Bootstrap is green; WU02 remains PLANNED. PR #66 must remain byte-unchanged.",
+  "secondary_engine_blocker": {
+    "id": "DEV-ENGINE-V1-BASELINE-001",
+    "class": "ENGINE_TERMINAL_LIFECYCLE_COMPATIBILITY_DEFECT",
+    "candidate_defect": false,
+    "status": "CONFIRMED",
+    "engineering_head": "3c0f54deaa47fbe7bce4d7b79153b42ab141650a",
+    "workflow": "Engineering Bootstrap",
+    "run_id": 37367447809,
+    "run_attempt": 2,
+    "failed_step": "Validate canonical ENG-00 baseline",
+    "exact_error": "CANONICAL_BASELINE_INVALID: business development status mismatch",
+    "root_cause": {
+      "immutable_baseline": "engineering/CANONICAL_BASELINE.json",
+      "baseline_business_development_status": "PAUSED",
+      "current_authoritative_business_development_status": "ACTIVE",
+      "validator": "scripts/governance/validate_canonical_baseline.py",
+      "observation": "The ENG-00 snapshot validator compares its historical PAUSED development_status directly to the current migration bridge ACTIVE state. ENG-09 terminal activation intentionally changed current lifecycle authority while preserving the ENG-00 baseline."
+    },
+    "safety_interpretation": "The immutable ENG-00 baseline must not be rewritten to ACTIVE. A lifecycle-aware validation or workflow route is required through a separately authorized engine reconciliation unit.",
+    "wu01_scope_authorization": "NOT_AUTHORIZED_TO_REPAIR",
+    "candidate_mutation_allowed": false,
+    "candidate_merge_allowed": false,
+    "lot46_unlock_allowed": false
+  }
 }

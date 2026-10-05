@@ -156,6 +156,9 @@
   "done_when": [
     "read-only candidate requalification evidence is complete",
     "candidate has not been mutated",
-    "a bounded successor remediation route or exact-head certification route is explicit"
+    "DEV-ENGINE-V1-IFACE-001 is cleared by exact-head interface-freeze evidence",
+    "DEV-ENGINE-V1-BASELINE-001 is cleared through a separately authorized engine reconciliation route",
+    "Engineering Bootstrap and Security Secrets are both SUCCESS on one exact engine head before WU02 activation",
+    "a bounded successor remediation route remains explicit and Lot46 remains locked"
   ]
 }

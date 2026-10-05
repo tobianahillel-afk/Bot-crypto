@@ -7,7 +7,7 @@
     "branch": "agent/lot45-order-flow-delta-cvd-engine-v2",
     "exact_head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133"
   },
-  "status": "STAGED_BLOCKED_BY_ENGINE_INTERFACE",
+  "status": "STAGED_BLOCKED_BY_ENGINE_LIFECYCLE",
   "principles": [
     "Do not mutate the candidate while LOT-45.1-WU01 remains active.",
     "Do not treat resolved review-thread state as proof when candidate bytes are unchanged.",
@@ -17,11 +17,27 @@
     "T4 exact-head and provenance certification occur only after source remediation stabilizes."
   ],
   "external_precondition": {
-    "id": "DEV-ENGINE-V1-IFACE-001",
-    "route": "AUTHORIZED_ENGINE_MAINTENANCE_REQUIRED",
-    "candidate_mutation": false,
-    "required_result": "Development Engine V1 interface freeze passes on the exact engine head while preserving the certified V1 CLI/path/authority surface.",
-    "current_failure_run": 37335527143
+    "status": "PARTIALLY_CLEARED_NEW_BLOCKER_DISCOVERED",
+    "cleared": [
+      {
+        "id": "DEV-ENGINE-V1-IFACE-001",
+        "exact_engine_head": "3c0f54deaa47fbe7bce4d7b79153b42ab141650a",
+        "bootstrap_run": 37367447809,
+        "run_attempt": 2,
+        "proof": "Validate Development Engine V1 interface freeze PASS; terminal business routing selftests PASS."
+      }
+    ],
+    "blocking": [
+      {
+        "id": "DEV-ENGINE-V1-BASELINE-001",
+        "route": "SEPARATELY_AUTHORIZED_ENGINE_RECONCILIATION_REQUIRED",
+        "candidate_mutation": false,
+        "required_result": "The immutable ENG-00 baseline remains historical while Bootstrap validates terminal ACTIVE business lifecycle without comparing that historical PAUSED snapshot to current authority.",
+        "current_failure_run": 37367447809,
+        "failed_step": "Validate canonical ENG-00 baseline",
+        "exact_error": "CANONICAL_BASELINE_INVALID: business development status mismatch"
+      }
+    ]
   },
   "remediation_units": [
     {
@@ -125,7 +141,9 @@
   ],
   "transition_after_engine_precondition": {
     "next_awu": "LOT-45.1-WU02",
-    "purpose": "Stage exact LOT-45.2 remediation AWUs and parent allowlists from this plan without candidate mutation.",
-    "candidate_mutation_in_wu02": false
+    "activation_condition": "Engineering Bootstrap SUCCESS on one exact engine head after DEV-ENGINE-V1-BASELINE-001 is cleared; Security Secrets must also be SUCCESS on that same head.",
+    "current_state": "BLOCKED",
+    "candidate_mutation_in_wu02": false,
+    "purpose": "Stage exact LOT-45.2 remediation AWUs and parent allowlists from this plan without candidate mutation."
   }
 }
