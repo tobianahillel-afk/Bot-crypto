@@ -13,21 +13,20 @@
 - Track: BUSINESS
 - Work item: LOT-45
 - Task: LOT-45.1
-- AWU: LOT-45.1-WU03
+- AWU: LOT-45.1-WU04
 - Risk: R2
 - Manifest: business/lots/LOT-45.json
-- AWU file: business/work_units/LOT-45.1-WU03.json
+- AWU file: business/work_units/LOT-45.1-WU04.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - business/lots/LOT-45.json
-- business/work_units/LOT-45.1-WU03.json
-- business/evidence/LOT45_V1_REQUALIFICATION.json
-- engineering/CANONICAL_BASELINE.json
+- business/work_units/LOT-45.1-WU04.json
 - engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json
-- scripts/governance/validate_canonical_baseline.py
+- engineering/REPOSITORY_PROTECTION_STATUS.json
+- scripts/governance/validate_repository_protection.py
 
 ## Execution context — reference
 
@@ -36,16 +35,16 @@
 
 ## Budget
 
-- Primary: 8 / 12 files
+- Primary: 7 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 66 / 1024 KiB
+- Routed size: 46 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: LOT-45.1-WU03: finish exact-head lifecycle reconciliation through the canonical BUSINESS activation bridge.
-- Next action: Qualify WU03 on Bootstrap + Security Secrets with scope_base_sha bound to activation predecessor; then restore WU01 read-only requalification.
+- Objective: LOT-45.1-WU04: reconcile fresh repository-protection status and obtain one exact all-green lifecycle qualification head.
+- Next action: Qualify WU04 on Engineering Bootstrap plus Security Secrets with live main/ruleset and PR #66 unchanged; then restore LOT-45.1-WU01 as the sole read-only requalification route.
 
 ## Non-authoritative sources
 
