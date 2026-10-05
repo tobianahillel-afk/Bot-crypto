@@ -81,8 +81,19 @@ def _context_status(
     if not all(isinstance(item, dict) for item in (active, execution, authority, awu)):
         return "STALE"
 
+    route_track = resolved.get("track")
+    expected_track = (
+        "ENGINEERING"
+        if route_track == "DEVELOPMENT_ENGINE"
+        else "BUSINESS"
+        if route_track == "BUSINESS"
+        else None
+    )
+    if expected_track is None:
+        return "STALE"
+
     expected_active = {
-        "track": "ENGINEERING",
+        "track": expected_track,
         "lot": resolved["active_lot"],
         "task": resolved["active_task"],
         "manifest": resolved["active_manifest"],
@@ -162,24 +173,41 @@ def _validate_recovered_route(
 
 def _validate_safety(state: dict[str, Any], resolved: dict[str, Any]) -> dict[str, Any]:
     business = state.get("business_track")
+    engineering = state.get("engineering_track")
     safety = state.get("safety")
-    if not isinstance(business, dict) or not isinstance(safety, dict):
-        raise ResumeRecoveryError("business/safety state missing")
+    if not isinstance(business, dict) or not isinstance(engineering, dict) or not isinstance(safety, dict):
+        raise ResumeRecoveryError("business/engineering/safety state missing")
     next_lot = business.get("next_lot")
-    if not isinstance(next_lot, dict):
-        raise ResumeRecoveryError("next business lot state missing")
+    candidate = business.get("candidate")
+    if not isinstance(next_lot, dict) or not isinstance(candidate, dict):
+        raise ResumeRecoveryError("next business lot/candidate state missing")
 
-    _require(resolved.get("business_development") == "PAUSED", "business development hold lifted")
+    mode = business.get("development_status")
+    route_track = resolved.get("track")
+    _require(mode in {"PAUSED", "ACTIVE"}, "unsupported business lifecycle")
+    _require(resolved.get("business_development") == mode, "resolved business lifecycle drift")
     _require(resolved.get("next_business_lot_status") == "LOCKED", "Lot46 lock lifted")
-    _require(business.get("development_status") == "PAUSED", "canonical business hold lifted")
     _require(next_lot.get("lot") == 46 and next_lot.get("status") == "LOCKED", "Lot46 state drift")
+
+    if route_track == "DEVELOPMENT_ENGINE":
+        _require(engineering.get("phase") == "BUILDING", "engineering recovery requires BUILDING")
+        _require(mode == "PAUSED", "engineering recovery requires business PAUSED")
+        _require(candidate.get("status") == "SUSPENDED_CANDIDATE", "suspended candidate drift")
+    elif route_track == "BUSINESS":
+        _require(engineering.get("phase") in {"STABLE", "COMPLETE"}, "business recovery requires terminal engineering")
+        _require(mode == "ACTIVE", "business recovery requires ACTIVE authority")
+        _require(candidate.get("status") == "ACTIVE_CANDIDATE", "active candidate drift")
+        _require(candidate.get("state") == "OPEN" and candidate.get("merged") is False, "active candidate state drift")
+    else:
+        raise ResumeRecoveryError(f"unsupported recovery route: {route_track!r}")
+
     _require(safety.get("trade_allowed") is False, "trading unexpectedly enabled")
     _require(safety.get("execution_allowed") is False, "execution unexpectedly enabled")
     _require(safety.get("live_execution") == "DISABLED", "live execution unexpectedly enabled")
     _require(safety.get("leverage") == "FORBIDDEN", "leverage unexpectedly enabled")
     _require(safety.get("withdrawals") == "FORBIDDEN", "withdrawals unexpectedly enabled")
     return {
-        "business_development": "PAUSED",
+        "business_development": mode,
         "next_business_lot": 46,
         "next_business_lot_status": "LOCKED",
         "trade_allowed": False,
@@ -200,11 +228,21 @@ def recover(
     handoff_validator: ModuleType,
 ) -> dict[str, Any]:
     try:
+        evidence_track = awu_bundle[2].get("track")
+        route_name = (
+            evidence_track.lower()
+            if isinstance(evidence_track, str)
+            else ""
+        )
+        if route_name not in {"engineering", "business"}:
+            raise ResumeRecoveryError(
+                f"unsupported validated recovery track: {evidence_track!r}"
+            )
         resolved = resolver.resolve(
             state,
             capabilities,
             "GITHUB_CONNECTOR_ONLY",
-            "engineering",
+            route_name,
             awu_bundle,
         )
     except resolver.ResolveError as exc:
@@ -219,7 +257,7 @@ def recover(
     context_status = _context_status(context, resolved, canonical_budget)
     awu = resolved.get("active_awu")
     if not isinstance(awu, dict):
-        raise ResumeRecoveryError("engineering recovery requires active AWU")
+        raise ResumeRecoveryError("recovery requires an active routed AWU")
 
     read_order = resolved.get("required_read_order")
     if not isinstance(read_order, list) or not read_order:
@@ -234,6 +272,7 @@ def recover(
     return {
         "recovery_version": 2,
         "authority": "config/governance/project_state.json",
+        "track": resolved["track"],
         "active_lot": resolved["active_lot"],
         "active_task": resolved["active_task"],
         "active_manifest": resolved["active_manifest"],
@@ -351,6 +390,7 @@ def main() -> int:
     normal = repository_recover()
     scenarios += 1
     assert normal["recovery_version"] == 2
+    assert normal["track"] == "DEVELOPMENT_ENGINE"
     assert normal["handoff_status"] == "VALID"
     assert normal["context_map_status"] == "VALID"
     assert normal["active_awu_id"] == expected_awu_id
@@ -453,6 +493,99 @@ def main() -> int:
         "mandatory paid LLM",
     )
     scenarios += 1
+
+    resolver = _module(
+        "resume_terminal_resolver",
+        ROOT / "scripts/governance/resolve_next_work.py",
+    )
+    handoff_validator = _module(
+        "resume_terminal_handoff_validator",
+        ROOT / "scripts/governance/validate_handoff.py",
+    )
+    activation = _module(
+        "resume_terminal_activation",
+        ROOT / "scripts/governance/validate_business_development_activation.py",
+    )
+    capabilities = _json(ROOT / "engineering/AGENT_CAPABILITIES.json")
+    business_manifest = activation.load(activation.BM)
+    business_awu = activation.load(activation.BA)
+    terminal_state, _terminal_manifest, terminal_awu = activation.synthetic_activation(
+        state, business_manifest, business_awu
+    )
+    state_machine.validate_current(terminal_state, policy)
+    terminal_awu["scope"]["scope_base_sha"] = "6c30f47c173218ff8645e23eefbbcf1a8f2eb373"
+    terminal_route = {
+        "awu_id": terminal_awu["id"],
+        "primary_files": [
+            "AGENTS.md",
+            "config/governance/project_state.json",
+            "business/lots/LOT-45.json",
+            "business/work_units/LOT-45.1-WU01.json",
+            "engineering/LOT45_ENGINE_PILOT_EVIDENCE.json",
+            "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json",
+            "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json",
+        ],
+        "reference_files": [
+            "engineering/MASTER_PLAN.md",
+            "engineering/AGENT_PROTOCOL.md",
+        ],
+        "primary_count": 7,
+        "reference_count": 2,
+        "total_bytes": 65536,
+        "total_kib_ceil": 64,
+    }
+    terminal_bundle = (
+        ROOT / "business/work_units/LOT-45.1-WU01.json",
+        terminal_awu,
+        {"context_route": terminal_route, "track": "BUSINESS"},
+    )
+    terminal_context = {
+        "active_work": {
+            "track": "BUSINESS",
+            "lot": "LOT-45",
+            "task": "LOT-45.1",
+            "manifest": "business/lots/LOT-45.json",
+            "awu_id": terminal_awu["id"],
+            "awu_path": "business/work_units/LOT-45.1-WU01.json",
+            "risk_class": terminal_awu["planning"]["risk_class"],
+            "complexity_score": terminal_awu["planning"]["complexity_score"],
+        },
+        "execution_context": {
+            "primary_files": terminal_route["primary_files"],
+            "reference_files": terminal_route["reference_files"],
+            "primary_count": terminal_route["primary_count"],
+            "reference_count": terminal_route["reference_count"],
+            "total_kib_ceil": terminal_route["total_kib_ceil"],
+            "budget": terminal_awu["planning"]["context_budget"],
+            "implicit_expansion": "FORBIDDEN",
+        },
+        "authority": {
+            "current_state": "config/governance/project_state.json",
+            "resume_hint": "engineering/handoff/CURRENT.json",
+            "resume_hint_is_authoritative": False,
+        },
+    }
+    terminal = recover(
+        terminal_state,
+        capabilities,
+        terminal_bundle,
+        None,
+        terminal_context,
+        resolver,
+        handoff_validator,
+    )
+    scenarios += 1
+    assert terminal["track"] == "BUSINESS"
+    assert terminal["active_lot"] == "LOT-45"
+    assert terminal["active_task"] == "LOT-45.1"
+    assert terminal["handoff_status"] == "MISSING"
+    assert terminal["context_map_status"] == "VALID"
+    assert terminal["business_development"] == "ACTIVE"
+    assert terminal["next_business_lot_status"] == "LOCKED"
+    assert terminal["safety_snapshot"]["trade_allowed"] is False
+    assert terminal["safety_snapshot"]["execution_allowed"] is False
+    assert terminal["write_authorized"] is False
+    assert terminal["required_before_write"] == [WRITE_GATE]
 
     units = active.load_work_units()
     _path, current = active.select_active_awu(units)
