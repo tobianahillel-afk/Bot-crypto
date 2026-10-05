@@ -43,12 +43,12 @@ def main() -> int:
     second = mod.render_block(state)
     assert first == second
     assert "generated_at" not in first.lower()
-    assert "SUSPENDED_CANDIDATE" in first
+    assert state["business_track"]["candidate"]["status"] in first
     assert "Lot 46 / LOCKED" in first
     assert "Trading allowed: `false`" in first
 
     changed = json.loads(json.dumps(state))
-    changed["engineering_track"]["active_task"] = "ENG-TEST-SENTINEL"
+    changed["business_track"]["merged_certified_baseline"]["version"] = "SELFTEST-SENTINEL"
     assert mod.render_block(changed) != first
 
     terminal = json.loads(json.dumps(state))
@@ -113,7 +113,15 @@ def main() -> int:
         assert before == after
 
         readme = temp / "README.md"
-        readme.write_text(readme.read_text(encoding="utf-8").replace("Business development: **PAUSED**", "Business development: **STALE**", 1), encoding="utf-8")
+        lifecycle = state["business_track"]["development_status"]
+        readme.write_text(
+            readme.read_text(encoding="utf-8").replace(
+                f"Business development: **{lifecycle}**",
+                "Business development: **STALE**",
+                1,
+            ),
+            encoding="utf-8",
+        )
         _expect(mod.CurrentStatusError, lambda: mod.run("check", temp), "stale generated block")
         mod.run("update", temp)
         mod.run("check", temp)

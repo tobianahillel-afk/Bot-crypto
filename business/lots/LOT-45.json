@@ -26,7 +26,8 @@
     "scripts/governance/selftest_bootstrap_validators.py",
     "scripts/governance/selftest_active_awu_scope.py",
     "scripts/governance/run_t0.py",
-    "scripts/governance/run_t1.py"
+    "scripts/governance/run_t1.py",
+    "scripts/governance/selftest_current_status.py"
   ],
   "forbidden_scope": [
     "candidate branch mutation during LOT-45.1-WU01",

@@ -90,6 +90,11 @@
       "name": "Canonical-scope T1 routing",
       "kind": "FILE",
       "locator": "scripts/governance/run_t1.py"
+    },
+    {
+      "name": "Lifecycle-aware generated current-status adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_current_status.py"
     }
   ],
   "scope": {
@@ -112,7 +117,8 @@
       "scripts/governance/selftest_bootstrap_validators.py",
       "scripts/governance/selftest_active_awu_scope.py",
       "scripts/governance/run_t0.py",
-      "scripts/governance/run_t1.py"
+      "scripts/governance/run_t1.py",
+      "scripts/governance/selftest_current_status.py"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -162,7 +168,8 @@
       "activation validator accepts the unique active maintenance AWU under LOT-45.1 and rejects a different business task or weakened candidate guards",
       "negative bootstrap selftest passes in terminal Engineering + ACTIVE Business lifecycle without synthesizing a nonexistent engineering active_manifest",
       "active AWU boundary passes through the standard activation bridge with only post-activation business and reconciliation files in the WU03 allowlist",
-      "incremental T0/T1 validate only the post-activation business diff and still rely on the canonical activation bridge for transition integrity"
+      "incremental T0/T1 validate only the post-activation business diff and still rely on the canonical activation bridge for transition integrity",
+      "CURRENT_STATUS selftest derives business lifecycle and candidate expectations from canonical project state and preserves stale-document detection"
     ]
   },
   "planning": {
@@ -190,8 +197,8 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 13,
-      "executable_loc_changed": 700,
+      "files_touched": 14,
+      "executable_loc_changed": 760,
       "new_public_behaviors": 1,
       "contract_families": 0,
       "independent_algorithms": 1,
