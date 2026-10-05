@@ -100,6 +100,16 @@
       "name": "Maintenance-aware T1 scope router",
       "kind": "FILE",
       "locator": "scripts/governance/run_t1.py"
+    },
+    {
+      "name": "Lifecycle-aware security-engine verifier",
+      "kind": "FILE",
+      "locator": "scripts/governance/verify_security_engine.py"
+    },
+    {
+      "name": "Lifecycle-aware security-engine adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_security_engine.py"
     }
   ],
   "scope": {
@@ -118,7 +128,9 @@
       "scripts/governance/validate_bootstrap_diff.py",
       "scripts/governance/selftest_active_awu_scope.py",
       "scripts/governance/run_t0.py",
-      "scripts/governance/run_t1.py"
+      "scripts/governance/run_t1.py",
+      "scripts/governance/verify_security_engine.py",
+      "scripts/governance/selftest_security_engine.py"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -151,7 +163,8 @@
       "PR #66 remains open unmerged at ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
       "Lot46 remains LOCKED and all runtime trading authority remains fail-closed",
       "one exact WU04 head must pass Engineering Bootstrap and Security Secrets before read-only WU01 resumes",
-      "a post-activation maintenance scope base is accepted only when the immutable activation predecessor/evidence and one-time activation transition validate first and the maintenance base is a descendant of the activation commit"
+      "a post-activation maintenance scope base is accepted only when the immutable activation predecessor/evidence and one-time activation transition validate first and the maintenance base is a descendant of the activation commit",
+      "historical ENG-04 security-engine verification evidence and its policy remain byte-unchanged; the final verifier must validate that historical snapshot separately from the mutable current repository-protection status"
     ],
     "acceptance_criteria": [
       "active AWU resolver selects LOT-45.1-WU04 as R2 complexity score 4 without mandatory split",
@@ -161,7 +174,8 @@
       "Engineering Bootstrap and Security Secrets are SUCCESS on one exact WU04 head",
       "live main PR #66 Lot46 and runtime safety match canonical state at final qualification",
       "after qualification WU01 may resume read-only exact-head requalification without candidate mutation or merge",
-      "active-scope validation accepts maintenance base 654b0b572d063f1524471b38cc92457db2f286b9 while rejecting a pre-activation or non-descendant maintenance base"
+      "active-scope validation accepts maintenance base 654b0b572d063f1524471b38cc92457db2f286b9 while rejecting a pre-activation or non-descendant maintenance base",
+      "security-engine verifier accepts PROTECTED_VERIFIED current protection while continuing to validate the immutable ENG-04 UNPROTECTED evidence against its historical policy"
     ]
   },
   "planning": {
@@ -189,8 +203,8 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 14,
-      "executable_loc_changed": 480,
+      "files_touched": 15,
+      "executable_loc_changed": 650,
       "new_public_behaviors": 1,
       "contract_families": 0,
       "independent_algorithms": 0,
