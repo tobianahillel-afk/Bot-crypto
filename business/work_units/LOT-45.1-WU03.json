@@ -70,6 +70,11 @@
       "name": "Lifecycle-aware activation adversarial tests",
       "kind": "TEST",
       "locator": "scripts/governance/selftest_business_development_activation.py"
+    },
+    {
+      "name": "Terminal-lifecycle bootstrap validator selftest",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_bootstrap_validators.py"
     }
   ],
   "scope": {
@@ -83,7 +88,8 @@
       "engineering/CONTEXT_MAP.md",
       "scripts/governance/validate_canonical_baseline.py",
       "scripts/governance/validate_business_development_activation.py",
-      "scripts/governance/selftest_business_development_activation.py"
+      "scripts/governance/selftest_business_development_activation.py",
+      "scripts/governance/selftest_bootstrap_validators.py"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -116,7 +122,8 @@
       "PAUSED lifecycle remains supported for historical and adversarial validation",
       "PR #66 remains byte-unchanged throughout reconciliation",
       "Lot46 and runtime trading authority remain fail-closed",
-      "ACTIVE business topology may route through a temporary maintenance AWU only when it remains under LOT-45.1 and explicitly forbids candidate mutation and merge"
+      "ACTIVE business topology may route through a temporary maintenance AWU only when it remains under LOT-45.1 and explicitly forbids candidate mutation and merge",
+      "terminal bootstrap selftests must exercise validate_state with no engineering active manifest while validating the active business work-item independently"
     ],
     "acceptance_criteria": [
       "baseline file is not in the AWU allowed paths and is explicitly forbidden from mutation",
@@ -126,7 +133,8 @@
       "validator rejects changed candidate head or mutated/merged activation evidence",
       "Engineering Bootstrap and Security Secrets are SUCCESS on one exact reconciliation head",
       "candidate head remains ec2c4ab16f21b23e062b7fca0bb796c8db4a5133 and Lot46 remains LOCKED",
-      "activation validator accepts the unique active maintenance AWU under LOT-45.1 and rejects a different business task or weakened candidate guards"
+      "activation validator accepts the unique active maintenance AWU under LOT-45.1 and rejects a different business task or weakened candidate guards",
+      "negative bootstrap selftest passes in terminal Engineering + ACTIVE Business lifecycle without synthesizing a nonexistent engineering active_manifest"
     ]
   },
   "planning": {
@@ -154,8 +162,8 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 9,
-      "executable_loc_changed": 380,
+      "files_touched": 10,
+      "executable_loc_changed": 450,
       "new_public_behaviors": 1,
       "contract_families": 0,
       "independent_algorithms": 1,

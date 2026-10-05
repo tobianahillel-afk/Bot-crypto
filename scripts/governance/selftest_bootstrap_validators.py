@@ -49,18 +49,29 @@ def main() -> int:
     policy = _json(ROOT / "engineering/STATE_TRANSITIONS.json")
     phase = state["bootstrap_engine"]["phase"]
     engine = state["bootstrap_engine"] if phase == "BUILDING" else state["engineering_engine"]
-    active_manifest = _json(ROOT / engine["active_manifest"])
+    if engine.get("phase") in {"STABLE", "COMPLETE"}:
+        state_manifest = None
+        authority_manifest = permanent_state.get("authority", {}).get("active_manifest")
+        if not isinstance(authority_manifest, str):
+            raise AssertionError("terminal lifecycle requires authoritative business manifest")
+        work_manifest = _json(ROOT / authority_manifest)
+    else:
+        declared_manifest = engine.get("active_manifest")
+        if not isinstance(declared_manifest, str):
+            raise AssertionError("building lifecycle requires engineering active_manifest")
+        state_manifest = _json(ROOT / declared_manifest)
+        work_manifest = state_manifest
     handoff = _json(ROOT / "engineering/handoff/CURRENT.json")
 
-    state_mod.validate_state(state, policy, active_manifest)
-    item_mod.validate_manifest(active_manifest, source=active_manifest["id"])
+    state_mod.validate_state(state, policy, state_manifest)
+    item_mod.validate_manifest(work_manifest, source=work_manifest["id"])
     handoff_mod.validate_handoff(permanent_state, handoff)
 
     unsafe_state = copy.deepcopy(state)
     unsafe_state["safety"]["trade_allowed"] = True
     _expect_failure(
         state_mod.BootstrapStateError,
-        lambda: state_mod.validate_state(unsafe_state, policy, active_manifest),
+        lambda: state_mod.validate_state(unsafe_state, policy, state_manifest),
         "unsafe state",
     )
 
@@ -68,11 +79,11 @@ def main() -> int:
     invalid_prefix["bootstrap_engine"]["completed"] = invalid_prefix["bootstrap_engine"]["completed"][:-1]
     _expect_failure(
         state_mod.BootstrapStateError,
-        lambda: state_mod.validate_state(invalid_prefix, policy, active_manifest),
+        lambda: state_mod.validate_state(invalid_prefix, policy, state_manifest),
         "bootstrap completed prefix",
     )
 
-    invalid_manifest = copy.deepcopy(active_manifest)
+    invalid_manifest = copy.deepcopy(work_manifest)
     invalid_manifest["status"] = "DONE"
     _expect_failure(
         item_mod.WorkItemError,
@@ -88,7 +99,20 @@ def main() -> int:
         "stale handoff",
     )
 
-    print("GOVERNANCE_VALIDATOR_SELFTEST_PASS probes=4")
+    if engine.get("phase") in {"STABLE", "COMPLETE"}:
+        terminal_engine_active = copy.deepcopy(state)
+        terminal_engine_active["engineering_engine"]["active_lot"] = "ENG-99"
+        _expect_failure(
+            state_mod.BootstrapStateError,
+            lambda: state_mod.validate_state(
+                terminal_engine_active,
+                policy,
+                work_manifest,
+            ),
+            "terminal engineering active lot",
+        )
+
+    print("GOVERNANCE_VALIDATOR_SELFTEST_PASS probes=5")
     return 0
 
 
