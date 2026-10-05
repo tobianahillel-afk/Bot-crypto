@@ -13,19 +13,19 @@
 - Track: ENGINEERING
 - Work item: ENG-09
 - Task: ENG-09.6
-- AWU: ENG-09.6-WU06
+- AWU: ENG-09.6-WU07
 - Risk: R2
 - Manifest: engineering/lots/ENG-09.json
-- AWU file: engineering/work_units/ENG-09.6-WU06.json
+- AWU file: engineering/work_units/ENG-09.6-WU07.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - engineering/lots/ENG-09.json
-- engineering/work_units/ENG-09.6-WU06.json
-- config/governance/business_unlock_activation_policy_v1.json
+- engineering/work_units/ENG-09.6-WU07.json
 - config/governance/active_work_routing_policy_v1.json
+- scripts/governance/validate_project_state.py
 
 ## Execution context — reference
 
@@ -36,14 +36,14 @@
 
 - Primary: 6 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 34 / 1024 KiB
+- Routed size: 40 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: Qualify terminal-business lifecycle compatibility in ENG-09.6-WU06 without activating BUSINESS.
-- Next action: Complete strict bimodal lifecycle validators, then exact-head qualify WU06 before opening WU07.
+- Objective: Qualify terminal-business resume, cold-start, handoff and current-status compatibility in ENG-09.6-WU07 without activating BUSINESS.
+- Next action: Implement and qualify terminal-aware resolve-next-work, cold-start, resume/recovery, handoff and current-status behavior; preserve PAUSED/BUILDING compatibility and do not activate BUSINESS.
 
 ## Non-authoritative sources
 
