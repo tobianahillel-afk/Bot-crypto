@@ -13,7 +13,8 @@
     "business/work_units/LOT-45.1-WU01.json",
     "business/work_units/LOT-45.1-WU02.json",
     "business/evidence/LOT45_V1_REQUALIFICATION.json",
-    "business/plans/LOT45_REMEDIATION_PLAN.json"
+    "business/plans/LOT45_REMEDIATION_PLAN.json",
+    "AGENTS.md"
   ],
   "forbidden_scope": [
     "candidate branch mutation during LOT-45.1-WU01",
