@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "plan_kind": "lot45_v1_remediation_plan_v1",
+  "source_awu": "LOT-45.1-WU01",
+  "candidate": {
+    "pr": 66,
+    "branch": "agent/lot45-order-flow-delta-cvd-engine-v2",
+    "exact_head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133"
+  },
+  "status": "STAGED_BLOCKED_BY_ENGINE_INTERFACE",
+  "principles": [
+    "Do not mutate the candidate while LOT-45.1-WU01 remains active.",
+    "Do not treat resolved review-thread state as proof when candidate bytes are unchanged.",
+    "Do not rerun or repair obsolete historical fanout workflows as a prerequisite to candidate remediation.",
+    "Mandatory progress remains zero-cost and LLM-independent.",
+    "Each future candidate mutation unit must be bounded and independently reviewable.",
+    "T4 exact-head and provenance certification occur only after source remediation stabilizes."
+  ],
+  "external_precondition": {
+    "id": "DEV-ENGINE-V1-IFACE-001",
+    "route": "AUTHORIZED_ENGINE_MAINTENANCE_REQUIRED",
+    "candidate_mutation": false,
+    "required_result": "Development Engine V1 interface freeze passes on the exact engine head while preserving the certified V1 CLI/path/authority surface.",
+    "current_failure_run": 37335527143
+  },
+  "remediation_units": [
+    {
+      "id": "LOT45-RM-01",
+      "order": 1,
+      "title": "Bind artifact market identity to classified source trades",
+      "class": "CANDIDATE_SEMANTIC_REMEDIATION",
+      "risk_floor": "R2",
+      "target_paths": [
+        "src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine_impl.py",
+        "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py",
+        "tests/test_lot45_market_identity_binding.py"
+      ],
+      "required_proof": [
+        "reject matching wrong-market Order Flow/CVD pair against source trades",
+        "preserve valid same-market path",
+        "standalone artifact checksum identity binding remains intact"
+      ],
+      "fixes": [
+        "LOT45-REQUAL-001"
+      ]
+    },
+    {
+      "id": "LOT45-RM-02",
+      "order": 2,
+      "title": "Restore type-check and canonical reconstruction-test consistency",
+      "class": "CANDIDATE_QUALITY_REMEDIATION",
+      "risk_floor": "R2",
+      "target_paths": [
+        "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py",
+        "tests/test_lot45_runtime_binding_and_rounding.py"
+      ],
+      "required_proof": [
+        "mypy src/crypto_quant_bot passes",
+        "CVD adversarial fixtures recompute a valid checksum when testing later invariants",
+        "full Lot45 targeted tests pass without weakening canonical checksum rejection"
+      ],
+      "fixes": [
+        "LOT45-REQUAL-002",
+        "LOT45-REQUAL-003"
+      ]
+    },
+    {
+      "id": "LOT45-RM-03",
+      "order": 3,
+      "title": "Rebuild certification topology from the stable remediated source",
+      "class": "CERTIFICATION_REBUILD",
+      "risk_floor": "R2",
+      "target_paths": [
+        "scripts/lot45_trusted_prelaunch.sh",
+        ".github/workflows/lot45-order-flow-delta-cvd.yml",
+        ".github/workflows/lot45-mutation-assurance.yml",
+        ".github/workflows/lot45-frozen-evidence.yml",
+        "reports/lot45/**",
+        "data/audit/*lot45*"
+      ],
+      "required_proof": [
+        "trusted pre-launch committed-tree proof passes on the new source topology",
+        "frozen evidence is regenerated from the new stable source rather than reused from 75e8a82f",
+        "provenance binds exact source/evidence/validator/frozen heads"
+      ],
+      "fixes": [
+        "LOT45-REQUAL-004"
+      ]
+    },
+    {
+      "id": "LOT45-RM-04",
+      "order": 4,
+      "title": "Development Engine V1 T3/T4 exact-head re-certification",
+      "class": "FINAL_ASSURANCE",
+      "risk_floor": "R2",
+      "candidate_mutation": false,
+      "required_t3": [
+        "MANUAL_DEEP_REVIEW",
+        "SECURITY_ASSURANCE",
+        "STATIC_ANALYSIS_ASSURANCE",
+        "WORKFLOW_ASSURANCE"
+      ],
+      "required_t4": [
+        "EXACT_HEAD_CERTIFICATION",
+        "PROVENANCE_CERTIFICATION"
+      ],
+      "required_proof": [
+        "no substantive candidate finding remains open by code/evidence",
+        "required V1 deterministic security/static/workflow assurance passes",
+        "exact-head certification binds the final candidate bytes",
+        "Lot46 remains LOCKED"
+      ]
+    }
+  ],
+  "excluded_work": [
+    {
+      "class": "LEGACY_WORKFLOW_FANOUT",
+      "count": 19,
+      "rationale": "Historical lot workflows are not repaired merely to turn old fanout green; only candidate-relevant V1 assurance is mandatory."
+    },
+    {
+      "class": "MANDATORY_CODEX_REVIEW",
+      "rationale": "Codex/LLM review may be optional but is not a mandatory transport or blocker."
+    }
+  ],
+  "transition_after_engine_precondition": {
+    "next_awu": "LOT-45.1-WU02",
+    "purpose": "Stage exact LOT-45.2 remediation AWUs and parent allowlists from this plan without candidate mutation.",
+    "candidate_mutation_in_wu02": false
+  }
+}
