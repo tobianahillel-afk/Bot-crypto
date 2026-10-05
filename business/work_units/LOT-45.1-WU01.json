@@ -64,7 +64,8 @@
       "business/work_units/LOT-45.1-WU01.json",
       "business/work_units/LOT-45.1-WU02.json",
       "business/lots/LOT-45.json",
-      "AGENTS.md"
+      "AGENTS.md",
+      "scripts/governance/selftest_terminal_business_routing.py"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
