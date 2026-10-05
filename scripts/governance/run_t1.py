@@ -134,14 +134,22 @@ def _check_governance_active_scope(_base: str) -> dict[str, Any]:
         raise T1Error(str(exc)) from exc
     scope = awu["scope"]
     base = diff.resolve_scope_base(scope["scope_base_sha"])
-    files = diff.changed_files(base)
     try:
-        diff.validate_scope(
-            files,
-            scope["allowed_paths"],
-            scope["forbidden_paths"],
-            evidence["parent_manifest"]["allowed_paths"],
-        )
+        if evidence.get("track") == "BUSINESS":
+            activation_commit, files = diff.validate_business_activation_bridge(
+                base,
+                scope,
+                evidence["parent_manifest"]["allowed_paths"],
+            )
+        else:
+            activation_commit = None
+            files = diff.changed_files(base)
+            diff.validate_scope(
+                files,
+                scope["allowed_paths"],
+                scope["forbidden_paths"],
+                evidence["parent_manifest"]["allowed_paths"],
+            )
     except diff.DiffScopeError as exc:
         raise T1Error(str(exc)) from exc
     return {
@@ -149,17 +157,13 @@ def _check_governance_active_scope(_base: str) -> dict[str, Any]:
         "active_awu": awu["id"],
         "awu_path": str(awu_path.relative_to(ROOT)),
         "changed_files": len(files),
+        "activation_commit": activation_commit,
     }
 
 
 def _check_selftest_entrypoints(_base: str) -> dict[str, Any]:
     t0 = _module("t1_t0_for_selftests", ROOT / "scripts/governance/run_t0.py")
-    active = _module("t1_active_for_selftests", ROOT / "scripts/governance/resolve_active_awu.py")
-    try:
-        _path, awu, _evidence = active.resolve_active_awu()
-    except active.ActiveAwuError as exc:
-        raise T1Error(str(exc)) from exc
-    changes = t0.changed_files(awu["scope"]["scope_base_sha"])
+    changes = t0.changed_files(_base)
     inspected: list[str] = []
     for change in changes:
         path = change.path
@@ -220,13 +224,15 @@ def repository_run(t0_result: dict[str, Any] | None = None) -> dict[str, Any]:
         raise T1Error("precomputed T0 result must be an object")
 
     selection = select_checks(t0_result, policy)
-    base = t0_result["scope_base_sha"]
-    executed = execute_checks(selection["selected_checks"], base)
+    scope_base = t0_result["scope_base_sha"]
+    effective_base = t0_result.get("effective_diff_base_sha", scope_base)
+    executed = execute_checks(selection["selected_checks"], effective_base)
 
     return {
         "t1_version": 1,
         "active_awu": t0_result["active_awu"],
-        "scope_base_sha": base,
+        "scope_base_sha": scope_base,
+        "effective_diff_base_sha": effective_base,
         "t0_elapsed_ms": t0_result["elapsed_ms"],
         "prerequisite_t0_source": "PRECOMPUTED" if precomputed else "COMPUTED",
         **selection,

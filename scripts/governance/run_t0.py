@@ -230,10 +230,32 @@ def repository_run() -> dict[str, Any]:
     base = awu.get("scope", {}).get("scope_base_sha")
     if not isinstance(base, str) or len(base) != 40:
         raise T0Error("active AWU has invalid scope_base_sha")
-    changes = changed_files(base)
+
+    effective_base = base
+    activation_bridge_applied = False
+    if _evidence.get("track") == "BUSINESS":
+        diff = _module(
+            "t0_business_activation_bridge",
+            ROOT / "scripts/governance/validate_bootstrap_diff.py",
+        )
+        try:
+            resolved_base = diff.resolve_scope_base(base)
+            activation_commit, _business_files = diff.validate_business_activation_bridge(
+                resolved_base,
+                awu["scope"],
+                _evidence["parent_manifest"]["allowed_paths"],
+            )
+        except diff.DiffScopeError as exc:
+            raise T0Error(str(exc)) from exc
+        effective_base = activation_commit
+        activation_bridge_applied = True
+
+    changes = changed_files(effective_base)
     result = run_t0_for_changes(changes, policy, classifier, impact)
     result["active_awu"] = awu["id"]
     result["scope_base_sha"] = base
+    result["effective_diff_base_sha"] = effective_base
+    result["activation_bridge_applied"] = activation_bridge_applied
     result["elapsed_ms"] = round((time.perf_counter() - started) * 1000, 3)
     return result
 
