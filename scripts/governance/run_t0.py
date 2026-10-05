@@ -240,14 +240,17 @@ def repository_run() -> dict[str, Any]:
         )
         try:
             resolved_base = diff.resolve_scope_base(base)
-            activation_commit, _business_files = diff.validate_business_activation_bridge(
+            (
+                activation_commit,
+                effective_base,
+                _business_files,
+            ) = diff.validate_business_activation_bridge(
                 resolved_base,
                 awu["scope"],
                 _evidence["parent_manifest"]["allowed_paths"],
             )
         except diff.DiffScopeError as exc:
             raise T0Error(str(exc)) from exc
-        effective_base = activation_commit
         activation_bridge_applied = True
 
     changes = changed_files(effective_base)

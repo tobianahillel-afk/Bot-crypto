@@ -126,19 +126,42 @@ def validate_activation_transition_files(files: list[str]) -> None:
         raise DiffScopeError(f"activation transition missing required files: {missing}")
 
 
+def resolve_business_effective_base(
+    scope_base: str,
+    activation_predecessor: str,
+    activation_commit: str,
+) -> str:
+    if scope_base == activation_predecessor:
+        return activation_commit
+    if _git(
+        "merge-base", "--is-ancestor", activation_commit, scope_base
+    ).returncode != 0:
+        raise DiffScopeError(
+            "BUSINESS maintenance scope base must descend from the activation commit"
+        )
+    return scope_base
+
+
 def validate_business_activation_bridge(
     base: str,
     scope: dict,
     parent_allowed: list[str],
-) -> tuple[str, list[str]]:
+) -> tuple[str, str, list[str]]:
     activation_path = ROOT / "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json"
     if not activation_path.is_file():
         raise DiffScopeError("ACTIVE BUSINESS route requires activation evidence")
     activation = _load_json(activation_path)
-    validate_activation_evidence(activation, base)
+    activation_predecessor = activation.get("activation_predecessor_head")
+    if (
+        not isinstance(activation_predecessor, str)
+        or SHA40_RE.fullmatch(activation_predecessor) is None
+    ):
+        raise DiffScopeError("activation evidence predecessor is not a SHA-40")
+    activation_predecessor = resolve_scope_base(activation_predecessor)
+    validate_activation_evidence(activation, activation_predecessor)
 
-    activation_commit = first_commit_after(base)
-    transition_files = changed_files_between(base, activation_commit)
+    activation_commit = first_commit_after(activation_predecessor)
+    transition_files = changed_files_between(activation_predecessor, activation_commit)
     validate_activation_transition_files(transition_files)
 
     wu05 = _load_json(ROOT / "engineering/work_units/ENG-09.6-WU05.json")
@@ -152,14 +175,17 @@ def validate_business_activation_bridge(
         eng09["allowed_paths"],
     )
 
-    business_files = changed_files_between(activation_commit, "HEAD")
+    effective_base = resolve_business_effective_base(
+        base, activation_predecessor, activation_commit
+    )
+    business_files = changed_files_between(effective_base, "HEAD")
     validate_scope(
         business_files,
         scope["allowed_paths"],
         scope["forbidden_paths"],
         parent_allowed,
     )
-    return activation_commit, business_files
+    return activation_commit, effective_base, business_files
 
 
 def validate_scope(
@@ -196,11 +222,12 @@ def main() -> int:
         base = resolve_scope_base(scope["scope_base_sha"])
         parent_allowed = evidence["parent_manifest"]["allowed_paths"]
         if evidence.get("track") == "BUSINESS":
-            activation_commit, files = validate_business_activation_bridge(
+            activation_commit, effective_base, files = validate_business_activation_bridge(
                 base, scope, parent_allowed
             )
         else:
             activation_commit = None
+            effective_base = base
             files = changed_files(base)
             validate_scope(
                 files,
@@ -215,7 +242,7 @@ def main() -> int:
     print(
         "ACTIVE_AWU_SCOPE_VALID "
         f"awu={awu['id']} path={awu_path.relative_to(ROOT)} "
-        f"base={base} changed_files={len(files)}"
+        f"base={base} effective_base={effective_base} changed_files={len(files)}"
         + (f" activation_commit={activation_commit}" if activation_commit else "")
     )
     return 0

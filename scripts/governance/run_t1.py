@@ -136,13 +136,18 @@ def _check_governance_active_scope(_base: str) -> dict[str, Any]:
     base = diff.resolve_scope_base(scope["scope_base_sha"])
     try:
         if evidence.get("track") == "BUSINESS":
-            activation_commit, files = diff.validate_business_activation_bridge(
+            (
+                activation_commit,
+                effective_base,
+                files,
+            ) = diff.validate_business_activation_bridge(
                 base,
                 scope,
                 evidence["parent_manifest"]["allowed_paths"],
             )
         else:
             activation_commit = None
+            effective_base = base
             files = diff.changed_files(base)
             diff.validate_scope(
                 files,
@@ -158,6 +163,7 @@ def _check_governance_active_scope(_base: str) -> dict[str, Any]:
         "awu_path": str(awu_path.relative_to(ROOT)),
         "changed_files": len(files),
         "activation_commit": activation_commit,
+        "effective_diff_base_sha": effective_base,
     }
 
 

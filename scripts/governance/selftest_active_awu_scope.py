@@ -152,7 +152,30 @@ def main() -> int:
         "incomplete activation transition",
     )
 
-    print("ACTIVE_AWU_SCOPE_SELFTEST_PASS probes=9")
+    if track == "BUSINESS":
+        activation = _json(
+            ROOT / "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json"
+        )
+        predecessor = activation["activation_predecessor_head"]
+        activation_commit = diff.first_commit_after(predecessor)
+        scope_base = diff.resolve_scope_base(active["scope"]["scope_base_sha"])
+        effective_base = diff.resolve_business_effective_base(
+            scope_base, predecessor, activation_commit
+        )
+        assert effective_base == scope_base
+
+        parent_result = diff._git("rev-parse", f"{predecessor}^")
+        assert parent_result.returncode == 0
+        pre_activation_base = parent_result.stdout.strip()
+        _expect(
+            diff.DiffScopeError,
+            lambda: diff.resolve_business_effective_base(
+                pre_activation_base, predecessor, activation_commit
+            ),
+            "pre-activation maintenance base",
+        )
+
+    print("ACTIVE_AWU_SCOPE_SELFTEST_PASS probes=11")
     return 0
 
 
