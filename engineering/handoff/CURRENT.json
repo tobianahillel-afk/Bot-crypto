@@ -1,10 +1,10 @@
 {
   "active_checkpoint": {
     "track": "BUSINESS",
-    "awu_id": "LOT-45.1-WU01",
-    "awu_path": "business/work_units/LOT-45.1-WU01.json",
+    "awu_id": "LOT-45.1-WU03",
+    "awu_path": "business/work_units/LOT-45.1-WU03.json",
     "parent_manifest": "business/lots/LOT-45.json",
-    "scope_base_sha": "6651f12870ed51318b8004246aa87b015caaeaa8",
+    "scope_base_sha": "dec31e78161a1a1e50181a06760130ab3bc27421",
     "risk_class": "R2",
     "complexity_score": 2
   },
@@ -14,7 +14,7 @@
     "state_source": "config/governance/project_state.json"
   },
   "blockers": [],
-  "current_objective": "LOT-45.1-WU01: read-only exact-head requalification of PR #66 under Development Engine V1.",
+  "current_objective": "LOT-45.1-WU03: clear DEV-ENGINE-V1-BASELINE-001 without mutating the immutable ENG-00 baseline or PR #66.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -27,7 +27,7 @@
     "lot45_merged": false
   },
   "kind": "engineering_handoff",
-  "next_action": "Reverify PR #66 live exact head and run read-only Development Engine V1 requalification; do not mutate the candidate, merge PR #66, or unlock Lot46.",
+  "next_action": "Qualify the lifecycle-aware canonical-baseline validator on one exact head; require Bootstrap + Security Secrets SUCCESS, then resume LOT-45.1-WU01 read-only requalification.",
   "next_engineering": {
     "active_lot": null,
     "active_task": null,
@@ -81,13 +81,6 @@
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
   ],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36607903196",
-      "head_sha": "86da75900304e364bc8f11a0cd3b472fe4606a2f",
-      "scope": "ENG-09.6-WU03A_TERMINAL_ROUTING_BOOTSTRAP"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "status": "PASS",
@@ -164,6 +157,13 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37322905878",
       "head_sha": "6651f12870ed51318b8004246aa87b015caaeaa8",
       "scope": "ENG-09.6-WU05_ACTIVATION_PREFLIGHT_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37378690451",
+      "head_sha": "dec31e78161a1a1e50181a06760130ab3bc27421",
+      "scope": "LOT-45.1-WU03_SCOPE_BASE_SECURITY_SECRETS"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"

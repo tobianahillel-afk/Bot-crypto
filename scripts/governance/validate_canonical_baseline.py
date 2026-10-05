@@ -44,8 +44,13 @@ def validate() -> None:
 
     business = baseline.get("business", {})
     state_business = state.get("business_track", {})
-    if business.get("development_status") != state_business.get("business_development"):
-        raise CanonicalBaselineError("business development status mismatch")
+    current_business_status = state_business.get("business_development")
+    if business.get("development_status") != "PAUSED":
+        raise CanonicalBaselineError(
+            "ENG-00 baseline must preserve historical PAUSED business development status"
+        )
+    if current_business_status not in {"PAUSED", "ACTIVE"}:
+        raise CanonicalBaselineError("current business development lifecycle is unsupported")
     if business.get("merged_certified_baseline", {}).get("lot") != 44:
         raise CanonicalBaselineError("Lot44 must be the certified implementation baseline")
     if business.get("merged_certified_baseline", {}).get("version") != "0.44.0":
@@ -59,18 +64,80 @@ def validate() -> None:
 
     candidate = business.get("candidate", {})
     state_candidate = state_business.get("active_candidate", {})
-    expected_candidate = {
+    expected_identity = {
         "lot": state_candidate.get("lot"),
         "pr": state_candidate.get("pull_request"),
         "branch": state_candidate.get("branch"),
         "observed_head": state_candidate.get("observed_head_sha"),
-        "status": state_candidate.get("status"),
     }
-    for key, expected in expected_candidate.items():
+    for key, expected in expected_identity.items():
         if candidate.get(key) != expected:
-            raise CanonicalBaselineError(f"Lot45 candidate mismatch for {key}")
+            raise CanonicalBaselineError(f"Lot45 candidate identity mismatch for {key}")
+    if candidate.get("status") != "SUSPENDED_CANDIDATE":
+        raise CanonicalBaselineError(
+            "ENG-00 baseline must preserve historical SUSPENDED_CANDIDATE status"
+        )
     if candidate.get("merged") is not False or candidate.get("state") != "OPEN":
-        raise CanonicalBaselineError("Lot45 candidate must remain explicitly open and unmerged")
+        raise CanonicalBaselineError("Lot45 baseline candidate must remain open and unmerged")
+
+    if state_business.get("next_lot") != {"lot": 46, "status": "LOCKED"}:
+        raise CanonicalBaselineError("current lifecycle must preserve the Lot46 lock")
+
+    if current_business_status == "PAUSED":
+        if state_candidate.get("status") != "SUSPENDED_CANDIDATE":
+            raise CanonicalBaselineError(
+                "PAUSED lifecycle requires SUSPENDED_CANDIDATE current status"
+            )
+    else:
+        if state_candidate.get("status") != "ACTIVE_CANDIDATE":
+            raise CanonicalBaselineError(
+                "ACTIVE lifecycle requires ACTIVE_CANDIDATE current status"
+            )
+        activation = _load("engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json")
+        if activation.get("schema_version") != 1:
+            raise CanonicalBaselineError("business activation evidence schema drift")
+        if (
+            activation.get("evidence_kind")
+            != "business_development_unlock_activation_v1"
+            or activation.get("status") != "ACTIVATED"
+            or activation.get("explicit_human_action") != "BUSINESS_DEVELOPMENT_UNLOCK"
+        ):
+            raise CanonicalBaselineError("ACTIVE lifecycle lacks explicit activation evidence")
+        if (
+            activation.get("candidate_mutated") is not False
+            or activation.get("candidate_merged") is not False
+            or activation.get("lot46_status") != "LOCKED"
+        ):
+            raise CanonicalBaselineError(
+                "activation evidence violates candidate immutability or Lot46 lock"
+            )
+        transition = activation.get("authority_transition", {})
+        if (
+            transition.get("business") != "PAUSED_TO_ACTIVE"
+            or transition.get("candidate")
+            != "SUSPENDED_CANDIDATE_TO_ACTIVE_CANDIDATE"
+        ):
+            raise CanonicalBaselineError("business activation transition drift")
+        live = activation.get("live_reverification", {})
+        activation_identity = {
+            "lot": 45,
+            "pr": live.get("lot45_pr"),
+            "branch": candidate.get("branch"),
+            "observed_head": live.get("lot45_head_sha"),
+        }
+        if activation_identity != {
+            "lot": candidate.get("lot"),
+            "pr": candidate.get("pr"),
+            "branch": candidate.get("branch"),
+            "observed_head": candidate.get("observed_head"),
+        }:
+            raise CanonicalBaselineError(
+                "activation evidence disagrees with immutable Lot45 candidate identity"
+            )
+        if live.get("lot45_state") != "open" or live.get("lot45_merged") is not False:
+            raise CanonicalBaselineError(
+                "activation evidence must preserve open unmerged Lot45 candidate"
+            )
     if business.get("next_lot") != {"lot": 46, "status": "LOCKED"}:
         raise CanonicalBaselineError("Lot46 lock missing")
 
@@ -139,8 +206,103 @@ def validate() -> None:
         raise CanonicalBaselineError("ENG-01 must start at ENG-01.1")
 
 
+def _expect_baseline_error(fn: Any, label: str) -> None:
+    try:
+        fn()
+    except CanonicalBaselineError:
+        return
+    raise AssertionError(f"canonical baseline negative scenario unexpectedly passed: {label}")
+
+
+def _self_check_lifecycle() -> None:
+    business = {
+        "development_status": "PAUSED",
+        "candidate": {
+            "lot": 45,
+            "pr": 66,
+            "branch": "agent/lot45-order-flow-delta-cvd-engine-v2",
+            "observed_head": "e" * 40,
+            "state": "OPEN",
+            "merged": False,
+            "status": "SUSPENDED_CANDIDATE",
+        },
+        "next_lot": {"lot": 46, "status": "LOCKED"},
+    }
+    paused = {
+        "business_development": "PAUSED",
+        "active_candidate": {
+            "lot": 45,
+            "pull_request": 66,
+            "branch": business["candidate"]["branch"],
+            "observed_head_sha": "e" * 40,
+            "status": "SUSPENDED_CANDIDATE",
+        },
+        "next_lot": {"lot": 46, "status": "LOCKED"},
+    }
+    active = json.loads(json.dumps(paused))
+    active["business_development"] = "ACTIVE"
+    active["active_candidate"]["status"] = "ACTIVE_CANDIDATE"
+
+    def probe(
+        baseline_business: dict[str, Any],
+        current_business: dict[str, Any],
+        activation: dict[str, Any] | None,
+    ) -> None:
+        if baseline_business.get("development_status") != "PAUSED":
+            raise CanonicalBaselineError("baseline PAUSED invariant")
+        candidate = baseline_business["candidate"]
+        current = current_business["active_candidate"]
+        for left, right in (
+            (candidate["lot"], current["lot"]),
+            (candidate["pr"], current["pull_request"]),
+            (candidate["branch"], current["branch"]),
+            (candidate["observed_head"], current["observed_head_sha"]),
+        ):
+            if left != right:
+                raise CanonicalBaselineError("candidate identity drift")
+        if current_business["business_development"] == "ACTIVE":
+            if activation is None:
+                raise CanonicalBaselineError("missing activation")
+            if activation.get("candidate_mutated") is not False:
+                raise CanonicalBaselineError("candidate mutation")
+            if activation.get("candidate_merged") is not False:
+                raise CanonicalBaselineError("candidate merge")
+            if activation.get("lot45_head_sha") != candidate["observed_head"]:
+                raise CanonicalBaselineError("activation head drift")
+
+    probe(business, paused, None)
+    activation = {
+        "candidate_mutated": False,
+        "candidate_merged": False,
+        "lot45_head_sha": "e" * 40,
+    }
+    probe(business, active, activation)
+
+    changed_baseline = json.loads(json.dumps(business))
+    changed_baseline["development_status"] = "ACTIVE"
+    _expect_baseline_error(
+        lambda: probe(changed_baseline, active, activation),
+        "rewritten historical lifecycle",
+    )
+    _expect_baseline_error(lambda: probe(business, active, None), "missing activation")
+    wrong_head = json.loads(json.dumps(active))
+    wrong_head["active_candidate"]["observed_head_sha"] = "f" * 40
+    _expect_baseline_error(
+        lambda: probe(business, wrong_head, activation),
+        "candidate head drift",
+    )
+    mutated = dict(activation)
+    mutated["candidate_mutated"] = True
+    _expect_baseline_error(
+        lambda: probe(business, active, mutated),
+        "candidate mutation",
+    )
+    print("CANONICAL_BASELINE_LIFECYCLE_SELFTEST_PASS probes=6")
+
+
 def main() -> int:
     try:
+        _self_check_lifecycle()
         validate()
     except CanonicalBaselineError as exc:
         print(f"CANONICAL_BASELINE_INVALID: {exc}", file=sys.stderr)

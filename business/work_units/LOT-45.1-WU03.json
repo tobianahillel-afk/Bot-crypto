@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "LOT-45.1-WU03",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "LOT-45",
+    "task_id": "LOT-45.1",
+    "manifest": "business/lots/LOT-45.json"
+  },
+  "title": "Reconcile immutable ENG-00 baseline with terminal ACTIVE business lifecycle",
+  "objective": "Clear DEV-ENGINE-V1-BASELINE-001 through a bounded lifecycle-aware canonical-baseline validator change while preserving the immutable ENG-00 PAUSED snapshot, current ACTIVE business authority, unchanged PR #66 bytes, Lot46 lock, and all runtime/trading safety boundaries.",
+  "non_goals": [
+    "rewrite engineering/CANONICAL_BASELINE.json",
+    "modify or merge PR #66",
+    "change Development Engine V1 frozen entrypoints",
+    "change business activation evidence",
+    "start Lot45 candidate remediation",
+    "unlock Lot46",
+    "enable runtime trading leverage withdrawals or live exchange access",
+    "introduce paid or LLM-backed mandatory review"
+  ],
+  "depends_on": [
+    "ENG-09.6-WU05"
+  ],
+  "inputs": [
+    {
+      "name": "Lot45 read-only requalification evidence",
+      "kind": "EVIDENCE",
+      "locator": "business/evidence/LOT45_V1_REQUALIFICATION.json"
+    },
+    {
+      "name": "Immutable ENG-00 canonical baseline",
+      "kind": "STATE",
+      "locator": "engineering/CANONICAL_BASELINE.json"
+    },
+    {
+      "name": "Explicit business activation evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json"
+    },
+    {
+      "name": "Canonical baseline validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_canonical_baseline.py"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Lifecycle-aware canonical baseline validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_canonical_baseline.py"
+    },
+    {
+      "name": "Reconciliation-routed handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    },
+    {
+      "name": "Reconciliation-routed context map",
+      "kind": "STATE",
+      "locator": "engineering/CONTEXT_MAP.json"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "dec31e78161a1a1e50181a06760130ab3bc27421",
+    "allowed_paths": [
+      "business/lots/LOT-45.json",
+      "business/work_units/LOT-45.1-WU01.json",
+      "business/work_units/LOT-45.1-WU03.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "scripts/governance/validate_canonical_baseline.py"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "contracts/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      ".github/workflows/**",
+      "engineering/CANONICAL_BASELINE.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json",
+      "config/governance/**"
+    ],
+    "forbidden_semantics": [
+      "Lot45 candidate mutation",
+      "candidate merge",
+      "ENG-00 baseline rewrite",
+      "business authority rollback",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "permission-to-trade activation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "engineering/CANONICAL_BASELINE.json remains byte-unchanged and preserves historical PAUSED plus SUSPENDED_CANDIDATE facts",
+      "current ACTIVE business lifecycle is accepted only when explicit ACTIVATED business-unlock evidence proves PAUSED_TO_ACTIVE and SUSPENDED_CANDIDATE_TO_ACTIVE_CANDIDATE",
+      "Lot45 candidate lot PR branch and observed head remain identical between immutable baseline current bridge state and activation evidence",
+      "ACTIVE validation fails closed if activation evidence is missing malformed claims candidate mutation/merge or disagrees with current candidate identity",
+      "PAUSED lifecycle remains supported for historical and adversarial validation",
+      "PR #66 remains byte-unchanged throughout reconciliation",
+      "Lot46 and runtime trading authority remain fail-closed"
+    ],
+    "acceptance_criteria": [
+      "baseline file is not in the AWU allowed paths and is explicitly forbidden from mutation",
+      "canonical baseline validator passes the current ACTIVE terminal lifecycle without changing historical baseline bytes",
+      "validator rejects a baseline rewritten to ACTIVE",
+      "validator rejects ACTIVE state without activation evidence",
+      "validator rejects changed candidate head or mutated/merged activation evidence",
+      "Engineering Bootstrap and Security Secrets are SUCCESS on one exact reconciliation head",
+      "candidate head remains ec2c4ab16f21b23e062b7fca0bb796c8db4a5133 and Lot46 remains LOCKED"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 2,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 1,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 7,
+      "executable_loc_changed": 220,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_canonical_baseline.py",
+      "lifecycle adversarial self-checks embedded in canonical baseline validator",
+      "exact-head Engineering Bootstrap",
+      "exact-head Security Secrets",
+      "live PR #66 immutability reverification"
+    ]
+  },
+  "done_when": [
+    "DEV-ENGINE-V1-BASELINE-001 is cleared without baseline mutation",
+    "one exact reconciliation head has Bootstrap and Security Secrets SUCCESS",
+    "LOT-45.1-WU01 may resume read-only requalification on the unchanged candidate",
+    "Lot46 remains locked and all runtime/trading safety remains disabled"
+  ]
+}

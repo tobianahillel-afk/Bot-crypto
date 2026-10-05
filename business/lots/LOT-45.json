@@ -15,7 +15,12 @@
     "business/evidence/LOT45_V1_REQUALIFICATION.json",
     "business/plans/LOT45_REMEDIATION_PLAN.json",
     "AGENTS.md",
-    "scripts/governance/selftest_terminal_business_routing.py"
+    "scripts/governance/selftest_terminal_business_routing.py",
+    "business/work_units/LOT-45.1-WU03.json",
+    "engineering/handoff/CURRENT.json",
+    "engineering/CONTEXT_MAP.json",
+    "engineering/CONTEXT_MAP.md",
+    "scripts/governance/validate_canonical_baseline.py"
   ],
   "forbidden_scope": [
     "candidate branch mutation during LOT-45.1-WU01",

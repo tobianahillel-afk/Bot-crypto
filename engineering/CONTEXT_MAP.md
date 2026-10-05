@@ -13,20 +13,21 @@
 - Track: BUSINESS
 - Work item: LOT-45
 - Task: LOT-45.1
-- AWU: LOT-45.1-WU01
+- AWU: LOT-45.1-WU03
 - Risk: R2
 - Manifest: business/lots/LOT-45.json
-- AWU file: business/work_units/LOT-45.1-WU01.json
+- AWU file: business/work_units/LOT-45.1-WU03.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - business/lots/LOT-45.json
-- business/work_units/LOT-45.1-WU01.json
-- engineering/LOT45_ENGINE_PILOT_EVIDENCE.json
-- engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json
+- business/work_units/LOT-45.1-WU03.json
+- business/evidence/LOT45_V1_REQUALIFICATION.json
+- engineering/CANONICAL_BASELINE.json
 - engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json
+- scripts/governance/validate_canonical_baseline.py
 
 ## Execution context — reference
 
@@ -35,16 +36,16 @@
 
 ## Budget
 
-- Primary: 7 / 12 files
+- Primary: 8 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 60 / 1024 KiB
+- Routed size: 62 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: LOT-45.1-WU01: read-only exact-head requalification of PR #66 under Development Engine V1.
-- Next action: Reverify PR #66 live exact head and run read-only Development Engine V1 requalification; do not mutate the candidate, merge PR #66, or unlock Lot46.
+- Objective: LOT-45.1-WU03: clear DEV-ENGINE-V1-BASELINE-001 without mutating the immutable ENG-00 baseline or PR #66.
+- Next action: Qualify the lifecycle-aware canonical-baseline validator on one exact head; require Bootstrap + Security Secrets SUCCESS, then resume LOT-45.1-WU01 read-only requalification.
 
 ## Non-authoritative sources
 

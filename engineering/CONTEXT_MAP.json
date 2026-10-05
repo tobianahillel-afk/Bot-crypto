@@ -1,13 +1,13 @@
 {
   "active_work": {
-    "awu_id": "LOT-45.1-WU01",
-    "awu_path": "business/work_units/LOT-45.1-WU01.json",
-    "complexity_score": 2,
+    "track": "BUSINESS",
     "lot": "LOT-45",
-    "manifest": "business/lots/LOT-45.json",
-    "risk_class": "R2",
     "task": "LOT-45.1",
-    "track": "BUSINESS"
+    "manifest": "business/lots/LOT-45.json",
+    "awu_id": "LOT-45.1-WU03",
+    "awu_path": "business/work_units/LOT-45.1-WU03.json",
+    "risk_class": "R2",
+    "complexity_score": 2
   },
   "authority": {
     "current_state": "config/governance/project_state.json",
@@ -29,28 +29,29 @@
     }
   },
   "execution_context": {
+    "primary_files": [
+      "AGENTS.md",
+      "config/governance/project_state.json",
+      "business/lots/LOT-45.json",
+      "business/work_units/LOT-45.1-WU03.json",
+      "business/evidence/LOT45_V1_REQUALIFICATION.json",
+      "engineering/CANONICAL_BASELINE.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json",
+      "scripts/governance/validate_canonical_baseline.py"
+    ],
+    "reference_files": [
+      "engineering/MASTER_PLAN.md",
+      "engineering/AGENT_PROTOCOL.md"
+    ],
+    "primary_count": 8,
+    "reference_count": 2,
+    "total_kib_ceil": 62,
     "budget": {
       "max_primary_files": 12,
       "max_reference_files": 16,
       "max_total_kib": 1024
     },
-    "implicit_expansion": "FORBIDDEN",
-    "primary_count": 7,
-    "primary_files": [
-      "AGENTS.md",
-      "config/governance/project_state.json",
-      "business/lots/LOT-45.json",
-      "business/work_units/LOT-45.1-WU01.json",
-      "engineering/LOT45_ENGINE_PILOT_EVIDENCE.json",
-      "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json",
-      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json"
-    ],
-    "reference_count": 2,
-    "reference_files": [
-      "engineering/MASTER_PLAN.md",
-      "engineering/AGENT_PROTOCOL.md"
-    ],
-    "total_kib_ceil": 60
+    "implicit_expansion": "FORBIDDEN"
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -66,9 +67,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "LOT-45.1-WU01: read-only exact-head requalification of PR #66 under Development Engine V1.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Reverify PR #66 live exact head and run read-only Development Engine V1 requalification; do not mutate the candidate, merge PR #66, or unlock Lot46."
+    "current_objective": "LOT-45.1-WU03: clear DEV-ENGINE-V1-BASELINE-001 without mutating the immutable ENG-00 baseline or PR #66.",
+    "next_action": "Qualify the lifecycle-aware canonical-baseline validator on one exact head; require Bootstrap + Security Secrets SUCCESS, then resume LOT-45.1-WU01 read-only requalification."
   },
   "safety": {
     "execution_allowed": false,
