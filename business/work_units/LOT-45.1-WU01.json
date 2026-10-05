@@ -9,14 +9,15 @@
     "manifest": "business/lots/LOT-45.json"
   },
   "title": "Requalify suspended Lot45 candidate under Development Engine V1",
-  "objective": "Read-only requalify PR #66 exact head ec2c4ab16f21b23e062b7fca0bb796c8db4a5133 against current Development Engine V1 controls, distinguish current candidate defects from legacy workflow fanout, and produce a bounded remediation plan without mutating the candidate.",
+  "objective": "Read-only requalify PR #66 exact head ec2c4ab16f21b23e062b7fca0bb796c8db4a5133 against current Development Engine V1 controls, distinguish current candidate defects from legacy workflow fanout, produce a bounded remediation plan, and clear DEV-ENGINE-V1-IFACE-001 through the narrow documented compatibility route without mutating the candidate.",
   "non_goals": [
     "modify the Lot45 candidate branch",
     "merge PR #66",
     "resolve review threads by assertion",
     "start or unlock Lot46",
     "enable runtime or trading authority",
-    "require Codex or any paid LLM reviewer"
+    "require Codex or any paid LLM reviewer",
+    "modify Development Engine implementation or frozen interface policy beyond restoring the exact missing AGENTS V1 compatibility phrase"
   ],
   "depends_on": [
     "ENG-09.6-WU05"
@@ -61,7 +62,8 @@
       "business/evidence/LOT45_V1_REQUALIFICATION.json",
       "business/plans/LOT45_REMEDIATION_PLAN.json",
       "business/work_units/LOT-45.1-WU01.json",
-      "business/work_units/LOT-45.1-WU02.json"
+      "business/work_units/LOT-45.1-WU02.json",
+      "business/lots/LOT-45.json"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -123,7 +125,7 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 4,
+      "files_touched": 6,
       "executable_loc_changed": 350,
       "new_public_behaviors": 1,
       "contract_families": 0,
