@@ -25,7 +25,8 @@
     "pull_request_base_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
     "pull_request_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
     "prior_pilot_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
-    "head_unchanged_since_engine_pilot": true
+    "head_unchanged_since_engine_pilot": true,
+    "reverified_at_utc": "2026-10-05T19:58:00Z"
   },
   "safety": {
     "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
@@ -36,8 +37,33 @@
     "withdrawals": "FORBIDDEN"
   },
   "current_review_state": {
-    "unresolved_non_outdated_threads": 0,
-    "rule": "thread resolution is not accepted as substantive remediation when candidate bytes are unchanged"
+    "unresolved_non_outdated_threads": 2,
+    "rule": "thread resolution is not accepted as substantive remediation when candidate bytes are unchanged; conversely an open UI thread may be code-resolved only when current exact-head bytes prove the finding is fixed",
+    "threads": [
+      {
+        "id": "PRRT_kwDOTtA9Ds6aIHFn",
+        "priority": "P1",
+        "ui_state": "OPEN_NON_OUTDATED",
+        "code_state": "RESOLVED_IN_CURRENT_HEAD_BY_CODE_INSPECTION",
+        "title": "Preserve market identity in order-flow artifacts",
+        "evidence": [
+          "OrderFlowStateV1 and CVDSeriesV1 carry required market_identity",
+          "standalone order-flow/CVD checksums bind market_identity",
+          "tests/test_lot45_market_identity_binding.py proves BTC/ETH artifact checksums differ"
+        ]
+      },
+      {
+        "id": "PRRT_kwDOTtA9Ds6aIhbE",
+        "priority": "P1",
+        "ui_state": "OPEN_NON_OUTDATED",
+        "code_state": "CONFIRMED_PRESENT",
+        "title": "Bind matching identities to the certified input market",
+        "evidence": [
+          "_build_engine_state receives source trades plus Order Flow/CVD artifacts",
+          "_build_engine_state does not compare artifact market_identity against homogeneous source-trade identity"
+        ]
+      }
+    ]
   },
   "prior_pilot": {
     "evidence_path": "engineering/LOT45_ENGINE_PILOT_EVIDENCE.json",
@@ -124,7 +150,7 @@
       "id": "PRRT_kwDOTtA9Ds6aIHFn",
       "prior_priority": "P1",
       "title": "Preserve market identity in Order Flow/CVD artifacts",
-      "status": "RESOLVED_IN_CURRENT_HEAD_BY_CODE_INSPECTION",
+      "status": "RESOLVED_IN_CURRENT_HEAD_BY_CODE_INSPECTION_UI_THREAD_STILL_OPEN",
       "evidence": [
         "OrderFlowStateV1 and CVDSeriesV1 expose required market_identity",
         "order_flow_state_v1.schema.json and cvd_series_v1.schema.json require market_identity",
@@ -187,7 +213,16 @@
     "failed_step": "Validate Development Engine V1 interface freeze",
     "detail": "AGENTS V1 interface phrase missing: resolve the single active AWU with `python scripts/governance/resolve_active_awu.py`",
     "historical_v1_certification_remains_immutable": true,
-    "consequence": "Current business-route bootstrap cannot become green until V1 compatibility text/policy is repaired through an authorized engine-maintenance route."
+    "consequence": "Current business-route bootstrap cannot become green until V1 compatibility text/policy is repaired through an authorized engine-maintenance route.",
+    "latest_requalification": {
+      "engineering_head": "e9877cbb00343ca889e09645a6884c4c57f4393a",
+      "interface_phrase_present": true,
+      "terminal_routing_selftest_fixture_updated": true,
+      "bootstrap_run_id": 37363993726,
+      "bootstrap_run_attempt": 2,
+      "bootstrap_status": "QUEUED",
+      "conclusion": "PENDING_EXACT_HEAD_BOOTSTRAP_RESULT"
+    }
   },
   "remediation_required": true,
   "remediation_plan_path": "business/plans/LOT45_REMEDIATION_PLAN.json",
