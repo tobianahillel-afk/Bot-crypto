@@ -34,6 +34,18 @@ jobs:
       - name: Compile governance scripts
         run: python -m compileall -q scripts/governance
 
+      - name: Resolve business lifecycle mode
+        id: business_lifecycle
+        shell: bash
+        run: |
+          set -euo pipefail
+          mode="$(python -c 'import json; print(json.load(open("config/governance/project_state.json", encoding="utf-8"))["business_track"]["development_status"])')"
+          case "${mode}" in
+            PAUSED|ACTIVE) ;;
+            *) echo "Unsupported BUSINESS lifecycle: ${mode}" >&2; exit 1 ;;
+          esac
+          printf 'mode=%s\n' "${mode}" >> "${GITHUB_OUTPUT}"
+
       - name: Validate Development Engine V1 interface freeze
         run: python scripts/governance/validate_development_engine_v1_interface_freeze.py
 
@@ -41,24 +53,34 @@ jobs:
         run: python scripts/governance/selftest_development_engine_v1_interface_freeze.py
 
       - name: Validate explicit business-development unlock decision
+        if: steps.business_lifecycle.outputs.mode == 'PAUSED'
         run: python scripts/governance/validate_business_development_unlock_decision.py
 
       - name: Run business-development unlock adversarial self-tests
+        if: steps.business_lifecycle.outputs.mode == 'PAUSED'
         run: python scripts/governance/selftest_business_development_unlock_decision.py
 
       - name: Validate post-remediation business-development unlock eligibility
+        if: steps.business_lifecycle.outputs.mode == 'PAUSED'
         run: python scripts/governance/validate_business_development_unlock_eligibility.py
 
       - name: Run business-development unlock eligibility adversarial self-tests
+        if: steps.business_lifecycle.outputs.mode == 'PAUSED'
         run: python scripts/governance/selftest_business_development_unlock_eligibility.py
 
       - name: Run terminal business routing adversarial self-tests
         run: python scripts/governance/selftest_terminal_business_routing.py
 
-      - name: Validate staged business-development activation topology
+      - name: Validate business-development activation topology
+        shell: bash
         run: |
-          python scripts/governance/validate_business_development_activation.py --mode staged
-          python scripts/governance/validate_business_development_activation.py --mode synthetic-activated
+          set -euo pipefail
+          if [ "${{ steps.business_lifecycle.outputs.mode }}" = "PAUSED" ]; then
+            python scripts/governance/validate_business_development_activation.py --mode staged
+            python scripts/governance/validate_business_development_activation.py --mode synthetic-activated
+          else
+            python scripts/governance/validate_business_development_activation.py --mode activated
+          fi
 
       - name: Run business-development activation adversarial self-tests
         run: python scripts/governance/selftest_business_development_activation.py

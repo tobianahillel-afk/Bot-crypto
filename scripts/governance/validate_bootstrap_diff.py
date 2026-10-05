@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import fnmatch
 import importlib.util
+import json
 import re
 import subprocess
 import sys
@@ -49,11 +50,116 @@ def resolve_scope_base(sha: str) -> str:
     return sha
 
 
-def changed_files(base: str) -> list[str]:
-    result = _git("diff", "--name-only", f"{base}...HEAD")
+def _load_json(path: Path) -> dict:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise DiffScopeError(f"cannot load {path}: {exc}") from exc
+    if not isinstance(value, dict):
+        raise DiffScopeError(f"{path} must contain an object")
+    return value
+
+
+def changed_files_between(base: str, head: str) -> list[str]:
+    result = _git("diff", "--name-only", f"{base}...{head}")
     if result.returncode != 0:
         raise DiffScopeError(f"git diff failed: {result.stderr.strip()}")
     return [line.strip() for line in result.stdout.splitlines() if line.strip()]
+
+
+def changed_files(base: str) -> list[str]:
+    return changed_files_between(base, "HEAD")
+
+
+def first_commit_after(base: str) -> str:
+    result = _git("rev-list", "--ancestry-path", "--reverse", f"{base}..HEAD")
+    if result.returncode != 0:
+        raise DiffScopeError(f"cannot resolve activation ancestry: {result.stderr.strip()}")
+    commits = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+    if not commits:
+        raise DiffScopeError("BUSINESS route has no commit after activation predecessor")
+    first = commits[0]
+    parents = _git("rev-list", "--parents", "-n", "1", first)
+    if parents.returncode != 0:
+        raise DiffScopeError("cannot resolve activation commit parent")
+    fields = parents.stdout.split()
+    if len(fields) != 2 or fields[1] != base:
+        raise DiffScopeError("activation transition must be one direct non-merge commit after predecessor")
+    return first
+
+
+ACTIVATION_REQUIRED_FILES = {
+    "AGENTS.md",
+    "README.md",
+    "config/governance/project_state.json",
+    "engineering/STATE.json",
+    "engineering/lots/ENG-09.json",
+    "engineering/handoff/CURRENT.json",
+    "engineering/CONTEXT_MAP.json",
+    "engineering/CONTEXT_MAP.md",
+    "engineering/CURRENT_STATUS.md",
+    "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json",
+    "engineering/work_units/ENG-09.6-WU05.json",
+    "business/lots/LOT-45.json",
+    "business/work_units/LOT-45.1-WU01.json",
+}
+
+
+def validate_activation_evidence(value: dict, base: str) -> None:
+    if value.get("schema_version") != 1:
+        raise DiffScopeError("activation evidence schema drift")
+    if value.get("evidence_kind") != "business_development_unlock_activation_v1":
+        raise DiffScopeError("activation evidence kind drift")
+    if value.get("explicit_human_action") != "BUSINESS_DEVELOPMENT_UNLOCK":
+        raise DiffScopeError("activation evidence lacks exact human authorization")
+    if value.get("activation_predecessor_head") != base:
+        raise DiffScopeError("activation evidence predecessor does not match BUSINESS scope base")
+    if value.get("candidate_mutated") is not False or value.get("candidate_merged") is not False:
+        raise DiffScopeError("activation evidence cannot claim candidate mutation or merge")
+    if value.get("lot46_status") != "LOCKED":
+        raise DiffScopeError("activation evidence must preserve Lot46 lock")
+
+
+def validate_activation_transition_files(files: list[str]) -> None:
+    missing = sorted(ACTIVATION_REQUIRED_FILES - set(files))
+    if missing:
+        raise DiffScopeError(f"activation transition missing required files: {missing}")
+
+
+def validate_business_activation_bridge(
+    base: str,
+    scope: dict,
+    parent_allowed: list[str],
+) -> tuple[str, list[str]]:
+    activation_path = ROOT / "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json"
+    if not activation_path.is_file():
+        raise DiffScopeError("ACTIVE BUSINESS route requires activation evidence")
+    activation = _load_json(activation_path)
+    validate_activation_evidence(activation, base)
+
+    activation_commit = first_commit_after(base)
+    transition_files = changed_files_between(base, activation_commit)
+    validate_activation_transition_files(transition_files)
+
+    wu05 = _load_json(ROOT / "engineering/work_units/ENG-09.6-WU05.json")
+    eng09 = _load_json(ROOT / "engineering/lots/ENG-09.json")
+    if wu05.get("status") != "DONE":
+        raise DiffScopeError("activation transition requires ENG-09.6-WU05 DONE")
+    validate_scope(
+        transition_files,
+        wu05["scope"]["allowed_paths"],
+        wu05["scope"]["forbidden_paths"],
+        eng09["allowed_paths"],
+    )
+
+    business_files = changed_files_between(activation_commit, "HEAD")
+    validate_scope(
+        business_files,
+        scope["allowed_paths"],
+        scope["forbidden_paths"],
+        parent_allowed,
+    )
+    return activation_commit, business_files
 
 
 def validate_scope(
@@ -88,14 +194,20 @@ def main() -> int:
 
         scope = awu["scope"]
         base = resolve_scope_base(scope["scope_base_sha"])
-        files = changed_files(base)
         parent_allowed = evidence["parent_manifest"]["allowed_paths"]
-        validate_scope(
-            files,
-            scope["allowed_paths"],
-            scope["forbidden_paths"],
-            parent_allowed,
-        )
+        if evidence.get("track") == "BUSINESS":
+            activation_commit, files = validate_business_activation_bridge(
+                base, scope, parent_allowed
+            )
+        else:
+            activation_commit = None
+            files = changed_files(base)
+            validate_scope(
+                files,
+                scope["allowed_paths"],
+                scope["forbidden_paths"],
+                parent_allowed,
+            )
     except DiffScopeError as exc:
         print(f"ACTIVE_AWU_SCOPE_INVALID: {exc}", file=sys.stderr)
         return 1
@@ -104,6 +216,7 @@ def main() -> int:
         "ACTIVE_AWU_SCOPE_VALID "
         f"awu={awu['id']} path={awu_path.relative_to(ROOT)} "
         f"base={base} changed_files={len(files)}"
+        + (f" activation_commit={activation_commit}" if activation_commit else "")
     )
     return 0
 

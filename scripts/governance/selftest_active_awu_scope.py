@@ -111,7 +111,32 @@ def main() -> int:
         "unknown scope base",
     )
 
-    print("ACTIVE_AWU_SCOPE_SELFTEST_PASS probes=7")
+    valid_activation = {
+        "schema_version": 1,
+        "evidence_kind": "business_development_unlock_activation_v1",
+        "explicit_human_action": "BUSINESS_DEVELOPMENT_UNLOCK",
+        "activation_predecessor_head": "a" * 40,
+        "candidate_mutated": False,
+        "candidate_merged": False,
+        "lot46_status": "LOCKED",
+    }
+    diff.validate_activation_evidence(valid_activation, "a" * 40)
+    stale_activation = copy.deepcopy(valid_activation)
+    stale_activation["activation_predecessor_head"] = "b" * 40
+    _expect(
+        diff.DiffScopeError,
+        lambda: diff.validate_activation_evidence(stale_activation, "a" * 40),
+        "stale activation predecessor",
+    )
+    _expect(
+        diff.DiffScopeError,
+        lambda: diff.validate_activation_transition_files(
+            sorted(diff.ACTIVATION_REQUIRED_FILES - {"config/governance/project_state.json"})
+        ),
+        "incomplete activation transition",
+    )
+
+    print("ACTIVE_AWU_SCOPE_SELFTEST_PASS probes=9")
     return 0
 
 

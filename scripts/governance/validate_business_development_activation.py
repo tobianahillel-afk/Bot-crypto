@@ -65,17 +65,21 @@ def validate_activated(s:dict[str,Any],m:dict[str,Any],a:dict[str,Any],policy:di
     req(b["candidate"]["status"]=="ACTIVE_CANDIDATE" and b["candidate"]["state"]=="OPEN" and b["candidate"]["merged"] is False,"candidate authority invalid")
     req(b["next_lot"]=={"lot":46,"status":"LOCKED"},"Lot46 unlock forbidden")
     req(s["authority"]["active_manifest"]=="business/lots/LOT-45.json","business manifest authority missing")
+    req(m.get("status")=="IN_PROGRESS","business manifest not active")
     req(m["tasks"][0]["status"]=="IN_PROGRESS" and sum(t["status"]=="IN_PROGRESS" for t in m["tasks"])==1,"business task cardinality invalid")
     req(a["status"]=="IN_PROGRESS","business AWU not active")
     for k,v in policy["invariant_safety"].items(): req(s["safety"].get(k)==v,f"safety weakened: {k}")
 
 def main()->int:
-    ap=argparse.ArgumentParser(); ap.add_argument("--mode",choices=["staged","synthetic-activated"],default="staged"); args=ap.parse_args()
+    ap=argparse.ArgumentParser(); ap.add_argument("--mode",choices=["staged","synthetic-activated","activated"],default="staged"); args=ap.parse_args()
     try:
         p=load(POLICY); plan=load(PLAN); s=load(STATE); bm=load(BM); ba=load(BA)
-        if args.mode=="staged": validate_staged(plan,s,bm,ba,p)
-        else:
+        if args.mode=="staged":
+            validate_staged(plan,s,bm,ba,p)
+        elif args.mode=="synthetic-activated":
             ns,nm,na=synthetic_activation(s,bm,ba); validate_activated(ns,nm,na,p)
+        else:
+            validate_activated(s,bm,ba,p)
     except (ActivationError,KeyError,TypeError) as e:
         print(f"BUSINESS_ACTIVATION_INVALID: {e}",file=sys.stderr); return 1
     print(f"BUSINESS_ACTIVATION_VALID mode={args.mode}"); return 0
