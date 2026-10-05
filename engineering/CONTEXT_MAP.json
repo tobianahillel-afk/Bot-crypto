@@ -1,7 +1,7 @@
 {
   "active_work": {
-    "awu_id": "ENG-09.6-WU07",
-    "awu_path": "engineering/work_units/ENG-09.6-WU07.json",
+    "awu_id": "ENG-09.6-WU05",
+    "awu_path": "engineering/work_units/ENG-09.6-WU05.json",
     "complexity_score": 7,
     "lot": "ENG-09",
     "manifest": "engineering/lots/ENG-09.json",
@@ -35,21 +35,24 @@
       "max_total_kib": 1024
     },
     "implicit_expansion": "FORBIDDEN",
-    "primary_count": 6,
+    "primary_count": 9,
     "primary_files": [
       "AGENTS.md",
       "config/governance/project_state.json",
       "engineering/lots/ENG-09.json",
-      "engineering/work_units/ENG-09.6-WU07.json",
-      "config/governance/active_work_routing_policy_v1.json",
-      "scripts/governance/validate_project_state.py"
+      "engineering/work_units/ENG-09.6-WU05.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION_PLAN.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY.json",
+      "config/governance/business_unlock_activation_policy_v1.json",
+      "business/lots/LOT-45.json",
+      "business/work_units/LOT-45.1-WU01.json"
     ],
     "reference_count": 2,
     "reference_files": [
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 40
+    "total_kib_ceil": 49
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -65,9 +68,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "Qualify terminal-business resume, cold-start, handoff and current-status compatibility in ENG-09.6-WU07 without activating BUSINESS.",
+    "current_objective": "Preflight ENG-09.6-WU05 atomic business-development activation without executing authority writes.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Implement and qualify terminal-aware resolve-next-work, cold-start, resume/recovery, handoff and current-status behavior; preserve PAUSED/BUILDING compatibility and do not activate BUSINESS."
+    "next_action": "Reverify live GitHub eligibility and remain fail-closed until the exact current-session human action BUSINESS_DEVELOPMENT_UNLOCK is supplied; generic continue is not authorization."
   },
   "safety": {
     "execution_allowed": false,
