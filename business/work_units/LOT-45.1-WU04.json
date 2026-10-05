@@ -80,6 +80,26 @@
       "name": "Restored read-only Lot45 requalification AWU",
       "kind": "STATE",
       "locator": "business/work_units/LOT-45.1-WU01.json"
+    },
+    {
+      "name": "Maintenance-aware active AWU diff validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_bootstrap_diff.py"
+    },
+    {
+      "name": "Maintenance-base active-scope adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_active_awu_scope.py"
+    },
+    {
+      "name": "Maintenance-aware T0 effective diff router",
+      "kind": "FILE",
+      "locator": "scripts/governance/run_t0.py"
+    },
+    {
+      "name": "Maintenance-aware T1 scope router",
+      "kind": "FILE",
+      "locator": "scripts/governance/run_t1.py"
     }
   ],
   "scope": {
@@ -94,7 +114,11 @@
       "engineering/handoff/CURRENT.json",
       "engineering/CONTEXT_MAP.json",
       "engineering/CONTEXT_MAP.md",
-      "business/work_units/LOT-45.1-WU01.json"
+      "business/work_units/LOT-45.1-WU01.json",
+      "scripts/governance/validate_bootstrap_diff.py",
+      "scripts/governance/selftest_active_awu_scope.py",
+      "scripts/governance/run_t0.py",
+      "scripts/governance/run_t1.py"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -126,7 +150,8 @@
       "only the mutable engineering/REPOSITORY_PROTECTION_STATUS.json current snapshot and its current-status documentation/selftest may be reconciled; activation evidence protection policy and historical evidence remain immutable",
       "PR #66 remains open unmerged at ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
       "Lot46 remains LOCKED and all runtime trading authority remains fail-closed",
-      "one exact WU04 head must pass Engineering Bootstrap and Security Secrets before read-only WU01 resumes"
+      "one exact WU04 head must pass Engineering Bootstrap and Security Secrets before read-only WU01 resumes",
+      "a post-activation maintenance scope base is accepted only when the immutable activation predecessor/evidence and one-time activation transition validate first and the maintenance base is a descendant of the activation commit"
     ],
     "acceptance_criteria": [
       "active AWU resolver selects LOT-45.1-WU04 as R2 complexity score 4 without mandatory split",
@@ -135,7 +160,8 @@
       "handoff and context map route only to WU04 while it is active",
       "Engineering Bootstrap and Security Secrets are SUCCESS on one exact WU04 head",
       "live main PR #66 Lot46 and runtime safety match canonical state at final qualification",
-      "after qualification WU01 may resume read-only exact-head requalification without candidate mutation or merge"
+      "after qualification WU01 may resume read-only exact-head requalification without candidate mutation or merge",
+      "active-scope validation accepts maintenance base 654b0b572d063f1524471b38cc92457db2f286b9 while rejecting a pre-activation or non-descendant maintenance base"
     ]
   },
   "planning": {
@@ -163,8 +189,8 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 10,
-      "executable_loc_changed": 180,
+      "files_touched": 14,
+      "executable_loc_changed": 480,
       "new_public_behaviors": 1,
       "contract_families": 0,
       "independent_algorithms": 0,
