@@ -17,7 +17,7 @@
     "start or unlock Lot46",
     "enable runtime or trading authority",
     "require Codex or any paid LLM reviewer",
-    "modify Development Engine implementation or frozen interface policy beyond restoring the exact missing AGENTS V1 compatibility phrase"
+    "modify Development Engine production routing implementation or frozen interface policy; only the missing AGENTS phrase and the stale terminal-routing selftest fixture may be repaired"
   ],
   "depends_on": [
     "ENG-09.6-WU05"
@@ -91,7 +91,8 @@
       "unresolved substantive findings remain explicit and cannot be waived by green legacy evidence",
       "Codex may be optional but is never a mandatory transport for progress",
       "any remediation scope is split into bounded successor AWUs before candidate mutation",
-      "the only Development Engine compatibility mutation permitted in WU01 is restoring the frozen AGENTS V1 resolver phrase; validator policy and engine implementation remain unchanged"
+      "the only Development Engine compatibility mutation permitted in WU01 is restoring the frozen AGENTS V1 resolver phrase; validator policy and engine implementation remain unchanged",
+      "terminal business routing production logic remains unchanged; only its synthetic pre-terminal fixture may be updated to reflect explicit BUILDING+PAUSED state"
     ],
     "acceptance_criteria": [
       "exact current PR head is recorded and compared with prior pilot head",
@@ -127,7 +128,7 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 6,
+      "files_touched": 7,
       "executable_loc_changed": 350,
       "new_public_behaviors": 1,
       "contract_families": 0,
