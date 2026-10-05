@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "LOT-45.1-WU04",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "LOT-45",
+    "task_id": "LOT-45.1",
+    "manifest": "business/lots/LOT-45.json"
+  },
+  "title": "Reconcile live repository protection and close Lot45 lifecycle qualification",
+  "objective": "Finish the split lifecycle reconciliation by binding the mutable repository-protection current snapshot to fresh GitHub branch/ruleset evidence, qualifying the exact head through Engineering Bootstrap plus Security Secrets, then returning the route to read-only LOT-45.1-WU01.",
+  "non_goals": [
+    "modify or merge PR #66",
+    "rewrite immutable ENG-00 baseline or business activation evidence",
+    "change repository protection policy",
+    "modify GitHub workflow definitions",
+    "start Lot45 candidate remediation",
+    "unlock Lot46",
+    "enable runtime trading leverage withdrawals or live exchange access",
+    "introduce paid or LLM-backed mandatory review"
+  ],
+  "depends_on": [
+    "LOT-45.1-WU03"
+  ],
+  "inputs": [
+    {
+      "name": "Canonical project state",
+      "kind": "STATE",
+      "locator": "config/governance/project_state.json"
+    },
+    {
+      "name": "Immutable business activation evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json"
+    },
+    {
+      "name": "Current repository protection snapshot",
+      "kind": "STATE",
+      "locator": "engineering/REPOSITORY_PROTECTION_STATUS.json"
+    },
+    {
+      "name": "Repository protection validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_repository_protection.py"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Verified current repository protection snapshot",
+      "kind": "STATE",
+      "locator": "engineering/REPOSITORY_PROTECTION_STATUS.json"
+    },
+    {
+      "name": "Verified repository protection documentation",
+      "kind": "FILE",
+      "locator": "engineering/REPOSITORY_PROTECTION.md"
+    },
+    {
+      "name": "Protected-current-state repository protection selftest",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_repository_protection.py"
+    },
+    {
+      "name": "WU04 routed handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    },
+    {
+      "name": "WU04 generated context map",
+      "kind": "STATE",
+      "locator": "engineering/CONTEXT_MAP.json"
+    },
+    {
+      "name": "WU04 human context map",
+      "kind": "FILE",
+      "locator": "engineering/CONTEXT_MAP.md"
+    },
+    {
+      "name": "Restored read-only Lot45 requalification AWU",
+      "kind": "STATE",
+      "locator": "business/work_units/LOT-45.1-WU01.json"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "654b0b572d063f1524471b38cc92457db2f286b9",
+    "allowed_paths": [
+      "business/lots/LOT-45.json",
+      "business/work_units/LOT-45.1-WU03.json",
+      "business/work_units/LOT-45.1-WU04.json",
+      "engineering/REPOSITORY_PROTECTION_STATUS.json",
+      "engineering/REPOSITORY_PROTECTION.md",
+      "scripts/governance/selftest_repository_protection.py",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "business/work_units/LOT-45.1-WU01.json"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "contracts/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      ".github/workflows/**",
+      "engineering/CANONICAL_BASELINE.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json",
+      "config/governance/**"
+    ],
+    "forbidden_semantics": [
+      "Lot45 candidate mutation",
+      "candidate merge",
+      "ENG-00 baseline rewrite",
+      "business authority rollback",
+      "repository protection policy weakening",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "permission-to-trade activation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "fresh GitHub reads continue to report main SHA 390d0779f2be257fa8134faf8f02193a760a09c3 protected=true and exactly one active main-targeted Protect ruleset",
+      "Protect ruleset enforces pull requests required status checks non-fast-forward blocking and deletion blocking with no bypass",
+      "only the mutable engineering/REPOSITORY_PROTECTION_STATUS.json current snapshot and its current-status documentation/selftest may be reconciled; activation evidence protection policy and historical evidence remain immutable",
+      "PR #66 remains open unmerged at ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+      "Lot46 remains LOCKED and all runtime trading authority remains fail-closed",
+      "one exact WU04 head must pass Engineering Bootstrap and Security Secrets before read-only WU01 resumes"
+    ],
+    "acceptance_criteria": [
+      "active AWU resolver selects LOT-45.1-WU04 as R2 complexity score 4 without mandatory split",
+      "repository-protection policy validator passes the refreshed current snapshot",
+      "repository-protection adversarial selftests pass with protected current state plus unprotected negative cases",
+      "handoff and context map route only to WU04 while it is active",
+      "Engineering Bootstrap and Security Secrets are SUCCESS on one exact WU04 head",
+      "live main PR #66 Lot46 and runtime safety match canonical state at final qualification",
+      "after qualification WU01 may resume read-only exact-head requalification without candidate mutation or merge"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 4,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 1,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 10,
+      "executable_loc_changed": 180,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 0,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_repository_protection.py --mode policy",
+      "python scripts/governance/selftest_repository_protection.py",
+      "exact-head Engineering Bootstrap",
+      "exact-head Security Secrets",
+      "live PR #66 and main/ruleset reverification"
+    ]
+  },
+  "done_when": [
+    "repository-protection current snapshot is proven against fresh live branch/ruleset evidence",
+    "one exact WU04 head has Engineering Bootstrap and Security Secrets SUCCESS",
+    "PR #66 remains unchanged Lot46 remains locked and runtime/trading safety remains disabled",
+    "LOT-45.1-WU01 is restored as the sole active read-only requalification route"
+  ]
+}
