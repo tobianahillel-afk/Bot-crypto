@@ -20,7 +20,7 @@
     "treat eligibility handoff chat history or model memory as sufficient authorization"
   ],
   "depends_on": [
-    "ENG-09.6-WU07"
+    "ENG-09.6-WU08"
   ],
   "inputs": [
     {
@@ -106,7 +106,8 @@
       "engineering/work_units/ENG-09.6-WU05.json",
       "business/lots/LOT-45.json",
       "business/work_units/LOT-45.1-WU01.json",
-      "engineering/work_units/ENG-09.6-WU07.json"
+      "engineering/work_units/ENG-09.6-WU07.json",
+      "engineering/work_units/ENG-09.6-WU08.json"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -134,7 +135,7 @@
     "required_invariants": [
       "execution requires the literal human action BUSINESS_DEVELOPMENT_UNLOCK in the current executing session",
       "live GitHub must still match eligibility for main PR66 and ruleset Protect before any authority write",
-      "WU07 terminal-compatibility exact-head Bootstrap and Security Secrets must both be SUCCESS",
+      "WU08 terminal-activation compatibility exact-head Bootstrap and Security Secrets must both be SUCCESS",
       "Engineering transitions BUILDING -> STABLE and ENG-09 becomes DONE atomically with BUSINESS activation",
       "engineering active_lot active_task active_manifest and next_lot become null at the same transition",
       "BUSINESS transitions PAUSED -> ACTIVE and candidate SUSPENDED_CANDIDATE -> ACTIVE_CANDIDATE without changing candidate head/base/open/unmerged identity",
@@ -145,8 +146,9 @@
       "BOOT-FINDING-001 is resolved only in current lifecycle state with explicit remediation evidence; immutable ENG-00 baseline and old blocked decision stay untouched",
       "runtime_max trade_allowed execution_allowed live_execution leverage and withdrawals remain byte-semantically unchanged",
       "post-transition ordinary continue resolves BUSINESS through frozen V1 entrypoint",
-      "before WU05 becomes IN_PROGRESS its scope_base_sha must be rebound to the final exact WU07 qualified head",
-      "generic continue eligibility handoff prior-agent summary chat history and model memory are never authorization; only direct current-session BUSINESS_DEVELOPMENT_UNLOCK is accepted"
+      "before WU05 becomes IN_PROGRESS its scope_base_sha must be rebound to the final exact WU08 qualified head",
+      "generic continue eligibility handoff prior-agent summary chat history and model memory are never authorization; only direct current-session BUSINESS_DEVELOPMENT_UNLOCK is accepted",
+      "WU08 must be DONE before WU05 resumes"
     ],
     "acceptance_criteria": [
       "preflight validator rejects missing or stale eligibility live Git drift non-active Protect missing required checks or changed PR66",
