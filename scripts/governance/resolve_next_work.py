@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Resolve one exact work context, including the active AWU for engineering work."""
+"""Resolve one exact work context across engineering, terminal business, or explicit audit work."""
 
 from __future__ import annotations
 
@@ -58,6 +58,47 @@ def _resolve_engineering(state: dict[str, Any]) -> tuple[str, str, str, str]:
     )
 
 
+def _resolve_business(
+    state: dict[str, Any],
+    awu_bundle: tuple[Path, dict[str, Any], dict[str, Any]] | None,
+) -> tuple[str, str, str, str]:
+    engineering = state.get("engineering_track")
+    business = state.get("business_track")
+    authority = state.get("authority")
+    if not isinstance(engineering, dict) or engineering.get("phase") not in {"STABLE", "COMPLETE"}:
+        raise ResolveError("BUSINESS route requires terminal ENGINEERING")
+    if not isinstance(business, dict) or business.get("development_status") != "ACTIVE":
+        raise ResolveError("BUSINESS route requires explicit ACTIVE authority")
+    candidate = business.get("candidate")
+    if (
+        not isinstance(candidate, dict)
+        or candidate.get("status") != "ACTIVE_CANDIDATE"
+        or candidate.get("state") != "OPEN"
+        or candidate.get("merged") is not False
+    ):
+        raise ResolveError("BUSINESS route requires active open unmerged Lot45 candidate")
+    if business.get("next_lot") != {"lot": 46, "status": "LOCKED"}:
+        raise ResolveError("BUSINESS route requires Lot46 to remain LOCKED")
+    if awu_bundle is None:
+        raise ResolveError("BUSINESS resolution requires the validated active AWU")
+    _path, awu, evidence = awu_bundle
+    if evidence.get("track") != "BUSINESS":
+        raise ResolveError("validated AWU track is not BUSINESS")
+    parent = awu.get("parent")
+    if not isinstance(parent, dict):
+        raise ResolveError("BUSINESS active AWU parent missing")
+    expected_lot = f"LOT-{candidate.get('lot')}"
+    manifest = authority.get("active_manifest") if isinstance(authority, dict) else None
+    if parent.get("work_item_id") != expected_lot:
+        raise ResolveError("BUSINESS active AWU lot disagrees with active candidate")
+    if parent.get("manifest") != manifest or not isinstance(manifest, str):
+        raise ResolveError("BUSINESS active AWU manifest disagrees with canonical authority")
+    task = parent.get("task_id")
+    if not isinstance(task, str) or not task:
+        raise ResolveError("BUSINESS active task is not resolvable")
+    return "BUSINESS", expected_lot, task, manifest
+
+
 def _resolve_audit(state: dict[str, Any]) -> tuple[str, str, str, str]:
     track = state.get("audit_track")
     if not isinstance(track, dict) or track.get("phase") != "BUILDING":
@@ -76,6 +117,29 @@ def _resolve_audit(state: dict[str, Any]) -> tuple[str, str, str, str]:
         values["active_task"],
         values["active_manifest"],
     )
+
+
+def _active_awu_descriptor(
+    awu_bundle: tuple[Path, dict[str, Any], dict[str, Any]],
+) -> tuple[dict[str, Any], list[str]]:
+    awu_path, awu, evidence = awu_bundle
+    route = evidence.get("context_route")
+    if not isinstance(route, dict):
+        raise ResolveError("active AWU context route is missing")
+    primary = route.get("primary_files")
+    reference = route.get("reference_files")
+    if not isinstance(primary, list) or not isinstance(reference, list):
+        raise ResolveError("active AWU context route is malformed")
+    active = {
+        "id": awu.get("id"),
+        "path": str(awu_path.relative_to(ROOT)),
+        "scope_base_sha": awu.get("scope", {}).get("scope_base_sha"),
+        "risk_class": awu.get("planning", {}).get("risk_class"),
+        "complexity_score": awu.get("planning", {}).get("complexity_score"),
+        "split_required": awu.get("planning", {}).get("split_required"),
+        "context_route": route,
+    }
+    return active, primary + reference
 
 
 def resolve(
@@ -97,20 +161,16 @@ def resolve(
         track_name, active_lot, active_task, active_manifest = _resolve_engineering(state)
         if awu_bundle is None:
             raise ResolveError("ENGINEERING resolution requires the validated active AWU")
-        awu_path, awu, evidence = awu_bundle
-        route = evidence.get("context_route")
-        if not isinstance(route, dict):
-            raise ResolveError("active AWU context route is missing")
-        active_awu = {
-            "id": awu.get("id"),
-            "path": str(awu_path.relative_to(ROOT)),
-            "scope_base_sha": awu.get("scope", {}).get("scope_base_sha"),
-            "risk_class": awu.get("planning", {}).get("risk_class"),
-            "complexity_score": awu.get("planning", {}).get("complexity_score"),
-            "split_required": awu.get("planning", {}).get("split_required"),
-            "context_route": route,
-        }
-        required_read_order = route["primary_files"] + route["reference_files"]
+        if awu_bundle[2].get("track") != "ENGINEERING":
+            raise ResolveError("validated AWU track is not ENGINEERING")
+        active_awu, required_read_order = _active_awu_descriptor(awu_bundle)
+    elif track == "business":
+        track_name, active_lot, active_task, active_manifest = _resolve_business(
+            state, awu_bundle
+        )
+        if awu_bundle is None:
+            raise ResolveError("BUSINESS resolution requires the validated active AWU")
+        active_awu, required_read_order = _active_awu_descriptor(awu_bundle)
     elif track == "audit":
         track_name, active_lot, active_task, active_manifest = _resolve_audit(state)
         required_read_order = [
@@ -152,20 +212,33 @@ def resolve(
     }
 
 
-def repository_resolve(profile: str, track: str = "engineering") -> dict[str, Any]:
+def repository_resolve(profile: str, track: str = "auto") -> dict[str, Any]:
     state = _load(ROOT / "config/governance/project_state.json")
     capabilities = _load(ROOT / "engineering/AGENT_CAPABILITIES.json")
-    awu_bundle = None
-    if track == "engineering":
-        active = _module(
-            "next_work_active_awu",
-            ROOT / "scripts/governance/resolve_active_awu.py",
+    if track == "audit":
+        return resolve(state, capabilities, profile, "audit", None)
+
+    active = _module(
+        "next_work_active_awu",
+        ROOT / "scripts/governance/resolve_active_awu.py",
+    )
+    try:
+        awu_bundle = active.resolve_active_awu()
+    except active.ActiveAwuError as exc:
+        raise ResolveError(str(exc)) from exc
+    validated_track = awu_bundle[2].get("track")
+    selected = (
+        validated_track.lower()
+        if track == "auto" and isinstance(validated_track, str)
+        else track
+    )
+    if selected not in {"engineering", "business"}:
+        raise ResolveError(f"unsupported ordinary work route: {selected!r}")
+    if validated_track != selected.upper():
+        raise ResolveError(
+            f"requested route {selected.upper()} disagrees with validated active route {validated_track}"
         )
-        try:
-            awu_bundle = active.resolve_active_awu()
-        except active.ActiveAwuError as exc:
-            raise ResolveError(str(exc)) from exc
-    return resolve(state, capabilities, profile, track, awu_bundle)
+    return resolve(state, capabilities, profile, selected, awu_bundle)
 
 
 def main() -> int:
@@ -180,7 +253,11 @@ def main() -> int:
             "READ_ONLY_AUDITOR",
         ],
     )
-    parser.add_argument("--track", default="engineering", choices=["engineering", "audit"])
+    parser.add_argument(
+        "--track",
+        default="auto",
+        choices=["auto", "engineering", "business", "audit"],
+    )
     args = parser.parse_args()
     try:
         result = repository_resolve(args.profile, args.track)
