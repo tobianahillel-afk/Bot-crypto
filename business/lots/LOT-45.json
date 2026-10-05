@@ -32,7 +32,9 @@
     "engineering/REPOSITORY_PROTECTION_STATUS.json",
     "engineering/REPOSITORY_PROTECTION.md",
     "scripts/governance/selftest_repository_protection.py",
-    "scripts/governance/validate_bootstrap_diff.py"
+    "scripts/governance/validate_bootstrap_diff.py",
+    "scripts/governance/verify_security_engine.py",
+    "scripts/governance/selftest_security_engine.py"
   ],
   "forbidden_scope": [
     "candidate branch mutation during LOT-45.1-WU01",
