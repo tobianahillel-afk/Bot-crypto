@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "lot45_development_engine_v1_read_only_requalification_v1",
+  "awu_id": "LOT-45.1-WU01",
+  "observed_date": "2026-10-05",
+  "verdict": "READ_ONLY_REQUALIFIED_REMEDIATION_REQUIRED_ENGINE_INTERFACE_BLOCKED",
+  "candidate_ready_for_merge": false,
+  "candidate_mutated": false,
+  "candidate_merged": false,
+  "lot46_unlock_allowed": false,
+  "live_git": {
+    "source": "GITHUB_CONNECTOR",
+    "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "main_branch_protected": true,
+    "active_ruleset": {
+      "id": 24172517,
+      "name": "Protect",
+      "target": "branch",
+      "enforcement": "active"
+    },
+    "pull_request": 66,
+    "pull_request_state": "open",
+    "pull_request_merged": false,
+    "pull_request_mergeable": true,
+    "pull_request_base_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "pull_request_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "prior_pilot_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "head_unchanged_since_engine_pilot": true
+  },
+  "safety": {
+    "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED",
+    "leverage": "FORBIDDEN",
+    "withdrawals": "FORBIDDEN"
+  },
+  "current_review_state": {
+    "unresolved_non_outdated_threads": 0,
+    "rule": "thread resolution is not accepted as substantive remediation when candidate bytes are unchanged"
+  },
+  "prior_pilot": {
+    "evidence_path": "engineering/LOT45_ENGINE_PILOT_EVIDENCE.json",
+    "exact_head_ci": {
+      "workflow_count": 49,
+      "success_count": 26,
+      "failure_count": 23,
+      "historical_fanout_failure_count": 19,
+      "direct_candidate_or_global_failure_count": 4
+    },
+    "validation_plan": {
+      "T0": "REQUIRED",
+      "T1_checks": [
+        "DIFF_CHECK",
+        "GOVERNANCE_ACTIVE_SCOPE",
+        "SELFTEST_ENTRYPOINT_CHECK"
+      ],
+      "T2_groups": [
+        "CHANGED_DOMAIN_TESTS",
+        "CONTRACT_TESTS",
+        "EVIDENCE_TESTS"
+      ],
+      "T3_requirements": [
+        "MANUAL_DEEP_REVIEW",
+        "SECURITY_ASSURANCE",
+        "STATIC_ANALYSIS_ASSURANCE",
+        "WORKFLOW_ASSURANCE"
+      ],
+      "T4_requirements": [
+        "EXACT_HEAD_CERTIFICATION",
+        "PROVENANCE_CERTIFICATION"
+      ]
+    }
+  },
+  "substantive_findings": [
+    {
+      "id": "LOT45-REQUAL-001",
+      "severity": "P1",
+      "class": "CANDIDATE_DEFECT",
+      "status": "CONFIRMED_PRESENT",
+      "original_review_thread": "PRRT_kwDOTtA9Ds6aIhbE",
+      "title": "Bind Order Flow/CVD market identity to source trades",
+      "evidence": {
+        "path": "src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine_impl.py",
+        "head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+        "function": "_build_engine_state",
+        "observation": "The function receives trades, order_flow and cvd but builds the engine state without comparing artifact market_identity to the homogeneous identity of trades."
+      },
+      "consequence": "A matching but wrong-market Order Flow/CVD pair can be embedded with certified lineage if timestamps and other bindings match."
+    },
+    {
+      "id": "LOT45-REQUAL-002",
+      "severity": "MEDIUM",
+      "class": "TYPE_CHECK_DEFECT",
+      "status": "CONFIRMED_BY_EXACT_HEAD_CI",
+      "run_id": 32144783998,
+      "failed_step": "Mypy package validation",
+      "path": "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py",
+      "line": 105,
+      "detail": "Incompatible return value type (got \"object\", expected \"Lot45MarketIdentityV1\") [return-value]."
+    },
+    {
+      "id": "LOT45-REQUAL-003",
+      "severity": "MEDIUM",
+      "class": "TEST_CONTRACT_INCONSISTENCY",
+      "status": "CONFIRMED_BY_EXACT_HEAD_CI",
+      "run_id": 32144783988,
+      "failed_step": "Security dependency full regression and anti-flake",
+      "detail": "Two tests in tests/test_lot45_runtime_binding_and_rounding.py construct CVD variants whose checksum is rejected immediately as a canonical mismatch. Remediation must determine whether the fixture should recompute a valid checksum before testing a later invariant or whether construction semantics are incorrect; canonical checksum rejection must not be weakened.",
+      "observed_result": "2363 passed, 1 skipped, 2 failed"
+    },
+    {
+      "id": "LOT45-REQUAL-004",
+      "severity": "HIGH",
+      "class": "CERTIFICATION_STALENESS",
+      "status": "CONFIRMED",
+      "run_id": 32144784085,
+      "failed_step": "Trusted pre-launch proof before Python setup",
+      "detail": "LOT45_PRELAUNCH_COMMITTED_TREE_DRIFT (exit 67). The current PR head is not the previously certified frozen source topology."
+    }
+  ],
+  "resolved_prior_findings": [
+    {
+      "id": "PRRT_kwDOTtA9Ds6aIHFn",
+      "prior_priority": "P1",
+      "title": "Preserve market identity in Order Flow/CVD artifacts",
+      "status": "RESOLVED_IN_CURRENT_HEAD_BY_CODE_INSPECTION",
+      "evidence": [
+        "OrderFlowStateV1 and CVDSeriesV1 expose required market_identity",
+        "order_flow_state_v1.schema.json and cvd_series_v1.schema.json require market_identity",
+        "tests/test_lot45_market_identity_binding.py verifies distinct market checksums and schema enforcement"
+      ]
+    }
+  ],
+  "derivative_failures": [
+    {
+      "run_id": 32144784139,
+      "workflow": "P0.6 final exact-commit assurance",
+      "classification": "DERIVATIVE",
+      "detail": "NO-GO includes mypy and repeated full-suite failures already represented by LOT45-REQUAL-002 and LOT45-REQUAL-003."
+    }
+  ],
+  "legacy_workflow_fanout": {
+    "count": 19,
+    "classification": "OBSOLETE_OR_HISTORICAL_FANOUT_NOT_CANDIDATE_DEFECT",
+    "workflows": [
+      "Lot 26 foundation and lifecycle validation",
+      "Lot 27 global market context validation",
+      "Lot 28 explanation core validation",
+      "Lot 29 V2 deterministic replay validation",
+      "Lot 30 V2 market analysis closure validation",
+      "Lot 31 market data source registry validation",
+      "Lot 31 post-merge audit exact-head",
+      "Lot 32 instrument normalization validation",
+      "Lot 32 post-merge audit exact-head",
+      "Lot 33 timestamp clock timezone governance validation",
+      "Lot 34 market data quality engine validation",
+      "Lot 35 candle trade book reconciliation validation",
+      "Lot 36 freshness gap outage V3 closure validation",
+      "Lot 37 microstructure scope and offline contracts validation",
+      "Lot 38 independent post-merge audit",
+      "Lot 39 independent post-merge audit",
+      "Lot 39 order book delta sequence validation",
+      "Lot 40 book integrity desynchronization validation",
+      "Lot 44 frozen evidence attestation"
+    ]
+  },
+  "prior_certification": {
+    "claimed_frozen_head": "75e8a82fe7c20717f7351129073d1f47b373d4b9",
+    "frozen_head_workflows": {
+      "count": 49,
+      "success": 49,
+      "failure": 0
+    },
+    "relation_to_current": "DIVERGED",
+    "current_ahead_by": 7,
+    "current_behind_by": 5,
+    "conclusion": "Previous 49/49 frozen-head evidence does not certify current PR head."
+  },
+  "engine_control_blocker": {
+    "id": "DEV-ENGINE-V1-IFACE-001",
+    "class": "ENGINE_COMPATIBILITY_DEFECT",
+    "candidate_defect": false,
+    "engineering_head": "f61ea408cdc83bc2de6566f8d4b8d604f72cb476",
+    "workflow": "Engineering Bootstrap",
+    "run_id": 37335527143,
+    "failed_step": "Validate Development Engine V1 interface freeze",
+    "detail": "AGENTS V1 interface phrase missing: resolve the single active AWU with `python scripts/governance/resolve_active_awu.py`",
+    "historical_v1_certification_remains_immutable": true,
+    "consequence": "Current business-route bootstrap cannot become green until V1 compatibility text/policy is repaired through an authorized engine-maintenance route."
+  },
+  "remediation_required": true,
+  "remediation_plan_path": "business/plans/LOT45_REMEDIATION_PLAN.json",
+  "bounded_successor_path": "business/work_units/LOT-45.1-WU02.json",
+  "closure_condition": "WU01 remains IN_PROGRESS until DEV-ENGINE-V1-IFACE-001 is cleared on an authorized engine-maintenance route and the business staging successor can be activated without scope/state drift."
+}
