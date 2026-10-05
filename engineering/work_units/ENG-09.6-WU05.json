@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "agent_work_unit",
   "id": "ENG-09.6-WU05",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "parent": {
     "work_item_id": "ENG-09",
     "task_id": "ENG-09.6",
@@ -107,7 +107,9 @@
       "business/lots/LOT-45.json",
       "business/work_units/LOT-45.1-WU01.json",
       "engineering/work_units/ENG-09.6-WU07.json",
-      "engineering/work_units/ENG-09.6-WU08.json"
+      "engineering/work_units/ENG-09.6-WU08.json",
+      "README.md",
+      "engineering/CURRENT_STATUS.md"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",

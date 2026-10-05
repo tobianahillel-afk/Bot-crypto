@@ -3,7 +3,7 @@
   "kind": "business_work_item",
   "id": "LOT-45",
   "title": "Lot45 Candidate Recovery Under Development Engine V1",
-  "status": "PLANNED",
+  "status": "IN_PROGRESS",
   "objective": "Resume the suspended Lot45 candidate under Development Engine V1 by requalifying the exact current PR head first, then decomposing any required remediation into bounded follow-up AWUs before merge consideration.",
   "depends_on": [
     "ENG-09"
@@ -27,7 +27,7 @@
   "tasks": [
     {
       "id": "LOT-45.1",
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "description": "Read-only exact-head requalification of PR #66 under Development Engine V1 and bounded remediation planning."
     },
     {

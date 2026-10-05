@@ -8,11 +8,11 @@ This file is the mandatory first entry point for any coding or audit agent.
 > Generated from `config/governance/project_state.json`. Do not edit this block manually.
 
 - Project: **Crypto Quant Bot V3.1-Ops**
-- Business development: **PAUSED**
+- Business development: **ACTIVE**
 - Certified business baseline: **Lot 44 / 0.44.0 / GO_LOT44_POST_MERGE**
-- Suspended business candidate: **Lot 45 / PR #66 / SUSPENDED_CANDIDATE**
+- Active business candidate: **Lot 45 / PR #66 / ACTIVE_CANDIDATE**
 - Next business lot: **Lot 46 / LOCKED**
-- Engineering: **ENG-09 / ENG-09.6 / BUILDING**
+- Engineering: **terminal / STABLE**
 - Next engineering lot: **ENGINE_COMPLETE**
 - Runtime maximum: `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY`
 - Trading allowed: `false`
@@ -20,17 +20,18 @@ This file is the mandatory first entry point for any coding or audit agent.
 - Live execution: `DISABLED`
 - Leverage: `FORBIDDEN`
 - Withdrawals: `FORBIDDEN`
-- Open blocking findings: `BOOT-FINDING-001` (MAIN_BRANCH_UNPROTECTED; before BUSINESS_DEVELOPMENT_UNLOCK)
+- Open blocking findings: **none**
 <!-- END GENERATED CURRENT STATUS -->
 
 ## Start here
 
 1. Read `config/governance/project_state.json`.
 2. Read `engineering/CONTEXT_MAP.json` for the generated bounded route; it never overrides canonical state.
-3. Resolve the requested track:
-   - ordinary `continue` / development work → `engineering_track`;
-   - historical audit work → `audit_track`, only when explicitly active/authorized.
-4. Read the active manifest declared by that track, then resolve the single active AWU with `python scripts/governance/resolve_active_awu.py`.
+3. Resolve the active track from canonical state with `python scripts/governance/resolve_active_awu.py`:
+   - `ENGINEERING` while the engineering phase is `BUILDING`;
+   - `BUSINESS` only after terminal engineering and explicit `ACTIVE` business authority;
+   - historical audit work remains separate and only when explicitly active/authorized.
+4. Read the manifest and bounded AWU returned by that resolver; ordinary `continue` follows that route.
 5. Verify external Git reality before writing:
    - `main` still matches the recorded observation or an authorized transition;
    - the active engineering branch exists;

@@ -8,11 +8,11 @@ Plateforme quantitative crypto défensive, déterministe, extensible et auditabl
 > Generated from `config/governance/project_state.json`. Do not edit this block manually.
 
 - Project: **Crypto Quant Bot V3.1-Ops**
-- Business development: **PAUSED**
+- Business development: **ACTIVE**
 - Certified business baseline: **Lot 44 / 0.44.0 / GO_LOT44_POST_MERGE**
-- Suspended business candidate: **Lot 45 / PR #66 / SUSPENDED_CANDIDATE**
+- Active business candidate: **Lot 45 / PR #66 / ACTIVE_CANDIDATE**
 - Next business lot: **Lot 46 / LOCKED**
-- Engineering: **ENG-09 / ENG-09.6 / BUILDING**
+- Engineering: **terminal / STABLE**
 - Next engineering lot: **ENGINE_COMPLETE**
 - Runtime maximum: `OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY`
 - Trading allowed: `false`
@@ -20,7 +20,7 @@ Plateforme quantitative crypto défensive, déterministe, extensible et auditabl
 - Live execution: `DISABLED`
 - Leverage: `FORBIDDEN`
 - Withdrawals: `FORBIDDEN`
-- Open blocking findings: `BOOT-FINDING-001` (MAIN_BRANCH_UNPROTECTED; before BUSINESS_DEVELOPMENT_UNLOCK)
+- Open blocking findings: **none**
 <!-- END GENERATED CURRENT STATUS -->
 Le Lot 29 prouve que les artefacts certifiés des Lots 21 à 28 forment une chaîne ordonnée,
 déterministe et non exécutable. Le Lot 30 clôture V2 en revérifiant les huit artefacts,

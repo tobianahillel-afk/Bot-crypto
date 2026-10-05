@@ -3,7 +3,7 @@
   "kind": "engineering_work_item",
   "id": "ENG-09",
   "title": "Productionization / Lot45 Pilot",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "objective": "Pilot the completed Development Engine against the suspended Lot45 candidate without mutating business code, identify engine/workflow redundancies or defects, certify Development Engine V1, freeze its bootstrap interfaces, and only then make an explicit business-development unlock decision.",
   "depends_on": [
     "ENG-08"
@@ -59,7 +59,7 @@
     },
     {
       "id": "ENG-09.6",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "description": "Explicitly decide whether business development may be unlocked; never auto-unlock."
     }
   ],

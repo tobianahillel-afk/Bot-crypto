@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "agent_work_unit",
   "id": "LOT-45.1-WU01",
-  "status": "PLANNED",
+  "status": "IN_PROGRESS",
   "parent": {
     "work_item_id": "LOT-45",
     "task_id": "LOT-45.1",
@@ -56,7 +56,7 @@
     }
   ],
   "scope": {
-    "scope_base_sha": "TO_BE_BOUND_AT_ACTIVATION_HEAD",
+    "scope_base_sha": "6651f12870ed51318b8004246aa87b015caaeaa8",
     "allowed_paths": [
       "business/evidence/LOT45_V1_REQUALIFICATION.json",
       "business/plans/LOT45_REMEDIATION_PLAN.json",
