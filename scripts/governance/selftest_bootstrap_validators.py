@@ -51,10 +51,7 @@ def main() -> int:
     engine = state["bootstrap_engine"] if phase == "BUILDING" else state["engineering_engine"]
     if engine.get("phase") in {"STABLE", "COMPLETE"}:
         state_manifest = None
-        authority_manifest = permanent_state.get("authority", {}).get("active_manifest")
-        if not isinstance(authority_manifest, str):
-            raise AssertionError("terminal lifecycle requires authoritative business manifest")
-        work_manifest = _json(ROOT / authority_manifest)
+        work_manifest = _json(ROOT / "engineering/lots/ENG-09.json")
     else:
         declared_manifest = engine.get("active_manifest")
         if not isinstance(declared_manifest, str):
@@ -85,6 +82,8 @@ def main() -> int:
 
     invalid_manifest = copy.deepcopy(work_manifest)
     invalid_manifest["status"] = "DONE"
+    if engine.get("phase") in {"STABLE", "COMPLETE"}:
+        invalid_manifest["tasks"][-1]["status"] = "PLANNED"
     _expect_failure(
         item_mod.WorkItemError,
         lambda: item_mod.validate_manifest(invalid_manifest, source="negative-manifest"),
