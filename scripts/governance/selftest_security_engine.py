@@ -73,13 +73,49 @@ def main() -> int:
     bad_policy["secret_weekly_cron"] = "0 0 * * *"
     _expect(mod.SecurityEngineError, lambda: mod.validate_policy(bad_policy), "assurance cadence drift")
 
-    protection = mod._json(ROOT / policy["repository_protection_status"])
-    bad_protection = copy.deepcopy(protection)
-    bad_protection["business_unlock_allowed"] = True
+    historical = mod.validate_protection(policy)
+    assert historical == {
+        "overall_status": "UNPROTECTED",
+        "business_unlock_allowed": False,
+        "manual_admin_action_required": True,
+    }
+
+    current = mod.validate_current_protection(policy)
+    assert current["overall_status"] == "PROTECTED_VERIFIED"
+    assert current["business_unlock_allowed"] is True
+    assert current["manual_admin_action_required"] is False
+
     original_json = mod._json
+    evidence = original_json(mod.EVIDENCE_PATH)
+    bad_evidence = copy.deepcopy(evidence)
+    bad_evidence["external_protection"]["business_unlock_allowed"] = True
     try:
-        mod._json = lambda path: bad_protection if path == ROOT / policy["repository_protection_status"] else original_json(path)
-        _expect(mod.SecurityEngineError, lambda: mod.validate_protection(policy), "unsafe business unlock")
+        mod._json = (
+            lambda path: bad_evidence
+            if path == mod.EVIDENCE_PATH
+            else original_json(path)
+        )
+        _expect(
+            mod.SecurityEngineError,
+            lambda: mod.validate_protection(policy),
+            "historical protection evidence mutation",
+        )
+    finally:
+        mod._json = original_json
+
+    bad_current = copy.deepcopy(current)
+    bad_current["enforcement"]["required_status_checks"] = False
+    try:
+        mod._json = (
+            lambda path: bad_current
+            if path == ROOT / policy["repository_protection_status"]
+            else original_json(path)
+        )
+        _expect(
+            mod.SecurityEngineError,
+            lambda: mod.validate_current_protection(policy),
+            "protected current state with failed enforcement",
+        )
     finally:
         mod._json = original_json
 
@@ -95,7 +131,7 @@ def main() -> int:
         mod._json = original_json
 
     mod.check_evidence(result)
-    print("SECURITY_ENGINE_SELFTEST_PASS probes=8")
+    print("SECURITY_ENGINE_SELFTEST_PASS probes=10")
     return 0
 
 

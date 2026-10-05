@@ -147,15 +147,62 @@ def validate_permissions_and_pins(policy: dict[str, Any]) -> None:
 
 
 def validate_protection(policy: dict[str, Any]) -> dict[str, Any]:
+    """Validate the immutable ENG-04 historical protection snapshot."""
+    evidence = _json(EVIDENCE_PATH)
+    external = evidence.get("external_protection")
+    expected = {
+        "overall_status": policy["expected"]["protection_status"],
+        "business_unlock_allowed": False,
+        "manual_admin_action_required": True,
+    }
+    if external != expected:
+        raise SecurityEngineError("historical ENG-04 protection evidence drift")
+    if evidence.get("business_unlock_status") != policy["expected"]["business_unlock_status"]:
+        raise SecurityEngineError("historical ENG-04 business-unlock evidence drift")
+    if evidence.get("blocking_finding_id") != policy["expected"]["blocking_finding_id"]:
+        raise SecurityEngineError("historical ENG-04 blocker identity drift")
+    return external
+
+
+def validate_current_protection(policy: dict[str, Any]) -> dict[str, Any]:
+    """Validate the mutable current snapshot without rewriting ENG-04 evidence."""
     status = _json(ROOT / policy["repository_protection_status"])
-    if status.get("overall_status") != policy["expected"]["protection_status"]:
-        raise SecurityEngineError("repository protection status drift")
-    if status.get("business_unlock_allowed") is not False:
-        raise SecurityEngineError("business unlock must remain denied while main is unprotected")
-    if status.get("manual_admin_action_required") is not True:
-        raise SecurityEngineError("manual repository-admin action must remain explicit")
-    if status.get("blocking_finding_id") != policy["expected"]["blocking_finding_id"]:
-        raise SecurityEngineError("repository protection blocker identity drift")
+    validator = _module(
+        "eng04_current_repository_protection",
+        ROOT / "scripts" / "governance" / "validate_repository_protection.py",
+    )
+    protection_policy = validator._json(validator.POLICY_PATH)
+    project_state = validator._json(validator.PROJECT_STATE_PATH)
+    try:
+        validator.validate_policy(protection_policy)
+        validator.validate_current_status(status, protection_policy, project_state)
+    except validator.RepositoryProtectionError as exc:
+        raise SecurityEngineError(
+            f"current repository protection validation failed: {exc}"
+        ) from exc
+
+    overall = status.get("overall_status")
+    failures = validator.unlock_failures(status, protection_policy)
+    if overall == "PROTECTED_VERIFIED":
+        if failures:
+            raise SecurityEngineError(
+                f"verified current protection has unlock failures: {failures}"
+            )
+        if status.get("blocking_finding_id") is not None:
+            raise SecurityEngineError(
+                "verified current protection cannot retain a blocking finding"
+            )
+    elif overall == "UNPROTECTED":
+        if status.get("business_unlock_allowed") is not False:
+            raise SecurityEngineError("unprotected current state cannot allow business unlock")
+        if status.get("manual_admin_action_required") is not True:
+            raise SecurityEngineError(
+                "unprotected current state must require manual admin action"
+            )
+    else:
+        raise SecurityEngineError(
+            f"unsupported current repository protection status: {overall!r}"
+        )
     return status
 
 
@@ -167,6 +214,7 @@ def build_result(policy: dict[str, Any]) -> dict[str, Any]:
     validate_path_scoping(policy)
     validate_permissions_and_pins(policy)
     protection = validate_protection(policy)
+    validate_current_protection(policy)
     return {
         "schema_version": 1,
         "verification_kind": "eng04_security_engine_verification_v1",
