@@ -28,6 +28,7 @@ This file is the mandatory first entry point for any coding or audit agent.
 1. Read `config/governance/project_state.json`.
 2. Read `engineering/CONTEXT_MAP.json` for the generated bounded route; it never overrides canonical state.
 3. Resolve the active track from canonical state with `python scripts/governance/resolve_active_awu.py`:
+   - The V1 compatibility contract is: resolve the single active AWU with `python scripts/governance/resolve_active_awu.py`.
    - `ENGINEERING` while the engineering phase is `BUILDING`;
    - `BUSINESS` only after terminal engineering and explicit `ACTIVE` business authority;
    - historical audit work remains separate and only when explicitly active/authorized.
