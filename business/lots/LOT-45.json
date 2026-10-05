@@ -17,6 +17,7 @@
     "AGENTS.md",
     "scripts/governance/selftest_terminal_business_routing.py",
     "business/work_units/LOT-45.1-WU03.json",
+    "business/work_units/LOT-45.1-WU04.json",
     "engineering/handoff/CURRENT.json",
     "engineering/CONTEXT_MAP.json",
     "engineering/CONTEXT_MAP.md",
