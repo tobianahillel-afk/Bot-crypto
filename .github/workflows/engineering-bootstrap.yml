@@ -75,11 +75,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [ "${{ steps.business_lifecycle.outputs.mode }}" = "PAUSED" ]; then
+          mode="$(python -c 'import json; print(json.load(open("config/governance/project_state.json", encoding="utf-8"))["business_track"]["development_status"])')"
+          if [ "${mode}" = "PAUSED" ]; then
             python scripts/governance/validate_business_development_activation.py --mode staged
             python scripts/governance/validate_business_development_activation.py --mode synthetic-activated
-          else
+          elif [ "${mode}" = "ACTIVE" ]; then
             python scripts/governance/validate_business_development_activation.py --mode activated
+          else
+            echo "Unsupported BUSINESS lifecycle: ${mode}" >&2
+            exit 1
           fi
 
       - name: Run business-development activation adversarial self-tests
