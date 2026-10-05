@@ -32,6 +32,25 @@ def _expect(exc_type: type[Exception], fn: Any, label: str) -> None:
     raise AssertionError(f"repository-protection negative scenario unexpectedly passed: {label}")
 
 
+def _unprotected_status(status: dict[str, Any]) -> dict[str, Any]:
+    value = copy.deepcopy(status)
+    value["branch_resource"]["protected"] = False
+    value["rulesets"]["count"] = 0
+    value["branch_protection_detail"]["state"] = "UNAVAILABLE_403_INTEGRATION_PERMISSION"
+    value["enforcement"] = {
+        "mechanism": "NONE_VERIFIED",
+        "pull_request_required": "UNVERIFIED",
+        "required_status_checks": "UNVERIFIED",
+        "force_pushes_blocked": "UNVERIFIED",
+        "branch_deletions_blocked": "UNVERIFIED",
+    }
+    value["overall_status"] = "UNPROTECTED"
+    value["business_unlock_allowed"] = False
+    value["manual_admin_action_required"] = True
+    value["blocking_finding_id"] = "BOOT-FINDING-001"
+    return value
+
+
 def main() -> int:
     mod = _module()
     policy = mod._json(mod.POLICY_PATH)
@@ -40,41 +59,36 @@ def main() -> int:
     mod.validate_policy(policy)
     mod.validate_current_status(status, policy, project_state)
 
-    current_failures = mod.unlock_failures(status, policy)
-    assert "NO_VERIFIED_PROTECTION_MECHANISM" in current_failures
-    assert "BUSINESS_UNLOCK_FLAG_FALSE" in current_failures
+    assert mod.unlock_failures(status, policy) == []
 
-    protected = copy.deepcopy(status)
-    protected["branch_resource"]["protected"] = True
-    protected["rulesets"]["count"] = 1
-    protected["branch_protection_detail"]["state"] = "VERIFIED_BY_ADMIN_OR_RULESET_EVIDENCE"
-    protected["enforcement"] = {
-        "mechanism": "REPOSITORY_RULESET",
-        "pull_request_required": True,
-        "required_status_checks": True,
-        "force_pushes_blocked": True,
-        "branch_deletions_blocked": True,
-    }
-    protected["overall_status"] = "PROTECTED_VERIFIED"
-    protected["business_unlock_allowed"] = True
-    protected["manual_admin_action_required"] = False
-    assert mod.unlock_failures(protected, policy) == []
-
-    unverifiable = copy.deepcopy(protected)
+    unverifiable = copy.deepcopy(status)
     unverifiable["enforcement"]["required_status_checks"] = "UNVERIFIED"
     assert any("required_status_checks" in item for item in mod.unlock_failures(unverifiable, policy))
 
-    no_mechanism = copy.deepcopy(protected)
+    no_mechanism = copy.deepcopy(status)
     no_mechanism["branch_resource"]["protected"] = False
     no_mechanism["rulesets"]["count"] = 0
     assert "NO_VERIFIED_PROTECTION_MECHANISM" in mod.unlock_failures(no_mechanism, policy)
 
-    bad_state = copy.deepcopy(project_state)
-    bad_state["findings"] = [x for x in bad_state["findings"] if x.get("id") != "BOOT-FINDING-001"]
+    historical = _unprotected_status(status)
+    historical_state = copy.deepcopy(project_state)
+    historical_state["external_observations"]["main"]["branch_protected"] = False
+    historical_state["external_observations"]["rulesets_count"] = 0
+    for finding in historical_state["findings"]:
+        if finding.get("id") == "BOOT-FINDING-001":
+            finding["observed"] = True
+    mod.validate_current_status(historical, policy, historical_state)
+    assert "NO_VERIFIED_PROTECTION_MECHANISM" in mod.unlock_failures(historical, policy)
+
+    missing_finding = copy.deepcopy(historical_state)
+    missing_finding["findings"] = [
+        item for item in missing_finding["findings"]
+        if item.get("id") != "BOOT-FINDING-001"
+    ]
     _expect(
         mod.RepositoryProtectionError,
-        lambda: mod.validate_current_status(status, policy, bad_state),
-        "removed unresolved protection finding",
+        lambda: mod.validate_current_status(historical, policy, missing_finding),
+        "unprotected state without unresolved finding",
     )
 
     wrong_sha = copy.deepcopy(status)
@@ -85,8 +99,16 @@ def main() -> int:
         "stale main SHA",
     )
 
+    branch_mismatch = copy.deepcopy(status)
+    branch_mismatch["branch_resource"]["protected"] = False
+    _expect(
+        mod.RepositoryProtectionError,
+        lambda: mod.validate_current_status(branch_mismatch, policy, project_state),
+        "branch protection flag mismatch",
+    )
+
     forged_403 = copy.deepcopy(status)
-    forged_403["overall_status"] = "PROTECTED_VERIFIED"
+    forged_403["branch_protection_detail"]["state"] = "UNAVAILABLE_403_INTEGRATION_PERMISSION"
     _expect(
         mod.RepositoryProtectionError,
         lambda: mod.validate_current_status(forged_403, policy, project_state),
@@ -101,7 +123,7 @@ def main() -> int:
     weakened["required_enforcement"]["force_pushes_blocked"] = False
     _expect(mod.RepositoryProtectionError, lambda: mod.validate_policy(weakened), "weakened force-push policy")
 
-    print("REPOSITORY_PROTECTION_SELFTEST_PASS probes=9")
+    print("REPOSITORY_PROTECTION_SELFTEST_PASS probes=10")
     return 0
 
 
