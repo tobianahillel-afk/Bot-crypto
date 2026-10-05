@@ -36,7 +36,6 @@
     "active_task": "ENG-09.6"
   },
   "recent_completed": [
-    "ENG-09.6-WU03 qualified backward-compatible terminal BUSINESS cold-start routing on exact head 86da75900304e364bc8f11a0cd3b472fe4606a2f; Engineering Bootstrap 36607903196 and Security Secrets 36607903198 passed.",
     "ENG-09.6-WU04 staged a bounded read-only Lot45 business route and passed activation staged/synthetic validation on head 2f996a5a1613f20beff51949ed9d95bbfca9eb57; Bootstrap 36617637470 and Security Secrets 36617637444 passed.",
     "ENG-09.6-WU04 final staging head c837a468ef318796bdda2d9f770613ec6c8593c5 passed Engineering Bootstrap 36618171456 and Security Secrets 36618171473.",
     "Direct current-session BUSINESS_DEVELOPMENT_UNLOCK authorization received; WU05 activated with no BUSINESS authority mutation yet.",
@@ -86,20 +85,6 @@
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
   ],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "head_sha": "aaf1606b53446d7b3d49324049c60237942217ac",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36557277759",
-      "scope": "ENG-09.6_BLOCKED_DECISION_SECURITY_SECRETS",
-      "status": "PASS"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "head_sha": "7dd1cf451990ab18662621037f775349a555666b",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36557686173",
-      "scope": "ENG-09.6-WU02_SCOPE_BASE_BOOTSTRAP",
-      "status": "PASS"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "head_sha": "7dd1cf451990ab18662621037f775349a555666b",
