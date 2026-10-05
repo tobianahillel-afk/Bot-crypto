@@ -53,24 +53,58 @@ def validate_state(state: dict[str, Any]) -> None:
         project = state["project"]
         business = state["business_track"]
         engineering = state["engineering_track"]
+        authority = state["authority"]
         safety = state["safety"]
         baseline = business["merged_certified_baseline"]
         candidate = business["candidate"]
         next_lot = business["next_lot"]
     except KeyError as exc:
         raise CurrentStatusError(f"canonical state missing required field: {exc}") from exc
+
     if project.get("canonical_name") != "Crypto Quant Bot V3.1-Ops":
         raise CurrentStatusError("canonical project identity drift")
-    if business.get("development_status") != "PAUSED":
-        raise CurrentStatusError("ENG-05.1 expects business development to remain PAUSED")
-    if candidate.get("status") != "SUSPENDED_CANDIDATE":
-        raise CurrentStatusError("Lot45 candidate must remain suspended")
-    if next_lot.get("status") != "LOCKED":
-        raise CurrentStatusError("next business lot must remain locked")
-    if safety.get("trade_allowed") is not False or safety.get("execution_allowed") is not False:
-        raise CurrentStatusError("trading/execution safety must remain disabled")
-    if not isinstance(baseline.get("lot"), int) or not isinstance(engineering.get("active_lot"), str):
-        raise CurrentStatusError("canonical status state shape invalid")
+    if not isinstance(baseline.get("lot"), int):
+        raise CurrentStatusError("certified baseline shape invalid")
+    if next_lot != {"lot": 46, "status": "LOCKED"}:
+        raise CurrentStatusError("next business lot must remain Lot46 LOCKED")
+    if candidate.get("state") != "OPEN" or candidate.get("merged") is not False:
+        raise CurrentStatusError("Lot45 candidate must remain open and unmerged")
+
+    mode = business.get("development_status")
+    phase = engineering.get("phase")
+    if mode == "PAUSED":
+        if candidate.get("status") != "SUSPENDED_CANDIDATE":
+            raise CurrentStatusError("PAUSED business requires suspended Lot45 candidate")
+        if phase != "BUILDING":
+            raise CurrentStatusError("PAUSED business requires BUILDING engineering")
+        for key in ("active_lot", "active_task", "active_manifest", "next_lot"):
+            if not isinstance(engineering.get(key), str) or not engineering[key]:
+                raise CurrentStatusError(f"BUILDING engineering requires {key}")
+    elif mode == "ACTIVE":
+        if candidate.get("status") != "ACTIVE_CANDIDATE":
+            raise CurrentStatusError("ACTIVE business requires active Lot45 candidate")
+        if phase not in {"STABLE", "COMPLETE"}:
+            raise CurrentStatusError("ACTIVE business requires terminal engineering")
+        for key in ("active_lot", "active_task", "active_manifest", "next_lot"):
+            if engineering.get(key) is not None:
+                raise CurrentStatusError(f"terminal engineering requires {key}=null")
+        if not engineering.get("completed") or engineering["completed"][-1] != "ENG-09":
+            raise CurrentStatusError("terminal engineering requires ENG-09 completion")
+        if engineering.get("blockers") != []:
+            raise CurrentStatusError("terminal engineering blockers must be empty")
+        if authority.get("active_manifest") != "business/lots/LOT-45.json":
+            raise CurrentStatusError("ACTIVE business authority manifest drift")
+    else:
+        raise CurrentStatusError(f"unsupported business lifecycle: {mode!r}")
+
+    if (
+        safety.get("trade_allowed") is not False
+        or safety.get("execution_allowed") is not False
+        or safety.get("live_execution") != "DISABLED"
+        or safety.get("leverage") != "FORBIDDEN"
+        or safety.get("withdrawals") != "FORBIDDEN"
+    ):
+        raise CurrentStatusError("runtime/trading safety must remain fail-closed")
 
 
 def render_block(state: dict[str, Any]) -> str:
@@ -88,6 +122,22 @@ def render_block(state: dict[str, Any]) -> str:
         )
         if findings else "**none**"
     )
+    mode = business["development_status"]
+    candidate_label = (
+        "Suspended business candidate"
+        if mode == "PAUSED"
+        else "Active business candidate"
+    )
+    engineering_text = (
+        f"{engineering['active_lot']} / {engineering['active_task']} / {engineering['phase']}"
+        if engineering["phase"] == "BUILDING"
+        else f"terminal / {engineering['phase']}"
+    )
+    next_engineering = (
+        engineering["next_lot"]
+        if engineering["next_lot"] is not None
+        else "ENGINE_COMPLETE"
+    )
     rows = [
         "<!-- BEGIN GENERATED CURRENT STATUS -->",
         "## Current project status (generated)",
@@ -97,10 +147,10 @@ def render_block(state: dict[str, Any]) -> str:
         f"- Project: **{state['project']['canonical_name']}**",
         f"- Business development: **{business['development_status']}**",
         f"- Certified business baseline: **Lot {baseline['lot']} / {baseline['version']} / {baseline['verdict']}**",
-        f"- Suspended business candidate: **Lot {candidate['lot']} / PR #{candidate['pr']} / {candidate['status']}**",
+        f"- {candidate_label}: **Lot {candidate['lot']} / PR #{candidate['pr']} / {candidate['status']}**",
         f"- Next business lot: **Lot {business['next_lot']['lot']} / {business['next_lot']['status']}**",
-        f"- Engineering: **{engineering['active_lot']} / {engineering['active_task']} / {engineering['phase']}**",
-        f"- Next engineering lot: **{engineering['next_lot']}**",
+        f"- Engineering: **{engineering_text}**",
+        f"- Next engineering lot: **{next_engineering}**",
         f"- Runtime maximum: `{safety['runtime_max']}`",
         f"- Trading allowed: `{str(safety['trade_allowed']).lower()}`",
         f"- Execution allowed: `{str(safety['execution_allowed']).lower()}`",
