@@ -65,15 +65,35 @@ def validate_context_free_contract(
         "canonical project identity drift",
     )
     _require(resolved.get("project") == "Crypto Quant Bot V3.1-Ops", "resolved project drift")
-    _require(resolved.get("track") == "DEVELOPMENT_ENGINE", "cold start must resolve engineering")
     engineering = state.get("engineering_track")
+    business = state.get("business_track")
     _require(isinstance(engineering, dict), "engineering state missing")
-    _require(resolved.get("active_lot") == engineering.get("active_lot"), "cold-start active lot drift")
-    _require(resolved.get("active_task") == engineering.get("active_task"), "cold-start active task drift")
-    _require(
-        resolved.get("active_manifest") == engineering.get("active_manifest"),
-        "cold-start manifest drift",
-    )
+    _require(isinstance(business, dict), "business state missing")
+    route_track = resolved.get("track")
+    if route_track == "DEVELOPMENT_ENGINE":
+        _require(engineering.get("phase") == "BUILDING", "engineering route requires BUILDING")
+        _require(business.get("development_status") == "PAUSED", "engineering route requires business PAUSED")
+        _require(resolved.get("active_lot") == engineering.get("active_lot"), "cold-start active lot drift")
+        _require(resolved.get("active_task") == engineering.get("active_task"), "cold-start active task drift")
+        _require(
+            resolved.get("active_manifest") == engineering.get("active_manifest"),
+            "cold-start manifest drift",
+        )
+        expected_context_track = "ENGINEERING"
+    elif route_track == "BUSINESS":
+        _require(engineering.get("phase") in {"STABLE", "COMPLETE"}, "business route requires terminal engineering")
+        _require(business.get("development_status") == "ACTIVE", "business route requires ACTIVE authority")
+        candidate = business.get("candidate", {})
+        _require(candidate.get("status") == "ACTIVE_CANDIDATE", "business candidate is not active")
+        _require(candidate.get("state") == "OPEN" and candidate.get("merged") is False, "business candidate state drift")
+        parent = awu.get("parent", {})
+        _require(resolved.get("active_lot") == parent.get("work_item_id"), "business active lot drift")
+        _require(resolved.get("active_task") == parent.get("task_id"), "business active task drift")
+        _require(resolved.get("active_manifest") == parent.get("manifest"), "business manifest drift")
+        _require(state.get("authority", {}).get("active_manifest") == parent.get("manifest"), "business authority manifest drift")
+        expected_context_track = "BUSINESS"
+    else:
+        raise ColdStartError(f"unsupported cold-start route: {route_track!r}")
 
     active = resolved.get("active_awu")
     _require(isinstance(active, dict), "cold-start active AWU missing")
@@ -94,7 +114,7 @@ def validate_context_free_contract(
         primary[:2] == ["AGENTS.md", "config/governance/project_state.json"],
         "authority prefix drift",
     )
-    active_manifest = engineering.get("active_manifest")
+    active_manifest = resolved.get("active_manifest")
     active_awu_path = active.get("path")
     _require(
         active_manifest in primary and active_awu_path in primary,
@@ -140,6 +160,7 @@ def validate_context_free_contract(
 
     context_active = context.get("active_work")
     _require(isinstance(context_active, dict), "context active work missing")
+    _require(context_active.get("track") == expected_context_track, "context active track stale")
     _require(context_active.get("lot") == resolved["active_lot"], "context active lot stale")
     _require(context_active.get("task") == resolved["active_task"], "context active task stale")
     _require(context_active.get("awu_id") == active["id"], "context active AWU stale")
@@ -170,17 +191,24 @@ def validate_context_free_contract(
         "GitHub-only agent may claim local PASS",
     )
 
-    business = state.get("business_track", {})
     safety = state.get("safety", {})
-    _require(business.get("development_status") == "PAUSED", "business development hold lifted")
+    business_mode = business.get("development_status")
+    _require(business_mode in {"PAUSED", "ACTIVE"}, "unsupported business lifecycle")
+    _require(resolved.get("business_development") == business_mode, "resolved business lifecycle drift")
     _require(business.get("next_lot", {}).get("status") == "LOCKED", "Lot46 is not locked")
+    if route_track == "DEVELOPMENT_ENGINE":
+        _require(business_mode == "PAUSED", "engineering cold start requires business PAUSED")
+        _require(business.get("candidate", {}).get("status") == "SUSPENDED_CANDIDATE", "suspended candidate drift")
+    else:
+        _require(business_mode == "ACTIVE", "business cold start requires ACTIVE authority")
+        _require(business.get("candidate", {}).get("status") == "ACTIVE_CANDIDATE", "active candidate drift")
     _require(safety.get("trade_allowed") is False, "trading unexpectedly enabled")
     _require(safety.get("execution_allowed") is False, "execution unexpectedly enabled")
     _require(safety.get("live_execution") == "DISABLED", "live execution unexpectedly enabled")
 
     _require(
-        context.get("business_hold", {}).get("development_status") == "PAUSED",
-        "context business hold drift",
+        context.get("business_hold", {}).get("development_status") == business_mode,
+        "context business lifecycle drift",
     )
     _require(
         context.get("business_hold", {}).get("next_lot", {}).get("status") == "LOCKED",
@@ -229,11 +257,12 @@ def main() -> int:
     except active_awu.ActiveAwuError as exc:
         raise ColdStartError(str(exc)) from exc
     try:
+        route_name = str(awu_evidence.get("track", "")).lower()
         resolved = resolver.resolve(
             state,
             capabilities,
             "GITHUB_CONNECTOR_ONLY",
-            "engineering",
+            route_name,
             (awu_path, awu, awu_evidence),
         )
     except resolver.ResolveError as exc:
@@ -242,13 +271,14 @@ def main() -> int:
     validate_context_free_contract(state, resolved, context, awu)
 
     engineering = state["engineering_track"]
-    bridge_engineering = bridge["engineering_engine"]
-    _require(bridge_engineering["active_lot"] == engineering["active_lot"], "bridge lot drift")
-    _require(bridge_engineering["active_task"] == engineering["active_task"], "bridge task drift")
-    _require(
-        bridge_engineering["active_manifest"] == engineering["active_manifest"],
-        "bridge manifest drift",
-    )
+    if awu_evidence.get("track") == "ENGINEERING":
+        bridge_engineering = bridge["engineering_engine"]
+        _require(bridge_engineering["active_lot"] == engineering["active_lot"], "bridge lot drift")
+        _require(bridge_engineering["active_task"] == engineering["active_task"], "bridge task drift")
+        _require(
+            bridge_engineering["active_manifest"] == engineering["active_manifest"],
+            "bridge manifest drift",
+        )
     handoff_validator.validate_handoff(state, handoff)
 
     probes = 0
@@ -343,6 +373,76 @@ def main() -> int:
         ColdStartError,
         lambda: validate_context_free_contract(state, escalated, context, awu),
         "GitHub-only local-execution escalation",
+    )
+    probes += 1
+
+    activation = _module(
+        "cold_terminal_activation",
+        ROOT / "scripts/governance/validate_business_development_activation.py",
+    )
+    business_manifest = activation.load(activation.BM)
+    business_awu = activation.load(activation.BA)
+    terminal_state, _terminal_manifest, terminal_awu = activation.synthetic_activation(
+        state, business_manifest, business_awu
+    )
+    terminal_awu["scope"]["scope_base_sha"] = "6c30f47c173218ff8645e23eefbbcf1a8f2eb373"
+    terminal_route = {
+        "awu_id": terminal_awu["id"],
+        "primary_files": [
+            "AGENTS.md",
+            "config/governance/project_state.json",
+            "business/lots/LOT-45.json",
+            "business/work_units/LOT-45.1-WU01.json",
+            "engineering/LOT45_ENGINE_PILOT_EVIDENCE.json",
+            "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json",
+            "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json",
+        ],
+        "reference_files": ["engineering/MASTER_PLAN.md", "engineering/AGENT_PROTOCOL.md"],
+        "primary_count": 7,
+        "reference_count": 2,
+        "total_bytes": 65536,
+        "total_kib_ceil": 64,
+    }
+    terminal_bundle = (
+        ROOT / "business/work_units/LOT-45.1-WU01.json",
+        terminal_awu,
+        {"context_route": terminal_route, "track": "BUSINESS"},
+    )
+    terminal_resolved = resolver.resolve(
+        terminal_state,
+        capabilities,
+        "GITHUB_CONNECTOR_ONLY",
+        "business",
+        terminal_bundle,
+    )
+    terminal_context = copy.deepcopy(context)
+    terminal_context["active_work"] = {
+        "track": "BUSINESS",
+        "lot": "LOT-45",
+        "task": "LOT-45.1",
+        "manifest": "business/lots/LOT-45.json",
+        "awu_id": terminal_awu["id"],
+        "awu_path": "business/work_units/LOT-45.1-WU01.json",
+        "risk_class": terminal_awu["planning"]["risk_class"],
+        "complexity_score": terminal_awu["planning"]["complexity_score"],
+    }
+    terminal_context["execution_context"] = {
+        "primary_files": terminal_route["primary_files"],
+        "reference_files": terminal_route["reference_files"],
+        "primary_count": terminal_route["primary_count"],
+        "reference_count": terminal_route["reference_count"],
+        "total_kib_ceil": terminal_route["total_kib_ceil"],
+        "budget": terminal_awu["planning"]["context_budget"],
+        "implicit_expansion": "FORBIDDEN",
+    }
+    terminal_context["business_hold"] = {
+        "development_status": "ACTIVE",
+        "candidate_lot": 45,
+        "candidate_status": "ACTIVE_CANDIDATE",
+        "next_lot": {"lot": 46, "status": "LOCKED"},
+    }
+    validate_context_free_contract(
+        terminal_state, terminal_resolved, terminal_context, terminal_awu
     )
     probes += 1
 
