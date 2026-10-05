@@ -6,7 +6,7 @@
     "parent_manifest": "business/lots/LOT-45.json",
     "scope_base_sha": "dec31e78161a1a1e50181a06760130ab3bc27421",
     "risk_class": "R2",
-    "complexity_score": 2
+    "complexity_score": 4
   },
   "authority": {
     "context_map": "engineering/CONTEXT_MAP.json",

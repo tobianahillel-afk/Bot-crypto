@@ -20,7 +20,9 @@
     "engineering/handoff/CURRENT.json",
     "engineering/CONTEXT_MAP.json",
     "engineering/CONTEXT_MAP.md",
-    "scripts/governance/validate_canonical_baseline.py"
+    "scripts/governance/validate_canonical_baseline.py",
+    "scripts/governance/validate_business_development_activation.py",
+    "scripts/governance/selftest_business_development_activation.py"
   ],
   "forbidden_scope": [
     "candidate branch mutation during LOT-45.1-WU01",

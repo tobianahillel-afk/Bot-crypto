@@ -60,6 +60,16 @@
       "name": "Reconciliation-routed context map",
       "kind": "STATE",
       "locator": "engineering/CONTEXT_MAP.json"
+    },
+    {
+      "name": "Lifecycle-aware active business AWU activation validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_business_development_activation.py"
+    },
+    {
+      "name": "Lifecycle-aware activation adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_business_development_activation.py"
     }
   ],
   "scope": {
@@ -71,7 +81,9 @@
       "engineering/handoff/CURRENT.json",
       "engineering/CONTEXT_MAP.json",
       "engineering/CONTEXT_MAP.md",
-      "scripts/governance/validate_canonical_baseline.py"
+      "scripts/governance/validate_canonical_baseline.py",
+      "scripts/governance/validate_business_development_activation.py",
+      "scripts/governance/selftest_business_development_activation.py"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -103,7 +115,8 @@
       "ACTIVE validation fails closed if activation evidence is missing malformed claims candidate mutation/merge or disagrees with current candidate identity",
       "PAUSED lifecycle remains supported for historical and adversarial validation",
       "PR #66 remains byte-unchanged throughout reconciliation",
-      "Lot46 and runtime trading authority remain fail-closed"
+      "Lot46 and runtime trading authority remain fail-closed",
+      "ACTIVE business topology may route through a temporary maintenance AWU only when it remains under LOT-45.1 and explicitly forbids candidate mutation and merge"
     ],
     "acceptance_criteria": [
       "baseline file is not in the AWU allowed paths and is explicitly forbidden from mutation",
@@ -112,12 +125,13 @@
       "validator rejects ACTIVE state without activation evidence",
       "validator rejects changed candidate head or mutated/merged activation evidence",
       "Engineering Bootstrap and Security Secrets are SUCCESS on one exact reconciliation head",
-      "candidate head remains ec2c4ab16f21b23e062b7fca0bb796c8db4a5133 and Lot46 remains LOCKED"
+      "candidate head remains ec2c4ab16f21b23e062b7fca0bb796c8db4a5133 and Lot46 remains LOCKED",
+      "activation validator accepts the unique active maintenance AWU under LOT-45.1 and rejects a different business task or weakened candidate guards"
     ]
   },
   "planning": {
     "risk_class": "R2",
-    "complexity_score": 2,
+    "complexity_score": 4,
     "split_required": false,
     "context_budget": {
       "max_primary_files": 12,
@@ -132,7 +146,7 @@
       "math_numeric_semantics": false,
       "temporal_lineage_semantics": false,
       "cross_domain_interfaces": 1,
-      "state_machine_or_concurrency": false,
+      "state_machine_or_concurrency": true,
       "security_trust_boundary": false,
       "risk_execution_permission": false,
       "dependency_change": false,
@@ -140,8 +154,8 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 7,
-      "executable_loc_changed": 220,
+      "files_touched": 9,
+      "executable_loc_changed": 380,
       "new_public_behaviors": 1,
       "contract_families": 0,
       "independent_algorithms": 1,

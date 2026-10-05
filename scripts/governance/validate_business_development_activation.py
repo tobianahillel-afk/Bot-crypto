@@ -12,6 +12,7 @@ PLAN=ROOT/"engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION_PLAN.json"
 STATE=ROOT/"config/governance/project_state.json"
 BM=ROOT/"business/lots/LOT-45.json"
 BA=ROOT/"business/work_units/LOT-45.1-WU01.json"
+BUSINESS_WU_DIR=ROOT/"business/work_units"
 
 class ActivationError(ValueError): pass
 def load(p:Path)->dict[str,Any]:
@@ -56,6 +57,26 @@ def synthetic_activation(staged_state:dict[str,Any], bm:dict[str,Any], ba:dict[s
     a["status"]="IN_PROGRESS"; a["scope"]["scope_base_sha"]="ACTIVATION_HEAD_PLACEHOLDER"
     return s,m,a
 
+def load_active_business_awu()->dict[str,Any]:
+    active=[]
+    for path in sorted(BUSINESS_WU_DIR.glob("*.json")):
+        value=load(path)
+        if value.get("status")=="IN_PROGRESS":
+            active.append((path,value))
+    req(len(active)==1,f"exactly one active business AWU required, found {len(active)}")
+    path,a=active[0]
+    parent=a.get("parent",{})
+    req(
+        parent.get("work_item_id")=="LOT-45"
+        and parent.get("task_id")=="LOT-45.1"
+        and parent.get("manifest")=="business/lots/LOT-45.json",
+        f"active business maintenance route invalid: {path.name}",
+    )
+    forbidden=a.get("scope",{}).get("forbidden_semantics",[])
+    req("Lot45 candidate mutation" in forbidden,"active business AWU lost candidate-mutation guard")
+    req("candidate merge" in forbidden,"active business AWU lost candidate-merge guard")
+    return a
+
 def validate_activated(s:dict[str,Any],m:dict[str,Any],a:dict[str,Any],policy:dict[str,Any])->None:
     validate_policy(policy)
     e=s["engineering_track"]; b=s["business_track"]
@@ -68,6 +89,16 @@ def validate_activated(s:dict[str,Any],m:dict[str,Any],a:dict[str,Any],policy:di
     req(m.get("status")=="IN_PROGRESS","business manifest not active")
     req(m["tasks"][0]["status"]=="IN_PROGRESS" and sum(t["status"]=="IN_PROGRESS" for t in m["tasks"])==1,"business task cardinality invalid")
     req(a["status"]=="IN_PROGRESS","business AWU not active")
+    parent=a.get("parent",{})
+    req(
+        parent.get("work_item_id")=="LOT-45"
+        and parent.get("task_id")=="LOT-45.1"
+        and parent.get("manifest")=="business/lots/LOT-45.json",
+        "active business AWU parent route invalid",
+    )
+    forbidden=a.get("scope",{}).get("forbidden_semantics",[])
+    req("Lot45 candidate mutation" in forbidden,"candidate mutation guard missing")
+    req("candidate merge" in forbidden,"candidate merge guard missing")
     for k,v in policy["invariant_safety"].items(): req(s["safety"].get(k)==v,f"safety weakened: {k}")
 
 def main()->int:
@@ -79,7 +110,8 @@ def main()->int:
         elif args.mode=="synthetic-activated":
             ns,nm,na=synthetic_activation(s,bm,ba); validate_activated(ns,nm,na,p)
         else:
-            validate_activated(s,bm,ba,p)
+            active_awu=load_active_business_awu()
+            validate_activated(s,bm,active_awu,p)
     except (ActivationError,KeyError,TypeError) as e:
         print(f"BUSINESS_ACTIVATION_INVALID: {e}",file=sys.stderr); return 1
     print(f"BUSINESS_ACTIVATION_VALID mode={args.mode}"); return 0
