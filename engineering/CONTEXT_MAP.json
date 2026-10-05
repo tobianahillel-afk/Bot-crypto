@@ -1,13 +1,13 @@
 {
   "active_work": {
-    "track": "BUSINESS",
-    "lot": "LOT-45",
-    "task": "LOT-45.1",
-    "manifest": "business/lots/LOT-45.json",
     "awu_id": "LOT-45.1-WU03",
     "awu_path": "business/work_units/LOT-45.1-WU03.json",
+    "complexity_score": 4,
+    "lot": "LOT-45",
+    "manifest": "business/lots/LOT-45.json",
     "risk_class": "R2",
-    "complexity_score": 4
+    "task": "LOT-45.1",
+    "track": "BUSINESS"
   },
   "authority": {
     "current_state": "config/governance/project_state.json",
@@ -29,6 +29,13 @@
     }
   },
   "execution_context": {
+    "budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "implicit_expansion": "FORBIDDEN",
+    "primary_count": 8,
     "primary_files": [
       "AGENTS.md",
       "config/governance/project_state.json",
@@ -39,19 +46,12 @@
       "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json",
       "scripts/governance/validate_canonical_baseline.py"
     ],
+    "reference_count": 2,
     "reference_files": [
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "primary_count": 8,
-    "reference_count": 2,
-    "total_kib_ceil": 66,
-    "budget": {
-      "max_primary_files": 12,
-      "max_reference_files": 16,
-      "max_total_kib": 1024
-    },
-    "implicit_expansion": "FORBIDDEN"
+    "total_kib_ceil": 66
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -67,8 +67,8 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "handoff": "engineering/handoff/CURRENT.json",
     "current_objective": "LOT-45.1-WU03: finish exact-head lifecycle reconciliation through the canonical BUSINESS activation bridge.",
+    "handoff": "engineering/handoff/CURRENT.json",
     "next_action": "Qualify WU03 on Bootstrap + Security Secrets with scope_base_sha bound to activation predecessor; then restore WU01 read-only requalification."
   },
   "safety": {
