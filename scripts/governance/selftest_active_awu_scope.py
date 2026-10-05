@@ -48,9 +48,19 @@ def main() -> int:
     )
 
     state = _json(ROOT / "config/governance/project_state.json")
-    units = resolver.load_work_units()
+    routing_policy = _json(resolver.ROUTING_POLICY_PATH)
+    track = resolver.resolve_active_track(state, routing_policy)
+    units = resolver.load_work_units(
+        resolver._work_units_directory(track, routing_policy)
+    )
     path, active = resolver.select_active_awu(units)
-    evidence = resolver.validate_full_awu(state, path, active)
+    evidence = resolver.validate_full_awu(
+        state,
+        path,
+        active,
+        track=track,
+        routing_policy=routing_policy,
+    )
     assert evidence["context_route"] is not None
 
     _expect(
@@ -61,8 +71,10 @@ def main() -> int:
 
     duplicate = dict(units)
     second = copy.deepcopy(active)
-    second["id"] = "ENG-02.7-WU99"
-    duplicate[ROOT / "engineering/work_units/duplicate.json"] = second
+    second["id"] = "LOT-45.1-WU99" if track == "BUSINESS" else "ENG-02.7-WU99"
+    duplicate[
+        resolver._work_units_directory(track, routing_policy) / "duplicate.json"
+    ] = second
     _expect(
         resolver.ActiveAwuError,
         lambda: resolver.select_active_awu(duplicate),
@@ -70,9 +82,13 @@ def main() -> int:
     )
 
     foreign = copy.deepcopy(active)
-    current_task = state["engineering_track"]["active_task"]
-    foreign_task = "ENG-02.1" if current_task != "ENG-02.1" else "ENG-02.2"
-    foreign["parent"]["task_id"] = foreign_task
+    if track == "BUSINESS":
+        foreign["parent"]["task_id"] = "LOT-45.2"
+    else:
+        current_task = state["engineering_track"]["active_task"]
+        foreign["parent"]["task_id"] = (
+            "ENG-02.1" if current_task != "ENG-02.1" else "ENG-02.2"
+        )
     _expect(
         resolver.ActiveAwuError,
         lambda: resolver.validate_parent_binding(state, path, foreign),
