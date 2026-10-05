@@ -51,6 +51,36 @@ def main() -> int:
     changed["engineering_track"]["active_task"] = "ENG-TEST-SENTINEL"
     assert mod.render_block(changed) != first
 
+    terminal = json.loads(json.dumps(state))
+    terminal_engineering = terminal["engineering_track"]
+    terminal_business = terminal["business_track"]
+    terminal_engineering["phase"] = "STABLE"
+    if not terminal_engineering["completed"] or terminal_engineering["completed"][-1] != "ENG-09":
+        terminal_engineering["completed"].append("ENG-09")
+    terminal_engineering["active_lot"] = None
+    terminal_engineering["active_task"] = None
+    terminal_engineering["active_manifest"] = None
+    terminal_engineering["next_lot"] = None
+    terminal_engineering["blockers"] = []
+    terminal_business["development_status"] = "ACTIVE"
+    terminal_business["candidate"]["status"] = "ACTIVE_CANDIDATE"
+    terminal["authority"]["active_manifest"] = "business/lots/LOT-45.json"
+    terminal_block = mod.render_block(terminal)
+    assert "Business development: **ACTIVE**" in terminal_block
+    assert "Active business candidate: **Lot 45 / PR #66 / ACTIVE_CANDIDATE**" in terminal_block
+    assert "Engineering: **terminal / STABLE**" in terminal_block
+    assert "Next engineering lot: **ENGINE_COMPLETE**" in terminal_block
+    assert "Lot 46 / LOCKED" in terminal_block
+    assert "Trading allowed: `false`" in terminal_block
+
+    unsafe_terminal = json.loads(json.dumps(terminal))
+    unsafe_terminal["business_track"]["next_lot"]["status"] = "OPEN"
+    _expect(
+        mod.CurrentStatusError,
+        lambda: mod.render_block(unsafe_terminal),
+        "terminal Lot46 unlock",
+    )
+
     _expect(
         mod.CurrentStatusError,
         lambda: mod.replace_block("# x\n", "<!-- BEGIN GENERATED CURRENT STATUS -->", "<!-- END GENERATED CURRENT STATUS -->", first),
@@ -88,7 +118,7 @@ def main() -> int:
         mod.run("update", temp)
         mod.run("check", temp)
 
-    print("CURRENT_STATUS_SELFTEST_PASS probes=9")
+    print("CURRENT_STATUS_SELFTEST_PASS probes=11")
     return 0
 
 
