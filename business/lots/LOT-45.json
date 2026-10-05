@@ -27,7 +27,10 @@
     "scripts/governance/selftest_active_awu_scope.py",
     "scripts/governance/run_t0.py",
     "scripts/governance/run_t1.py",
-    "scripts/governance/selftest_current_status.py"
+    "scripts/governance/selftest_current_status.py",
+    "engineering/REPOSITORY_PROTECTION_STATUS.json",
+    "engineering/REPOSITORY_PROTECTION.md",
+    "scripts/governance/selftest_repository_protection.py"
   ],
   "forbidden_scope": [
     "candidate branch mutation during LOT-45.1-WU01",
