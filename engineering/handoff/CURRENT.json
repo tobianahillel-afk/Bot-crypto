@@ -4,7 +4,7 @@
     "awu_id": "LOT-45.1-WU03",
     "awu_path": "business/work_units/LOT-45.1-WU03.json",
     "parent_manifest": "business/lots/LOT-45.json",
-    "scope_base_sha": "dec31e78161a1a1e50181a06760130ab3bc27421",
+    "scope_base_sha": "6651f12870ed51318b8004246aa87b015caaeaa8",
     "risk_class": "R2",
     "complexity_score": 4
   },
@@ -14,7 +14,7 @@
     "state_source": "config/governance/project_state.json"
   },
   "blockers": [],
-  "current_objective": "LOT-45.1-WU03: clear DEV-ENGINE-V1-BASELINE-001 without mutating the immutable ENG-00 baseline or PR #66.",
+  "current_objective": "LOT-45.1-WU03: finish exact-head lifecycle reconciliation through the canonical BUSINESS activation bridge.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -27,7 +27,7 @@
     "lot45_merged": false
   },
   "kind": "engineering_handoff",
-  "next_action": "Qualify the lifecycle-aware canonical-baseline validator on one exact head; require Bootstrap + Security Secrets SUCCESS, then resume LOT-45.1-WU01 read-only requalification.",
+  "next_action": "Qualify WU03 on Bootstrap + Security Secrets with scope_base_sha bound to activation predecessor; then restore WU01 read-only requalification.",
   "next_engineering": {
     "active_lot": null,
     "active_task": null,

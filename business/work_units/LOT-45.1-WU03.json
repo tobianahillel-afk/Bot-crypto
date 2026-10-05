@@ -78,10 +78,15 @@
     }
   ],
   "scope": {
-    "scope_base_sha": "dec31e78161a1a1e50181a06760130ab3bc27421",
+    "scope_base_sha": "6651f12870ed51318b8004246aa87b015caaeaa8",
     "allowed_paths": [
-      "business/lots/LOT-45.json",
+      "business/evidence/LOT45_V1_REQUALIFICATION.json",
+      "business/plans/LOT45_REMEDIATION_PLAN.json",
       "business/work_units/LOT-45.1-WU01.json",
+      "business/work_units/LOT-45.1-WU02.json",
+      "business/lots/LOT-45.json",
+      "AGENTS.md",
+      "scripts/governance/selftest_terminal_business_routing.py",
       "business/work_units/LOT-45.1-WU03.json",
       "engineering/handoff/CURRENT.json",
       "engineering/CONTEXT_MAP.json",
@@ -123,7 +128,8 @@
       "PR #66 remains byte-unchanged throughout reconciliation",
       "Lot46 and runtime trading authority remain fail-closed",
       "ACTIVE business topology may route through a temporary maintenance AWU only when it remains under LOT-45.1 and explicitly forbids candidate mutation and merge",
-      "terminal bootstrap selftests must exercise validate_state with no engineering active manifest while validating the active business work-item independently"
+      "terminal bootstrap selftests must exercise validate_state with no engineering active manifest while validating the active business work-item independently",
+      "BUSINESS scope_base_sha remains the explicit activation predecessor so the standard activation bridge validates the one-time authority transition separately from post-activation maintenance"
     ],
     "acceptance_criteria": [
       "baseline file is not in the AWU allowed paths and is explicitly forbidden from mutation",
@@ -134,7 +140,8 @@
       "Engineering Bootstrap and Security Secrets are SUCCESS on one exact reconciliation head",
       "candidate head remains ec2c4ab16f21b23e062b7fca0bb796c8db4a5133 and Lot46 remains LOCKED",
       "activation validator accepts the unique active maintenance AWU under LOT-45.1 and rejects a different business task or weakened candidate guards",
-      "negative bootstrap selftest passes in terminal Engineering + ACTIVE Business lifecycle without synthesizing a nonexistent engineering active_manifest"
+      "negative bootstrap selftest passes in terminal Engineering + ACTIVE Business lifecycle without synthesizing a nonexistent engineering active_manifest",
+      "active AWU boundary passes through the standard activation bridge with only post-activation business and reconciliation files in the WU03 allowlist"
     ]
   },
   "planning": {
@@ -162,7 +169,7 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 10,
+      "files_touched": 15,
       "executable_loc_changed": 450,
       "new_public_behaviors": 1,
       "contract_families": 0,

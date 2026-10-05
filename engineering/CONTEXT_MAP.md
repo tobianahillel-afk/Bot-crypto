@@ -38,14 +38,14 @@
 
 - Primary: 8 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 63 / 1024 KiB
+- Routed size: 64 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: LOT-45.1-WU03: clear DEV-ENGINE-V1-BASELINE-001 without mutating the immutable ENG-00 baseline or PR #66.
-- Next action: Qualify the lifecycle-aware canonical-baseline validator on one exact head; require Bootstrap + Security Secrets SUCCESS, then resume LOT-45.1-WU01 read-only requalification.
+- Objective: LOT-45.1-WU03: finish exact-head lifecycle reconciliation through the canonical BUSINESS activation bridge.
+- Next action: Qualify WU03 on Bootstrap + Security Secrets with scope_base_sha bound to activation predecessor; then restore WU01 read-only requalification.
 
 ## Non-authoritative sources
 

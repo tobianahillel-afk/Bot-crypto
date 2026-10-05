@@ -45,7 +45,7 @@
     ],
     "primary_count": 8,
     "reference_count": 2,
-    "total_kib_ceil": 63,
+    "total_kib_ceil": 64,
     "budget": {
       "max_primary_files": 12,
       "max_reference_files": 16,
@@ -68,8 +68,8 @@
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
     "handoff": "engineering/handoff/CURRENT.json",
-    "current_objective": "LOT-45.1-WU03: clear DEV-ENGINE-V1-BASELINE-001 without mutating the immutable ENG-00 baseline or PR #66.",
-    "next_action": "Qualify the lifecycle-aware canonical-baseline validator on one exact head; require Bootstrap + Security Secrets SUCCESS, then resume LOT-45.1-WU01 read-only requalification."
+    "current_objective": "LOT-45.1-WU03: finish exact-head lifecycle reconciliation through the canonical BUSINESS activation bridge.",
+    "next_action": "Qualify WU03 on Bootstrap + Security Secrets with scope_base_sha bound to activation predecessor; then restore WU01 read-only requalification."
   },
   "safety": {
     "execution_allowed": false,
