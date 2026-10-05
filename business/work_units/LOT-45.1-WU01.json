@@ -63,7 +63,8 @@
       "business/plans/LOT45_REMEDIATION_PLAN.json",
       "business/work_units/LOT-45.1-WU01.json",
       "business/work_units/LOT-45.1-WU02.json",
-      "business/lots/LOT-45.json"
+      "business/lots/LOT-45.json",
+      "AGENTS.md"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -89,7 +90,8 @@
       "current exact-head failures are separated from historical workflow fanout",
       "unresolved substantive findings remain explicit and cannot be waived by green legacy evidence",
       "Codex may be optional but is never a mandatory transport for progress",
-      "any remediation scope is split into bounded successor AWUs before candidate mutation"
+      "any remediation scope is split into bounded successor AWUs before candidate mutation",
+      "the only Development Engine compatibility mutation permitted in WU01 is restoring the frozen AGENTS V1 resolver phrase; validator policy and engine implementation remain unchanged"
     ],
     "acceptance_criteria": [
       "exact current PR head is recorded and compared with prior pilot head",
