@@ -13,21 +13,19 @@
 - Track: BUSINESS
 - Work item: LOT-45
 - Task: LOT-45.1
-- AWU: LOT-45.1-WU01
-- Risk: R2
+- AWU: LOT-45.1-WU02
+- Risk: R0
 - Manifest: business/lots/LOT-45.json
-- AWU file: business/work_units/LOT-45.1-WU01.json
+- AWU file: business/work_units/LOT-45.1-WU02.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - business/lots/LOT-45.json
-- business/work_units/LOT-45.1-WU01.json
-- business/work_units/LOT-45.1-WU05.json
-- engineering/LOT45_ENGINE_PILOT_EVIDENCE.json
-- engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json
-- engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json
+- business/work_units/LOT-45.1-WU02.json
+- business/evidence/LOT45_V1_REQUALIFICATION.json
+- business/plans/LOT45_REMEDIATION_PLAN.json
 
 ## Execution context — reference
 
@@ -36,16 +34,16 @@
 
 ## Budget
 
-- Primary: 8 / 12 files
-- Reference: 2 / 16 files
-- Routed size: 73 / 1024 KiB
+- Primary: 6 / 8 files
+- Reference: 2 / 8 files
+- Routed size: 51 / 512 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: LOT-45.1-WU01: read-only exact-head requalification of PR #66 under the fully reconciled Development Engine V1.
-- Next action: Live-reverify PR #66 exact head and required checks, then update only the read-only Lot45 requalification evidence/remediation plan; do not mutate or merge the candidate and keep Lot46 locked.
+- Objective: LOT-45.1-WU02: stage four bounded LOT-45.2 remediation AWUs from the refreshed read-only requalification plan.
+- Next action: Reverify PR #66 remains unchanged, create LOT-45.2-WU01..WU04 matching RM-01..RM-04, expand the Lot45 parent allowlist only to those manifests, and do not mutate candidate bytes.
 
 ## Non-authoritative sources
 

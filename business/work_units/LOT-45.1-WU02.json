@@ -2,14 +2,14 @@
   "schema_version": 1,
   "kind": "agent_work_unit",
   "id": "LOT-45.1-WU02",
-  "status": "PLANNED",
+  "status": "IN_PROGRESS",
   "parent": {
     "work_item_id": "LOT-45",
     "task_id": "LOT-45.1",
     "manifest": "business/lots/LOT-45.json"
   },
-  "title": "Stage bounded Lot45 remediation units after V1 interface recovery",
-  "objective": "After the Development Engine V1 interface blocker is cleared, reverify the unchanged candidate and convert LOT45_REMEDIATION_PLAN into exact bounded LOT-45.2 execution AWUs without mutating PR #66.",
+  "title": "Stage bounded Lot45 remediation execution units",
+  "objective": "With Development Engine V1 lifecycle reconciliation fully green, reverify the unchanged PR #66 candidate and materialize LOT45-RM-01 through LOT45-RM-04 as bounded LOT-45.2 execution AWUs, without mutating PR #66.",
   "non_goals": [
     "modify the Lot45 candidate branch",
     "merge PR #66",
@@ -48,16 +48,43 @@
       "name": "Updated remediation staging plan",
       "kind": "STATE",
       "locator": "business/plans/LOT45_REMEDIATION_PLAN.json"
+    },
+    {
+      "name": "Market identity remediation AWU",
+      "kind": "STATE",
+      "locator": "business/work_units/LOT-45.2-WU01.json"
+    },
+    {
+      "name": "Type/test consistency remediation AWU",
+      "kind": "STATE",
+      "locator": "business/work_units/LOT-45.2-WU02.json"
+    },
+    {
+      "name": "Certification rebuild AWU",
+      "kind": "STATE",
+      "locator": "business/work_units/LOT-45.2-WU03.json"
+    },
+    {
+      "name": "Final assurance AWU",
+      "kind": "STATE",
+      "locator": "business/work_units/LOT-45.2-WU04.json"
     }
   ],
   "scope": {
-    "scope_base_sha": "6651f12870ed51318b8004246aa87b015caaeaa8",
+    "scope_base_sha": "ef8dfbdc3965d27e5947697f6d9fba877864d817",
     "allowed_paths": [
       "business/lots/LOT-45.json",
       "business/evidence/LOT45_V1_REQUALIFICATION.json",
       "business/plans/LOT45_REMEDIATION_PLAN.json",
       "business/work_units/LOT-45.1-WU01.json",
-      "business/work_units/LOT-45.1-WU02.json"
+      "business/work_units/LOT-45.1-WU02.json",
+      "business/work_units/LOT-45.2-WU01.json",
+      "business/work_units/LOT-45.2-WU02.json",
+      "business/work_units/LOT-45.2-WU03.json",
+      "business/work_units/LOT-45.2-WU04.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -67,7 +94,10 @@
       ".github/workflows/**",
       "AGENTS.md",
       "config/governance/**",
-      "engineering/**"
+      "engineering/CANONICAL_BASELINE.json",
+      "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json",
+      "engineering/REPOSITORY_PROTECTION_STATUS.json"
     ],
     "forbidden_semantics": [
       "Lot45 candidate mutation",
@@ -87,14 +117,20 @@
       "candidate bytes remain unchanged throughout WU02",
       "the remediation split preserves LOT45-RM-01 through LOT45-RM-04 ordering",
       "legacy fanout is not converted into candidate remediation work",
-      "future candidate mutation is authorized only by LOT-45.2 AWUs"
+      "future candidate mutation is authorized only by LOT-45.2 AWUs",
+      "WU01 is DONE on exact engine head ef8dfbdc3965d27e5947697f6d9fba877864d817 with Engineering Bootstrap 37454493298 and Security Secrets 37454493458 SUCCESS",
+      "WU02 creates only planning manifests and route metadata; candidate source contracts workflows reports and audit evidence remain untouched",
+      "the four staged LOT-45.2 AWUs map one-to-one and in order to LOT45-RM-01 through LOT45-RM-04"
     ],
     "acceptance_criteria": [
       "Development Engine V1 bootstrap/interface freeze is green on the exact engine head",
       "PR66 still points to the expected head or state drift is raised",
       "Lot45 parent manifest is expanded only to exact files required by the staged remediation units",
       "future LOT-45.2 AWUs are individually bounded by semantic concern",
-      "no candidate write occurs in WU02"
+      "no candidate write occurs in WU02",
+      "LOT-45.2-WU01 through LOT-45.2-WU04 are created with bounded scopes matching the remediation plan",
+      "only LOT-45.2-WU01 is eligible to become the next active candidate-remediation unit after WU02 closes",
+      "PR #66 remains open unmerged and byte-unchanged at ec2c4ab16f21b23e062b7fca0bb796c8db4a5133"
     ]
   },
   "planning": {
@@ -122,7 +158,7 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 5,
+      "files_touched": 11,
       "executable_loc_changed": 0,
       "new_public_behaviors": 0,
       "contract_families": 0,
@@ -145,7 +181,7 @@
   },
   "done_when": [
     "engine compatibility blocker is cleared before activation",
-    "bounded LOT-45.2 remediation execution route is staged",
+    "bounded LOT-45.2 remediation execution route is staged as four ordered AWUs",
     "candidate remains unmodified",
     "Lot46 remains locked"
   ]

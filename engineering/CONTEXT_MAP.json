@@ -1,11 +1,11 @@
 {
   "active_work": {
-    "awu_id": "LOT-45.1-WU01",
-    "awu_path": "business/work_units/LOT-45.1-WU01.json",
-    "complexity_score": 2,
+    "awu_id": "LOT-45.1-WU02",
+    "awu_path": "business/work_units/LOT-45.1-WU02.json",
+    "complexity_score": 0,
     "lot": "LOT-45",
     "manifest": "business/lots/LOT-45.json",
-    "risk_class": "R2",
+    "risk_class": "R0",
     "task": "LOT-45.1",
     "track": "BUSINESS"
   },
@@ -30,28 +30,26 @@
   },
   "execution_context": {
     "budget": {
-      "max_primary_files": 12,
-      "max_reference_files": 16,
-      "max_total_kib": 1024
+      "max_primary_files": 8,
+      "max_reference_files": 8,
+      "max_total_kib": 512
     },
     "implicit_expansion": "FORBIDDEN",
-    "primary_count": 8,
+    "primary_count": 6,
     "primary_files": [
       "AGENTS.md",
       "config/governance/project_state.json",
       "business/lots/LOT-45.json",
-      "business/work_units/LOT-45.1-WU01.json",
-      "business/work_units/LOT-45.1-WU05.json",
-      "engineering/LOT45_ENGINE_PILOT_EVIDENCE.json",
-      "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json",
-      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json"
+      "business/work_units/LOT-45.1-WU02.json",
+      "business/evidence/LOT45_V1_REQUALIFICATION.json",
+      "business/plans/LOT45_REMEDIATION_PLAN.json"
     ],
     "reference_count": 2,
     "reference_files": [
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 73
+    "total_kib_ceil": 51
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -67,9 +65,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "LOT-45.1-WU01: read-only exact-head requalification of PR #66 under the fully reconciled Development Engine V1.",
+    "current_objective": "LOT-45.1-WU02: stage four bounded LOT-45.2 remediation AWUs from the refreshed read-only requalification plan.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Live-reverify PR #66 exact head and required checks, then update only the read-only Lot45 requalification evidence/remediation plan; do not mutate or merge the candidate and keep Lot46 locked."
+    "next_action": "Reverify PR #66 remains unchanged, create LOT-45.2-WU01..WU04 matching RM-01..RM-04, expand the Lot45 parent allowlist only to those manifests, and do not mutate candidate bytes."
   },
   "safety": {
     "execution_allowed": false,
