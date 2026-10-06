@@ -27,6 +27,8 @@
 - business/work_units/LOT-45.1-WU04.json
 - scripts/governance/qualify_work_decomposition.py
 - engineering/REPOSITORY_PROTECTION_STATUS.json
+- scripts/governance/resume_recovery_qualification.py
+- scripts/governance/selftest_resume_recovery.py
 
 ## Execution context — reference
 
@@ -35,9 +37,9 @@
 
 ## Budget
 
-- Primary: 7 / 12 files
+- Primary: 9 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 50 / 1024 KiB
+- Routed size: 84 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
