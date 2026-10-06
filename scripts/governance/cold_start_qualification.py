@@ -317,11 +317,13 @@ def main() -> int:
     )
     probes += 1
 
-    units = active_awu.load_work_units()
+    routing_policy = _json(active_awu.ROUTING_POLICY_PATH)
+    active_dir = active_awu._work_units_directory(awu_evidence["track"], routing_policy)
+    units = active_awu.load_work_units(active_dir)
     duplicate = dict(units)
     second = copy.deepcopy(awu)
     second["id"] = f"{awu['parent']['task_id']}-WU99"
-    duplicate[ROOT / "engineering/work_units/cold-duplicate.json"] = second
+    duplicate[active_dir / "cold-duplicate.json"] = second
     _expect(
         active_awu.ActiveAwuError,
         lambda: active_awu.select_active_awu(duplicate),

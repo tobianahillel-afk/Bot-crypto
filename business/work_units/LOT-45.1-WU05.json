@@ -99,7 +99,8 @@
       "engineering/CONTEXT_MAP.md",
       "business/work_units/LOT-45.1-WU01.json",
       "scripts/governance/resume_recovery_qualification.py",
-      "scripts/governance/selftest_resume_recovery.py"
+      "scripts/governance/selftest_resume_recovery.py",
+      "scripts/governance/cold_start_qualification.py"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -137,7 +138,8 @@
       "Lot46 remains LOCKED and runtime/trading authority remains fail-closed",
       "one exact WU05 head must pass Engineering Bootstrap and Security Secrets before WU01 resumes",
       "resume/recovery qualification derives expected lifecycle task route and business mode from the validated active track instead of assuming BUILDING engineering plus PAUSED business",
-      "resume/recovery duplicate-active probing uses the work-unit directory for the validated active track"
+      "resume/recovery duplicate-active probing uses the work-unit directory for the validated active track",
+      "cold-start ambiguous-active probing uses the work-unit directory for the validated active track rather than the legacy engineering default"
     ],
     "acceptance_criteria": [
       "active resolver selects LOT-45.1-WU05 as BUSINESS R2 complexity score 2 without mandatory split",
@@ -149,7 +151,8 @@
       "live main ruleset PR #66 Lot46 and runtime safety remain unchanged at final qualification",
       "after qualification LOT-45.1-WU01 becomes the sole IN_PROGRESS business AWU for read-only candidate requalification",
       "resume/recovery qualification passes for active BUSINESS with ACTIVE business authority while preserving the LIVE_GIT_REVERIFY_REQUIRED write gate",
-      "resume/recovery adversarial tests preserve PAUSED engineering semantics in synthetic/history cases and ACTIVE semantics for the current BUSINESS route"
+      "resume/recovery adversarial tests preserve PAUSED engineering semantics in synthetic/history cases and ACTIVE semantics for the current BUSINESS route",
+      "cold-start qualification passes for active BUSINESS and its duplicate-active negative probe targets business/work_units while preserving ENGINEERING behavior"
     ]
   },
   "planning": {
@@ -177,8 +180,8 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 10,
-      "executable_loc_changed": 360,
+      "files_touched": 11,
+      "executable_loc_changed": 420,
       "new_public_behaviors": 1,
       "contract_families": 0,
       "independent_algorithms": 0,
@@ -202,6 +205,7 @@
     ]
   },
   "done_when": [
+    "cold-start qualification is lifecycle-aware for BUSINESS duplicate-active probing without regressing ENGINEERING cold start",
     "work-decomposition qualification is lifecycle-aware for terminal BUSINESS without regressing ENGINEERING graph validation",
     "one exact WU05 head has Engineering Bootstrap and Security Secrets SUCCESS",
     "PR #66 remains unchanged Lot46 remains locked and runtime/trading safety remains disabled",

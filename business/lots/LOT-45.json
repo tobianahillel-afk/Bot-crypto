@@ -38,7 +38,8 @@
     "business/work_units/LOT-45.1-WU05.json",
     "scripts/governance/qualify_work_decomposition.py",
     "scripts/governance/resume_recovery_qualification.py",
-    "scripts/governance/selftest_resume_recovery.py"
+    "scripts/governance/selftest_resume_recovery.py",
+    "scripts/governance/cold_start_qualification.py"
   ],
   "forbidden_scope": [
     "candidate branch mutation during LOT-45.1-WU01",
