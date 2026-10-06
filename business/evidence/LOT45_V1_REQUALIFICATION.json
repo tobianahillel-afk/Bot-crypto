@@ -2,8 +2,8 @@
   "schema_version": 1,
   "evidence_kind": "lot45_development_engine_v1_read_only_requalification_v1",
   "awu_id": "LOT-45.1-WU01",
-  "observed_date": "2026-10-05",
-  "verdict": "READ_ONLY_REQUALIFIED_REMEDIATION_REQUIRED_ENGINE_LIFECYCLE_BLOCKED",
+  "observed_date": "2026-10-06",
+  "verdict": "READ_ONLY_REQUALIFIED_REMEDIATION_REQUIRED_ENGINE_PRECONDITION_CLEARED",
   "candidate_ready_for_merge": false,
   "candidate_mutated": false,
   "candidate_merged": false,
@@ -16,7 +16,13 @@
       "id": 24172517,
       "name": "Protect",
       "target": "branch",
-      "enforcement": "active"
+      "enforcement": "active",
+      "bypass_count": 0,
+      "required_status_checks": [
+        "Gitleaks pinned CLI",
+        "CodeQL Python security-extended",
+        "quality"
+      ]
     },
     "pull_request": 66,
     "pull_request_state": "open",
@@ -26,7 +32,7 @@
     "pull_request_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
     "prior_pilot_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
     "head_unchanged_since_engine_pilot": true,
-    "reverified_at_utc": "2026-10-05T21:47:21Z"
+    "reverified_during_wu01": true
   },
   "safety": {
     "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
@@ -37,31 +43,23 @@
     "withdrawals": "FORBIDDEN"
   },
   "current_review_state": {
-    "unresolved_non_outdated_threads": 2,
-    "rule": "thread resolution is not accepted as substantive remediation when candidate bytes are unchanged; conversely an open UI thread may be code-resolved only when current exact-head bytes prove the finding is fixed",
-    "threads": [
+    "unresolved_non_outdated_threads": 0,
+    "source": "GitHub review-thread live read",
+    "rule": "UI resolution is not accepted as proof of code remediation; current candidate bytes and deterministic evidence remain authoritative.",
+    "conclusion": "NO_CURRENT_UNRESOLVED_NON_OUTDATED_THREADS_BUT_ONE_P1_CODE_DEFECT_REMAINS_CONFIRMED_BY_READ_ONLY_INSPECTION",
+    "historically_relevant_threads": [
       {
         "id": "PRRT_kwDOTtA9Ds6aIHFn",
         "priority": "P1",
-        "ui_state": "OPEN_NON_OUTDATED",
-        "code_state": "RESOLVED_IN_CURRENT_HEAD_BY_CODE_INSPECTION",
         "title": "Preserve market identity in order-flow artifacts",
-        "evidence": [
-          "OrderFlowStateV1 and CVDSeriesV1 carry required market_identity",
-          "standalone order-flow/CVD checksums bind market_identity",
-          "tests/test_lot45_market_identity_binding.py proves BTC/ETH artifact checksums differ"
-        ]
+        "current_code_state": "RESOLVED_IN_CURRENT_HEAD_BY_CODE_INSPECTION"
       },
       {
         "id": "PRRT_kwDOTtA9Ds6aIhbE",
         "priority": "P1",
-        "ui_state": "OPEN_NON_OUTDATED",
-        "code_state": "CONFIRMED_PRESENT",
         "title": "Bind matching identities to the certified input market",
-        "evidence": [
-          "_build_engine_state receives source trades plus Order Flow/CVD artifacts",
-          "_build_engine_state does not compare artifact market_identity against homogeneous source-trade identity"
-        ]
+        "current_code_state": "CONFIRMED_PRESENT_BY_CURRENT_CODE_INSPECTION",
+        "observation": "_build_engine_state receives trades, order_flow and cvd and serializes both artifacts without comparing their market_identity to the homogeneous source-trade market identity."
       }
     ]
   },
@@ -103,46 +101,48 @@
       "id": "LOT45-REQUAL-001",
       "severity": "P1",
       "class": "CANDIDATE_DEFECT",
-      "status": "CONFIRMED_PRESENT",
+      "status": "CONFIRMED_PRESENT_BY_CURRENT_CODE_INSPECTION",
       "original_review_thread": "PRRT_kwDOTtA9Ds6aIhbE",
       "title": "Bind Order Flow/CVD market identity to source trades",
       "evidence": {
         "path": "src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine_impl.py",
         "head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
         "function": "_build_engine_state",
-        "observation": "The function receives trades, order_flow and cvd but builds the engine state without comparing artifact market_identity to the homogeneous identity of trades."
+        "lines": "656-702",
+        "observation": "The function receives trades, order_flow and cvd, validates causal times, then embeds order_flow.to_dict() and cvd.to_dict() without comparing artifact market_identity against the homogeneous identity of source trades."
       },
-      "consequence": "A matching but wrong-market Order Flow/CVD pair can be embedded with certified lineage if timestamps and other bindings match."
+      "consequence": "A matching but wrong-market Order Flow/CVD pair can be embedded with certified lineage if timestamps and other bindings match.",
+      "review_ui_state": "NO_CURRENT_UNRESOLVED_NON_OUTDATED_THREAD"
     },
     {
       "id": "LOT45-REQUAL-002",
       "severity": "MEDIUM",
       "class": "TYPE_CHECK_DEFECT",
-      "status": "CONFIRMED_BY_EXACT_HEAD_CI",
+      "status": "CONFIRMED_BY_UNCHANGED_EXACT_HEAD_CI_AND_CODE",
       "run_id": 32144783998,
       "failed_step": "Mypy package validation",
       "path": "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py",
       "line": 105,
-      "detail": "Incompatible return value type (got \"object\", expected \"Lot45MarketIdentityV1\") [return-value]."
+      "detail": "Incompatible return value type (got \"object\", expected \"Lot45MarketIdentityV1\") [return-value]; _require_market_identity returns the object-typed parameter after a custom require() that mypy does not narrow."
     },
     {
       "id": "LOT45-REQUAL-003",
       "severity": "MEDIUM",
       "class": "TEST_CONTRACT_INCONSISTENCY",
-      "status": "CONFIRMED_BY_EXACT_HEAD_CI",
+      "status": "CONFIRMED_BY_UNCHANGED_EXACT_HEAD_CI",
       "run_id": 32144783988,
       "failed_step": "Security dependency full regression and anti-flake",
-      "detail": "Two tests in tests/test_lot45_runtime_binding_and_rounding.py construct CVD variants whose checksum is rejected immediately as a canonical mismatch. Remediation must determine whether the fixture should recompute a valid checksum before testing a later invariant or whether construction semantics are incorrect; canonical checksum rejection must not be weakened.",
+      "detail": "Both failing tests in tests/test_lot45_runtime_binding_and_rounding.py construct CVD variants that fail immediately with `CVD checksum canonical mismatch`; remediation must repair the fixtures/constructor path without weakening canonical checksum verification.",
       "observed_result": "2363 passed, 1 skipped, 2 failed"
     },
     {
       "id": "LOT45-REQUAL-004",
       "severity": "HIGH",
       "class": "CERTIFICATION_STALENESS",
-      "status": "CONFIRMED",
+      "status": "CONFIRMED_BY_UNCHANGED_EXACT_HEAD_CI",
       "run_id": 32144784085,
       "failed_step": "Trusted pre-launch proof before Python setup",
-      "detail": "LOT45_PRELAUNCH_COMMITTED_TREE_DRIFT (exit 67). The current PR head is not the previously certified frozen source topology."
+      "detail": "Exact candidate head emits LOT45_PRELAUNCH_COMMITTED_TREE_DRIFT (exit 67); prior frozen certification topology does not certify the current candidate bytes."
     }
   ],
   "resolved_prior_findings": [
@@ -207,55 +207,96 @@
     "id": "DEV-ENGINE-V1-IFACE-001",
     "class": "ENGINE_COMPATIBILITY_DEFECT",
     "candidate_defect": false,
-    "engineering_head": "f61ea408cdc83bc2de6566f8d4b8d604f72cb476",
-    "workflow": "Engineering Bootstrap",
-    "run_id": 37335527143,
-    "failed_step": "Validate Development Engine V1 interface freeze",
-    "detail": "AGENTS V1 interface phrase missing: resolve the single active AWU with `python scripts/governance/resolve_active_awu.py`",
+    "status": "CLEARED",
     "historical_v1_certification_remains_immutable": true,
-    "consequence": "DEV-ENGINE-V1-IFACE-001 itself is cleared on exact head 3c0f54de..., but the same bootstrap run now exposes a later lifecycle incompatibility in the ENG-00 canonical-baseline validator.",
-    "latest_requalification": {
-      "engineering_head": "3c0f54deaa47fbe7bce4d7b79153b42ab141650a",
-      "interface_phrase_present": true,
-      "terminal_routing_selftest_fixture_updated": true,
-      "bootstrap_run_id": 37367447809,
-      "bootstrap_run_attempt": 2,
-      "interface_freeze_step": "PASS",
-      "terminal_routing_selftest_step": "PASS",
-      "security_secrets_run_id": 37367447615,
-      "security_secrets_run_attempt": 2,
-      "security_secrets_conclusion": "SUCCESS",
-      "overall_bootstrap_conclusion": "FAILURE",
-      "conclusion": "DEV_ENGINE_V1_IFACE_001_CLEARED_BUT_BOOTSTRAP_BLOCKED_LATER"
-    },
-    "status": "CLEARED_INTERFACE_STEP_ONLY"
+    "current_proof": {
+      "lifecycle_reconciliation_head": "4fa9084d5ef097d9b02140bf88c573063845b779",
+      "engineering_bootstrap_run": 37452667127,
+      "security_secrets_run": 37452667165
+    }
   },
   "remediation_required": true,
   "remediation_plan_path": "business/plans/LOT45_REMEDIATION_PLAN.json",
   "bounded_successor_path": "business/work_units/LOT-45.1-WU02.json",
-  "closure_condition": "WU01 remains IN_PROGRESS until DEV-ENGINE-V1-BASELINE-001 is cleared through a separately authorized engine reconciliation route and the exact-head Bootstrap is green; WU02 remains PLANNED. PR #66 must remain byte-unchanged.",
+  "closure_condition": "WU01 may close after this refreshed read-only evidence and remediation plan pass the engine branch checks; WU02 may then stage bounded LOT-45.2 remediation AWUs without candidate mutation. PR #66 remains unchanged and Lot46 remains LOCKED.",
   "secondary_engine_blocker": {
     "id": "DEV-ENGINE-V1-BASELINE-001",
     "class": "ENGINE_TERMINAL_LIFECYCLE_COMPATIBILITY_DEFECT",
     "candidate_defect": false,
-    "status": "CONFIRMED",
-    "engineering_head": "3c0f54deaa47fbe7bce4d7b79153b42ab141650a",
-    "workflow": "Engineering Bootstrap",
-    "run_id": 37367447809,
-    "run_attempt": 2,
-    "failed_step": "Validate canonical ENG-00 baseline",
-    "exact_error": "CANONICAL_BASELINE_INVALID: business development status mismatch",
-    "root_cause": {
-      "immutable_baseline": "engineering/CANONICAL_BASELINE.json",
-      "baseline_business_development_status": "PAUSED",
-      "current_authoritative_business_development_status": "ACTIVE",
-      "validator": "scripts/governance/validate_canonical_baseline.py",
-      "observation": "The ENG-00 snapshot validator compares its historical PAUSED development_status directly to the current migration bridge ACTIVE state. ENG-09 terminal activation intentionally changed current lifecycle authority while preserving the ENG-00 baseline."
-    },
-    "safety_interpretation": "The immutable ENG-00 baseline must not be rewritten to ACTIVE. A lifecycle-aware validation or workflow route is required through a separately authorized engine reconciliation unit.",
-    "wu01_scope_authorization": "NOT_AUTHORIZED_TO_REPAIR",
+    "status": "CLEARED",
+    "resolution": "Lifecycle-aware baseline/current-authority validation completed through LOT-45.1-WU03/WU04/WU05 without mutating engineering/CANONICAL_BASELINE.json.",
+    "proof_head": "4fa9084d5ef097d9b02140bf88c573063845b779",
+    "engineering_bootstrap_run": 37452667127,
+    "security_secrets_run": 37452667165,
     "candidate_mutation_allowed": false,
     "candidate_merge_allowed": false,
     "lot46_unlock_allowed": false
+  },
+  "current_exact_head_ci": {
+    "head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "workflow_count": 49,
+    "success_count": 26,
+    "failure_count": 23,
+    "legacy_historical_fanout_failure_count": 19,
+    "direct_candidate_or_global_failure_count": 4,
+    "latest_run_activity": "2026-08-18",
+    "candidate_head_unchanged_since_runs": true,
+    "direct_failures": [
+      {
+        "run_id": 32144783998,
+        "workflow": "Institutional code quality gates",
+        "failed_step": "Mypy package validation",
+        "classification": "CURRENT_CANDIDATE_DEFECT",
+        "maps_to": "LOT45-REQUAL-002"
+      },
+      {
+        "run_id": 32144783988,
+        "workflow": "Lot 45 V4 implementation entry gate",
+        "failed_step": "Security dependency full regression and anti-flake",
+        "classification": "CURRENT_CANDIDATE_DEFECT",
+        "maps_to": "LOT45-REQUAL-003"
+      },
+      {
+        "run_id": 32144784085,
+        "workflow": "Lot 45 frozen evidence attestation",
+        "failed_step": "Trusted pre-launch proof before Python setup",
+        "classification": "CURRENT_CERTIFICATION_STALENESS",
+        "maps_to": "LOT45-REQUAL-004"
+      },
+      {
+        "run_id": 32144784139,
+        "workflow": "P0.6 final exact-commit assurance",
+        "failed_step": "Enforce final assurance verdict",
+        "classification": "DERIVATIVE",
+        "maps_to": "LOT45-REQUAL-002|LOT45-REQUAL-003"
+      }
+    ]
+  },
+  "engine_reconciliation": {
+    "status": "CLEARED",
+    "candidate_mutated": false,
+    "proofs": [
+      {
+        "blocker": "DEV-ENGINE-V1-IFACE-001",
+        "status": "CLEARED",
+        "conclusion": "Development Engine V1 interface-freeze compatibility is green on the reconciled engine route."
+      },
+      {
+        "blocker": "DEV-ENGINE-V1-BASELINE-001",
+        "status": "CLEARED",
+        "conclusion": "Lifecycle-aware canonical-baseline reconciliation completed without rewriting the immutable ENG-00 baseline."
+      }
+    ],
+    "lifecycle_reconciliation_exact_head": "4fa9084d5ef097d9b02140bf88c573063845b779",
+    "lifecycle_reconciliation_runs": {
+      "engineering_bootstrap": 37452667127,
+      "security_secrets": 37452667165
+    },
+    "wu01_routed_exact_head": "1aa140f7d40187711f336631bfc37f07aab2dce2",
+    "wu01_routed_runs": {
+      "engineering_bootstrap": 37453730047,
+      "security_secrets": 37453729825
+    },
+    "main_and_candidate_reverified_unchanged": true
   }
 }
