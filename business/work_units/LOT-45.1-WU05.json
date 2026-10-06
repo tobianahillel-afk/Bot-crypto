@@ -105,7 +105,7 @@
   "contracts": {
     "required_invariants": [
       "work-decomposition qualification derives the active work-unit directory from the validated active track rather than assuming engineering/work_units",
-      "ENGINEERING and BUSINESS work-unit graphs remain separate and each validates independently",
+      "the active AWU must belong to the track-specific work-unit directory while the operational dependency DAG is validated over the union of ENGINEERING and BUSINESS work units so cross-track predecessor edges remain explicit",
       "the active AWU belongs to the graph for evidence.track and all active dependencies precede it",
       "resolve_next_work is called with the validated active track rather than a hard-coded engineering route",
       "duplicate-active negative probing uses the active track directory",
@@ -117,8 +117,8 @@
     ],
     "acceptance_criteria": [
       "active resolver selects LOT-45.1-WU05 as BUSINESS R2 complexity score 2 without mandatory split",
-      "qualifier validates the complete business/work_units graph and finds LOT-45.1-WU05 in topological order",
-      "qualifier validates the non-active engineering/work_units graph separately without mixing graph dependencies",
+      "qualifier validates the unified operational ENGINEERING+BUSINESS DAG and finds LOT-45.1-WU05 after every declared predecessor",
+      "qualifier separately proves LOT-45.1-WU05 comes from business/work_units while cross-track dependencies are resolved only in the operational DAG",
       "qualifier resolves next work through the BUSINESS route and preserves bounded context",
       "all existing decomposition negative probes still fail closed",
       "Engineering Bootstrap and Security Secrets are SUCCESS on one exact WU05 head",

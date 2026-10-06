@@ -54,10 +54,22 @@ def main() -> int:
     risk_policy = _json(ROOT / "config/governance/awu_risk_policy_v1.json")
     context_policy = _json(ROOT / "config/governance/awu_context_policy_v1.json")
 
-    paths = sorted((ROOT / "engineering/work_units").glob("*.json"))
-    units = graph_mod.load_paths(paths)
-    topo = graph_mod.validate_graph(units)
+    routing_policy = _json(active_mod.ROUTING_POLICY_PATH)
     awu_path, active, evidence = active_mod.resolve_active_awu()
+    track = evidence["track"]
+    assert track in {"ENGINEERING", "BUSINESS"}
+
+    active_dir = active_mod._work_units_directory(track, routing_policy)
+    track_units = active_mod.load_work_units(active_dir)
+    assert awu_path in track_units
+    assert track_units[awu_path]["id"] == active["id"]
+
+    operational_paths = [
+        *sorted((ROOT / "engineering/work_units").glob("*.json")),
+        *sorted((ROOT / "business/work_units").glob("*.json")),
+    ]
+    units = graph_mod.load_paths(operational_paths)
+    topo = graph_mod.validate_graph(units)
     assert active["id"] in topo
     for dependency in active["depends_on"]:
         assert topo.index(dependency) < topo.index(active["id"])
@@ -66,7 +78,7 @@ def main() -> int:
         state,
         capabilities,
         "GITHUB_CONNECTOR_ONLY",
-        "engineering",
+        track.lower(),
         (awu_path, active, evidence),
     )
     assert resolved["active_awu"]["id"] == active["id"]
@@ -81,7 +93,8 @@ def main() -> int:
     )
 
     missing = copy.deepcopy(units)
-    missing[active["id"]]["depends_on"] = ["ENG-02.8-WU99"]
+    missing_dependency = f"{active['parent']['task_id']}-WU99"
+    missing[active["id"]]["depends_on"] = [missing_dependency]
     _expect(
         graph_mod.AgentWorkUnitGraphError,
         lambda: graph_mod.validate_graph(missing),
@@ -121,10 +134,10 @@ def main() -> int:
         "forged context budget",
     )
 
-    duplicate = active_mod.load_work_units()
+    duplicate = active_mod.load_work_units(active_dir)
     second = copy.deepcopy(active)
-    second["id"] = "ENG-02.8-WU99"
-    duplicate[ROOT / "engineering/work_units/qual-duplicate.json"] = second
+    second["id"] = f"{active['parent']['task_id']}-WU99"
+    duplicate[active_dir / "qual-duplicate.json"] = second
     _expect(
         active_mod.ActiveAwuError,
         lambda: active_mod.select_active_awu(duplicate),
@@ -144,7 +157,7 @@ def main() -> int:
 
     print(
         "WORK_DECOMPOSITION_QUALIFICATION_PASS "
-        f"awu={active['id']} nodes={len(units)} scenarios=8 "
+        f"track={track} awu={active['id']} nodes={len(units)} scenarios=8 "
         f"context=P{evidence['context_route']['primary_count']}:"
         f"R{evidence['context_route']['reference_count']}:"
         f"K{evidence['context_route']['total_kib_ceil']}"
