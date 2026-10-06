@@ -35,7 +35,7 @@
       "max_total_kib": 1024
     },
     "implicit_expansion": "FORBIDDEN",
-    "primary_count": 7,
+    "primary_count": 9,
     "primary_files": [
       "AGENTS.md",
       "config/governance/project_state.json",
@@ -43,14 +43,16 @@
       "business/work_units/LOT-45.1-WU05.json",
       "business/work_units/LOT-45.1-WU04.json",
       "scripts/governance/qualify_work_decomposition.py",
-      "engineering/REPOSITORY_PROTECTION_STATUS.json"
+      "engineering/REPOSITORY_PROTECTION_STATUS.json",
+      "scripts/governance/resume_recovery_qualification.py",
+      "scripts/governance/selftest_resume_recovery.py"
     ],
     "reference_count": 2,
     "reference_files": [
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 50
+    "total_kib_ceil": 84
   },
   "instructions": [
     "verify external Git reality before writing",
