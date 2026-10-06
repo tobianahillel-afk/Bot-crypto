@@ -52,11 +52,14 @@ def main() -> int:
         ROOT / "scripts/governance/resolve_active_awu.py",
     )
     try:
-        _active_path, expected_awu, _active_evidence = active.resolve_active_awu()
+        _active_path, expected_awu, active_evidence = active.resolve_active_awu()
     except active.ActiveAwuError as exc:
         raise AssertionError(str(exc)) from exc
-    expected_task = state["engineering_track"]["active_task"]
-    assert expected_awu["parent"]["task_id"] == expected_task
+    expected_task = expected_awu["parent"]["task_id"]
+    expected_track = active_evidence.get("track")
+    assert expected_track in {"ENGINEERING", "BUSINESS"}
+    expected_route = "DEVELOPMENT_ENGINE" if expected_track == "ENGINEERING" else "BUSINESS"
+    expected_business_mode = "PAUSED" if expected_track == "ENGINEERING" else "ACTIVE"
     expected_awu_id = expected_awu["id"]
     probes = 0
 
@@ -64,6 +67,7 @@ def main() -> int:
     probes += 1
     assert normal["authority"] == "config/governance/project_state.json"
     assert normal["recovery_version"] == 2
+    assert normal["track"] == expected_route
     assert normal["active_awu_id"] == expected_awu_id
     assert normal["active_task"] == expected_task
     assert normal["write_authorized"] is False
@@ -166,7 +170,7 @@ def main() -> int:
     assert malformed_context["active_task"] == normal["active_task"]
 
     for field, expected in (
-        ("business_development", "PAUSED"),
+        ("business_development", expected_business_mode),
         ("next_business_lot_status", "LOCKED"),
     ):
         probes += 1
@@ -174,7 +178,7 @@ def main() -> int:
 
     probes += 1
     assert normal["safety_snapshot"] == {
-        "business_development": "PAUSED",
+        "business_development": expected_business_mode,
         "next_business_lot": 46,
         "next_business_lot_status": "LOCKED",
         "trade_allowed": False,
