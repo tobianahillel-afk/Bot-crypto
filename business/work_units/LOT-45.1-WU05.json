@@ -1,0 +1,184 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "LOT-45.1-WU05",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "LOT-45",
+    "task_id": "LOT-45.1",
+    "manifest": "business/lots/LOT-45.json"
+  },
+  "title": "Qualify business-aware work decomposition and close lifecycle reconciliation",
+  "objective": "Repair the work-decomposition qualification so it validates the canonical active ENGINEERING or BUSINESS AWU graph without mixing tracks, obtain one exact all-green WU05 head, then restore LOT-45.1-WU01 as the sole read-only Lot45 requalification route.",
+  "non_goals": [
+    "modify or merge PR #66",
+    "change repository protection policy or rulesets",
+    "modify GitHub workflow definitions",
+    "rewrite immutable ENG-00 baseline or business activation evidence",
+    "start Lot45 candidate remediation",
+    "unlock Lot46",
+    "enable runtime trading leverage withdrawals or live exchange access",
+    "introduce paid or LLM-backed mandatory review"
+  ],
+  "depends_on": [
+    "LOT-45.1-WU03"
+  ],
+  "inputs": [
+    {
+      "name": "Split WU04 lifecycle reconciliation",
+      "kind": "STATE",
+      "locator": "business/work_units/LOT-45.1-WU04.json"
+    },
+    {
+      "name": "Work decomposition qualifier",
+      "kind": "FILE",
+      "locator": "scripts/governance/qualify_work_decomposition.py"
+    },
+    {
+      "name": "Verified current repository protection snapshot",
+      "kind": "STATE",
+      "locator": "engineering/REPOSITORY_PROTECTION_STATUS.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Lifecycle-aware work decomposition qualifier",
+      "kind": "FILE",
+      "locator": "scripts/governance/qualify_work_decomposition.py"
+    },
+    {
+      "name": "WU05 routed handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    },
+    {
+      "name": "WU05 generated context map",
+      "kind": "STATE",
+      "locator": "engineering/CONTEXT_MAP.json"
+    },
+    {
+      "name": "WU05 human context map",
+      "kind": "FILE",
+      "locator": "engineering/CONTEXT_MAP.md"
+    },
+    {
+      "name": "Restored read-only Lot45 requalification AWU",
+      "kind": "STATE",
+      "locator": "business/work_units/LOT-45.1-WU01.json"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "6e2cd68600d67c4abd0a2a706f9086527cf6914e",
+    "allowed_paths": [
+      "business/lots/LOT-45.json",
+      "business/work_units/LOT-45.1-WU04.json",
+      "business/work_units/LOT-45.1-WU05.json",
+      "scripts/governance/qualify_work_decomposition.py",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "business/work_units/LOT-45.1-WU01.json"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "contracts/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      ".github/workflows/**",
+      "engineering/CANONICAL_BASELINE.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json",
+      "config/governance/**"
+    ],
+    "forbidden_semantics": [
+      "Lot45 candidate mutation",
+      "candidate merge",
+      "ENG-00 baseline rewrite",
+      "business authority rollback",
+      "repository protection policy weakening",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "permission-to-trade activation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "work-decomposition qualification derives the active work-unit directory from the validated active track rather than assuming engineering/work_units",
+      "ENGINEERING and BUSINESS work-unit graphs remain separate and each validates independently",
+      "the active AWU belongs to the graph for evidence.track and all active dependencies precede it",
+      "resolve_next_work is called with the validated active track rather than a hard-coded engineering route",
+      "duplicate-active negative probing uses the active track directory",
+      "WU04 remains BLOCKED by FILES_TOUCHED_GT_15 and its already-qualified repository-protection/security work is not rewritten",
+      "fresh GitHub reads keep main at 390d0779f2be257fa8134faf8f02193a760a09c3 protected by the single active Protect ruleset with no bypass",
+      "PR #66 remains open unmerged at ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+      "Lot46 remains LOCKED and runtime/trading authority remains fail-closed",
+      "one exact WU05 head must pass Engineering Bootstrap and Security Secrets before WU01 resumes"
+    ],
+    "acceptance_criteria": [
+      "active resolver selects LOT-45.1-WU05 as BUSINESS R2 complexity score 2 without mandatory split",
+      "qualifier validates the complete business/work_units graph and finds LOT-45.1-WU05 in topological order",
+      "qualifier validates the non-active engineering/work_units graph separately without mixing graph dependencies",
+      "qualifier resolves next work through the BUSINESS route and preserves bounded context",
+      "all existing decomposition negative probes still fail closed",
+      "Engineering Bootstrap and Security Secrets are SUCCESS on one exact WU05 head",
+      "live main ruleset PR #66 Lot46 and runtime safety remain unchanged at final qualification",
+      "after qualification LOT-45.1-WU01 becomes the sole IN_PROGRESS business AWU for read-only candidate requalification"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 2,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 1,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 8,
+      "executable_loc_changed": 360,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 0,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/qualify_work_decomposition.py",
+      "exact-head Engineering Bootstrap",
+      "exact-head Security Secrets",
+      "live PR #66 and main/ruleset reverification"
+    ]
+  },
+  "done_when": [
+    "work-decomposition qualification is lifecycle-aware for terminal BUSINESS without regressing ENGINEERING graph validation",
+    "one exact WU05 head has Engineering Bootstrap and Security Secrets SUCCESS",
+    "PR #66 remains unchanged Lot46 remains locked and runtime/trading safety remains disabled",
+    "LOT-45.1-WU01 is restored as the sole active read-only requalification route"
+  ]
+}

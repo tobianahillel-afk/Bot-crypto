@@ -1,12 +1,12 @@
 {
   "active_checkpoint": {
     "track": "BUSINESS",
-    "awu_id": "LOT-45.1-WU04",
-    "awu_path": "business/work_units/LOT-45.1-WU04.json",
+    "awu_id": "LOT-45.1-WU05",
+    "awu_path": "business/work_units/LOT-45.1-WU05.json",
     "parent_manifest": "business/lots/LOT-45.json",
-    "scope_base_sha": "654b0b572d063f1524471b38cc92457db2f286b9",
+    "scope_base_sha": "6e2cd68600d67c4abd0a2a706f9086527cf6914e",
     "risk_class": "R2",
-    "complexity_score": 4
+    "complexity_score": 2
   },
   "authority": {
     "context_map": "engineering/CONTEXT_MAP.json",
@@ -14,7 +14,7 @@
     "state_source": "config/governance/project_state.json"
   },
   "blockers": [],
-  "current_objective": "LOT-45.1-WU04: reconcile fresh repository-protection status and obtain one exact all-green lifecycle qualification head.",
+  "current_objective": "LOT-45.1-WU05: make work-decomposition qualification lifecycle-aware, obtain one exact all-green head, then restore read-only WU01.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -27,21 +27,21 @@
     "lot45_merged": false
   },
   "kind": "engineering_handoff",
-  "next_action": "Qualify WU04 on Engineering Bootstrap plus Security Secrets with live main/ruleset and PR #66 unchanged; then restore LOT-45.1-WU01 as the sole read-only requalification route.",
+  "next_action": "Update qualify_work_decomposition.py to select the validated active track graph and next-work route; qualify exact head on Engineering Bootstrap plus Security Secrets; reverify main/ruleset and PR #66; then restore WU01.",
   "next_engineering": {
     "active_lot": null,
     "active_task": null,
     "active_manifest": null
   },
   "recent_completed": [
-    "ENG-09.6-WU05 staging exact head 787871d9527acf81f7d020d79e9cec3e00dc8ced passed Engineering Bootstrap 36640205649; direct unlock remains authorized but not yet executed.",
     "ENG-09.6-WU06 is closed; WU07 scope base 6c30f47c173218ff8645e23eefbbcf1a8f2eb373 passed Engineering Bootstrap 36641980568 and Security Secrets 36641980576.",
     "ENG-09.6-WU07 terminal compatibility passed Engineering Bootstrap 37302659296 and Security Secrets 37302659318 on exact head 97f026dbd6d2de8c61fd737a7f37c45ff2dd1b14; WU05 is now the bounded preflight route only.",
     "ENG-09.6-WU08 activated after preflight found that exact-head BUSINESS activation would otherwise fail PAUSED-only bootstrap validation; no business authority changed.",
     "ENG-09.6-WU08 terminal activation compatibility qualified on exact head d4a275458aa32c25f84370957595bdf47a2fa90d; Engineering Bootstrap 37321549602 and Security Secrets 37321549689 passed. WU05 resumed only as bounded preflight; prior-session authorization is not reusable.",
     "ENG-09.6-WU05 current-session activation preflight on head 6651f12870ed51318b8004246aa87b015caaeaa8 passed Engineering Bootstrap 37322906082 and Security Secrets 37322905878; live main, PR #66 and Protect ruleset were reverified unchanged.",
     "Direct current-session BUSINESS_DEVELOPMENT_UNLOCK authorization executed as the atomic terminal Engineering -> active read-only Lot45 business-route transition from predecessor 6651f12870ed51318b8004246aa87b015caaeaa8.",
-    "LOT-45.1-WU03 core lifecycle slice closed by mandatory file-count split: head 654b0b572d063f1524471b38cc92457db2f286b9 passed Security Secrets 37388265817 and Engineering Bootstrap 37388265876 reached the repository-protection gate after context-map validation."
+    "LOT-45.1-WU03 core lifecycle slice closed by mandatory file-count split: head 654b0b572d063f1524471b38cc92457db2f286b9 passed Security Secrets 37388265817 and Engineering Bootstrap 37388265876 reached the repository-protection gate after context-map validation.",
+    "LOT-45.1-WU04 reached its mandatory 15-file boundary on head 6e2cd68600d67c4abd0a2a706f9086527cf6914e: Security Secrets 37390738269 passed and Engineering Bootstrap 37390738279 passed through security/protection but exposed an engineering-only work-decomposition qualifier; continuation split to WU05."
   ],
   "resume_read_order": [
     "AGENTS.md",
@@ -81,13 +81,6 @@
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
   ],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36618171473",
-      "head_sha": "c837a468ef318796bdda2d9f770613ec6c8593c5",
-      "scope": "ENG-09.6-WU04_FINAL_SECURITY_SECRETS"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "status": "PASS",
@@ -164,6 +157,13 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37388265817",
       "head_sha": "654b0b572d063f1524471b38cc92457db2f286b9",
       "scope": "LOT-45.1-WU04_SCOPE_BASE_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37390738269",
+      "head_sha": "6e2cd68600d67c4abd0a2a706f9086527cf6914e",
+      "scope": "LOT-45.1-WU05_SCOPE_BASE_SECURITY_SECRETS"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"

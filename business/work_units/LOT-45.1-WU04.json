@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "agent_work_unit",
   "id": "LOT-45.1-WU04",
-  "status": "IN_PROGRESS",
+  "status": "BLOCKED",
   "parent": {
     "work_item_id": "LOT-45",
     "task_id": "LOT-45.1",
@@ -130,7 +130,8 @@
       "scripts/governance/run_t0.py",
       "scripts/governance/run_t1.py",
       "scripts/governance/verify_security_engine.py",
-      "scripts/governance/selftest_security_engine.py"
+      "scripts/governance/selftest_security_engine.py",
+      "scripts/governance/qualify_work_decomposition.py"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -175,13 +176,14 @@
       "live main PR #66 Lot46 and runtime safety match canonical state at final qualification",
       "after qualification WU01 may resume read-only exact-head requalification without candidate mutation or merge",
       "active-scope validation accepts maintenance base 654b0b572d063f1524471b38cc92457db2f286b9 while rejecting a pre-activation or non-descendant maintenance base",
-      "security-engine verifier accepts PROTECTED_VERIFIED current protection while continuing to validate the immutable ENG-04 UNPROTECTED evidence against its historical policy"
+      "security-engine verifier accepts PROTECTED_VERIFIED current protection while continuing to validate the immutable ENG-04 UNPROTECTED evidence against its historical policy",
+      "mandatory file-count split activates LOT-45.1-WU05 before the 16th functional file is modified"
     ]
   },
   "planning": {
     "risk_class": "R2",
     "complexity_score": 4,
-    "split_required": false,
+    "split_required": true,
     "context_budget": {
       "max_primary_files": 12,
       "max_reference_files": 16,
@@ -203,7 +205,7 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 15,
+      "files_touched": 16,
       "executable_loc_changed": 650,
       "new_public_behaviors": 1,
       "contract_families": 0,
@@ -212,7 +214,9 @@
       "trust_boundaries": 1,
       "new_dependencies": 0
     },
-    "split_reasons": []
+    "split_reasons": [
+      "FILES_TOUCHED_GT_15"
+    ]
   },
   "validation": {
     "required_tiers": [
