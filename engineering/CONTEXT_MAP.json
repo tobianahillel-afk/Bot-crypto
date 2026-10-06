@@ -1,7 +1,7 @@
 {
   "active_work": {
-    "awu_id": "LOT-45.1-WU05",
-    "awu_path": "business/work_units/LOT-45.1-WU05.json",
+    "awu_id": "LOT-45.1-WU01",
+    "awu_path": "business/work_units/LOT-45.1-WU01.json",
     "complexity_score": 2,
     "lot": "LOT-45",
     "manifest": "business/lots/LOT-45.json",
@@ -35,24 +35,23 @@
       "max_total_kib": 1024
     },
     "implicit_expansion": "FORBIDDEN",
-    "primary_count": 9,
+    "primary_count": 8,
     "primary_files": [
       "AGENTS.md",
       "config/governance/project_state.json",
       "business/lots/LOT-45.json",
+      "business/work_units/LOT-45.1-WU01.json",
       "business/work_units/LOT-45.1-WU05.json",
-      "business/work_units/LOT-45.1-WU04.json",
-      "scripts/governance/qualify_work_decomposition.py",
-      "engineering/REPOSITORY_PROTECTION_STATUS.json",
-      "scripts/governance/resume_recovery_qualification.py",
-      "scripts/governance/selftest_resume_recovery.py"
+      "engineering/LOT45_ENGINE_PILOT_EVIDENCE.json",
+      "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json"
     ],
     "reference_count": 2,
     "reference_files": [
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 84
+    "total_kib_ceil": 73
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -68,9 +67,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "LOT-45.1-WU05: make work-decomposition qualification lifecycle-aware, obtain one exact all-green head, then restore read-only WU01.",
+    "current_objective": "LOT-45.1-WU01: read-only exact-head requalification of PR #66 under the fully reconciled Development Engine V1.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Update qualify_work_decomposition.py to select the validated active track graph and next-work route; qualify exact head on Engineering Bootstrap plus Security Secrets; reverify main/ruleset and PR #66; then restore WU01."
+    "next_action": "Live-reverify PR #66 exact head and required checks, then update only the read-only Lot45 requalification evidence/remediation plan; do not mutate or merge the candidate and keep Lot46 locked."
   },
   "safety": {
     "execution_allowed": false,

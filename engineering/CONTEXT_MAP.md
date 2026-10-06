@@ -13,22 +13,21 @@
 - Track: BUSINESS
 - Work item: LOT-45
 - Task: LOT-45.1
-- AWU: LOT-45.1-WU05
+- AWU: LOT-45.1-WU01
 - Risk: R2
 - Manifest: business/lots/LOT-45.json
-- AWU file: business/work_units/LOT-45.1-WU05.json
+- AWU file: business/work_units/LOT-45.1-WU01.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - business/lots/LOT-45.json
+- business/work_units/LOT-45.1-WU01.json
 - business/work_units/LOT-45.1-WU05.json
-- business/work_units/LOT-45.1-WU04.json
-- scripts/governance/qualify_work_decomposition.py
-- engineering/REPOSITORY_PROTECTION_STATUS.json
-- scripts/governance/resume_recovery_qualification.py
-- scripts/governance/selftest_resume_recovery.py
+- engineering/LOT45_ENGINE_PILOT_EVIDENCE.json
+- engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json
+- engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json
 
 ## Execution context — reference
 
@@ -37,16 +36,16 @@
 
 ## Budget
 
-- Primary: 9 / 12 files
+- Primary: 8 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 84 / 1024 KiB
+- Routed size: 73 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: LOT-45.1-WU05: make work-decomposition qualification lifecycle-aware, obtain one exact all-green head, then restore read-only WU01.
-- Next action: Update qualify_work_decomposition.py to select the validated active track graph and next-work route; qualify exact head on Engineering Bootstrap plus Security Secrets; reverify main/ruleset and PR #66; then restore WU01.
+- Objective: LOT-45.1-WU01: read-only exact-head requalification of PR #66 under the fully reconciled Development Engine V1.
+- Next action: Live-reverify PR #66 exact head and required checks, then update only the read-only Lot45 requalification evidence/remediation plan; do not mutate or merge the candidate and keep Lot46 locked.
 
 ## Non-authoritative sources
 

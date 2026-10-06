@@ -2,14 +2,14 @@
   "schema_version": 1,
   "kind": "agent_work_unit",
   "id": "LOT-45.1-WU01",
-  "status": "BLOCKED",
+  "status": "IN_PROGRESS",
   "parent": {
     "work_item_id": "LOT-45",
     "task_id": "LOT-45.1",
     "manifest": "business/lots/LOT-45.json"
   },
-  "title": "Requalify suspended Lot45 candidate under Development Engine V1",
-  "objective": "Read-only requalify PR #66 exact head ec2c4ab16f21b23e062b7fca0bb796c8db4a5133 against current Development Engine V1 controls, distinguish current candidate defects from legacy workflow fanout, produce a bounded remediation plan, and clear DEV-ENGINE-V1-IFACE-001 through the narrow documented compatibility route without mutating the candidate.",
+  "title": "Requalify active Lot45 candidate under Development Engine V1",
+  "objective": "Read-only requalify PR #66 exact head ec2c4ab16f21b23e062b7fca0bb796c8db4a5133 against the fully reconciled Development Engine V1, distinguish current candidate defects from legacy workflow fanout, and produce a bounded remediation plan without mutating or merging the candidate.",
   "non_goals": [
     "modify the Lot45 candidate branch",
     "merge PR #66",
@@ -20,9 +20,14 @@
     "modify Development Engine production routing implementation or frozen interface policy; only the missing AGENTS phrase and the stale terminal-routing selftest fixture may be repaired"
   ],
   "depends_on": [
-    "ENG-09.6-WU05"
+    "LOT-45.1-WU05"
   ],
   "inputs": [
+    {
+      "name": "Completed lifecycle reconciliation and exact-head qualification",
+      "kind": "STATE",
+      "locator": "business/work_units/LOT-45.1-WU05.json"
+    },
     {
       "name": "Prior Lot45 engine pilot",
       "kind": "EVIDENCE",
@@ -57,7 +62,7 @@
     }
   ],
   "scope": {
-    "scope_base_sha": "6651f12870ed51318b8004246aa87b015caaeaa8",
+    "scope_base_sha": "4fa9084d5ef097d9b02140bf88c573063845b779",
     "allowed_paths": [
       "business/evidence/LOT45_V1_REQUALIFICATION.json",
       "business/plans/LOT45_REMEDIATION_PLAN.json",
@@ -65,7 +70,11 @@
       "business/work_units/LOT-45.1-WU02.json",
       "business/lots/LOT-45.json",
       "AGENTS.md",
-      "scripts/governance/selftest_terminal_business_routing.py"
+      "scripts/governance/selftest_terminal_business_routing.py",
+      "business/work_units/LOT-45.1-WU05.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -93,7 +102,10 @@
       "Codex may be optional but is never a mandatory transport for progress",
       "any remediation scope is split into bounded successor AWUs before candidate mutation",
       "the only Development Engine compatibility mutation permitted in WU01 is restoring the frozen AGENTS V1 resolver phrase; validator policy and engine implementation remain unchanged",
-      "terminal business routing production logic remains unchanged; only its synthetic pre-terminal fixture may be updated to reflect explicit BUILDING+PAUSED state"
+      "terminal business routing production logic remains unchanged; only its synthetic pre-terminal fixture may be updated to reflect explicit BUILDING+PAUSED state",
+      "LOT-45.1-WU05 is DONE and its exact head 4fa9084d5ef097d9b02140bf88c573063845b779 passed Engineering Bootstrap 37452667127 and Security Secrets 37452667165 before WU01 resumes",
+      "WU01 scope starts after the reconciled engine head so lifecycle maintenance history is not reinterpreted as candidate remediation",
+      "handoff and generated context-map mutations are administrative route restoration only; PR #66 and its branch remain read-only"
     ],
     "acceptance_criteria": [
       "exact current PR head is recorded and compared with prior pilot head",
@@ -101,7 +113,10 @@
       "current candidate defects and obsolete legacy fanout are separately listed",
       "substantive unresolved findings are preserved",
       "remediation plan contains bounded ordered AWUs or an explicit no-remediation certification route",
-      "no candidate write occurs"
+      "no candidate write occurs",
+      "active resolver selects LOT-45.1-WU01 as the sole BUSINESS IN_PROGRESS AWU from scope base 4fa9084d5ef097d9b02140bf88c573063845b779",
+      "live main remains protected at 390d0779f2be257fa8134faf8f02193a760a09c3 with one active Protect ruleset and no bypass",
+      "PR #66 remains open unmerged at ec2c4ab16f21b23e062b7fca0bb796c8db4a5133 before read-only evidence generation"
     ]
   },
   "planning": {
@@ -129,7 +144,7 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 7,
+      "files_touched": 11,
       "executable_loc_changed": 350,
       "new_public_behaviors": 1,
       "contract_families": 0,
