@@ -378,19 +378,28 @@ def main() -> int:
     context = _json(ROOT / "engineering/CONTEXT_MAP.json")
 
     try:
-        _active_path, expected_awu, _active_evidence = active.resolve_active_awu()
+        _active_path, expected_awu, active_evidence = active.resolve_active_awu()
     except active.ActiveAwuError as exc:
         raise ResumeRecoveryError(str(exc)) from exc
     expected_awu_id = expected_awu["id"]
     expected_task = expected_awu["parent"]["task_id"]
-    if expected_task != state["engineering_track"]["active_task"]:
-        raise ResumeRecoveryError("active AWU task disagrees with canonical engineering task")
+    expected_track = active_evidence.get("track")
+    if expected_track == "ENGINEERING":
+        if expected_task != state["engineering_track"]["active_task"]:
+            raise ResumeRecoveryError("active AWU task disagrees with canonical engineering task")
+        expected_route = "DEVELOPMENT_ENGINE"
+        expected_business_mode = "PAUSED"
+    elif expected_track == "BUSINESS":
+        expected_route = "BUSINESS"
+        expected_business_mode = "ACTIVE"
+    else:
+        raise ResumeRecoveryError(f"unsupported active recovery track: {expected_track!r}")
 
     scenarios = 0
     normal = repository_recover()
     scenarios += 1
     assert normal["recovery_version"] == 2
-    assert normal["track"] == "DEVELOPMENT_ENGINE"
+    assert normal["track"] == expected_route
     assert normal["handoff_status"] == "VALID"
     assert normal["context_map_status"] == "VALID"
     assert normal["active_awu_id"] == expected_awu_id
@@ -401,7 +410,7 @@ def main() -> int:
     assert normal["conversational_context_required"] is False
     assert normal["state_auto_healed"] is False
     assert normal["hints_authoritative"] is False
-    assert normal["safety_snapshot"]["business_development"] == "PAUSED"
+    assert normal["safety_snapshot"]["business_development"] == expected_business_mode
     assert normal["safety_snapshot"]["next_business_lot_status"] == "LOCKED"
     assert normal["safety_snapshot"]["trade_allowed"] is False
     assert normal["safety_snapshot"]["execution_allowed"] is False
@@ -587,12 +596,14 @@ def main() -> int:
     assert terminal["write_authorized"] is False
     assert terminal["required_before_write"] == [WRITE_GATE]
 
-    units = active.load_work_units()
+    routing_policy = _json(active.ROUTING_POLICY_PATH)
+    active_dir = active._work_units_directory(expected_track, routing_policy)
+    units = active.load_work_units(active_dir)
     _path, current = active.select_active_awu(units)
     duplicate = dict(units)
     second = copy.deepcopy(current)
     second["id"] = f"{current['parent']['task_id']}-WU99"
-    duplicate[ROOT / "engineering/work_units/resume-duplicate.json"] = second
+    duplicate[active_dir / "resume-duplicate.json"] = second
     _expect(
         active.ActiveAwuError,
         lambda: active.select_active_awu(duplicate),
