@@ -38,6 +38,16 @@
       "name": "Verified current repository protection snapshot",
       "kind": "STATE",
       "locator": "engineering/REPOSITORY_PROTECTION_STATUS.json"
+    },
+    {
+      "name": "Resume/recovery qualifier",
+      "kind": "FILE",
+      "locator": "scripts/governance/resume_recovery_qualification.py"
+    },
+    {
+      "name": "Resume/recovery adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_resume_recovery.py"
     }
   ],
   "outputs": [
@@ -65,6 +75,16 @@
       "name": "Restored read-only Lot45 requalification AWU",
       "kind": "STATE",
       "locator": "business/work_units/LOT-45.1-WU01.json"
+    },
+    {
+      "name": "Lifecycle-aware resume/recovery qualifier",
+      "kind": "FILE",
+      "locator": "scripts/governance/resume_recovery_qualification.py"
+    },
+    {
+      "name": "Lifecycle-aware resume/recovery adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_resume_recovery.py"
     }
   ],
   "scope": {
@@ -77,7 +97,9 @@
       "engineering/handoff/CURRENT.json",
       "engineering/CONTEXT_MAP.json",
       "engineering/CONTEXT_MAP.md",
-      "business/work_units/LOT-45.1-WU01.json"
+      "business/work_units/LOT-45.1-WU01.json",
+      "scripts/governance/resume_recovery_qualification.py",
+      "scripts/governance/selftest_resume_recovery.py"
     ],
     "forbidden_paths": [
       "src/crypto_quant_bot/**",
@@ -113,7 +135,9 @@
       "fresh GitHub reads keep main at 390d0779f2be257fa8134faf8f02193a760a09c3 protected by the single active Protect ruleset with no bypass",
       "PR #66 remains open unmerged at ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
       "Lot46 remains LOCKED and runtime/trading authority remains fail-closed",
-      "one exact WU05 head must pass Engineering Bootstrap and Security Secrets before WU01 resumes"
+      "one exact WU05 head must pass Engineering Bootstrap and Security Secrets before WU01 resumes",
+      "resume/recovery qualification derives expected lifecycle task route and business mode from the validated active track instead of assuming BUILDING engineering plus PAUSED business",
+      "resume/recovery duplicate-active probing uses the work-unit directory for the validated active track"
     ],
     "acceptance_criteria": [
       "active resolver selects LOT-45.1-WU05 as BUSINESS R2 complexity score 2 without mandatory split",
@@ -123,7 +147,9 @@
       "all existing decomposition negative probes still fail closed",
       "Engineering Bootstrap and Security Secrets are SUCCESS on one exact WU05 head",
       "live main ruleset PR #66 Lot46 and runtime safety remain unchanged at final qualification",
-      "after qualification LOT-45.1-WU01 becomes the sole IN_PROGRESS business AWU for read-only candidate requalification"
+      "after qualification LOT-45.1-WU01 becomes the sole IN_PROGRESS business AWU for read-only candidate requalification",
+      "resume/recovery qualification passes for active BUSINESS with ACTIVE business authority while preserving the LIVE_GIT_REVERIFY_REQUIRED write gate",
+      "resume/recovery adversarial tests preserve PAUSED engineering semantics in synthetic/history cases and ACTIVE semantics for the current BUSINESS route"
     ]
   },
   "planning": {
@@ -151,7 +177,7 @@
     },
     "size_estimate": {
       "business_domains": 1,
-      "files_touched": 8,
+      "files_touched": 10,
       "executable_loc_changed": 360,
       "new_public_behaviors": 1,
       "contract_families": 0,
