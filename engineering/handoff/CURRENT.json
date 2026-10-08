@@ -83,9 +83,9 @@
   "validation_evidence": [
     {
       "class": "GITHUB_ACTIONS",
-      "head_sha": "6651f12870ed51318b8004246aa87b015caaeaa8",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37322905878",
-      "scope": "ENG-09.6-WU05_ACTIVATION_PREFLIGHT_SECURITY_SECRETS",
+      "head_sha": "6c30f47c173218ff8645e23eefbbcf1a8f2eb373",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36641980568",
+      "scope": "ENG-09.6-WU07_SCOPE_BASE_BOOTSTRAP",
       "status": "PASS"
     },
     {
