@@ -34,7 +34,6 @@
     "active_task": null
   },
   "recent_completed": [
-    "LOT-45.1-WU05 lifecycle reconciliation closed on exact head 4fa9084d5ef097d9b02140bf88c573063845b779: Engineering Bootstrap 37452667127 and Security Secrets 37452667165 both passed; main/ruleset and PR #66 were reverified unchanged before WU01 restoration.",
     "LOT-45.1-WU01 read-only requalification refreshed on candidate ec2c4ab16f21b23e062b7fca0bb796c8db4a5133; engine preconditions are cleared and exact engine head ef8dfbdc3965d27e5947697f6d9fba877864d817 passed Engineering Bootstrap 37454493298 plus Security Secrets 37454493458.",
     "LOT-45.1-WU02 staged four PLANNED LOT-45.2 AWUs at f692c93bf5fb1d276afbdbbfc76ffbfa943b13fa; Bootstrap 37838227357 and Security Secrets 37838227405 SUCCESS; PR66 unchanged.",
     "LOT-45.1-WU02 isolated integration branch agent/lot45-v1-remediation-integration created and read-verified at candidate ec2c4ab16f21b23e062b7fca0bb796c8db4a5133; candidate PR66 and protected main remain unchanged. No two-parent merge or LOT-45.2 activation was executed. Overlap audit reconfirmed five divergent shared paths and required jsonschema==4.26.0/referencing==0.37.0 lock parity.",
@@ -82,20 +81,6 @@
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
   ],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "head_sha": "6c30f47c173218ff8645e23eefbbcf1a8f2eb373",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36641980568",
-      "scope": "ENG-09.6-WU07_SCOPE_BASE_BOOTSTRAP",
-      "status": "PASS"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "head_sha": "dec31e78161a1a1e50181a06760130ab3bc27421",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37378690451",
-      "scope": "LOT-45.1-WU03_SCOPE_BASE_SECURITY_SECRETS",
-      "status": "PASS"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "head_sha": "654b0b572d063f1524471b38cc92457db2f286b9",
