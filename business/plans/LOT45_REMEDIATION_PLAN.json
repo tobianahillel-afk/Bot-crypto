@@ -198,7 +198,6 @@
       "verified_at_utc": "2026-10-08T20:30:00Z",
       "common_ancestor": "390d0779f2be257fa8134faf8f02193a760a09c3",
       "protected_main_head": "390d0779f2be257fa8134faf8f02193a760a09c3",
-      "current_engine_head": "d81fff2ae334499f2d852fc78d63073d214210c2",
       "lot45_candidate_head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
       "divergent": true,
       "current_candidate_pr": 66,
@@ -207,7 +206,8 @@
         "engineering_bootstrap_run": 37839889982,
         "security_secrets_run": 37839890028,
         "status": "SUCCESS"
-      }
+      },
+      "engine_qualification_reference_head": "d81fff2ae334499f2d852fc78d63073d214210c2"
     },
     "isolation": {
       "new_branch_required": true,
@@ -242,7 +242,42 @@
       "all_mandatory_v1_validators_PASS_on_exact_activation_HEAD",
       "trade_allowed_false_execution_allowed_false_Lot46_LOCKED"
     ],
-    "current_unresolved_gate": "NO_INTEGRATION_BASE_EXISTS_YET; NO_LOT45.2_ACTIVATION_AUTHORIZED",
-    "scope_note": "This entry is a design and read-only Git-ancestry qualification, not execution evidence or permission to mutate PR66."
+    "current_unresolved_gate": "NO_REVIEWED_TWO_PARENT_INTEGRATION_COMMIT; NO_LOT45.2_ACTIVATION_AUTHORIZED",
+    "scope_note": "This entry is a design and read-only Git-ancestry qualification, not execution evidence or permission to mutate PR66.",
+    "three_way_overlap_audit": {
+      "method": "EXACT_GIT_TREE_BLOB_COMPARISON_AGAINST_COMMON_BASE",
+      "status": "READ_ONLY_COMPLETED_NO_MERGE_EXECUTED",
+      "inventories": {
+        "main_entries": 2426,
+        "candidate_entries": 2464,
+        "engineering_entries": 2865,
+        "any_truncated": false
+      },
+      "paths_changed_in_both": 5,
+      "identical_blobs_in_both": 0,
+      "distinct_same_path_changes": [
+        "README.md",
+        "docs/FUNCTIONAL_COVERAGE_REGISTRY.md",
+        "docs/ROADMAP_V1_TO_V21.md",
+        "docs/SYSTEM_EXECUTION_ARCHITECTURE.md",
+        "pyproject.toml"
+      ],
+      "overlapping_src_contracts_tests": 0,
+      "cautions": [
+        "Different blob SHAs indicate overlapping changed paths, not a proven textual merge conflict.",
+        "The candidate README/roadmap contain V4.1-Ops legacy naming; the engine's V3.1-Ops canonical identity and generated status remain authoritative.",
+        "Preserve historical certified Lot44 baseline, Lot45 candidate lifecycle and all V1-V21 lot ordering while reconciling documentation.",
+        "The candidate pyproject declares jsonschema==4.26.0 and referencing==0.37.0 absent from engineering pyproject; test actual imports and satisfy exact dev-dependency/lock parity before accepting a resolution.",
+        "Retain exact main/candidate/engine commits as separate immutable anchors; neither implementation nor merger authorization is inferred from this read-only audit."
+      ],
+      "mandatory_resolution_policy": {
+        "README.md": "ENGINE_IDENTITY_AND_GENERATED_STATUS_WIN; MERGE_ONLY_VERIFIED_LOT45_DETAILS",
+        "docs/FUNCTIONAL_COVERAGE_REGISTRY.md": "KEEP_CERTIFIED_LOT44_TRUTH; MERGE_CANDIDATE_CONTEXT_NONAUTHORITATIVELY",
+        "docs/ROADMAP_V1_TO_V21.md": "KEEP_ENGINE_CANONICAL_IDENTITY_AND_LOT_ORDER; PRESERVE_VERIFIED_CANDIDATE_DETAILS",
+        "docs/SYSTEM_EXECUTION_ARCHITECTURE.md": "RECONCILE_ARCHITECTURE_WITHOUT_REDUCING_SAFETY_INVARIANTS",
+        "pyproject.toml": "KEEP_V3_1_IDENTITY_AND_0_44_0_CERTIFIED_VERSION; RECONCILE_REQUIRED_EXACT_DEV_DEPENDENCIES_WITH_LOCK_AND_AUDIT"
+      },
+      "forbidden_shortcut": "NO_AUTOMATIC_OURS_THEIRS_RESOLUTION_FOR_SHARED_PATHS"
+    }
   }
 }
