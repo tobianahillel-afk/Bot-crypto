@@ -83,20 +83,6 @@
   "validation_evidence": [
     {
       "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "head_sha": "6c30f47c173218ff8645e23eefbbcf1a8f2eb373",
-      "scope": "ENG-09.6-WU07_SCOPE_BASE_BOOTSTRAP",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36641980568"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "head_sha": "4fa9084d5ef097d9b02140bf88c573063845b779",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37452667165",
-      "scope": "LOT-45.1-WU01_SCOPE_BASE_SECURITY_SECRETS",
-      "status": "PASS"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
       "head_sha": "ef8dfbdc3965d27e5947697f6d9fba877864d817",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37454493298",
       "scope": "LOT-45.1-WU02_SCOPE_BASE_BOOTSTRAP",
@@ -164,6 +150,20 @@
       "head_sha": "fa1fe875a1c3ce7b54a42771e8db6b94dfdebe79",
       "scope": "LOT45_WU02_CONTEXT_SYNC_SECRET_CONTROLS",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37850424132"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37852440156",
+      "head_sha": "4c5adf201f05a19ee249cbc94d037b982a4ad8d3",
+      "scope": "PRE00_SCOPE_BASE_ENGINEERING_BOOTSTRAP"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37852440337",
+      "head_sha": "4c5adf201f05a19ee249cbc94d037b982a4ad8d3",
+      "scope": "PRE00_SCOPE_BASE_SECURITY_SECRETS"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"
