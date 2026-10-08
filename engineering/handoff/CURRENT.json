@@ -34,7 +34,6 @@
     "active_manifest": null
   },
   "recent_completed": [
-    "ENG-09.6-WU08 terminal activation compatibility qualified on exact head d4a275458aa32c25f84370957595bdf47a2fa90d; Engineering Bootstrap 37321549602 and Security Secrets 37321549689 passed. WU05 resumed only as bounded preflight; prior-session authorization is not reusable.",
     "ENG-09.6-WU05 current-session activation preflight on head 6651f12870ed51318b8004246aa87b015caaeaa8 passed Engineering Bootstrap 37322906082 and Security Secrets 37322905878; live main, PR #66 and Protect ruleset were reverified unchanged.",
     "Direct current-session BUSINESS_DEVELOPMENT_UNLOCK authorization executed as the atomic terminal Engineering -> active read-only Lot45 business-route transition from predecessor 6651f12870ed51318b8004246aa87b015caaeaa8.",
     "LOT-45.1-WU03 core lifecycle slice closed by mandatory file-count split: head 654b0b572d063f1524471b38cc92457db2f286b9 passed Security Secrets 37388265817 and Engineering Bootstrap 37388265876 reached the repository-protection gate after context-map validation.",
@@ -82,13 +81,6 @@
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
   ],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36641980568",
-      "head_sha": "6c30f47c173218ff8645e23eefbbcf1a8f2eb373",
-      "scope": "ENG-09.6-WU07_SCOPE_BASE_BOOTSTRAP"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "status": "PASS",
