@@ -602,11 +602,11 @@
           "status": "PLANNED",
           "risk_floor": "R2",
           "target_paths": [
-            "config/engineering_deviations.json"
+            "config/governance/legacy_engineering_deviations_v1.json"
           ],
           "reported_expired_count": 135,
           "observed_expiration_date": "2026-09-30",
-          "requirement": "Locate the authoritative deviation registry path before activation; inventory all 135 by metric, owner, affected current code and approved debt, then remediate or re-approve each by evidence. Never bulk-extend deadlines.",
+          "requirement": "Audit the confirmed authoritative 135-entry legacy deviation registry; check whether each deviation remains current, and separately review deadlines and already-passed remediation triggers. Remediate or re-approve with evidence; never bulk-extend deadlines.",
           "acceptance": [
             "Validator passes with zero expired/unowned/unregistered deviations",
             "Each retained deviation has owner, evidence, actual metric, rationale, deadline and review",
