@@ -34,14 +34,14 @@
     "active_task": null
   },
   "recent_completed": [
-    "LOT-45.1-WU01 read-only requalification refreshed on candidate ec2c4ab16f21b23e062b7fca0bb796c8db4a5133; engine preconditions are cleared and exact engine head ef8dfbdc3965d27e5947697f6d9fba877864d817 passed Engineering Bootstrap 37454493298 plus Security Secrets 37454493458.",
     "LOT-45.1-WU02 staged four PLANNED LOT-45.2 AWUs at f692c93bf5fb1d276afbdbbfc76ffbfa943b13fa; Bootstrap 37838227357 and Security Secrets 37838227405 SUCCESS; PR66 unchanged.",
     "LOT-45.1-WU02 isolated integration branch agent/lot45-v1-remediation-integration created and read-verified at candidate ec2c4ab16f21b23e062b7fca0bb796c8db4a5133; candidate PR66 and protected main remain unchanged. No two-parent merge or LOT-45.2 activation was executed. Overlap audit reconfirmed five divergent shared paths and required jsonschema==4.26.0/referencing==0.37.0 lock parity.",
     "LOT-45.1-WU02 isolated two-parent base 2275d478cb69446c9ad3a7f2f4923f671c4d6e95 created (candidate ec2c4ab16f21b23e062b7fca0bb796c8db4a5133 + engine 343e3fe056a97e2680ee2eb8bf27bc9346a7b970), immutable candidate source/contracts/tests/audit preserved, five shared paths resolved explicitly plus canonical identity override and lock parity; V1 exact-head CI NOT YET EXECUTED.",
     "LOT-45.1-WU02 draft integration PR #67 opened for SHA 2275d478cb69446c9ad3a7f2f4923f671c4d6e95; SAST and Secrets PASS; five separate blocking integration findings recorded. Exact-head V1 certification and Lot45.2 activation remain BLOCKED.",
     "LOT-45.1-WU02 design-only preactivation remediation plan committed at 980c4ba8d0b2d15c39cd4a3848997e6135953e6e. Eight ordered PRE units cover five integration blockers; Engineering Bootstrap 37846910978 and Security Secrets 37846911073 both SUCCESS. Future code changes remain unauthorized by WU02.",
     "LOT-45.1-WU02 PRE-00 read-only preflight refreshed 2026-10-08: main and PR66 unchanged, PR67 draft at 2275d478; latest engine a50b2f6 has 8 commits after integration parent 343e3fe; five recorded blockers remain OPEN. Scope packet is design-only and does not authorize implementation.",
-    "LOT-45.1-WU02 read-only PRE-00 requalification at engine head 449aaa6edf391192bf5eac0008602607dbec237b: PR66/main and PR67 unchanged; 11 post-integration-parent engine commits affect only plan/context/handoff; PR67 still has five blockers and no PRE activation authority."
+    "LOT-45.1-WU02 read-only PRE-00 requalification at engine head 449aaa6edf391192bf5eac0008602607dbec237b: PR66/main and PR67 unchanged; 11 post-integration-parent engine commits affect only plan/context/handoff; PR67 still has five blockers and no PRE activation authority.",
+    "LOT-45.1-WU02 context-map budget reconciliation: engine HEAD fa1fe875a1c3ce7b54a42771e8db6b94dfdebe79 passed Engineering Bootstrap 37850424318 and Security Secrets 37850424132. Both generated context maps now carry 82 KiB. PR66, PR67, main and PRE-00 authorization remain unchanged."
   ],
   "resume_read_order": [
     "AGENTS.md",
@@ -81,20 +81,6 @@
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
   ],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "head_sha": "6c30f47c173218ff8645e23eefbbcf1a8f2eb373",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36641980568",
-      "scope": "ENG-09.6-WU07_SCOPE_BASE_BOOTSTRAP",
-      "status": "PASS"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "head_sha": "6e2cd68600d67c4abd0a2a706f9086527cf6914e",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37390738269",
-      "scope": "LOT-45.1-WU05_SCOPE_BASE_SECURITY_SECRETS",
-      "status": "PASS"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "head_sha": "4fa9084d5ef097d9b02140bf88c573063845b779",
@@ -164,6 +150,20 @@
       "head_sha": "449aaa6edf391192bf5eac0008602607dbec237b",
       "scope": "LOT45_PRE00_ENGINE_HEAD_SECRETS_ONLY",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37848691401"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "head_sha": "fa1fe875a1c3ce7b54a42771e8db6b94dfdebe79",
+      "scope": "LOT45_WU02_CONTEXT_SYNC_BOOTSTRAP",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37850424318"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "head_sha": "fa1fe875a1c3ce7b54a42771e8db6b94dfdebe79",
+      "scope": "LOT45_WU02_CONTEXT_SYNC_SECRET_CONTROLS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37850424132"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"
