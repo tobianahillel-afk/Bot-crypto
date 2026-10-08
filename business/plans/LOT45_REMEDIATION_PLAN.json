@@ -775,39 +775,42 @@
       },
       "latest_read_only_pre00_reverification": {
         "status": "READ_ONLY_VERIFIED_NOT_ACTIVATED",
-        "verified_on": "2026-10-08",
-        "exact_engine_head": "449aaa6edf391192bf5eac0008602607dbec237b",
+        "verified_on_local_date": "2026-10-09",
+        "exact_engine_head": "5f41aca65affd0362be982f55497b049c64956fb",
         "engine_parent_integration": "343e3fe056a97e2680ee2eb8bf27bc9346a7b970",
-        "engine_commits_after_integration_parent": 11,
-        "parent_relation": "ANCESTOR_VERIFIED",
+        "engine_commits_after_integration_parent": 18,
+        "engine_parent_relation": "ANCESTOR_VERIFIED",
         "changed_engine_paths_since_integration_parent": [
           "business/plans/LOT45_REMEDIATION_PLAN.json",
           "engineering/CONTEXT_MAP.json",
           "engineering/CONTEXT_MAP.md",
           "engineering/handoff/CURRENT.json"
         ],
-        "changed_paths_classification": "PLAN_CONTEXT_HANDOFF_ONLY",
-        "executable_source_contracts_security_workflows_changed_since_integration_parent": false,
-        "protected_main_head": "390d0779f2be257fa8134faf8f02193a760a09c3",
-        "pr66": {
+        "source_contract_test_workflow_dependency_delta_since_engine_parent": false,
+        "main": {
+          "head": "390d0779f2be257fa8134faf8f02193a760a09c3",
+          "protected": true,
+          "active_ruleset_id": 24172517
+        },
+        "original_candidate": {
+          "pr": 66,
           "state": "OPEN",
           "merged": false,
           "head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133"
         },
-        "pr67": {
+        "integration": {
+          "pr": 67,
           "state": "OPEN",
           "draft": true,
           "merged": false,
           "head": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
-          "parents": [
+          "commit_parents": [
             "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
             "343e3fe056a97e2680ee2eb8bf27bc9346a7b970"
-          ]
+          ],
+          "status": "NOT_EXACT_HEAD_V1_CERTIFIED"
         },
-        "platform": {
-          "active_rulesets_count": 1
-        },
-        "exact_integration_ci": {
+        "integration_ci": {
           "passing": [
             "Security Secrets",
             "Security SAST"
@@ -818,26 +821,73 @@
             "Security Dependencies",
             "Roadmap documentation validation"
           ],
-          "all_green": false
+          "failing_run_ids": [
+            37844693182,
+            37844693255,
+            37844693129,
+            37844693079
+          ]
         },
-        "remaining_findings": [
+        "blockers": [
           "LOT45-INT-001",
           "LOT45-INT-002",
           "LOT45-INT-003",
           "LOT45-INT-004",
           "LOT45-INT-005"
         ],
-        "no_authorization_granted_for": [
-          "PRE-00 activation",
-          "PRE-01A..PRE-06 execution",
+        "authorization": "NONE_FOR_NEW_PRE_AWUS_OR_PR67_MUTATIONS",
+        "next_action": "Stage a separate scored PRE-00 activation transition within an independently authorized scope; do not self-expand LOT-45.1-WU02."
+      },
+      "pre00_transition_blueprint": {
+        "status": "DESIGN_ONLY_NOT_AUTHORIZED",
+        "target": "LOT45-PRE-00",
+        "branch_separation": {
+          "state_and_governance_authority": "engineering/bootstrap-development-engine",
+          "pending_work_branch": "agent/lot45-v1-remediation-integration",
+          "original_candidate": "agent/lot45-order-flow-delta-cvd-engine-v2",
+          "protected_main": "main"
+        },
+        "steps": [
+          "Reverify main/PR66/PR67/head and active repository protection ruleset immediately before mutation.",
+          "Create a distinct risk-scored and split-qualified PRE-00 administrative AWU; do not reuse or expand R0 WU02 to execute remediation.",
+          "Explicitly amend business/lots/LOT-45.json parent paths and task status to cover the new PRE-00 AWU and only its administrative transition paths.",
+          "Mark LOT-45.1-WU02 DONE and activate exactly one PRE-00 AWU with a scope_base_sha ancestor of the branch receiving the transition.",
+          "Regenerate the active context route and handoff from authoritative state; verify source-of-truth consistency and run T0, cold-start and bootstrap on the activation HEAD.",
+          "On the integration branch, authorize each PRE-01A/PRE-01B/PRE-02/PRE-03/PRE-04/PRE-05 unit separately, with R2 risk floor and explicit file allowlist; do not mutate PR66.",
+          "Keep PR67 draft and run PRE-06 full exact-head T3/T4 checks before any Lot45.2 activation."
+        ],
+        "minimum_administrative_paths": [
+          "business/lots/LOT-45.json",
+          "business/work_units/LOT-45.1-WU02.json",
+          "business/work_units/<NEW_PRE00_AWU>.json",
+          "business/plans/LOT45_REMEDIATION_PLAN.json",
+          "engineering/CONTEXT_MAP.json",
+          "engineering/CONTEXT_MAP.md",
+          "engineering/handoff/CURRENT.json"
+        ],
+        "explicitly_not_authorized": [
+          ".github/workflows/**",
+          "requirements-dev.lock",
+          "config/governance/legacy_engineering_deviations_v1.json",
+          "src/crypto_quant_bot/**",
+          "contracts/**",
+          "data/audit/**",
+          "reports/lot*/**",
           "PR66 mutation",
           "PR67 mutation",
-          "merge",
+          "main mutation",
           "Lot46 unlock",
           "trading activation"
         ],
-        "next_authorized_action": "Prepare a separately scoped PRE-00 administrative transition, qualify its parent scope and new AWU, then activate only after explicit governance authorization.",
-        "note": "Read-only metadata refresh under LOT-45.1-WU02; no live code, dependency, workflow or GitHub setting modification."
+        "qualification_floor": [
+          "exact Git ancestry and unchanged original PR66 bytes",
+          "single active business AWU and matching parent task",
+          "AWU scope descendant of exact scope base",
+          "risk and split-policy qualification",
+          "T0+bootstrap+Secrets exact activation HEAD",
+          "no unresolved security bypass or unpaid external dependency"
+        ],
+        "no_transition_committed": true
       }
     }
   }
