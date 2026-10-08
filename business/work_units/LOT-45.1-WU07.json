@@ -93,7 +93,9 @@
       "PRE-01A or later PRE execution without branch-local authorization",
       "Lot45.2 activation, Lot46 unlock, runtime/trading permission",
       "Historical evidence mutation",
-      "Mandatory paid dependency or LLM reviewer"
+      "Mandatory paid dependency or LLM reviewer",
+      "Lot45 candidate mutation",
+      "candidate merge"
     ]
   },
   "contracts": {
