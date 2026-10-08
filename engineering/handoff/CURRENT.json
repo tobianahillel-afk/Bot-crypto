@@ -34,7 +34,6 @@
     "active_task": null
   },
   "recent_completed": [
-    "LOT-45.1-WU02 read-only PRE-00 requalification at engine head 449aaa6edf391192bf5eac0008602607dbec237b: PR66/main and PR67 unchanged; 11 post-integration-parent engine commits affect only plan/context/handoff; PR67 still has five blockers and no PRE activation authority.",
     "LOT-45.1-WU02 context-map budget reconciliation: engine HEAD fa1fe875a1c3ce7b54a42771e8db6b94dfdebe79 passed Engineering Bootstrap 37850424318 and Security Secrets 37850424132. Both generated context maps now carry 82 KiB. PR66, PR67, main and PRE-00 authorization remain unchanged.",
     "2026-10-09 LOT-45.1-WU02 read-only PRE-00 Git qualification: engine HEAD 5f41aca65affd0362be982f55497b049c64956fb is 18 commits after integration engine parent, with only plan/context/handoff path deltas; PR66/main unchanged; PR67 draft/head unchanged; 2 exact integration checks PASS and 4 FAIL. Separate PRE-00 authority still required.",
     "PRE-00 activation planned on independently scoped R2 LOT-45.1-WU06 using verified engine HEAD 4c5adf201f05a19ee249cbc94d037b982a4ad8d3; main PR66 PR67 unchanged, ruleset Protect active. Exact activation-head CI not yet available.",
@@ -82,20 +81,6 @@
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
   ],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36641980568",
-      "head_sha": "6c30f47c173218ff8645e23eefbbcf1a8f2eb373",
-      "scope": "ENG-09.6-WU07_SCOPE_BASE_BOOTSTRAP"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "head_sha": "980c4ba8d0b2d15c39cd4a3848997e6135953e6e",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37846910978",
-      "scope": "LOT45_PREACTIVATION_DESIGN_BOOTSTRAP",
-      "status": "PASS"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "head_sha": "980c4ba8d0b2d15c39cd4a3848997e6135953e6e",
