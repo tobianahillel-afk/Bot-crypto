@@ -1067,7 +1067,219 @@
         "Verify candidate source/contracts/tests/frozen audit blobs unchanged against PR66",
         "Pass branch-local scope resolver/T0/bootstrap and security assurance on exact activation HEAD before workflow edits",
         "Never change PR66 main Lot46 trading or frozen historical evidence"
-      ]
+      ],
+      "qualified_read_only_observations": {
+        "observed_on_local_date": "2026-10-09",
+        "authority_branch": "engineering/bootstrap-development-engine",
+        "authority_head": "06a6abf8db0f77bda3d437321bbfa240dee4e210",
+        "authority_ci": {
+          "engineering_bootstrap": {
+            "run_id": 37860673404,
+            "conclusion": "SUCCESS"
+          },
+          "security_secrets": {
+            "run_id": 37860673389,
+            "conclusion": "SUCCESS"
+          }
+        },
+        "protected_main": {
+          "head": "390d0779f2be257fa8134faf8f02193a760a09c3",
+          "ruleset_id": 24172517,
+          "ruleset_name": "Protect",
+          "ruleset_enforcement": "active"
+        },
+        "original_candidate": {
+          "pr": 66,
+          "state": "OPEN",
+          "merged": false,
+          "head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133"
+        },
+        "isolated_integration": {
+          "pr": 67,
+          "draft": true,
+          "merged": false,
+          "branch": "agent/lot45-v1-remediation-integration",
+          "head": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+          "expected_first_parent": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+          "expected_second_parent": "343e3fe056a97e2680ee2eb8bf27bc9346a7b970",
+          "certification_status": "NOT_CERTIFIED"
+        },
+        "engine_parent_ancestry": {
+          "base": "343e3fe056a97e2680ee2eb8bf27bc9346a7b970",
+          "target": "06a6abf8db0f77bda3d437321bbfa240dee4e210",
+          "status": "ANCESTOR",
+          "ahead_commits": 46,
+          "behind_commits": 0,
+          "changed_paths_since_parent": [
+            "business/lots/LOT-45.json",
+            "business/plans/LOT45_REMEDIATION_PLAN.json",
+            "business/work_units/LOT-45.1-WU02.json",
+            "business/work_units/LOT-45.1-WU06.json",
+            "business/work_units/LOT-45.1-WU07.json",
+            "engineering/CONTEXT_MAP.json",
+            "engineering/CONTEXT_MAP.md",
+            "engineering/handoff/CURRENT.json"
+          ],
+          "requires_explicit_branch_reconciliation": true,
+          "no_automatic_rebase": true
+        },
+        "action_pin_inventory": {
+          "status": "OFFICIAL_TAG_REFS_AND_ACTION_RUNTIME_REVERIFIED_READ_ONLY",
+          "original_refs": [
+            "actions/checkout@v4",
+            "actions/setup-python@v5",
+            "actions/upload-artifact@v4"
+          ],
+          "verified_tags": [
+            {
+              "name": "actions/checkout",
+              "tag": "v4.2.2",
+              "sha": "11bd71901bbe5b1630ceea73d27597364c9af683",
+              "runtime": "node20"
+            },
+            {
+              "name": "actions/setup-python",
+              "tag": "v5.6.0",
+              "sha": "a26af69be951a213d495a4c3e4e4022e16d87065",
+              "runtime": "node20"
+            },
+            {
+              "name": "actions/upload-artifact",
+              "tag": "v4.6.2",
+              "sha": "ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "runtime": "node20"
+            }
+          ],
+          "target_files": [
+            {
+              "path": ".github/workflows/lot45-order-flow-delta-cvd.yml",
+              "blob_sha": "5ec5a2a6366276cce7d0a774b3359d892080f332",
+              "uses_at_lines": [
+                36,
+                45,
+                274
+              ],
+              "workflow_permissions": "contents: read"
+            },
+            {
+              "path": ".github/workflows/lot45-mutation-assurance.yml",
+              "blob_sha": "e5a569b79b70e42da7c9ce2cc96b8623a0040f1d",
+              "uses_at_lines": [
+                29,
+                38,
+                254
+              ],
+              "workflow_permissions": "contents: read"
+            }
+          ],
+          "total_changed_uses_planned": 6,
+          "workflow_bytes_modified": false
+        },
+        "integration_ci_existing": {
+          "exact_head": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+          "passing": [
+            "Security Secrets",
+            "Security SAST"
+          ],
+          "failing": [
+            "Security Supply Chain",
+            "Security Actions",
+            "Security Dependencies",
+            "Roadmap documentation validation"
+          ],
+          "do_not_claim_exact_head_certification": true
+        }
+      },
+      "independent_execution_sequence": {
+        "status": "PLANNED_NOT_AUTHORIZED",
+        "intent": "Avoid self-authorizing workflow edits from the governance branch. Activate and qualify an independent branch-local administrative scope before touching either Lot45 workflow.",
+        "boundary": "WU07 permits design and governance-record amendments only. No WU07 edit to PR67/PR66/main, no automatic branch reconciliation, no production or historical evidence mutation.",
+        "step_1_admin_authorization": {
+          "proposed_awuid": "LOT-45.1-WU08",
+          "stage": "NEW_BRANCH_LOCAL_ADMINISTRATIVE_AWU",
+          "proposed_work_branch": "agent/lot45-pre01a-authorized-work",
+          "start_commit": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+          "risk_class_floor": "R2",
+          "complexity_budget": {
+            "score_expected": 2,
+            "complexity_factors": {
+              "state_machine_or_concurrency": true
+            },
+            "max_files_touched": 10,
+            "executable_loc_changed": 0,
+            "split_required": false
+          },
+          "prospective_paths": [
+            "business/lots/LOT-45.json",
+            "business/work_units/LOT-45.1-WU02.json",
+            "business/work_units/LOT-45.1-WU08.json",
+            "business/plans/LOT45_REMEDIATION_PLAN.json",
+            "engineering/handoff/CURRENT.json",
+            "engineering/CONTEXT_MAP.json",
+            "engineering/CONTEXT_MAP.md"
+          ],
+          "prospective_forbidden_paths": [
+            ".github/workflows/**",
+            "src/crypto_quant_bot/**",
+            "contracts/**",
+            "data/audit/**",
+            "reports/lot*/**",
+            "requirements-dev.lock",
+            "config/governance/legacy_engineering_deviations_v1.json"
+          ],
+          "explicit_parent_manifest_update": "Include both named target workflows only in future parent bounds for a later separate executable AWU; never edit workflows in the activation commit.",
+          "pre_activation_authority": "NONE_FROM_WU07; MUST_PASS_SEPARATELY_VALIDATED_SCOPE_TRANSITION",
+          "required_proofs": [
+            "Review inherited WU02 and parent scope before any transition; stop if the activation itself lacks authority",
+            "Confirm integration head and both parents, original candidate blobs, protected main and ruleset",
+            "Establish new exact scope_base_sha ancestor on dedicated branch without force-push",
+            "Validate single active branch-local AWU, R2 floor, complexity, split, context budgets and parent allowlists",
+            "Generate context map and handoff from branch-local canonical state",
+            "Pass Engineering Bootstrap and Security Secrets on exact activation HEAD",
+            "Keep original PR67 draft/head unchanged until separately authorized branch integration"
+          ],
+          "result": "ONLY_AUTHORITY_TO_START_NEXT_WORKFLOW_AWU_AFTER_PASS"
+        },
+        "step_2_workflow_pinning": {
+          "proposed_awuid": "LOT-45.1-WU09",
+          "stage": "SEPARATE_BRANCH_LOCAL_WORKFLOW_CHANGE",
+          "risk_class_floor": "R2",
+          "complexity_factors": {
+            "security_trust_boundary": true,
+            "ci_evidence_topology_change": true
+          },
+          "score_expected": 3,
+          "allowed_workflow_paths": [
+            ".github/workflows/lot45-order-flow-delta-cvd.yml",
+            ".github/workflows/lot45-mutation-assurance.yml"
+          ],
+          "allowed_semantics": "Only six precise remote-action uses replaced by immutable 40-hex SHAs and version comments. Preserve workflow jobs, triggers, permissions, inputs, output and artifact identity.",
+          "never_before": "QUALIFIED_WU08_ACTIVATION_HEAD",
+          "required_evidence": [
+            "Check exact workflow blob SHAs again before editing",
+            "Pin SHA references to official release-tag commit and confirm compatible Node20 runtime",
+            "Run actionlint and zizmor without broad suppression",
+            "Run supply-chain security, workflow security and affected Lot45 checks on resulting exact HEAD",
+            "Prove source/contracts/tests and frozen history unchanged from PR66",
+            "Keep security failures from other PRE tasks open rather than bypass them",
+            "Do not merge PR66, PR67 or unlock Lot46"
+          ]
+        },
+        "stop_on": [
+          "MAIN_OR_PR66_OR_PR67_REF_DRIFT",
+          "PARENT_OR_AWU_SCOPE_GAP",
+          "UNVERIFIED_ACTION_SHA",
+          "UNAUTHORIZED_WORKFLOW_EDIT",
+          "ENGINE_PARENT_RECONCILIATION_AMBIGUITY",
+          "RISK_OR_SPLIT_POLICY_FAILURE",
+          "CI_PROOF_UNAVAILABLE",
+          "TRADE_OR_EXECUTION_PERMISSION_DRIFT"
+        ],
+        "no_execution_performed": true,
+        "no_new_awu_created": true,
+        "no_workflow_modification": true,
+        "no_pr_mutation": true
+      }
     }
   }
 }
