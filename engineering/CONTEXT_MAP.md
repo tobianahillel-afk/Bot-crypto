@@ -13,17 +13,17 @@
 - Track: BUSINESS
 - Work item: LOT-45
 - Task: LOT-45.1
-- AWU: LOT-45.1-WU06
+- AWU: LOT-45.1-WU07
 - Risk: R2
 - Manifest: business/lots/LOT-45.json
-- AWU file: business/work_units/LOT-45.1-WU06.json
+- AWU file: business/work_units/LOT-45.1-WU07.json
 
 ## Execution context — primary
 
 - AGENTS.md
 - config/governance/project_state.json
 - business/lots/LOT-45.json
-- business/work_units/LOT-45.1-WU06.json
+- business/work_units/LOT-45.1-WU07.json
 - business/plans/LOT45_REMEDIATION_PLAN.json
 - business/evidence/LOT45_V1_REQUALIFICATION.json
 
@@ -36,14 +36,14 @@
 
 - Primary: 6 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 91 / 1024 KiB
+- Routed size: 92 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: LOT-45.1-WU06 / PRE-00: preserve certified authorization boundary; PRE-01A read-only pin inventory is recorded and next integration-branch authority remains separate.
-- Next action: PRE-01A verified-design pin inventory is in business/plans/LOT45_REMEDIATION_PLAN.json: six floating uses across two Lot45 workflows, three audited immutable action pins. Next, create a distinct scoped R2 integration-branch AWU before editing PR67; keep PR66/main/Lot46 unchanged.
+- Objective: LOT-45.1-WU07: establish exact PRE-01A integration-branch authorization preflight without candidate mutation.
+- Next action: Validate PRE-01A branch-local R2 AWU design and integration ancestry, then separately activate a scoped AWU on PR67 before changing the two Lot45 workflows. PR66/main/Lot46 remain unchanged.
 
 ## Non-authoritative sources
 

@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "LOT-45.1-WU07",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "LOT-45",
+    "task_id": "LOT-45.1",
+    "manifest": "business/lots/LOT-45.json"
+  },
+  "title": "PRE-01A integration-branch execution authority preflight",
+  "objective": "Qualify a separate branch-local R2 PRE-01A execution authorization packet, preserving exact PR66/PR67/main refs and verified immutable action pins before any workflow edit.",
+  "non_goals": [
+    "Edit PR66 or PR67 or their branches during this administrative AWU",
+    "Modify main, source, contracts, dependencies, workflows or frozen evidence",
+    "Execute any PRE remediation before an independent branch-local AWU",
+    "Activate LOT-45.2 or Lot46",
+    "Enable live orders, trading, leverage or withdrawals",
+    "Introduce mandatory paid or LLM-backed dependencies"
+  ],
+  "depends_on": [
+    "LOT-45.1-WU06"
+  ],
+  "inputs": [
+    {
+      "name": "Lot45 preactivation plan",
+      "kind": "STATE",
+      "locator": "business/plans/LOT45_REMEDIATION_PLAN.json"
+    },
+    {
+      "name": "Lot45 V1 read-only requalification",
+      "kind": "EVIDENCE",
+      "locator": "business/evidence/LOT45_V1_REQUALIFICATION.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Parent work-item state",
+      "kind": "STATE",
+      "locator": "business/lots/LOT-45.json"
+    },
+    {
+      "name": "Completed predecessor",
+      "kind": "STATE",
+      "locator": "business/work_units/LOT-45.1-WU06.json"
+    },
+    {
+      "name": "Next active preflight AWU",
+      "kind": "STATE",
+      "locator": "business/work_units/LOT-45.1-WU07.json"
+    },
+    {
+      "name": "PRE-01A branch-local scope packet",
+      "kind": "STATE",
+      "locator": "business/plans/LOT45_REMEDIATION_PLAN.json"
+    },
+    {
+      "name": "Generated context map",
+      "kind": "STATE",
+      "locator": "engineering/CONTEXT_MAP.json"
+    },
+    {
+      "name": "Handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "c729eff18f229a1b9e8e74ed82d2f5a63e31fe9c",
+    "allowed_paths": [
+      "business/lots/LOT-45.json",
+      "business/work_units/LOT-45.1-WU06.json",
+      "business/work_units/LOT-45.1-WU07.json",
+      "business/plans/LOT45_REMEDIATION_PLAN.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md"
+    ],
+    "forbidden_paths": [
+      ".github/workflows/**",
+      "src/crypto_quant_bot/**",
+      "contracts/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "config/governance/**",
+      "requirements-dev.lock",
+      "engineering/CANONICAL_BASELINE.json",
+      "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json"
+    ],
+    "forbidden_semantics": [
+      "PR66/PR67/main mutation or merge during administrative AWU",
+      "PRE-01A or later PRE execution without branch-local authorization",
+      "Lot45.2 activation, Lot46 unlock, runtime/trading permission",
+      "Historical evidence mutation",
+      "Mandatory paid dependency or LLM reviewer"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "Exactly one active BUSINESS AWU, predecessor WU06 DONE, WU07 IN_PROGRESS",
+      "Scope base is exact certified engineering HEAD and its ancestor on transition branch",
+      "main remains protected at 390d0779f2be257fa8134faf8f02193a760a09c3",
+      "PR66 remains open unmerged at ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+      "PR67 remains draft unmerged at 2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+      "Do not mutate PR67 workflow bytes before an independent integration-branch AWU passes",
+      "Future PRE-01A scope is limited to two named workflows and minimum authority files",
+      "No business source, contracts, historical evidence, trading authority, or Lot46 mutation"
+    ],
+    "acceptance_criteria": [
+      "Current PR66/PR67/main facts verified against exact GitHub refs",
+      "Verified action pin inventory remains recorded as design only",
+      "Transition touches exactly seven authorized administrative paths",
+      "Context map and handoff resolve WU07 with exact R2 budget",
+      "Engineering Bootstrap and Security Secrets pass on exact activation HEAD",
+      "PR67 code/workflows, PR66, and main are untouched"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 2,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": true,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 7,
+      "executable_loc_changed": 0,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 0,
+      "state_machines": 1,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "live exact GitHub main PR66 PR67 and ruleset checks",
+      "python scripts/governance/resolve_active_awu.py",
+      "python scripts/governance/validate_bootstrap_diff.py",
+      "python scripts/governance/render_context_map.py --check",
+      "GitHub Actions Engineering Bootstrap and Security Secrets at exact transition HEAD"
+    ]
+  },
+  "done_when": [
+    "Stage independently bounded branch-local PRE-01A execution AWU design and route",
+    "Exact workflow/pin scope preserved, no execution granted",
+    "Exact transition HEAD passes mandatory CI; main PR66 PR67 Lot46 and safety unaffected"
+  ]
+}

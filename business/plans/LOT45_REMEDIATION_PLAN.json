@@ -1044,6 +1044,30 @@
           ]
         }
       }
+    },
+    "preactivation_execution_authority_preflight": {
+      "schema_version": 1,
+      "status": "DESIGN_ONLY_BRANCH_LOCAL_AWU_NOT_YET_ACTIVATED",
+      "active_administrative_awu": "LOT-45.1-WU07",
+      "engine_scope_base_sha": "c729eff18f229a1b9e8e74ed82d2f5a63e31fe9c",
+      "integration_branch": "agent/lot45-v1-remediation-integration",
+      "integration_head_sha": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+      "future_branch_local_scope_base_sha": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+      "work_unit": "LOT45-PRE-01A",
+      "workflow_paths": [
+        ".github/workflows/lot45-order-flow-delta-cvd.yml",
+        ".github/workflows/lot45-mutation-assurance.yml"
+      ],
+      "verified_pin_inventory_source": "preactivation_remediation_design.priorities[LOT45-PRE-01A].read_only_pin_inventory",
+      "branch_mutation_authorized": false,
+      "prerequisites": [
+        "Preserve exact PR66/main/PR67 Git observations and integration parent ancestry",
+        "Activate a separate R2 branch-local AWU whose scope base is an ancestor of its working branch HEAD",
+        "Review two workflow exact action pins and GitHub permissions, reject any hidden workflow behavior changes",
+        "Verify candidate source/contracts/tests/frozen audit blobs unchanged against PR66",
+        "Pass branch-local scope resolver/T0/bootstrap and security assurance on exact activation HEAD before workflow edits",
+        "Never change PR66 main Lot46 trading or frozen historical evidence"
+      ]
     }
   }
 }

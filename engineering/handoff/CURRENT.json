@@ -1,12 +1,12 @@
 {
   "active_checkpoint": {
-    "awu_id": "LOT-45.1-WU06",
-    "awu_path": "business/work_units/LOT-45.1-WU06.json",
-    "complexity_score": 2,
+    "track": "BUSINESS",
+    "awu_id": "LOT-45.1-WU07",
+    "awu_path": "business/work_units/LOT-45.1-WU07.json",
     "parent_manifest": "business/lots/LOT-45.json",
     "risk_class": "R2",
-    "scope_base_sha": "4c5adf201f05a19ee249cbc94d037b982a4ad8d3",
-    "track": "BUSINESS"
+    "complexity_score": 2,
+    "scope_base_sha": "c729eff18f229a1b9e8e74ed82d2f5a63e31fe9c"
   },
   "authority": {
     "context_map": "engineering/CONTEXT_MAP.json",
@@ -14,7 +14,7 @@
     "state_source": "config/governance/project_state.json"
   },
   "blockers": [],
-  "current_objective": "LOT-45.1-WU06 / PRE-00: preserve certified authorization boundary; PRE-01A read-only pin inventory is recorded and next integration-branch authority remains separate.",
+  "current_objective": "LOT-45.1-WU07: establish exact PRE-01A integration-branch authorization preflight without candidate mutation.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -27,7 +27,7 @@
     "rulesets_count": 1
   },
   "kind": "engineering_handoff",
-  "next_action": "PRE-01A verified-design pin inventory is in business/plans/LOT45_REMEDIATION_PLAN.json: six floating uses across two Lot45 workflows, three audited immutable action pins. Next, create a distinct scoped R2 integration-branch AWU before editing PR67; keep PR66/main/Lot46 unchanged.",
+  "next_action": "Validate PRE-01A branch-local R2 AWU design and integration ancestry, then separately activate a scoped AWU on PR67 before changing the two Lot45 workflows. PR66/main/Lot46 remain unchanged.",
   "next_engineering": {
     "active_lot": null,
     "active_manifest": null,
@@ -41,7 +41,8 @@
     "2026-10-09 LOT-45.1-WU02 read-only PRE-00 Git qualification: engine HEAD 5f41aca65affd0362be982f55497b049c64956fb is 18 commits after integration engine parent, with only plan/context/handoff path deltas; PR66/main unchanged; PR67 draft/head unchanged; 2 exact integration checks PASS and 4 FAIL. Separate PRE-00 authority still required.",
     "PRE-00 activation planned on independently scoped R2 LOT-45.1-WU06 using verified engine HEAD 4c5adf201f05a19ee249cbc94d037b982a4ad8d3; main PR66 PR67 unchanged, ruleset Protect active. Exact activation-head CI not yet available.",
     "LOT-45 PRE-00 exact administrative activation anchor 29dccae3fe8caff5bb61cbaf8fb794530dc48c6a: Engineering Bootstrap 37854704354 SUCCESS, Security Secrets 37854704349 SUCCESS; two-parent integration ancestry + PR66/main/protection confirmed; only seven AWU paths changed. No candidate mutation or PRE-01A implementation.",
-    "2026-10-09 WU06 design-only PRE-01A audit: exact PR67 head 2275d478 preserved; six uses in two workflows, checkout@v4.2.2, setup-python@v5.6.0, upload-artifact@v4.6.2 Git tag SHA pins verified. No PR67/PR66/main writes, no PRE01A execution authority."
+    "2026-10-09 WU06 design-only PRE-01A audit: exact PR67 head 2275d478 preserved; six uses in two workflows, checkout@v4.2.2, setup-python@v5.6.0, upload-artifact@v4.6.2 Git tag SHA pins verified. No PR67/PR66/main writes, no PRE01A execution authority.",
+    "LOT-45.1-WU06 PRE-00 qualified at c729eff18f229a1b9e8e74ed82d2f5a63e31fe9c; Engineering Bootstrap 37859397941 and Security Secrets 37859397971 SUCCESS; main protected, PR66/PR67 unchanged."
   ],
   "resume_read_order": [
     "AGENTS.md",

@@ -1,13 +1,13 @@
 {
   "active_work": {
-    "awu_id": "LOT-45.1-WU06",
-    "awu_path": "business/work_units/LOT-45.1-WU06.json",
-    "complexity_score": 2,
+    "track": "BUSINESS",
     "lot": "LOT-45",
-    "manifest": "business/lots/LOT-45.json",
-    "risk_class": "R2",
     "task": "LOT-45.1",
-    "track": "BUSINESS"
+    "manifest": "business/lots/LOT-45.json",
+    "awu_id": "LOT-45.1-WU07",
+    "awu_path": "business/work_units/LOT-45.1-WU07.json",
+    "risk_class": "R2",
+    "complexity_score": 2
   },
   "authority": {
     "current_state": "config/governance/project_state.json",
@@ -40,7 +40,7 @@
       "AGENTS.md",
       "config/governance/project_state.json",
       "business/lots/LOT-45.json",
-      "business/work_units/LOT-45.1-WU06.json",
+      "business/work_units/LOT-45.1-WU07.json",
       "business/plans/LOT45_REMEDIATION_PLAN.json",
       "business/evidence/LOT45_V1_REQUALIFICATION.json"
     ],
@@ -49,7 +49,7 @@
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 91
+    "total_kib_ceil": 92
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -65,9 +65,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "LOT-45.1-WU06 / PRE-00: preserve certified authorization boundary; PRE-01A read-only pin inventory is recorded and next integration-branch authority remains separate.",
+    "current_objective": "LOT-45.1-WU07: establish exact PRE-01A integration-branch authorization preflight without candidate mutation.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "PRE-01A verified-design pin inventory is in business/plans/LOT45_REMEDIATION_PLAN.json: six floating uses across two Lot45 workflows, three audited immutable action pins. Next, create a distinct scoped R2 integration-branch AWU before editing PR67; keep PR66/main/Lot46 unchanged."
+    "next_action": "Validate PRE-01A branch-local R2 AWU design and integration ancestry, then separately activate a scoped AWU on PR67 before changing the two Lot45 workflows. PR66/main/Lot46 remain unchanged."
   },
   "safety": {
     "execution_allowed": false,
