@@ -444,6 +444,217 @@
       ],
       "handling_policy": "Separate bounded preactivation integration remediation or review by authorized transition; current LOT-45.1-WU02 cannot mutate workflows, production code or security policy. Do not mark LOT-45.2-WU01 active.",
       "next_required_gate": "Explicit scope-and-risk authorization for integration-preflight corrections, then exact-head V1 assurance. Current draft PR must not be merged."
+    },
+    "preactivation_remediation_design": {
+      "schema_version": 1,
+      "status": "PLAN_ONLY_AWAITING_SEPARATE_BOUNDED_SCOPE_AUTHORIZATION",
+      "observed_on": "2026-10-08",
+      "current_awuid": "LOT-45.1-WU02",
+      "source_branch": "agent/lot45-v1-remediation-integration",
+      "integrated_head": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+      "protected_main": "390d0779f2be257fa8134faf8f02193a760a09c3",
+      "original_candidate_pr": 66,
+      "original_candidate_head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+      "engineering_branch_head_at_planning": "1a9f55775c3209f40f14113bf464408909e4e673",
+      "engine_head_at_integration_parent": "343e3fe056a97e2680ee2eb8bf27bc9346a7b970",
+      "engine_head_divergence": {
+        "ahead_commits": 3,
+        "behind_commits": 0,
+        "meaning": "Current engineering branch moved after PR67's second parent; revalidate parent and merged-tree invariants before exact-head certification. No automatic rebase or implicit parent substitution."
+      },
+      "authority": {
+        "currently_allowed": "Read-only GitHub qualification and planning files allowed by LOT-45.1-WU02",
+        "currently_forbidden": "Current AWU cannot change any workflow, dependency lock, platform policy, historical audit records, production source or PR66.",
+        "activation_precondition": "A separate risk-scored/split-qualified AWU must explicitly enumerate every writable path, update parent manifests/state through validated transition, pass T0 and cold-start, and bind its scope_base_sha to an ancestor of the integration head before executing any correction.",
+        "no_implicit_changes": [
+          "PR66",
+          "main",
+          "Lot46",
+          "frozen Lots0-44 evidence",
+          "live trading authority"
+        ]
+      },
+      "priorities": [
+        {
+          "id": "LOT45-PRE-00",
+          "kind": "AUTHORIZATION_AND_BASELINE_GATE",
+          "status": "PLANNED",
+          "risk_floor": "R2",
+          "target": "Business manifest and active AWU / explicit preactivation scope only",
+          "acceptance": [
+            "PR66/main/protection observations unchanged",
+            "PR67 integration-head unchanged or divergence explicitly reconciled",
+            "engine parent ancestry verified; latest 3 engine commits assessed",
+            "separate AWU explicit scopes forbid candidate/frozen evidence mutation",
+            "T0 and bootstrap run PASS on exact activation HEAD"
+          ]
+        },
+        {
+          "id": "LOT45-PRE-01A",
+          "fixes": [
+            "LOT45-INT-001"
+          ],
+          "kind": "ACTION_PINNING_PART_A",
+          "status": "PLANNED",
+          "risk_floor": "R2",
+          "observed_counts": {
+            "floating_total_in_changed_six_workflows": 19,
+            "blocking_uses_on_three_lot45_workflows": 12
+          },
+          "target_paths": [
+            ".github/workflows/lot45-order-flow-delta-cvd.yml",
+            ".github/workflows/lot45-mutation-assurance.yml"
+          ],
+          "requirement": "Replace all remote floating uses in these two workflows with verified immutable full commit SHAs at compatible versions; verify action permissions and Node/runtime compatibility, no blanket exemption.",
+          "acceptance": [
+            "Both changed workflows pass actionlint and zizmor",
+            "Supply-chain changed-workflow gate reports zero blocked floating remote refs for these paths",
+            "Workflow semantics/trusted evidence inputs and outputs unchanged or explicitly versioned",
+            "No expansion into historical workflow fanout"
+          ]
+        },
+        {
+          "id": "LOT45-PRE-01B",
+          "fixes": [
+            "LOT45-INT-001"
+          ],
+          "kind": "ACTION_PINNING_PART_B",
+          "status": "PLANNED",
+          "risk_floor": "R2",
+          "target_paths": [
+            ".github/workflows/lot45-frozen-evidence.yml"
+          ],
+          "requirement": "Replace its six reported floating action uses with audited immutable full SHA pins and preserve artifact download/upload semantics and provenance.",
+          "acceptance": [
+            "Zero floating refs in changed workflow",
+            "Pinned artifact actions are compatible with the attestation chain",
+            "actionlint and zizmor pass without suppressions",
+            "Exact frozen-evidence provenance must be rebuilt later; do not reuse stale attestation"
+          ]
+        },
+        {
+          "id": "LOT45-PRE-02",
+          "fixes": [
+            "LOT45-INT-002"
+          ],
+          "kind": "SHELLCHECK_FIX",
+          "status": "PLANNED",
+          "risk_floor": "R2",
+          "target_paths": [
+            ".github/workflows/lot44-frozen-evidence.yml",
+            ".github/workflows/lot45-frozen-evidence.yml"
+          ],
+          "location": [
+            "lot44 frozen workflow shell block near line 172",
+            "lot45 frozen workflow shell block near line 216"
+          ],
+          "requirement": "Remove or correctly use the unused repetition variable with control flow audited; no global SC2034 suppression.",
+          "acceptance": [
+            "actionlint/ShellCheck return zero SC2034 on both blocks",
+            "Shell behavior and repetition/anti-flake semantics preserved",
+            "No frozen historical artifact rewritten"
+          ]
+        },
+        {
+          "id": "LOT45-PRE-03",
+          "fixes": [
+            "LOT45-INT-003"
+          ],
+          "kind": "DEPENDENCY_SECURITY_FIX",
+          "status": "PLANNED",
+          "risk_floor": "R2",
+          "target_paths": [
+            "requirements-dev.lock"
+          ],
+          "observed": "urllib3==2.7.0 with PYSEC-2026-4175, PYSEC-2026-4176 and PYSEC-2026-4177",
+          "candidate_fixed_version": "2.8.0",
+          "requirement": "Verify version compatibility and solver consistency; update exact pin/lock only after independently confirming fixed release and verifying the complete Python dependency graph. Retain jsonschema==4.26.0 and referencing==0.37.0.",
+          "acceptance": [
+            "pip-audit -r requirements-dev.lock succeeds (no ignore vulnerability list)",
+            "Dependency lock remains internally consistent and repeatably installable",
+            "Domain regression for network/HTTP consumers if any exists",
+            "No policy weakening or vulnerability bypass"
+          ]
+        },
+        {
+          "id": "LOT45-PRE-04",
+          "fixes": [
+            "LOT45-INT-004"
+          ],
+          "kind": "GITHUB_DEPENDENCY_GRAPH_PLATFORM",
+          "status": "PLANNED_PLATFORM_ACTION_OR_INDEPENDENT_GATE",
+          "risk_floor": "R2",
+          "target_paths": [],
+          "requirement": "Verify GitHub dependency graph/dependency-review eligibility; if supported, enable in repository security settings using an authorized admin UI. If unavailable, design an independently certified, machine-readable new-dependency diff and vulnerability-gate fallback before any replacement of required checks.",
+          "acceptance": [
+            "Dependency Review action passes on exact integration PR with supported graph, OR separately certified fail-closed equivalent provides vulnerable-new-dependency coverage",
+            "No automatic skip, continue-on-error or suppression",
+            "Platform-setting action cannot be claimed from this GitHub connector without authority/evidence"
+          ],
+          "implementation_status": "BLOCKED_PENDING_PLATFORM_CAPABILITY"
+        },
+        {
+          "id": "LOT45-PRE-05",
+          "fixes": [
+            "LOT45-INT-005"
+          ],
+          "kind": "OWNED_QUALITY_DEVIATION_REVIEW",
+          "status": "PLANNED",
+          "risk_floor": "R2",
+          "target_paths": [
+            "config/engineering_deviations.json"
+          ],
+          "reported_expired_count": 135,
+          "observed_expiration_date": "2026-09-30",
+          "requirement": "Locate the authoritative deviation registry path before activation; inventory all 135 by metric, owner, affected current code and approved debt, then remediate or re-approve each by evidence. Never bulk-extend deadlines.",
+          "acceptance": [
+            "Validator passes with zero expired/unowned/unregistered deviations",
+            "Each retained deviation has owner, evidence, actual metric, rationale, deadline and review",
+            "No blanket deadline extension; code fixes separately scoped when needed",
+            "Historical certified evidence is not rewritten"
+          ]
+        },
+        {
+          "id": "LOT45-PRE-06",
+          "kind": "EXACT_HEAD_INTEGRATION_CERTIFICATION",
+          "status": "PLANNED",
+          "risk_floor": "R2",
+          "target_paths": [],
+          "depends_on": [
+            "LOT45-PRE-00",
+            "LOT45-PRE-01A",
+            "LOT45-PRE-01B",
+            "LOT45-PRE-02",
+            "LOT45-PRE-03",
+            "LOT45-PRE-04",
+            "LOT45-PRE-05"
+          ],
+          "requirement": "Qualify a single stable integration SHA with Security Secrets, Security SAST, Security Supply Chain, Security Actions, Security Dependencies, roadmap quality, and Development Engine bootstrap; verify original candidate bytes and historical evidence immutability.",
+          "acceptance": [
+            "Exact current integration HEAD passes every mandatory applicable check",
+            "No skipped dependency graph validation, ignored vulnerability, unpinned action, SC2034 or expired deviation",
+            "PR67 stays draft and not merged until independent approval",
+            "Only then separately activate LOT-45.2-WU01 via validated business lifecycle"
+          ]
+        }
+      ],
+      "blocking_findings": [
+        "LOT45-INT-001",
+        "LOT45-INT-002",
+        "LOT45-INT-003",
+        "LOT45-INT-004",
+        "LOT45-INT-005"
+      ],
+      "workflow_evidence": {
+        "supply_chain": 37844693182,
+        "security_actions": 37844693255,
+        "dependencies": 37844693129,
+        "roadmap_quality": 37844693079,
+        "secrets_pass": 37844693164,
+        "sast_pass": 37844693080
+      },
+      "relation_to_existing_remediation_units": "All PRE units are integration/preactivation only and are not LOT45-RM-01..04. The four staged LOT-45.2 AWUs must remain PLANNED and unchanged.",
+      "next_action": "Explicitly authorize and activate bounded preactivation AWUs before editing paths outside LOT-45.1-WU02. Do not mark PRE plan as execution authority."
     }
   }
 }
