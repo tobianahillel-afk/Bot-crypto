@@ -42,8 +42,8 @@
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: LOT-45.1-WU02: isolated two-parent integration 2275d478cb69446c9ad3a7f2f4923f671c4d6e95 created; draft PR #67 exposes five blocking integration findings; PR66 untouched.
-- Next action: LOT-45.1-WU02: resolve LOT45-INT-001..005 through separately authorized bounded preactivation work (pins, ShellCheck, urllib3 lock, dependency-graph assurance, expired deviations), then qualify exact integrated head and activation scope before LOT-45.2-WU01. Never weaken gates or mutate PR66.
+- Objective: LOT-45.1-WU02: eight design-only PRE-00..PRE-06 integration preactivation units staged in business/plans/LOT45_REMEDIATION_PLAN.json; PR67 remains a blocked draft, PR66 untouched, no remediation AWU activated.
+- Next action: Authorize a separate bounded LOT45-PRE-00 integration-preflight AWU and exact scope/branch transition, then execute PRE-01A/B through PRE-05 only under their authorized scopes; run PRE-06 exact-head assurance before activating LOT-45.2-WU01. No PR66 mutation, merge, Lot46 unlock, or trading authority.
 
 ## Non-authoritative sources
 
