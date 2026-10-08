@@ -43,7 +43,8 @@
     "business/work_units/LOT-45.2-WU01.json",
     "business/work_units/LOT-45.2-WU02.json",
     "business/work_units/LOT-45.2-WU03.json",
-    "business/work_units/LOT-45.2-WU04.json"
+    "business/work_units/LOT-45.2-WU04.json",
+    "business/work_units/LOT-45.1-WU06.json"
   ],
   "forbidden_scope": [
     "candidate branch mutation during LOT-45.1-WU01",

@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "LOT-45.1-WU06",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "LOT-45",
+    "task_id": "LOT-45.1",
+    "manifest": "business/lots/LOT-45.json"
+  },
+  "title": "PRE-00 independently scoped integration preactivation authority",
+  "objective": "Qualify a separate R2 administrative transition, preserve exact main/PR66/PR67 Git and safety boundaries, and define the next authorized integration preactivation step without implementing it.",
+  "non_goals": [
+    "Edit or merge PR #66",
+    "Edit PR #67 or its integration branch",
+    "Modify production source, contracts, dependencies, workflows or immutable audit evidence",
+    "Execute PRE-01A to PRE-06 in this AWU",
+    "Activate LOT-45.2 or unlock Lot46",
+    "Enable trading, exchange or live execution",
+    "Introduce mandatory paid or LLM-backed checks"
+  ],
+  "depends_on": [
+    "LOT-45.1-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "Lot45 preactivation plan",
+      "kind": "STATE",
+      "locator": "business/plans/LOT45_REMEDIATION_PLAN.json"
+    },
+    {
+      "name": "Lot45 V1 read-only requalification",
+      "kind": "EVIDENCE",
+      "locator": "business/evidence/LOT45_V1_REQUALIFICATION.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Bounded business parent scope",
+      "kind": "STATE",
+      "locator": "business/lots/LOT-45.json"
+    },
+    {
+      "name": "Completed WU02 stage",
+      "kind": "STATE",
+      "locator": "business/work_units/LOT-45.1-WU02.json"
+    },
+    {
+      "name": "Independent PRE-00 AWU",
+      "kind": "STATE",
+      "locator": "business/work_units/LOT-45.1-WU06.json"
+    },
+    {
+      "name": "PRE-00 activation record",
+      "kind": "STATE",
+      "locator": "business/plans/LOT45_REMEDIATION_PLAN.json"
+    },
+    {
+      "name": "Canonical generated context map",
+      "kind": "STATE",
+      "locator": "engineering/CONTEXT_MAP.json"
+    },
+    {
+      "name": "Human context map",
+      "kind": "FILE",
+      "locator": "engineering/CONTEXT_MAP.md"
+    },
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "4c5adf201f05a19ee249cbc94d037b982a4ad8d3",
+    "allowed_paths": [
+      "business/lots/LOT-45.json",
+      "business/work_units/LOT-45.1-WU02.json",
+      "business/work_units/LOT-45.1-WU06.json",
+      "business/plans/LOT45_REMEDIATION_PLAN.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/handoff/CURRENT.json"
+    ],
+    "forbidden_paths": [
+      ".github/workflows/**",
+      "src/crypto_quant_bot/**",
+      "contracts/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "config/governance/**",
+      "requirements-dev.lock",
+      "engineering/CANONICAL_BASELINE.json",
+      "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json"
+    ],
+    "forbidden_semantics": [
+      "Any original PR66 candidate mutation or merge",
+      "Any PR67 branch mutation or merge",
+      "Implement or approve PRE-01A through PRE-06",
+      "Business Lot45.2 activation",
+      "Lot46 unlock",
+      "Authority to place orders, trade, withdraw or leverage",
+      "Historical evidence mutation",
+      "Dependency security gate bypass",
+      "Mandatory paid dependency",
+      "Mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "A distinct R2 scored PRE-00 AWU, not R0 WU02, owns this administrative transition",
+      "Exactly one IN_PROGRESS business AWU remains and its parent stays LOT-45.1",
+      "All changed paths are explicitly allowed by both this AWU and the parent",
+      "PRE-00 scope base is an ancestor of engineering activation HEAD",
+      "PR66 remains open unmerged at ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+      "PR67 remains open draft unmerged at 2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+      "main stays protected at 390d0779f2be257fa8134faf8f02193a760a09c3",
+      "Neither candidate source nor integrated candidate bytes are modified",
+      "Source of authority remains config/governance/project_state.json; no authority relaxation",
+      "Runtime remains offline research-only and Lot46 LOCKED",
+      "Next PRE execution units require separate bounded authority on the integration branch"
+    ],
+    "acceptance_criteria": [
+      "Parent manifest explicitly admits this AWU's seven administrative paths",
+      "WU02 is DONE and this AWU is the sole IN_PROGRESS unit",
+      "Risk policy derives R2 from state machine transition, complexity score 2 and no mandatory split",
+      "Generated context map matches the active route and R2 budget",
+      "T0, Engineering Bootstrap and Security Secrets all PASS at exact activation HEAD",
+      "External Git main/PR66/PR67 facts match the locked observations",
+      "PR67 stays draft; no PR66/PR67/main write, merge or safety activation",
+      "PRE-01A execution is not authorized merely by PRE-00 staging"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 2,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": true,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 7,
+      "executable_loc_changed": 0,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 0,
+      "state_machines": 1,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "live GitHub main, ruleset, PR66 and PR67 exact-ref verification",
+      "python scripts/governance/resolve_active_awu.py",
+      "python scripts/governance/validate_bootstrap_diff.py",
+      "python scripts/governance/render_context_map.py --check",
+      "GitHub Actions Engineering Bootstrap and Security Secrets on exact PRE-00 activation HEAD"
+    ]
+  },
+  "done_when": [
+    "PRE-00 administrative activation is exact-head certified",
+    "Next integration remediation work remains separately gated",
+    "PR66, PR67, main, Lot46 and trading safety remain unchanged"
+  ]
+}

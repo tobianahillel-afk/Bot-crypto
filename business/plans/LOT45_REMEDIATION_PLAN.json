@@ -658,7 +658,7 @@
       "pre00_authorization_packet": {
         "schema_version": 1,
         "packet_kind": "lot45_pre00_bounded_transition_preflight_v1",
-        "status": "DESIGN_ONLY_NOT_ACTIVATED",
+        "status": "ACTIVATED_PENDING_EXACT_HEAD_QUALIFICATION",
         "observed_on": "2026-10-08",
         "source_work_unit": "LOT-45.1-WU02",
         "authoritative_branch": "engineering/bootstrap-development-engine",
@@ -839,7 +839,7 @@
         "next_action": "Stage a separate scored PRE-00 activation transition within an independently authorized scope; do not self-expand LOT-45.1-WU02."
       },
       "pre00_transition_blueprint": {
-        "status": "DESIGN_ONLY_NOT_AUTHORIZED",
+        "status": "ACTIVATED_PENDING_EXACT_HEAD_QUALIFICATION",
         "target": "LOT45-PRE-00",
         "branch_separation": {
           "state_and_governance_authority": "engineering/bootstrap-development-engine",
@@ -887,7 +887,29 @@
           "T0+bootstrap+Secrets exact activation HEAD",
           "no unresolved security bypass or unpaid external dependency"
         ],
-        "no_transition_committed": true
+        "no_transition_committed": false
+      },
+      "pre00_activation": {
+        "status": "ACTIVE_R2_ADMINISTRATIVE_AWU_PENDING_CI",
+        "awu_id": "LOT-45.1-WU06",
+        "track": "BUSINESS",
+        "task": "LOT-45.1",
+        "engine_scope_base_sha": "4c5adf201f05a19ee249cbc94d037b982a4ad8d3",
+        "engine_branch": "engineering/bootstrap-development-engine",
+        "approved_paths": [
+          "business/lots/LOT-45.json",
+          "business/work_units/LOT-45.1-WU02.json",
+          "business/work_units/LOT-45.1-WU06.json",
+          "business/plans/LOT45_REMEDIATION_PLAN.json",
+          "engineering/CONTEXT_MAP.json",
+          "engineering/CONTEXT_MAP.md",
+          "engineering/handoff/CURRENT.json"
+        ],
+        "exact_head_bootstrap": "PENDING",
+        "exact_head_secrets": "PENDING",
+        "no_pr66_or_pr67_write": true,
+        "no_merges": true,
+        "next": "Qualify PRE-00 administrative head before any integration-branch PRE-01 change."
       }
     }
   }
