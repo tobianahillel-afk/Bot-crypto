@@ -34,7 +34,6 @@
     "active_task": null
   },
   "recent_completed": [
-    "LOT-45.1-WU04 reached its mandatory 15-file boundary on head 6e2cd68600d67c4abd0a2a706f9086527cf6914e: Security Secrets 37390738269 passed and Engineering Bootstrap 37390738279 passed through security/protection but exposed an engineering-only work-decomposition qualifier; continuation split to WU05.",
     "LOT-45.1-WU05 lifecycle reconciliation closed on exact head 4fa9084d5ef097d9b02140bf88c573063845b779: Engineering Bootstrap 37452667127 and Security Secrets 37452667165 both passed; main/ruleset and PR #66 were reverified unchanged before WU01 restoration.",
     "LOT-45.1-WU01 read-only requalification refreshed on candidate ec2c4ab16f21b23e062b7fca0bb796c8db4a5133; engine preconditions are cleared and exact engine head ef8dfbdc3965d27e5947697f6d9fba877864d817 passed Engineering Bootstrap 37454493298 plus Security Secrets 37454493458.",
     "LOT-45.1-WU02 staged four PLANNED LOT-45.2 AWUs at f692c93bf5fb1d276afbdbbfc76ffbfa943b13fa; Bootstrap 37838227357 and Security Secrets 37838227405 SUCCESS; PR66 unchanged.",
