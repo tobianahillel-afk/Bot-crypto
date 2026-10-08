@@ -478,7 +478,7 @@
         {
           "id": "LOT45-PRE-00",
           "kind": "AUTHORIZATION_AND_BASELINE_GATE",
-          "status": "PLANNED",
+          "status": "EXACT_HEAD_QUALIFIED_PRE01_NOT_AUTHORIZED",
           "risk_floor": "R2",
           "target": "Business manifest and active AWU / explicit preactivation scope only",
           "acceptance": [
@@ -487,7 +487,12 @@
             "engine parent ancestry verified; latest 3 engine commits assessed",
             "separate AWU explicit scopes forbid candidate/frozen evidence mutation",
             "T0 and bootstrap run PASS on exact activation HEAD"
-          ]
+          ],
+          "exact_head_evidence": {
+            "head_sha": "29dccae3fe8caff5bb61cbaf8fb794530dc48c6a",
+            "bootstrap_run": 37854704354,
+            "secrets_run": 37854704349
+          }
         },
         {
           "id": "LOT45-PRE-01A",
@@ -654,11 +659,11 @@
         "sast_pass": 37844693080
       },
       "relation_to_existing_remediation_units": "All PRE units are integration/preactivation only and are not LOT45-RM-01..04. The four staged LOT-45.2 AWUs must remain PLANNED and unchanged.",
-      "next_action": "Explicitly authorize and activate bounded preactivation AWUs before editing paths outside LOT-45.1-WU02. Do not mark PRE plan as execution authority.",
+      "next_action": "Use PRE-00 exact-head evidence to separately authorize the PRE-01A integration-branch AWU (risk >=R2, bounded workflow files). Do not edit PR67 code/workflows under LOT-45.1-WU06.",
       "pre00_authorization_packet": {
         "schema_version": 1,
         "packet_kind": "lot45_pre00_bounded_transition_preflight_v1",
-        "status": "ACTIVATED_PENDING_EXACT_HEAD_QUALIFICATION",
+        "status": "PRE00_ANCHOR_QUALIFIED_NEXT_AUTHORITY_REQUIRED",
         "observed_on": "2026-10-08",
         "source_work_unit": "LOT-45.1-WU02",
         "authoritative_branch": "engineering/bootstrap-development-engine",
@@ -839,7 +844,7 @@
         "next_action": "Stage a separate scored PRE-00 activation transition within an independently authorized scope; do not self-expand LOT-45.1-WU02."
       },
       "pre00_transition_blueprint": {
-        "status": "ACTIVATED_PENDING_EXACT_HEAD_QUALIFICATION",
+        "status": "PRE00_ANCHOR_QUALIFIED_NEXT_AUTHORITY_REQUIRED",
         "target": "LOT45-PRE-00",
         "branch_separation": {
           "state_and_governance_authority": "engineering/bootstrap-development-engine",
@@ -890,7 +895,7 @@
         "no_transition_committed": false
       },
       "pre00_activation": {
-        "status": "ACTIVE_R2_ADMINISTRATIVE_AWU_PENDING_CI",
+        "status": "EXACT_HEAD_QUALIFIED_PRE01_NOT_AUTHORIZED",
         "awu_id": "LOT-45.1-WU06",
         "track": "BUSINESS",
         "task": "LOT-45.1",
@@ -905,11 +910,56 @@
           "engineering/CONTEXT_MAP.md",
           "engineering/handoff/CURRENT.json"
         ],
-        "exact_head_bootstrap": "PENDING",
-        "exact_head_secrets": "PENDING",
+        "exact_head_bootstrap": "SUCCESS",
+        "exact_head_secrets": "SUCCESS",
         "no_pr66_or_pr67_write": true,
         "no_merges": true,
-        "next": "Qualify PRE-00 administrative head before any integration-branch PRE-01 change."
+        "next": "Design the separate risk-scored PRE-01A integration-branch AWU with explicit workflow-path authority. WU06 does not authorize that work; PR67 remains draft.",
+        "exact_head_evidence": {
+          "head_sha": "29dccae3fe8caff5bb61cbaf8fb794530dc48c6a",
+          "bootstrap": {
+            "run_id": 37854704354,
+            "conclusion": "SUCCESS"
+          },
+          "secrets": {
+            "run_id": 37854704349,
+            "conclusion": "SUCCESS"
+          },
+          "scope_base_sha": "4c5adf201f05a19ee249cbc94d037b982a4ad8d3",
+          "git_scope": {
+            "status": "PASS",
+            "paths_changed": 7,
+            "all_paths_allowed": true,
+            "scope_base_ancestor": true
+          },
+          "refs": {
+            "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+            "main_protected": true,
+            "ruleset": "Protect",
+            "ruleset_enforcement": "active",
+            "pr66": {
+              "state": "OPEN",
+              "merged": false,
+              "head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133"
+            },
+            "pr67": {
+              "state": "OPEN",
+              "draft": true,
+              "merged": false,
+              "head": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+              "direct_parents": [
+                "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+                "343e3fe056a97e2680ee2eb8bf27bc9346a7b970"
+              ]
+            }
+          },
+          "limitations": [
+            "This certifies only PRE-00 administrative state at the recorded immutable anchor.",
+            "It does not qualify PR67's integrated code or authorize PRE-01A implementation.",
+            "No PR66/PR67/main mutation or merge is authorized.",
+            "Follow-up must create a distinct risk-scored and scoped integration-branch AWU."
+          ]
+        }
       }
     }
   }
