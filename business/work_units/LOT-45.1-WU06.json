@@ -104,7 +104,9 @@
       "Historical evidence mutation",
       "Dependency security gate bypass",
       "Mandatory paid dependency",
-      "Mandatory LLM review"
+      "Mandatory LLM review",
+      "Lot45 candidate mutation",
+      "candidate merge"
     ]
   },
   "contracts": {
