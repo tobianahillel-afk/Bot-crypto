@@ -36,14 +36,14 @@
 
 - Primary: 6 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 101 / 1024 KiB
+- Routed size: 103 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
 - Objective: LOT-45.1-WU07: establish exact PRE-01A integration-branch authorization preflight without candidate mutation.
-- Next action: Validate PRE-01A branch-local R2 AWU design and integration ancestry, then separately activate a scoped AWU on PR67 before changing the two Lot45 workflows. PR66/main/Lot46 remain unchanged.
+- Next action: LOT-45.1-WU07: isolated branch agent/lot45-pre01a-authorized-work is created at exact PR67 integration SHA 2275d478cb69446c9ad3a7f2f4923f671c4d6e95. Independently qualify a separate R2 WU08 parent/scope activation; inherited WU02 R0 does not authorize creation of WU08 or workflow writes. Do not modify PR66, PR67, main, Lot46 or the two Lot45 workflows.
 
 ## Non-authoritative sources
 
