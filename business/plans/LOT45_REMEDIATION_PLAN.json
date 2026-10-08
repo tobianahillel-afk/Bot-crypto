@@ -504,7 +504,8 @@
           "risk_floor": "R2",
           "observed_counts": {
             "floating_total_in_changed_six_workflows": 19,
-            "blocking_uses_on_three_lot45_workflows": 12
+            "floating_uses_in_two_PRE01A_workflows_verified": 6,
+            "other_workflows_deferred_to_separate_PRE_units": true
           },
           "target_paths": [
             ".github/workflows/lot45-order-flow-delta-cvd.yml",
@@ -516,7 +517,89 @@
             "Supply-chain changed-workflow gate reports zero blocked floating remote refs for these paths",
             "Workflow semantics/trusted evidence inputs and outputs unchanged or explicitly versioned",
             "No expansion into historical workflow fanout"
-          ]
+          ],
+          "read_only_pin_inventory": {
+            "status": "VERIFIED_DESIGN_ONLY_NO_BRANCH_MUTATION",
+            "validated_from_git_refs_on": "2026-10-09",
+            "integration_branch": "agent/lot45-v1-remediation-integration",
+            "integration_head_sha": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+            "branch_head_observation": "IDENTICAL_TO_INTEGRATION_HEAD",
+            "action_tag_pins": [
+              {
+                "action": "actions/checkout",
+                "tag": "v4.2.2",
+                "sha": "11bd71901bbe5b1630ceea73d27597364c9af683",
+                "tag_object_type": "commit"
+              },
+              {
+                "action": "actions/setup-python",
+                "tag": "v5.6.0",
+                "sha": "a26af69be951a213d495a4c3e4e4022e16d87065",
+                "tag_object_type": "commit"
+              },
+              {
+                "action": "actions/upload-artifact",
+                "tag": "v4.6.2",
+                "sha": "ea165f8d65b6e75b540449e92b4886f43607fa02",
+                "tag_object_type": "commit"
+              }
+            ],
+            "target_workflows": [
+              {
+                "path": ".github/workflows/lot45-order-flow-delta-cvd.yml",
+                "blob_sha": "5ec5a2a6366276cce7d0a774b3359d892080f332",
+                "action_uses": [
+                  {
+                    "line": 36,
+                    "action": "actions/checkout"
+                  },
+                  {
+                    "line": 45,
+                    "action": "actions/setup-python"
+                  },
+                  {
+                    "line": 274,
+                    "action": "actions/upload-artifact"
+                  }
+                ]
+              },
+              {
+                "path": ".github/workflows/lot45-mutation-assurance.yml",
+                "blob_sha": "e5a569b79b70e42da7c9ce2cc96b8623a0040f1d",
+                "action_uses": [
+                  {
+                    "line": 29,
+                    "action": "actions/checkout"
+                  },
+                  {
+                    "line": 38,
+                    "action": "actions/setup-python"
+                  },
+                  {
+                    "line": 254,
+                    "action": "actions/upload-artifact"
+                  }
+                ]
+              }
+            ],
+            "actual_floating_uses_in_PRE01A_scope": 6,
+            "no_major_upgrade": true,
+            "rule": "Pin existing major-version family only; never change action inputs, permissions, shell behavior, artifact names, job ordering, or trusted evidence semantics as a side effect.",
+            "qualification": [
+              "Recheck exact integration branch head before mutation",
+              "Use distinct R2 integration-branch AWU with scope_base_sha ancestor of that branch",
+              "Require parent allowed_paths to explicitly admit each workflow",
+              "Reverify upstream commit SHAs and tags, inspect upstream action.yml runtime and permission requirements",
+              "Replace the six uses with full 40-hex SHAs + audit-friendly version comments",
+              "Run actionlint and zizmor, plus Security Supply Chain/Actions and affected Lot45 workflows on exact new head",
+              "Avoid recreating or rewriting frozen evidence until separate PRE-06 attestation"
+            ],
+            "blockers": [
+              "PRE-01A_INTEGRATION_BRANCH_AWU_NOT_ACTIVATED",
+              "PRE-01A_NO_WORKFLOW_WRITE_AUTHORITY_YET"
+            ],
+            "safety": "PR66, PR67, main, Lot46, offline/trading gates unchanged"
+          }
         },
         {
           "id": "LOT45-PRE-01B",
