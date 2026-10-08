@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "business_development_unlock_eligibility_v1",
+  "semantics": "POST_REMEDIATION_ELIGIBILITY_WITHOUT_ACTIVATION",
+  "project": "Crypto Quant Bot V3.1-Ops",
+  "evaluated_engine": {
+    "version": "V1",
+    "certification_verdict": "PASS_DEVELOPMENT_ENGINE_V1_EXACT_HEAD_CERTIFIED",
+    "certification_candidate_id": "DEV_ENGINE_V1:b9e5ebadbb739e57f2e0023d7498593f0f9a45bde46af24d8a83541351cdd1ed",
+    "certified_head_sha": "972748579bcb998fc48542c02ed76aacae482fa5"
+  },
+  "historical_checkpoint": {
+    "blocked_decision_path": "engineering/BUSINESS_DEVELOPMENT_UNLOCK_DECISION.json",
+    "blocked_verdict": "BLOCKED_NO_UNLOCK",
+    "baseline_finding_id": "BOOT-FINDING-001",
+    "baseline_preserved": true
+  },
+  "live_reverification": {
+    "date": "2026-09-29",
+    "source": "GITHUB_CONNECTOR",
+    "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "main_branch_protected": true,
+    "lot45_pr": 66,
+    "lot45_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "lot45_base_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "lot45_state": "open",
+    "lot45_merged": false,
+    "live_rulesets_count": 1,
+    "active_rulesets_count": 1,
+    "observed_ruleset": {
+      "id": 24172517,
+      "name": "Protect",
+      "target": "branch",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/main"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        },
+        {
+          "type": "required_status_checks",
+          "parameters": {
+            "strict_required_status_checks_policy": false,
+            "do_not_enforce_on_create": false,
+            "required_status_checks": [
+              {
+                "context": "Gitleaks pinned CLI",
+                "integration_id": 15368
+              },
+              {
+                "context": "CodeQL Python security-extended",
+                "integration_id": 15368
+              },
+              {
+                "context": "quality"
+              }
+            ]
+          }
+        },
+        {
+          "type": "pull_request",
+          "parameters": {
+            "required_approving_review_count": 0,
+            "dismiss_stale_reviews_on_push": false,
+            "required_reviewers": [],
+            "require_code_owner_review": false,
+            "require_last_push_approval": false,
+            "required_review_thread_resolution": false,
+            "require_extra_approval_for_unattributed_changes": true,
+            "allowed_merge_methods": [
+              "merge",
+              "squash",
+              "rebase"
+            ]
+          }
+        }
+      ],
+      "bypass_actors": [],
+      "current_user_can_bypass": "never"
+    }
+  },
+  "protection_compliance": {
+    "mechanism": "REPOSITORY_RULESET",
+    "branch_is_protected": true,
+    "pull_request_required": true,
+    "required_status_checks": true,
+    "force_pushes_blocked": true,
+    "branch_deletions_blocked": true,
+    "no_bypass": true,
+    "required_check_contexts_present": true,
+    "floor_satisfied": true
+  },
+  "hardening_snapshot": {
+    "strict_required_status_checks_policy": false,
+    "required_approving_review_count": 0,
+    "required_review_thread_resolution": false,
+    "classification": "OPTIONAL_HARDENING_NOT_REQUIRED_FOR_CURRENT_FLOOR"
+  },
+  "live_blocking_findings": [],
+  "verdict": "ELIGIBLE_AWAITING_EXPLICIT_HUMAN_UNLOCK",
+  "authority": {
+    "business_development_unlock_eligible": true,
+    "business_development_unlock_executed": false,
+    "development_status": "PAUSED",
+    "lot45_status": "SUSPENDED_CANDIDATE",
+    "lot45_merge_allowed": false,
+    "lot46_status": "LOCKED",
+    "lot46_unlock_allowed": false,
+    "runtime_unlock_allowed": false,
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED",
+    "leverage": "FORBIDDEN",
+    "withdrawals": "FORBIDDEN"
+  },
+  "next_transition": {
+    "requires_explicit_human_instruction": true,
+    "action": "BUSINESS_DEVELOPMENT_UNLOCK",
+    "automatic_transition_forbidden": true,
+    "candidate_merge_separate": true,
+    "lot46_unlock_separate": true
+  }
+}

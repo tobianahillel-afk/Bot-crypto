@@ -1,0 +1,249 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "historical_audit_findings_schema_v1",
+  "title": "HistoricalAuditFindingsRegistryV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "registry_kind",
+    "mode",
+    "registry_id",
+    "manifest_identity_sha256",
+    "mapping_identity_sha256",
+    "plan_identity_sha256",
+    "batch_identity_sha256",
+    "lot",
+    "audit_result",
+    "finding_count",
+    "findings",
+    "mutation_permissions",
+    "registry_identity_sha256"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "registry_kind": {
+      "const": "historical_audit_findings_registry_v1"
+    },
+    "mode": {
+      "const": "READ_ONLY"
+    },
+    "registry_id": {
+      "type": "string",
+      "pattern": "^HIST-FIND-B[0-9]{3}-L[0-9]{3}$"
+    },
+    "manifest_identity_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "mapping_identity_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "plan_identity_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "batch_identity_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "lot": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 44
+    },
+    "audit_result": {
+      "enum": [
+        "CLEAN",
+        "FINDINGS"
+      ]
+    },
+    "finding_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 999
+    },
+    "findings": {
+      "type": "array",
+      "maxItems": 999,
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "mutation_permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "historical_evidence",
+        "business_code",
+        "contracts",
+        "reports",
+        "data_audit",
+        "runtime_authority",
+        "business_state"
+      ],
+      "properties": {
+        "historical_evidence": {
+          "const": false
+        },
+        "business_code": {
+          "const": false
+        },
+        "contracts": {
+          "const": false
+        },
+        "reports": {
+          "const": false
+        },
+        "data_audit": {
+          "const": false
+        },
+        "runtime_authority": {
+          "const": false
+        },
+        "business_state": {
+          "const": false
+        }
+      }
+    },
+    "registry_identity_sha256": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "repository_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "locator"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "finding_id",
+        "requirement_id",
+        "finding_type",
+        "severity",
+        "previous_severity",
+        "severity_change_rationale",
+        "status",
+        "disposition",
+        "owner",
+        "summary",
+        "rationale",
+        "references"
+      ],
+      "properties": {
+        "finding_id": {
+          "type": "string",
+          "pattern": "^HIST-FIND-B[0-9]{3}-L[0-9]{3}-F[0-9]{3}$"
+        },
+        "requirement_id": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 120,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,119}$"
+        },
+        "finding_type": {
+          "enum": [
+            "MISSING_IMPLEMENTATION",
+            "MISSING_TEST",
+            "MISSING_CONTRACT",
+            "MISSING_EVIDENCE",
+            "TRACEABILITY_GAP",
+            "SOURCE_DRIFT",
+            "CONTROL_GAP",
+            "OTHER"
+          ]
+        },
+        "severity": {
+          "enum": [
+            "BLOCKER",
+            "MAJOR",
+            "MINOR",
+            "INFO"
+          ]
+        },
+        "previous_severity": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "BLOCKER",
+            "MAJOR",
+            "MINOR",
+            "INFO",
+            null
+          ]
+        },
+        "severity_change_rationale": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000
+        },
+        "status": {
+          "enum": [
+            "OPEN",
+            "CLOSED"
+          ]
+        },
+        "disposition": {
+          "enum": [
+            "UNRESOLVED",
+            "REMEDIATION_REQUIRED",
+            "DEFERRED",
+            "ACCEPTED_RISK",
+            "FALSE_POSITIVE",
+            "RESOLVED"
+          ]
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "rationale": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000
+        },
+        "references": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "items": {
+            "$ref": "#/$defs/repository_ref"
+          }
+        }
+      }
+    }
+  }
+}

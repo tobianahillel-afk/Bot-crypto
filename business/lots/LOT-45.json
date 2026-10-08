@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "kind": "business_work_item",
+  "id": "LOT-45",
+  "title": "Lot45 Candidate Recovery Under Development Engine V1",
+  "status": "IN_PROGRESS",
+  "objective": "Resume the suspended Lot45 candidate under Development Engine V1 by requalifying the exact current PR head first, then decomposing any required remediation into bounded follow-up AWUs before merge consideration.",
+  "depends_on": [
+    "ENG-09"
+  ],
+  "allowed_paths": [
+    "business/lots/LOT-45.json",
+    "business/work_units/LOT-45.1-WU01.json",
+    "business/work_units/LOT-45.1-WU02.json",
+    "business/evidence/LOT45_V1_REQUALIFICATION.json",
+    "business/plans/LOT45_REMEDIATION_PLAN.json",
+    "AGENTS.md",
+    "scripts/governance/selftest_terminal_business_routing.py",
+    "business/work_units/LOT-45.1-WU03.json",
+    "business/work_units/LOT-45.1-WU04.json",
+    "engineering/handoff/CURRENT.json",
+    "engineering/CONTEXT_MAP.json",
+    "engineering/CONTEXT_MAP.md",
+    "scripts/governance/validate_canonical_baseline.py",
+    "scripts/governance/validate_business_development_activation.py",
+    "scripts/governance/selftest_business_development_activation.py",
+    "scripts/governance/selftest_bootstrap_validators.py",
+    "scripts/governance/selftest_active_awu_scope.py",
+    "scripts/governance/run_t0.py",
+    "scripts/governance/run_t1.py",
+    "scripts/governance/selftest_current_status.py",
+    "engineering/REPOSITORY_PROTECTION_STATUS.json",
+    "engineering/REPOSITORY_PROTECTION.md",
+    "scripts/governance/selftest_repository_protection.py",
+    "scripts/governance/validate_bootstrap_diff.py",
+    "scripts/governance/verify_security_engine.py",
+    "scripts/governance/selftest_security_engine.py",
+    "business/work_units/LOT-45.1-WU05.json",
+    "scripts/governance/qualify_work_decomposition.py",
+    "scripts/governance/resume_recovery_qualification.py",
+    "scripts/governance/selftest_resume_recovery.py",
+    "scripts/governance/cold_start_qualification.py",
+    "business/work_units/LOT-45.2-WU01.json",
+    "business/work_units/LOT-45.2-WU02.json",
+    "business/work_units/LOT-45.2-WU03.json",
+    "business/work_units/LOT-45.2-WU04.json"
+  ],
+  "forbidden_scope": [
+    "candidate branch mutation during LOT-45.1-WU01",
+    "Lot45 merge during LOT-45.1-WU01",
+    "Lot46 unlock or implementation",
+    "runtime capability activation",
+    "trading execution leverage or withdrawal activation",
+    "historical certified evidence mutation",
+    "mandatory paid or LLM-backed dependency"
+  ],
+  "tasks": [
+    {
+      "id": "LOT-45.1",
+      "status": "IN_PROGRESS",
+      "description": "Read-only exact-head requalification of PR #66 under Development Engine V1 and bounded remediation planning."
+    },
+    {
+      "id": "LOT-45.2",
+      "status": "PLANNED",
+      "description": "Execute only remediation AWUs produced by LOT-45.1, then re-certify a stable exact head before any merge decision."
+    }
+  ],
+  "done_when": [
+    "current PR66 head is requalified under Development Engine V1",
+    "substantive candidate defects are either remediated or explicitly blocked",
+    "candidate reaches one stable exact-head certification candidate",
+    "merge is considered only after required V1 assurance and exact-head certification",
+    "Lot46 remains locked until a separate Lot45 post-merge gate"
+  ]
+}

@@ -1,14 +1,6 @@
 name: Lot 33 critical mutation assurance
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'src/crypto_quant_bot/data_governance/timestamp_*.py'
-      - 'tests/test_lot33_*.py'
-      - 'config/data_governance/timestamp_clock_timezone_governance_v1.json'
-      - '.github/workflows/lot33-mutation.yml'
-      - 'requirements-dev.lock'
   push:
     branches: [main]
   workflow_dispatch:

@@ -1,0 +1,96 @@
+# ENG-09.3-WU12 qualification anchor: P0.6 automatic mutation ownership is assigned to this generic control.
+name: CI Mutation Profiles
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/crypto_quant_bot/contracts/decision_evidence.py'
+      - 'tests/test_p06_decision_evidence*.py'
+      - '.github/workflows/ci-mutation.yml'
+      - 'requirements-dev.lock'
+      - 'pyproject.toml'
+  push:
+    branches:
+      - main
+      - engineering/bootstrap-development-engine
+    paths:
+      - 'src/crypto_quant_bot/contracts/decision_evidence.py'
+      - 'tests/test_p06_decision_evidence*.py'
+      - '.github/workflows/ci-mutation.yml'
+      - 'requirements-dev.lock'
+      - 'pyproject.toml'
+      - 'scripts/governance/run_mutation_profile.py'
+      - 'scripts/governance/selftest_mutation_runner.py'
+      - 'scripts/governance/validate_mutation_profiles.py'
+      - 'scripts/governance/selftest_mutation_profiles.py'
+      - 'scripts/governance/select_mutation_profile.py'
+      - 'config/governance/mutation_profile_policy_v1.json'
+      - 'config/governance/mutation_profiles_v1.json'
+  workflow_dispatch:
+    inputs:
+      profile_id:
+        description: Declarative mutation profile to execute
+        required: true
+        type: choice
+        default: P06_DECISION_EVIDENCE
+        options:
+          - P06_DECISION_EVIDENCE
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-mutation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mutation-profile:
+    name: P0.6 generic mutation control
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PROFILE_ID: ${{ github.event.inputs.profile_id || 'P06_DECISION_EVIDENCE' }}
+      PYTHONHASHSEED: "0"
+    steps:
+      - name: Checkout exact head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python 3.11.9
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11.9"
+          cache: pip
+          cache-dependency-path: requirements-dev.lock
+
+      - name: Install locked mutation toolchain
+        run: python -m pip install -r requirements-dev.lock
+
+      - name: Validate mutation profile model
+        run: |
+          python scripts/governance/validate_mutation_profiles.py
+          python scripts/governance/selftest_mutation_profiles.py
+
+      - name: Qualify fixed-command mutation runner
+        run: python scripts/governance/selftest_mutation_runner.py
+
+      - name: Validate materialized profile without mutation
+        run: python scripts/governance/run_mutation_profile.py --profile "${PROFILE_ID}" --validate-only
+
+      - name: Execute generic mutation profile
+        run: python scripts/governance/run_mutation_profile.py --profile "${PROFILE_ID}"
+
+      - name: Verify canonical source immutability
+        run: git diff --exit-code -- pyproject.toml src/crypto_quant_bot
+
+      - name: Upload mutation profile evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: mutation-profile-evidence-${{ github.sha }}
+          path: reports/quality/p06_extended_mutation/
+          if-no-files-found: warn

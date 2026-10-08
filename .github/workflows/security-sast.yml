@@ -1,0 +1,89 @@
+name: Security SAST
+
+on:
+  pull_request:
+    paths:
+      - "src/**/*.py"
+      - ".github/workflows/security-sast.yml"
+      - "config/governance/sast_control_policy_v1.json"
+      - "scripts/governance/validate_sast_controls.py"
+  push:
+    branches:
+      - main
+      - engineering/bootstrap-development-engine
+    paths:
+      - "src/**/*.py"
+      - ".github/workflows/security-sast.yml"
+      - "config/governance/sast_control_policy_v1.json"
+      - "scripts/governance/validate_sast_controls.py"
+  schedule:
+    - cron: "37 4 * * 3"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-sast-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  codeql:
+    name: CodeQL Python security-extended
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Initialize pinned CodeQL
+        uses: github/codeql-action/init@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4; defaults bundle v2.27.0
+        with:
+          languages: python
+          queries: security-extended
+          source-root: src/crypto_quant_bot
+
+      - name: Analyze without Code Scanning upload
+        uses: github/codeql-action/analyze@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4; defaults bundle v2.27.0
+        with:
+          upload: never
+          output: codeql-results
+
+      - name: Enforce zero CodeQL security findings
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          files = sorted(Path("codeql-results").rglob("*.sarif"))
+          if not files:
+              raise SystemExit("CODEQL_SARIF_MISSING")
+          findings = []
+          for path in files:
+              payload = json.loads(path.read_text(encoding="utf-8"))
+              for run in payload.get("runs", []):
+                  for result in run.get("results", []):
+                      locations = result.get("locations", [])
+                      physical = {}
+                      if locations:
+                          physical = locations[0].get("physicalLocation", {})
+                      artifact = physical.get("artifactLocation", {}).get("uri")
+                      line = physical.get("region", {}).get("startLine")
+                      findings.append({
+                          "rule_id": result.get("ruleId"),
+                          "level": result.get("level"),
+                          "file": artifact,
+                          "start_line": line,
+                      })
+          print(f"CODEQL_SARIF_FILES={len(files)}")
+          print(f"CODEQL_FINDINGS={len(findings)}")
+          for item in findings:
+              print(json.dumps(item, sort_keys=True))
+          if findings:
+              raise SystemExit("CODEQL_FINDINGS_DETECTED")
+          print("CODEQL_SECURITY_EXTENDED_PASS")
+          PY

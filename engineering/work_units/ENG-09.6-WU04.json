@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-09.6-WU04",
+  "status": "DONE",
+  "parent": {
+    "work_item_id": "ENG-09",
+    "task_id": "ENG-09.6",
+    "manifest": "engineering/lots/ENG-09.json"
+  },
+  "title": "Stage atomic business-development activation route",
+  "objective": "Prepare an atomic terminal ENGINEERING -> BUSINESS activation transaction and a bounded read-only Lot45 business entry route while keeping canonical business authority PAUSED throughout this staging AWU.",
+  "non_goals": [
+    "activate business development",
+    "change canonical project_state business or engineering authority",
+    "mark ENG-09 done",
+    "modify merge remediate or adopt the Lot45 candidate",
+    "unlock or start Lot46",
+    "enable runtime trading execution leverage or withdrawals",
+    "treat prior chat handoff or model memory as human authorization",
+    "mutate certified Development Engine V1 or historical evidence"
+  ],
+  "depends_on": [
+    "ENG-09.6-WU03"
+  ],
+  "inputs": [
+    {
+      "name": "Post-remediation unlock eligibility",
+      "kind": "EVIDENCE",
+      "locator": "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY.json"
+    },
+    {
+      "name": "Terminal active-work routing policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/active_work_routing_policy_v1.json"
+    },
+    {
+      "name": "Lot45 Development Engine pilot evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/LOT45_ENGINE_PILOT_EVIDENCE.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Expanded ENG-09 transition scope",
+      "kind": "STATE",
+      "locator": "engineering/lots/ENG-09.json"
+    },
+    {
+      "name": "Business activation policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/business_unlock_activation_policy_v1.json"
+    },
+    {
+      "name": "Business activation plan",
+      "kind": "EVIDENCE",
+      "locator": "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION_PLAN.json"
+    },
+    {
+      "name": "Activation validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_business_development_activation.py"
+    },
+    {
+      "name": "Activation adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_business_development_activation.py"
+    },
+    {
+      "name": "Explicit activation successor AWU",
+      "kind": "STATE",
+      "locator": "engineering/work_units/ENG-09.6-WU05.json"
+    },
+    {
+      "name": "Staged Lot45 business manifest",
+      "kind": "STATE",
+      "locator": "business/lots/LOT-45.json"
+    },
+    {
+      "name": "Staged read-only Lot45 requalification AWU",
+      "kind": "STATE",
+      "locator": "business/work_units/LOT-45.1-WU01.json"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "86da75900304e364bc8f11a0cd3b472fe4606a2f",
+    "allowed_paths": [
+      "AGENTS.md",
+      "config/governance/project_state.json",
+      "config/governance/business_unlock_activation_policy_v1.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-09.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION_PLAN.json",
+      "engineering/work_units/ENG-09.6-WU03A.json",
+      "engineering/work_units/ENG-09.6-WU04.json",
+      "engineering/work_units/ENG-09.6-WU05.json",
+      "scripts/governance/validate_business_development_activation.py",
+      "scripts/governance/selftest_business_development_activation.py",
+      ".github/workflows/engineering-bootstrap.yml",
+      "business/lots/LOT-45.json",
+      "business/work_units/LOT-45.1-WU01.json",
+      "business/evidence/LOT45_V1_REQUALIFICATION.json",
+      "business/plans/LOT45_REMEDIATION_PLAN.json"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_DECISION.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY.json",
+      "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json",
+      "business/** except explicitly allowlisted staging files"
+    ],
+    "forbidden_semantics": [
+      "business development activation",
+      "canonical authority transition",
+      "Lot45 candidate mutation merge remediation or adoption",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "permission-to-trade activation",
+      "historical or certification evidence mutation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "WU04 stages only; canonical BUSINESS remains PAUSED and ENGINEERING remains BUILDING",
+      "the parent ENG-09 manifest must explicitly authorize each business staging path before any business file is created",
+      "the staged first business AWU is read-only with respect to PR66 candidate code and only requalifies exact-head evidence under Development Engine V1",
+      "the future activation transaction must atomically terminalize ENGINEERING create one ACTIVE business route and leave Lot46 LOCKED",
+      "the future activation transaction requires a direct explicit human BUSINESS_DEVELOPMENT_UNLOCK instruction in the executing session",
+      "chat history model memory and non-authoritative handoff are never sufficient authorization",
+      "runtime trade execution leverage and withdrawals remain unchanged and fail-closed"
+    ],
+    "acceptance_criteria": [
+      "WU03A is DONE and WU04 is the only IN_PROGRESS engineering AWU",
+      "ENG-09 parent scope is expanded before staged business files are introduced",
+      "activation policy separates eligibility staging and explicit execution",
+      "synthetic activation tests reject PAUSED business missing candidate missing business AWU Lot46 unlock or weakened safety",
+      "staged business manifest/AWU remain non-active until the explicit successor transition",
+      "Engineering Bootstrap and Security Secrets pass on exact WU04 staging heads"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 8,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 1,
+      "state_machine_or_concurrency": true,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 15,
+      "executable_loc_changed": 760,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 1,
+      "trust_boundaries": 1,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/resolve_active_awu.py",
+      "python scripts/governance/render_context_map.py --check",
+      "python scripts/governance/validate_business_development_activation.py --mode staged",
+      "python scripts/governance/selftest_business_development_activation.py"
+    ]
+  },
+  "done_when": [
+    "ENG-09 scope safely admits exact staged business route files",
+    "read-only Lot45 business manifest and PLANNED AWU exist without activating BUSINESS",
+    "activation policy validator and adversarial tests are green",
+    "WU05 can execute only after a direct explicit human BUSINESS_DEVELOPMENT_UNLOCK instruction",
+    "WU04 exact-head Bootstrap run 36617637470 and Security Secrets run 36617637444 pass before WU05 may be activated"
+  ]
+}

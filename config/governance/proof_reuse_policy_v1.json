@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "policy_kind": "proof_reuse_policy_v1",
+  "semantics": "EXACT_INPUT_CANONICAL_SHA256_FAIL_CLOSED",
+  "reusable_subjects": {
+    "T1": [
+      "SELFTEST_ENTRYPOINT_CHECK"
+    ],
+    "T2": [
+      "CONTRACT_TESTS",
+      "DATA_TESTS",
+      "CHANGED_DOMAIN_TESTS",
+      "RISK_EXECUTION_TESTS",
+      "EVIDENCE_TESTS"
+    ]
+  },
+  "forbidden_tiers": [
+    "T0",
+    "T3",
+    "T4"
+  ],
+  "forbidden_subject_ids": [
+    "LIVE_EXTERNAL_GIT_STATE",
+    "EXACT_HEAD_CERTIFICATION",
+    "PROVENANCE_CERTIFICATION",
+    "R3_FULL_CERTIFICATION_CHAIN"
+  ],
+  "required_result": "PASS",
+  "environment_fields": [
+    "python_implementation",
+    "python_version",
+    "platform",
+    "machine"
+  ],
+  "non_key_metadata_fields": [
+    "observed_head",
+    "created_at_utc",
+    "producer_run_id",
+    "producer_job_id"
+  ],
+  "max_bound_files": 80,
+  "max_parameters_bytes": 16384,
+  "invariants": [
+    "proof key is sha256 of canonical key material only",
+    "metadata never changes proof key",
+    "all file bindings use repository-relative regular non-symlink files",
+    "input policy and implementation file groups are separately bound",
+    "parameters and execution environment are part of key material",
+    "only PASS proofs may be reused",
+    "T0 T3 T4 and live-external-state proofs are never reusable",
+    "reuse requires candidate self-integrity and equality with freshly recomputed expected proof key"
+  ]
+}

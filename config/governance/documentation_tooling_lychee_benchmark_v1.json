@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "policy_kind": "documentation_tooling_lychee_benchmark_v1",
+  "semantics": "LYCHEE_PINNED_OFFLINE_LOCAL_LINKS_EVIDENCE_ONLY",
+  "authority_role": "NON_AUTHORITATIVE",
+  "candidate": "LYCHEE",
+  "release": {
+    "repository": "lycheeverse/lychee",
+    "tag": "lychee-v0.24.2",
+    "source_commit": "2bba271688c1abb1503097a064e6c3bc1d1b6a9b",
+    "immutable_release": false,
+    "asset_digest_is_execution_authority": true,
+    "asset_name": "lychee-x86_64-unknown-linux-gnu.tar.gz",
+    "asset_url": "https://github.com/lycheeverse/lychee/releases/download/lychee-v0.24.2/lychee-x86_64-unknown-linux-gnu.tar.gz",
+    "asset_sha256": "1f4e0ef7f6554a6ed33dd7ac144fb2e1bbed98598e7af973042fc5cd43951c9a",
+    "expected_version": "0.24.2",
+    "license": "MIT OR Apache-2.0"
+  },
+  "workflow": {
+    "path": ".github/workflows/documentation-tooling-benchmark.yml",
+    "checkout_action_sha": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+    "checkout_version_comment": "v7.0.1",
+    "permissions": {
+      "contents": "read"
+    },
+    "benchmark_branch": "engineering/bootstrap-development-engine"
+  },
+  "execution": {
+    "offline_required": true,
+    "external_url_health_checks_allowed": false,
+    "github_token_required": false,
+    "cache_allowed": false,
+    "paid_api_required": false,
+    "paid_saas_required": false,
+    "paid_llm_required": false,
+    "paid_runner_required": false,
+    "download_network_scope": "PINNED_RELEASE_ASSET_ONLY",
+    "max_representative_docs": 4,
+    "max_lychee_elapsed_ms": 5000,
+    "broken_fixture_required_errors": 1,
+    "valid_fixture_max_errors": 0
+  },
+  "representative_docs": [
+    "README.md",
+    "AGENTS.md",
+    "engineering/MASTER_PLAN.md",
+    "engineering/DOCUMENTATION_TOOLING_EVALUATION.md"
+  ],
+  "invariants": [
+    "release archive SHA-256 is verified before extraction or execution",
+    "lychee version output must contain 0.24.2",
+    "every lychee invocation includes --offline",
+    "--offline is relied upon only for local files and blocks network requests",
+    "no GitHub token is passed to lychee",
+    "synthetic broken local link must fail with link-check exit code 2 and at least one error",
+    "synthetic valid local link must pass with zero errors",
+    "representative documentation is measured but not mutated",
+    "benchmark does not alter canonical documentation authority",
+    "benchmark mandatory cost remains zero"
+  ]
+}

@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-05.6-WU05",
+  "status": "DONE",
+  "parent": {
+    "work_item_id": "ENG-05",
+    "task_id": "ENG-05.6",
+    "manifest": "engineering/lots/ENG-05.json"
+  },
+  "title": "Benchmark pinned lychee offline",
+  "objective": "Benchmark the exact pinned lychee v0.24.2 Linux x86_64 GNU release binary with --offline on deterministic local fixtures and representative project Markdown, measuring local-link detection without external network requests.",
+  "non_goals": [
+    "execute Vale",
+    "execute DocGuard",
+    "check external URL health",
+    "make lychee authoritative",
+    "business implementation",
+    "Lot45 remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-05.6-WU04"
+  ],
+  "inputs": [
+    {
+      "name": "Tooling candidate registry",
+      "kind": "CONFIG",
+      "locator": "config/governance/documentation_tooling_candidates_v1.json"
+    },
+    {
+      "name": "Approved action pin registry",
+      "kind": "CONFIG",
+      "locator": "config/governance/action_pin_registry_v1.json"
+    },
+    {
+      "name": "Workflow security policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/workflow_security_policy_v1.json"
+    },
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "lychee benchmark policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/documentation_tooling_lychee_benchmark_v1.json"
+    },
+    {
+      "name": "lychee benchmark runner",
+      "kind": "FILE",
+      "locator": "scripts/governance/benchmark_lychee.py"
+    },
+    {
+      "name": "lychee benchmark workflow",
+      "kind": "FILE",
+      "locator": ".github/workflows/documentation-tooling-benchmark.yml"
+    },
+    {
+      "name": "documentation tooling benchmark evidence",
+      "kind": "FILE",
+      "locator": "engineering/DOCUMENTATION_TOOLING_BENCHMARK.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "c6ae1454fb959009efea9d054d6db836fcd00153",
+    "allowed_paths": [
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-05.6-WU04.json",
+      "engineering/work_units/ENG-05.6-WU05.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "config/governance/documentation_tooling_lychee_benchmark_v1.json",
+      "scripts/governance/benchmark_lychee.py",
+      ".github/workflows/documentation-tooling-benchmark.yml",
+      "engineering/DOCUMENTATION_TOOLING_BENCHMARK.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      "config/governance/project_state.json",
+      "engineering/STATE.json"
+    ],
+    "forbidden_semantics": [
+      "unverified third-party binary execution",
+      "external network link checking",
+      "external tool authority",
+      "Vale execution",
+      "business implementation",
+      "Lot45 remediation",
+      "Lot46 unlock",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "lychee x86_64 GNU asset SHA-256 equals 1f4e0ef7f6554a6ed33dd7ac144fb2e1bbed98598e7af973042fc5cd43951c9a",
+      "workflow uses only approved exact checkout action pins",
+      "lychee executes only after archive digest verification",
+      "every lychee benchmark invocation includes --offline",
+      "no GitHub token credential or external URL check is required",
+      "benchmark workflow remains isolated from routine engineering bootstrap",
+      "benchmark findings are evidence only and cannot alter canonical documentation authority"
+    ],
+    "acceptance_criteria": [
+      "synthetic missing local link is detected by lychee offline",
+      "synthetic valid local link passes lychee offline",
+      "representative project docs are benchmarked with elapsed time and finding count",
+      "benchmark success requires no external network request",
+      "workflow requires no paid token service or larger runner",
+      "lychee evidence is sufficient to decide whether a later changed-doc local-link integration is justified"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 5,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": true,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 9,
+      "executable_loc_changed": 380,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 1
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/benchmark_lychee.py --self-check",
+      "GitHub Actions documentation-tooling-benchmark workflow"
+    ]
+  },
+  "done_when": [
+    "lychee release archive is cryptographically verified before execution",
+    "offline synthetic local-link positive and negative controls prove expected behavior",
+    "representative-doc local-link runtime and findings are measured without external requests",
+    "lychee benchmark evidence is recorded for the final ENG-05.6 adoption decision"
+  ]
+}

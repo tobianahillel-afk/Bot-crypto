@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "policy_kind": "permanent_project_state_transitions_v1",
+  "state_file": "config/governance/project_state.json",
+  "business_mutation_mode": "LOCKED_DURING_ENGINE_FOUNDATION",
+  "safety_mutation_mode": "LOCKED_FAIL_CLOSED_DURING_ENGINE_FOUNDATION",
+  "cost_mutation_mode": "LOCKED_ZERO_COST_DURING_ENGINE_FOUNDATION",
+  "engineering_phase_transitions": {
+    "BUILDING": [
+      "BUILDING",
+      "BLOCKED",
+      "STABLE",
+      "COMPLETE"
+    ],
+    "BLOCKED": [
+      "BLOCKED",
+      "BUILDING"
+    ],
+    "STABLE": [
+      "STABLE",
+      "BUILDING",
+      "COMPLETE"
+    ],
+    "COMPLETE": [
+      "COMPLETE"
+    ]
+  },
+  "audit_phase_transitions": {
+    "NOT_STARTED": [
+      "NOT_STARTED",
+      "BUILDING"
+    ],
+    "BUILDING": [
+      "BUILDING",
+      "BLOCKED",
+      "STABLE",
+      "COMPLETE"
+    ],
+    "BLOCKED": [
+      "BLOCKED",
+      "BUILDING"
+    ],
+    "STABLE": [
+      "STABLE",
+      "BUILDING",
+      "COMPLETE"
+    ],
+    "COMPLETE": [
+      "COMPLETE"
+    ]
+  },
+  "invariants": {
+    "engineering_task_progression": "CURRENT_MANIFEST_ORDER_NO_SKIPS",
+    "engineering_lot_progression": "NEXT_LOT_ONLY",
+    "completed_engineering_lots": "APPEND_ONLY",
+    "findings": "NO_SILENT_REMOVAL",
+    "external_observations": "MAY_REFRESH_BUT_NEVER_AUTO_PROMOTE_BUSINESS",
+    "business_unlock_target": "ENG-09",
+    "audit_activation_target": "ENG-07"
+  }
+}

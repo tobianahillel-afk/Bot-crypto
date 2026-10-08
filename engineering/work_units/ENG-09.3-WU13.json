@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-09.3-WU13",
+  "status": "DONE",
+  "parent": {
+    "work_item_id": "ENG-09",
+    "task_id": "ENG-09.3",
+    "manifest": "engineering/lots/ENG-09.json"
+  },
+  "title": "Define and qualify the Lot45 mutation candidate profile read-only",
+  "objective": "Model the suspended Lot45 candidate mutation semantics as a lifecycle-gated read-only candidate profile and prove selector/evidence equivalence against exact PR #66 Git evidence without modifying the candidate branch, enabling generic execution, or adopting the profile into active mutation control.",
+  "non_goals": [
+    "modify PR #66 or candidate business code",
+    "add Lot45 to the active mutation_profiles_v1 registry",
+    "make the production mutation selector select Lot45",
+    "execute the Lot45 mutation campaign again",
+    "modify ci-mutation.yml or code-quality.yml",
+    "modify protected Lot44 workflows",
+    "merge Lot45",
+    "unlock Lot46 or business development",
+    "introduce paid services or mandatory LLM review"
+  ],
+  "depends_on": [
+    "ENG-09.3-WU12"
+  ],
+  "inputs": [
+    {
+      "name": "WU12 migration evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/ENG09_WU12_P06_MIGRATION_EVIDENCE.json"
+    },
+    {
+      "name": "Phase-2 consolidation plan",
+      "kind": "EVIDENCE",
+      "locator": "engineering/ENG09_PHASE1_MUTATION_CONSOLIDATION_PLAN.json"
+    },
+    {
+      "name": "Active mutation policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/mutation_profile_policy_v1.json"
+    },
+    {
+      "name": "Active P0.6 registry",
+      "kind": "CONFIG",
+      "locator": "config/governance/mutation_profiles_v1.json"
+    },
+    {
+      "name": "Suspended Lot45 PR",
+      "kind": "EVIDENCE",
+      "locator": "PR#66@ec2c4ab16f21b23e062b7fca0bb796c8db4a5133"
+    },
+    {
+      "name": "Lot45 mutation workflow",
+      "kind": "EVIDENCE",
+      "locator": ".github/workflows/lot45-mutation-assurance.yml@ec2c4ab16f21b23e062b7fca0bb796c8db4a5133"
+    },
+    {
+      "name": "Lot45 mutation summary",
+      "kind": "EVIDENCE",
+      "locator": "reports/lot45/mutation_summary.json@ec2c4ab16f21b23e062b7fca0bb796c8db4a5133"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Candidate mutation profile policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/mutation_candidate_profile_policy_v1.json"
+    },
+    {
+      "name": "Read-only Lot45 candidate profile registry",
+      "kind": "CONFIG",
+      "locator": "config/governance/mutation_candidate_profiles_v1.json"
+    },
+    {
+      "name": "Candidate profile validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_mutation_candidate_profiles.py"
+    },
+    {
+      "name": "Candidate profile qualification selector",
+      "kind": "FILE",
+      "locator": "scripts/governance/select_mutation_candidate_profile.py"
+    },
+    {
+      "name": "Candidate profile adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_mutation_candidate_profiles.py"
+    },
+    {
+      "name": "WU13 Lot45 profile evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/ENG09_WU13_LOT45_PROFILE_EVIDENCE.json"
+    },
+    {
+      "name": "Candidate profile documentation",
+      "kind": "FILE",
+      "locator": "engineering/MUTATION_CANDIDATE_PROFILE_CONTROL.md"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "984154bd62ce38d36f3d10a415e74b49d92e9f6b",
+    "allowed_paths": [
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-09.3-WU12.json",
+      "engineering/work_units/ENG-09.3-WU13.json",
+      "engineering/ENG09_WU13_LOT45_PROFILE_EVIDENCE.json",
+      "config/governance/mutation_candidate_profile_policy_v1.json",
+      "config/governance/mutation_candidate_profiles_v1.json",
+      "scripts/governance/validate_mutation_candidate_profiles.py",
+      "scripts/governance/select_mutation_candidate_profile.py",
+      "scripts/governance/selftest_mutation_candidate_profiles.py",
+      "engineering/MUTATION_CANDIDATE_PROFILE_CONTROL.md",
+      ".github/workflows/eng09-wu13-candidate-profile-qualification.yml"
+    ],
+    "forbidden_paths": [
+      "config/governance/mutation_profiles_v1.json",
+      "scripts/governance/run_mutation_profile.py",
+      ".github/workflows/ci-mutation.yml",
+      ".github/workflows/code-quality.yml",
+      ".github/workflows/lot44-*.yml",
+      ".github/workflows/lot45-*.yml",
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "Lot45 candidate mutation",
+      "Lot45 active profile adoption",
+      "production mutation selector activation",
+      "generic mutation runner adoption",
+      "institutional mutation deduplication",
+      "Lot44 protected workflow mutation",
+      "Lot45 candidate remediation",
+      "Lot45 merge",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "WU12 evidence remains PASS and P0.6 active control is untouched",
+      "candidate profile is stored separately from mutation_profiles_v1 and remains non-executable",
+      "candidate binding records PR 66 head ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+      "candidate mutation workflow blob is e5a569b79b70e42da7c9ce2cc96b8623a0040f1d",
+      "candidate mutation summary blob is 26e49b1d1fc450a00ebc346541a69e82059f1119",
+      "candidate source binding remains EXACT_HEAD_INPUT c418338da86c49bd4b688d4a64893ee5042adc40",
+      "workflow selectors baseline tests mutation targets test-selection exclusions workspace-copy semantics and score formula are represented exactly",
+      "candidate score evidence remains PASS with 1341 killed 0 timeout 0 suspicious 324 survived 1665 evaluated and 80.54 percent",
+      "qualification selector can simulate candidate selection but production selector visibility remains false",
+      "no Lot45 mutation execution occurs in WU13",
+      "business development remains PAUSED and Lot46 remains LOCKED",
+      "WU13 qualification workflow is temporary and must be removed after qualification evidence is captured"
+    ],
+    "acceptance_criteria": [
+      "candidate registry and policy validate deterministically",
+      "candidate selection qualification matches source test config schema workflow and lockfile trigger paths",
+      "unrelated paths select no candidate profile",
+      "active mutation_profiles_v1 remains byte-identical to scope base",
+      "ci-mutation.yml and code-quality.yml remain byte-identical to scope base",
+      "PR #66 head and main/base remain externally unchanged",
+      "candidate evidence arithmetic exactly reproduces 80.54 percent from 1341 over 1665 with timeout and suspicious required zero",
+      "candidate lifecycle is READ_ONLY_QUALIFIED_NOT_ADOPTED and execution_allowed=false",
+      "Engineering Bootstrap Security Secrets Security Actions and Security Supply Chain pass on qualification head"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 2,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 13,
+      "executable_loc_changed": 450,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_mutation_candidate_profiles.py",
+      "python scripts/governance/selftest_mutation_candidate_profiles.py",
+      "python scripts/governance/select_mutation_candidate_profile.py --path src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py"
+    ]
+  },
+  "done_when": [
+    "Lot45 mutation semantics are captured exactly in a read-only lifecycle-gated profile",
+    "selection and evidence equivalence are proven without executing mutation",
+    "active production mutation control remains unchanged",
+    "PR #66 remains untouched"
+  ]
+}

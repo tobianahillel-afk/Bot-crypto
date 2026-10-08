@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-09.4-WU02",
+  "status": "DONE",
+  "parent": {
+    "work_item_id": "ENG-09",
+    "task_id": "ENG-09.4",
+    "manifest": "engineering/lots/ENG-09.json"
+  },
+  "title": "Qualify Development Engine V1 at exact head",
+  "objective": "Execute the Development Engine V1 candidate validator and adversarial suite at one exact engineering HEAD, bind the candidate to exact Git tree/blob identities through the existing ENG-06 exact-head machinery, and emit machine-readable T4 qualification material without promoting business development or runtime execution.",
+  "non_goals": [
+    "change Development Engine V1 candidate material assembled by WU01",
+    "weaken or replace ENG-06 certification semantics",
+    "mark business development unlocked",
+    "resolve or suppress BOOT-FINDING-001",
+    "modify or merge Lot45",
+    "unlock Lot46",
+    "activate trading runtime leverage or withdrawals",
+    "introduce a paid service or mandatory LLM review"
+  ],
+  "depends_on": [
+    "ENG-09.4-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Development Engine V1 candidate",
+      "kind": "EVIDENCE",
+      "locator": "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_CANDIDATE.json"
+    },
+    {
+      "name": "Development Engine V1 policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/development_engine_v1_certification_policy_v1.json"
+    },
+    {
+      "name": "Development Engine V1 validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_development_engine_v1_certification.py"
+    },
+    {
+      "name": "Exact-head certification policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/certification_exact_head_binding_v1.json"
+    },
+    {
+      "name": "Deep-assurance certification policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/certification_deep_assurance_v1.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Exact-head qualification driver",
+      "kind": "FILE",
+      "locator": "scripts/governance/qualify_development_engine_v1_exact_head.py"
+    },
+    {
+      "name": "Temporary exact-head qualification workflow",
+      "kind": "FILE",
+      "locator": ".github/workflows/eng09-wu02-development-engine-v1-qualification.yml"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "37e62e2cdcf6b1f86595e0056688cfdb1394ab58",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-09.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-09.4-WU01.json",
+      "engineering/work_units/ENG-09.4-WU02.json",
+      "scripts/governance/qualify_development_engine_v1_exact_head.py",
+      ".github/workflows/eng09-wu02-development-engine-v1-qualification.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      "config/governance/mutation_profiles_v1.json",
+      "config/governance/mutation_candidate_profiles_v1.json",
+      "scripts/governance/run_mutation_profile.py",
+      ".github/workflows/lot45-*.yml"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "business development unlock",
+      "BOOT-FINDING-001 suppression",
+      "Lot45 candidate mutation remediation or merge",
+      "Lot46 unlock",
+      "certification policy weakening",
+      "candidate material rewrite",
+      "runtime capability activation",
+      "permission-to-trade activation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "WU01 candidate and policy remain byte-identical inputs throughout this work unit",
+      "qualification driver imports and reuses ENG-06 exact-head and deep-assurance controls rather than implementing parallel certification semantics",
+      "qualification candidate head equals the checked-out Git HEAD",
+      "exact-head input binding covers WU01 policy candidate validator selftest and all eight evidence inputs",
+      "qualification workflow uses exact action pins least privilege full Git history and no paid dependency",
+      "qualification output binds Git tree exact blob identities candidate id current head WU02 scope base and exact workflow run id",
+      "T3 deep assurance is evaluated through existing policy and remains NOT_REQUIRED when no T3 requirement is selected",
+      "EXACT_HEAD_CERTIFICATION is selected as the T4 requirement and cannot be reused across heads",
+      "successful qualification does not mark business unlocked does not mark Lot45 merge-ready and does not change runtime authority"
+    ],
+    "acceptance_criteria": [
+      "WU01 validator passes at the exact qualification HEAD",
+      "WU01 adversarial suite reports 16 probes PASS",
+      "ENG-06 exact-head self-check passes at the exact qualification HEAD",
+      "ENG-06 deep-assurance self-check passes",
+      "exact-head binding contains the candidate policy validator selftest and eight evidence blobs",
+      "qualification output records the current workflow run id and exact candidate head with success conclusion semantics",
+      "Security Secrets and Engineering Bootstrap pass on the same qualification HEAD",
+      "candidate remains pre-promotion and BOOT-FINDING-001 remains an explicit business-unlock blocker"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 6,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": true,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 1,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 10,
+      "executable_loc_changed": 650,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3",
+      "T4"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_development_engine_v1_certification.py",
+      "python scripts/governance/selftest_development_engine_v1_certification.py",
+      "python scripts/governance/qualify_development_engine_v1_exact_head.py"
+    ]
+  },
+  "done_when": [
+    "one exact qualification HEAD has green Engineering Bootstrap Security Secrets and Development Engine V1 qualification workflow",
+    "qualification output is bound to the exact HEAD tree blobs and workflow run id",
+    "candidate remains pre-business-unlock and external protection blocker remains visible",
+    "no business candidate runtime or historical evidence was mutated"
+  ]
+}

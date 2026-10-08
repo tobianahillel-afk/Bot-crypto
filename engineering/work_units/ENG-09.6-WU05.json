@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-09.6-WU05",
+  "status": "DONE",
+  "parent": {
+    "work_item_id": "ENG-09",
+    "task_id": "ENG-09.6",
+    "manifest": "engineering/lots/ENG-09.json"
+  },
+  "title": "Execute explicit atomic business-development activation",
+  "objective": "After a direct current-session human BUSINESS_DEVELOPMENT_UNLOCK instruction, atomically terminalize Development Engine engineering authority and activate the bounded read-only Lot45 business route without changing runtime/trading authority or unlocking Lot46.",
+  "non_goals": [
+    "execute without direct exact human BUSINESS_DEVELOPMENT_UNLOCK authorization",
+    "modify or merge PR #66 during the activation transaction",
+    "start Lot45 remediation in the same activation transaction",
+    "unlock or start Lot46",
+    "enable trade execution leverage withdrawals or live exchange access",
+    "rewrite historical blocked unlock evidence or Development Engine V1 certification",
+    "treat eligibility handoff chat history or model memory as sufficient authorization"
+  ],
+  "depends_on": [
+    "ENG-09.6-WU08"
+  ],
+  "inputs": [
+    {
+      "name": "Staged activation plan",
+      "kind": "EVIDENCE",
+      "locator": "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION_PLAN.json"
+    },
+    {
+      "name": "Post-remediation unlock eligibility",
+      "kind": "EVIDENCE",
+      "locator": "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY.json"
+    },
+    {
+      "name": "Activation policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/business_unlock_activation_policy_v1.json"
+    },
+    {
+      "name": "Staged Lot45 business manifest",
+      "kind": "STATE",
+      "locator": "business/lots/LOT-45.json"
+    },
+    {
+      "name": "Staged Lot45 read-only AWU",
+      "kind": "STATE",
+      "locator": "business/work_units/LOT-45.1-WU01.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Canonical project-state activation",
+      "kind": "STATE",
+      "locator": "config/governance/project_state.json"
+    },
+    {
+      "name": "Migration bridge terminal state",
+      "kind": "STATE",
+      "locator": "engineering/STATE.json"
+    },
+    {
+      "name": "ENG-09 terminal manifest",
+      "kind": "STATE",
+      "locator": "engineering/lots/ENG-09.json"
+    },
+    {
+      "name": "Business activation evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json"
+    },
+    {
+      "name": "Activated Lot45 manifest",
+      "kind": "STATE",
+      "locator": "business/lots/LOT-45.json"
+    },
+    {
+      "name": "Activated read-only Lot45 AWU",
+      "kind": "STATE",
+      "locator": "business/work_units/LOT-45.1-WU01.json"
+    },
+    {
+      "name": "Business-routed context map",
+      "kind": "STATE",
+      "locator": "engineering/CONTEXT_MAP.json"
+    },
+    {
+      "name": "Terminal handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "d4a275458aa32c25f84370957595bdf47a2fa90d",
+    "allowed_paths": [
+      "AGENTS.md",
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-09.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json",
+      "engineering/work_units/ENG-09.6-WU04.json",
+      "engineering/work_units/ENG-09.6-WU05.json",
+      "business/lots/LOT-45.json",
+      "business/work_units/LOT-45.1-WU01.json",
+      "engineering/work_units/ENG-09.6-WU07.json",
+      "engineering/work_units/ENG-09.6-WU08.json",
+      "README.md",
+      "engineering/CURRENT_STATUS.md"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "contracts/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      ".github/workflows/**",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_DECISION.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY.json",
+      "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json"
+    ],
+    "forbidden_semantics": [
+      "activation without direct exact human authorization",
+      "Lot45 candidate mutation remediation merge or adoption",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "permission-to-trade activation",
+      "leverage or withdrawal activation",
+      "historical or certification evidence mutation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "execution requires the literal human action BUSINESS_DEVELOPMENT_UNLOCK in the current executing session",
+      "live GitHub must still match eligibility for main PR66 and ruleset Protect before any authority write",
+      "WU08 terminal-activation compatibility exact-head Bootstrap and Security Secrets must both be SUCCESS",
+      "Engineering transitions BUILDING -> STABLE and ENG-09 becomes DONE atomically with BUSINESS activation",
+      "engineering active_lot active_task active_manifest and next_lot become null at the same transition",
+      "BUSINESS transitions PAUSED -> ACTIVE and candidate SUSPENDED_CANDIDATE -> ACTIVE_CANDIDATE without changing candidate head/base/open/unmerged identity",
+      "authority.active_manifest becomes business/lots/LOT-45.json",
+      "LOT-45 manifest task LOT-45.1 and AWU LOT-45.1-WU01 become the single IN_PROGRESS business route",
+      "business AWU scope_base_sha is bound to the exact activation predecessor head",
+      "Lot46 remains LOCKED",
+      "BOOT-FINDING-001 is resolved only in current lifecycle state with explicit remediation evidence; immutable ENG-00 baseline and old blocked decision stay untouched",
+      "runtime_max trade_allowed execution_allowed live_execution leverage and withdrawals remain byte-semantically unchanged",
+      "post-transition ordinary continue resolves BUSINESS through frozen V1 entrypoint",
+      "before WU05 becomes IN_PROGRESS its scope_base_sha must be rebound to the final exact WU08 qualified head",
+      "generic continue eligibility handoff prior-agent summary chat history and model memory are never authorization; only direct current-session BUSINESS_DEVELOPMENT_UNLOCK is accepted",
+      "WU08 must be DONE before WU05 resumes"
+    ],
+    "acceptance_criteria": [
+      "preflight validator rejects missing or stale eligibility live Git drift non-active Protect missing required checks or changed PR66",
+      "preflight rejects generic continue as authorization",
+      "post-transition canonical-state validator passes terminal Engineering and active Business topology",
+      "resolver returns BUSINESS and exactly LOT-45.1-WU01 after activation",
+      "context map renders BUSINESS using the frozen path/schema",
+      "Lot45 candidate branch has no write during activation",
+      "Lot46 remains LOCKED and runtime/trading safety remains disabled",
+      "Engineering Bootstrap Security Secrets Security Actions and Security Supply Chain pass on the exact activation head where applicable"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 7,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 1,
+      "state_machine_or_concurrency": true,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 12,
+      "executable_loc_changed": 500,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 0,
+      "state_machines": 1,
+      "trust_boundaries": 1,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "live business unlock eligibility verification",
+      "python scripts/governance/validate_business_development_activation.py --mode activated",
+      "python scripts/governance/resolve_active_awu.py",
+      "python scripts/governance/render_context_map.py --check",
+      "exact-head GitHub Actions qualification"
+    ]
+  },
+  "done_when": [
+    "explicit authorized activation is persisted atomically",
+    "ordinary continue routes BUSINESS to read-only Lot45 requalification",
+    "Development Engine engineering lifecycle is terminal",
+    "candidate code remains untouched",
+    "Lot46 and all runtime trading authorities remain locked"
+  ]
+}

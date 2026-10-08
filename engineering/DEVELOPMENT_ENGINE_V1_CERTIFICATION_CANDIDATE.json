@@ -1,0 +1,118 @@
+{
+  "candidate_id": "DEV_ENGINE_V1:b9e5ebadbb739e57f2e0023d7498593f0f9a45bde46af24d8a83541351cdd1ed",
+  "candidate_kind": "development_engine_v1_certification_candidate_v1",
+  "material": {
+    "assembly": {
+      "base_head_sha": "77d581d2d16643ffa636fcc336148fa57c43c60c",
+      "pre_assembly_bootstrap": {
+        "conclusion": "success",
+        "head_sha": "77d581d2d16643ffa636fcc336148fa57c43c60c",
+        "run_id": 36457626752
+      },
+      "work_unit_id": "ENG-09.4-WU01"
+    },
+    "blocking_finding": {
+      "code": "MAIN_BRANCH_UNPROTECTED",
+      "id": "BOOT-FINDING-001",
+      "must_be_resolved_before": "BUSINESS_DEVELOPMENT_UNLOCK",
+      "observed": true
+    },
+    "business_candidate": {
+      "lot": 45,
+      "merged": false,
+      "observed_head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+      "pr": 66,
+      "status": "SUSPENDED_CANDIDATE"
+    },
+    "certification_gate": {
+      "business_unlock_allowed": false,
+      "certified": false,
+      "exact_head_t4_executed": false,
+      "required_later_t4": [
+        "EXACT_HEAD_CERTIFICATION"
+      ],
+      "runtime_unlock_allowed": false
+    },
+    "cleanup": {
+      "temporary_workflow_path": ".github/workflows/eng09-wu13-candidate-profile-qualification.yml",
+      "temporary_workflow_present": false
+    },
+    "derived_verdicts": {
+      "FAST": true,
+      "LOT45_PILOT_READ_ONLY": true,
+      "SAFE": true,
+      "SECURITY": true,
+      "ZERO_COST": true
+    },
+    "engine_version": "V1",
+    "evidence_bindings": {
+      "cold_start": {
+        "blob_sha": "17b03061f3751481a6b2579997a89f2680c7fa32",
+        "path": "engineering/COLD_START_QUALIFICATION_EVIDENCE.json"
+      },
+      "critical_r3_bypass": {
+        "blob_sha": "d651b8c50a633a2ea20ca899720ea235641dd5ef",
+        "path": "engineering/CRITICAL_R3_BYPASS_EVIDENCE.json"
+      },
+      "interruption_recovery": {
+        "blob_sha": "a8611d1603b5e62aa6ba0879d1d1151c05ac5232",
+        "path": "engineering/INTERRUPTION_RECOVERY_EVIDENCE.json"
+      },
+      "lot45_pilot": {
+        "blob_sha": "d116f6986945c8ed92acbbd2fdb7d085e7429d93",
+        "path": "engineering/LOT45_ENGINE_PILOT_EVIDENCE.json"
+      },
+      "lot45_profile": {
+        "blob_sha": "1b85a021533a14a0e0de678ee76f24066e15fabc",
+        "path": "engineering/ENG09_WU13_LOT45_PROFILE_EVIDENCE.json"
+      },
+      "mandatory_cost": {
+        "blob_sha": "127c3a056a7ee3407b3caf2a6bfb32d73da71920",
+        "path": "engineering/MANDATORY_COST_ZERO_EVIDENCE.json"
+      },
+      "security_engine": {
+        "blob_sha": "434c09377baa192a0a981c1ee2dde9d26c3626fe",
+        "path": "engineering/SECURITY_ENGINE_VERIFICATION.json"
+      },
+      "timing_budget": {
+        "blob_sha": "086918f98196ecfb9e75da77bce3787742cbed38",
+        "path": "config/governance/validation_timing_budget_v1.json"
+      }
+    },
+    "fast": {
+      "budgets_ms": {
+        "COLD_START": 1000,
+        "INTERRUPTION_RECOVERY": 1000,
+        "RECOVERY_SELFTEST": 1000,
+        "T0": 250,
+        "T1": 500,
+        "T2": 750,
+        "TOTAL": 1500
+      },
+      "cold_start_ms": 38.129,
+      "interruption_recovery_ms": 113.574,
+      "recovery_selftest_ms": 177.574,
+      "routine_calibration_ms": {
+        "T0": 20.536,
+        "T1": 22.219,
+        "T2": 15.782,
+        "TOTAL": 71.289
+      }
+    },
+    "material_version": 1,
+    "policy_sha256": "093c4ec84c7b162a532cb13e72a29fee625118e1ed7cb832808d82e91ea08792",
+    "safety_lock": {
+      "business_development": "PAUSED",
+      "execution_allowed": false,
+      "leverage": "FORBIDDEN",
+      "live_execution": "DISABLED",
+      "lot46_status": "LOCKED",
+      "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+      "trade_allowed": false,
+      "withdrawals": "FORBIDDEN"
+    }
+  },
+  "material_sha256": "b9e5ebadbb739e57f2e0023d7498593f0f9a45bde46af24d8a83541351cdd1ed",
+  "schema_version": 1,
+  "status": "CERTIFICATION_CANDIDATE_READY_FOR_EXACT_HEAD_QUALIFICATION"
+}

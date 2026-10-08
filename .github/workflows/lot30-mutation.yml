@@ -1,13 +1,6 @@
 name: Lot 30 critical mutation assurance
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'src/crypto_quant_bot/market_analysis/v2_market_analysis_closure*.py'
-      - 'tests/test_lot30_*.py'
-      - '.github/workflows/lot30-mutation.yml'
-      - 'requirements-dev.lock'
   push:
     branches: [main]
   workflow_dispatch:

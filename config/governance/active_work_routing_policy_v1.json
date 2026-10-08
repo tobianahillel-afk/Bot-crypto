@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "policy_kind": "active_work_routing_policy_v1",
+  "semantics": "ENGINEERING_WHILE_BUILDING_BUSINESS_AFTER_TERMINAL_EXPLICIT_ACTIVATION",
+  "engineering_active_phase": "BUILDING",
+  "engineering_terminal_phases": [
+    "STABLE",
+    "COMPLETE"
+  ],
+  "engineering_work_units_dir": "engineering/work_units",
+  "business_work_units_dir": "business/work_units",
+  "business_required_status": "ACTIVE",
+  "business_candidate_required_status": "ACTIVE_CANDIDATE",
+  "business_candidate_required_state": "OPEN",
+  "business_candidate_merged": false,
+  "business_work_item_id_template": "LOT-{lot}",
+  "business_next_lot_required_status": "LOCKED",
+  "audit_automatic_route": false,
+  "invariants": [
+    "ENGINEERING retains precedence while engineering phase is BUILDING",
+    "BUSINESS is routable only after engineering is terminal and explicit canonical business activation",
+    "BUSINESS requires one active unmerged candidate and one IN_PROGRESS business AWU",
+    "Lot46 remains locked when Lot45 is the active candidate",
+    "AUDIT is never selected by ordinary continue",
+    "chat history and model memory never authorize a route"
+  ]
+}

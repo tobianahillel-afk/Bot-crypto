@@ -1,20 +1,6 @@
 name: Lot 32 instrument normalization validation
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'config/data_governance/instrument_symbol_contract_normalization_v1.json'
-      - 'contracts/schemas/instrument_*.json'
-      - 'src/crypto_quant_bot/data_governance/**'
-      - 'scripts/*lot32*'
-      - 'tests/test_lot32_*.py'
-      - 'docs/*LOT_32*'
-      - 'docs/LOT32_*'
-      - 'reports/*lot_32*'
-      - 'data/audit/*lot32.json'
-      - '.github/workflows/lot32-instrument-normalization.yml'
-      - 'requirements-dev.lock'
   push:
     branches: [main]
   workflow_dispatch:

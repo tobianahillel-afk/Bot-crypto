@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "eng09_wu04_completion_evidence_v1",
+  "awu_id": "ENG-09.3-WU04",
+  "verdict": "PASS",
+  "scope_base_sha": "f983edf74c53cabe511cd2122a03e5c7b566bf38",
+  "exact_head_sha": "06b3338ec59c831f7adcefcdccbf1bc366fec194",
+  "transformations": [
+    {
+      "path": ".github/workflows/lot39-mutation-assurance.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": false,
+      "jobs_suffix_byte_identical": true
+    },
+    {
+      "path": ".github/workflows/lot34-mutation.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": true,
+      "jobs_suffix_byte_identical": true
+    },
+    {
+      "path": ".github/workflows/lot29-mutation.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": true,
+      "jobs_suffix_byte_identical": true
+    },
+    {
+      "path": ".github/workflows/lot41-mutation-assurance.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": false,
+      "jobs_suffix_byte_identical": true
+    },
+    {
+      "path": ".github/workflows/lot33-mutation.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": true,
+      "jobs_suffix_byte_identical": true
+    },
+    {
+      "path": ".github/workflows/lot27-mutation.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": true,
+      "jobs_suffix_byte_identical": true
+    },
+    {
+      "path": ".github/workflows/lot35-mutation.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": true,
+      "jobs_suffix_byte_identical": true
+    },
+    {
+      "path": ".github/workflows/lot42-mutation-assurance.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": false,
+      "jobs_suffix_byte_identical": true
+    },
+    {
+      "path": ".github/workflows/lot43-mutation-assurance.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": false,
+      "jobs_suffix_byte_identical": true
+    }
+  ],
+  "protected_boundaries": {
+    "lot44_mutation_assurance_unchanged": true,
+    "lot45_workflows_unchanged": true,
+    "global_workflows_unchanged": true,
+    "business_code_unchanged": true,
+    "historical_evidence_unchanged": true,
+    "contracts_unchanged": true
+  },
+  "exact_head_runs": [
+    {
+      "id": 36349354927,
+      "name": "Engineering Bootstrap",
+      "conclusion": "success"
+    },
+    {
+      "id": 36349354899,
+      "name": "Security Secrets",
+      "conclusion": "success"
+    },
+    {
+      "id": 36349354913,
+      "name": "Security Actions",
+      "conclusion": "success"
+    },
+    {
+      "id": 36349354926,
+      "name": "Security Supply Chain",
+      "conclusion": "success"
+    }
+  ]
+}

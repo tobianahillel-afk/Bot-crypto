@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "eng09_wu11_p06_parity_evidence_v1",
+  "work_unit": "ENG-09.3-WU11",
+  "status": "PASS",
+  "scope_base_sha": "e21413288c3548dc6c0246fb7ff5e06ee945e176",
+  "parity_head_sha": "af93cac4387b93865080a732c88ab8fd6eebeea0",
+  "profile": {
+    "id": "P06_DECISION_EVIDENCE",
+    "version": 1,
+    "source_binding": "CURRENT_CHECKOUT",
+    "materialized_config_sha256": "df29ee50f3cf9226ccce5940ebcb5204c4a94976e66dff42a0204a42ec23c648",
+    "mutmut_version": "3.5.0",
+    "python_version": "3.11.9",
+    "fixed_commands": [
+      [
+        "mutmut",
+        "run"
+      ],
+      [
+        "mutmut",
+        "results"
+      ]
+    ]
+  },
+  "legacy_reference": {
+    "workflow": ".github/workflows/p06-extended-mutation.yml",
+    "expected_blob_sha": "b1653c0c392e74ea7f50b7b922fd8750fa402bb7",
+    "observed_blob_sha": "b1653c0c392e74ea7f50b7b922fd8750fa402bb7",
+    "lifecycle": "PARITY_REFERENCE_UNTIL_WU12_MIGRATION"
+  },
+  "mutation_result": {
+    "killed": 39,
+    "timeout": 0,
+    "suspicious": 0,
+    "survived": 9,
+    "numerator": 39,
+    "denominator": 48,
+    "numerator_terms": [
+      "killed",
+      "timeout"
+    ],
+    "denominator_terms": [
+      "killed",
+      "timeout",
+      "suspicious",
+      "survived"
+    ],
+    "minimum_percent": 80,
+    "score_percent": 81.25,
+    "status": "PASS"
+  },
+  "github_actions": {
+    "parity_run": {
+      "run_id": 36403097208,
+      "job_id": 108865349567,
+      "workflow": "CI Mutation Profiles",
+      "conclusion": "success",
+      "head_sha": "af93cac4387b93865080a732c88ab8fd6eebeea0"
+    },
+    "bootstrap_run": {
+      "run_id": 36403097138,
+      "workflow": "Engineering Bootstrap",
+      "conclusion": "success",
+      "head_sha": "af93cac4387b93865080a732c88ab8fd6eebeea0"
+    },
+    "secrets_run": {
+      "run_id": 36403097074,
+      "workflow": "Security Secrets",
+      "conclusion": "success",
+      "head_sha": "af93cac4387b93865080a732c88ab8fd6eebeea0"
+    }
+  },
+  "artifact": {
+    "id": 10960734995,
+    "name": "mutation-profile-evidence-af93cac4387b93865080a732c88ab8fd6eebeea0",
+    "size_bytes": 2519,
+    "digest": "sha256:0342c4e83ee1bffb31d25b7cae1ac51b9bafbbc08209b05d23dc8bb4b31f3b54",
+    "expires_at": "2026-12-27T09:22:38Z"
+  },
+  "qualification": {
+    "profile_validator": "PASS",
+    "profile_selftest_probes": 12,
+    "runner_selftest_probes": 12,
+    "validate_only": "PASS",
+    "mutation_execution": "PASS",
+    "source_immutability": "PASS",
+    "workflow_trigger_migration_performed": false,
+    "lot45_touched": false,
+    "business_code_touched": false
+  },
+  "diff_from_scope_base": [
+    ".github/workflows/ci-mutation.yml",
+    "engineering/MUTATION_RUNNER.md",
+    "engineering/work_units/ENG-09.3-WU11.json",
+    "scripts/governance/run_mutation_profile.py",
+    "scripts/governance/selftest_mutation_runner.py"
+  ],
+  "verdict": "P06_GENERIC_RUNNER_PARITY_PROVEN_WU12_MAY_PREPARE_TRIGGER_MIGRATION"
+}

@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "policy_kind": "historical_audit_evidence_protection_policy_v1",
+  "semantics": "BIND_AUDIT_ENGINE_TO_CANONICAL_IMMUTABLE_EVIDENCE_WITHOUT_WRITE_AUTHORITY",
+  "canonical_protection": {
+    "policy_path": "engineering/HISTORICAL_EVIDENCE_PROTECTION.json",
+    "validator_path": "scripts/governance/validate_historical_evidence_protection.py",
+    "expected_policy_kind": "historical_evidence_protection",
+    "comparison_base": "origin/main"
+  },
+  "audit_policy_bindings": [
+    "config/governance/historical_audit_findings_policy_v1.json",
+    "config/governance/historical_audit_report_policy_v1.json"
+  ],
+  "audit_validator_paths": [
+    "scripts/governance/plan_historical_audit_batches.py",
+    "scripts/governance/validate_historical_audit_manifest.py",
+    "scripts/governance/validate_historical_audit_mapping.py",
+    "scripts/governance/validate_historical_audit_findings.py",
+    "scripts/governance/validate_historical_audit_report.py"
+  ],
+  "report_schema_path": "config/governance/historical_audit_report_schema_v1.json",
+  "work_unit_glob": "ENG-07*.json",
+  "required_mutation_permissions": {
+    "historical_evidence": false,
+    "business_code": false,
+    "contracts": false,
+    "reports": false,
+    "data_audit": false,
+    "runtime_authority": false,
+    "business_state": false
+  },
+  "authority": {
+    "audit_execution_authority": false,
+    "remediation_execution_authority": false,
+    "historical_mutation_authority": false,
+    "business_mutation_authority": false,
+    "runtime_mutation_authority": false
+  },
+  "forbidden_scope_prefixes": [
+    "src/crypto_quant_bot/",
+    "data/audit/",
+    "reports/lot",
+    "contracts/"
+  ],
+  "required_parent_forbidden_scope": [
+    "src/crypto_quant_bot/** business implementation changes",
+    "Lot45 candidate branch changes",
+    "Lot46 implementation or unlock",
+    "data/audit/** historical evidence mutation",
+    "reports/lot*/** historical evidence mutation",
+    "contracts/** historical certification mutation",
+    "runtime capability activation",
+    "mandatory paid or LLM-backed dependency",
+    "live trading execution enablement"
+  ],
+  "forbidden_import_roots": [
+    "requests",
+    "httpx",
+    "socket",
+    "shutil"
+  ],
+  "forbidden_call_names": [
+    "open"
+  ],
+  "forbidden_call_attributes": [
+    "write_text",
+    "write_bytes",
+    "unlink",
+    "rename",
+    "replace",
+    "mkdir",
+    "rmdir",
+    "remove",
+    "chmod",
+    "touch",
+    "symlink_to",
+    "hardlink_to"
+  ],
+  "forbidden_queue_fields": [
+    "command",
+    "commands",
+    "patch",
+    "patches",
+    "target_path",
+    "target_paths",
+    "branch",
+    "commit",
+    "write_authority",
+    "mutation_authority",
+    "execution_authority",
+    "repository_action",
+    "github_action",
+    "shell",
+    "script"
+  ],
+  "invariants": [
+    "canonical historical evidence protection remains authoritative and is validated unchanged",
+    "Lot44 and Lot45 certified anchors remain commit-bound through the canonical protection validator",
+    "findings and report mutation permissions remain all false",
+    "audit and remediation objects possess no execution or mutation authority",
+    "audit validator source files contain no write primitive or external mutation client import",
+    "ENG-07 operational AWU allowlists cannot include business code contracts data/audit certified report prefixes or canonical protected current-tree paths",
+    "remediation queue schema contains metadata only and no command patch branch target-path or write-authority field",
+    "future remediation requires a separate explicitly authorized work item and may not rewrite certified historical evidence"
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-02-DAG-WU02",
+  "status": "READY",
+  "parent": {
+    "work_item_id": "ENG-02",
+    "task_id": "ENG-02.2",
+    "manifest": "engineering/lots/ENG-02.json"
+  },
+  "title": "Dependency DAG fixture ENG-02-DAG-WU02",
+  "objective": "Provide a valid DAG node for ENG-02-DAG-WU02.",
+  "non_goals": [
+    "business implementation",
+    "complexity scoring",
+    "risk classification"
+  ],
+  "depends_on": [
+    "ENG-02-DAG-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Active ENG-02 manifest",
+      "kind": "STATE",
+      "locator": "engineering/lots/ENG-02.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "DAG middle",
+      "kind": "OTHER",
+      "locator": "engineering/fixtures/awu_graph_valid/ENG-02-DAG-WU02.json"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "55baac717c4d1b22af902f816d5cda8a528d0e63",
+    "allowed_paths": [
+      "engineering/fixtures/awu_graph_valid/**"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**"
+    ],
+    "forbidden_semantics": [
+      "business implementation",
+      "Lot46 unlock"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "all declared AWU dependencies exist in the validated graph",
+      "dependency graph is acyclic"
+    ],
+    "acceptance_criteria": [
+      "graph validator accepts this node in the valid fixture set"
+    ]
+  },
+  "planning": {
+    "risk_class": "R0",
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "complexity_score": 0,
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 1,
+      "executable_loc_changed": 0,
+      "new_public_behaviors": 0,
+      "contract_families": 0,
+      "independent_algorithms": 0,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_required": false,
+    "split_reasons": [],
+    "context_budget": {
+      "max_primary_files": 8,
+      "max_reference_files": 8,
+      "max_total_kib": 512
+    }
+  },
+  "validation": {
+    "required_tiers": [
+      "T0"
+    ],
+    "target_commands": []
+  },
+  "done_when": [
+    "dependency semantics are satisfied"
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "policy_kind": "historical_audit_lifecycle_v1",
+  "semantics": "READ_ONLY_FAIL_CLOSED_BATCH_LIFECYCLE",
+  "states": [
+    "PLANNED",
+    "READY",
+    "IN_PROGRESS",
+    "REVIEW_REQUIRED",
+    "COMPLETE",
+    "BLOCKED"
+  ],
+  "initial_state": "PLANNED",
+  "terminal_states": [
+    "COMPLETE"
+  ],
+  "allowed_transitions": {
+    "PLANNED": [
+      "READY",
+      "BLOCKED"
+    ],
+    "READY": [
+      "IN_PROGRESS",
+      "BLOCKED"
+    ],
+    "IN_PROGRESS": [
+      "REVIEW_REQUIRED",
+      "BLOCKED"
+    ],
+    "REVIEW_REQUIRED": [
+      "COMPLETE",
+      "BLOCKED"
+    ],
+    "BLOCKED": [
+      "READY"
+    ],
+    "COMPLETE": []
+  },
+  "blockers_rule": "BLOCKED_REQUIRES_NONEMPTY_OTHER_STATES_REQUIRE_EMPTY",
+  "mutation_policy": "NO_HISTORICAL_EVIDENCE_BUSINESS_REMEDIATION_OR_RUNTIME_MUTATION",
+  "invariants": [
+    "state transition must appear explicitly in allowed_transitions",
+    "same-state transition is not a lifecycle transition",
+    "COMPLETE is reachable only from REVIEW_REQUIRED",
+    "BLOCKED requires at least one explicit blocker",
+    "non-BLOCKED manifests carry no blockers",
+    "lifecycle evaluation is pure and read-only"
+  ]
+}

@@ -1,15 +1,6 @@
 name: Lot 26 critical mutation assurance
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'src/crypto_quant_bot/contracts/timeframe_alignment.py'
-      - 'src/crypto_quant_bot/market_analysis/alignment_*.py'
-      - 'tests/lot26_fixtures.py'
-      - 'tests/test_lot26_*.py'
-      - '.github/workflows/lot26-mutation.yml'
-      - 'requirements-dev.lock'
   push:
     branches: [main]
   workflow_dispatch:

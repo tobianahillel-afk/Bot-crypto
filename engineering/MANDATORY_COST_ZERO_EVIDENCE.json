@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "mandatory_cost_zero_live_evidence_v1",
+  "observed_date": "2026-09-24",
+  "repository_observation": {
+    "source": "GITHUB_CONNECTOR_GET_REPO",
+    "id": "1322269966",
+    "full_name": "tobianahillel-afk/Bot-crypto",
+    "visibility": "public",
+    "private": false,
+    "archived": false,
+    "default_branch": "main"
+  },
+  "static_wu01_binding": {
+    "head_sha": "e341ad2693e246ddee32939b452c87f5a3ce55a0",
+    "bootstrap_run_id": 36057570058,
+    "bootstrap_conclusion": "success",
+    "static_verdict": "PASS_WITH_VISIBILITY_UNVERIFIED"
+  },
+  "github_actions_billing_observation": {
+    "source_kind": "OFFICIAL_GITHUB_DOCUMENTATION",
+    "observed_date": "2026-09-24",
+    "sources": {
+      "actions_billing": "https://docs.github.com/en/billing/concepts/product-billing/github-actions",
+      "hosted_runners": "https://docs.github.com/en/actions/reference/runners/github-hosted-runners",
+      "larger_runners": "https://docs.github.com/en/actions/concepts/runners/larger-runners",
+      "dependency_cache": "https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching",
+      "advanced_security_billing": "https://docs.github.com/en/billing/concepts/product-billing/github-advanced-security"
+    },
+    "facts": {
+      "standard_public_runner_usage_free": true,
+      "standard_public_runner_usage_unlimited": true,
+      "standard_public_runner_labels": [
+        "ubuntu-latest"
+      ],
+      "larger_runners_always_billed": true,
+      "default_cache_included_gb_per_repository": 10,
+      "cache_overage_requires_usage_above_included_allowance": true,
+      "increasing_cache_limit_beyond_default_can_incur_cost": true,
+      "code_scanning_free_for_public_repositories": true,
+      "dependency_review_free_for_public_repositories": true
+    }
+  },
+  "engine_storage_observation": {
+    "upload_artifact_action_required": false,
+    "explicit_actions_cache_action_required": false,
+    "setup_python_cache_workflows": [
+      ".github/workflows/security-dependencies.yml"
+    ],
+    "paid_cache_limit_expansion_required": false
+  },
+  "claim_scope": {
+    "mandatory_paid_requirement_only": true,
+    "account_wide_no_bill_claim": false,
+    "optional_paid_products_excluded": true,
+    "optional_cache_limit_expansion_excluded": true,
+    "payment_method_or_balance_queried": false
+  }
+}

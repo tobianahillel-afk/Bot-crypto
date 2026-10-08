@@ -1,21 +1,6 @@
 name: Lot 27 global market context validation
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'config/math/global_market_context_aggregator_v1.json'
-      - 'contracts/schemas/global_market_context_aggregator_state_v1.schema.json'
-      - 'src/crypto_quant_bot/market_analysis/global_market_context_aggregator*.py'
-      - 'scripts/run_lot27_global_market_context_aggregator.py'
-      - 'scripts/validate_lot27.py'
-      - 'tests/lot27_fixtures.py'
-      - 'tests/test_lot27_*.py'
-      - 'docs/*LOT_27*'
-      - 'reports/*lot_27*'
-      - 'data/audit/global_market_context_aggregator*lot27.json'
-      - '.github/workflows/lot27-global-context.yml'
-      - 'requirements-dev.lock'
   push:
     branches: [main]
   workflow_dispatch:

@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "eng09_phase1_mutation_consolidation_plan_v1",
+  "awu_id": "ENG-09.3-WU09",
+  "generated_from": {
+    "engine_head": "84693d0a307cc153af0424ac31058c1fbf8fc051",
+    "business_candidate_head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "business_candidate_pr": 66,
+    "redundancy_evidence": "engineering/LOT45_WORKFLOW_REDUNDANCY_EVIDENCE.json",
+    "wu08_reconciliation": "engineering/ENG09_WU08_COMPLETION_EVIDENCE.json"
+  },
+  "phase1": {
+    "original_candidate_workflows": 49,
+    "historical_fanout_original": 41,
+    "historical_fanout_removed": 38,
+    "protected_lot44_exceptions": 3,
+    "historical_fanout_reduction_percent": 92.68,
+    "projected_candidate_workflows_after_engine_adoption": 11,
+    "projected_total_workflow_reduction_percent": 77.55,
+    "historical_failure_noise_original": 19,
+    "historical_failure_noise_removed": 18,
+    "protected_historical_failure_retained": 1,
+    "historical_failure_noise_reduction_percent": 94.74,
+    "reason_target_49_to_8_not_reached": "Three Lot44 workflows are protected current-tree historical evidence and may not differ from origin/main during engineering foundation work without a separately approved historical migration/remediation work item.",
+    "protected_exceptions": [
+      ".github/workflows/lot44-mutation-assurance.yml",
+      ".github/workflows/lot44-trades-aggressor-classification.yml",
+      ".github/workflows/lot44-frozen-evidence.yml"
+    ]
+  },
+  "phase2_current_top_level_mutation_workflows": [
+    {
+      "id": "P06_EXTENDED_MUTATION",
+      "location": {
+        "branch": "engineering/bootstrap-development-engine",
+        "path": ".github/workflows/p06-extended-mutation.yml"
+      },
+      "triggers": [
+        "pull_request:main:path-filtered",
+        "push:main:path-filtered",
+        "workflow_dispatch"
+      ],
+      "mutation_targets": [
+        "src/crypto_quant_bot/contracts/decision_evidence.py"
+      ],
+      "tests": [
+        "tests/test_p06_decision_evidence.py",
+        "tests/test_p06_decision_evidence_properties.py"
+      ],
+      "threshold": {
+        "minimum_percent": 80,
+        "numerator": "killed + timeout",
+        "denominator": "killed + timeout + suspicious + survived",
+        "timeout_must_be_zero": false,
+        "suspicious_must_be_zero": false
+      },
+      "source_binding": "CURRENT_CHECKOUT",
+      "evidence_path": "reports/quality/p06_extended_mutation/",
+      "canonical_source_immutability_check": true
+    },
+    {
+      "id": "LOT45_MUTATION_ASSURANCE",
+      "location": {
+        "branch": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+        "path": ".github/workflows/lot45-mutation-assurance.yml"
+      },
+      "candidate_only": true,
+      "triggers": [
+        "pull_request:main:path-filtered",
+        "workflow_dispatch"
+      ],
+      "mutation_targets": [
+        "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py",
+        "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py",
+        "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py"
+      ],
+      "baseline_tests_count": 8,
+      "threshold": {
+        "minimum_percent": 80,
+        "numerator": "killed",
+        "denominator": "killed + timeout + suspicious + survived",
+        "timeout_must_be_zero": true,
+        "suspicious_must_be_zero": true
+      },
+      "deterministic_controls": {
+        "max_children": 1,
+        "python_hash_seed": "0",
+        "mutate_only_covered_lines": true,
+        "timeout_factor": 8
+      },
+      "source_binding": {
+        "hardcoded_source_head": "c418338da86c49bd4b688d4a64893ee5042adc40",
+        "observed_candidate_head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+        "status": "STALE_HARDCODED_BINDING_REQUIRES_LIFECYCLE_INPUT_BEFORE_ADOPTION"
+      },
+      "trusted_prelaunch_required": true,
+      "lot46_absence_checks_required": true,
+      "evidence_path": "reports/lot45/mutation/"
+    }
+  ],
+  "overlapping_embedded_mutation_capability": {
+    "workflow": ".github/workflows/code-quality.yml",
+    "capability": "Targeted mutation score gate",
+    "targets_count": 5,
+    "target_domain": "market_analysis technical indicators and numeric finite-float guard",
+    "threshold": {
+      "minimum_percent": 80,
+      "numerator": "killed + timeout",
+      "denominator": "killed + timeout + suspicious + survived"
+    },
+    "disposition": "KEEP_UNCHANGED_DURING_PHASE2; handle as phase-3 global-assurance deduplication so phase2 does not silently weaken institutional quality."
+  },
+  "phase2_target_architecture": {
+    "principle": "ONE_REUSABLE_MUTATION_CONTROL_WITH_EXPLICIT_PROFILES_AND_DETERMINISTIC_IMPACT_SELECTION",
+    "proposed_files": [
+      "config/governance/mutation_profile_policy_v1.json",
+      "config/governance/mutation_profiles_v1.json",
+      "scripts/governance/validate_mutation_profiles.py",
+      "scripts/governance/select_mutation_profile.py",
+      "scripts/governance/run_mutation_profile.py",
+      ".github/workflows/ci-mutation.yml"
+    ],
+    "profile_contract": [
+      "profile id and version are explicit",
+      "changed-path selectors are deterministic and non-overlapping or fail closed",
+      "mutation targets are explicit repository-relative Python files",
+      "test selection is explicit and bounded",
+      "score numerator/denominator semantics are profile-specific and cannot be globally normalized",
+      "timeout and suspicious policies are explicit per profile",
+      "source-head binding mode is explicit; hardcoded stale source heads are forbidden in the generic control",
+      "critical profiles may require trusted prelaunch, candidate-lock and source-immutability guards",
+      "JSON profile data never supplies arbitrary shell commands",
+      "evidence output schema is common while profile-specific score semantics remain preserved"
+    ],
+    "initial_engine_profile": "P06_DECISION_EVIDENCE",
+    "deferred_candidate_profile": "LOT45_ORDER_FLOW_DELTA_CVD",
+    "candidate_adoption_rule": "Define and validate the Lot45 profile contract in the engine, but do not replace or edit the candidate workflow until the business candidate is explicitly revalidated through the engine lifecycle.",
+    "invocation_target": "At most one top-level generic mutation workflow selected per candidate diff after adoption."
+  },
+  "implementation_awus": [
+    {
+      "order": 1,
+      "id": "ENG-09.3-WU10",
+      "objective": "Implement profile schema/policy, validator, deterministic selector and P0.6 profile with adversarial tests; no workflow migration yet.",
+      "expected_risk": "R1",
+      "no_business_code": true
+    },
+    {
+      "order": 2,
+      "id": "ENG-09.3-WU11",
+      "objective": "Implement reusable ci-mutation workflow and runner, execute P0.6 parity qualification without deleting the legacy P0.6 workflow.",
+      "expected_risk": "R2",
+      "no_business_code": true
+    },
+    {
+      "order": 3,
+      "id": "ENG-09.3-WU12",
+      "objective": "After parity evidence, migrate P0.6 trigger surface to the generic control; keep code-quality embedded mutation unchanged for phase 3.",
+      "expected_risk": "R1",
+      "no_business_code": true
+    },
+    {
+      "order": 4,
+      "id": "ENG-09.3-WU13",
+      "objective": "Define the Lot45 profile from read-only candidate semantics and prove selection/evidence equivalence without modifying PR #66; actual candidate adoption remains lifecycle-gated.",
+      "expected_risk": "R1",
+      "no_business_code": true
+    }
+  ],
+  "safety": {
+    "modifies_workflows_in_wu09": false,
+    "modifies_business_candidate": false,
+    "weakens_lot44_protection": false,
+    "introduces_paid_dependency": false,
+    "requires_llm": false,
+    "unlocks_lot46": false
+  }
+}

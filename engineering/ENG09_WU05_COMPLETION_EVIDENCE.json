@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "eng09_wu05_completion_evidence_v1",
+  "awu_id": "ENG-09.3-WU05",
+  "verdict": "PASS",
+  "scope_base_sha": "06b3338ec59c831f7adcefcdccbf1bc366fec194",
+  "exact_head_sha": "36f5bc1bf28b7cd97817d8336114b0c70eaeb142",
+  "transformations": [
+    {
+      "path": ".github/workflows/lot40-engineering-diagnostic.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": false,
+      "jobs_suffix_byte_identical": true
+    },
+    {
+      "path": ".github/workflows/lot40-book-integrity-desynchronization.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": false,
+      "jobs_suffix_byte_identical": true
+    },
+    {
+      "path": ".github/workflows/lot36-freshness-gap-outage-v3-closure.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": true,
+      "jobs_suffix_byte_identical": true
+    },
+    {
+      "path": ".github/workflows/lot37-microstructure-scope-contracts.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": true,
+      "jobs_suffix_byte_identical": true
+    },
+    {
+      "path": ".github/workflows/lot43-book-resilience-replenishment.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": false,
+      "jobs_suffix_byte_identical": true
+    },
+    {
+      "path": ".github/workflows/lot29-v2-replay-audit.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": true,
+      "jobs_suffix_byte_identical": true
+    },
+    {
+      "path": ".github/workflows/lot31-source-registry.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": true,
+      "jobs_suffix_byte_identical": true
+    },
+    {
+      "path": ".github/workflows/pre-lot26-readiness-validation.yml",
+      "pull_request_removed": true,
+      "workflow_dispatch_preserved": true,
+      "preexisting_push_main_preserved": true,
+      "jobs_suffix_byte_identical": true
+    }
+  ],
+  "protected_boundaries": {
+    "lot44_workflows_unchanged": true,
+    "lot45_workflows_unchanged": true,
+    "global_workflows_unchanged": true,
+    "business_code_unchanged": true,
+    "historical_evidence_unchanged": true,
+    "contracts_unchanged": true
+  },
+  "exact_head_runs": [
+    {
+      "id": 36349637574,
+      "name": "Engineering Bootstrap",
+      "conclusion": "success"
+    },
+    {
+      "id": 36349637569,
+      "name": "Security Secrets",
+      "conclusion": "success"
+    },
+    {
+      "id": 36349637593,
+      "name": "Security Actions",
+      "conclusion": "success"
+    },
+    {
+      "id": 36349637572,
+      "name": "Security Supply Chain",
+      "conclusion": "success"
+    }
+  ]
+}

@@ -1,0 +1,646 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/tobianahillel-afk/Bot-crypto/config/governance/project_state_v1.schema.json",
+  "title": "Crypto Quant Bot Permanent Project State V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "state_kind",
+    "project",
+    "business_track",
+    "engineering_track",
+    "audit_track",
+    "safety",
+    "cost_policy",
+    "authority",
+    "external_observations",
+    "findings",
+    "stop_conditions",
+    "freshness_policy"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "state_kind": {
+      "const": "project_state_v1"
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "canonical_name",
+        "repository"
+      ],
+      "properties": {
+        "canonical_name": {
+          "const": "Crypto Quant Bot V3.1-Ops"
+        },
+        "repository": {
+          "const": "tobianahillel-afk/Bot-crypto"
+        }
+      }
+    },
+    "business_track": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "development_status",
+        "merged_certified_baseline",
+        "merged_entry_gate",
+        "candidate",
+        "next_lot"
+      ],
+      "properties": {
+        "development_status": {
+          "enum": [
+            "PAUSED",
+            "ACTIVE",
+            "BLOCKED"
+          ]
+        },
+        "merged_certified_baseline": {
+          "$ref": "#/$defs/certifiedBaseline"
+        },
+        "merged_entry_gate": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/entryGate"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "candidate": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/businessCandidate"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "next_lot": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/nextLot"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "engineering_track": {
+      "$ref": "#/$defs/workTrack"
+    },
+    "audit_track": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "completed",
+        "active_batch",
+        "active_task",
+        "next_batch",
+        "active_manifest",
+        "blockers"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "NOT_STARTED",
+            "BUILDING",
+            "STABLE",
+            "BLOCKED",
+            "COMPLETE"
+          ]
+        },
+        "completed": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "active_batch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "active_task": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "next_batch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "active_manifest": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "blockers": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "safety": {
+      "$ref": "#/$defs/safety"
+    },
+    "cost_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "paid_external_api_required",
+        "paid_llm_required",
+        "paid_saas_required",
+        "paid_runner_required"
+      ],
+      "properties": {
+        "paid_external_api_required": {
+          "type": "boolean"
+        },
+        "paid_llm_required": {
+          "type": "boolean"
+        },
+        "paid_saas_required": {
+          "type": "boolean"
+        },
+        "paid_runner_required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "current_state",
+        "canonical_baseline",
+        "repository_truth_registry",
+        "historical_evidence_protection",
+        "master_plan",
+        "active_manifest"
+      ],
+      "properties": {
+        "current_state": {
+          "type": "string",
+          "minLength": 1
+        },
+        "canonical_baseline": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repository_truth_registry": {
+          "type": "string",
+          "minLength": 1
+        },
+        "historical_evidence_protection": {
+          "type": "string",
+          "minLength": 1
+        },
+        "master_plan": {
+          "type": "string",
+          "minLength": 1
+        },
+        "active_manifest": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "external_observations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "main",
+        "rulesets_count",
+        "business_candidate"
+      ],
+      "properties": {
+        "main": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sha",
+            "branch_protected"
+          ],
+          "properties": {
+            "sha": {
+              "$ref": "#/$defs/sha40"
+            },
+            "branch_protected": {
+              "type": "boolean"
+            }
+          }
+        },
+        "rulesets_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "business_candidate": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "pr",
+                "state",
+                "merged",
+                "head",
+                "base"
+              ],
+              "properties": {
+                "pr": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "state": {
+                  "enum": [
+                    "open",
+                    "closed"
+                  ]
+                },
+                "merged": {
+                  "type": "boolean"
+                },
+                "head": {
+                  "$ref": "#/$defs/sha40"
+                },
+                "base": {
+                  "$ref": "#/$defs/sha40"
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "stop_conditions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "freshness_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verify_external_git_on_every_agent_resume",
+        "auto_heal_state_from_external_git",
+        "mismatch_consequence"
+      ],
+      "properties": {
+        "verify_external_git_on_every_agent_resume": {
+          "type": "boolean"
+        },
+        "auto_heal_state_from_external_git": {
+          "type": "boolean"
+        },
+        "mismatch_consequence": {
+          "const": "STATE_DRIFT"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha40": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "certifiedBaseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lot",
+        "version",
+        "verdict",
+        "source_head",
+        "implementation_merge",
+        "post_merge_audit_pr",
+        "post_merge_audit_head",
+        "post_merge_audit_merge"
+      ],
+      "properties": {
+        "lot": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^0\\.[0-9]+\\.0$"
+        },
+        "verdict": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_head": {
+          "$ref": "#/$defs/sha40"
+        },
+        "implementation_merge": {
+          "$ref": "#/$defs/sha40"
+        },
+        "post_merge_audit_pr": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "post_merge_audit_head": {
+          "$ref": "#/$defs/sha40"
+        },
+        "post_merge_audit_merge": {
+          "$ref": "#/$defs/sha40"
+        }
+      }
+    },
+    "entryGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target_lot",
+        "verdict",
+        "pr",
+        "pr_head",
+        "merge"
+      ],
+      "properties": {
+        "target_lot": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "verdict": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pr": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "pr_head": {
+          "$ref": "#/$defs/sha40"
+        },
+        "merge": {
+          "$ref": "#/$defs/sha40"
+        }
+      }
+    },
+    "businessCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lot",
+        "pr",
+        "branch",
+        "observed_head",
+        "state",
+        "merged",
+        "status"
+      ],
+      "properties": {
+        "lot": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pr": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "branch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observed_head": {
+          "$ref": "#/$defs/sha40"
+        },
+        "state": {
+          "enum": [
+            "OPEN",
+            "CLOSED"
+          ]
+        },
+        "merged": {
+          "type": "boolean"
+        },
+        "status": {
+          "enum": [
+            "ACTIVE_CANDIDATE",
+            "SUSPENDED_CANDIDATE",
+            "BLOCKED_CANDIDATE",
+            "CERTIFIED_CANDIDATE",
+            "REJECTED_CANDIDATE"
+          ]
+        }
+      }
+    },
+    "nextLot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lot",
+        "status"
+      ],
+      "properties": {
+        "lot": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "enum": [
+            "LOCKED",
+            "PLANNED_LOCKED",
+            "GATED",
+            "OPEN"
+          ]
+        }
+      }
+    },
+    "workTrack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "completed",
+        "active_lot",
+        "active_task",
+        "next_lot",
+        "active_manifest",
+        "branch",
+        "blockers"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "BUILDING",
+            "STABLE",
+            "BLOCKED",
+            "COMPLETE"
+          ]
+        },
+        "completed": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "active_lot": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "active_task": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "next_lot": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "active_manifest": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "branch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "blockers": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runtime_max",
+        "trade_allowed",
+        "execution_allowed",
+        "live_execution",
+        "leverage",
+        "withdrawals"
+      ],
+      "properties": {
+        "runtime_max": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trade_allowed": {
+          "type": "boolean"
+        },
+        "execution_allowed": {
+          "type": "boolean"
+        },
+        "live_execution": {
+          "enum": [
+            "DISABLED",
+            "SANDBOX_ONLY",
+            "ENABLED"
+          ]
+        },
+        "leverage": {
+          "enum": [
+            "FORBIDDEN",
+            "ALLOWED"
+          ]
+        },
+        "withdrawals": {
+          "enum": [
+            "FORBIDDEN",
+            "ALLOWED"
+          ]
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "severity",
+        "code",
+        "observed",
+        "impact",
+        "remediation_target",
+        "must_be_resolved_before"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "severity": {
+          "enum": [
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "CRITICAL"
+          ]
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observed": {
+          "type": "boolean"
+        },
+        "impact": {
+          "type": "string",
+          "minLength": 1
+        },
+        "remediation_target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "must_be_resolved_before": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

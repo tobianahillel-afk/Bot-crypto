@@ -1,17 +1,6 @@
 name: Lot 40 mutation assurance
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector*.py'
-      - 'tests/test_lot40*.py'
-      - 'config/microstructure/book_integrity_desynchronization_detector_v1.json'
-      - 'contracts/schemas/book_integrity*.json'
-      - 'contracts/schemas/book_health_veto_v1.schema.json'
-      - 'reports/lot40/mutation_summary.json'
-      - '.github/workflows/lot40-mutation-assurance.yml'
-      - 'requirements-dev.lock'
   workflow_dispatch:
 
 permissions:

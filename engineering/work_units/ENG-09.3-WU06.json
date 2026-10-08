@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-09.3-WU06",
+  "status": "DONE",
+  "parent": {
+    "work_item_id": "ENG-09",
+    "task_id": "ENG-09.3",
+    "manifest": "engineering/lots/ENG-09.json"
+  },
+  "title": "Suppress historical validation PR fanout batch 2",
+  "objective": "Remove pull_request triggering from the remaining eight mutable historical validation workflows while preserving existing push/manual lifecycle surfaces and all validation jobs, commands, thresholds and evidence logic.",
+  "non_goals": [
+    "modify any Lot44 workflow",
+    "modify Lot45 or global workflows",
+    "change validation jobs commands thresholds reports or evidence semantics",
+    "modify business code",
+    "resolve Lot45 P1 findings",
+    "merge PR #66",
+    "unlock Lot46",
+    "change business development status",
+    "modify frozen historical evidence"
+  ],
+  "depends_on": [
+    "ENG-09.3-WU05"
+  ],
+  "inputs": [
+    {
+      "name": "Lot45 workflow redundancy evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/LOT45_WORKFLOW_REDUNDANCY_EVIDENCE.json"
+    },
+    {
+      "name": "WU05 completion evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/ENG09_WU05_COMPLETION_EVIDENCE.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Historical validation workflow batch2 1",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot39-order-book-delta-sequence.yml"
+    },
+    {
+      "name": "Historical validation workflow batch2 2",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot28-explanation-core.yml"
+    },
+    {
+      "name": "Historical validation workflow batch2 3",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot33-timestamp-governance.yml"
+    },
+    {
+      "name": "Historical validation workflow batch2 4",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot34-market-data-quality.yml"
+    },
+    {
+      "name": "Historical validation workflow batch2 5",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot32-instrument-normalization.yml"
+    },
+    {
+      "name": "Historical validation workflow batch2 6",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot30-v2-closure.yml"
+    },
+    {
+      "name": "Historical validation workflow batch2 7",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot35-candle-trade-book-reconciliation.yml"
+    },
+    {
+      "name": "Historical validation workflow batch2 8",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot27-global-context.yml"
+    },
+    {
+      "name": "WU06 completion evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/ENG09_WU06_COMPLETION_EVIDENCE.json"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "36f5bc1bf28b7cd97817d8336114b0c70eaeb142",
+    "allowed_paths": [
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-09.3-WU05.json",
+      "engineering/work_units/ENG-09.3-WU06.json",
+      "engineering/ENG09_WU05_COMPLETION_EVIDENCE.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      ".github/workflows/lot39-order-book-delta-sequence.yml",
+      ".github/workflows/lot28-explanation-core.yml",
+      ".github/workflows/lot33-timestamp-governance.yml",
+      ".github/workflows/lot34-market-data-quality.yml",
+      ".github/workflows/lot32-instrument-normalization.yml",
+      ".github/workflows/lot30-v2-closure.yml",
+      ".github/workflows/lot35-candle-trade-book-reconciliation.yml",
+      ".github/workflows/lot27-global-context.yml",
+      "engineering/ENG09_WU06_COMPLETION_EVIDENCE.json"
+    ],
+    "forbidden_paths": [
+      ".github/workflows/lot44-*.yml",
+      ".github/workflows/lot45-*.yml",
+      ".github/workflows/code-quality.yml",
+      ".github/workflows/p06-*.yml",
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "Lot44 workflow mutation",
+      "Lot45 or global workflow mutation",
+      "workflow job command threshold or artifact mutation",
+      "new workflow trigger introduction",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot45 merge",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "each target loses pull_request triggering and pull-request-only path filters",
+      "workflow_dispatch remains present on all eight targets",
+      "pre-existing push main surfaces remain unchanged",
+      "workflows without pre-existing push remain manual-only",
+      "everything below each trigger block remains byte-for-byte unchanged",
+      "no Lot44 Lot45 or global workflow is modified",
+      "validation jobs commands thresholds reports and evidence logic remain unchanged",
+      "business development remains paused and Lot46 remains locked"
+    ],
+    "acceptance_criteria": [
+      "lot39 order-book validation becomes workflow_dispatch-only",
+      "lot28 lot33 lot34 lot32 lot30 lot35 and lot27 retain push main plus workflow_dispatch",
+      "all eight jobs sections are unchanged",
+      "workflow security and supply-chain gates pass on exact head",
+      "Security Secrets and Engineering Bootstrap pass on exact head"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 14,
+      "executable_loc_changed": 0,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 0,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/run_incremental_validation.py",
+      "python scripts/governance/validate_workflow_security_controls.py",
+      "python scripts/governance/audit_action_supply_chain.py --mode changed"
+    ]
+  },
+  "done_when": [
+    "the final eight mutable historical validation workflows no longer trigger on unrelated candidate pull requests",
+    "their original push/manual lifecycle surfaces are preserved",
+    "their jobs and validation semantics are unchanged",
+    "no Lot44 Lot45 or global workflow is touched",
+    "same-head bootstrap and security gates pass"
+  ]
+}

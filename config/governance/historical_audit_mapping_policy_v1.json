@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "policy_kind": "historical_audit_mapping_policy_v1",
+  "semantics": "SOURCE_BOUND_READ_ONLY_TRACEABILITY_WITH_EXPLICIT_GAPS",
+  "historical_lot_range": {
+    "min": 0,
+    "max": 44
+  },
+  "mapping_mode": "READ_ONLY",
+  "coverage_statuses": [
+    "MAPPED",
+    "JUSTIFIED_NON_CODE",
+    "UNRESOLVED"
+  ],
+  "requirement_categories": [
+    "FUNCTIONAL",
+    "SAFETY",
+    "GOVERNANCE",
+    "DOCUMENTATION",
+    "EVIDENCE"
+  ],
+  "reference_prefixes": {
+    "requirement_source": [
+      "docs/"
+    ],
+    "design_section": [
+      "docs/"
+    ],
+    "implementation_symbol": [
+      "src/crypto_quant_bot/",
+      "scripts/"
+    ],
+    "test_id": [
+      "tests/"
+    ],
+    "contract_artifact": [
+      "contracts/",
+      "docs/contracts/",
+      "config/"
+    ],
+    "evidence_artifact": [
+      "data/audit/",
+      "reports/",
+      "docs/"
+    ]
+  },
+  "mutation_permissions": {
+    "historical_evidence": false,
+    "business_code": false,
+    "contracts": false,
+    "reports": false,
+    "data_audit": false,
+    "runtime_authority": false,
+    "business_state": false
+  },
+  "identity": {
+    "algorithm": "sha256",
+    "canonical_json": {
+      "sort_keys": true,
+      "separators": [
+        ",",
+        ":"
+      ],
+      "ensure_ascii": false,
+      "allow_nan": false
+    },
+    "excluded_fields": [
+      "mapping_identity_sha256"
+    ]
+  },
+  "status_rules": {
+    "MAPPED": {
+      "require_nonempty": [
+        "design_sections",
+        "implementation_symbols",
+        "test_ids",
+        "contract_artifacts",
+        "evidence_artifacts"
+      ],
+      "justification": "MUST_BE_NULL",
+      "gap_reason": "MUST_BE_NULL"
+    },
+    "JUSTIFIED_NON_CODE": {
+      "require_nonempty": [
+        "design_sections",
+        "evidence_artifacts"
+      ],
+      "require_empty": [
+        "implementation_symbols",
+        "test_ids"
+      ],
+      "justification": "REQUIRED_NONEMPTY",
+      "gap_reason": "MUST_BE_NULL"
+    },
+    "UNRESOLVED": {
+      "gap_reason": "REQUIRED_NONEMPTY",
+      "justification": "MUST_BE_NULL"
+    }
+  },
+  "invariants": [
+    "mapping binds exactly one validated ENG-07.2 manifest and one historical lot in that manifest batch",
+    "plan and batch identities must equal the validated manifest identities",
+    "requirements are strictly ordered by requirement_id and unique",
+    "all repository references are relative traversal-free and category-prefix constrained",
+    "reference arrays are duplicate-free",
+    "MAPPED never omits design implementation test contract or evidence coverage",
+    "JUSTIFIED_NON_CODE cannot invent implementation or test references",
+    "UNRESOLVED remains explicit and requires a gap reason",
+    "mapping identity covers all semantic fields except itself",
+    "all mutation permissions remain false"
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "authority": {
+    "active_manifest": "business/lots/LOT-45.json",
+    "bootstrap_protocol": "engineering/BOOTSTRAP.md",
+    "current_state": "config/governance/project_state.json",
+    "handoff": "engineering/handoff/CURRENT.json",
+    "master_plan": "engineering/MASTER_PLAN.md",
+    "transition_policy": "engineering/STATE_TRANSITIONS.json"
+  },
+  "bootstrap_engine": {
+    "active_lot": null,
+    "active_manifest": null,
+    "active_task": null,
+    "blockers": [],
+    "branch": "engineering/bootstrap-development-engine",
+    "completed": [
+      "BOOT-00",
+      "BOOT-01",
+      "BOOT-02",
+      "BOOT-03",
+      "BOOT-04",
+      "BOOT-05",
+      "BOOT-06",
+      "BOOT-07"
+    ],
+    "next_lot": null,
+    "phase": "STABLE",
+    "qualification": {
+      "conclusion": "success",
+      "head_sha": "8cf72a4008e2984189652782e9d8c3697f88cef0",
+      "qualified_scenarios": 4,
+      "workflow_run_id": 35776801100
+    }
+  },
+  "business_track": {
+    "active_candidate": {
+      "branch": "agent/lot45-order-flow-delta-cvd-engine-v2",
+      "lot": 45,
+      "observed_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+      "pull_request": 66,
+      "status": "ACTIVE_CANDIDATE"
+    },
+    "business_development": "ACTIVE",
+    "last_merged_certified_lot": 44,
+    "next_lot": {
+      "lot": 46,
+      "status": "LOCKED"
+    }
+  },
+  "engineering_engine": {
+    "active_lot": null,
+    "active_manifest": null,
+    "active_task": null,
+    "blockers": [],
+    "completed": [
+      "ENG-00",
+      "ENG-01",
+      "ENG-02",
+      "ENG-03",
+      "ENG-04",
+      "ENG-05",
+      "ENG-06",
+      "ENG-07",
+      "ENG-08",
+      "ENG-09"
+    ],
+    "next_lot": null,
+    "phase": "STABLE"
+  },
+  "known_findings": [
+    {
+      "code": "MAIN_BRANCH_UNPROTECTED",
+      "id": "BOOT-FINDING-001",
+      "impact": "Direct pushes or unreviewed changes to main are not prevented by branch protection.",
+      "must_be_resolved_before": "BUSINESS_DEVELOPMENT_UNLOCK",
+      "observed": false,
+      "remediation_target": "ENG-04.6",
+      "severity": "HIGH"
+    }
+  ],
+  "mandatory_cost_policy": {
+    "paid_external_api_required": false,
+    "paid_llm_required": false,
+    "paid_runner_required": false,
+    "paid_saas_required": false
+  },
+  "observed_git_baseline": {
+    "default_branch": "main",
+    "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "verified_at_utc": "2026-09-22T19:19:32Z"
+  },
+  "project": {
+    "canonical_name": "Crypto Quant Bot V3.1-Ops",
+    "repository": "tobianahillel-afk/Bot-crypto"
+  },
+  "safety": {
+    "execution_allowed": false,
+    "leverage": "FORBIDDEN",
+    "live_execution": "DISABLED",
+    "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "trade_allowed": false,
+    "withdrawals": "FORBIDDEN"
+  },
+  "schema_version": 1,
+  "state_kind": "bootstrap_engine_state",
+  "stop_conditions": [
+    "STATE_DRIFT",
+    "BUSINESS_SCOPE_TOUCHED_WITHOUT_UNLOCK",
+    "FROZEN_EVIDENCE_MUTATION",
+    "LOT46_UNLOCK_ATTEMPT",
+    "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
+  ]
+}

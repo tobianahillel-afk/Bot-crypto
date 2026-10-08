@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "registry_kind": "mutation_profiles_v1",
+  "profiles": [
+    {
+      "id": "P06_DECISION_EVIDENCE",
+      "profile_version": 2,
+      "enabled": true,
+      "selectors": [
+        {
+          "mode": "EXACT",
+          "pattern": "src/crypto_quant_bot/contracts/decision_evidence.py"
+        },
+        {
+          "mode": "GLOB",
+          "pattern": "tests/test_p06_decision_evidence*.py"
+        },
+        {
+          "mode": "EXACT",
+          "pattern": ".github/workflows/ci-mutation.yml"
+        },
+        {
+          "mode": "EXACT",
+          "pattern": "requirements-dev.lock"
+        },
+        {
+          "mode": "EXACT",
+          "pattern": "pyproject.toml"
+        }
+      ],
+      "mutation": {
+        "source_paths": [
+          "src/crypto_quant_bot/contracts/"
+        ],
+        "targets": [
+          "src/crypto_quant_bot/contracts/decision_evidence.py"
+        ],
+        "tests": [
+          "tests/test_p06_decision_evidence.py",
+          "tests/test_p06_decision_evidence_properties.py"
+        ],
+        "also_copy": [
+          "src/crypto_quant_bot/__init__.py",
+          "src/crypto_quant_bot/core/",
+          "src/crypto_quant_bot/data/",
+          "config/",
+          "contracts/",
+          "pyproject.toml"
+        ],
+        "settings": {
+          "mutate_only_covered_lines": true,
+          "max_stack_depth": 10,
+          "timeout_multiplier": 8,
+          "timeout_constant": 1,
+          "do_not_mutate_patterns": [
+            "raise \\\\w+",
+            "logger\\\\.\\\\w+"
+          ]
+        }
+      },
+      "score": {
+        "minimum_percent": 80,
+        "numerator": [
+          "killed",
+          "timeout"
+        ],
+        "denominator": [
+          "killed",
+          "timeout",
+          "suspicious",
+          "survived"
+        ],
+        "require_zero": []
+      },
+      "source_binding": {
+        "mode": "CURRENT_CHECKOUT",
+        "exact_head": null
+      },
+      "evidence": {
+        "directory": "reports/quality/p06_extended_mutation/",
+        "run_log": "run.txt",
+        "results_log": "results.txt",
+        "score_file": "score.json",
+        "schema_version": "p0-6-decision-evidence-mutation-score-v1"
+      },
+      "source_immutability": {
+        "enabled": true,
+        "restore_paths": [
+          "pyproject.toml"
+        ],
+        "verify_paths": [
+          "src/crypto_quant_bot"
+        ]
+      },
+      "legacy_reference": {
+        "workflow": ".github/workflows/p06-extended-mutation.yml",
+        "workflow_blob_sha": "b1653c0c392e74ea7f50b7b922fd8750fa402bb7",
+        "canonical_mutmut_defaults": "pyproject.toml",
+        "lifecycle": "GENERIC_CONTROL_ACTIVE_AFTER_WU12"
+      }
+    }
+  ]
+}

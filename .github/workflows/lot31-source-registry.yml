@@ -1,21 +1,6 @@
 name: Lot 31 market data source registry validation
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'config/data_governance/market_data_source_registry_v1.json'
-      - 'contracts/schemas/*source_registry*.json'
-      - 'contracts/schemas/market_data_governance_scope_source_registry_*.json'
-      - 'src/crypto_quant_bot/data_governance/**'
-      - 'scripts/*lot31*'
-      - 'tests/test_lot31_*.py'
-      - 'docs/*LOT_31*'
-      - 'docs/LOT31_*'
-      - 'reports/*lot_31*'
-      - 'data/audit/*lot31.json'
-      - '.github/workflows/lot31-source-registry.yml'
-      - 'requirements-dev.lock'
   push:
     branches: [main]
   workflow_dispatch:

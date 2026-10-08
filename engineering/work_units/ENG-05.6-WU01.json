@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-05.6-WU01",
+  "status": "DONE",
+  "parent": {
+    "work_item_id": "ENG-05",
+    "task_id": "ENG-05.6",
+    "manifest": "engineering/lots/ENG-05.json"
+  },
+  "title": "Make resume/recovery qualification task-agnostic",
+  "objective": "Remove task-specific ENG-05.5 assumptions from permanent resume/recovery qualification so every future active AWU can be recovered and validated generically.",
+  "non_goals": [
+    "evaluate or install third-party documentation tools",
+    "change permanent state or handoff schemas",
+    "weaken recovery fail-closed semantics",
+    "business implementation",
+    "Lot45 candidate remediation",
+    "Lot46 unlock"
+  ],
+  "depends_on": [
+    "ENG-05.5-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Current handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    },
+    {
+      "name": "Active AWU resolver",
+      "kind": "FILE",
+      "locator": "scripts/governance/resolve_active_awu.py"
+    },
+    {
+      "name": "Resume recovery qualification",
+      "kind": "TEST",
+      "locator": "scripts/governance/resume_recovery_qualification.py"
+    },
+    {
+      "name": "Resume recovery selftest",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_resume_recovery.py"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Generic resume recovery qualification",
+      "kind": "TEST",
+      "locator": "scripts/governance/resume_recovery_qualification.py"
+    },
+    {
+      "name": "Generic resume recovery adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_resume_recovery.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "48b32eb43f778d2da364725974e1805bd2660837",
+    "allowed_paths": [
+      "config/governance/project_state.json",
+      "engineering/STATE.json",
+      "engineering/lots/ENG-05.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-05.5-WU01.json",
+      "engineering/work_units/ENG-05.6-WU01.json",
+      "AGENTS.md",
+      "README.md",
+      "engineering/CURRENT_STATUS.md",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "scripts/governance/resume_recovery_qualification.py",
+      "scripts/governance/selftest_resume_recovery.py",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      ".github/workflows/lot*/**"
+    ],
+    "forbidden_semantics": [
+      "task-specific recovery authorization",
+      "handoff becomes authorization source",
+      "automatic permanent-state healing",
+      "business implementation",
+      "Lot45 candidate remediation",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "mandatory paid dependency"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "resume/recovery qualification derives active lot task and AWU from permanent state plus the active AWU resolver",
+      "no literal prior task or AWU id may be required for success",
+      "handoff remains a non-authoritative hint",
+      "stale or missing hints cannot change the recovered canonical task",
+      "write_authorized remains false until live Git revalidation",
+      "unsafe Lot46 paid dependency and ambiguous AWU scenarios remain fail-closed"
+    ],
+    "acceptance_criteria": [
+      "qualification passes when ENG-05.6-WU01 is active without changing recovery semantics",
+      "normal assertions bind to the current handoff checkpoint rather than a literal AWU id",
+      "stale handoff/context tests compare against the dynamically recovered baseline",
+      "ambiguous-AWU fixture derives its duplicate id from the current task",
+      "full Engineering Bootstrap reaches cold-start after recovery tests",
+      "no external dependency network or paid service is introduced"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 14,
+      "executable_loc_changed": 120,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1"
+    ],
+    "target_commands": [
+      "python scripts/governance/resume_recovery_qualification.py",
+      "python scripts/governance/selftest_resume_recovery.py",
+      "python scripts/governance/cold_start_qualification.py"
+    ]
+  },
+  "done_when": [
+    "recovery qualification contains no task-specific success requirement",
+    "the next active AWU passes resume/recovery and cold-start without modifying the recovery harness again",
+    "all fail-closed recovery scenarios remain enforced"
+  ]
+}

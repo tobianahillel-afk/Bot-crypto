@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "policy_kind": "certification_deep_assurance_v1",
+  "semantics": "T3_REASON_TO_EXISTING_EXACT_HEAD_WORKFLOW_EVIDENCE_FAIL_CLOSED",
+  "selection_policy_source": "config/governance/validation_t3_t4_policy_v1.json",
+  "exact_head_policy_source": "config/governance/certification_exact_head_binding_v1.json",
+  "security_engine_policy_source": "config/governance/security_engine_verification_policy_v1.json",
+  "evidence_policy_source": "engineering/AGENT_CAPABILITIES.json",
+  "execution_model": "EXISTING_EVENT_TRIGGERED_WORKFLOWS_NO_DUPLICATE_SCANNER_RUNS",
+  "control_catalog": {
+    "ENGINEERING_BOOTSTRAP": {
+      "automatic": true,
+      "workflow_name": "Engineering Bootstrap",
+      "workflow_path": ".github/workflows/engineering-bootstrap.yml"
+    },
+    "WORKFLOW_SECURITY": {
+      "automatic": true,
+      "workflow_name": "Security Actions",
+      "workflow_path": ".github/workflows/security-actions.yml"
+    },
+    "SUPPLY_CHAIN": {
+      "automatic": true,
+      "workflow_name": "Security Supply Chain",
+      "workflow_path": ".github/workflows/security-supply-chain.yml"
+    },
+    "SECRET_SCANNING": {
+      "automatic": true,
+      "workflow_name": "Security Secrets",
+      "workflow_path": ".github/workflows/security-secrets.yml"
+    },
+    "SAST": {
+      "automatic": true,
+      "workflow_name": "Security SAST",
+      "workflow_path": ".github/workflows/security-sast.yml"
+    },
+    "DEPENDENCY_SECURITY": {
+      "automatic": true,
+      "workflow_name": "Security Dependencies",
+      "workflow_path": ".github/workflows/security-dependencies.yml"
+    },
+    "MANUAL_REVIEW": {
+      "automatic": false,
+      "workflow_name": null,
+      "workflow_path": null
+    }
+  },
+  "requirement_reason_controls": {
+    "WORKFLOW_ASSURANCE": {
+      "RESIDUAL_IMPACT:WORKFLOW_SYNTAX": [
+        "WORKFLOW_SECURITY"
+      ]
+    },
+    "SECURITY_ASSURANCE": {
+      "RESIDUAL_IMPACT:ACTIONS_SECURITY": [
+        "WORKFLOW_SECURITY",
+        "SUPPLY_CHAIN"
+      ],
+      "RESIDUAL_IMPACT:SECURITY_STATIC_ANALYSIS": [
+        "SAST"
+      ],
+      "RESIDUAL_IMPACT:SECRET_CONTROLS": [
+        "SECRET_SCANNING"
+      ]
+    },
+    "STATIC_ANALYSIS_ASSURANCE": {
+      "RESIDUAL_IMPACT:STATIC_ANALYSIS": [
+        "SAST"
+      ]
+    },
+    "RISK_EXECUTION_ASSURANCE": {
+      "RISK_CLASS:R3": [
+        "ENGINEERING_BOOTSTRAP",
+        "SAST",
+        "SECRET_SCANNING"
+      ]
+    },
+    "MANUAL_DEEP_REVIEW": {
+      "RESIDUAL_IMPACT:CONSERVATIVE_BROAD_IMPACT": [
+        "MANUAL_REVIEW"
+      ],
+      "RESIDUAL_IMPACT:HUMAN_REVIEW_REQUIRED": [
+        "MANUAL_REVIEW"
+      ]
+    }
+  },
+  "exact_run_fields": [
+    "control_id",
+    "run_id",
+    "workflow",
+    "head_sha",
+    "conclusion"
+  ],
+  "required_conclusion": "success",
+  "max_evidence_runs": 16,
+  "invariants": [
+    "T3 requirements and reasons come from the validated T3/T4 selector contract",
+    "automatic controls point only to existing ENG-04 or engineering-bootstrap workflows",
+    "no scanner implementation is duplicated by certification assurance",
+    "only controls selected by requirement and reason are eligible evidence",
+    "automatic control evidence is a unique exact-head successful GitHub Actions run",
+    "manual deep review is never automatically satisfied and does not require an LLM",
+    "missing stale failed duplicate wrong-workflow or extra unselected evidence fails closed",
+    "R3 risk-execution assurance requires Engineering Bootstrap Security SAST and Security Secrets",
+    "unselected deep assurance causes no additional scanner requirement",
+    "mandatory assurance verification requires no paid API SaaS LLM or runner"
+  ]
+}

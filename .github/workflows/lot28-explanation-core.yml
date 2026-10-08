@@ -1,21 +1,6 @@
 name: Lot 28 explanation core validation
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'config/explanations/explanation_core_why_not_trade_v1.json'
-      - 'contracts/schemas/explanation_core_why_not_trade_layer_state_v1.schema.json'
-      - 'src/crypto_quant_bot/market_analysis/explanation_core*.py'
-      - 'scripts/run_lot28_explanation_core_and_why_not_trade_layer.py'
-      - 'scripts/validate_lot28.py'
-      - 'tests/lot28_fixtures.py'
-      - 'tests/test_lot28_*.py'
-      - 'docs/*LOT_28*'
-      - 'reports/*lot_28*'
-      - 'data/audit/explanation_core_and_why_not_trade_layer*lot28.json'
-      - '.github/workflows/lot28-explanation-core.yml'
-      - 'requirements-dev.lock'
   push:
     branches: [main]
   workflow_dispatch:

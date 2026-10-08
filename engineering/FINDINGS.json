@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "findings": [
+    {
+      "id": "BOOT-FINDING-001",
+      "severity": "HIGH",
+      "code": "MAIN_BRANCH_UNPROTECTED",
+      "status": "OPEN",
+      "evidence": {
+        "checked_branch": "main",
+        "observed_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+        "protected": false,
+        "required_status_check_enforcement": "off"
+      },
+      "consequence": "The permanent Development Engine cannot treat main as protected until repository settings enforce the intended merge/check policy.",
+      "remediation": {
+        "target": "ENG-04.6",
+        "requirement": "Configure and verify branch/ruleset protection with least-privilege merge policy and required checks.",
+        "automatic_plugin_write_available": false
+      },
+      "gate": "Must be resolved before BUSINESS_DEVELOPMENT_UNLOCK."
+    }
+  ]
+}

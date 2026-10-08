@@ -1,0 +1,359 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "development_engine_v1_certification_evidence_v1",
+  "verdict": "PASS_DEVELOPMENT_ENGINE_V1_EXACT_HEAD_CERTIFIED",
+  "engine_version": "V1",
+  "candidate_id": "DEV_ENGINE_V1:b9e5ebadbb739e57f2e0023d7498593f0f9a45bde46af24d8a83541351cdd1ed",
+  "qualified_head_sha": "972748579bcb998fc48542c02ed76aacae482fa5",
+  "qualification_source": {
+    "workflow_run_id": 36461104451,
+    "workflow_job_id": 109059569948,
+    "workflow": "Development Engine V1 Exact Head Qualification",
+    "run_attempt": 1,
+    "actual_conclusion": "success",
+    "qualification_material_status": "PASS_PENDING_ACTUAL_GITHUB_RUN_SUCCESS_CONFIRMATION",
+    "material_origin": "EXACT_WU02_GITHUB_ACTIONS_LOG"
+  },
+  "exact_identities": {
+    "candidate_material_sha256": "b9e5ebadbb739e57f2e0023d7498593f0f9a45bde46af24d8a83541351cdd1ed",
+    "input_identity_sha256": "32829891fa11c4e5905ef01d9f24320a34180e03640d478807fda2edf10565ac",
+    "bundle_identity_sha256": "490cf76580b4259a5812e81cc861c63bf9e4c1825591f46a276b1694ad18590b",
+    "git_tree_sha": "ce99d5de33bf6dd6bc930db27b91617c8390338a",
+    "deep_assurance_plan_identity_sha256": "f28c0a1af67db8d93bf91309f210874d7416ad481f25dd49a6f64fbf9ed2ea39",
+    "deep_assurance_identity_sha256": "c000495007267a8c5c2e820b8cd67f1c22ad9320b0e8995ff666ff37e739f68a"
+  },
+  "required_assurance": {
+    "risk_class": "R2",
+    "required_t3": [],
+    "deep_assurance_status": "NOT_REQUIRED",
+    "deep_assurance_satisfied": true,
+    "required_t4": [
+      "EXACT_HEAD_CERTIFICATION"
+    ],
+    "exact_head_certification_executed": true
+  },
+  "actual_github_runs": [
+    {
+      "key": "exact_head_qualification",
+      "run_id": 36461104451,
+      "workflow": "Development Engine V1 Exact Head Qualification",
+      "head_sha": "972748579bcb998fc48542c02ed76aacae482fa5",
+      "status": "completed",
+      "conclusion": "success",
+      "run_attempt": 1,
+      "created_at": "2026-09-28T17:51:31Z",
+      "updated_at": "2026-09-28T17:51:55Z",
+      "url": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36461104451"
+    },
+    {
+      "key": "engineering_bootstrap",
+      "run_id": 36461103875,
+      "workflow": "Engineering Bootstrap",
+      "head_sha": "972748579bcb998fc48542c02ed76aacae482fa5",
+      "status": "completed",
+      "conclusion": "success",
+      "run_attempt": 1,
+      "created_at": "2026-09-28T17:51:30Z",
+      "updated_at": "2026-09-28T17:52:27Z",
+      "url": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36461103875"
+    },
+    {
+      "key": "security_secrets",
+      "run_id": 36461103947,
+      "workflow": "Security Secrets",
+      "head_sha": "972748579bcb998fc48542c02ed76aacae482fa5",
+      "status": "completed",
+      "conclusion": "success",
+      "run_attempt": 1,
+      "created_at": "2026-09-28T17:51:31Z",
+      "updated_at": "2026-09-28T17:52:11Z",
+      "url": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36461103947"
+    },
+    {
+      "key": "security_actions",
+      "run_id": 36461104200,
+      "workflow": "Security Actions",
+      "head_sha": "972748579bcb998fc48542c02ed76aacae482fa5",
+      "status": "completed",
+      "conclusion": "success",
+      "run_attempt": 1,
+      "created_at": "2026-09-28T17:51:31Z",
+      "updated_at": "2026-09-28T17:51:44Z",
+      "url": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36461104200"
+    },
+    {
+      "key": "security_supply_chain",
+      "run_id": 36461103963,
+      "workflow": "Security Supply Chain",
+      "head_sha": "972748579bcb998fc48542c02ed76aacae482fa5",
+      "status": "completed",
+      "conclusion": "success",
+      "run_attempt": 1,
+      "created_at": "2026-09-28T17:51:31Z",
+      "updated_at": "2026-09-28T17:51:41Z",
+      "url": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36461103963"
+    }
+  ],
+  "qualification_material": {
+    "bound_paths": [
+      "config/governance/development_engine_v1_certification_policy_v1.json",
+      "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_CANDIDATE.json",
+      "scripts/governance/validate_development_engine_v1_certification.py",
+      "scripts/governance/selftest_development_engine_v1_certification.py",
+      "engineering/work_units/ENG-09.4-WU02.json",
+      "scripts/governance/qualify_development_engine_v1_exact_head.py",
+      ".github/workflows/eng09-wu02-development-engine-v1-qualification.yml",
+      "engineering/COLD_START_QUALIFICATION_EVIDENCE.json",
+      "engineering/CRITICAL_R3_BYPASS_EVIDENCE.json",
+      "engineering/INTERRUPTION_RECOVERY_EVIDENCE.json",
+      "engineering/LOT45_ENGINE_PILOT_EVIDENCE.json",
+      "engineering/ENG09_WU13_LOT45_PROFILE_EVIDENCE.json",
+      "engineering/MANDATORY_COST_ZERO_EVIDENCE.json",
+      "engineering/SECURITY_ENGINE_VERIFICATION.json",
+      "config/governance/validation_timing_budget_v1.json"
+    ],
+    "candidate_core": {
+      "candidate_id": "DEV_ENGINE_V1:b9e5ebadbb739e57f2e0023d7498593f0f9a45bde46af24d8a83541351cdd1ed",
+      "head_sha": "972748579bcb998fc48542c02ed76aacae482fa5",
+      "risk_class": "R2"
+    },
+    "candidate_id": "DEV_ENGINE_V1:b9e5ebadbb739e57f2e0023d7498593f0f9a45bde46af24d8a83541351cdd1ed",
+    "candidate_material_sha256": "b9e5ebadbb739e57f2e0023d7498593f0f9a45bde46af24d8a83541351cdd1ed",
+    "deep_assurance_plan": {
+      "manual_review_required": false,
+      "material": {
+        "candidate_head": "972748579bcb998fc48542c02ed76aacae482fa5",
+        "controls": [],
+        "execution_model": "EXISTING_EVENT_TRIGGERED_WORKFLOWS_NO_DUPLICATE_SCANNER_RUNS",
+        "plan_version": 1,
+        "selection_reasons": [],
+        "t3_requirements": []
+      },
+      "plan_identity_sha256": "f28c0a1af67db8d93bf91309f210874d7416ad481f25dd49a6f64fbf9ed2ea39",
+      "plan_version": 1
+    },
+    "deep_assurance_verdict": {
+      "assurance_identity_sha256": "c000495007267a8c5c2e820b8cd67f1c22ad9320b0e8995ff666ff37e739f68a",
+      "evidence_runs": [],
+      "plan_identity_sha256": "f28c0a1af67db8d93bf91309f210874d7416ad481f25dd49a6f64fbf9ed2ea39",
+      "satisfied": true,
+      "status": "NOT_REQUIRED"
+    },
+    "evidence_kind": "development_engine_v1_exact_head_qualification_v1",
+    "exact_head_bundle": {
+      "bundle_identity_sha256": "490cf76580b4259a5812e81cc861c63bf9e4c1825591f46a276b1694ad18590b",
+      "bundle_version": 1,
+      "material": {
+        "bundle_version": 1,
+        "candidate": {
+          "candidate_id": "DEV_ENGINE_V1:b9e5ebadbb739e57f2e0023d7498593f0f9a45bde46af24d8a83541351cdd1ed",
+          "head_sha": "972748579bcb998fc48542c02ed76aacae482fa5",
+          "risk_class": "R2"
+        },
+        "ci_evidence_class": "EXACT_GITHUB_ACTIONS_RUN",
+        "ci_runs": [
+          {
+            "conclusion": "success",
+            "head_sha": "972748579bcb998fc48542c02ed76aacae482fa5",
+            "run_id": 36461104451,
+            "workflow": "Development Engine V1 Exact Head Qualification"
+          }
+        ],
+        "input_identity_sha256": "32829891fa11c4e5905ef01d9f24320a34180e03640d478807fda2edf10565ac"
+      }
+    },
+    "input_binding": {
+      "binding_version": 1,
+      "input_identity_sha256": "32829891fa11c4e5905ef01d9f24320a34180e03640d478807fda2edf10565ac",
+      "material": {
+        "bound_blobs": [
+          {
+            "bytes": 1784,
+            "git_blob_sha": "5eaf075a92fa049011bb257a4a4eba117f86c08a",
+            "mode": "100644",
+            "path": ".github/workflows/eng09-wu02-development-engine-v1-qualification.yml",
+            "sha256": "8ba0adf3673ca5a86e3fa315140f949b4fff5ebcf19e81bbdbff4ffa690da5b9"
+          },
+          {
+            "bytes": 4386,
+            "git_blob_sha": "7a1ab68a978359a3a519daaa5c753e81a012d799",
+            "mode": "100644",
+            "path": "config/governance/development_engine_v1_certification_policy_v1.json",
+            "sha256": "fd8a608dfea9f20129e5cf316416410b8c26f549bde59e25aa5ce2502a2766fe"
+          },
+          {
+            "bytes": 1403,
+            "git_blob_sha": "086918f98196ecfb9e75da77bce3787742cbed38",
+            "mode": "100644",
+            "path": "config/governance/validation_timing_budget_v1.json",
+            "sha256": "36123205ce41ab007d8fa5f7a843869f35cd259bab3db3200f09a15375cd264f"
+          },
+          {
+            "bytes": 1026,
+            "git_blob_sha": "17b03061f3751481a6b2579997a89f2680c7fa32",
+            "mode": "100644",
+            "path": "engineering/COLD_START_QUALIFICATION_EVIDENCE.json",
+            "sha256": "cb9e251b518629ba501c05d199e8acb64bd32980d2ae613266f9d7747ba19abe"
+          },
+          {
+            "bytes": 4055,
+            "git_blob_sha": "d651b8c50a633a2ea20ca899720ea235641dd5ef",
+            "mode": "100644",
+            "path": "engineering/CRITICAL_R3_BYPASS_EVIDENCE.json",
+            "sha256": "10b18f527724105b5d47b4815b0fa3cd99019939066236267aa2c46d078ccaec"
+          },
+          {
+            "bytes": 3948,
+            "git_blob_sha": "2d8b503f2bfc7149bf598c611c37d19b8fe861f7",
+            "mode": "100644",
+            "path": "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_CANDIDATE.json",
+            "sha256": "2af0ec9198e042464329c8748774a00c96b66f7b6b36ecf8b30aa50457d48092"
+          },
+          {
+            "bytes": 4185,
+            "git_blob_sha": "1b85a021533a14a0e0de678ee76f24066e15fabc",
+            "mode": "100644",
+            "path": "engineering/ENG09_WU13_LOT45_PROFILE_EVIDENCE.json",
+            "sha256": "d2c26466b893f5a2cb40e84d3ebac6105093f251e19640dd4e7cfd299e926eaa"
+          },
+          {
+            "bytes": 1513,
+            "git_blob_sha": "a8611d1603b5e62aa6ba0879d1d1151c05ac5232",
+            "mode": "100644",
+            "path": "engineering/INTERRUPTION_RECOVERY_EVIDENCE.json",
+            "sha256": "7e38ef3e300230d5a7f32713eb023051373dc2bfcfb68bb0cab1fd70c07d0e52"
+          },
+          {
+            "bytes": 14561,
+            "git_blob_sha": "d116f6986945c8ed92acbbd2fdb7d085e7429d93",
+            "mode": "100644",
+            "path": "engineering/LOT45_ENGINE_PILOT_EVIDENCE.json",
+            "sha256": "4a9d9aeff680cfda094f90d927fc7aa28d791c7362d323b51e5dcc488e87692a"
+          },
+          {
+            "bytes": 2380,
+            "git_blob_sha": "127c3a056a7ee3407b3caf2a6bfb32d73da71920",
+            "mode": "100644",
+            "path": "engineering/MANDATORY_COST_ZERO_EVIDENCE.json",
+            "sha256": "2d5dade6863cf289f79c7570676658f1a1bdfeda15a318f2de2f2dadc0f1dee6"
+          },
+          {
+            "bytes": 1262,
+            "git_blob_sha": "434c09377baa192a0a981c1ee2dde9d26c3626fe",
+            "mode": "100644",
+            "path": "engineering/SECURITY_ENGINE_VERIFICATION.json",
+            "sha256": "b551ead6dc4fb0e058e6e989ee6de61c9d58536f95a1d136409c82c2bce2446c"
+          },
+          {
+            "bytes": 7299,
+            "git_blob_sha": "1887488d13ac6a43296e936af19322fa1970a55a",
+            "mode": "100644",
+            "path": "engineering/work_units/ENG-09.4-WU02.json",
+            "sha256": "6db460bec7be23555964e556e51d6649d578353bdb995ffcce2af8f813a358c1"
+          },
+          {
+            "bytes": 9741,
+            "git_blob_sha": "d423a035bc4c2aa7c4a8b36200825e1c7341cf63",
+            "mode": "100644",
+            "path": "scripts/governance/qualify_development_engine_v1_exact_head.py",
+            "sha256": "1ee13174a4e40cf57b85aacea02d744eb28d893833c16efdfe4429510b91d919"
+          },
+          {
+            "bytes": 6175,
+            "git_blob_sha": "23e6fb6882a2288f32ee0c7fdfebd5f72b78ce99",
+            "mode": "100644",
+            "path": "scripts/governance/selftest_development_engine_v1_certification.py",
+            "sha256": "0b165d4b1fbe8c1c027f82283d195de74d4fb89fe785acd1438516fec8d65a63"
+          },
+          {
+            "bytes": 22634,
+            "git_blob_sha": "40b54de7c6ea2081f24a38b82503f1867a70e6aa",
+            "mode": "100644",
+            "path": "scripts/governance/validate_development_engine_v1_certification.py",
+            "sha256": "528587a926e67c9930885fbd11311dc01e0e3a2bc7e46005e5b16adac62fe6cf"
+          }
+        ],
+        "candidate": {
+          "candidate_id": "DEV_ENGINE_V1:b9e5ebadbb739e57f2e0023d7498593f0f9a45bde46af24d8a83541351cdd1ed",
+          "head_sha": "972748579bcb998fc48542c02ed76aacae482fa5",
+          "risk_class": "R2"
+        },
+        "context": {
+          "awu_id": "ENG-09.4-WU02",
+          "required_t3": [],
+          "required_t4": [
+            "EXACT_HEAD_CERTIFICATION"
+          ],
+          "scope_base_sha": "37e62e2cdcf6b1f86595e0056688cfdb1394ab58"
+        },
+        "git_tree_sha": "ce99d5de33bf6dd6bc930db27b91617c8390338a",
+        "material_version": 1
+      }
+    },
+    "required_t3": [],
+    "required_t4": [
+      "EXACT_HEAD_CERTIFICATION"
+    ],
+    "safety": {
+      "blocking_finding_id": "BOOT-FINDING-001",
+      "business_unlock_allowed": false,
+      "execution_allowed": false,
+      "lot45_merge_allowed": false,
+      "lot46_unlock_allowed": false,
+      "runtime_unlock_allowed": false,
+      "trade_allowed": false
+    },
+    "schema_version": 1,
+    "scope_base_sha": "37e62e2cdcf6b1f86595e0056688cfdb1394ab58",
+    "status": "PASS_PENDING_ACTUAL_GITHUB_RUN_SUCCESS_CONFIRMATION",
+    "workflow_run": {
+      "declared_conclusion": "success",
+      "evidence_valid_only_if_actual_run_conclusion": "success",
+      "head_sha": "972748579bcb998fc48542c02ed76aacae482fa5",
+      "run_attempt": 1,
+      "run_id": 36461104451,
+      "workflow": "Development Engine V1 Exact Head Qualification"
+    }
+  },
+  "authority_separation": {
+    "development_engine_v1_certified": true,
+    "business_development_unlocked": false,
+    "runtime_unlocked": false,
+    "lot45_merge_allowed": false,
+    "lot46_unlock_allowed": false,
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "certification_does_not_grant_business_or_runtime_authority": true
+  },
+  "blocking_finding": {
+    "id": "BOOT-FINDING-001",
+    "code": "MAIN_BRANCH_UNPROTECTED",
+    "observed": true,
+    "must_be_resolved_before": "BUSINESS_DEVELOPMENT_UNLOCK",
+    "preserved_by_certification": true
+  },
+  "business_candidate_snapshot": {
+    "lot": 45,
+    "pr": 66,
+    "head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "merged": false,
+    "state": "OPEN",
+    "status": "SUSPENDED_CANDIDATE"
+  },
+  "safety_lock": {
+    "business_development": "PAUSED",
+    "lot46_status": "LOCKED",
+    "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED",
+    "leverage": "FORBIDDEN",
+    "withdrawals": "FORBIDDEN"
+  },
+  "cleanup_contract": {
+    "temporary_workflow_path": ".github/workflows/eng09-wu02-development-engine-v1-qualification.yml",
+    "workflow_present_at_evidence_capture": true,
+    "removal_required_after_evidence_capture": true,
+    "evidence_must_not_be_rewritten_for_cleanup": true
+  }
+}

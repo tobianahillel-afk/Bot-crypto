@@ -1,0 +1,4 @@
+# Vetted false positives only. Validated by scripts/governance/validate_secret_controls.py.
+# Entries are bound to the immutable Git blob in secret_false_positive_registry_v1.json.
+data/audit/product_scope_roadmap_lot21.jsonl:generic-api-key:120
+data/audit/product_scope_roadmap_lot21.jsonl:generic-api-key:152

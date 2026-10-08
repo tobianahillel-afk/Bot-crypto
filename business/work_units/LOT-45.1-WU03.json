@@ -1,0 +1,231 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "LOT-45.1-WU03",
+  "status": "DONE",
+  "parent": {
+    "work_item_id": "LOT-45",
+    "task_id": "LOT-45.1",
+    "manifest": "business/lots/LOT-45.json"
+  },
+  "title": "Reconcile immutable ENG-00 baseline with terminal ACTIVE business lifecycle — core",
+  "objective": "Complete the lifecycle-aware canonical-baseline, activation-routing, incremental-validation, bootstrap-selftest, active-scope and current-status reconciliation core, then hand the repository-protection current-snapshot refresh and final exact-head qualification to LOT-45.1-WU04.",
+  "non_goals": [
+    "rewrite engineering/CANONICAL_BASELINE.json",
+    "modify or merge PR #66",
+    "change Development Engine V1 frozen entrypoints",
+    "change business activation evidence",
+    "start Lot45 candidate remediation",
+    "unlock Lot46",
+    "enable runtime trading leverage withdrawals or live exchange access",
+    "introduce paid or LLM-backed mandatory review"
+  ],
+  "depends_on": [
+    "ENG-09.6-WU05"
+  ],
+  "inputs": [
+    {
+      "name": "Lot45 read-only requalification evidence",
+      "kind": "EVIDENCE",
+      "locator": "business/evidence/LOT45_V1_REQUALIFICATION.json"
+    },
+    {
+      "name": "Immutable ENG-00 canonical baseline",
+      "kind": "STATE",
+      "locator": "engineering/CANONICAL_BASELINE.json"
+    },
+    {
+      "name": "Explicit business activation evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json"
+    },
+    {
+      "name": "Canonical baseline validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_canonical_baseline.py"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Lifecycle-aware canonical baseline validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_canonical_baseline.py"
+    },
+    {
+      "name": "Reconciliation-routed handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    },
+    {
+      "name": "Reconciliation-routed context map",
+      "kind": "STATE",
+      "locator": "engineering/CONTEXT_MAP.json"
+    },
+    {
+      "name": "Lifecycle-aware active business AWU activation validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_business_development_activation.py"
+    },
+    {
+      "name": "Lifecycle-aware activation adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_business_development_activation.py"
+    },
+    {
+      "name": "Terminal-lifecycle bootstrap validator selftest",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_bootstrap_validators.py"
+    },
+    {
+      "name": "Terminal BUSINESS active-AWU scope adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_active_awu_scope.py"
+    },
+    {
+      "name": "BUSINESS activation-aware T0 effective diff routing",
+      "kind": "FILE",
+      "locator": "scripts/governance/run_t0.py"
+    },
+    {
+      "name": "Canonical-scope T1 routing",
+      "kind": "FILE",
+      "locator": "scripts/governance/run_t1.py"
+    },
+    {
+      "name": "Lifecycle-aware generated current-status adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_current_status.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "6651f12870ed51318b8004246aa87b015caaeaa8",
+    "allowed_paths": [
+      "business/evidence/LOT45_V1_REQUALIFICATION.json",
+      "business/plans/LOT45_REMEDIATION_PLAN.json",
+      "business/work_units/LOT-45.1-WU01.json",
+      "business/work_units/LOT-45.1-WU02.json",
+      "business/lots/LOT-45.json",
+      "AGENTS.md",
+      "scripts/governance/selftest_terminal_business_routing.py",
+      "business/work_units/LOT-45.1-WU03.json",
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "scripts/governance/validate_canonical_baseline.py",
+      "scripts/governance/validate_business_development_activation.py",
+      "scripts/governance/selftest_business_development_activation.py",
+      "scripts/governance/selftest_bootstrap_validators.py",
+      "scripts/governance/selftest_active_awu_scope.py",
+      "scripts/governance/run_t0.py",
+      "scripts/governance/run_t1.py",
+      "scripts/governance/selftest_current_status.py"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "contracts/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      ".github/workflows/**",
+      "engineering/CANONICAL_BASELINE.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json",
+      "config/governance/**"
+    ],
+    "forbidden_semantics": [
+      "Lot45 candidate mutation",
+      "candidate merge",
+      "ENG-00 baseline rewrite",
+      "business authority rollback",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "permission-to-trade activation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "engineering/CANONICAL_BASELINE.json remains byte-unchanged and preserves historical PAUSED plus SUSPENDED_CANDIDATE facts",
+      "current ACTIVE business lifecycle is accepted only when explicit ACTIVATED business-unlock evidence proves PAUSED_TO_ACTIVE and SUSPENDED_CANDIDATE_TO_ACTIVE_CANDIDATE",
+      "Lot45 candidate lot PR branch and observed head remain identical between immutable baseline current bridge state and activation evidence",
+      "ACTIVE validation fails closed if activation evidence is missing malformed claims candidate mutation/merge or disagrees with current candidate identity",
+      "PAUSED lifecycle remains supported for historical and adversarial validation",
+      "PR #66 remains byte-unchanged throughout reconciliation",
+      "Lot46 and runtime trading authority remain fail-closed",
+      "ACTIVE business topology may route through a temporary maintenance AWU only when it remains under LOT-45.1 and explicitly forbids candidate mutation and merge",
+      "terminal bootstrap selftests must exercise validate_state with no engineering active manifest while validating the active business work-item independently",
+      "BUSINESS scope_base_sha remains the explicit activation predecessor so the standard activation bridge validates the one-time authority transition separately from post-activation maintenance",
+      "size_estimate.files_touched counts files intentionally modified by WU03, while the cumulative bridge allowlist may also contain prior post-activation business files required for scope replay",
+      "for ACTIVE BUSINESS routes the effective incremental diff begins after the one-time activation commit while scope_base_sha remains the immutable activation predecessor"
+    ],
+    "acceptance_criteria": [
+      "baseline file is not in the AWU allowed paths and is explicitly forbidden from mutation",
+      "canonical baseline validator passes the current ACTIVE terminal lifecycle without changing historical baseline bytes",
+      "validator rejects a baseline rewritten to ACTIVE",
+      "validator rejects ACTIVE state without activation evidence",
+      "validator rejects changed candidate head or mutated/merged activation evidence",
+      "candidate head remains ec2c4ab16f21b23e062b7fca0bb796c8db4a5133 and Lot46 remains LOCKED",
+      "activation validator accepts the unique active maintenance AWU under LOT-45.1 and rejects a different business task or weakened candidate guards",
+      "negative bootstrap selftest passes in terminal Engineering + ACTIVE Business lifecycle without synthesizing a nonexistent engineering active_manifest",
+      "active AWU boundary passes through the standard activation bridge with only post-activation business and reconciliation files in the WU03 allowlist",
+      "incremental T0/T1 validate only the post-activation business diff and still rely on the canonical activation bridge for transition integrity",
+      "CURRENT_STATUS selftest derives business lifecycle and candidate expectations from canonical project state and preserves stale-document detection",
+      "core lifecycle reconciliation is proven through head 654b0b572d063f1524471b38cc92457db2f286b9: Engineering Bootstrap reached the repository-protection gate after context-map validation and Security Secrets passed on that exact head"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 4,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 1,
+      "state_machine_or_concurrency": true,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 14,
+      "executable_loc_changed": 760,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_canonical_baseline.py",
+      "lifecycle adversarial self-checks embedded in canonical baseline validator",
+      "exact-head Engineering Bootstrap",
+      "exact-head Security Secrets",
+      "live PR #66 immutability reverification"
+    ]
+  },
+  "done_when": [
+    "DEV-ENGINE-V1-BASELINE-001 lifecycle mismatch is cleared without baseline mutation",
+    "canonical baseline activation topology active-AWU scope incremental routing current-status and context-map core validations pass before the repository-protection gate",
+    "PR #66 remains byte-unchanged candidate-unmerged and Lot46 remains locked",
+    "repository-protection snapshot refresh and final exact-head all-green qualification are delegated to LOT-45.1-WU04 by the mandatory file-count split"
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "policy_kind": "certification_candidate_lifecycle_v1",
+  "semantics": "EXPLICIT_FAIL_CLOSED_CERTIFICATION_CANDIDATE_STATE_MACHINE",
+  "initial_state": "DRAFT",
+  "states": [
+    "DRAFT",
+    "VALIDATING",
+    "ASSURANCE_REQUIRED",
+    "CERTIFICATION_READY",
+    "STALE",
+    "CERTIFIED",
+    "REJECTED",
+    "WITHDRAWN"
+  ],
+  "mutable_states": [
+    "DRAFT",
+    "VALIDATING",
+    "ASSURANCE_REQUIRED",
+    "CERTIFICATION_READY",
+    "STALE"
+  ],
+  "terminal_states": [
+    "CERTIFIED",
+    "REJECTED",
+    "WITHDRAWN"
+  ],
+  "allowed_transitions": {
+    "DRAFT": [
+      "DRAFT",
+      "VALIDATING",
+      "WITHDRAWN"
+    ],
+    "VALIDATING": [
+      "VALIDATING",
+      "ASSURANCE_REQUIRED",
+      "CERTIFICATION_READY",
+      "STALE",
+      "REJECTED",
+      "WITHDRAWN"
+    ],
+    "ASSURANCE_REQUIRED": [
+      "ASSURANCE_REQUIRED",
+      "CERTIFICATION_READY",
+      "STALE",
+      "REJECTED",
+      "WITHDRAWN"
+    ],
+    "CERTIFICATION_READY": [
+      "CERTIFICATION_READY",
+      "CERTIFIED",
+      "STALE",
+      "REJECTED",
+      "WITHDRAWN"
+    ],
+    "STALE": [
+      "STALE",
+      "VALIDATING",
+      "REJECTED",
+      "WITHDRAWN"
+    ],
+    "CERTIFIED": [],
+    "REJECTED": [],
+    "WITHDRAWN": []
+  },
+  "evidence_policy_source": "engineering/AGENT_CAPABILITIES.json",
+  "assurance_policy_source": "config/governance/validation_t3_t4_policy_v1.json",
+  "prerequisite_catalog": {
+    "CANDIDATE_REF_BOUND": {
+      "allowed_evidence_classes": [
+        "EXACT_GITHUB_REF"
+      ]
+    },
+    "VALIDATION_PASS_BOUND": {
+      "allowed_evidence_classes": [
+        "EXACT_GITHUB_ACTIONS_RUN"
+      ]
+    },
+    "ASSURANCE_SELECTION_BOUND": {
+      "allowed_evidence_classes": [
+        "REPOSITORY_ARTIFACT"
+      ]
+    },
+    "NO_OPEN_BLOCKER": {
+      "allowed_evidence_classes": [
+        "REPOSITORY_ARTIFACT",
+        "OBSERVATION"
+      ]
+    },
+    "EXACT_HEAD_CERTIFICATION_EVIDENCE": {
+      "allowed_evidence_classes": [
+        "EXACT_GITHUB_ACTIONS_RUN"
+      ]
+    },
+    "CERTIFICATION_VERDICT_PASS": {
+      "allowed_evidence_classes": [
+        "EXACT_GITHUB_ACTIONS_RUN",
+        "REPOSITORY_ARTIFACT"
+      ]
+    }
+  },
+  "required_prerequisites_by_state": {
+    "DRAFT": [],
+    "VALIDATING": [
+      "CANDIDATE_REF_BOUND"
+    ],
+    "ASSURANCE_REQUIRED": [
+      "CANDIDATE_REF_BOUND",
+      "VALIDATION_PASS_BOUND",
+      "ASSURANCE_SELECTION_BOUND"
+    ],
+    "CERTIFICATION_READY": [
+      "CANDIDATE_REF_BOUND",
+      "VALIDATION_PASS_BOUND",
+      "ASSURANCE_SELECTION_BOUND",
+      "NO_OPEN_BLOCKER"
+    ],
+    "STALE": [
+      "CANDIDATE_REF_BOUND"
+    ],
+    "CERTIFIED": [
+      "CANDIDATE_REF_BOUND",
+      "VALIDATION_PASS_BOUND",
+      "ASSURANCE_SELECTION_BOUND",
+      "NO_OPEN_BLOCKER",
+      "EXACT_HEAD_CERTIFICATION_EVIDENCE",
+      "CERTIFICATION_VERDICT_PASS"
+    ],
+    "REJECTED": [
+      "CANDIDATE_REF_BOUND"
+    ],
+    "WITHDRAWN": [
+      "CANDIDATE_REF_BOUND"
+    ]
+  },
+  "evidence_fresh_required_states": [
+    "CERTIFICATION_READY",
+    "CERTIFIED"
+  ],
+  "stale_state": "STALE",
+  "invariants": [
+    "candidate id head SHA and risk class are immutable inside one lifecycle",
+    "unknown states transitions prerequisites evidence classes and assurance ids fail closed",
+    "CERTIFICATION_READY requires all selected T3 assurance satisfied and fresh evidence",
+    "CERTIFIED requires all selected T3 and T4 requirements satisfied plus exact-head certification evidence and PASS verdict binding",
+    "R3 candidates inherit the R3 T3 and T4 requirement floors from validation_t3_t4_policy_v1",
+    "stale evidence cannot remain CERTIFICATION_READY",
+    "CERTIFIED REJECTED and WITHDRAWN are terminal and cannot resurrect",
+    "head change requires a new candidate identity rather than lifecycle mutation",
+    "lifecycle state never unlocks business development or runtime execution"
+  ]
+}

@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "LOT-45.2-WU01",
+  "status": "PLANNED",
+  "parent": {
+    "work_item_id": "LOT-45",
+    "task_id": "LOT-45.2",
+    "manifest": "business/lots/LOT-45.json"
+  },
+  "title": "Correct Order Flow/CVD certified source-market binding",
+  "objective": "Fix LOT45-REQUAL-001 by checking both derived artifacts against the homogeneous identity of their certified source trades, not only against each other; preserve causal, checksum and replay invariants.",
+  "non_goals": [
+    "regenerate frozen evidence",
+    "modify CI workflows",
+    "weaken artifact identity or checksum validation",
+    "expand trade authority",
+    "merge PR66"
+  ],
+  "depends_on": [
+    "LOT-45.1-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "V1 requalification finding",
+      "kind": "EVIDENCE",
+      "locator": "business/evidence/LOT45_V1_REQUALIFICATION.json"
+    },
+    {
+      "name": "Remediation unit",
+      "kind": "STATE",
+      "locator": "business/plans/LOT45_REMEDIATION_PLAN.json"
+    },
+    {
+      "name": "Candidate source at observed baseline",
+      "kind": "FILE",
+      "locator": "src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine_impl.py"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Certified source-market binding",
+      "kind": "FILE",
+      "locator": "src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine_impl.py"
+    },
+    {
+      "name": "Market identity model contract",
+      "kind": "FILE",
+      "locator": "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py"
+    },
+    {
+      "name": "Wrong-market negative tests",
+      "kind": "TEST",
+      "locator": "tests/test_lot45_market_identity_binding.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "allowed_paths": [
+      "src/crypto_quant_bot/microstructure/_order_flow_delta_and_cvd_engine_impl.py",
+      "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py",
+      "tests/test_lot45_market_identity_binding.py"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/risk/**",
+      "src/crypto_quant_bot/execution/**",
+      "src/crypto_quant_bot/oms/**",
+      "src/crypto_quant_bot/ems/**",
+      "data/audit/product_scope_roadmap_lot21.jsonl"
+    ],
+    "forbidden_semantics": [
+      "modification of unrelated market domains",
+      "unreviewed widening of schema or certification topology",
+      "Lot46 unlock",
+      "trading or live execution activation",
+      "mutation of Lots 0-44 historical evidence",
+      "mandatory paid or LLM-backed review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "reject matching Order Flow/CVD pair if its market differs from certified source-trade identity",
+      "validate complete source/venue/instrument/market_type tuple before serializing certified engine state",
+      "keep standalone artifact identity in canonical checksums",
+      "preserve fail-closed input homogeneity and causal time/lineage checks",
+      "no candidate mutation until a separately validated LOT-45.2 activation"
+    ],
+    "acceptance_criteria": [
+      "synthetic wrong-market Order Flow/CVD pair is rejected even when internally matching",
+      "valid same-market source trades and artifacts pass",
+      "standalone market-identity checksum fixtures remain distinct",
+      "negative tests cover each identity dimension and missing identity",
+      "Lot46 locked and trade_allowed=false"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 4,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 2,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": true,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 3,
+      "executable_loc_changed": 360,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "target_commands": [
+      "targeted market identity tests",
+      "Lot45 offline contract/replay validation",
+      "independent adversarial source identity mismatch tests"
+    ]
+  },
+  "done_when": [
+    "LOT45-REQUAL-001 remediated in source and bounded tests",
+    "no checksum or causal invariant regressions",
+    "exact candidate source head and tests recorded"
+  ]
+}

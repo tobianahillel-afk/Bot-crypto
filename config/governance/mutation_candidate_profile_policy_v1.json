@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "policy_kind": "mutation_candidate_profile_policy_v1",
+  "semantics": "READ_ONLY_LIFECYCLE_GATED_NO_EXECUTION",
+  "registry_path": "config/governance/mutation_candidate_profiles_v1.json",
+  "active_registry_path": "config/governance/mutation_profiles_v1.json",
+  "allowed_selector_modes": [
+    "EXACT",
+    "GLOB"
+  ],
+  "allowed_lifecycles": [
+    "READ_ONLY_QUALIFIED_NOT_ADOPTED"
+  ],
+  "required_false_flags": [
+    "execution_allowed",
+    "active_registry_adopted",
+    "production_selector_visible",
+    "generic_runner_executable"
+  ],
+  "forbidden_profile_keys": [
+    "command",
+    "commands",
+    "shell",
+    "run",
+    "script",
+    "executable",
+    "argv",
+    "environment",
+    "env"
+  ],
+  "bounds": {
+    "max_profiles": 8,
+    "max_selectors_per_profile": 32,
+    "max_mutation_targets_per_profile": 8,
+    "max_baseline_tests_per_profile": 32,
+    "max_workspace_members_per_profile": 64
+  },
+  "invariants": [
+    "candidate profiles are qualification-only and never executable",
+    "candidate profiles live outside the active mutation_profiles_v1 registry",
+    "candidate selection performs no mutation execution",
+    "candidate Git evidence bindings are exact and lifecycle-gated",
+    "unsafe repository-relative paths fail closed",
+    "score arithmetic is recomputed from stored evidence rather than trusted as a label",
+    "candidate source binding mode is explicit and limited to exact-head qualification input"
+  ],
+  "allowed_source_binding_modes": [
+    "EXACT_HEAD_INPUT"
+  ]
+}

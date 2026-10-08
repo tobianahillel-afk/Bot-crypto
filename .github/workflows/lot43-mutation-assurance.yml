@@ -1,16 +1,6 @@
 name: Lot 43 mutation assurance
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_*.py'
-      - 'tests/test_lot43*.py'
-      - 'config/microstructure/book_resilience_and_replenishment_engine_v1.json'
-      - 'contracts/schemas/book_resilience_*.json'
-      - 'reports/lot43/mutation_summary.json'
-      - '.github/workflows/lot43-mutation-assurance.yml'
-      - 'requirements-dev.lock'
   workflow_dispatch:
 
 permissions:

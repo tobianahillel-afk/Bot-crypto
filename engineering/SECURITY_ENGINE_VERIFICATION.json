@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "verification_kind": "eng04_security_engine_verification_v1",
+  "verdict": "PASS_ENGINEERING_SECURITY",
+  "business_unlock_status": "BUSINESS_UNLOCK_BLOCKED_EXTERNAL_PROTECTION",
+  "blocking_finding_id": "BOOT-FINDING-001",
+  "zero_cost": true,
+  "least_privilege": true,
+  "approved_exact_action_pins": true,
+  "risk_proportional": true,
+  "security_workflows": [
+    ".github/workflows/security-actions.yml",
+    ".github/workflows/security-dependencies.yml",
+    ".github/workflows/security-sast.yml",
+    ".github/workflows/security-secrets.yml",
+    ".github/workflows/security-supply-chain.yml"
+  ],
+  "path_scoped_workflows": [
+    ".github/workflows/security-actions.yml",
+    ".github/workflows/security-dependencies.yml",
+    ".github/workflows/security-sast.yml",
+    ".github/workflows/security-supply-chain.yml"
+  ],
+  "secret_routing": {
+    "routine_events": [
+      "pull_request",
+      "push"
+    ],
+    "assurance_events": [
+      "schedule",
+      "workflow_dispatch"
+    ],
+    "weekly_cron": "41 4 * * 1",
+    "missing_base_fallback": "FULL_HISTORY_FALLBACK"
+  },
+  "external_protection": {
+    "overall_status": "UNPROTECTED",
+    "business_unlock_allowed": false,
+    "manual_admin_action_required": true
+  }
+}

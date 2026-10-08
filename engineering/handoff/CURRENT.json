@@ -1,0 +1,170 @@
+{
+  "active_checkpoint": {
+    "track": "BUSINESS",
+    "awu_id": "LOT-45.1-WU02",
+    "awu_path": "business/work_units/LOT-45.1-WU02.json",
+    "parent_manifest": "business/lots/LOT-45.json",
+    "scope_base_sha": "ef8dfbdc3965d27e5947697f6d9fba877864d817",
+    "risk_class": "R0",
+    "complexity_score": 0
+  },
+  "authority": {
+    "context_map": "engineering/CONTEXT_MAP.json",
+    "handoff_role": "RESUME_HINT_NOT_AUTHORITY",
+    "state_source": "config/governance/project_state.json"
+  },
+  "blockers": [],
+  "current_objective": "LOT-45.1-WU02: four Lot45 remediation AWUs staged; integration branch binding designed but not executed; PR66 remains byte-unchanged.",
+  "engineering_branch": "engineering/bootstrap-development-engine",
+  "external_git_observation": {
+    "default_branch": "main",
+    "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "main_branch_protected": true,
+    "rulesets_count": 1,
+    "lot45_pr": 66,
+    "lot45_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "lot45_state": "open",
+    "lot45_merged": false
+  },
+  "kind": "engineering_handoff",
+  "next_action": "LOT-45.1-WU02: prepare and verify a new isolated two-parent candidate+engine integration base following business/plans/LOT45_REMEDIATION_PLAN.json execution_branch_binding_design. Do not move PR66; do not activate LOT-45.2-WU01 or change business code until ancestry, transition scope and exact-head V1 gates pass.",
+  "next_engineering": {
+    "active_lot": null,
+    "active_task": null,
+    "active_manifest": null
+  },
+  "recent_completed": [
+    "ENG-09.6-WU05 current-session activation preflight on head 6651f12870ed51318b8004246aa87b015caaeaa8 passed Engineering Bootstrap 37322906082 and Security Secrets 37322905878; live main, PR #66 and Protect ruleset were reverified unchanged.",
+    "Direct current-session BUSINESS_DEVELOPMENT_UNLOCK authorization executed as the atomic terminal Engineering -> active read-only Lot45 business-route transition from predecessor 6651f12870ed51318b8004246aa87b015caaeaa8.",
+    "LOT-45.1-WU03 core lifecycle slice closed by mandatory file-count split: head 654b0b572d063f1524471b38cc92457db2f286b9 passed Security Secrets 37388265817 and Engineering Bootstrap 37388265876 reached the repository-protection gate after context-map validation.",
+    "LOT-45.1-WU04 reached its mandatory 15-file boundary on head 6e2cd68600d67c4abd0a2a706f9086527cf6914e: Security Secrets 37390738269 passed and Engineering Bootstrap 37390738279 passed through security/protection but exposed an engineering-only work-decomposition qualifier; continuation split to WU05.",
+    "LOT-45.1-WU05 lifecycle reconciliation closed on exact head 4fa9084d5ef097d9b02140bf88c573063845b779: Engineering Bootstrap 37452667127 and Security Secrets 37452667165 both passed; main/ruleset and PR #66 were reverified unchanged before WU01 restoration.",
+    "LOT-45.1-WU01 read-only requalification refreshed on candidate ec2c4ab16f21b23e062b7fca0bb796c8db4a5133; engine preconditions are cleared and exact engine head ef8dfbdc3965d27e5947697f6d9fba877864d817 passed Engineering Bootstrap 37454493298 plus Security Secrets 37454493458.",
+    "LOT-45.1-WU02 staged four PLANNED LOT-45.2 AWUs at f692c93bf5fb1d276afbdbbfc76ffbfa943b13fa; Bootstrap 37838227357 and Security Secrets 37838227405 SUCCESS; PR66 unchanged.",
+    "LOT-45.1-WU02 isolated integration branch agent/lot45-v1-remediation-integration created and read-verified at candidate ec2c4ab16f21b23e062b7fca0bb796c8db4a5133; candidate PR66 and protected main remain unchanged. No two-parent merge or LOT-45.2 activation was executed. Overlap audit reconfirmed five divergent shared paths and required jsonschema==4.26.0/referencing==0.37.0 lock parity."
+  ],
+  "resume_read_order": [
+    "AGENTS.md",
+    "config/governance/project_state.json",
+    "engineering/CONTEXT_MAP.json",
+    "engineering/handoff/CURRENT.json"
+  ],
+  "schema_version": 2,
+  "stale_when": [
+    "STATE_ACTIVE_WORK_MISMATCH",
+    "ACTIVE_AWU_MISMATCH",
+    "MAIN_SHA_MISMATCH",
+    "BUSINESS_CANDIDATE_HEAD_MISMATCH",
+    "BUSINESS_HOLD_CHANGED",
+    "SAFETY_SNAPSHOT_CHANGED",
+    "STOP_CONDITIONS_CHANGED"
+  ],
+  "state_snapshot": {
+    "engineering_phase": "STABLE",
+    "active_lot": null,
+    "active_task": null,
+    "active_manifest": null,
+    "business_development": "ACTIVE",
+    "lot46_status": "LOCKED",
+    "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED",
+    "open_findings": []
+  },
+  "status": "COMPLETE",
+  "stop_conditions": [
+    "STATE_DRIFT",
+    "BUSINESS_SCOPE_TOUCHED_WITHOUT_UNLOCK",
+    "FROZEN_EVIDENCE_MUTATION",
+    "LOT46_UNLOCK_ATTEMPT",
+    "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
+  ],
+  "validation_evidence": [
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36641980568",
+      "head_sha": "6c30f47c173218ff8645e23eefbbcf1a8f2eb373",
+      "scope": "ENG-09.6-WU07_SCOPE_BASE_BOOTSTRAP"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37322906082",
+      "head_sha": "6651f12870ed51318b8004246aa87b015caaeaa8",
+      "scope": "ENG-09.6-WU05_ACTIVATION_PREFLIGHT_BOOTSTRAP"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37322905878",
+      "head_sha": "6651f12870ed51318b8004246aa87b015caaeaa8",
+      "scope": "ENG-09.6-WU05_ACTIVATION_PREFLIGHT_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37378690451",
+      "head_sha": "dec31e78161a1a1e50181a06760130ab3bc27421",
+      "scope": "LOT-45.1-WU03_SCOPE_BASE_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37388265817",
+      "head_sha": "654b0b572d063f1524471b38cc92457db2f286b9",
+      "scope": "LOT-45.1-WU04_SCOPE_BASE_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37390738269",
+      "head_sha": "6e2cd68600d67c4abd0a2a706f9086527cf6914e",
+      "scope": "LOT-45.1-WU05_SCOPE_BASE_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37452667127",
+      "head_sha": "4fa9084d5ef097d9b02140bf88c573063845b779",
+      "scope": "LOT-45.1-WU01_SCOPE_BASE_BOOTSTRAP"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37452667165",
+      "head_sha": "4fa9084d5ef097d9b02140bf88c573063845b779",
+      "scope": "LOT-45.1-WU01_SCOPE_BASE_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37454493298",
+      "head_sha": "ef8dfbdc3965d27e5947697f6d9fba877864d817",
+      "scope": "LOT-45.1-WU02_SCOPE_BASE_BOOTSTRAP"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37454493458",
+      "head_sha": "ef8dfbdc3965d27e5947697f6d9fba877864d817",
+      "scope": "LOT-45.1-WU02_SCOPE_BASE_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37838227357",
+      "head_sha": "f692c93bf5fb1d276afbdbbfc76ffbfa943b13fa",
+      "scope": "LOT-45.1-WU02_STAGED_AWUS_BOOTSTRAP"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37838227405",
+      "head_sha": "f692c93bf5fb1d276afbdbbfc76ffbfa943b13fa",
+      "scope": "LOT-45.1-WU02_STAGED_AWUS_SECURITY_SECRETS"
+    }
+  ],
+  "workstream": "DEVELOPMENT_ENGINE"
+}

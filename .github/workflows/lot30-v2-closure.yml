@@ -1,19 +1,6 @@
 name: Lot 30 V2 market analysis closure validation
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'config/closure/v2_market_analysis_closure_v1.json'
-      - 'contracts/schemas/v2_market_analysis_closure_state_v1.schema.json'
-      - 'src/crypto_quant_bot/market_analysis/v2_market_analysis_closure*.py'
-      - 'scripts/*lot30*'
-      - 'tests/test_lot30_*.py'
-      - 'docs/*LOT_30*'
-      - 'reports/*lot_30*'
-      - 'data/audit/*lot30.json'
-      - '.github/workflows/lot30-v2-closure.yml'
-      - 'requirements-dev.lock'
   push:
     branches: [main]
   workflow_dispatch:

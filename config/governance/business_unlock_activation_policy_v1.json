@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "policy_kind": "business_unlock_activation_policy_v1",
+  "semantics": "ELIGIBILITY_PLUS_DIRECT_HUMAN_AUTHORIZATION_ATOMIC_TERMINAL_ROUTE",
+  "eligibility_path": "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ELIGIBILITY.json",
+  "activation_plan_path": "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION_PLAN.json",
+  "canonical_state_path": "config/governance/project_state.json",
+  "engineering_manifest_path": "engineering/lots/ENG-09.json",
+  "staged_business_manifest_path": "business/lots/LOT-45.json",
+  "staged_business_awu_path": "business/work_units/LOT-45.1-WU01.json",
+  "activation_successor_awu_path": "engineering/work_units/ENG-09.6-WU05.json",
+  "explicit_human_action": "BUSINESS_DEVELOPMENT_UNLOCK",
+  "requirements": [
+    "unlock eligibility verdict is ELIGIBLE_AWAITING_EXPLICIT_HUMAN_UNLOCK and still matches live GitHub",
+    "executing session receives direct explicit human BUSINESS_DEVELOPMENT_UNLOCK instruction",
+    "ENGINEERING is still BUILDING on ENG-09.6 before transaction",
+    "Lot45 candidate head/base/open/unmerged facts exactly match eligibility evidence",
+    "repository ruleset Protect remains active and compliant",
+    "staged business manifest and AWU validate before state activation",
+    "activation atomically sets ENGINEERING terminal and BUSINESS ACTIVE with exactly one business AWU IN_PROGRESS",
+    "Lot46 remains LOCKED",
+    "runtime/trade/execution/leverage/withdrawal safety is unchanged"
+  ],
+  "forbidden_authorization_sources": [
+    "handoff",
+    "chat_history",
+    "model_memory",
+    "eligibility_alone",
+    "prior_agent_summary"
+  ],
+  "invariant_safety": {
+    "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED",
+    "leverage": "FORBIDDEN",
+    "withdrawals": "FORBIDDEN"
+  }
+}

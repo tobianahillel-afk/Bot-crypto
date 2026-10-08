@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "registry_kind": "mutation_candidate_profiles_v1",
+  "profiles": [
+    {
+      "id": "LOT45_ORDER_FLOW_DELTA_CVD",
+      "profile_version": 1,
+      "lifecycle": "READ_ONLY_QUALIFIED_NOT_ADOPTED",
+      "execution_allowed": false,
+      "active_registry_adopted": false,
+      "production_selector_visible": false,
+      "generic_runner_executable": false,
+      "candidate_binding": {
+        "pull_request": 66,
+        "candidate_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+        "base_branch": "main",
+        "base_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+        "mutation_workflow": ".github/workflows/lot45-mutation-assurance.yml",
+        "mutation_workflow_blob_sha": "e5a569b79b70e42da7c9ce2cc96b8623a0040f1d",
+        "mutation_summary": "reports/lot45/mutation_summary.json",
+        "mutation_summary_blob_sha": "26e49b1d1fc450a00ebc346541a69e82059f1119",
+        "source_head_sha": "c418338da86c49bd4b688d4a64893ee5042adc40",
+        "trusted_prelaunch": "scripts/lot45_trusted_prelaunch.sh",
+        "trusted_prelaunch_blob_sha": "f9aec59ec03449702dc67cac98b020ffe64fe403"
+      },
+      "selectors": [
+        {
+          "mode": "GLOB",
+          "pattern": "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine*.py"
+        },
+        {
+          "mode": "EXACT",
+          "pattern": "scripts/lot45_trusted_prelaunch.sh"
+        },
+        {
+          "mode": "GLOB",
+          "pattern": "tests/test_lot45*.py"
+        },
+        {
+          "mode": "EXACT",
+          "pattern": "config/microstructure/order_flow_delta_and_cvd_engine_v1.json"
+        },
+        {
+          "mode": "EXACT",
+          "pattern": "contracts/schemas/order_flow_delta_cvd_engine_state_v1.schema.json"
+        },
+        {
+          "mode": "EXACT",
+          "pattern": "contracts/schemas/order_flow_delta_cvd_engine_audit_v1.schema.json"
+        },
+        {
+          "mode": "EXACT",
+          "pattern": "contracts/schemas/order_flow_state_v1.schema.json"
+        },
+        {
+          "mode": "EXACT",
+          "pattern": "contracts/schemas/cvd_series_v1.schema.json"
+        },
+        {
+          "mode": "EXACT",
+          "pattern": ".github/workflows/lot45-mutation-assurance.yml"
+        },
+        {
+          "mode": "EXACT",
+          "pattern": "requirements-dev.lock"
+        }
+      ],
+      "baseline_tests": [
+        "tests/test_lot45_order_flow_delta_and_cvd_engine.py",
+        "tests/test_lot45_policy_contract.py",
+        "tests/test_lot45_runtime_binding_and_rounding.py",
+        "tests/test_lot45_schema_contracts.py",
+        "tests/test_lot45_checksum_binding_adversarial.py",
+        "tests/test_lot45_untracked_executable_source_binding.py",
+        "tests/test_lot45_decimal_context_and_pre_epoch.py",
+        "tests/test_lot45_top_level_checksum_authenticity.py"
+      ],
+      "mutation": {
+        "workspace_root": ".tmp-lot45-mutants",
+        "targets": [
+          "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine.py",
+          "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py",
+          "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_validation.py"
+        ],
+        "tests": [
+          "tests/test_lot45_order_flow_delta_and_cvd_engine.py",
+          "tests/test_lot45_policy_contract.py",
+          "tests/test_lot45_runtime_binding_and_rounding.py",
+          "tests/test_lot45_schema_contracts.py",
+          "tests/test_lot45_checksum_binding_adversarial.py",
+          "tests/test_lot45_untracked_executable_source_binding.py",
+          "tests/test_lot45_decimal_context_and_pre_epoch.py",
+          "tests/test_lot45_top_level_checksum_authenticity.py"
+        ],
+        "pytest_exclusion_expression": "not test_reference_frozen_lot44_builds_expected_order_flow and not test_artifacts_reject_nonexistent_and_mismatched_code_commits and not test_real_code_commit_validation_invokes_executable_source_guard",
+        "copy_semantics": {
+          "exact_files": [
+            "src/crypto_quant_bot/__init__.py"
+          ],
+          "whole_directories": [
+            "src/crypto_quant_bot/data_governance/"
+          ],
+          "microstructure_python_except_targets": [
+            "src/crypto_quant_bot/microstructure/__init__.py",
+            "src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector.py",
+            "src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector_models.py",
+            "src/crypto_quant_bot/microstructure/book_integrity_desynchronization_detector_validation.py",
+            "src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_analysis.py",
+            "src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine.py",
+            "src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_models.py",
+            "src/crypto_quant_bot/microstructure/book_resilience_and_replenishment_engine_validation.py",
+            "src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_analysis.py",
+            "src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine.py",
+            "src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine_models.py",
+            "src/crypto_quant_bot/microstructure/liquidity_zones_walls_and_voids_engine_validation.py",
+            "src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts.py",
+            "src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts_models.py",
+            "src/crypto_quant_bot/microstructure/microstructure_scope_and_offline_data_contracts_validation.py",
+            "src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor.py",
+            "src/crypto_quant_bot/microstructure/order_book_delta_and_sequence_reconstructor_models.py",
+            "src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor.py",
+            "src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor_models.py",
+            "src/crypto_quant_bot/microstructure/order_book_delta_sequence_reconstructor_validation.py",
+            "src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine.py",
+            "src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine_models.py",
+            "src/crypto_quant_bot/microstructure/order_book_l2_snapshot_engine_validation.py",
+            "src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine.py",
+            "src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine_models.py",
+            "src/crypto_quant_bot/microstructure/spread_depth_and_imbalance_engine_validation.py",
+            "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema.py",
+            "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_models.py",
+            "src/crypto_quant_bot/microstructure/trades_and_aggressor_classification_schema_validation.py"
+          ],
+          "static_directories": [
+            "config/",
+            "data/audit/",
+            "contracts/",
+            "tests/fixtures/"
+          ]
+        },
+        "settings": {
+          "mutate_only_covered_lines": true,
+          "timeout_factor": 8,
+          "max_children": 1,
+          "python_hash_seed": "0",
+          "do_not_mutate_patterns": [
+            "raise \\w+",
+            "logger\\.\\w+"
+          ]
+        }
+      },
+      "score": {
+        "minimum_percent": 80,
+        "numerator": [
+          "killed"
+        ],
+        "denominator": [
+          "killed",
+          "timeout",
+          "suspicious",
+          "survived"
+        ],
+        "require_zero": [
+          "timeout",
+          "suspicious"
+        ],
+        "rounding_digits": 2
+      },
+      "evidence": {
+        "schema_version": "lot45-mutation-summary-v1",
+        "status": "PASS",
+        "killed": 1341,
+        "timeout": 0,
+        "suspicious": 0,
+        "survived": 324,
+        "evaluated": 1665,
+        "completed": 1665,
+        "total": 1665,
+        "score_percent": 80.54,
+        "mutmut_run_exit_code": 0,
+        "mutmut_results_exit_code": 0
+      },
+      "source_binding": {
+        "mode": "EXACT_HEAD_INPUT",
+        "exact_head": "c418338da86c49bd4b688d4a64893ee5042adc40",
+        "candidate_head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+        "trusted_prelaunch_required": true,
+        "lot46_absence_checks_required": true
+      }
+    }
+  ]
+}

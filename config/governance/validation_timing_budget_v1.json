@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "policy_kind": "validation_timing_budget_v1",
+  "semantics": "ROUTINE_PATH_MEASURED_ELAPSED_FAIL_CLOSED",
+  "source_incremental_policy": "config/governance/incremental_validation_policy_v1.json",
+  "applicability": {
+    "routine_path": true,
+    "pytest_invoked": false,
+    "full_suite_executed": false,
+    "network_used": false,
+    "deep_assurance_executed": false,
+    "certification_executed": false
+  },
+  "required_measurement_fields": [
+    "stage_elapsed_ms.T0",
+    "stage_elapsed_ms.T1",
+    "stage_elapsed_ms.T2",
+    "elapsed_ms"
+  ],
+  "budgets_ms": {
+    "T0": 250,
+    "T1": 500,
+    "T2": 750,
+    "TOTAL": 1500
+  },
+  "calibration_reference": {
+    "workflow_run_id": 36043856025,
+    "head_sha": "fa1623e8bc5c7ea8a30c49970c9b7248cbdf7246",
+    "observed_ms": {
+      "T0": 20.536,
+      "T1": 22.219,
+      "T2": 15.782,
+      "TOTAL": 71.289
+    }
+  },
+  "invariants": [
+    "budgets apply only to the routine no-pytest no-network no-deep-assurance path",
+    "every required timing is taken from measured elapsed_ms output",
+    "T0 budget is stricter than T1 T2 and total budgets",
+    "total budget never exceeds the incremental validation routine ceiling",
+    "pytest-backed T2 is explicitly outside this policy rather than silently accepted",
+    "budget validation executes no validation tier and uses no wall clock external service or LLM"
+  ]
+}

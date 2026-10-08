@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "baseline_kind": "eng00_canonical_baseline",
+  "project": {
+    "canonical_name": "Crypto Quant Bot V3.1-Ops",
+    "repository": "tobianahillel-afk/Bot-crypto"
+  },
+  "provenance": {
+    "engineering_task": "ENG-00.5",
+    "engineering_branch": "engineering/bootstrap-development-engine",
+    "baseline_parent_sha": "5cdfb649c2320515547149521b83fadcfdf42852",
+    "prior_assurance_run": {
+      "run_id": 35792145392,
+      "head_sha": "e34e07d5818fb1a03363c45ba442dd6f04ee4e26",
+      "conclusion": "success"
+    }
+  },
+  "business": {
+    "development_status": "PAUSED",
+    "merged_certified_baseline": {
+      "lot": 44,
+      "version": "0.44.0",
+      "verdict": "GO_LOT44_POST_MERGE",
+      "source_head": "d3cc4cf916ecea5166716746143a593f01b1d051",
+      "implementation_merge": "5c5d3c388abaf10e2e81593a6a3918375a0c0e19",
+      "post_merge_audit_pr": 64,
+      "post_merge_audit_head": "0ddf2c3150b339b8573fead8c942c4b1efa4b300",
+      "post_merge_audit_merge": "1fd85f26102f94d4c42a8f515b522c23028bac89"
+    },
+    "merged_entry_gate": {
+      "target_lot": 45,
+      "verdict": "GO_LOT45_IMPLEMENTATION_ENTRY",
+      "pr": 65,
+      "pr_head": "36a575f2f27da07625875b6fbb579aa75fe4d429",
+      "merge": "390d0779f2be257fa8134faf8f02193a760a09c3"
+    },
+    "candidate": {
+      "lot": 45,
+      "pr": 66,
+      "branch": "agent/lot45-order-flow-delta-cvd-engine-v2",
+      "observed_head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+      "state": "OPEN",
+      "merged": false,
+      "status": "SUSPENDED_CANDIDATE"
+    },
+    "next_lot": {
+      "lot": 46,
+      "status": "LOCKED"
+    }
+  },
+  "safety": {
+    "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED",
+    "leverage": "FORBIDDEN",
+    "withdrawals": "FORBIDDEN"
+  },
+  "authority": {
+    "current_bootstrap_state": "engineering/STATE.json",
+    "repository_truth_registry": "engineering/REPOSITORY_TRUTH_REGISTRY.json",
+    "permanent_state_design": "engineering/PERMANENT_STATE_DESIGN.json",
+    "historical_evidence_protection": "engineering/HISTORICAL_EVIDENCE_PROTECTION.json",
+    "master_plan": "engineering/MASTER_PLAN.md",
+    "root_agent_protocol": "AGENTS.md"
+  },
+  "reconciled_status_views": [
+    "README.md",
+    "docs/ROADMAP_V1_TO_V21.md",
+    "pyproject.toml",
+    "docs/FUNCTIONAL_COVERAGE_REGISTRY.md",
+    "docs/SYSTEM_EXECUTION_ARCHITECTURE.md"
+  ],
+  "external_git_observations": {
+    "main": {
+      "sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+      "branch_protected": false
+    },
+    "rulesets_count": 0,
+    "lot45_candidate": {
+      "pr": 66,
+      "state": "open",
+      "merged": false,
+      "head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+      "base": "390d0779f2be257fa8134faf8f02193a760a09c3"
+    }
+  },
+  "unresolved_findings": [
+    {
+      "id": "BOOT-FINDING-001",
+      "severity": "HIGH",
+      "code": "MAIN_BRANCH_UNPROTECTED",
+      "remediation_target": "ENG-04.6",
+      "blocks": "BUSINESS_DEVELOPMENT_UNLOCK"
+    }
+  ],
+  "invariants": [
+    "candidate PR state is not merged certified truth",
+    "Lot45 entry gate is not Lot45 implementation certification",
+    "Lot46 remains locked",
+    "historical evidence remains immutable",
+    "business development remains paused",
+    "trade and execution remain disabled",
+    "mandatory development path remains zero-cost",
+    "external Git observations must be reverified on every fresh resume"
+  ],
+  "handoff_target": {
+    "engineering_lot": "ENG-01",
+    "first_task": "ENG-01.1",
+    "purpose": "Build the permanent project-state schema and migrate away from the bootstrap state representation."
+  }
+}

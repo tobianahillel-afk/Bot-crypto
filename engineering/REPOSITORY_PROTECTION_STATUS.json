@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "status_kind": "repository_protection_status_v1",
+  "repository": "tobianahillel-afk/Bot-crypto",
+  "default_branch": "main",
+  "observation_id": "LOT-45.1-WU03-LIVE-OBS-001",
+  "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+  "branch_resource": {
+    "protected": true,
+    "source": "GET /repos/{owner}/{repo}/branches/main"
+  },
+  "rulesets": {
+    "count": 1,
+    "source": "GET /repos/{owner}/{repo}/rulesets",
+    "verified_ruleset": {
+      "id": 24172517,
+      "name": "Protect",
+      "target": "branch",
+      "enforcement": "active",
+      "ref_include": [
+        "refs/heads/main"
+      ],
+      "current_user_can_bypass": "never",
+      "rules": [
+        "deletion",
+        "non_fast_forward",
+        "required_status_checks",
+        "pull_request"
+      ],
+      "required_status_checks": [
+        "Gitleaks pinned CLI",
+        "CodeQL Python security-extended",
+        "quality"
+      ]
+    }
+  },
+  "branch_protection_detail": {
+    "state": "VERIFIED_BY_RULESET_EVIDENCE",
+    "source": "GET /repos/{owner}/{repo}/rulesets/24172517",
+    "direct_branch_protection_admin_detail": "UNAVAILABLE_403_INTEGRATION_PERMISSION"
+  },
+  "enforcement": {
+    "mechanism": "REPOSITORY_RULESET",
+    "pull_request_required": true,
+    "required_status_checks": true,
+    "force_pushes_blocked": true,
+    "branch_deletions_blocked": true
+  },
+  "overall_status": "PROTECTED_VERIFIED",
+  "business_unlock_allowed": true,
+  "manual_admin_action_required": false,
+  "blocking_finding_id": null,
+  "note": "Fresh GitHub reads verify main protected=true and active ruleset Protect targets refs/heads/main with pull_request, required_status_checks, non_fast_forward, and deletion rules; current_user_can_bypass=never. Direct branch-protection administration details remain unavailable to the connector, but the repository ruleset is an accepted verified enforcement mechanism."
+}

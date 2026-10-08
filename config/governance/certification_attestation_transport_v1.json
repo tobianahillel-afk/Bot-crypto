@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "policy_kind": "certification_attestation_transport_v1",
+  "semantics": "NATIVE_GITHUB_ATTESTATION_TRANSPORT_ONLY_NO_PROMOTION",
+  "provenance_policy_source": "config/governance/certification_provenance_v1.json",
+  "action_pin_registry_source": "config/governance/action_pin_registry_v1.json",
+  "workflow_permission_policy_source": "config/governance/workflow_permission_policy_v1.json",
+  "action_supply_chain_policy_source": "config/governance/action_supply_chain_policy_v1.json",
+  "workflow_path": ".github/workflows/certification-provenance.yml",
+  "action": {
+    "repository": "actions/attest",
+    "source_ref": "v4.2.2",
+    "approved_commit_sha": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+    "license": "MIT"
+  },
+  "allowed_ref": "refs/heads/engineering/bootstrap-development-engine",
+  "permissions": {
+    "read": [
+      "contents"
+    ],
+    "write": [
+      "id-token",
+      "attestations"
+    ]
+  },
+  "subject_name": "certification-provenance-envelope.json",
+  "predicate_type": "https://github.com/tobianahillel-afk/Bot-crypto/attestations/certification-provenance/v1",
+  "probe": {
+    "candidate_id": "ENG-06.4-ATTESTATION-PROBE",
+    "risk_class": "R2",
+    "assurance_status": "NOT_REQUIRED",
+    "domain_integrity_path": "config/governance/certification_provenance_v1.json",
+    "awu_id": "ENG-06.4-WU02"
+  },
+  "transport": {
+    "push_to_registry": false,
+    "create_storage_record": false,
+    "show_summary": false
+  },
+  "forbidden_write_scopes": [
+    "actions",
+    "artifact-metadata",
+    "checks",
+    "contents",
+    "packages",
+    "pull-requests",
+    "security-events"
+  ],
+  "cost_policy": {
+    "paid_api_required": false,
+    "paid_saas_required": false,
+    "paid_llm_required": false,
+    "paid_runner_required": false
+  },
+  "invariants": [
+    "native transport consumes but never redefines the canonical provenance envelope",
+    "actions/attest release and commit are exact and offline-registered before workflow use",
+    "OIDC and attestations write permissions are approved only for the certification provenance workflow",
+    "engineering transport probe runs only on the dedicated engineering branch",
+    "probe assurance is NOT_REQUIRED and cannot imply T3 PASS T4 completion promotion or business certification",
+    "attestation subject SHA-256 is exactly the WU01 provenance envelope identity",
+    "domain integrity SHA-256 remains a separate reference inside the predicate envelope",
+    "registry push storage record and workflow summary are disabled",
+    "mandatory transport uses GitHub native public-repository attestation support and no paid dependency or LLM"
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "critical_r3_bypass_qualification_v1",
+  "awu_id": "ENG-08.7-WU02",
+  "parent_task": "ENG-08.7",
+  "qualified_head": "d0bf1381298ea81356e469afec4e9f5a90deefda",
+  "qualified_tree": "d66c37370f1f65e09193bdb83fc2d5de7afe78ce",
+  "verdict": "CRITICAL_R3_BYPASS_PASS",
+  "same_head_evidence": true,
+  "bootstrap": {
+    "run_id": 36121700188,
+    "conclusion": "success",
+    "head_sha": "d0bf1381298ea81356e469afec4e9f5a90deefda"
+  },
+  "security_secrets": {
+    "run_id": 36121700184,
+    "conclusion": "success",
+    "head_sha": "d0bf1381298ea81356e469afec4e9f5a90deefda",
+    "scanner": "gitleaks",
+    "scanner_version": "8.30.1",
+    "routine_mode": "RANGE",
+    "introduced_range": "162f91b547debc817d5a82b4b34675b740be83a9..d0bf1381298ea81356e469afec4e9f5a90deefda",
+    "findings": 0
+  },
+  "r3_assurance": {
+    "required_t3": [
+      "RISK_EXECUTION_ASSURANCE"
+    ],
+    "required_t4": [
+      "EXACT_HEAD_CERTIFICATION",
+      "R3_FULL_CERTIFICATION_CHAIN"
+    ],
+    "selector_cross_layer_selftest": {
+      "status": "PASS",
+      "probes": 16
+    },
+    "exact_head": {
+      "status": "PASS",
+      "selftest_probes": 12,
+      "bound_head": "d0bf1381298ea81356e469afec4e9f5a90deefda",
+      "bound_tree": "d66c37370f1f65e09193bdb83fc2d5de7afe78ce"
+    },
+    "deep_assurance": {
+      "status": "PASS",
+      "selftest_probes": 16
+    }
+  },
+  "lifecycle_recovery": {
+    "verdict": "INTERRUPTION_RECOVERY_PASS",
+    "elapsed_ms": 236.169,
+    "budget_ms": 1000,
+    "scenarios": 13,
+    "active_awu": "ENG-08.7-WU02",
+    "active_task": "ENG-08.7",
+    "primary_count": 8,
+    "reference_count": 2,
+    "total_kib_ceil": 69,
+    "handoff_status": "VALID",
+    "context_map_status": "VALID",
+    "conversational_context_required": false,
+    "state_auto_healed": false,
+    "write_authorized": false,
+    "live_git_reverify_satisfied": false,
+    "required_before_write": "LIVE_GIT_REVERIFY_REQUIRED"
+  },
+  "recovery_adversarial_selftest": {
+    "status": "PASS",
+    "probes": 17,
+    "elapsed_ms": 347.015,
+    "budget_ms": 1000
+  },
+  "cold_start_regression": {
+    "verdict": "CONTEXT_FREE_COLD_START_PASS",
+    "elapsed_ms": 38.066,
+    "budget_ms": 1000,
+    "negative_probes": 10,
+    "primary_count": 8,
+    "reference_count": 2,
+    "total_kib_ceil": 69,
+    "profile": "GITHUB_CONNECTOR_ONLY",
+    "conversational_context_required": false,
+    "implicit_expansion": "FORBIDDEN"
+  },
+  "scope_integrity": {
+    "scope_base_sha": "6d9bc16d4c1958e9b762c64b5020ccc4e0a4f96e",
+    "commits_ahead": 5,
+    "changed_paths": [
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/handoff/CURRENT.json",
+      "engineering/work_units/ENG-08.7-WU01.json",
+      "engineering/work_units/ENG-08.7-WU02.json",
+      "scripts/governance/resume_recovery_qualification.py",
+      "scripts/governance/selftest_resume_recovery.py"
+    ],
+    "forbidden_r3_controls_touched": [],
+    "unchanged_critical_controls": [
+      "config/governance/validation_t3_t4_policy_v1.json",
+      "config/governance/certification_deep_assurance_v1.json",
+      "config/governance/certification_exact_head_binding_v1.json",
+      ".github/workflows/engineering-bootstrap.yml"
+    ]
+  },
+  "external_git": {
+    "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "main_branch_protected": false,
+    "rulesets_count": 0,
+    "lot45_pr": 66,
+    "lot45_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "lot45_state": "open",
+    "lot45_merged": false
+  },
+  "safety": {
+    "business_development": "PAUSED",
+    "next_business_lot": 46,
+    "next_business_lot_status": "LOCKED",
+    "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED",
+    "leverage": "FORBIDDEN",
+    "withdrawals": "FORBIDDEN"
+  },
+  "mandatory_cost": {
+    "paid_external_api_required": false,
+    "paid_llm_required": false,
+    "paid_saas_required": false,
+    "paid_runner_required": false
+  }
+}

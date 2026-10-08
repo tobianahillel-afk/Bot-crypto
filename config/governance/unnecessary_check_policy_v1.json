@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "policy_kind": "unnecessary_check_policy_v1",
+  "semantics": "EXACT_EXPECTED_WORK_FROM_IMPACTS_AND_RISK",
+  "trace_version": 1,
+  "source_policies": {
+    "t1": "config/governance/validation_t1_policy_v1.json",
+    "t2": "config/governance/validation_t2_policy_v1.json",
+    "t3_t4": "config/governance/validation_t3_t4_policy_v1.json",
+    "incremental": "config/governance/incremental_validation_policy_v1.json"
+  },
+  "required_trace_fields": [
+    "trace_version",
+    "impact_families",
+    "risk_class",
+    "stage_invocations",
+    "selected_t1_checks",
+    "selected_t2_groups",
+    "t3_requirements",
+    "t4_requirements",
+    "pytest_invoked",
+    "full_suite_executed",
+    "network_used",
+    "deep_assurance_executed",
+    "certification_executed"
+  ],
+  "verdicts": [
+    "CLEAN",
+    "OVERVALIDATED",
+    "UNDERVALIDATED",
+    "MISMATCH"
+  ],
+  "incremental_execution_expectations": {
+    "full_suite_executed": false,
+    "network_used": false,
+    "deep_assurance_executed": false,
+    "certification_executed": false
+  },
+  "invariants": [
+    "expected work is recomputed from canonical validation policies rather than copied into this policy",
+    "selected symbolic checks groups and requirements are compared as exact sets",
+    "stage invocation counts must exactly match canonical single-pass counts",
+    "pytest is required exactly when at least one T2 group is selected",
+    "full suite network T3 execution and T4 execution are never expected inside incremental validation",
+    "extra work is overvalidation and missing required work is undervalidation",
+    "detector is pure standard-library logic and executes no validation command"
+  ]
+}

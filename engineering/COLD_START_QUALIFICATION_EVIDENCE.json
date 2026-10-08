@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "context_free_cold_start_qualification_v1",
+  "awu_id": "ENG-08.5-WU01",
+  "qualified_head": "5ec2ede8c194fbe01e178ae02d9fba5f0d139b2a",
+  "verdict": "CONTEXT_FREE_COLD_START_PASS",
+  "bootstrap": {
+    "run_id": 36063155037,
+    "conclusion": "success",
+    "head_sha": "5ec2ede8c194fbe01e178ae02d9fba5f0d139b2a"
+  },
+  "security_secrets": {
+    "run_id": 36063155021,
+    "conclusion": "success",
+    "head_sha": "5ec2ede8c194fbe01e178ae02d9fba5f0d139b2a"
+  },
+  "metrics": {
+    "elapsed_ms": 38.129,
+    "budget_ms": 1000,
+    "primary_count": 7,
+    "reference_count": 2,
+    "total_kib_ceil": 57,
+    "negative_probes": 10,
+    "conversational_context_required": false,
+    "implicit_expansion": "FORBIDDEN"
+  },
+  "authority": "config/governance/project_state.json",
+  "capability_profile": "GITHUB_CONNECTOR_ONLY",
+  "safety": {
+    "business_development": "PAUSED",
+    "next_business_lot_status": "LOCKED",
+    "trade_allowed": false,
+    "execution_allowed": false
+  }
+}

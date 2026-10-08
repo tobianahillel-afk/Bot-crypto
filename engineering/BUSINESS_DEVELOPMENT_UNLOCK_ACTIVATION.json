@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "business_development_unlock_activation_v1",
+  "semantics": "DIRECT_CURRENT_SESSION_HUMAN_AUTHORIZED_ATOMIC_ACTIVATION",
+  "project": "Crypto Quant Bot V3.1-Ops",
+  "explicit_human_action": "BUSINESS_DEVELOPMENT_UNLOCK",
+  "authorization_source": "CURRENT_SESSION_DIRECT_USER_ACTION",
+  "activation_predecessor_head": "6651f12870ed51318b8004246aa87b015caaeaa8",
+  "live_reverification": {
+    "source": "GITHUB_CONNECTOR",
+    "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "main_branch_protected": true,
+    "rulesets_count": 1,
+    "ruleset": {
+      "id": 24172517,
+      "name": "Protect",
+      "target": "branch",
+      "enforcement": "active",
+      "current_user_can_bypass": "never"
+    },
+    "lot45_pr": 66,
+    "lot45_base_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "lot45_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "lot45_state": "open",
+    "lot45_merged": false
+  },
+  "preflight_evidence": [
+    {
+      "workflow": "Engineering Bootstrap",
+      "run_id": 37322906082,
+      "head_sha": "6651f12870ed51318b8004246aa87b015caaeaa8",
+      "conclusion": "success"
+    },
+    {
+      "workflow": "Security Secrets",
+      "run_id": 37322905878,
+      "head_sha": "6651f12870ed51318b8004246aa87b015caaeaa8",
+      "conclusion": "success"
+    },
+    {
+      "workflow": "Engineering Bootstrap WU08 final",
+      "run_id": 37321549602,
+      "head_sha": "d4a275458aa32c25f84370957595bdf47a2fa90d",
+      "conclusion": "success"
+    },
+    {
+      "workflow": "Security Secrets WU08 final",
+      "run_id": 37321549689,
+      "head_sha": "d4a275458aa32c25f84370957595bdf47a2fa90d",
+      "conclusion": "success"
+    }
+  ],
+  "authority_transition": {
+    "engineering": "BUILDING_TO_STABLE",
+    "business": "PAUSED_TO_ACTIVE",
+    "candidate": "SUSPENDED_CANDIDATE_TO_ACTIVE_CANDIDATE",
+    "active_manifest": "business/lots/LOT-45.json",
+    "first_business_awu": "business/work_units/LOT-45.1-WU01.json"
+  },
+  "candidate_mutated": false,
+  "candidate_merged": false,
+  "lot46_status": "LOCKED",
+  "safety_unchanged": {
+    "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED",
+    "leverage": "FORBIDDEN",
+    "withdrawals": "FORBIDDEN"
+  },
+  "status": "ACTIVATED"
+}

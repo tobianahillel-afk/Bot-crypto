@@ -1,0 +1,119 @@
+{
+  "assembly": {
+    "base_head_sha": "77d581d2d16643ffa636fcc336148fa57c43c60c",
+    "pre_assembly_bootstrap": {
+      "conclusion": "success",
+      "head_sha": "77d581d2d16643ffa636fcc336148fa57c43c60c",
+      "run_id": 36457626752
+    },
+    "work_unit_id": "ENG-09.4-WU01"
+  },
+  "business_candidate": {
+    "lot": 45,
+    "merged": false,
+    "observed_head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "pr": 66,
+    "status": "SUSPENDED_CANDIDATE"
+  },
+  "candidate_kind": "development_engine_v1_certification_candidate_v1",
+  "candidate_status": "CERTIFICATION_CANDIDATE_READY_FOR_EXACT_HEAD_QUALIFICATION",
+  "engine_version": "V1",
+  "evidence_sources": {
+    "cold_start": {
+      "blob_sha": "17b03061f3751481a6b2579997a89f2680c7fa32",
+      "path": "engineering/COLD_START_QUALIFICATION_EVIDENCE.json"
+    },
+    "critical_r3_bypass": {
+      "blob_sha": "d651b8c50a633a2ea20ca899720ea235641dd5ef",
+      "path": "engineering/CRITICAL_R3_BYPASS_EVIDENCE.json"
+    },
+    "interruption_recovery": {
+      "blob_sha": "a8611d1603b5e62aa6ba0879d1d1151c05ac5232",
+      "path": "engineering/INTERRUPTION_RECOVERY_EVIDENCE.json"
+    },
+    "lot45_pilot": {
+      "blob_sha": "d116f6986945c8ed92acbbd2fdb7d085e7429d93",
+      "path": "engineering/LOT45_ENGINE_PILOT_EVIDENCE.json"
+    },
+    "lot45_profile": {
+      "blob_sha": "1b85a021533a14a0e0de678ee76f24066e15fabc",
+      "path": "engineering/ENG09_WU13_LOT45_PROFILE_EVIDENCE.json"
+    },
+    "mandatory_cost": {
+      "blob_sha": "127c3a056a7ee3407b3caf2a6bfb32d73da71920",
+      "path": "engineering/MANDATORY_COST_ZERO_EVIDENCE.json"
+    },
+    "security_engine": {
+      "blob_sha": "434c09377baa192a0a981c1ee2dde9d26c3626fe",
+      "path": "engineering/SECURITY_ENGINE_VERIFICATION.json"
+    },
+    "timing_budget": {
+      "blob_sha": "086918f98196ecfb9e75da77bce3787742cbed38",
+      "path": "config/governance/validation_timing_budget_v1.json"
+    }
+  },
+  "expected_verdicts": {
+    "cold_start": "CONTEXT_FREE_COLD_START_PASS",
+    "critical_r3_bypass": "CRITICAL_R3_BYPASS_PASS",
+    "interruption_recovery": "INTERRUPTION_RECOVERY_PASS",
+    "lot45_pilot": "ENGINE_PILOT_PASS_CANDIDATE_BLOCKED",
+    "lot45_profile_status": "PASS",
+    "lot45_profile_verdict": "READ_ONLY_LOT45_CANDIDATE_PROFILE_QUALIFIED_NOT_ADOPTED",
+    "security_business_unlock_status": "BUSINESS_UNLOCK_BLOCKED_EXTERNAL_PROTECTION",
+    "security_engine": "PASS_ENGINEERING_SECURITY"
+  },
+  "fast_budgets_ms": {
+    "COLD_START": 1000,
+    "INTERRUPTION_RECOVERY": 1000,
+    "RECOVERY_SELFTEST": 1000,
+    "T0": 250,
+    "T1": 500,
+    "T2": 750,
+    "TOTAL": 1500
+  },
+  "forbidden_candidate_statuses": [
+    "CERTIFIED"
+  ],
+  "invariants": [
+    "candidate identity binds canonical policy content and exact Git blob SHAs for all eight evidence inputs",
+    "SAFE FAST zero-cost security and read-only pilot verdicts are derived from evidence fields rather than prose",
+    "BOOT-FINDING-001 remains visible and continues to block business unlock",
+    "Lot45 remains suspended and unmerged and Lot46 remains locked",
+    "temporary WU13 qualification workflow must be absent before candidate assembly",
+    "candidate status is pre-T4 and can never be CERTIFIED in this work unit",
+    "candidate cannot unlock business development runtime execution leverage or withdrawals",
+    "changing evidence bytes policy content verdicts timing floors safety locks or blocker state fails closed"
+  ],
+  "policy_kind": "development_engine_v1_certification_policy_v1",
+  "required_blocker": {
+    "code": "MAIN_BRANCH_UNPROTECTED",
+    "id": "BOOT-FINDING-001",
+    "must_be_resolved_before": "BUSINESS_DEVELOPMENT_UNLOCK",
+    "observed": true
+  },
+  "required_later_t4": [
+    "EXACT_HEAD_CERTIFICATION"
+  ],
+  "required_r3_floor": {
+    "t3": [
+      "RISK_EXECUTION_ASSURANCE"
+    ],
+    "t4": [
+      "EXACT_HEAD_CERTIFICATION",
+      "R3_FULL_CERTIFICATION_CHAIN"
+    ]
+  },
+  "safety_lock": {
+    "business_development": "PAUSED",
+    "execution_allowed": false,
+    "leverage": "FORBIDDEN",
+    "live_execution": "DISABLED",
+    "lot46_status": "LOCKED",
+    "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "trade_allowed": false,
+    "withdrawals": "FORBIDDEN"
+  },
+  "schema_version": 1,
+  "semantics": "BOUNDED_EXACT_EVIDENCE_PRE_T4_CANDIDATE_FAIL_CLOSED",
+  "state_source": "config/governance/project_state.json"
+}

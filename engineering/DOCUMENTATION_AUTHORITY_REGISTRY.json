@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "registry_kind": "documentation_authority_registry_v1",
+  "semantics": "PROGRESSIVE_DISCLOSURE_WITH_SINGLE_CURRENT_STATE_AUTHORITY",
+  "current_state_authority": "config/governance/project_state.json",
+  "generated_current_view": "engineering/CURRENT_STATUS.md",
+  "compatibility_bridge": {
+    "path": "engineering/STATE.json",
+    "role": "MIGRATION_COMPATIBILITY_ONLY",
+    "authorization_allowed": false
+  },
+  "documents": [
+    {
+      "path": "README.md",
+      "role": "GENERATED_CURRENT_VIEW_HOST",
+      "canonical_identity_required": true,
+      "generated_status_required": true,
+      "bridge_policy": "FORBIDDEN",
+      "required_substrings": [
+        "config/governance/project_state.json"
+      ],
+      "forbidden_substrings": [
+        "Crypto Quant Bot V4.1-Ops"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "role": "AGENT_BOOTSTRAP_CURRENT_AUTHORITY",
+      "canonical_identity_required": true,
+      "generated_status_required": true,
+      "bridge_policy": "COMPATIBILITY_ONLY",
+      "required_substrings": [
+        "config/governance/project_state.json",
+        "migration compatibility bridge"
+      ],
+      "forbidden_substrings": [
+        "Crypto Quant Bot V4.1-Ops"
+      ]
+    },
+    {
+      "path": "engineering/CURRENT_STATUS.md",
+      "role": "FULLY_GENERATED_CURRENT_VIEW",
+      "canonical_identity_required": true,
+      "generated_status_required": true,
+      "bridge_policy": "FORBIDDEN",
+      "required_substrings": [
+        "Fully generated from `config/governance/project_state.json`"
+      ],
+      "forbidden_substrings": [
+        "Crypto Quant Bot V4.1-Ops"
+      ]
+    },
+    {
+      "path": "docs/PROJECT_IDENTITY.md",
+      "role": "NORMATIVE_PROJECT_IDENTITY",
+      "canonical_identity_required": true,
+      "generated_status_required": false,
+      "bridge_policy": "FORBIDDEN",
+      "required_substrings": [
+        "Le projet est Crypto Quant Bot V3.1-Ops."
+      ],
+      "forbidden_substrings": [
+        "Crypto Quant Bot V4.1-Ops"
+      ]
+    },
+    {
+      "path": "docs/ROADMAP_V1_TO_V21.md",
+      "role": "NORMATIVE_ROADMAP_NO_CURRENT_STATE_DUPLICATION",
+      "canonical_identity_required": true,
+      "generated_status_required": false,
+      "bridge_policy": "FORBIDDEN",
+      "required_substrings": [
+        "## Autorité d’état courant",
+        "config/governance/project_state.json",
+        "engineering/CURRENT_STATUS.md"
+      ],
+      "forbidden_substrings": [
+        "## État actuel",
+        "engineering/STATE.json",
+        "Crypto Quant Bot V4.1-Ops"
+      ]
+    },
+    {
+      "path": "docs/FUNCTIONAL_COVERAGE_REGISTRY.md",
+      "role": "REFERENCE_BASELINE_SNAPSHOT",
+      "canonical_identity_required": false,
+      "generated_status_required": false,
+      "bridge_policy": "FORBIDDEN",
+      "required_substrings": [
+        "Snapshot de couverture métier : baseline certifiée Lot 44 (`0.44.0`)",
+        "config/governance/project_state.json",
+        "engineering/CURRENT_STATUS.md"
+      ],
+      "forbidden_substrings": [
+        "Statut courant dérivé",
+        "engineering/STATE.json"
+      ]
+    },
+    {
+      "path": "docs/SYSTEM_EXECUTION_ARCHITECTURE.md",
+      "role": "NORMATIVE_ARCHITECTURE_NO_CURRENT_STATE_DUPLICATION",
+      "canonical_identity_required": false,
+      "generated_status_required": false,
+      "bridge_policy": "FORBIDDEN",
+      "required_substrings": [
+        "## 8. Autorité d’état courant",
+        "config/governance/project_state.json",
+        "engineering/CURRENT_STATUS.md"
+      ],
+      "forbidden_substrings": [
+        "## 8. État actuel",
+        "engineering/STATE.json"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "policy_kind": "historical_audit_batching_v1",
+  "semantics": "EXPLICIT_COMPLEXITY_GREEDY_ASCENDING_READ_ONLY",
+  "eligible_lot_range": {
+    "min": 0,
+    "max": 44
+  },
+  "suspended_candidate_lot": 45,
+  "next_locked_lot": 46,
+  "complexity": {
+    "min": 1,
+    "max": 50,
+    "normal_batch_budget": 18
+  },
+  "max_lots_per_batch": 6,
+  "oversized_lot_policy": "ISOLATE_SINGLE_LOT",
+  "ordering": "ASCENDING_LOT_ID",
+  "mutation_policy": "READ_ONLY_NO_HISTORICAL_EVIDENCE_MUTATION",
+  "identity_algorithm": "SHA256_CANONICAL_JSON",
+  "invariants": [
+    "request must contain every eligible historical lot 0 through 44 exactly once",
+    "Lot45 suspended candidate and Lot46 or later are never eligible",
+    "complexity is explicit integer input and is never inferred silently",
+    "batching is greedy deterministic and preserves ascending historical lot order",
+    "normal batch cannot exceed lot-count or cumulative-complexity budget",
+    "a single lot above the normal complexity budget is isolated and never dropped",
+    "every batch and the whole plan receive canonical SHA-256 identities",
+    "planner is pure and performs no repository audit evidence or business mutation"
+  ]
+}

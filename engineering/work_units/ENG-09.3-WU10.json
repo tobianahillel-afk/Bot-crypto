@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-09.3-WU10",
+  "status": "DONE",
+  "parent": {
+    "work_item_id": "ENG-09",
+    "task_id": "ENG-09.3",
+    "manifest": "engineering/lots/ENG-09.json"
+  },
+  "title": "Implement deterministic mutation profiles and P0.6 profile",
+  "objective": "Implement a command-free profile policy, validated P0.6 mutation profile and deterministic changed-path selector that preserve the exact P0.6 mutation semantics without migrating or editing any workflow.",
+  "non_goals": [
+    "modify or replace p06-extended-mutation.yml",
+    "create ci-mutation.yml",
+    "execute mutmut from the generic engine",
+    "define or adopt the Lot45 mutation profile",
+    "modify Lot45 candidate or business code",
+    "deduplicate code-quality.yml mutation",
+    "unlock Lot46 or business development"
+  ],
+  "depends_on": [
+    "ENG-09.3-WU09"
+  ],
+  "inputs": [
+    {
+      "name": "Mutation consolidation plan",
+      "kind": "EVIDENCE",
+      "locator": "engineering/ENG09_PHASE1_MUTATION_CONSOLIDATION_PLAN.json"
+    },
+    {
+      "name": "P0.6 extended mutation workflow",
+      "kind": "FILE",
+      "locator": ".github/workflows/p06-extended-mutation.yml"
+    },
+    {
+      "name": "Canonical mutmut defaults",
+      "kind": "FILE",
+      "locator": "pyproject.toml"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Mutation profile policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/mutation_profile_policy_v1.json"
+    },
+    {
+      "name": "Mutation profile registry",
+      "kind": "CONFIG",
+      "locator": "config/governance/mutation_profiles_v1.json"
+    },
+    {
+      "name": "Mutation profile validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_mutation_profiles.py"
+    },
+    {
+      "name": "Deterministic mutation profile selector",
+      "kind": "FILE",
+      "locator": "scripts/governance/select_mutation_profile.py"
+    },
+    {
+      "name": "Mutation profile adversarial tests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_mutation_profiles.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "0476acda65470992c6abe1cc0ebea3790acbe0e6",
+    "allowed_paths": [
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-09.3-WU09.json",
+      "engineering/work_units/ENG-09.3-WU10.json",
+      "config/governance/mutation_profile_policy_v1.json",
+      "config/governance/mutation_profiles_v1.json",
+      "scripts/governance/validate_mutation_profiles.py",
+      "scripts/governance/select_mutation_profile.py",
+      "scripts/governance/selftest_mutation_profiles.py",
+      "engineering/MUTATION_PROFILE_CONTROL.md"
+    ],
+    "forbidden_paths": [
+      ".github/workflows/**",
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**"
+    ],
+    "forbidden_semantics": [
+      "workflow mutation",
+      "mutation execution",
+      "historical protection weakening",
+      "business implementation",
+      "Lot45 profile adoption",
+      "Lot45 candidate remediation",
+      "Lot45 merge",
+      "Lot46 unlock",
+      "business development unlock",
+      "runtime capability activation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "profile JSON contains data only and cannot inject shell commands",
+      "P0.6 profile preserves the exact mutation target tests score numerator denominator threshold and inherited mutmut controls",
+      "changed-path selection is deterministic and any multi-profile overlap fails closed",
+      "no-match diffs select no mutation profile rather than a blanket mutation suite",
+      "source binding is explicit and P0.6 remains CURRENT_CHECKOUT",
+      "profile evidence semantics are explicit but no mutation command is executed in WU10",
+      "Lot45 profile and workflow remain untouched"
+    ],
+    "acceptance_criteria": [
+      "P0.6 selectors match the legacy workflow path filter surface",
+      "P0.6 mutation target is only src/crypto_quant_bot/contracts/decision_evidence.py",
+      "P0.6 tests are exactly the two decision-evidence test files",
+      "P0.6 score is 80 percent using killed plus timeout over killed plus timeout plus suspicious plus survived",
+      "mutate_only_covered_lines max_stack_depth timeout multiplier timeout constant do-not-mutate patterns and also-copy semantics are explicit",
+      "selector emits P06_DECISION_EVIDENCE for any matching P0.6 path and none for unrelated paths",
+      "ambiguous profile matches and unsafe repository paths fail closed",
+      "no workflow or business file differs from the WU10 scope base"
+    ]
+  },
+  "planning": {
+    "risk_class": "R1",
+    "complexity_score": 1,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 10,
+      "max_reference_files": 12,
+      "max_total_kib": 768
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 11,
+      "executable_loc_changed": 650,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 1,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_mutation_profiles.py",
+      "python scripts/governance/selftest_mutation_profiles.py"
+    ]
+  },
+  "done_when": [
+    "P0.6 mutation semantics are represented losslessly as validated data",
+    "profile selection is deterministic bounded and fail-closed",
+    "no workflow is migrated or changed",
+    "WU11 can implement the generic runner/workflow without rereading legacy mutation semantics"
+  ]
+}

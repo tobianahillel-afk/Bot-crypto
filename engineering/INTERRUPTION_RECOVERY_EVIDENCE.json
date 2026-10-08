@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "interruption_recovery_qualification_v1",
+  "awu_id": "ENG-08.6-WU01",
+  "qualified_head": "ad131734d7b85fde809d6ab7bd4a89f25321f82f",
+  "verdict": "INTERRUPTION_RECOVERY_PASS",
+  "bootstrap": {
+    "run_id": 36073305546,
+    "conclusion": "success",
+    "head_sha": "ad131734d7b85fde809d6ab7bd4a89f25321f82f"
+  },
+  "security_secrets": {
+    "run_id": 36073305552,
+    "conclusion": "success",
+    "head_sha": "ad131734d7b85fde809d6ab7bd4a89f25321f82f"
+  },
+  "recovery_metrics": {
+    "elapsed_ms": 113.574,
+    "budget_ms": 1000,
+    "scenarios": 13,
+    "primary_count": 7,
+    "reference_count": 2,
+    "total_kib_ceil": 62,
+    "conversational_context_required": false,
+    "state_auto_healed": false,
+    "write_authorized": false,
+    "required_before_write": "LIVE_GIT_REVERIFY_REQUIRED"
+  },
+  "adversarial_selftest": {
+    "probes": 17,
+    "elapsed_ms": 177.574,
+    "budget_ms": 1000
+  },
+  "cold_start_regression": {
+    "verdict": "CONTEXT_FREE_COLD_START_PASS",
+    "elapsed_ms": 21.516,
+    "negative_probes": 10,
+    "primary_count": 7,
+    "reference_count": 2,
+    "total_kib_ceil": 62
+  },
+  "authority": "config/governance/project_state.json",
+  "capability_profile": "GITHUB_CONNECTOR_ONLY",
+  "safety": {
+    "business_development": "PAUSED",
+    "next_business_lot_status": "LOCKED",
+    "trade_allowed": false,
+    "execution_allowed": false,
+    "live_execution": "DISABLED",
+    "leverage": "FORBIDDEN",
+    "withdrawals": "FORBIDDEN"
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "ENG-09.5-WU02",
+  "status": "DONE",
+  "parent": {
+    "work_item_id": "ENG-09",
+    "task_id": "ENG-09.5",
+    "manifest": "engineering/lots/ENG-09.json"
+  },
+  "title": "Enforce Development Engine V1 interface freeze in permanent bootstrap",
+  "objective": "Integrate the V1 interface-freeze validator and adversarial selftests into the permanent Engineering Bootstrap workflow so compatibility drift fails closed on every engineering push.",
+  "non_goals": [
+    "change V1 interface semantics or certification identities",
+    "freeze dynamic project-state or generated payload bytes",
+    "add a temporary qualification workflow",
+    "unlock business development or Lot46",
+    "modify or merge Lot45",
+    "change runtime execution authority",
+    "introduce paid services or mandatory LLM review"
+  ],
+  "depends_on": [
+    "ENG-09.5-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "V1 interface freeze policy",
+      "kind": "CONFIG",
+      "locator": "config/governance/development_engine_v1_interface_freeze_v1.json"
+    },
+    {
+      "name": "V1 interface freeze validator",
+      "kind": "FILE",
+      "locator": "scripts/governance/validate_development_engine_v1_interface_freeze.py"
+    },
+    {
+      "name": "V1 interface freeze selftests",
+      "kind": "TEST",
+      "locator": "scripts/governance/selftest_development_engine_v1_interface_freeze.py"
+    },
+    {
+      "name": "Permanent Engineering Bootstrap workflow",
+      "kind": "FILE",
+      "locator": ".github/workflows/engineering-bootstrap.yml"
+    },
+    {
+      "name": "Certified Development Engine V1 evidence",
+      "kind": "EVIDENCE",
+      "locator": "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Permanent Engineering Bootstrap with V1 interface gate",
+      "kind": "FILE",
+      "locator": ".github/workflows/engineering-bootstrap.yml"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "476a1042c9dfff84ebed89f7ad1ee10e2ef07a9c",
+    "allowed_paths": [
+      "engineering/handoff/CURRENT.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/work_units/ENG-09.5-WU01.json",
+      "engineering/work_units/ENG-09.5-WU02.json",
+      ".github/workflows/engineering-bootstrap.yml"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/**",
+      "data/audit/**",
+      "reports/lot*/**",
+      "contracts/**",
+      "config/governance/development_engine_v1_interface_freeze_v1.json",
+      "scripts/governance/validate_development_engine_v1_interface_freeze.py",
+      "scripts/governance/selftest_development_engine_v1_interface_freeze.py",
+      "engineering/DEVELOPMENT_ENGINE_V1_CERTIFICATION_EVIDENCE.json"
+    ],
+    "forbidden_semantics": [
+      "V1 interface contract mutation",
+      "certification evidence mutation",
+      "business development unlock",
+      "BOOT-FINDING-001 suppression",
+      "Lot45 mutation remediation merge or adoption",
+      "Lot46 unlock",
+      "runtime capability activation",
+      "permission-to-trade activation",
+      "mandatory paid dependency",
+      "mandatory LLM review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "Engineering Bootstrap executes the V1 interface validator on every branch push already covered by the permanent workflow",
+      "Engineering Bootstrap executes the V1 interface adversarial selftests immediately after the validator",
+      "no temporary qualification workflow is introduced",
+      "V1 policy validator selftest and certification evidence remain byte-unchanged in this WU",
+      "existing bootstrap permissions triggers and other validation steps remain unchanged",
+      "business/runtime authority remains unchanged and BOOT-FINDING-001 remains blocking"
+    ],
+    "acceptance_criteria": [
+      "bootstrap contains exactly one V1 interface validation step",
+      "bootstrap contains exactly one V1 interface adversarial selftest step",
+      "both commands use the stable scripts defined by WU01",
+      "exact-head bootstrap run on the integration commit succeeds through both new steps",
+      "Security Secrets remains successful on the integration head",
+      "no other workflow is added or changed"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 5,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 1,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": true,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 6,
+      "executable_loc_changed": 80,
+      "new_public_behaviors": 1,
+      "contract_families": 0,
+      "independent_algorithms": 0,
+      "state_machines": 0,
+      "trust_boundaries": 1,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/validate_development_engine_v1_interface_freeze.py",
+      "python scripts/governance/selftest_development_engine_v1_interface_freeze.py"
+    ]
+  },
+  "done_when": [
+    "V1 interface freeze is a permanent fail-closed bootstrap gate",
+    "validator and adversarial selftests pass in exact-head Engineering Bootstrap CI",
+    "Security Secrets remains green on the same head",
+    "no business runtime or certification authority changes occur"
+  ]
+}

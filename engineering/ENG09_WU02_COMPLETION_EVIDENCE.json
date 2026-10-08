@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "eng09_wu02_completion_evidence_v1",
+  "awu_id": "ENG-09.3-WU02",
+  "verdict": "PASS_BY_IMPLEMENTATION_DELTA_PLUS_REPAIRED_GATE_COMPOSITION",
+  "implementation_delta": {
+    "base_sha": "8c886fc6839201b4e6fb7d7303cdb4128909d213",
+    "implementation_head_sha": "40291845a8e01a4d0ca44005f5fd22a03e234a89",
+    "workflow_count": 8,
+    "all_zero_additions": true,
+    "all_jobs_suffix_byte_identical": true,
+    "workflows": [
+      {
+        "path": ".github/workflows/lot26-mutation.yml",
+        "additions": 0,
+        "deletions": 9,
+        "before": [
+          "pull_request",
+          "push:main",
+          "workflow_dispatch"
+        ],
+        "after": [
+          "push:main",
+          "workflow_dispatch"
+        ],
+        "jobs_suffix_byte_identical": true
+      },
+      {
+        "path": ".github/workflows/lot28-mutation.yml",
+        "additions": 0,
+        "deletions": 9,
+        "before": [
+          "pull_request",
+          "push:main",
+          "workflow_dispatch"
+        ],
+        "after": [
+          "push:main",
+          "workflow_dispatch"
+        ],
+        "jobs_suffix_byte_identical": true
+      },
+      {
+        "path": ".github/workflows/lot30-mutation.yml",
+        "additions": 0,
+        "deletions": 7,
+        "before": [
+          "pull_request",
+          "push:main",
+          "workflow_dispatch"
+        ],
+        "after": [
+          "push:main",
+          "workflow_dispatch"
+        ],
+        "jobs_suffix_byte_identical": true
+      },
+      {
+        "path": ".github/workflows/lot31-mutation.yml",
+        "additions": 0,
+        "deletions": 8,
+        "before": [
+          "pull_request",
+          "push:main",
+          "workflow_dispatch"
+        ],
+        "after": [
+          "push:main",
+          "workflow_dispatch"
+        ],
+        "jobs_suffix_byte_identical": true
+      },
+      {
+        "path": ".github/workflows/lot32-mutation.yml",
+        "additions": 0,
+        "deletions": 11,
+        "before": [
+          "pull_request",
+          "push:main",
+          "workflow_dispatch"
+        ],
+        "after": [
+          "push:main",
+          "workflow_dispatch"
+        ],
+        "jobs_suffix_byte_identical": true
+      },
+      {
+        "path": ".github/workflows/lot36-mutation-assurance.yml",
+        "additions": 0,
+        "deletions": 8,
+        "before": [
+          "pull_request",
+          "workflow_dispatch"
+        ],
+        "after": [
+          "workflow_dispatch"
+        ],
+        "jobs_suffix_byte_identical": true
+      },
+      {
+        "path": ".github/workflows/lot37-mutation-assurance.yml",
+        "additions": 0,
+        "deletions": 8,
+        "before": [
+          "pull_request",
+          "workflow_dispatch"
+        ],
+        "after": [
+          "workflow_dispatch"
+        ],
+        "jobs_suffix_byte_identical": true
+      },
+      {
+        "path": ".github/workflows/lot40-mutation-assurance.yml",
+        "additions": 0,
+        "deletions": 11,
+        "before": [
+          "pull_request",
+          "workflow_dispatch"
+        ],
+        "after": [
+          "workflow_dispatch"
+        ],
+        "jobs_suffix_byte_identical": true
+      }
+    ]
+  },
+  "blocked_head_evidence": {
+    "head_sha": "40291845a8e01a4d0ca44005f5fd22a03e234a89",
+    "runs": [
+      {
+        "id": 36137808847,
+        "name": "Engineering Bootstrap",
+        "conclusion": "success"
+      },
+      {
+        "id": 36137808737,
+        "name": "Security Secrets",
+        "conclusion": "success"
+      },
+      {
+        "id": 36137808803,
+        "name": "Security Actions",
+        "conclusion": "failure"
+      },
+      {
+        "id": 36137808635,
+        "name": "Security Supply Chain",
+        "conclusion": "failure"
+      }
+    ],
+    "diagnosis": "WU02 implementation passed bootstrap and secret controls; blocking failures were legacy-debt behavior in workflow-security and action-supply-chain gates."
+  },
+  "repair_evidence": {
+    "awu_id": "ENG-09.3-WU03",
+    "exact_head_sha": "8d728d228e5a287cc2e054acb2f2a68a57c24011",
+    "scope_base_sha": "40291845a8e01a4d0ca44005f5fd22a03e234a89",
+    "historical_mutation_workflows_touched": false,
+    "runs": [
+      {
+        "id": 36141845236,
+        "name": "Engineering Bootstrap",
+        "conclusion": "success"
+      },
+      {
+        "id": 36141845230,
+        "name": "Security Secrets",
+        "conclusion": "success"
+      },
+      {
+        "id": 36141845234,
+        "name": "Security Actions",
+        "conclusion": "success"
+      },
+      {
+        "id": 36141845322,
+        "name": "Security Supply Chain",
+        "conclusion": "success"
+      }
+    ],
+    "regression_semantics": [
+      "trigger-only edits with unchanged legacy floating uses pass diff-local gates",
+      "new floating uses fail",
+      "changed unapproved SHA uses fail",
+      "changed dangerous zizmor findings fail",
+      "unlocated zizmor findings fail closed"
+    ]
+  },
+  "resumed_certification": {
+    "exact_head_sha": "43d584b4ac06cf7603074cfe8f476b20fc384785",
+    "runs": [
+      {
+        "id": 36348909815,
+        "name": "Engineering Bootstrap",
+        "conclusion": "success"
+      },
+      {
+        "id": 36348909853,
+        "name": "Security Secrets",
+        "conclusion": "success"
+      }
+    ],
+    "active_scope_base_sha": "8d728d228e5a287cc2e054acb2f2a68a57c24011"
+  },
+  "protected_boundaries": {
+    "lot44_protected_workflows_mutated": false,
+    "lot45_or_global_workflows_mutated": false,
+    "business_code_mutated": false,
+    "historical_data_audit_mutated": false,
+    "contracts_mutated": false,
+    "lot46_unlocked": false
+  },
+  "live_git_observation": {
+    "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "lot45_pr": 66,
+    "lot45_head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "lot45_state": "open",
+    "lot45_merged": false,
+    "main_branch_protected": false,
+    "rulesets_count": 0
+  },
+  "final_certification": {
+    "exact_head_sha": "f983edf74c53cabe511cd2122a03e5c7b566bf38",
+    "engineering_bootstrap_run": 36349052437,
+    "security_secrets_run": 36349052493,
+    "verdict": "PASS"
+  }
+}

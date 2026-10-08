@@ -1,0 +1,273 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "historical_audit_mapping_schema_v1",
+  "title": "HistoricalAuditTraceabilityMappingV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "mapping_kind",
+    "mode",
+    "mapping_id",
+    "manifest_identity_sha256",
+    "plan_identity_sha256",
+    "batch_identity_sha256",
+    "lot",
+    "requirements",
+    "mutation_permissions",
+    "mapping_identity_sha256"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "mapping_kind": {
+      "const": "historical_audit_traceability_mapping_v1"
+    },
+    "mode": {
+      "const": "READ_ONLY"
+    },
+    "mapping_id": {
+      "type": "string",
+      "pattern": "^HIST-MAP-B[0-9]{3}-L[0-9]{3}$"
+    },
+    "manifest_identity_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "plan_identity_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "batch_identity_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "lot": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 44
+    },
+    "requirements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/requirement"
+      }
+    },
+    "mutation_permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "historical_evidence",
+        "business_code",
+        "contracts",
+        "reports",
+        "data_audit",
+        "runtime_authority",
+        "business_state"
+      ],
+      "properties": {
+        "historical_evidence": {
+          "const": false
+        },
+        "business_code": {
+          "const": false
+        },
+        "contracts": {
+          "const": false
+        },
+        "reports": {
+          "const": false
+        },
+        "data_audit": {
+          "const": false
+        },
+        "runtime_authority": {
+          "const": false
+        },
+        "business_state": {
+          "const": false
+        }
+      }
+    },
+    "mapping_identity_sha256": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "source_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "locator",
+        "requirement_sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "requirement_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "location_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "locator"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      }
+    },
+    "symbol_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "symbol"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "symbol": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      }
+    },
+    "test_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "test_id"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "test_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      }
+    },
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "category",
+        "source",
+        "design_sections",
+        "implementation_symbols",
+        "test_ids",
+        "contract_artifacts",
+        "evidence_artifacts",
+        "coverage_status",
+        "justification",
+        "gap_reason"
+      ],
+      "properties": {
+        "requirement_id": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 120,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,119}$"
+        },
+        "category": {
+          "enum": [
+            "FUNCTIONAL",
+            "SAFETY",
+            "GOVERNANCE",
+            "DOCUMENTATION",
+            "EVIDENCE"
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "design_sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/location_ref"
+          }
+        },
+        "implementation_symbols": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/symbol_ref"
+          }
+        },
+        "test_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/test_ref"
+          }
+        },
+        "contract_artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/location_ref"
+          }
+        },
+        "evidence_artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/location_ref"
+          }
+        },
+        "coverage_status": {
+          "enum": [
+            "MAPPED",
+            "JUSTIFIED_NON_CODE",
+            "UNRESOLVED"
+          ]
+        },
+        "justification": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000
+        },
+        "gap_reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000
+        }
+      }
+    }
+  }
+}
