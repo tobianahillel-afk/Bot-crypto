@@ -169,5 +169,26 @@
     "unresolved_non_outdated_review_threads": 0,
     "merge_ready": false,
     "lot46_status": "LOCKED"
+  },
+  "staging_evidence": {
+    "status": "FOUR_AWUS_STAGED_EXACT_ENGINE_HEAD_QUALIFIED",
+    "engine_branch": "engineering/bootstrap-development-engine",
+    "engine_head": "f692c93bf5fb1d276afbdbbfc76ffbfa943b13fa",
+    "awu_paths": [
+      "business/work_units/LOT-45.2-WU01.json",
+      "business/work_units/LOT-45.2-WU02.json",
+      "business/work_units/LOT-45.2-WU03.json",
+      "business/work_units/LOT-45.2-WU04.json"
+    ],
+    "engineering_bootstrap_run": 37838227357,
+    "security_secrets_run": 37838227405,
+    "candidate_pr": 66,
+    "candidate_unchanged_head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "candidate_mutated": false,
+    "branch_boundary": {
+      "status": "NEEDS_EXPLICIT_SAFE_BINDING_BEFORE_ACTIVATION",
+      "reason": "The staged WU01 scope_base_sha is the PR66 candidate head. It is not an ancestor of the separate engineering/bootstrap-development-engine work branch; validation there cannot use it as a scope base.",
+      "required_decision": "Use an ancestry-correct exact-head scope on the authorized execution branch, retaining the V1 controls, candidate PR history, and fail-closed scope checks. Reverify both heads and protect frozen evidence before candidate writes."
+    }
   }
 }

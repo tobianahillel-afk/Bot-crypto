@@ -14,7 +14,7 @@
     "state_source": "config/governance/project_state.json"
   },
   "blockers": [],
-  "current_objective": "LOT-45.1-WU02: stage four bounded LOT-45.2 remediation AWUs from the refreshed read-only requalification plan.",
+  "current_objective": "LOT-45.1-WU02: four ordered Lot45 remediation AWUs are staged and exact-head checks are green; preserve candidate immutability until safe branch-bound activation.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -27,21 +27,21 @@
     "lot45_merged": false
   },
   "kind": "engineering_handoff",
-  "next_action": "Reverify PR #66 remains unchanged, create LOT-45.2-WU01..WU04 matching RM-01..RM-04, expand the Lot45 parent allowlist only to those manifests, and do not mutate candidate bytes.",
+  "next_action": "Before closing WU02/activating LOT-45.2-WU01, define and validate an ancestry-correct candidate-branch execution/scope binding for Development Engine V1. Do not activate WU01 with candidate scope_base_sha on the unrelated engineering branch; do not modify PR66, merge, or unlock Lot46 as part of staging.",
   "next_engineering": {
     "active_lot": null,
     "active_task": null,
     "active_manifest": null
   },
   "recent_completed": [
-    "ENG-09.6-WU08 activated after preflight found that exact-head BUSINESS activation would otherwise fail PAUSED-only bootstrap validation; no business authority changed.",
     "ENG-09.6-WU08 terminal activation compatibility qualified on exact head d4a275458aa32c25f84370957595bdf47a2fa90d; Engineering Bootstrap 37321549602 and Security Secrets 37321549689 passed. WU05 resumed only as bounded preflight; prior-session authorization is not reusable.",
     "ENG-09.6-WU05 current-session activation preflight on head 6651f12870ed51318b8004246aa87b015caaeaa8 passed Engineering Bootstrap 37322906082 and Security Secrets 37322905878; live main, PR #66 and Protect ruleset were reverified unchanged.",
     "Direct current-session BUSINESS_DEVELOPMENT_UNLOCK authorization executed as the atomic terminal Engineering -> active read-only Lot45 business-route transition from predecessor 6651f12870ed51318b8004246aa87b015caaeaa8.",
     "LOT-45.1-WU03 core lifecycle slice closed by mandatory file-count split: head 654b0b572d063f1524471b38cc92457db2f286b9 passed Security Secrets 37388265817 and Engineering Bootstrap 37388265876 reached the repository-protection gate after context-map validation.",
     "LOT-45.1-WU04 reached its mandatory 15-file boundary on head 6e2cd68600d67c4abd0a2a706f9086527cf6914e: Security Secrets 37390738269 passed and Engineering Bootstrap 37390738279 passed through security/protection but exposed an engineering-only work-decomposition qualifier; continuation split to WU05.",
     "LOT-45.1-WU05 lifecycle reconciliation closed on exact head 4fa9084d5ef097d9b02140bf88c573063845b779: Engineering Bootstrap 37452667127 and Security Secrets 37452667165 both passed; main/ruleset and PR #66 were reverified unchanged before WU01 restoration.",
-    "LOT-45.1-WU01 read-only requalification refreshed on candidate ec2c4ab16f21b23e062b7fca0bb796c8db4a5133; engine preconditions are cleared and exact engine head ef8dfbdc3965d27e5947697f6d9fba877864d817 passed Engineering Bootstrap 37454493298 plus Security Secrets 37454493458."
+    "LOT-45.1-WU01 read-only requalification refreshed on candidate ec2c4ab16f21b23e062b7fca0bb796c8db4a5133; engine preconditions are cleared and exact engine head ef8dfbdc3965d27e5947697f6d9fba877864d817 passed Engineering Bootstrap 37454493298 plus Security Secrets 37454493458.",
+    "LOT-45.1-WU02 staged four PLANNED LOT-45.2 AWUs at f692c93bf5fb1d276afbdbbfc76ffbfa943b13fa; Bootstrap 37838227357 and Security Secrets 37838227405 SUCCESS; PR66 unchanged."
   ],
   "resume_read_order": [
     "AGENTS.md",
@@ -81,20 +81,6 @@
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
   ],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36641980568",
-      "head_sha": "6c30f47c173218ff8645e23eefbbcf1a8f2eb373",
-      "scope": "ENG-09.6-WU07_SCOPE_BASE_BOOTSTRAP"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37321549602",
-      "head_sha": "d4a275458aa32c25f84370957595bdf47a2fa90d",
-      "scope": "ENG-09.6-WU08_FINAL_BOOTSTRAP"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "status": "PASS",
@@ -164,6 +150,20 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37454493458",
       "head_sha": "ef8dfbdc3965d27e5947697f6d9fba877864d817",
       "scope": "LOT-45.1-WU02_SCOPE_BASE_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37838227357",
+      "head_sha": "f692c93bf5fb1d276afbdbbfc76ffbfa943b13fa",
+      "scope": "LOT-45.1-WU02_STAGED_AWUS_BOOTSTRAP"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37838227405",
+      "head_sha": "f692c93bf5fb1d276afbdbbfc76ffbfa943b13fa",
+      "scope": "LOT-45.1-WU02_STAGED_AWUS_SECURITY_SECRETS"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"
