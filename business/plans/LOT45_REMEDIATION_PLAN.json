@@ -186,9 +186,63 @@
     "candidate_unchanged_head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
     "candidate_mutated": false,
     "branch_boundary": {
-      "status": "NEEDS_EXPLICIT_SAFE_BINDING_BEFORE_ACTIVATION",
+      "status": "SAFE_INTEGRATION_ROUTE_DESIGNED_BUT_NOT_EXECUTED",
       "reason": "The staged WU01 scope_base_sha is the PR66 candidate head. It is not an ancestor of the separate engineering/bootstrap-development-engine work branch; validation there cannot use it as a scope base.",
-      "required_decision": "Use an ancestry-correct exact-head scope on the authorized execution branch, retaining the V1 controls, candidate PR history, and fail-closed scope checks. Reverify both heads and protect frozen evidence before candidate writes."
+      "required_decision": "Use a new isolated, two-parent candidate+engine integration base with explicitly reviewed conflicts and ancestry-correct scope. Validate the separate business activation transition before WU01 code changes; never move PR66 implicitly."
     }
+  },
+  "execution_branch_binding_design": {
+    "status": "DESIGNED_NOT_EXECUTED",
+    "risk": "R2_OR_HIGHER_IF_CONFLICTS_TOUCH_SECURITY_OR_CERTIFICATION",
+    "source_facts": {
+      "verified_at_utc": "2026-10-08T20:30:00Z",
+      "common_ancestor": "390d0779f2be257fa8134faf8f02193a760a09c3",
+      "protected_main_head": "390d0779f2be257fa8134faf8f02193a760a09c3",
+      "current_engine_head": "d81fff2ae334499f2d852fc78d63073d214210c2",
+      "lot45_candidate_head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+      "divergent": true,
+      "current_candidate_pr": 66,
+      "candidate_branch_unchanged": true,
+      "exact_engine_qualification": {
+        "engineering_bootstrap_run": 37839889982,
+        "security_secrets_run": 37839890028,
+        "status": "SUCCESS"
+      }
+    },
+    "isolation": {
+      "new_branch_required": true,
+      "proposed_branch": "agent/lot45-v1-remediation-integration",
+      "never_force_push": true,
+      "pr66_original_branch_mutation": "FORBIDDEN_WITHOUT_SEPARATE_AUTHORIZED_TRANSITION",
+      "frozen_historical_evidence_mutation": "FORBIDDEN",
+      "main_direct_write": "FORBIDDEN",
+      "lot46_unlock": "FORBIDDEN"
+    },
+    "proposed_procedure": [
+      "Reverify main SHA, both source branch SHAs, PR66 state and protection rules before execution.",
+      "Create a fresh isolated branch/worktree from the exact Lot45 candidate head; do not move PR66 or main.",
+      "Perform a reviewed, explicit merge of the exact certified engineering head; reject unresolved conflicts and silent overlap resolution.",
+      "Record a genuine two-parent integration commit with candidate and engineering ancestry; verify both SHAs with git merge-base --is-ancestor.",
+      "Compare candidate-owned business source/contracts/tests/evidence with PR66 baseline; require byte-for-byte equality absent an explicitly reviewed integration conflict.",
+      "Verify frozen historical evidence and safety settings remain immutable; fail on any unreviewed modified path.",
+      "Only after a certified clean integration base exists, stage a separate BUSINESS activation transition commit on that integration branch.",
+      "Bind LOT-45.2-WU01 scope_base_sha to the actual integration-base ancestor, not to the unrelated remote PR66 head.",
+      "For the activation transition, explicitly authorize and validate the minimum control-plane files in the LOT45 parent and WU01 scope; never silently bypass scope checking.",
+      "Update generated context/status/handoff consistently and qualify the exact activated HEAD under Security Secrets and Engineering Bootstrap.",
+      "Only then execute LOT-45.2-WU01 source corrections, with T0-T3 domain safety checks and exact SHA evidence."
+    ],
+    "mandatory_pre_activation_proofs": [
+      "candidate_head_is_ancestor_of_integration_base",
+      "engineering_head_is_ancestor_of_integration_base",
+      "candidate_business_bytes_preserved_or_conflicts_individually_reviewed",
+      "no_protected_evidence_mutation",
+      "no_unreviewed_workflow_or_execution_permission_drift",
+      "correct_scope_base_is_ancestor_of_active_business_head",
+      "transition_files_covered_by_both_active_AWU_and_parent_scope",
+      "all_mandatory_v1_validators_PASS_on_exact_activation_HEAD",
+      "trade_allowed_false_execution_allowed_false_Lot46_LOCKED"
+    ],
+    "current_unresolved_gate": "NO_INTEGRATION_BASE_EXISTS_YET; NO_LOT45.2_ACTIVATION_AUTHORIZED",
+    "scope_note": "This entry is a design and read-only Git-ancestry qualification, not execution evidence or permission to mutate PR66."
   }
 }

@@ -49,7 +49,7 @@
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 52
+    "total_kib_ceil": 55
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -65,9 +65,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "LOT-45.1-WU02: four ordered Lot45 remediation AWUs are staged and exact-head checks are green; preserve candidate immutability until safe branch-bound activation.",
+    "current_objective": "LOT-45.1-WU02: four Lot45 remediation AWUs staged; integration branch binding designed but not executed; PR66 remains byte-unchanged.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Before closing WU02/activating LOT-45.2-WU01, define and validate an ancestry-correct candidate-branch execution/scope binding for Development Engine V1. Do not activate WU01 with candidate scope_base_sha on the unrelated engineering branch; do not modify PR66, merge, or unlock Lot46 as part of staging."
+    "next_action": "LOT-45.1-WU02: prepare and verify a new isolated two-parent candidate+engine integration base following business/plans/LOT45_REMEDIATION_PLAN.json execution_branch_binding_design. Do not move PR66; do not activate LOT-45.2-WU01 or change business code until ancestry, transition scope and exact-head V1 gates pass."
   },
   "safety": {
     "execution_allowed": false,

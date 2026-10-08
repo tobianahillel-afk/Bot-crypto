@@ -36,14 +36,14 @@
 
 - Primary: 6 / 8 files
 - Reference: 2 / 8 files
-- Routed size: 52 / 512 KiB
+- Routed size: 55 / 512 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: LOT-45.1-WU02: four ordered Lot45 remediation AWUs are staged and exact-head checks are green; preserve candidate immutability until safe branch-bound activation.
-- Next action: Before closing WU02/activating LOT-45.2-WU01, define and validate an ancestry-correct candidate-branch execution/scope binding for Development Engine V1. Do not activate WU01 with candidate scope_base_sha on the unrelated engineering branch; do not modify PR66, merge, or unlock Lot46 as part of staging.
+- Objective: LOT-45.1-WU02: four Lot45 remediation AWUs staged; integration branch binding designed but not executed; PR66 remains byte-unchanged.
+- Next action: LOT-45.1-WU02: prepare and verify a new isolated two-parent candidate+engine integration base following business/plans/LOT45_REMEDIATION_PLAN.json execution_branch_binding_design. Do not move PR66; do not activate LOT-45.2-WU01 or change business code until ancestry, transition scope and exact-head V1 gates pass.
 
 ## Non-authoritative sources
 
