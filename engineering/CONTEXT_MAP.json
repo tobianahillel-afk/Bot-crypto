@@ -1,13 +1,13 @@
 {
   "active_work": {
-    "track": "BUSINESS",
-    "lot": "LOT-45",
-    "task": "LOT-45.1",
-    "manifest": "business/lots/LOT-45.json",
     "awu_id": "LOT-45.1-WU07",
     "awu_path": "business/work_units/LOT-45.1-WU07.json",
+    "complexity_score": 2,
+    "lot": "LOT-45",
+    "manifest": "business/lots/LOT-45.json",
     "risk_class": "R2",
-    "complexity_score": 2
+    "task": "LOT-45.1",
+    "track": "BUSINESS"
   },
   "authority": {
     "current_state": "config/governance/project_state.json",
