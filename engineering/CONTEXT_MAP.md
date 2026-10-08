@@ -36,14 +36,14 @@
 
 - Primary: 6 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 88 / 1024 KiB
+- Routed size: 91 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: LOT-45.1-WU06 / PRE-00: anchor qualified on exact engine HEAD; preserve authorization boundary and prepare separate PRE-01A scope.
-- Next action: PRE-00 verification PASS at 29dccae3 (bootstrap 37854704354, secrets 37854704349, PR66/PR67/main protected refs verified). Next: separately scoped risk-scored PRE-01A authority on integration branch; no current permission to edit PR67, no Lot45.2 activation.
+- Objective: LOT-45.1-WU06 / PRE-00: preserve certified authorization boundary; PRE-01A read-only pin inventory is recorded and next integration-branch authority remains separate.
+- Next action: PRE-01A verified-design pin inventory is in business/plans/LOT45_REMEDIATION_PLAN.json: six floating uses across two Lot45 workflows, three audited immutable action pins. Next, create a distinct scoped R2 integration-branch AWU before editing PR67; keep PR66/main/Lot46 unchanged.
 
 ## Non-authoritative sources
 
