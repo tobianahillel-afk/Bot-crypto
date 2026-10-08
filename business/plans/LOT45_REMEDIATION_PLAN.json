@@ -671,9 +671,9 @@
           "integration_draft": true,
           "integration_branch": "agent/lot45-v1-remediation-integration",
           "integration_head": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
-          "current_engine_head": "a50b2f6f60e9745759f46fc13fd57ae569dc6c63",
+          "current_engine_head": "449aaa6edf391192bf5eac0008602607dbec237b",
           "integration_engine_parent": "343e3fe056a97e2680ee2eb8bf27bc9346a7b970",
-          "engine_commits_after_integration_parent": 8,
+          "engine_commits_after_integration_parent": 11,
           "active_protection_ruleset_count": 1
         },
         "finding_ids": [
@@ -772,6 +772,72 @@
           "trade_allowed=false, execution_allowed=false and Lot46 LOCKED"
         ],
         "next_required_action": "Authorize PRE-00 as a separately scoped state transition; do not interpret this design record as write permission or proof of qualification."
+      },
+      "latest_read_only_pre00_reverification": {
+        "status": "READ_ONLY_VERIFIED_NOT_ACTIVATED",
+        "verified_on": "2026-10-08",
+        "exact_engine_head": "449aaa6edf391192bf5eac0008602607dbec237b",
+        "engine_parent_integration": "343e3fe056a97e2680ee2eb8bf27bc9346a7b970",
+        "engine_commits_after_integration_parent": 11,
+        "parent_relation": "ANCESTOR_VERIFIED",
+        "changed_engine_paths_since_integration_parent": [
+          "business/plans/LOT45_REMEDIATION_PLAN.json",
+          "engineering/CONTEXT_MAP.json",
+          "engineering/CONTEXT_MAP.md",
+          "engineering/handoff/CURRENT.json"
+        ],
+        "changed_paths_classification": "PLAN_CONTEXT_HANDOFF_ONLY",
+        "executable_source_contracts_security_workflows_changed_since_integration_parent": false,
+        "protected_main_head": "390d0779f2be257fa8134faf8f02193a760a09c3",
+        "pr66": {
+          "state": "OPEN",
+          "merged": false,
+          "head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133"
+        },
+        "pr67": {
+          "state": "OPEN",
+          "draft": true,
+          "merged": false,
+          "head": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+          "parents": [
+            "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+            "343e3fe056a97e2680ee2eb8bf27bc9346a7b970"
+          ]
+        },
+        "platform": {
+          "active_rulesets_count": 1
+        },
+        "exact_integration_ci": {
+          "passing": [
+            "Security Secrets",
+            "Security SAST"
+          ],
+          "failing": [
+            "Security Supply Chain",
+            "Security Actions",
+            "Security Dependencies",
+            "Roadmap documentation validation"
+          ],
+          "all_green": false
+        },
+        "remaining_findings": [
+          "LOT45-INT-001",
+          "LOT45-INT-002",
+          "LOT45-INT-003",
+          "LOT45-INT-004",
+          "LOT45-INT-005"
+        ],
+        "no_authorization_granted_for": [
+          "PRE-00 activation",
+          "PRE-01A..PRE-06 execution",
+          "PR66 mutation",
+          "PR67 mutation",
+          "merge",
+          "Lot46 unlock",
+          "trading activation"
+        ],
+        "next_authorized_action": "Prepare a separately scoped PRE-00 administrative transition, qualify its parent scope and new AWU, then activate only after explicit governance authorization.",
+        "note": "Read-only metadata refresh under LOT-45.1-WU02; no live code, dependency, workflow or GitHub setting modification."
       }
     }
   }
