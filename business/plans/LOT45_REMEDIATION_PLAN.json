@@ -1238,7 +1238,40 @@
             "Pass Engineering Bootstrap and Security Secrets on exact activation HEAD",
             "Keep original PR67 draft/head unchanged until separately authorized branch integration"
           ],
-          "result": "ONLY_AUTHORITY_TO_START_NEXT_WORKFLOW_AWU_AFTER_PASS"
+          "result": "ONLY_AUTHORITY_TO_START_NEXT_WORKFLOW_AWU_AFTER_PASS",
+          "isolated_branch_creation": {
+            "status": "CREATED_IDENTICAL_TO_VERIFIED_PR67_HEAD",
+            "branch": "agent/lot45-pre01a-authorized-work",
+            "base_commit": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+            "branch_compare": {
+              "status": "identical",
+              "ahead_by": 0,
+              "behind_by": 0,
+              "changed_files": 0
+            },
+            "pr66": {
+              "pr": 66,
+              "head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+              "state": "open",
+              "merged": false
+            },
+            "pr67": {
+              "pr": 67,
+              "head": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+              "state": "open",
+              "draft": true,
+              "merged": false
+            },
+            "action": "BRANCH_REF_CREATED_ONLY_NO_FILES_OR_WORKFLOWS_CHANGED",
+            "scope_authority": "NOT_GRANTED",
+            "next_gate": "INDEPENDENT_WU08_ADMINISTRATIVE_ACTIVATION_WITH_PARENT_AND_AWU_SCOPE_AUTHORIZATION"
+          },
+          "activation_blocker": {
+            "id": "PRE01A_ADMIN_AWU_SCOPE_GAP",
+            "status": "OPEN",
+            "reason": "Isolated branch inherits LOT-45.1-WU02 (R0), whose allowed_paths exclude the prospective WU08 path and whose forbidden semantics prohibit workflow changes. The separate R2 activation must not be silently inferred from branch creation.",
+            "remediation": "Prepare a distinct explicitly approved state/parent-scope transition; qualify exact R2 AWU and cold start before any PRE-01A workflow edit."
+          }
         },
         "step_2_workflow_pinning": {
           "proposed_awuid": "LOT-45.1-WU09",
