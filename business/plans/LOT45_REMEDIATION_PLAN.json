@@ -216,7 +216,20 @@
       "pr66_original_branch_mutation": "FORBIDDEN_WITHOUT_SEPARATE_AUTHORIZED_TRANSITION",
       "frozen_historical_evidence_mutation": "FORBIDDEN",
       "main_direct_write": "FORBIDDEN",
-      "lot46_unlock": "FORBIDDEN"
+      "lot46_unlock": "FORBIDDEN",
+      "branch_creation_evidence": {
+        "status": "CREATED_VERIFIED_SOURCE_EXACT",
+        "branch": "agent/lot45-v1-remediation-integration",
+        "head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+        "compared_to_candidate": "IDENTICAL",
+        "ahead_by": 0,
+        "behind_by": 0,
+        "pre_merge_state": "NO_INTEGRATION_COMMIT",
+        "no_business_code_mutation": true,
+        "pr66_unchanged": true,
+        "main_unchanged": true,
+        "checked_at_utc": "2026-10-08T20:40:00Z"
+      }
     },
     "proposed_procedure": [
       "Reverify main SHA, both source branch SHAs, PR66 state and protection rules before execution.",
@@ -242,7 +255,7 @@
       "all_mandatory_v1_validators_PASS_on_exact_activation_HEAD",
       "trade_allowed_false_execution_allowed_false_Lot46_LOCKED"
     ],
-    "current_unresolved_gate": "NO_REVIEWED_TWO_PARENT_INTEGRATION_COMMIT; NO_LOT45.2_ACTIVATION_AUTHORIZED",
+    "current_unresolved_gate": "TWO_PARENT_INTEGRATION_COMMIT_NOT_CREATED; NO_LOT45.2_ACTIVATION_AUTHORIZED",
     "scope_note": "This entry is a design and read-only Git-ancestry qualification, not execution evidence or permission to mutate PR66.",
     "three_way_overlap_audit": {
       "method": "EXACT_GIT_TREE_BLOB_COMPARISON_AGAINST_COMMON_BASE",
@@ -277,7 +290,22 @@
         "docs/SYSTEM_EXECUTION_ARCHITECTURE.md": "RECONCILE_ARCHITECTURE_WITHOUT_REDUCING_SAFETY_INVARIANTS",
         "pyproject.toml": "KEEP_V3_1_IDENTITY_AND_0_44_0_CERTIFIED_VERSION; RECONCILE_REQUIRED_EXACT_DEV_DEPENDENCIES_WITH_LOCK_AND_AUDIT"
       },
-      "forbidden_shortcut": "NO_AUTOMATIC_OURS_THEIRS_RESOLUTION_FOR_SHARED_PATHS"
+      "forbidden_shortcut": "NO_AUTOMATIC_OURS_THEIRS_RESOLUTION_FOR_SHARED_PATHS",
+      "dependency_parity_recheck": {
+        "observed_on": "2026-10-08",
+        "candidate_dev_extras": [
+          "jsonschema==4.26.0",
+          "referencing==0.37.0"
+        ],
+        "missing_from_engine_dev_extras": [
+          "jsonschema==4.26.0",
+          "referencing==0.37.0"
+        ],
+        "missing_from_engine_requirements_dev_lock": true,
+        "candidate_requirements_dev_lock_contains_both": true,
+        "resolution": "MUST_RECONCILE_EXACT_DEPENDENCY_LOCK_AND_AUDIT_BEFORE_MERGE_CERTIFICATION",
+        "not_authorized_to_drop_dependencies": true
+      }
     }
   }
 }
