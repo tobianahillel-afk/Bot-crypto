@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "LOT-45.2-WU02",
+  "status": "PLANNED",
+  "parent": {
+    "work_item_id": "LOT-45",
+    "task_id": "LOT-45.2",
+    "manifest": "business/lots/LOT-45.json"
+  },
+  "title": "Repair mypy narrowing and checksum-correct reconstruction fixtures",
+  "objective": "Resolve LOT45-REQUAL-002/003 by making the identity return type statically sound and constructing valid CVD adversarial fixtures that reach their intended later invariants.",
+  "non_goals": [
+    "disable mypy",
+    "relax canonical CVD checksum validation",
+    "modify unrelated financial mathematics",
+    "regenerate frozen evidence",
+    "merge PR66"
+  ],
+  "depends_on": [
+    "LOT-45.2-WU01"
+  ],
+  "inputs": [
+    {
+      "name": "Current source model",
+      "kind": "FILE",
+      "locator": "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py"
+    },
+    {
+      "name": "Failing fixture tests",
+      "kind": "TEST",
+      "locator": "tests/test_lot45_runtime_binding_and_rounding.py"
+    },
+    {
+      "name": "Requalification defects",
+      "kind": "EVIDENCE",
+      "locator": "business/evidence/LOT45_V1_REQUALIFICATION.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Typed market identity narrowing",
+      "kind": "FILE",
+      "locator": "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py"
+    },
+    {
+      "name": "Canonical checksum fixtures",
+      "kind": "TEST",
+      "locator": "tests/test_lot45_runtime_binding_and_rounding.py"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "allowed_paths": [
+      "src/crypto_quant_bot/microstructure/order_flow_delta_and_cvd_engine_models.py",
+      "tests/test_lot45_runtime_binding_and_rounding.py"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/risk/**",
+      "src/crypto_quant_bot/execution/**",
+      "src/crypto_quant_bot/oms/**",
+      "src/crypto_quant_bot/ems/**",
+      "data/audit/product_scope_roadmap_lot21.jsonl"
+    ],
+    "forbidden_semantics": [
+      "bypass or suppression of type errors",
+      "skip/xpass for failing tests",
+      "looser checksum acceptance",
+      "premature certification",
+      "Lot46 unlock",
+      "trading or live execution activation",
+      "mutation of Lots 0-44 historical evidence",
+      "mandatory paid or LLM-backed review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "return-typed market identity validation narrows to Lot45MarketIdentityV1 without Any or blanket type ignore",
+      "negative reconstruction tests recompute correct canonical checksums before evaluating intended guard",
+      "tampered checksums remain rejected",
+      "no financial calculation or rounding semantics relaxed"
+    ],
+    "acceptance_criteria": [
+      "mypy src/crypto_quant_bot passes on exact new candidate head",
+      "previous 2 adversarial reconstruction cases reach their intended later invariant and PASS",
+      "canonical CVD checksum rejection still has a negative test",
+      "full Lot45 targeted tests and security regression are green on final WU02 candidate head"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 2,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 1,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": true,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 2,
+      "executable_loc_changed": 200,
+      "new_public_behaviors": 0,
+      "contract_families": 0,
+      "independent_algorithms": 0,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "target_commands": [
+      "mypy src/crypto_quant_bot",
+      "pytest targeted Lot45 tests",
+      "checksum-corruption negative validation"
+    ]
+  },
+  "done_when": [
+    "LOT45-REQUAL-002 and LOT45-REQUAL-003 fixed without type/checksum weakening",
+    "targeted offline replay and negative tests pass",
+    "source changes bound to exact candidate head"
+  ]
+}

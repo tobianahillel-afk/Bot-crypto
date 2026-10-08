@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "LOT-45.2-WU03",
+  "status": "PLANNED",
+  "parent": {
+    "work_item_id": "LOT-45",
+    "task_id": "LOT-45.2",
+    "manifest": "business/lots/LOT-45.json"
+  },
+  "title": "Rebuild Lot45 frozen evidence and trusted prelaunch provenance",
+  "objective": "Resolve LOT45-REQUAL-004 by regenerating Lot45 evidence only from the stable remediated candidate and correcting trusted prelaunch/attestation bindings; never reuse prior frozen evidence for altered source bytes.",
+  "non_goals": [
+    "rewrite immutably certified Lots 0-44",
+    "accept stale 75e8a82f evidence for new candidate",
+    "modify order-flow math",
+    "disable trusted prelaunch gate",
+    "merge PR66"
+  ],
+  "depends_on": [
+    "LOT-45.2-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "Trusted pre-launch script",
+      "kind": "FILE",
+      "locator": "scripts/lot45_trusted_prelaunch.sh"
+    },
+    {
+      "name": "Stale attestation diagnostic",
+      "kind": "EVIDENCE",
+      "locator": "business/evidence/LOT45_V1_REQUALIFICATION.json"
+    },
+    {
+      "name": "Verified remediated source head",
+      "kind": "OTHER",
+      "locator": "LOT-45.2-WU02-EXACT-HEAD"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Pre-launch invariant",
+      "kind": "FILE",
+      "locator": "scripts/lot45_trusted_prelaunch.sh"
+    },
+    {
+      "name": "Lot45 CI topology",
+      "kind": "FILE",
+      "locator": ".github/workflows/lot45-frozen-evidence.yml"
+    },
+    {
+      "name": "New candidate-only report evidence",
+      "kind": "EVIDENCE",
+      "locator": "reports/lot45/**"
+    },
+    {
+      "name": "New Lot45 audit lineage",
+      "kind": "EVIDENCE",
+      "locator": "data/audit/*lot45*"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+    "allowed_paths": [
+      "scripts/lot45_trusted_prelaunch.sh",
+      ".github/workflows/lot45-order-flow-delta-cvd.yml",
+      ".github/workflows/lot45-mutation-assurance.yml",
+      ".github/workflows/lot45-frozen-evidence.yml",
+      "reports/lot45/**",
+      "data/audit/*lot45*"
+    ],
+    "forbidden_paths": [
+      "src/crypto_quant_bot/risk/**",
+      "src/crypto_quant_bot/execution/**",
+      "src/crypto_quant_bot/oms/**",
+      "src/crypto_quant_bot/ems/**",
+      "data/audit/product_scope_roadmap_lot21.jsonl"
+    ],
+    "forbidden_semantics": [
+      "rewrite certified earlier-lot evidence",
+      "reuse previous frozen checksum for new source",
+      "disable or suppress prelaunch verification",
+      "run unreviewed live trading",
+      "Lot46 unlock",
+      "trading or live execution activation",
+      "mutation of Lots 0-44 historical evidence",
+      "mandatory paid or LLM-backed review"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "prelaunch checks committed-tree source/evidence/validator/frozen head consistency",
+      "evidence regenerated from final stable remediated source, never copied from 75e8a82f",
+      "historical Lots 0-44 immutable; Lot45 new evidence is candidate-scoped",
+      "all GitHub Action edits remain pinned and least privilege"
+    ],
+    "acceptance_criteria": [
+      "trusted pre-launch script passes from committed candidate HEAD",
+      "Lot45 frozen evidence regenerated reproducibly",
+      "provenance explicitly binds exact source, validator, evidence and frozen commit IDs",
+      "fail-closed test demonstrates old frozen evidence rejected on new source",
+      "no wider historical workflow fanout repair"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 3,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 1,
+      "persistence_checksum_boundary": true,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": false,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": true
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 10,
+      "executable_loc_changed": 550,
+      "new_public_behaviors": 0,
+      "contract_families": 0,
+      "independent_algorithms": 0,
+      "state_machines": 0,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3",
+      "T4"
+    ],
+    "target_commands": [
+      "trusted Lot45 pre-launch committed-tree",
+      "Lot45 frozen evidence generation from stable source",
+      "exact-head provenance mismatch negative test"
+    ]
+  },
+  "done_when": [
+    "LOT45-REQUAL-004 resolved",
+    "new source/evidence/validator/frozen chain coherent",
+    "candidate ready for independent final assurance not yet merge authorized"
+  ]
+}
