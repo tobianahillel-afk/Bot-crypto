@@ -186,13 +186,13 @@
     "candidate_unchanged_head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
     "candidate_mutated": false,
     "branch_boundary": {
-      "status": "SAFE_INTEGRATION_ROUTE_DESIGNED_BUT_NOT_EXECUTED",
-      "reason": "The staged WU01 scope_base_sha is the PR66 candidate head. It is not an ancestor of the separate engineering/bootstrap-development-engine work branch; validation there cannot use it as a scope base.",
+      "status": "TWO_PARENT_INTEGRATION_BASE_CREATED_PENDING_EXACT_HEAD_ASSURANCE",
+      "reason": "The two-parent candidate+engine base is created and ancestry/tree preservation are statically verified; LOT-45.2 activation and code mutation remain blocked until exact-head V1 assurance and activation-scope checks pass.",
       "required_decision": "Use a new isolated, two-parent candidate+engine integration base with explicitly reviewed conflicts and ancestry-correct scope. Validate the separate business activation transition before WU01 code changes; never move PR66 implicitly."
     }
   },
   "execution_branch_binding_design": {
-    "status": "DESIGNED_NOT_EXECUTED",
+    "status": "INTEGRATION_BASE_CREATED_PENDING_EXACT_HEAD_V1_QUALIFICATION",
     "risk": "R2_OR_HIGHER_IF_CONFLICTS_TOUCH_SECURITY_OR_CERTIFICATION",
     "source_facts": {
       "verified_at_utc": "2026-10-08T20:30:00Z",
@@ -255,7 +255,7 @@
       "all_mandatory_v1_validators_PASS_on_exact_activation_HEAD",
       "trade_allowed_false_execution_allowed_false_Lot46_LOCKED"
     ],
-    "current_unresolved_gate": "TWO_PARENT_INTEGRATION_COMMIT_NOT_CREATED; NO_LOT45.2_ACTIVATION_AUTHORIZED",
+    "current_unresolved_gate": "EXACT_INTEGRATION_HEAD_V1_CI_AND_ACTIVATION_SCOPE_NOT_QUALIFIED; LOT-45.2_WU01_REMAINS_PLANNED",
     "scope_note": "This entry is a design and read-only Git-ancestry qualification, not execution evidence or permission to mutate PR66.",
     "three_way_overlap_audit": {
       "method": "EXACT_GIT_TREE_BLOB_COMPARISON_AGAINST_COMMON_BASE",
@@ -306,6 +306,58 @@
         "resolution": "MUST_RECONCILE_EXACT_DEPENDENCY_LOCK_AND_AUDIT_BEFORE_MERGE_CERTIFICATION",
         "not_authorized_to_drop_dependencies": true
       }
-    }
+    },
+    "integration_commit_evidence": {
+      "status": "CREATED_GIT_TREE_AND_DIRECT_PARENTS_VERIFIED_NOT_CI_CERTIFIED",
+      "branch": "agent/lot45-v1-remediation-integration",
+      "commit": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+      "first_parent_candidate": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+      "second_parent_engine": "343e3fe056a97e2680ee2eb8bf27bc9346a7b970",
+      "merged_tree": "c0464336c5b84d6f44ec5248e15c09bbf2f5df97",
+      "candidate_source_contract_tests_and_lot45_audit_blobs": "BYTE_FOR_BYTE_PRESERVED",
+      "engine_governance_blobs": "BYTE_FOR_BYTE_PRESERVED",
+      "source_head_and_main": "UNCHANGED",
+      "conflict_resolution": [
+        {
+          "path": "README.md",
+          "decision": "ENGINE_V3_1_CANONICAL"
+        },
+        {
+          "path": "docs/FUNCTIONAL_COVERAGE_REGISTRY.md",
+          "decision": "ENGINE_LOT44_BASELINE_CANONICAL"
+        },
+        {
+          "path": "docs/ROADMAP_V1_TO_V21.md",
+          "decision": "ENGINE_V1_V21_ORDER_AND_CANONICAL_IDENTITY"
+        },
+        {
+          "path": "docs/SYSTEM_EXECUTION_ARCHITECTURE.md",
+          "decision": "ENGINE_SAFETY_CONSTRAINTS"
+        },
+        {
+          "path": "pyproject.toml",
+          "decision": "ENGINE_V3_1_VERSION_0_44_0_PLUS_EXACT_CANDIDATE_DEV_EXTRAS"
+        },
+        {
+          "path": "docs/MASTER_SYSTEM_SPECIFICATION.md",
+          "decision": "ENGINE_V3_1_IDENTITY_OVERRIDES_CANDIDATE_V4_1_LEGACY"
+        },
+        {
+          "path": ".github/workflows/p06-extended-mutation.yml",
+          "decision": "KEEP_ENGINE_DELETION_OF_OBSOLETE_FANOUT"
+        }
+      ],
+      "exact_dependency_lock_sha": "ae1a8ac77a404d307025febfd6856bea8b3327fb",
+      "reconciled_pyproject_blob": "04de772f95154f9f98b87dd95edeed23c0342db8",
+      "required_exact_dev_extras": [
+        "jsonschema==4.26.0",
+        "referencing==0.37.0"
+      ],
+      "evidence_tier": "READ_ONLY_GITHUB_GIT_TREE_AND_PARENT_CHECKS_ONLY",
+      "github_actions_exact_head": "NOT_YET_EXECUTED",
+      "candidate_remediation_started": false,
+      "business_activation_authorized": false
+    },
+    "required_decision": "QUALIFY_EXACT_INTEGRATION_SHA_AND_SEPARATE_ACTIVATION_SCOPE_BEFORE_LOT45_2"
   }
 }

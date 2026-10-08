@@ -42,8 +42,8 @@
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: LOT-45.1-WU02: four Lot45 remediation AWUs staged; integration branch binding designed but not executed; PR66 remains byte-unchanged.
-- Next action: LOT-45.1-WU02: prepare and verify a new isolated two-parent candidate+engine integration base following business/plans/LOT45_REMEDIATION_PLAN.json execution_branch_binding_design. Do not move PR66; do not activate LOT-45.2-WU01 or change business code until ancestry, transition scope and exact-head V1 gates pass.
+- Objective: LOT-45.1-WU02: isolated two-parent candidate+engine integration base created at 2275d478cb69446c9ad3a7f2f4923f671c4d6e95; PR66 unchanged; exact-head V1 qualification still pending.
+- Next action: LOT-45.1-WU02: qualify the isolated integration commit 2275d478cb69446c9ad3a7f2f4923f671c4d6e95 with Development Engine V1 on that exact head, then validate a separate LOT-45.2-WU01 scope-base/activation transition. No source remediation, PR66 mutation, Lot46 unlock or runtime execution before these gates.
 
 ## Non-authoritative sources
 
