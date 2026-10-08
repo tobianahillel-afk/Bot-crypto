@@ -157,14 +157,6 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37838227405",
       "head_sha": "f692c93bf5fb1d276afbdbbfc76ffbfa943b13fa",
       "scope": "LOT-45.1-WU02_STAGED_AWUS_SECURITY_SECRETS"
-    },
-    {
-      "class": "GITHUB_CONNECTOR_READ",
-      "status": "VERIFIED_NOT_CERTIFIED",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/tree/agent/lot45-v1-remediation-integration",
-      "head_sha": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
-      "scope": "LOT-45.1-WU02_ISOLATED_BRANCH_CREATED_NO_MERGE",
-      "note": "New branch equals exact PR66 candidate head, 0 commits ahead/behind. No code changes, two-parent integration or business activation; dependency parity remains unresolved."
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"
