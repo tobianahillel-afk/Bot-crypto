@@ -34,7 +34,6 @@
     "active_task": null
   },
   "recent_completed": [
-    "LOT-45.1-WU02 design-only preactivation remediation plan committed at 980c4ba8d0b2d15c39cd4a3848997e6135953e6e. Eight ordered PRE units cover five integration blockers; Engineering Bootstrap 37846910978 and Security Secrets 37846911073 both SUCCESS. Future code changes remain unauthorized by WU02.",
     "LOT-45.1-WU02 PRE-00 read-only preflight refreshed 2026-10-08: main and PR66 unchanged, PR67 draft at 2275d478; latest engine a50b2f6 has 8 commits after integration parent 343e3fe; five recorded blockers remain OPEN. Scope packet is design-only and does not authorize implementation.",
     "LOT-45.1-WU02 read-only PRE-00 requalification at engine head 449aaa6edf391192bf5eac0008602607dbec237b: PR66/main and PR67 unchanged; 11 post-integration-parent engine commits affect only plan/context/handoff; PR67 still has five blockers and no PRE activation authority.",
     "LOT-45.1-WU02 context-map budget reconciliation: engine HEAD fa1fe875a1c3ce7b54a42771e8db6b94dfdebe79 passed Engineering Bootstrap 37850424318 and Security Secrets 37850424132. Both generated context maps now carry 82 KiB. PR66, PR67, main and PRE-00 authorization remain unchanged.",
