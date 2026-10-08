@@ -34,7 +34,6 @@
     "active_task": null
   },
   "recent_completed": [
-    "LOT-45.1-WU02 staged four PLANNED LOT-45.2 AWUs at f692c93bf5fb1d276afbdbbfc76ffbfa943b13fa; Bootstrap 37838227357 and Security Secrets 37838227405 SUCCESS; PR66 unchanged.",
     "LOT-45.1-WU02 isolated integration branch agent/lot45-v1-remediation-integration created and read-verified at candidate ec2c4ab16f21b23e062b7fca0bb796c8db4a5133; candidate PR66 and protected main remain unchanged. No two-parent merge or LOT-45.2 activation was executed. Overlap audit reconfirmed five divergent shared paths and required jsonschema==4.26.0/referencing==0.37.0 lock parity.",
     "LOT-45.1-WU02 isolated two-parent base 2275d478cb69446c9ad3a7f2f4923f671c4d6e95 created (candidate ec2c4ab16f21b23e062b7fca0bb796c8db4a5133 + engine 343e3fe056a97e2680ee2eb8bf27bc9346a7b970), immutable candidate source/contracts/tests/audit preserved, five shared paths resolved explicitly plus canonical identity override and lock parity; V1 exact-head CI NOT YET EXECUTED.",
     "LOT-45.1-WU02 draft integration PR #67 opened for SHA 2275d478cb69446c9ad3a7f2f4923f671c4d6e95; SAST and Secrets PASS; five separate blocking integration findings recorded. Exact-head V1 certification and Lot45.2 activation remain BLOCKED.",
