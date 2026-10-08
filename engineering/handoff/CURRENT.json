@@ -83,10 +83,10 @@
   "validation_evidence": [
     {
       "class": "GITHUB_ACTIONS",
-      "head_sha": "4fa9084d5ef097d9b02140bf88c573063845b779",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37452667127",
-      "scope": "LOT-45.1-WU01_SCOPE_BASE_BOOTSTRAP",
-      "status": "PASS"
+      "status": "PASS",
+      "head_sha": "6c30f47c173218ff8645e23eefbbcf1a8f2eb373",
+      "scope": "ENG-09.6-WU07_SCOPE_BASE_BOOTSTRAP",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36641980568"
     },
     {
       "class": "GITHUB_ACTIONS",
