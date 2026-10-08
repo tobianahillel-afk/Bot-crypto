@@ -65,9 +65,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "LOT-45.1-WU02: eight design-only PRE-00..PRE-06 integration preactivation units staged in business/plans/LOT45_REMEDIATION_PLAN.json; PR67 remains a blocked draft, PR66 untouched, no remediation AWU activated.",
+    "current_objective": "LOT-45.1-WU02: PRE-00 independent administrative transition is specified and live-ref-qualified; no remediation or integration mutation authorized.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Authorize a separate bounded LOT45-PRE-00 integration-preflight AWU and exact scope/branch transition, then execute PRE-01A/B through PRE-05 only under their authorized scopes; run PRE-06 exact-head assurance before activating LOT-45.2-WU01. No PR66 mutation, merge, Lot46 unlock, or trading authority."
+    "next_action": "Qualify and authorize a NEW R2+ PRE-00 administrative AWU and parent/task/scope transition on a validated exact branch base; then execute PRE-01A/B to PRE-05 in isolated AWUs, PRE-06 exact-head assurance, and only then LOT-45.2. PR66 and PR67 stay untouched for now."
   },
   "safety": {
     "execution_allowed": false,
