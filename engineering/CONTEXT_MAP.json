@@ -49,7 +49,7 @@
       "engineering/MASTER_PLAN.md",
       "engineering/AGENT_PROTOCOL.md"
     ],
-    "total_kib_ceil": 86
+    "total_kib_ceil": 88
   },
   "instructions": [
     "verify external Git reality before writing",
@@ -65,9 +65,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "LOT-45.1-WU06 / PRE-00: independently qualify the R2 administrative transition and exact Git ancestry; no PR66/PR67 implementation mutation.",
+    "current_objective": "LOT-45.1-WU06 / PRE-00: anchor qualified on exact engine HEAD; preserve authorization boundary and prepare separate PRE-01A scope.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Confirm Engineering Bootstrap and Security Secrets SUCCESS at the exact PRE-00 activation HEAD, reverify PR66/PR67/main, then prepare the separately scoped PRE-01A integration correction. Do not merge or activate LOT-45.2."
+    "next_action": "PRE-00 verification PASS at 29dccae3 (bootstrap 37854704354, secrets 37854704349, PR66/PR67/main protected refs verified). Next: separately scoped risk-scored PRE-01A authority on integration branch; no current permission to edit PR67, no Lot45.2 activation."
   },
   "safety": {
     "execution_allowed": false,
