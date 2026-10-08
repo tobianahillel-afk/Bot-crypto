@@ -73,7 +73,7 @@
     "runtime_max": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
     "trade_allowed": false
   },
-  "status": "IN_PROGRESS",
+  "status": "COMPLETE",
   "stop_conditions": [
     "STATE_DRIFT",
     "BUSINESS_SCOPE_TOUCHED_WITHOUT_UNLOCK",
