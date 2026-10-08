@@ -654,7 +654,125 @@
         "sast_pass": 37844693080
       },
       "relation_to_existing_remediation_units": "All PRE units are integration/preactivation only and are not LOT45-RM-01..04. The four staged LOT-45.2 AWUs must remain PLANNED and unchanged.",
-      "next_action": "Explicitly authorize and activate bounded preactivation AWUs before editing paths outside LOT-45.1-WU02. Do not mark PRE plan as execution authority."
+      "next_action": "Explicitly authorize and activate bounded preactivation AWUs before editing paths outside LOT-45.1-WU02. Do not mark PRE plan as execution authority.",
+      "pre00_authorization_packet": {
+        "schema_version": 1,
+        "packet_kind": "lot45_pre00_bounded_transition_preflight_v1",
+        "status": "DESIGN_ONLY_NOT_ACTIVATED",
+        "observed_on": "2026-10-08",
+        "source_work_unit": "LOT-45.1-WU02",
+        "authoritative_branch": "engineering/bootstrap-development-engine",
+        "observed_external_refs": {
+          "protected_main": "390d0779f2be257fa8134faf8f02193a760a09c3",
+          "candidate_pr": 66,
+          "candidate_head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+          "candidate_open_unmerged": true,
+          "integration_pr": 67,
+          "integration_draft": true,
+          "integration_branch": "agent/lot45-v1-remediation-integration",
+          "integration_head": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+          "current_engine_head": "a50b2f6f60e9745759f46fc13fd57ae569dc6c63",
+          "integration_engine_parent": "343e3fe056a97e2680ee2eb8bf27bc9346a7b970",
+          "engine_commits_after_integration_parent": 8,
+          "active_protection_ruleset_count": 1
+        },
+        "finding_ids": [
+          "LOT45-INT-001",
+          "LOT45-INT-002",
+          "LOT45-INT-003",
+          "LOT45-INT-004",
+          "LOT45-INT-005"
+        ],
+        "authorization_boundary": {
+          "current_allowed_work": "Update the existing LOT-45.1-WU02 planning manifest, parent bounds and handoff only; do not mutate PR67 implementation or security workflows.",
+          "next_required_transition": "Create and independently qualify a new PRE-00 administrative AWU with a fresh scope-base ancestor and explicit parent/scope/active-state transition.",
+          "current_awu_cannot_authorize": [
+            "New production source edits",
+            "Workflow ref pinning",
+            "Dependency lock remediation",
+            "Quality-deviation deadline extension",
+            "Changing GitHub repository security settings",
+            "Certifying PR67",
+            "Merging PR66 or PR67"
+          ],
+          "rule": "DO_NOT_SELF_EXPAND_WU02_TO_EXECUTE_PRE01_PRE05"
+        },
+        "planned_execution_units": [
+          {
+            "id": "PRE-00",
+            "type": "AUTHORIZATION",
+            "scope": "explicit manifest/state/handoff activation only",
+            "must_be_separate_from": "PRE-01A..PRE-06"
+          },
+          {
+            "id": "PRE-01A",
+            "type": "WORKFLOW_ACTION_PINS",
+            "paths": [
+              ".github/workflows/lot45-order-flow-delta-cvd.yml",
+              ".github/workflows/lot45-mutation-assurance.yml"
+            ]
+          },
+          {
+            "id": "PRE-01B",
+            "type": "WORKFLOW_ACTION_PINS",
+            "paths": [
+              ".github/workflows/lot45-frozen-evidence.yml"
+            ]
+          },
+          {
+            "id": "PRE-02",
+            "type": "WORKFLOW_SHELLCHECK",
+            "paths": [
+              ".github/workflows/lot44-frozen-evidence.yml",
+              ".github/workflows/lot45-frozen-evidence.yml"
+            ]
+          },
+          {
+            "id": "PRE-03",
+            "type": "DEPENDENCY_UPDATE",
+            "paths": [
+              "requirements-dev.lock"
+            ]
+          },
+          {
+            "id": "PRE-04",
+            "type": "PLATFORM_OR_EQUIVALENT_GATE",
+            "paths": [],
+            "status": "NO_REPOSITORY_ADMIN_MUTATION_WITH_CURRENT_AWU"
+          },
+          {
+            "id": "PRE-05",
+            "type": "QUALITY_DEVIATION_REVIEW",
+            "paths": [
+              "config/governance/legacy_engineering_deviations_v1.json"
+            ]
+          },
+          {
+            "id": "PRE-06",
+            "type": "EXACT_HEAD_ASSURANCE",
+            "paths": [],
+            "depends_on": [
+              "PRE-00",
+              "PRE-01A",
+              "PRE-01B",
+              "PRE-02",
+              "PRE-03",
+              "PRE-04",
+              "PRE-05"
+            ]
+          }
+        ],
+        "release_conditions": [
+          "Both parent commits remain ancestors of integration branch without silent rebase",
+          "New integration HEAD passes mandatory Development Engine V1 bootstrap and secrets checks after authorized activation",
+          "Every security workflow pin is verified against official immutable upstream commit",
+          "No weakened or skipped dependency vulnerability protection",
+          "Historical Lots 0-44 evidence remains byte-identical",
+          "No lot45 original candidate PR66 mutation or merge",
+          "trade_allowed=false, execution_allowed=false and Lot46 LOCKED"
+        ],
+        "next_required_action": "Authorize PRE-00 as a separately scoped state transition; do not interpret this design record as write permission or proof of qualification."
+      }
     }
   }
 }
