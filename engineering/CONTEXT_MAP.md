@@ -36,14 +36,14 @@
 
 - Primary: 6 / 8 files
 - Reference: 2 / 8 files
-- Routed size: 61 / 512 KiB
+- Routed size: 65 / 512 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: LOT-45.1-WU02: isolated two-parent candidate+engine integration base created at 2275d478cb69446c9ad3a7f2f4923f671c4d6e95; PR66 unchanged; exact-head V1 qualification still pending.
-- Next action: LOT-45.1-WU02: qualify the isolated integration commit 2275d478cb69446c9ad3a7f2f4923f671c4d6e95 with Development Engine V1 on that exact head, then validate a separate LOT-45.2-WU01 scope-base/activation transition. No source remediation, PR66 mutation, Lot46 unlock or runtime execution before these gates.
+- Objective: LOT-45.1-WU02: isolated two-parent integration 2275d478cb69446c9ad3a7f2f4923f671c4d6e95 created; draft PR #67 exposes five blocking integration findings; PR66 untouched.
+- Next action: LOT-45.1-WU02: resolve LOT45-INT-001..005 through separately authorized bounded preactivation work (pins, ShellCheck, urllib3 lock, dependency-graph assurance, expired deviations), then qualify exact integrated head and activation scope before LOT-45.2-WU01. Never weaken gates or mutate PR66.
 
 ## Non-authoritative sources
 

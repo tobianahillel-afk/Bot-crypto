@@ -255,7 +255,7 @@
       "all_mandatory_v1_validators_PASS_on_exact_activation_HEAD",
       "trade_allowed_false_execution_allowed_false_Lot46_LOCKED"
     ],
-    "current_unresolved_gate": "EXACT_INTEGRATION_HEAD_V1_CI_AND_ACTIVATION_SCOPE_NOT_QUALIFIED; LOT-45.2_WU01_REMAINS_PLANNED",
+    "current_unresolved_gate": "LOT45_INT_001_TO_005_OPEN; V1_EXACT_HEAD_NOT_CERTIFIED; LOT45_2_NOT_ACTIVE",
     "scope_note": "This entry is a design and read-only Git-ancestry qualification, not execution evidence or permission to mutate PR66.",
     "three_way_overlap_audit": {
       "method": "EXACT_GIT_TREE_BLOB_COMPARISON_AGAINST_COMMON_BASE",
@@ -358,6 +358,92 @@
       "candidate_remediation_started": false,
       "business_activation_authorized": false
     },
-    "required_decision": "QUALIFY_EXACT_INTEGRATION_SHA_AND_SEPARATE_ACTIVATION_SCOPE_BEFORE_LOT45_2"
+    "required_decision": "QUALIFY_EXACT_INTEGRATION_SHA_AND_SEPARATE_ACTIVATION_SCOPE_BEFORE_LOT45_2",
+    "integration_pr_validation": {
+      "status": "NO_GO_INTEGRATION_NOT_CERTIFIED",
+      "validation_pr": 67,
+      "url": "https://github.com/tobianahillel-afk/Bot-crypto/pull/67",
+      "base": "engineering/bootstrap-development-engine",
+      "head": "agent/lot45-v1-remediation-integration",
+      "observed_head": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+      "draft": true,
+      "candidate_PR66_unchanged": true,
+      "assurance_on_exact_integration_commit": false,
+      "observed_workflows": [
+        {
+          "name": "Security Secrets",
+          "run": 37844693164,
+          "result": "SUCCESS"
+        },
+        {
+          "name": "Security SAST",
+          "run": 37844693080,
+          "result": "SUCCESS"
+        },
+        {
+          "name": "Security Supply Chain",
+          "run": 37844693182,
+          "result": "FAIL",
+          "blocker": "19 floating action uses in 6 candidate-modified workflows"
+        },
+        {
+          "name": "Security Actions",
+          "run": 37844693255,
+          "result": "FAIL",
+          "blocker": "SC2034 unused repetition in Lot44 and Lot45 frozen evidence workflows"
+        },
+        {
+          "name": "Security Dependencies",
+          "run": 37844693129,
+          "result": "FAIL",
+          "blocker": "Dependency Review unavailable because GitHub dependency graph not enabled; pip-audit flags urllib3 2.7.0 with 3 PYSEC-2026 advisories"
+        },
+        {
+          "name": "Roadmap documentation validation",
+          "run": 37844693079,
+          "result": "FAIL",
+          "blocker": "135 registered quality deviations expired on 2026-09-30"
+        }
+      ],
+      "blocking_findings": [
+        {
+          "id": "LOT45-INT-001",
+          "category": "ACTIONS_SUPPLY_CHAIN",
+          "status": "OPEN",
+          "evidence_run": 37844693182,
+          "detail": "19 unpinned remote action uses; independent pinning/removal review required for 6 workflows; no blanket disable."
+        },
+        {
+          "id": "LOT45-INT-002",
+          "category": "WORKFLOW_SHELLCHECK",
+          "status": "OPEN",
+          "evidence_run": 37844693255,
+          "detail": "SC2034 repetition unused in lot44-frozen-evidence.yml and lot45-frozen-evidence.yml; do not suppress globally."
+        },
+        {
+          "id": "LOT45-INT-003",
+          "category": "DEP_VULNERABILITY",
+          "status": "OPEN",
+          "evidence_run": 37844693129,
+          "detail": "urllib3==2.7.0: PYSEC-2026-4175/4176/4177; GitHub pip-audit recommends 2.8.0. Verify dependency compatibility and update exact lock if authorized."
+        },
+        {
+          "id": "LOT45-INT-004",
+          "category": "DEPENDENCY_GRAPH_PLATFORM",
+          "status": "OPEN",
+          "evidence_run": 37844693129,
+          "detail": "GitHub Dependency Review unavailable; check repo dependency graph setting or adopt independently certified deterministic fallback without weakening vulnerability assurance."
+        },
+        {
+          "id": "LOT45-INT-005",
+          "category": "EXPIRED_QUALITY_DEVIATIONS",
+          "status": "OPEN",
+          "evidence_run": 37844693079,
+          "detail": "135 owned engineering deviations expired 2026-09-30; require owned remediation/review not indiscriminate deadline extensions."
+        }
+      ],
+      "handling_policy": "Separate bounded preactivation integration remediation or review by authorized transition; current LOT-45.1-WU02 cannot mutate workflows, production code or security policy. Do not mark LOT-45.2-WU01 active.",
+      "next_required_gate": "Explicit scope-and-risk authorization for integration-preflight corrections, then exact-head V1 assurance. Current draft PR must not be merged."
+    }
   }
 }
