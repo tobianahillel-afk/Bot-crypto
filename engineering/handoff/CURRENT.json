@@ -14,7 +14,7 @@
     "state_source": "config/governance/project_state.json"
   },
   "blockers": [],
-  "current_objective": "LOT-45.1-WU02: eight design-only PRE-00..PRE-06 integration preactivation units staged in business/plans/LOT45_REMEDIATION_PLAN.json; PR67 remains a blocked draft, PR66 untouched, no remediation AWU activated.",
+  "current_objective": "LOT-45.1-WU02: PRE-00 independent administrative transition is specified and live-ref-qualified; no remediation or integration mutation authorized.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -27,7 +27,7 @@
     "rulesets_count": 1
   },
   "kind": "engineering_handoff",
-  "next_action": "Authorize a separate bounded LOT45-PRE-00 integration-preflight AWU and exact scope/branch transition, then execute PRE-01A/B through PRE-05 only under their authorized scopes; run PRE-06 exact-head assurance before activating LOT-45.2-WU01. No PR66 mutation, merge, Lot46 unlock, or trading authority.",
+  "next_action": "Qualify and authorize a NEW R2+ PRE-00 administrative AWU and parent/task/scope transition on a validated exact branch base; then execute PRE-01A/B to PRE-05 in isolated AWUs, PRE-06 exact-head assurance, and only then LOT-45.2. PR66 and PR67 stay untouched for now.",
   "next_engineering": {
     "active_lot": null,
     "active_manifest": null,
@@ -41,7 +41,8 @@
     "LOT-45.1-WU02 design-only preactivation remediation plan committed at 980c4ba8d0b2d15c39cd4a3848997e6135953e6e. Eight ordered PRE units cover five integration blockers; Engineering Bootstrap 37846910978 and Security Secrets 37846911073 both SUCCESS. Future code changes remain unauthorized by WU02.",
     "LOT-45.1-WU02 PRE-00 read-only preflight refreshed 2026-10-08: main and PR66 unchanged, PR67 draft at 2275d478; latest engine a50b2f6 has 8 commits after integration parent 343e3fe; five recorded blockers remain OPEN. Scope packet is design-only and does not authorize implementation.",
     "LOT-45.1-WU02 read-only PRE-00 requalification at engine head 449aaa6edf391192bf5eac0008602607dbec237b: PR66/main and PR67 unchanged; 11 post-integration-parent engine commits affect only plan/context/handoff; PR67 still has five blockers and no PRE activation authority.",
-    "LOT-45.1-WU02 context-map budget reconciliation: engine HEAD fa1fe875a1c3ce7b54a42771e8db6b94dfdebe79 passed Engineering Bootstrap 37850424318 and Security Secrets 37850424132. Both generated context maps now carry 82 KiB. PR66, PR67, main and PRE-00 authorization remain unchanged."
+    "LOT-45.1-WU02 context-map budget reconciliation: engine HEAD fa1fe875a1c3ce7b54a42771e8db6b94dfdebe79 passed Engineering Bootstrap 37850424318 and Security Secrets 37850424132. Both generated context maps now carry 82 KiB. PR66, PR67, main and PRE-00 authorization remain unchanged.",
+    "2026-10-09 LOT-45.1-WU02 read-only PRE-00 Git qualification: engine HEAD 5f41aca65affd0362be982f55497b049c64956fb is 18 commits after integration engine parent, with only plan/context/handoff path deltas; PR66/main unchanged; PR67 draft/head unchanged; 2 exact integration checks PASS and 4 FAIL. Separate PRE-00 authority still required."
   ],
   "resume_read_order": [
     "AGENTS.md",
