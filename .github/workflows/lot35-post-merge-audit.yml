@@ -4,9 +4,6 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'pyproject.toml'
-      - 'README.md'
-      - 'docs/ROADMAP_V1_TO_V21.md'
       - 'docs/LOT_35_POST_MERGE_AUDIT.md'
       - 'docs/LOT35_POST_MERGE_VALIDATION_MATRIX.md'
       - 'data/audit/roadmap_lifecycle_overlay_lot35.json'
@@ -14,9 +11,7 @@ on:
       - 'reports/lot35/mutation_summary.json'
       - 'scripts/validate_lot35_entry_gate.py'
       - 'scripts/validate_lot35_post_merge.py'
-      - 'scripts/validate_roadmap_documentation.py'
       - 'tests/test_lot35_post_merge_state.py'
-      - '.github/workflows/lot35-post-merge-audit.yml'
   workflow_dispatch:
 
 permissions:

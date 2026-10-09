@@ -1,0 +1,114 @@
+{
+  "cvd_series": {
+    "cvd_checksum": "68e6f47f0df214f74279c9749b1cfd1ac9e0cead7484bff9a098ee34481aa559",
+    "points": [
+      {
+        "cvd": "0.05",
+        "event_time": "2026-08-06T19:18:40.000000Z",
+        "schema_version": "cvd-point-v1",
+        "session_id": "2026-08-06",
+        "signed_delta": "0.05",
+        "window_checksum": "09bd6b8809622b450f04e98c5d519a0fb3cc9f9b3c749eaa588f97499aebc10c"
+      }
+    ],
+    "schema_version": "cvd-series-v1",
+    "session_policy_version": "lot45-utc-day-session-v1"
+  },
+  "event_time": "2026-08-06T19:18:40.000000Z",
+  "generated_at": "2026-08-06T19:18:41.100000Z",
+  "lineage": {
+    "available_at": "2026-08-06T19:18:40.050000Z",
+    "entry_gate_checksum": "15ca4d69e59a0898f32eb9cbe558571ecf00ae496ec5d41075da1124393d4468",
+    "entry_gate_merge_commit": "390d0779f2be257fa8134faf8f02193a760a09c3",
+    "lineage_id": "lot45-from-certified-lot44-order-flow-inputs-v1",
+    "lot44_audit_checksum": "03ceda1c49746509f95e7f2ed039e8cc321e8e3cb4adbb946f1aef4ed3eba07d",
+    "lot44_confidence_checksum": "7cb11e078d7f0d9ed0858229d8c6fe31a7cf653a238b280b05dbdd84d1250f05",
+    "lot44_config_checksum": "dac06cb3235f3a09cbbb9b41098d7cf2593b94171659f50ef840d1633bfa95b7",
+    "lot44_post_merge_checksum": "b8b531b2fcb09a30728549cc480d54d9be71504356468704c102ff085c39ea9a",
+    "lot44_state_checksum": "1a461cef0bedc0e2b34185ff538a64b1b53373b12b0633b749a34cee2b3c5541",
+    "schema_version": "lot45-lineage-envelope-v1"
+  },
+  "order_flow": {
+    "buy_trades_total": 1,
+    "buy_volume": "0.08",
+    "classification_coverage": "0.6875",
+    "confidence_weighted_coverage": "0.6875",
+    "confidence_weighted_volume": "0.11",
+    "order_flow_checksum": "3dc7a0d4836090509d12239c2a407cfa3afd736fa7d3f80ef2c2eeed3b4fa9ea",
+    "schema_version": "order-flow-state-v1",
+    "sell_trades_total": 1,
+    "sell_volume": "0.03",
+    "signed_delta": "0.05",
+    "total_volume": "0.16",
+    "trades_total": 3,
+    "unknown_trades_total": 1,
+    "unknown_volume": "0.05",
+    "unknown_volume_ratio": "0.3125",
+    "windows": [
+      {
+        "buy_trades_total": 1,
+        "buy_volume": "0.08",
+        "classification_coverage": "0.6875",
+        "confidence_weighted_coverage": "0.6875",
+        "confidence_weighted_volume": "0.11",
+        "delta_impulse": "0.05",
+        "event_time": "2026-08-06T19:18:40.000000Z",
+        "receive_time": "2026-08-06T19:18:40.050000Z",
+        "schema_version": "order-flow-window-v1",
+        "sell_trades_total": 1,
+        "sell_volume": "0.03",
+        "session_id": "2026-08-06",
+        "signed_delta": "0.05",
+        "signed_imbalance": "0.3125",
+        "total_volume": "0.16",
+        "trades_total": 3,
+        "unknown_trades_total": 1,
+        "unknown_volume": "0.05",
+        "window_checksum": "09bd6b8809622b450f04e98c5d519a0fb3cc9f9b3c749eaa588f97499aebc10c",
+        "window_end": "2026-08-06T19:18:41.000000Z",
+        "window_start": "2026-08-06T19:18:40.000000Z"
+      }
+    ]
+  },
+  "output_checksum": "e22e4fa4c5fadfe687ce1b95229a339c427f7e52dc5e029ff0c7f1c1c6f92c12",
+  "policy_version": "lot45-order-flow-delta-cvd-policy-v1",
+  "reason_codes": [
+    "LOT45_OFFLINE_ORDER_FLOW_DELTA_CVD_VALIDATED",
+    "EVENT_TIME_TUMBLING_WINDOWS_ENFORCED",
+    "UNKNOWN_VOLUME_PRESERVED_WITH_ZERO_SIGNED_CONTRIBUTION",
+    "CVD_SESSION_RESET_POLICY_VERSIONED",
+    "CLASSIFICATION_COVERAGE_AND_CONFIDENCE_BOUND",
+    "NO_FUTURE_STATE_OR_LOOKAHEAD",
+    "LOT46_REMAINS_LOCKED"
+  ],
+  "receive_time": "2026-08-06T19:18:40.050000Z",
+  "run_context": {
+    "code_commit": "c418338da86c49bd4b688d4a64893ee5042adc40",
+    "config_version": "lot45-order-flow-delta-cvd-config-v1",
+    "correlation_id": "microstructure-v4-lot45-reference",
+    "run_id": "lot45-reference-run-v1",
+    "runtime_mode": "OFFLINE_MICROSTRUCTURE_RESEARCH_ONLY",
+    "schema_version": "lot45-run-context-v1"
+  },
+  "safety": {
+    "analysis_only": true,
+    "approved_size": 0,
+    "execution_allowed": false,
+    "external_connectivity_allowed": false,
+    "market_event_publication_allowed": false,
+    "network_ingestion_allowed": false,
+    "order_routing_allowed": false,
+    "participant_behavior_inference_explicitly_labeled": true,
+    "raw_data_mutation_allowed": false,
+    "real_credentials_allowed": false,
+    "risk_approval_allowed": false,
+    "scenario_score_is_signal": false,
+    "signal_generation_allowed": false,
+    "trade_allowed": false,
+    "used_for_decision": false
+  },
+  "schema_version": "order-flow-delta-cvd-engine-state-v1",
+  "session_policy_version": "lot45-utc-day-session-v1",
+  "validation_state": "VALIDATED_OFFLINE_ORDER_FLOW_DELTA_CVD_ONLY",
+  "window_policy_version": "lot45-event-time-tumbling-v1"
+}

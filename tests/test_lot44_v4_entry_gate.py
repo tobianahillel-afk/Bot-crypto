@@ -19,6 +19,8 @@ from scripts.validate_lot44_entry_gate import (
 ROOT = Path(__file__).resolve().parents[1]
 GATE_PATH = ROOT / "data/audit/lot44_v4_entry_gate.json"
 SCHEMA_PATH = ROOT / "contracts/schemas/lot44_v4_entry_gate_v1.schema.json"
+LOT45_GATE_PATH = ROOT / "data/audit/lot45_v4_entry_gate.json"
+LOT45_GATE_CHECKSUM = "15ca4d69e59a0898f32eb9cbe558571ecf00ae496ec5d41075da1124393d4468"
 
 
 @pytest.fixture(autouse=True)
@@ -39,6 +41,7 @@ def _isolate_historical_gate(monkeypatch: pytest.MonkeyPatch) -> None:
         },
     )
     monkeypatch.setattr(gate_validator, "LOT44_FORBIDDEN_IMPLEMENTATION_PATHS", ())
+    monkeypatch.setattr(gate_validator, "LOT45_FORBIDDEN_IMPLEMENTATION_PATHS", ())
 
 
 def _tamper(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, mutate) -> None:
@@ -119,9 +122,16 @@ def test_lot43_historical_gate_isolated_from_authorized_lot44_current_tree() -> 
     assert 'monkeypatch.setattr(gate_validator, "LOT44_FORBIDDEN_IMPLEMENTATION_PATHS", ())' in historical_test
 
 
-def test_lot45_implementation_remains_absent() -> None:
-    for path in gate_validator.LOT45_FORBIDDEN_IMPLEMENTATION_PATHS:
-        assert not path.exists()
+def test_authorized_lot45_current_tree_is_isolated_from_historical_gate() -> None:
+    payload = json.loads(LOT45_GATE_PATH.read_text(encoding="utf-8"))
+    body = dict(payload)
+    actual = body.pop("gate_checksum")
+    assert actual == LOT45_GATE_CHECKSUM
+    assert canonical_checksum(body) == actual
+    assert payload["gate_status"] == "GO_LOT45_IMPLEMENTATION_ENTRY"
+    assert payload["post_merge_verdict"] == "GO_LOT44_POST_MERGE"
+    assert payload["next_lot"] == 46
+    assert payload["next_lot_status"] == "PLANNED_LOCKED"
 
 
 def test_lot46_implementation_remains_absent_from_canonical_roadmap() -> None:
