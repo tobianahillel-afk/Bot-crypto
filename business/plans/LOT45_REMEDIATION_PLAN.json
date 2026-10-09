@@ -1605,7 +1605,16 @@
           "workflow_runs_observed": 0,
           "check_runs_observed": 0,
           "certification": "NOT_PROVEN",
-          "note": "Engineering Bootstrap has push filtering for engineering/bootstrap-development-engine and workflow_dispatch; push on isolated branch does not trigger it. Do not claim PASS from another SHA."
+          "note": "Engineering Bootstrap has push filtering for engineering/bootstrap-development-engine and workflow_dispatch; push on isolated branch does not trigger it. Do not claim PASS from another SHA.",
+          "dispatch_path_assessment": {
+            "verdict": "BLOCKED_WORKFLOWS_ABSENT_ON_DEFAULT_BRANCH",
+            "observed_default_branch": "main",
+            "engineering_bootstrap_on_default": false,
+            "security_secrets_on_default": false,
+            "github_rule": "workflow_dispatch requires workflow file on repository default branch",
+            "implication": "Manual Run workflow via GitHub UI and REST dispatch cannot independently certify isolated branch at this repository state.",
+            "valid_next_step": "Authorize a separate non-bypassing exact-head CI execution route, preserving protected main and existing AWU forbidden paths."
+          }
         },
         "protected_refs_unchanged": {
           "main": "390d0779f2be257fa8134faf8f02193a760a09c3",
@@ -1613,7 +1622,7 @@
           "PR67": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95"
         },
         "decision": "WU08_ACTIVATED_BUT_NOT_EXACT_HEAD_CERTIFIED",
-        "next_gate": "Independently verify the authorization provenance, run Engineering Bootstrap and Security Secrets on exact isolated HEAD via workflow_dispatch, validate all WU08 R2 gates, then only consider a separately authorized WU09. No workflow/code/trading/lot46 mutation."
+        "next_gate": "Independently verify R2 authority. Obtain a separately approved exact-head qualification route: Engineering Bootstrap and Security Secrets are not present on default main, so their workflow_dispatch cannot be used. Do not weaken protected main, grant WU09, or infer PASS from the engineering branch."
       }
     }
   }
