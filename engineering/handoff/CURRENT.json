@@ -27,7 +27,7 @@
     "rulesets_count": 1
   },
   "kind": "engineering_handoff",
-  "next_action": "LOT-45.1-WU07: isolated branch agent/lot45-pre01a-authorized-work is created at exact PR67 integration SHA 2275d478cb69446c9ad3a7f2f4923f671c4d6e95. Independently qualify a separate R2 WU08 parent/scope activation; inherited WU02 R0 does not authorize creation of WU08 or workflow writes. Do not modify PR66, PR67, main, Lot46 or the two Lot45 workflows.",
+  "next_action": "LOT-45.1-WU07: design-only PRE-01A WU08/WU09 packet is recorded in business/plans/LOT45_REMEDIATION_PLAN.json. Independent R2 authority transition must first permit WU08 creation/activation on isolated branch agent/lot45-pre01a-authorized-work (still exact PR67 integration SHA 2275d478); inherited WU02 R0 and WU07 administrative scope CANNOT grant workflow-write permission. Do not change PR66, PR67, main, Lot46, or Lot45 workflows before separately qualified WU08 and WU09.",
   "next_engineering": {
     "active_lot": null,
     "active_manifest": null,
@@ -41,7 +41,8 @@
     "2026-10-09 WU06 design-only PRE-01A audit: exact PR67 head 2275d478 preserved; six uses in two workflows, checkout@v4.2.2, setup-python@v5.6.0, upload-artifact@v4.6.2 Git tag SHA pins verified. No PR67/PR66/main writes, no PRE01A execution authority.",
     "LOT-45.1-WU06 PRE-00 qualified at c729eff18f229a1b9e8e74ed82d2f5a63e31fe9c; Engineering Bootstrap 37859397941 and Security Secrets 37859397971 SUCCESS; main protected, PR66/PR67 unchanged.",
     "2026-10-09 WU07 PRE-01A preflight recorded in business/plans/LOT45_REMEDIATION_PLAN.json at d329e4056bed4ce91b692dee633fb9e0c1b3560d: protected main and unchanged PR66/PR67 verified, engine integration parent remains ancestor (46 governance-only commits), six remote action uses/three official SHA tag pins/Node20 runtimes verified. Separate R2 branch-local administrative activation and later bounded workflow AWU remain DESIGN ONLY; no PR, source, workflow, evidence, or safety mutation.",
-    "LOT-45.1-WU07 preflight: created isolated branch agent/lot45-pre01a-authorized-work at exact PR67 integration commit 2275d478cb69446c9ad3a7f2f4923f671c4d6e95, verified compare identical (0 ahead/behind and no changed files); original PR66, PR67 and protected main remain unmoved. Branch-local WU08 activation is NOT authorized because inherited WU02 R0 scope excludes the new AWU; six pinned action substitutions remain design-only."
+    "LOT-45.1-WU07 preflight: created isolated branch agent/lot45-pre01a-authorized-work at exact PR67 integration commit 2275d478cb69446c9ad3a7f2f4923f671c4d6e95, verified compare identical (0 ahead/behind and no changed files); original PR66, PR67 and protected main remain unmoved. Branch-local WU08 activation is NOT authorized because inherited WU02 R0 scope excludes the new AWU; six pinned action substitutions remain design-only.",
+    "2026-10-09 LOT-45.1-WU07 PRE-01A staged authorization design: immutable integration branch agent/lot45-pre01a-authorized-work remains at 2275d478; six action uses in two named Lot45 workflows are mapped to three independently reverified official tag SHAs. Separate WU08 R2 administrative activation and WU09 R2 workflow pinning are DESIGN_ONLY; original PR66, draft PR67, protected main, Lot46 and runtime authority remain untouched. Engineering Bootstrap 37863240791 and Security Secrets 37863240705 SUCCESS at exact engineering HEAD 4d95ac0a8f9278447e849cc2c9772a51a4fbce69."
   ],
   "resume_read_order": [
     "AGENTS.md",
@@ -164,6 +165,20 @@
       "head_sha": "91ba89846f5e84e6029828966119d311e82a7057",
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37861555723",
       "scope": "LOT45_WU07_PREPARATION_SECRET_CONTROLS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "head_sha": "4d95ac0a8f9278447e849cc2c9772a51a4fbce69",
+      "scope": "LOT45_WU07_PRE01A_DESIGN_BOOTSTRAP",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37863240791"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "head_sha": "4d95ac0a8f9278447e849cc2c9772a51a4fbce69",
+      "scope": "LOT45_WU07_PRE01A_DESIGN_SECRETS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37863240705"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"
