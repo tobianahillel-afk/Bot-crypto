@@ -16,3 +16,5 @@ This avoids two opposite failures:
 The machine-readable policy is `engineering/HISTORICAL_EVIDENCE_PROTECTION.json`.
 During the engineering-foundation branch, its protected current-tree paths must remain
 byte-identical to `origin/main`.
+
+A single separately approved migration is recorded under `approved_protected_path_migrations`: it binds the Lot44 frozen-attestation workflow to its exact source commit, parent, and before/after Git blob IDs. The validator accepts that exact path only when the commit is an ancestor of HEAD and the current blob still matches the approved target. All other protected-path drift remains invalid.
