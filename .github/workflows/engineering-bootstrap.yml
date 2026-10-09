@@ -1,0 +1,23 @@
+# CI-BOOT-01 — registration proposal only; not a certification workflow.
+# On the default branch this intentionally fails closed if dispatched.
+# The original full workflow exists on engineering and isolated Lot45 branches.
+name: Engineering Bootstrap
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  registration-only:
+    name: Registration guard (not a quality result)
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Reject default-branch stub execution
+        shell: bash
+        run: |
+          echo "::error::Default-branch registration stub cannot qualify a commit."
+          echo "::error::Use the audited branch-specific full workflow and verify exact run head_sha."
+          exit 1
