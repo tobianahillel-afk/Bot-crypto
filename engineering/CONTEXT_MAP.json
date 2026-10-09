@@ -67,7 +67,7 @@
   "resume": {
     "current_objective": "LOT-45.1-WU07: establish exact PRE-01A integration-branch authorization preflight without candidate mutation.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "LOT-45.1-WU07: isolated branch agent/lot45-pre01a-authorized-work is created at exact PR67 integration SHA 2275d478cb69446c9ad3a7f2f4923f671c4d6e95. Independently qualify a separate R2 WU08 parent/scope activation; inherited WU02 R0 does not authorize creation of WU08 or workflow writes. Do not modify PR66, PR67, main, Lot46 or the two Lot45 workflows."
+    "next_action": "LOT-45.1-WU07: design-only PRE-01A WU08/WU09 packet is recorded in business/plans/LOT45_REMEDIATION_PLAN.json. Independent R2 authority transition must first permit WU08 creation/activation on isolated branch agent/lot45-pre01a-authorized-work (still exact PR67 integration SHA 2275d478); inherited WU02 R0 and WU07 administrative scope CANNOT grant workflow-write permission. Do not change PR66, PR67, main, Lot46, or Lot45 workflows before separately qualified WU08 and WU09."
   },
   "safety": {
     "execution_allowed": false,
