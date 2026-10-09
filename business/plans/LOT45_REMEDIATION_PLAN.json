@@ -307,5 +307,72 @@
         "not_authorized_to_drop_dependencies": true
       }
     }
+  },
+  "administrative_r2_transition_request": {
+    "requested_awu": "LOT-45.1-WU08",
+    "risk_class": "R2",
+    "permission_source": "DIRECT_HUMAN_AUTHORIZATION_2026-10-09",
+    "intent": "Administrative-only preparation and qualification of authorizations needed for the next Lot45 development stage.",
+    "status": "AUTHORIZED_FOR_PREPARATION_NOT_ACTIVATED",
+    "execution_branch": "agent/lot45-pre01a-authorized-work",
+    "authorization_scope": {
+      "permitted": [
+        "admin planning/authorization evidence",
+        "precondition checks",
+        "bounded future AWU design"
+      ],
+      "prohibited": [
+        "workflow modification",
+        "business code or tests modification",
+        "historical certified evidence mutation",
+        "PR66 modification",
+        "PR67 modification",
+        "main branch mutation",
+        "Lot46 unlock",
+        "trade/execution/live authority escalation"
+      ],
+      "writes_must_be_isolated_to_branch": true
+    },
+    "observed_at_authorization": {
+      "source_commit": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+      "original_candidate_pr": 66,
+      "original_candidate_head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+      "integration_pr": 67,
+      "integration_pr_head": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+      "main_head": "390d0779f2be257fa8134faf8f02193a760a09c3",
+      "main_protected": true,
+      "rulesets_count": 1,
+      "two_parent_base": {
+        "parent1": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+        "parent2": "343e3fe056a97e2680ee2eb8bf27bc9346a7b970"
+      }
+    },
+    "prerequisites_for_activation": [
+      "LOT-45.1-WU02 must first reach a properly evidenced DONE state; the current canonical active AWU cannot be skipped.",
+      "A dedicated LOT-45.1-WU08 manifest must be created and validated with R2 risk and explicit administrative-only allowlists, dependency DAG and correct ancestor scope_base_sha.",
+      "The LOT-45 parent allowlist must explicitly authorize every administrative transition path, without silently expanding business/source/workflow scope.",
+      "Canonical project_state, context map, handoff and single-active-AWU routing must agree on an exact head after activation.",
+      "Complete an integration exact-head qualification, including investigation and resolution of applicable blocking Security Dependencies, Security Supply Chain, Security Actions and Roadmap validation checks.",
+      "Reverify main, PR66 and PR67 immutability and all runtime/lot46 locks on the exact transition head.",
+      "Do not activate LOT-45.2 or edit candidate business code during this administrative transition."
+    ],
+    "qualification_on_source_commit": {
+      "verdict": "BLOCKED_PENDING_EXACT_HEAD_VALIDATION",
+      "source_head": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+      "observed_green": [
+        "Security Secrets",
+        "Security SAST"
+      ],
+      "observed_failed": [
+        "Security Dependencies",
+        "Security Supply Chain",
+        "Security Actions",
+        "Roadmap documentation validation"
+      ],
+      "engineering_bootstrap_exact_head": "NOT_CONFIRMED",
+      "claim_of_awu08_activation": false,
+      "claim_of_future_business_development_unlock": false
+    },
+    "next_action": "Qualify and close LOT-45.1-WU02 on the isolated integration base, resolve prerequisite CI failures without altering forbidden refs or files in this authorization-only transition, then stage and validate a separate R2 WU08 activation. Do not auto-activate."
   }
 }
