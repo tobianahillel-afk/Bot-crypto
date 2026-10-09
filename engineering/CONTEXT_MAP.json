@@ -65,9 +65,9 @@
   ],
   "project": "Crypto Quant Bot V3.1-Ops",
   "resume": {
-    "current_objective": "LOT-45.1-WU07: reconcile observed isolated WU08 activation without treating it as certification or permission for WU09.",
+    "current_objective": "LOT-45.1-WU07: read-only recovery coordination for separately approved isolated R2 WU08; isolate contains unauthorised cross-scope changes and remains NOT_CERTIFIED.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Isolated WU08 HEAD 4dd6e1ef8e14d3d56c886a202a810de6e3d14b89 passes 15/15 read-only structural checks, but has ZERO exact-head CI runs and independently approved R2 grant remains unverified. Prefer a separately authorized zero-file-change workflow-ID dispatch test via Actions-write GitHub CLI/API (Bootstrap 364546277, Secrets 364994700); the connected GitHub tool lacks workflow-dispatch POST. Require real SUCCESS runs bound to that exact HEAD and checkout. See issue #68 comment 6081722012 and #69. Do not mutate PR66/PR67/main, workflows, frozen evidence, Lot46 or trading, nor grant WU09 before qualification."
+    "next_action": "2026-10-09 LIVE: isolated agent/lot45-pre01a-authorized-work HEAD 5bc05e9c01c5cc7e1b73066686d9ef344241c80a. Owner approval for 4dd6e1ef... recorded in issue #68 comment 6083702769; exact-head Security Secrets run 37956216987 SUCCESS, Engineering Bootstrap run 37956214042 FAILURE at active-AWU diff scope: five extra paths (.github/workflows/engineering-bootstrap.yml; engineering/HISTORICAL_EVIDENCE_PROTECTION.{json,md}; scripts/governance/{validate_historical_evidence_protection.py,selftest_historical_evidence_protection.py}). Preserve nine-commit forensic HEAD. Do not add those paths to WU08. Require separately authorized historical-evidence/CI migration on its own branch, then clean seven-file R2 WU08 activation line and fresh exact-head Bootstrap+Secrets. See issue #68 comment 6084736451 and issue #69. PR66/PR67/main unchanged; WU09, Lot46 and trading LOCKED."
   },
   "safety": {
     "execution_allowed": false,
