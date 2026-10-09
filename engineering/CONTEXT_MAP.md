@@ -36,14 +36,14 @@
 
 - Primary: 6 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 113 / 1024 KiB
+- Routed size: 115 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: LOT-45.1-WU07: establish exact PRE-01A integration-branch authorization preflight without candidate mutation.
-- Next action: LOT-45.1-WU07: design-only PRE-01A WU08/WU09 packet is recorded in business/plans/LOT45_REMEDIATION_PLAN.json. Independent R2 authority transition must first permit WU08 creation/activation on isolated branch agent/lot45-pre01a-authorized-work (still exact PR67 integration SHA 2275d478); inherited WU02 R0 and WU07 administrative scope CANNOT grant workflow-write permission. Do not change PR66, PR67, main, Lot46, or Lot45 workflows before separately qualified WU08 and WU09.
+- Objective: LOT-45.1-WU07: reconcile isolated PRE-01A preparation-grant observation, preserve R2 authorization boundary.
+- Next action: Read business/plans/LOT45_REMEDIATION_PLAN.json execution_branch_binding_design.pre01a_branch_authority_packet.subsequent_external_observation: isolated head 0b3ed78f one commit after PR67 records preparation-only R2 grant. WU02 remains IN_PROGRESS, WU08 manifest absent, no exact-head CI. Require separate approved and qualified R2 scope/state transition before WU08 activation; workflow edits require distinct WU09. Preserve PR66/PR67/main and Lot46 lock.
 
 ## Non-authoritative sources
 
