@@ -34,7 +34,6 @@
     "active_task": null
   },
   "recent_completed": [
-    "PRE-00 activation planned on independently scoped R2 LOT-45.1-WU06 using verified engine HEAD 4c5adf201f05a19ee249cbc94d037b982a4ad8d3; main PR66 PR67 unchanged, ruleset Protect active. Exact activation-head CI not yet available.",
     "LOT-45 PRE-00 exact administrative activation anchor 29dccae3fe8caff5bb61cbaf8fb794530dc48c6a: Engineering Bootstrap 37854704354 SUCCESS, Security Secrets 37854704349 SUCCESS; two-parent integration ancestry + PR66/main/protection confirmed; only seven AWU paths changed. No candidate mutation or PRE-01A implementation.",
     "2026-10-09 WU06 design-only PRE-01A audit: exact PR67 head 2275d478 preserved; six uses in two workflows, checkout@v4.2.2, setup-python@v5.6.0, upload-artifact@v4.6.2 Git tag SHA pins verified. No PR67/PR66/main writes, no PRE01A execution authority.",
     "LOT-45.1-WU06 PRE-00 qualified at c729eff18f229a1b9e8e74ed82d2f5a63e31fe9c; Engineering Bootstrap 37859397941 and Security Secrets 37859397971 SUCCESS; main protected, PR66/PR67 unchanged.",
