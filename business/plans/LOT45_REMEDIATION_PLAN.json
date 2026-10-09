@@ -1526,6 +1526,56 @@
         "if_approved_next_action": "On isolated branch, create and qualify only administrative WU08 under a separately granted scope, with no workflow or candidate mutation; WU09 requires its own later grant.",
         "no_implicit_approval": true,
         "effect": "READ_ONLY_PREFLIGHT_EVIDENCE_ONLY"
+      },
+      "subsequent_external_observation": {
+        "observation_kind": "subsequent_isolated_branch_administrative_grant_record_v1",
+        "observation_date": "2026-10-09",
+        "branch": "agent/lot45-pre01a-authorized-work",
+        "expected_integration_commit": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+        "observed_branch_head": "0b3ed78f9c2a82af321496d72306ffd53dd39d72",
+        "exact_one_commit_ahead": true,
+        "only_changed_path": "business/plans/LOT45_REMEDIATION_PLAN.json",
+        "recorded_grant": {
+          "field": "administrative_r2_transition_request",
+          "permission_source_claim": "DIRECT_HUMAN_AUTHORIZATION_2026-10-09",
+          "status": "AUTHORIZED_FOR_PREPARATION_NOT_ACTIVATED",
+          "grant_commit": "0b3ed78f9c2a82af321496d72306ffd53dd39d72",
+          "source_branch_file_sha": "f67cb95435ed5d3851739494ecc409c32d5250aa",
+          "independent_human_approval_verified_outside_repo": false,
+          "permitted": "administrative planning and precondition checks only on isolated branch",
+          "workflow_and_business_mutations_allowed": false
+        },
+        "observed_pr66": {
+          "state": "OPEN",
+          "merged": false,
+          "head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133"
+        },
+        "observed_pr67": {
+          "state": "OPEN",
+          "draft": true,
+          "merged": false,
+          "head": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95"
+        },
+        "observed_main": {
+          "protected": true,
+          "head": "390d0779f2be257fa8134faf8f02193a760a09c3"
+        },
+        "isolated_branch_predecessor_awu": {
+          "id": "LOT-45.1-WU02",
+          "status": "IN_PROGRESS",
+          "risk_class": "R0"
+        },
+        "isolated_branch_wu08_manifest_exists": false,
+        "isolated_branch_exact_head_ci_runs_observed": 0,
+        "result": "PREFLIGHT_EVIDENCE_UPDATED_WU08_NOT_ACTIVATED",
+        "stop_reason": "Existing WU02/parent scope excludes WU08; preparation-only grant is not an independently certified R2 scope/state transition. No automatic grant expansion.",
+        "next_gate": [
+          "Independently verify the human-authority record and its scope",
+          "Qualify WU02 completion without bypassing single-active-AWU and exact-head validations",
+          "Authorize separate R2 administrative transition with explicit parent and AWU path allowlists",
+          "Create and certify WU08 only after that gate; no workflow writes",
+          "Qualify WU09 separately for pinned workflow edits"
+        ]
       }
     }
   }
