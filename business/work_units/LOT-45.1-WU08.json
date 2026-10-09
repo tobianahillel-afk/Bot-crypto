@@ -99,6 +99,8 @@
       "business/work_units/LOT-45.2-*.json"
     ],
     "forbidden_semantics": [
+      "Lot45 candidate mutation",
+      "candidate merge",
       "Workflow action pin or CI topology change",
       "Business code test contract dependency or frozen evidence mutation",
       "Write to PR66 PR67 main or engineering branch",
