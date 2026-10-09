@@ -67,7 +67,7 @@
   "resume": {
     "current_objective": "LOT-45.1-WU07: reconcile observed isolated WU08 activation without treating it as certification or permission for WU09.",
     "handoff": "engineering/handoff/CURRENT.json",
-    "next_action": "Isolated WU08 is at 4dd6e1ef8e14d3d56c886a202a810de6e3d14b89 with 7 scoped administrative paths, but has ZERO exact-head CI runs. GitHub workflow_dispatch is unavailable because both Engineering Bootstrap and Security Secrets are ABSENT from default main. A separately authorized exact-head CI execution route and independently verified R2 grant are required; do not modify workflow files under WU07/WU08, or PR66/PR67/main/frozen evidence/trading/Lot46. WU09 remains DESIGN_ONLY."
+    "next_action": "Isolated WU08 HEAD 4dd6e1ef8e14d3d56c886a202a810de6e3d14b89 passes 15/15 read-only structural checks, but has ZERO exact-head CI runs and independently approved R2 grant remains unverified. Prefer a separately authorized zero-file-change workflow-ID dispatch test via Actions-write GitHub CLI/API (Bootstrap 364546277, Secrets 364994700); the connected GitHub tool lacks workflow-dispatch POST. Require real SUCCESS runs bound to that exact HEAD and checkout. See issue #68 comment 6081722012 and #69. Do not mutate PR66/PR67/main, workflows, frozen evidence, Lot46 or trading, nor grant WU09 before qualification."
   },
   "safety": {
     "execution_allowed": false,
