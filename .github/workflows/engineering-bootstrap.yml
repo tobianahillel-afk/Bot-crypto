@@ -143,7 +143,9 @@ jobs:
         run: python scripts/governance/validate_permanent_state_design.py
 
       - name: Validate historical evidence protection
-        run: python scripts/governance/validate_historical_evidence_protection.py
+        run: |
+          python scripts/governance/validate_historical_evidence_protection.py
+          python scripts/governance/selftest_historical_evidence_protection.py
 
       - name: Validate canonical ENG-00 baseline
         run: python scripts/governance/validate_canonical_baseline.py
