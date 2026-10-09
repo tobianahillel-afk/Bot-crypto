@@ -1480,7 +1480,53 @@
       ],
       "ready_for_separate_authorization": true,
       "execution_authorized": false,
-      "candidate_source_mutated": false
+      "candidate_source_mutated": false,
+      "independent_approval_gate": {
+        "gate_id": "LOT45-PRE01A-WU08-INDEPENDENT-R2-AUTHORIZATION",
+        "observed_at_utc": "2026-10-09T00:23:00Z",
+        "authority_request": "https://github.com/tobianahillel-afk/Bot-crypto/issues/68",
+        "issue_state": "OPEN",
+        "issue_comments_at_observation": 0,
+        "external_refs_verified": {
+          "engineering_head": "02f67f8409c0335fb7a4301a15eb4710a75d26e6",
+          "engineering_bootstrap_run": 37864125634,
+          "engineering_secrets_run": 37864125685,
+          "engineering_runs_exact_head_success": true,
+          "main_head": "390d0779f2be257fa8134faf8f02193a760a09c3",
+          "main_ruleset": "Protect",
+          "main_ruleset_enforcement": "active",
+          "pr66_head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+          "pr66_open_unmerged": true,
+          "pr67_head": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+          "pr67_draft_open_unmerged": true,
+          "isolated_branch": "agent/lot45-pre01a-authorized-work",
+          "isolated_branch_head": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+          "isolated_ancestry_compare": "IDENTICAL_0_AHEAD_0_BEHIND"
+        },
+        "permission_check": {
+          "active_authority": "LOT-45.1-WU07 ADMINISTRATIVE_PREFLIGHT_ONLY",
+          "isolated_ancestor_authority": "LOT-45.1-WU02 R0",
+          "parent_currently_allows_WU08": false,
+          "active_WU07_allows_workflow_write": false,
+          "written_independent_authorization_present": false,
+          "WU08_manifest_created": false,
+          "WU08_activation_permitted": false,
+          "WU09_workflow_edits_permitted": false
+        },
+        "required_next_decision": "An independent authorized R2 scope/state transition must permit administrative WU08 on isolated integration branch; issue creation and a generic 'continue development' instruction are not substitutes for the approval gate.",
+        "exact_authorized_scope_proposal": [
+          "business/lots/LOT-45.json",
+          "business/work_units/LOT-45.1-WU02.json",
+          "business/work_units/LOT-45.1-WU08.json",
+          "business/plans/LOT45_REMEDIATION_PLAN.json",
+          "engineering/CONTEXT_MAP.json",
+          "engineering/CONTEXT_MAP.md",
+          "engineering/handoff/CURRENT.json"
+        ],
+        "if_approved_next_action": "On isolated branch, create and qualify only administrative WU08 under a separately granted scope, with no workflow or candidate mutation; WU09 requires its own later grant.",
+        "no_implicit_approval": true,
+        "effect": "READ_ONLY_PREFLIGHT_EVIDENCE_ONLY"
+      }
     }
   }
 }
