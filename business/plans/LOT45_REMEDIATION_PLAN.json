@@ -311,9 +311,9 @@
   "administrative_r2_transition_request": {
     "requested_awu": "LOT-45.1-WU08",
     "risk_class": "R2",
-    "permission_source": "DIRECT_HUMAN_AUTHORIZATION_2026-10-09",
+    "permission_source": "EXPLICIT_USER_MESSAGE_2026-10-09T01:05:13Z",
     "intent": "Administrative-only preparation and qualification of authorizations needed for the next Lot45 development stage.",
-    "status": "AUTHORIZED_FOR_PREPARATION_NOT_ACTIVATED",
+    "status": "WU08_ADMINISTRATIVE_ACTIVATION_PENDING_EXACT_HEAD_CERTIFICATION",
     "execution_branch": "agent/lot45-pre01a-authorized-work",
     "authorization_scope": {
       "permitted": [
@@ -331,7 +331,19 @@
         "Lot46 unlock",
         "trade/execution/live authority escalation"
       ],
-      "writes_must_be_isolated_to_branch": true
+      "writes_must_be_isolated_to_branch": true,
+      "exact_authorized_paths": [
+        "business/lots/LOT-45.json",
+        "business/work_units/LOT-45.1-WU02.json",
+        "business/work_units/LOT-45.1-WU08.json",
+        "business/plans/LOT45_REMEDIATION_PLAN.json",
+        "engineering/CONTEXT_MAP.json",
+        "engineering/CONTEXT_MAP.md",
+        "engineering/handoff/CURRENT.json"
+      ],
+      "workflow_edit_authorized": false,
+      "wu09_activation_authorized": false,
+      "risk_class": "R2"
     },
     "observed_at_authorization": {
       "source_commit": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
@@ -373,6 +385,49 @@
       "claim_of_awu08_activation": false,
       "claim_of_future_business_development_unlock": false
     },
-    "next_action": "Qualify and close LOT-45.1-WU02 on the isolated integration base, resolve prerequisite CI failures without altering forbidden refs or files in this authorization-only transition, then stage and validate a separate R2 WU08 activation. Do not auto-activate."
+    "next_action": "Certify isolated WU08 exact HEAD; investigate upstream failed Security Dependencies, Supply Chain, Actions and Roadmap checks without modifying out-of-scope files. WU09 requires a separate qualified grant.",
+    "administrative_activation": {
+      "status": "WU08_IN_PROGRESS_QUALIFICATION_PENDING",
+      "explicit_approval": "User message 2026-10-09T01:05:13Z",
+      "related_issue": "https://github.com/tobianahillel-afk/Bot-crypto/issues/68",
+      "branch": "agent/lot45-pre01a-authorized-work",
+      "predecessor_head": "0b3ed78f9c2a82af321496d72306ffd53dd39d72",
+      "scope_base_sha": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+      "exact_paths": [
+        "business/lots/LOT-45.json",
+        "business/work_units/LOT-45.1-WU02.json",
+        "business/work_units/LOT-45.1-WU08.json",
+        "business/plans/LOT45_REMEDIATION_PLAN.json",
+        "engineering/CONTEXT_MAP.json",
+        "engineering/CONTEXT_MAP.md",
+        "engineering/handoff/CURRENT.json"
+      ],
+      "completed_awu": "LOT-45.1-WU02",
+      "active_awu": "LOT-45.1-WU08",
+      "risk_class": "R2",
+      "derived_complexity_score": 2,
+      "split_required": false,
+      "qualification_status": "NOT_YET_CERTIFIED",
+      "exact_activation_head": "TO_BE_VERIFIED_FROM_GIT_AFTER_COMMIT",
+      "required_evidence": [
+        "T0",
+        "T1",
+        "T3",
+        "Engineering Bootstrap",
+        "Security Secrets",
+        "External-ref non-drift"
+      ],
+      "forbidden_followup": "WU09 WORKFLOWS NOT AUTHORIZED",
+      "expected_refs": {
+        "main": "390d0779f2be257fa8134faf8f02193a760a09c3",
+        "pr66": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+        "pr67": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95"
+      },
+      "safety": {
+        "trade_allowed": false,
+        "execution_allowed": false,
+        "lot46": "LOCKED"
+      }
+    }
   }
 }

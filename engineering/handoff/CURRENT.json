@@ -1,12 +1,12 @@
 {
   "active_checkpoint": {
     "track": "BUSINESS",
-    "awu_id": "LOT-45.1-WU02",
-    "awu_path": "business/work_units/LOT-45.1-WU02.json",
+    "awu_id": "LOT-45.1-WU08",
+    "awu_path": "business/work_units/LOT-45.1-WU08.json",
     "parent_manifest": "business/lots/LOT-45.json",
-    "scope_base_sha": "ef8dfbdc3965d27e5947697f6d9fba877864d817",
-    "risk_class": "R0",
-    "complexity_score": 0
+    "scope_base_sha": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+    "risk_class": "R2",
+    "complexity_score": 2
   },
   "authority": {
     "context_map": "engineering/CONTEXT_MAP.json",
@@ -14,7 +14,7 @@
     "state_source": "config/governance/project_state.json"
   },
   "blockers": [],
-  "current_objective": "LOT-45.1-WU02: four Lot45 remediation AWUs staged; integration branch binding designed but not executed; PR66 remains byte-unchanged.",
+  "current_objective": "LOT-45.1-WU08: separately approved administrative R2 activation on isolated branch; exact-head checks pending.",
   "engineering_branch": "engineering/bootstrap-development-engine",
   "external_git_observation": {
     "default_branch": "main",
@@ -27,21 +27,21 @@
     "lot45_merged": false
   },
   "kind": "engineering_handoff",
-  "next_action": "LOT-45.1-WU02: prepare and verify a new isolated two-parent candidate+engine integration base following business/plans/LOT45_REMEDIATION_PLAN.json execution_branch_binding_design. Do not move PR66; do not activate LOT-45.2-WU01 or change business code until ancestry, transition scope and exact-head V1 gates pass.",
+  "next_action": "Qualify exact WU08 HEAD with T0/T1/T3, Engineering Bootstrap and Security Secrets. WU09 remains DESIGN_ONLY and separately gated; never mutate workflows, PR66, PR67, main, Lot46 or trading permissions.",
   "next_engineering": {
     "active_lot": null,
     "active_task": null,
     "active_manifest": null
   },
   "recent_completed": [
-    "ENG-09.6-WU05 current-session activation preflight on head 6651f12870ed51318b8004246aa87b015caaeaa8 passed Engineering Bootstrap 37322906082 and Security Secrets 37322905878; live main, PR #66 and Protect ruleset were reverified unchanged.",
     "Direct current-session BUSINESS_DEVELOPMENT_UNLOCK authorization executed as the atomic terminal Engineering -> active read-only Lot45 business-route transition from predecessor 6651f12870ed51318b8004246aa87b015caaeaa8.",
     "LOT-45.1-WU03 core lifecycle slice closed by mandatory file-count split: head 654b0b572d063f1524471b38cc92457db2f286b9 passed Security Secrets 37388265817 and Engineering Bootstrap 37388265876 reached the repository-protection gate after context-map validation.",
     "LOT-45.1-WU04 reached its mandatory 15-file boundary on head 6e2cd68600d67c4abd0a2a706f9086527cf6914e: Security Secrets 37390738269 passed and Engineering Bootstrap 37390738279 passed through security/protection but exposed an engineering-only work-decomposition qualifier; continuation split to WU05.",
     "LOT-45.1-WU05 lifecycle reconciliation closed on exact head 4fa9084d5ef097d9b02140bf88c573063845b779: Engineering Bootstrap 37452667127 and Security Secrets 37452667165 both passed; main/ruleset and PR #66 were reverified unchanged before WU01 restoration.",
     "LOT-45.1-WU01 read-only requalification refreshed on candidate ec2c4ab16f21b23e062b7fca0bb796c8db4a5133; engine preconditions are cleared and exact engine head ef8dfbdc3965d27e5947697f6d9fba877864d817 passed Engineering Bootstrap 37454493298 plus Security Secrets 37454493458.",
     "LOT-45.1-WU02 staged four PLANNED LOT-45.2 AWUs at f692c93bf5fb1d276afbdbbfc76ffbfa943b13fa; Bootstrap 37838227357 and Security Secrets 37838227405 SUCCESS; PR66 unchanged.",
-    "LOT-45.1-WU02 isolated integration branch agent/lot45-v1-remediation-integration created and read-verified at candidate ec2c4ab16f21b23e062b7fca0bb796c8db4a5133; candidate PR66 and protected main remain unchanged. No two-parent merge or LOT-45.2 activation was executed. Overlap audit reconfirmed five divergent shared paths and required jsonschema==4.26.0/referencing==0.37.0 lock parity."
+    "LOT-45.1-WU02 isolated integration branch agent/lot45-v1-remediation-integration created and read-verified at candidate ec2c4ab16f21b23e062b7fca0bb796c8db4a5133; candidate PR66 and protected main remain unchanged. No two-parent merge or LOT-45.2 activation was executed. Overlap audit reconfirmed five divergent shared paths and required jsonschema==4.26.0/referencing==0.37.0 lock parity.",
+    "LOT-45.1-WU02 DONE: staged four Lot45.2 units previously; independent user approval authorizes seven-file R2 WU08 transition only, with exact-head certification pending."
   ],
   "resume_read_order": [
     "AGENTS.md",
@@ -81,20 +81,6 @@
     "MANDATORY_PAID_DEPENDENCY_INTRODUCED"
   ],
   "validation_evidence": [
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/36641980568",
-      "head_sha": "6c30f47c173218ff8645e23eefbbcf1a8f2eb373",
-      "scope": "ENG-09.6-WU07_SCOPE_BASE_BOOTSTRAP"
-    },
-    {
-      "class": "GITHUB_ACTIONS",
-      "status": "PASS",
-      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37322906082",
-      "head_sha": "6651f12870ed51318b8004246aa87b015caaeaa8",
-      "scope": "ENG-09.6-WU05_ACTIVATION_PREFLIGHT_BOOTSTRAP"
-    },
     {
       "class": "GITHUB_ACTIONS",
       "status": "PASS",
@@ -164,6 +150,13 @@
       "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37838227405",
       "head_sha": "f692c93bf5fb1d276afbdbbfc76ffbfa943b13fa",
       "scope": "LOT-45.1-WU02_STAGED_AWUS_SECURITY_SECRETS"
+    },
+    {
+      "class": "GITHUB_ACTIONS",
+      "status": "PASS",
+      "ref": "https://github.com/tobianahillel-afk/Bot-crypto/actions/runs/37844693164",
+      "head_sha": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+      "scope": "INTEGRATION_ANCESTOR_SECURITY_SECRETS_ONLY_NOT_WU08_CERTIFICATION"
     }
   ],
   "workstream": "DEVELOPMENT_ENGINE"

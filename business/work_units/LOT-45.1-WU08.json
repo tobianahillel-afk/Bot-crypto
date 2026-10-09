@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "kind": "agent_work_unit",
+  "id": "LOT-45.1-WU08",
+  "status": "IN_PROGRESS",
+  "parent": {
+    "work_item_id": "LOT-45",
+    "task_id": "LOT-45.1",
+    "manifest": "business/lots/LOT-45.json"
+  },
+  "title": "PRE-01A independent R2 administrative transition",
+  "objective": "Complete WU02 and route exactly one R2 WU08 under the separately approved seven-file administrative transition on the isolated branch; preserve all code, workflows, protected refs and trading locks.",
+  "non_goals": [
+    "Workflow or WU09 changes",
+    "Business code tests contracts dependencies and evidence changes",
+    "PR66 PR67 main or engineering-branch mutation",
+    "Lot45.2 or Lot46 unlock",
+    "Trading/execution activation",
+    "Assuming exact-head certification before checks run"
+  ],
+  "depends_on": [
+    "LOT-45.1-WU02"
+  ],
+  "inputs": [
+    {
+      "name": "Approved administrative transition plan",
+      "kind": "STATE",
+      "locator": "business/plans/LOT45_REMEDIATION_PLAN.json"
+    },
+    {
+      "name": "Completed WU02",
+      "kind": "STATE",
+      "locator": "business/work_units/LOT-45.1-WU02.json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Parent governance",
+      "kind": "STATE",
+      "locator": "business/lots/LOT-45.json"
+    },
+    {
+      "name": "Completed WU02",
+      "kind": "STATE",
+      "locator": "business/work_units/LOT-45.1-WU02.json"
+    },
+    {
+      "name": "Active R2 WU08",
+      "kind": "STATE",
+      "locator": "business/work_units/LOT-45.1-WU08.json"
+    },
+    {
+      "name": "Authorization and qualification record",
+      "kind": "STATE",
+      "locator": "business/plans/LOT45_REMEDIATION_PLAN.json"
+    },
+    {
+      "name": "Context JSON",
+      "kind": "STATE",
+      "locator": "engineering/CONTEXT_MAP.json"
+    },
+    {
+      "name": "Context Markdown",
+      "kind": "FILE",
+      "locator": "engineering/CONTEXT_MAP.md"
+    },
+    {
+      "name": "Agent handoff",
+      "kind": "STATE",
+      "locator": "engineering/handoff/CURRENT.json"
+    }
+  ],
+  "scope": {
+    "scope_base_sha": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+    "allowed_paths": [
+      "business/lots/LOT-45.json",
+      "business/work_units/LOT-45.1-WU02.json",
+      "business/work_units/LOT-45.1-WU08.json",
+      "business/plans/LOT45_REMEDIATION_PLAN.json",
+      "engineering/CONTEXT_MAP.json",
+      "engineering/CONTEXT_MAP.md",
+      "engineering/handoff/CURRENT.json"
+    ],
+    "forbidden_paths": [
+      "AGENTS.md",
+      "config/governance/**",
+      ".github/workflows/**",
+      "src/**",
+      "contracts/**",
+      "tests/**",
+      "requirements*.lock",
+      "requirements*.txt",
+      "data/audit/**",
+      "reports/**",
+      "engineering/STATE.json",
+      "engineering/BUSINESS_DEVELOPMENT_UNLOCK_ACTIVATION.json",
+      "engineering/REPOSITORY_PROTECTION_STATUS.json",
+      "business/work_units/LOT-45.1-WU09.json",
+      "business/work_units/LOT-45.2-*.json"
+    ],
+    "forbidden_semantics": [
+      "Workflow action pin or CI topology change",
+      "Business code test contract dependency or frozen evidence mutation",
+      "Write to PR66 PR67 main or engineering branch",
+      "Activate WU09 or any Lot45.2 AWU without independent authorization",
+      "Lot46 unlock or trading execution authority escalation",
+      "Mandatory paid or LLM-backed service"
+    ]
+  },
+  "contracts": {
+    "required_invariants": [
+      "Explicit user approval on 2026-10-09 applies to R2 WU08 administrative transition only",
+      "Exactly seven designated governance paths changed since ancestor scope base",
+      "Integration SHA is ancestor of isolated activation head and remains PR67 unchanged head",
+      "WU02 DONE and WU08 sole IN_PROGRESS business AWU",
+      "Parent manifest includes WU08 without granting workflow scope",
+      "Risk R2 derives from state_machine_or_concurrency and exact score 2 without split",
+      "Context route uses R2 limits 12/16/1024",
+      "Main PR66 PR67 remain byte-unchanged and unmerged",
+      "Trade allowed false, execution allowed false and Lot46 LOCKED",
+      "T0 T1 T3 and exact-head workflow assurance remain mandatory before further promotion"
+    ],
+    "acceptance_criteria": [
+      "Only the seven exact approved files are changed",
+      "No workflow production contract test dependency evidence or external PR mutation",
+      "Parent and active AWU authorize the same complete transition diff",
+      "WU08 depends on completed WU02, single active business AWU and deterministic risk/split checks pass",
+      "Context JSON and Markdown and handoff agree with R2 AWU",
+      "Live main PR66 PR67 and safety locks reverified unchanged",
+      "Missing exact-head CI evidence explicitly blocks certification and subsequent WU09"
+    ]
+  },
+  "planning": {
+    "risk_class": "R2",
+    "complexity_score": 2,
+    "split_required": false,
+    "context_budget": {
+      "max_primary_files": 12,
+      "max_reference_files": 16,
+      "max_total_kib": 1024
+    },
+    "complexity_factors": {
+      "production_modules": 0,
+      "contract_schema_families": 0,
+      "policy_config_families": 0,
+      "persistence_checksum_boundary": false,
+      "math_numeric_semantics": false,
+      "temporal_lineage_semantics": false,
+      "cross_domain_interfaces": 0,
+      "state_machine_or_concurrency": true,
+      "security_trust_boundary": false,
+      "risk_execution_permission": false,
+      "dependency_change": false,
+      "ci_evidence_topology_change": false
+    },
+    "size_estimate": {
+      "business_domains": 1,
+      "files_touched": 7,
+      "executable_loc_changed": 0,
+      "new_public_behaviors": 0,
+      "contract_families": 0,
+      "independent_algorithms": 0,
+      "state_machines": 1,
+      "trust_boundaries": 0,
+      "new_dependencies": 0
+    },
+    "split_reasons": []
+  },
+  "validation": {
+    "required_tiers": [
+      "T0",
+      "T1",
+      "T3"
+    ],
+    "target_commands": [
+      "python scripts/governance/resolve_active_awu.py",
+      "python scripts/governance/validate_bootstrap_diff.py",
+      "python scripts/governance/validate_agent_work_unit_graph.py business/work_units/*.json",
+      "python scripts/governance/run_incremental_validation.py",
+      "python scripts/governance/validate_handoff.py",
+      "Engineering Bootstrap exact activation HEAD",
+      "Security Secrets exact activation HEAD",
+      "Verify unchanged main PR66 PR67"
+    ]
+  },
+  "done_when": [
+    "Seven-file administrative activation committed",
+    "WU02 completed and WU08 sole active AWU",
+    "Exact-head certification recorded or left explicitly blocked",
+    "WU09 remains separately gated and Lot46/execution locked"
+  ]
+}
