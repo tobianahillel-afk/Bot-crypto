@@ -36,14 +36,14 @@
 
 - Primary: 6 / 12 files
 - Reference: 2 / 16 files
-- Routed size: 115 / 1024 KiB
+- Routed size: 117 / 1024 KiB
 - Implicit repository expansion: FORBIDDEN
 
 ## Resume hint
 
 - Handoff: engineering/handoff/CURRENT.json
-- Objective: LOT-45.1-WU07: reconcile isolated PRE-01A preparation-grant observation, preserve R2 authorization boundary.
-- Next action: Read business/plans/LOT45_REMEDIATION_PLAN.json execution_branch_binding_design.pre01a_branch_authority_packet.subsequent_external_observation: isolated head 0b3ed78f one commit after PR67 records preparation-only R2 grant. WU02 remains IN_PROGRESS, WU08 manifest absent, no exact-head CI. Require separate approved and qualified R2 scope/state transition before WU08 activation; workflow edits require distinct WU09. Preserve PR66/PR67/main and Lot46 lock.
+- Objective: LOT-45.1-WU07: reconcile observed isolated WU08 activation without treating it as certification or permission for WU09.
+- Next action: An independent isolated-branch R2 WU08 activation is now at 4dd6e1ef8e14d3d56c886a202a810de6e3d14b89, 2 commits and exactly 7 administrative paths after PR67 integration base. WU02 DONE/WU08 IN_PROGRESS there, but zero exact-head Actions/check runs: NOT CERTIFIED. Engineering Bootstrap dispatch on exact isolated ref plus Security Secrets and R2 validators required. Verify claimed approval independently. WU09 remains separately gated; never edit workflows, PR66, PR67, main, frozen evidence, Lot46 or runtime/trading authority.
 
 ## Non-authoritative sources
 
