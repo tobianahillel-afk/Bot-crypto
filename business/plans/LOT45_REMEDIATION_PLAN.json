@@ -1576,6 +1576,44 @@
           "Create and certify WU08 only after that gate; no workflow writes",
           "Qualify WU09 separately for pinned workflow edits"
         ]
+      },
+      "successor_isolated_activation_observation": {
+        "observation_kind": "READ_ONLY_GITHUB_RECONCILIATION_2026_10_09",
+        "isolated_branch": "agent/lot45-pre01a-authorized-work",
+        "prior_grant_head": "0b3ed78f9c2a82af321496d72306ffd53dd39d72",
+        "observed_head": "4dd6e1ef8e14d3d56c886a202a810de6e3d14b89",
+        "integration_ancestor": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+        "commits_ahead_of_integration": 2,
+        "exact_changed_paths": [
+          "business/lots/LOT-45.json",
+          "business/plans/LOT45_REMEDIATION_PLAN.json",
+          "business/work_units/LOT-45.1-WU02.json",
+          "business/work_units/LOT-45.1-WU08.json",
+          "engineering/CONTEXT_MAP.json",
+          "engineering/CONTEXT_MAP.md",
+          "engineering/handoff/CURRENT.json"
+        ],
+        "observed_isolated_state": {
+          "predecessor_WU02": "DONE",
+          "active_WU08": "IN_PROGRESS",
+          "WU08_risk_class": "R2",
+          "WU08_scope_base_sha": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+          "WU09_status": "DESIGN_ONLY_NOT_AUTHORIZED"
+        },
+        "exact_head_ci": {
+          "checked_head": "4dd6e1ef8e14d3d56c886a202a810de6e3d14b89",
+          "workflow_runs_observed": 0,
+          "check_runs_observed": 0,
+          "certification": "NOT_PROVEN",
+          "note": "Engineering Bootstrap has push filtering for engineering/bootstrap-development-engine and workflow_dispatch; push on isolated branch does not trigger it. Do not claim PASS from another SHA."
+        },
+        "protected_refs_unchanged": {
+          "main": "390d0779f2be257fa8134faf8f02193a760a09c3",
+          "PR66": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133",
+          "PR67": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95"
+        },
+        "decision": "WU08_ACTIVATED_BUT_NOT_EXACT_HEAD_CERTIFIED",
+        "next_gate": "Independently verify the authorization provenance, run Engineering Bootstrap and Security Secrets on exact isolated HEAD via workflow_dispatch, validate all WU08 R2 gates, then only consider a separately authorized WU09. No workflow/code/trading/lot46 mutation."
       }
     }
   }
