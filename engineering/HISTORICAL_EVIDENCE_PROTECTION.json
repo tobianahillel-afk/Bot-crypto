@@ -75,5 +75,16 @@
     "historical Git anchors are never rewritten; newer reconciliation creates new commits instead",
     "status views may change when they do not mutate certified frozen evidence",
     "a required historical correction must use a separately approved migration/remediation work item rather than silent edit"
+  ],
+  "approved_protected_path_migrations": [
+    {
+      "approval_id": "REPOSITORY_OWNER_REMEDIATION_72",
+      "issue_url": "https://github.com/tobianahillel-afk/Bot-crypto/issues/72",
+      "path": ".github/workflows/lot44-frozen-evidence.yml",
+      "source_commit": "2506278e3368c7cfadf34eb1e24490fb143d9e1c",
+      "source_parent": "9eb63ae1b948842523eeaa723f802e0b919cb475",
+      "from_blob": "03996c563bbdff7639ea669b383d709c4876f269",
+      "to_blob": "c23a59b1d5223dccf412d5af87d8c52ea3327b68"
+    }
   ]
 }
