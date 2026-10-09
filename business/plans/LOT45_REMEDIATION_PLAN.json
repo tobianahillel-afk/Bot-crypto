@@ -1313,6 +1313,174 @@
         "no_workflow_modification": true,
         "no_pr_mutation": true
       }
+    },
+    "pre01a_branch_authority_packet": {
+      "schema_version": 1,
+      "packet_kind": "lot45_pre01a_separate_authorization_design_v1",
+      "status": "DESIGN_ONLY_NOT_AUTHORIZED",
+      "source_awu": "LOT-45.1-WU07",
+      "source_branch": "engineering/bootstrap-development-engine",
+      "isolated_branch": "agent/lot45-pre01a-authorized-work",
+      "immutable_integration_base": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+      "verified_external_refs": {
+        "main_sha": "390d0779f2be257fa8134faf8f02193a760a09c3",
+        "main_protected": true,
+        "protection_ruleset": "Protect",
+        "protection_enforcement": "active",
+        "pr66": {
+          "number": 66,
+          "state": "OPEN",
+          "merged": false,
+          "head": "ec2c4ab16f21b23e062b7fca0bb796c8db4a5133"
+        },
+        "pr67": {
+          "number": 67,
+          "state": "OPEN",
+          "draft": true,
+          "merged": false,
+          "head": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95"
+        },
+        "isolated_branch_matches_integration_base": true
+      },
+      "no_execution_authority_reason": [
+        "The existing integration branch has sole active LOT-45.1-WU02 with R0 and .github/workflows/** forbidden.",
+        "The original integration parent business/lots/LOT-45.json does not authorize a WU08 path or the two PRE-01A workflow paths.",
+        "The sole active engineering-branch WU07 permits administrative preparation only and explicitly forbids workflow writes or expansion into production/candidate scope.",
+        "Creation/activation of a new integration-branch R2 AWU must be qualified independently; this document is not executable authority."
+      ],
+      "next_work_units": [
+        {
+          "proposed_id": "LOT-45.1-WU08",
+          "status": "DESIGN_ONLY",
+          "purpose": "Independent R2 integration-branch administrative authority transition (no workflow mutation)",
+          "proposed_scope_base_sha": "2275d478cb69446c9ad3a7f2f4923f671c4d6e95",
+          "risk_class": "R2",
+          "complexity_factors": {
+            "production_modules": 0,
+            "contract_schema_families": 0,
+            "policy_config_families": 0,
+            "persistence_checksum_boundary": false,
+            "math_numeric_semantics": false,
+            "temporal_lineage_semantics": false,
+            "cross_domain_interfaces": 0,
+            "state_machine_or_concurrency": true,
+            "security_trust_boundary": false,
+            "risk_execution_permission": false,
+            "dependency_change": false,
+            "ci_evidence_topology_change": false
+          },
+          "derived_complexity_score": 2,
+          "split_required": false,
+          "proposed_administrative_paths": [
+            "business/lots/LOT-45.json",
+            "business/work_units/LOT-45.1-WU02.json",
+            "business/work_units/LOT-45.1-WU08.json",
+            "business/plans/LOT45_REMEDIATION_PLAN.json",
+            "engineering/CONTEXT_MAP.json",
+            "engineering/CONTEXT_MAP.md",
+            "engineering/handoff/CURRENT.json"
+          ],
+          "additional_rules": [
+            "The current WU02 cannot create WU08; do not self-expand WU02 or WU07.",
+            "Any separate transition authority must include both parent and AWU allowlists and a Git-ancestry-correct scope.",
+            "A single active business AWU and a consistent generated context route must result.",
+            "Do not treat branch creation as activation."
+          ],
+          "gate": "Independent R2 scope authorization, T0/split/risk/cold-start, Engineering Bootstrap and Security Secrets on exact branch activation HEAD",
+          "forbidden": [
+            ".github/workflows/**",
+            "requirements-dev.lock",
+            "src/crypto_quant_bot/**",
+            "contracts/**",
+            "data/audit/**",
+            "reports/lot*/**",
+            "PR66/PR67/main writes",
+            "Lot46",
+            "trading enablement"
+          ]
+        },
+        {
+          "proposed_id": "LOT-45.1-WU09",
+          "status": "DESIGN_ONLY_AFTER_WU08_CERTIFICATION",
+          "purpose": "Six exact SHA action-pin substitutions only, with no unrelated workflow behavior changes",
+          "risk_class": "R2",
+          "complexity_factors": {
+            "production_modules": 0,
+            "contract_schema_families": 0,
+            "policy_config_families": 0,
+            "persistence_checksum_boundary": false,
+            "math_numeric_semantics": false,
+            "temporal_lineage_semantics": false,
+            "cross_domain_interfaces": 0,
+            "state_machine_or_concurrency": false,
+            "security_trust_boundary": true,
+            "risk_execution_permission": false,
+            "dependency_change": false,
+            "ci_evidence_topology_change": true
+          },
+          "derived_complexity_score": 3,
+          "split_required": false,
+          "allowed_workflow_paths": [
+            ".github/workflows/lot45-order-flow-delta-cvd.yml",
+            ".github/workflows/lot45-mutation-assurance.yml"
+          ],
+          "exact_action_pins": [
+            {
+              "action": "actions/checkout",
+              "tag": "v4.2.2",
+              "sha": "11bd71901bbe5b1630ceea73d27597364c9af683"
+            },
+            {
+              "action": "actions/setup-python",
+              "tag": "v5.6.0",
+              "sha": "a26af69be951a213d495a4c3e4e4022e16d87065"
+            },
+            {
+              "action": "actions/upload-artifact",
+              "tag": "v4.6.2",
+              "sha": "ea165f8d65b6e75b540449e92b4886f43607fa02"
+            }
+          ],
+          "verified_source_blobs": {
+            ".github/workflows/lot45-order-flow-delta-cvd.yml": "5ec5a2a6366276cce7d0a774b3359d892080f332",
+            ".github/workflows/lot45-mutation-assurance.yml": "e5a569b79b70e42da7c9ce2cc96b8623a0040f1d"
+          },
+          "expected_remote_action_replacements": 6,
+          "forbidden": [
+            "Changing workflow execution semantics",
+            "Changing action inputs/job permissions",
+            "Changing artifact/evidence names",
+            "Rebuilding frozen evidence",
+            "Editing unrelated workflows",
+            "PR66/PR67/main mutation",
+            "Lot46",
+            "live trading enablement"
+          ],
+          "exact_head_validation": [
+            "Reverify branch HEAD and baseline workflow blob SHAs before changing uses",
+            "Verify exact official Git tag SHAs and action runtime compatibility",
+            "Run actionlint, zizmor, Security Supply Chain and Security Actions on changed workflows",
+            "Run affected Lot45 validation/mutation jobs when applicable and preserve research-only safety",
+            "No certification claim unless all required exact-head checks pass"
+          ]
+        }
+      ],
+      "ordering": [
+        "INDEPENDENT_AUTHORITY_TRANSITION_WU08",
+        "EXACT_ACTION_PIN_WORK_WU09",
+        "FURTHER_PREACTIVATION_WORK",
+        "PRE06_EXACT_HEAD_ASSURANCE"
+      ],
+      "explicit_non_goals": [
+        "No WU08/WU09 manifest is created here",
+        "No branch/PR/workflow mutation",
+        "No state-machine promotion",
+        "No hidden authority elevation",
+        "No Lot45.2 or Lot46 unlock"
+      ],
+      "ready_for_separate_authorization": true,
+      "execution_authorized": false,
+      "candidate_source_mutated": false
     }
   }
 }
